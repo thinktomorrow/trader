@@ -10,6 +10,7 @@ use Thinktomorrow\Trader\Discounts\Domain\DiscountCollection;
 use Thinktomorrow\Trader\Discounts\Domain\DiscountId;
 use Thinktomorrow\Trader\Order\Domain\Item;
 use Thinktomorrow\Trader\Order\Domain\Order;
+use Thinktomorrow\Trader\Order\Domain\OrderId;
 use Thinktomorrow\Trader\Price\Percentage;
 use Thinktomorrow\Trader\Tests\Unit\Stubs\ConcretePurchasable;
 use Thinktomorrow\Trader\Tests\Unit\UnitTestCase;
@@ -20,7 +21,7 @@ class ApplyDiscountsToOrderTest extends UnitTestCase
     function it_can_apply_discounts_to_order()
     {
         // Set up order, items and discount
-        $order = new Order();
+        $order = $this->makeOrder();
         $order->items()->add(Item::fromPurchasable(new ConcretePurchasable(20,[],Money::EUR(240))));
         $percentageOffDiscount = new PercentageOffDiscount(DiscountId::fromInteger(1),Percentage::fromPercent(20));
 
@@ -40,7 +41,7 @@ class ApplyDiscountsToOrderTest extends UnitTestCase
             Percentage::fromPercent(20)
         );
 
-        $order = new Order();
+        $order = $this->makeOrder();
         $order->items()->add(Item::fromPurchasable(new ConcretePurchasable(20,[],Money::EUR(110))),2);
         $order->items()->add(Item::fromPurchasable(new ConcretePurchasable(30,[],Money::EUR(240))));
 

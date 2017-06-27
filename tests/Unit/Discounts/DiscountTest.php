@@ -15,7 +15,7 @@ class DiscountTest extends UnitTestCase
     /** @test */
     function it_can_add_applied_discount_to_order()
     {
-        $order = new Order();
+        $order = $this->makeOrder();
         $percentageOffDiscount = new ConcretePercentageOffDiscount(1,Percentage::fromPercent(20));
         $appliedDiscount = $percentageOffDiscount->apply($order);
 
@@ -28,7 +28,7 @@ class DiscountTest extends UnitTestCase
     /** @test */
     function directly_adding_applied_discount_to_order_will_not_change_totalprice()
     {
-        $order = new Order();
+        $order = $this->makeOrder();
         $percentageOffDiscount = new ConcretePercentageOffDiscount(1,Percentage::fromPercent(20));
         $appliedDiscount = $percentageOffDiscount->apply($order);
 

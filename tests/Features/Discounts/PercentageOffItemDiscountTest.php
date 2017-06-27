@@ -27,7 +27,7 @@ class PercentageOffItemDiscountTest extends UnitTestCase
             ])
         );
 
-        $order = new Order();
+        $order = $this->makeOrder();
         $order->items()->add(Item::fromPurchasable(new ConcretePurchasable(20,[],Money::EUR(110))),2);
 
         // Assert amount prior to item discount

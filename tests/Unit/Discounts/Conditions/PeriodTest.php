@@ -11,7 +11,7 @@ class PeriodTest extends UnitTestCase
     function it_checks_ok_if_no_period_is_enforced()
     {
         $condition = new Period;
-        $order = new Order;
+        $order = $this->makeOrder();
 
         $this->assertTrue($condition->check([],$order));
     }
@@ -23,7 +23,7 @@ class PeriodTest extends UnitTestCase
 
         (new Period())->check([
             'start_at' => 'foobar'
-        ],new Order);
+        ],$this->makeOrder());
     }
 
     /** @test */
@@ -31,28 +31,28 @@ class PeriodTest extends UnitTestCase
     {
         $this->assertTrue((new Period())->check([
             'start_at' => new \DateTime('@'.strtotime('-1 day'))
-        ],new Order));
+        ],$this->makeOrder()));
 
         $this->assertFalse((new Period())->check([
             'start_at' => new \DateTime('@'.strtotime('+1 day'))
-        ],new Order));
+        ],$this->makeOrder()));
 
         $this->assertTrue((new Period())->check([
             'end_at' => new \DateTime('@'.strtotime('+1 day'))
-        ],new Order));
+        ],$this->makeOrder()));
 
         $this->assertFalse((new Period())->check([
             'end_at' => new \DateTime('@'.strtotime('-1 day'))
-        ],new Order));
+        ],$this->makeOrder()));
 
         $this->assertFalse((new Period())->check([
             'start_at' => new \DateTime('@'.strtotime('+1 day')),
             'end_at' => new \DateTime('@'.strtotime('+2 day'))
-        ],new Order));
+        ],$this->makeOrder()));
 
         $this->assertTrue((new Period())->check([
             'start_at' => new \DateTime('@'.strtotime('-1 day')),
             'end_at' => new \DateTime('@'.strtotime('+1 day'))
-        ],new Order));
+        ],$this->makeOrder()));
     }
 }

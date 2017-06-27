@@ -15,14 +15,15 @@ class Order
     private $discounts; // order level applied discounts
     private $discountTotal;
 
-    public function __construct()
+    public function __construct(OrderId $id)
     {
+        $this->id = $id;
         $this->items = new ItemCollection;
         $this->discounts = new AppliedDiscountCollection;
         $this->discountTotal = Money::EUR(0); // TODO set currency outside of class
     }
 
-    public function id()
+    public function id(): OrderId
     {
         return $this->id;
     }

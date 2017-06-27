@@ -7,7 +7,7 @@ use Thinktomorrow\Trader\Price\Percentage;
 
 require_once __DIR__.'/../vendor/autoload.php';
 
-    $order = new \Thinktomorrow\Trader\Order\Domain\Order();
+    $order = new \Thinktomorrow\Trader\Order\Domain\Order(\Thinktomorrow\Trader\Order\Domain\OrderId::fromInteger(1));
 
     $order->items()->add(
         \Thinktomorrow\Trader\Order\Domain\Item::fromPurchasable(new Product(33,[
