@@ -28,22 +28,22 @@ class ItemCollection implements \ArrayAccess, \Countable, \IteratorAggregate
         return count($this->items);
     }
 
-    public function find(int $id)
+    public function find(ItemId $id)
     {
-        if( !isset($this->items[$id]) ) return null;
+        if( !isset($this->items[$id->get()]) ) return null;
 
-        return $this->items[$id];
+        return $this->items[$id->get()];
     }
 
     public function add(Item $item, $quantity = 1)
     {
-        if( isset($this->items[$item->id()]) )
+        if( isset($this->items[$item->id()->get()]) )
         {
-            $this->items[$item->id()]->add($quantity);
+            $this->items[$item->id()->get()]->add($quantity);
             return;
         }
 
-        $this->items[$item->id()] = $item;
+        $this->items[$item->id()->get()] = $item;
 
         // Quantify newly added item
         if($quantity > 1) $this->add($item,--$quantity);

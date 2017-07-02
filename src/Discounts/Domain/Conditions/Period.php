@@ -3,23 +3,44 @@
 namespace Thinktomorrow\Trader\Discounts\Domain\Conditions;
 
 use DateTime;
+use Thinktomorrow\Trader\Common\Domain\Conditions\BaseCondition;
+use Thinktomorrow\Trader\Common\Domain\Conditions\Condition;
+use Thinktomorrow\Trader\Common\Domain\Conditions\OrderCondition;
 use Thinktomorrow\Trader\Order\Domain\Order;
 
-class Period implements Condition
+class Period extends BaseCondition implements Condition, OrderCondition
 {
-    public function check(array $conditions, Order $order): bool
+    public function check(Order $order): bool
     {
         $valid_start_at = $this->comesAfterStartAt(
             new DateTime,
-            isset($conditions['start_at']) ? $conditions['start_at'] : null
+            isset($this->parameters['start_at']) ? $this->parameters['start_at'] : null
         );
 
         $valid_end_at = $this->comesBeforeEndAt(
             new DateTime,
-            isset($conditions['end_at']) ? $conditions['end_at'] : null
+            isset($this->parameters['end_at']) ? $this->parameters['end_at'] : null
         );
 
         return (true == $valid_start_at && true == $valid_end_at);
+    }
+
+    /**
+     * Validation of required parameters
+     *
+     * @param $parameters
+     */
+    protected function validateParameters(array $parameters)
+    {
+        if(isset($parameters['start_at']) && ! $parameters['start_at'] instanceof \DateTime)
+        {
+            throw new \InvalidArgumentException('DiscountCondition value for start_at must be instance of DateTime.');
+        }
+
+        if(isset($parameters['end_at']) && ! $parameters['end_at'] instanceof \DateTime)
+        {
+            throw new \InvalidArgumentException('DiscountCondition value for end_at must be instance of DateTime.');
+        }
     }
 
     private function comesAfterStartAt(DateTime $datetime, DateTime $startAt = null)

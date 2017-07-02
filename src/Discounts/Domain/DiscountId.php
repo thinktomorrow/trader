@@ -2,25 +2,9 @@
 
 namespace Thinktomorrow\Trader\Discounts\Domain;
 
+use Thinktomorrow\Trader\Common\Domain\AggregateId;
+
 class DiscountId
 {
-    /**
-     * @var int
-     */
-    private $id;
-
-    public function __construct(int $id)
-    {
-        $this->id = $id;
-    }
-
-    public static function fromInteger(int $id)
-    {
-        return new self($id);
-    }
-
-    public function get(): int
-    {
-        return $this->id;
-    }
+    use AggregateId;
 }

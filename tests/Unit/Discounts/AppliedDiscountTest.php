@@ -2,11 +2,11 @@
 
 namespace Thinktomorrow\Trader\Tests\Unit;
 
+use Money\Money;
 use Thinktomorrow\Trader\Discounts\Domain\AppliedDiscount;
 use Thinktomorrow\Trader\Discounts\Domain\DiscountDescription;
 use Thinktomorrow\Trader\Discounts\Domain\DiscountId;
-use Thinktomorrow\Trader\Discounts\Domain\DiscountType;
-use Thinktomorrow\Trader\Order\Domain\ItemCollection;
+use Thinktomorrow\Trader\Discounts\Domain\Types\TypeId;
 
 class AppliedDiscountTest extends UnitTestCase
 {
@@ -14,20 +14,20 @@ class AppliedDiscountTest extends UnitTestCase
     function it_can_create_applied_discount()
     {
         $discountId = DiscountId::fromInteger(1);
-        $discountType = DiscountType::fromString('foobar');
+        $discountType = TypeId::fromString('percentage_off');
         $description = new DiscountDescription('foo',[]);
-        $affectedItems = new ItemCollection();
+        $amount = Money::EUR(20);
 
         $appliedDiscount = new AppliedDiscount(
             $discountId,
             $discountType,
             $description,
-            $affectedItems
+            $amount
         );
 
         $this->assertSame($discountId, $appliedDiscount->discountId());
         $this->assertSame($discountType, $appliedDiscount->discountType());
         $this->assertSame($description, $appliedDiscount->description());
-        $this->assertSame($affectedItems, $appliedDiscount->affectedItems());
+        $this->assertSame($amount, $appliedDiscount->amount());
     }
 }

@@ -14,6 +14,10 @@ class Order
     private $items;
     private $discounts; // order level applied discounts
     private $discountTotal;
+    private $shipmentTotal;
+
+    private $shipmentMethodId;
+    private $shipmentRuleId;
 
     public function __construct(OrderId $id)
     {
@@ -21,6 +25,7 @@ class Order
         $this->items = new ItemCollection;
         $this->discounts = new AppliedDiscountCollection;
         $this->discountTotal = Money::EUR(0); // TODO set currency outside of class
+        $this->shipmentTotal = Money::EUR(0); // TODO set currency outside of class
     }
 
     public function id(): OrderId
@@ -63,6 +68,34 @@ class Order
     public function addToDiscountTotal(Money $addition)
     {
         $this->discountTotal = $this->discountTotal->add($addition);
+    }
+
+    public function shipmentTotal(): Money
+    {
+        return $this->shipmentTotal;
+    }
+
+    public function shipmentMethodId(): ShipmentMethodId
+    {
+        return $this->shipmentMethodId;
+    }
+
+    public function shipmentRuleId(): ShipmentRuleId
+    {
+        return $this->shipmentRuleId;
+    }
+
+    public function setShipment(ShipmentMethodId $shipmentMethodId, ShipmentRuleId $shipmentRuleId)
+    {
+        $this->shipmentMethodId = $shipmentMethodId;
+        $this->shipmentRuleId = $shipmentRuleId;
+    }
+
+    public function setShipmentTotal(Money $shipmentTotal)
+    {
+        $this->shipmentTotal = $shipmentTotal;
+
+        return $this;
     }
 
     public function total(): Money

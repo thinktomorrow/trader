@@ -2,7 +2,8 @@
 
 namespace Thinktomorrow\Trader\Discounts\Domain;
 
-use Thinktomorrow\Trader\Order\Domain\ItemCollection;
+use Money\Money;
+use Thinktomorrow\Trader\Discounts\Domain\Types\TypeId;
 
 class AppliedDiscount
 {
@@ -12,26 +13,26 @@ class AppliedDiscount
     private $discountId;
 
     /**
-     * @var DiscountType
+     * @var TypeId
      */
     private $discountType;
+
+    /**
+     * @var Money
+     */
+    private $amount;
 
     /**
      * @var DiscountDescription
      */
     private $description;
 
-    /**
-     * @var ItemCollection
-     */
-    private $affectedItems;
-
-    public function __construct(DiscountId $discountId, DiscountType $discountType, DiscountDescription $description, ItemCollection $affectedItems)
+    public function __construct(DiscountId $discountId, TypeId $discountType, DiscountDescription $description, Money $amount = null)
     {
         $this->discountId = $discountId;
         $this->discountType = $discountType;
         $this->description = $description;
-        $this->affectedItems = $affectedItems;
+        $this->amount = $amount;
     }
 
     /**
@@ -43,11 +44,26 @@ class AppliedDiscount
     }
 
     /**
-     * @return DiscountType
+     * unique identifier for applied discount.
+     *
+     * @return DiscountId
      */
-    public function discountType(): DiscountType
+    public function id(): DiscountId
+    {
+        return $this->discountId();
+    }
+
+    /**
+     * @return TypeId
+     */
+    public function discountType(): TypeId
     {
         return $this->discountType;
+    }
+
+    public function amount()
+    {
+        return $this->amount;
     }
 
     /**
@@ -57,24 +73,4 @@ class AppliedDiscount
     {
         return $this->description;
     }
-
-    /**
-     * @return ItemCollection
-     */
-    public function affectedItems(): ItemCollection
-    {
-        return $this->affectedItems;
-    }
-
-    /**
-     * Is this applied discount affecting certain / all
-     * items or on the order level in general.
-     *
-     * @return bool
-     */
-    public function affectsItems(): bool
-    {
-        return !$this->affectedItems()->isEmpty();
-    }
-
 }

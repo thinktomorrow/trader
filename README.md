@@ -3,6 +3,29 @@
 ## TODO
 - AlmostApplicableDiscounts
 - DiscountConditions: Should default be only one item to be discounted? (see getAffectedItemQuantity)
+
+- shipment costs: ZONES (LANDEN), METHODS
+            //  -> RULES: conditions (zone, minimale subtotaal van bestelling, maximale subtotaal van bestelling, ...)
+                          costs: baseCost (global for order)
+                // RULES SHOULD BE ORDERED AS FIRST TRUE WILL BE USED!
+
+## Shipping rules
+- order of rules matter: first one matching order will be chosen
+- order of conditions does not matter. Only if all conditions match, the rule will be selected.
+
+## rules
+rules have conditions and adjusters attached to them
+use rule logic for shipment, payment, tax and discount adjustments on the order
+abstract this code
+
+! IMPORTANT FOR DISCOUNTS: volgorde van discounts in discountCollection is van belang. als parameter bij applyDiscountsToOrder handler.
+Want subtotaal van order wordt in principe aangepast door de item discounts waardoor het beter is om eerst item gerelateerde discounts toe te passen en dan pas order discounts.
+Deze laatste zijn immers afhankelijk van een juiste subtotaal.
+
+## adjusters
+allow to add / override adjusters
+allow to add / override conditions
+
 ## Cart
 
 Cart: available singleton

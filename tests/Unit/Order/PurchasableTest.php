@@ -2,6 +2,7 @@
 
 namespace Thinktomorrow\Trader\Tests\Unit;
 
+use Thinktomorrow\Trader\Order\Domain\ItemId;
 use Thinktomorrow\Trader\Tests\Unit\Stubs\ConcretePurchasable;
 
 class PurchasableTest extends UnitTestCase
@@ -11,7 +12,7 @@ class PurchasableTest extends UnitTestCase
     {
         $purchasable = new ConcretePurchasable(1);
 
-        $this->assertEquals(1,$purchasable->itemId());
+        $this->assertEquals(ItemId::fromInteger(1),$purchasable->itemId());
     }
 
     /** @test */

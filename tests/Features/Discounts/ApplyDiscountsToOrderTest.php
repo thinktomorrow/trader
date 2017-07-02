@@ -2,8 +2,8 @@
 
 namespace Thinktomorrow\Trader\Tests\Features;
 
-use App\Discounts\PercentageOffDiscount;
-use App\Discounts\PercentageOffItemDiscount;
+use Thinktomorrow\Trader\Discounts\Domain\Types\PercentageOffDiscount;
+use Thinktomorrow\Trader\Discounts\Domain\Types\PercentageOffItemDiscount;
 use Money\Money;
 use Thinktomorrow\Trader\Discounts\Application\ApplyDiscountsToOrder;
 use Thinktomorrow\Trader\Discounts\Domain\DiscountCollection;

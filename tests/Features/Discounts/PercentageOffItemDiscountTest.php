@@ -2,7 +2,7 @@
 
 namespace Thinktomorrow\Trader\Tests\Features;
 
-use App\Discounts\PercentageOffItemDiscount;
+use Thinktomorrow\Trader\Discounts\Domain\Types\PercentageOffItemDiscount;
 use Money\Money;
 use Thinktomorrow\Trader\Discounts\Domain\DiscountConditions;
 use Thinktomorrow\Trader\Discounts\Domain\DiscountId;

@@ -8,10 +8,10 @@ use Thinktomorrow\Trader\Price\Percentage;
 interface Purchasable
 {
     /**
-     * Unique item identifier - usually the SKU
-     * @return mixed
+     * Unique item identifier - usually the SKU or primary key
+     * @return ItemId
      */
-    public function itemId();
+    public function itemId(): ItemId;
 
     /**
      * Collection of item details. Here you pass

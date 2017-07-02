@@ -3,7 +3,6 @@
 namespace Thinktomorrow\Trader\Tests\Unit;
 
 use Thinktomorrow\Trader\Discounts\Domain\Conditions\Period;
-use Thinktomorrow\Trader\Order\Domain\Order;
 
 class PeriodTest extends UnitTestCase
 {
@@ -11,48 +10,49 @@ class PeriodTest extends UnitTestCase
     function it_checks_ok_if_no_period_is_enforced()
     {
         $condition = new Period;
-        $order = $this->makeOrder();
 
-        $this->assertTrue($condition->check([],$order));
+        $this->assertTrue($condition->check($this->makeOrder()));
     }
 
     /** @test */
     function passed_date_must_be_a_dateTime()
     {
-        $this->setExpectedException(\TypeError::class);
+        $this->setExpectedException(\InvalidArgumentException::class);
 
-        (new Period())->check([
-            'start_at' => 'foobar'
-        ],$this->makeOrder());
+        (new Period())->setParameters(['start_at' => 'foobar']);
     }
 
     /** @test */
     function it_checks_if_given_datetime_is_within_period()
     {
-        $this->assertTrue((new Period())->check([
-            'start_at' => new \DateTime('@'.strtotime('-1 day'))
-        ],$this->makeOrder()));
+        // Start at yesterday
+        $condition = (new Period())->setParameters(['start_at' => new \DateTime('@'.strtotime('-1 day'))]);
+        $this->assertTrue($condition->check($this->makeOrder()));
 
-        $this->assertFalse((new Period())->check([
-            'start_at' => new \DateTime('@'.strtotime('+1 day'))
-        ],$this->makeOrder()));
+        // Start at tomorrow
+        $condition = (new Period())->setParameters(['start_at' => new \DateTime('@'.strtotime('+1 day'))]);
+        $this->assertFalse($condition->check($this->makeOrder()));
 
-        $this->assertTrue((new Period())->check([
-            'end_at' => new \DateTime('@'.strtotime('+1 day'))
-        ],$this->makeOrder()));
+        // End at tomorrow
+        $condition = (new Period())->setParameters(['end_at' => new \DateTime('@'.strtotime('+1 day'))]);
+        $this->assertTrue($condition->check($this->makeOrder()));
 
-        $this->assertFalse((new Period())->check([
-            'end_at' => new \DateTime('@'.strtotime('-1 day'))
-        ],$this->makeOrder()));
+        // End at yesterday
+        $condition = (new Period())->setParameters(['end_at' => new \DateTime('@'.strtotime('-1 day'))]);
+        $this->assertFalse($condition->check($this->makeOrder()));
 
-        $this->assertFalse((new Period())->check([
+        // Current time falls out of given period
+        $condition = (new Period())->setParameters([
             'start_at' => new \DateTime('@'.strtotime('+1 day')),
             'end_at' => new \DateTime('@'.strtotime('+2 day'))
-        ],$this->makeOrder()));
+        ]);
+        $this->assertFalse($condition->check($this->makeOrder()));
 
-        $this->assertTrue((new Period())->check([
+        // Current time falls in given period
+        $condition = (new Period())->setParameters([
             'start_at' => new \DateTime('@'.strtotime('-1 day')),
             'end_at' => new \DateTime('@'.strtotime('+1 day'))
-        ],$this->makeOrder()));
+        ]);
+        $this->assertTrue($condition->check($this->makeOrder()));
     }
 }

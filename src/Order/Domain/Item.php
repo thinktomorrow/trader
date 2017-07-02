@@ -10,9 +10,9 @@ use Thinktomorrow\Trader\Price\Percentage;
 class Item
 {
     /**
-     * Identifier of line item
+     * Unique identifier of line item
      *
-     * @var integer
+     * @var itemId
      */
     private $id;
 
@@ -46,7 +46,7 @@ class Item
         return new self($purchasable);
     }
 
-    public function id()
+    public function id(): ItemId
     {
         return $this->id;
     }

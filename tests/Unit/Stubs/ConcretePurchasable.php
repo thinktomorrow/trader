@@ -3,6 +3,7 @@
 namespace Thinktomorrow\Trader\Tests\Unit\Stubs;
 
 use Money\Money;
+use Thinktomorrow\Trader\Order\Domain\ItemId;
 use Thinktomorrow\Trader\Order\Domain\Purchasable;
 use Thinktomorrow\Trader\Price\Percentage;
 
@@ -23,9 +24,9 @@ class ConcretePurchasable implements Purchasable
         $this->salePrice = $salePrice ?: null;
     }
 
-    public function itemId()
+    public function itemId(): ItemId
     {
-        return $this->id;
+        return ItemId::fromInteger($this->id);
     }
 
     public function itemData(): array

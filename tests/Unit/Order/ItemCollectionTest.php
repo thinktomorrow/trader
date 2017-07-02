@@ -4,6 +4,7 @@ namespace Thinktomorrow\Trader\Tests\Unit;
 
 use Thinktomorrow\Trader\Order\Domain\Item;
 use Thinktomorrow\Trader\Order\Domain\ItemCollection;
+use Thinktomorrow\Trader\Order\Domain\ItemId;
 use Thinktomorrow\Trader\Tests\Unit\Stubs\ConcretePurchasable;
 
 class ItemCollectionTest extends UnitTestCase
@@ -20,15 +21,15 @@ class ItemCollectionTest extends UnitTestCase
     function it_can_start_with_array_of_items()
     {
         $collection = new ItemCollection(
-            Item::fromPurchasable(new ConcretePurchasable()),
-            Item::fromPurchasable(new ConcretePurchasable())
+            Item::fromPurchasable(new ConcretePurchasable(1)),
+            Item::fromPurchasable(new ConcretePurchasable(2))
         );
 
         $this->assertEquals(2,$collection->size());
     }
 
     /** @test */
-    function items_are_properly_added_and_quantified_when_passed_on_instantiation()
+    function same_items_are_added_up()
     {
         $collection = new ItemCollection(
             Item::fromPurchasable(new ConcretePurchasable(2)),
@@ -36,7 +37,7 @@ class ItemCollectionTest extends UnitTestCase
         );
 
         $this->assertEquals(1,$collection->size());
-        $this->assertEquals(2,$collection->find(2)->quantity());
+        $this->assertEquals(2,$collection->find(ItemId::fromInteger(2))->quantity());
     }
 
     /** @test */

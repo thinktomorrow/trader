@@ -3,10 +3,19 @@
 namespace Thinktomorrow\Trader\Tests\Unit;
 
 use Thinktomorrow\Trader\Order\Domain\Item;
+use Thinktomorrow\Trader\Order\Domain\ItemId;
 use Thinktomorrow\Trader\Tests\Unit\Stubs\ConcretePurchasable;
 
 class ItemTest extends UnitTestCase
 {
+    /** @test */
+    function itemId_is_a_valid_identifier()
+    {
+        $itemId = ItemId::fromInteger(2);
+
+        $this->assertEquals(2,$itemId->get());
+    }
+
     /** @test */
     function it_can_add_to_quantity()
     {
