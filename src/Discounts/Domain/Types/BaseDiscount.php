@@ -20,6 +20,11 @@ abstract class BaseDiscount
      */
     protected $conditions;
 
+    /**
+     * @var array
+     */
+    protected $adjusters;
+
     public function id(): DiscountId
     {
         return $this->id;

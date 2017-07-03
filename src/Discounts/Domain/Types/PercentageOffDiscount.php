@@ -31,6 +31,7 @@ final class PercentageOffDiscount extends BaseDiscount implements Discount, Orde
         $this->id = $id;
         $this->conditions = $conditions;
         $this->percentage = $adjusters['percentage'];
+        $this->adjusters = $adjusters;
         $this->type = TypeId::fromDiscount($this);
     }
 

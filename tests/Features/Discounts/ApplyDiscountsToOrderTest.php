@@ -23,11 +23,10 @@ class ApplyDiscountsToOrderTest extends UnitTestCase
         // Set up order, items and discount
         $order = $this->makeOrder();
         $order->items()->add(Item::fromPurchasable(new ConcretePurchasable(20,[],Money::EUR(240))));
-        $percentageOffDiscount = new PercentageOffDiscount(DiscountId::fromInteger(1),Percentage::fromPercent(20));
+        $percentageOffDiscount = new PercentageOffDiscount(DiscountId::fromInteger(1),[],['percentage' => Percentage::fromPercent(20)]);
 
         // Apply discount to order
-        $handler = new ApplyDiscountsToOrder();
-        $handler->handle($order, new DiscountCollection($percentageOffDiscount));
+        (new ApplyDiscountsToOrder())->handle($order, new DiscountCollection([$percentageOffDiscount]));
 
         $this->assertCount(1,$order->discounts());
         $this->assertEquals(Money::EUR(240)->multiply(0.8), $order->total());
@@ -37,8 +36,8 @@ class ApplyDiscountsToOrderTest extends UnitTestCase
     function it_can_apply_discount_to_items()
     {
         $discount = new PercentageOffItemDiscount(
-            DiscountId::fromInteger(1),
-            Percentage::fromPercent(20)
+            DiscountId::fromInteger(1),[],
+            ['percentage' => Percentage::fromPercent(20)]
         );
 
         $order = $this->makeOrder();

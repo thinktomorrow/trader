@@ -24,13 +24,14 @@ final class PercentageOffItemDiscount extends BaseItemDiscount implements Discou
      */
     private $type;
 
-    public function __construct(DiscountId $id, array $conditions,  array $adjusters)
+    public function __construct(DiscountId $id, array $conditions, array $adjusters)
     {
         $this->validateParameters($conditions, $adjusters);
 
         $this->id = $id;
         $this->conditions = $conditions;
         $this->percentage = $adjusters['percentage'];
+        $this->adjusters = $adjusters;
         $this->type = TypeId::fromDiscount($this);
     }
 

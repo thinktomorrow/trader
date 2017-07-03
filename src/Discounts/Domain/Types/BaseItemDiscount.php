@@ -23,6 +23,11 @@ abstract class BaseItemDiscount
      */
     protected $conditions;
 
+    /**
+     * @var array
+     */
+    protected $adjusters;
+
     public function id(): DiscountId
     {
         return $this->id;
@@ -56,12 +61,16 @@ abstract class BaseItemDiscount
      */
     public function getAffectedItemQuantity(Item $item)
     {
-        if(isset($this->conditions['maximum_affected_item_quantity']))
+        $maximum = $item->quantity();
+
+        if(isset($this->adjusters['maximum_affected_quantity']))
         {
-            return (int) $this->conditions['maximum_affected_item_quantity'];
+            $forced_maximum = (int) $this->adjusters['maximum_affected_quantity'];
+
+            if($forced_maximum < $maximum) $maximum = $forced_maximum;
         }
 
-        return $item->quantity();
+        return $maximum;
     }
 
     /**
