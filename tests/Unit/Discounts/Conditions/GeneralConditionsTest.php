@@ -100,7 +100,6 @@ class GeneralConditionsTest extends UnitTestCase
         $order = $this->makeOrder();
 
         $discount = (new DiscountFactory(new DummyContainer()))->create(1,'percentage_off',[
-            'minimum_amount' => Money::EUR(50),
             'start_at' => (new \DateTime('@'.strtotime('+3 days' )))
         ],[
             'percentage' => Percentage::fromPercent(15),
@@ -110,13 +109,12 @@ class GeneralConditionsTest extends UnitTestCase
 
         // Period of discount has started
         $discount = (new DiscountFactory(new DummyContainer()))->create(1,'percentage_off',[
-            'minimum_amount' => Money::EUR(50),
             'start_at' => (new \DateTime('@'.strtotime('-3 days' )))
         ],[
             'percentage' => Percentage::fromPercent(15),
         ]);
 
-        $this->assertFalse($discount->applicable($order));
+        $this->assertTrue($discount->applicable($order));
 
     }
 }

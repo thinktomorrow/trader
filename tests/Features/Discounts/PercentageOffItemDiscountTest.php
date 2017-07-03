@@ -18,7 +18,7 @@ class PercentageOffItemDiscountTest extends UnitTestCase
     {
         $discount = (new DiscountFactory(new DummyContainer()))->create(1,'percentage_off_item',[
             'purchasable_ids' => [20],
-            'minimum_quantity' => 2,
+            'minimum_item_quantity' => 2,
         ],[
             'maximum_affected_quantity' => 1,
             'percentage' => Percentage::fromPercent(20)

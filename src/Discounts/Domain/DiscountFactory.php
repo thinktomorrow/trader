@@ -37,9 +37,7 @@ class DiscountFactory
              * just skip it and use it as parameter value for our condition instances
              */
             try{
-                $conditionClass = $this->getConditionClassName($condition);
-
-                $this->conditions[] = $this->resolveConditionClass($conditionClass, $conditions);
+                $this->conditions[] = $this->resolveConditionClass($this->getConditionClassName($condition), $conditions);
             }
             catch(\InvalidArgumentException $e)
             {

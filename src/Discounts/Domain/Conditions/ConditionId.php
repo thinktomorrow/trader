@@ -7,6 +7,9 @@ final class ConditionId
     private static $mapping = [
         'minimum_amount' => MinimumAmount::class,
         'purchasable_ids' => ItemWhitelist::class,
+        'minimum_item_quantity' => MinimumItemQuantity::class,
+        'start_at' => Period::class,
+        'end_at' => Period::class, // TODO avoid duplicate conditional loading!!
     ];
 
     /**
