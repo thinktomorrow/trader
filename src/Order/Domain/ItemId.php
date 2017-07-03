@@ -4,7 +4,7 @@ namespace Thinktomorrow\Trader\Order\Domain;
 
 use Thinktomorrow\Trader\Common\Domain\AggregateId;
 
-class ItemId
+final class ItemId
 {
     use AggregateId;
 }

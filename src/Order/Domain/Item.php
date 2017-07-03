@@ -7,7 +7,7 @@ use Thinktomorrow\Trader\Discounts\Domain\AppliedDiscount;
 use Thinktomorrow\Trader\Discounts\Domain\AppliedDiscountCollection;
 use Thinktomorrow\Trader\Price\Percentage;
 
-class Item
+final class Item
 {
     /**
      * Unique identifier of line item

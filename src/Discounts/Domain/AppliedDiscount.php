@@ -5,7 +5,7 @@ namespace Thinktomorrow\Trader\Discounts\Domain;
 use Money\Money;
 use Thinktomorrow\Trader\Discounts\Domain\Types\TypeId;
 
-class AppliedDiscount
+final class AppliedDiscount
 {
     /**
      * @var DiscountId

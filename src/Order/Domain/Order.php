@@ -6,7 +6,7 @@ use Money\Money;
 use Thinktomorrow\Trader\Discounts\Domain\AppliedDiscount;
 use Thinktomorrow\Trader\Discounts\Domain\AppliedDiscountCollection;
 
-class Order
+final class Order
 {
     const STATUS_NEW = 1;
 
