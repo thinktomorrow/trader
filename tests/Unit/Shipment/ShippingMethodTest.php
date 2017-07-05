@@ -10,7 +10,6 @@ use Thinktomorrow\Trader\Shipment\Domain\ShippingMethodId;
 use Thinktomorrow\Trader\Shipment\Domain\ShippingRuleFactory;
 use Thinktomorrow\Trader\Tests\DummyContainer;
 use Thinktomorrow\Trader\Tests\Unit\Stubs\ConcretePurchasable;
-use TypeError;
 
 class ShippingMethodTest extends UnitTestCase
 {
@@ -47,7 +46,11 @@ class ShippingMethodTest extends UnitTestCase
 
 
         $method = new ShippingMethod(ShippingMethodId::fromInteger(2),[
-            (new ShippingRuleFactory(new DummyContainer))->create(1, ['minimum_amount' => Money::EUR(30)],[])
+            (new ShippingRuleFactory(new DummyContainer))->create(1, [
+                'minimum_amount' => Money::EUR(30)
+            ],[
+                'amount' => Money::EUR(0)
+            ])
         ]);
 
         $this->assertTrue($method->applicable($order));
@@ -59,9 +62,12 @@ class ShippingMethodTest extends UnitTestCase
         $order = $this->makeOrder();
         $order->items()->add(Item::fromPurchasable(new ConcretePurchasable(1,[],Money::EUR(10))));
 
-
         $method = new ShippingMethod(ShippingMethodId::fromInteger(2),[
-            (new ShippingRuleFactory(new DummyContainer))->create(1, ['minimum_amount' => Money::EUR(30)],[])
+            (new ShippingRuleFactory(new DummyContainer))->create(1, [
+                'minimum_amount' => Money::EUR(30)
+            ],[
+                'amount' => Money::EUR(0)
+            ])
         ]);
 
         $this->assertFalse($method->applicable($order));

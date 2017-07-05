@@ -15,7 +15,10 @@ class UniqueCollection implements \ArrayAccess, \Countable, \IteratorAggregate
 
     protected function assertItem($item)
     {
-        //
+        if(!is_object($item) || !method_exists($item,'id'))
+        {
+            throw new \InvalidArgumentException('Invalid value for unique collection. Object with id method expected. Instead ['.gettype($item).'] is given.');
+        }
     }
 
     public function all(): array
@@ -81,7 +84,7 @@ class UniqueCollection implements \ArrayAccess, \Countable, \IteratorAggregate
             throw new \InvalidArgumentException('Adding item to cart requires an explicit key. This key is the item identifier.');
         }
 
-        if($offset != $value->id())
+        if($offset != $value->id()->get())
         {
             throw new \InvalidArgumentException('Key must be set as the item id value. '. $offset. ' is given while ' . $value->id() .' was expected.');
         }

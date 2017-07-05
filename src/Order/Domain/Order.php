@@ -5,6 +5,8 @@ namespace Thinktomorrow\Trader\Order\Domain;
 use Money\Money;
 use Thinktomorrow\Trader\Discounts\Domain\AppliedDiscount;
 use Thinktomorrow\Trader\Discounts\Domain\AppliedDiscountCollection;
+use Thinktomorrow\Trader\Shipment\Domain\ShippingMethodId;
+use Thinktomorrow\Trader\Shipment\Domain\ShippingRuleId;
 
 final class Order
 {
@@ -75,22 +77,6 @@ final class Order
         return $this->shipmentTotal;
     }
 
-    public function shipmentMethodId(): ShipmentMethodId
-    {
-        return $this->shipmentMethodId;
-    }
-
-    public function shipmentRuleId(): ShipmentRuleId
-    {
-        return $this->shipmentRuleId;
-    }
-
-    public function setShipment(ShipmentMethodId $shipmentMethodId, ShipmentRuleId $shipmentRuleId)
-    {
-        $this->shipmentMethodId = $shipmentMethodId;
-        $this->shipmentRuleId = $shipmentRuleId;
-    }
-
     public function setShipmentTotal(Money $shipmentTotal)
     {
         $this->shipmentTotal = $shipmentTotal;
@@ -98,10 +84,27 @@ final class Order
         return $this;
     }
 
+    public function shipmentMethodId()
+    {
+        return $this->shipmentMethodId;
+    }
+
+    public function shipmentRuleId()
+    {
+        return $this->shipmentRuleId;
+    }
+
+    public function setShipment(ShippingMethodId $shipmentMethodId, ShippingRuleId $shipmentRuleId)
+    {
+        $this->shipmentMethodId = $shipmentMethodId;
+        $this->shipmentRuleId = $shipmentRuleId;
+    }
+
     public function total(): Money
     {
         return $this->subtotal()
-                    ->subtract($this->discountTotal());
+                    ->subtract($this->discountTotal())
+                    ->add($this->shipmentTotal());
     }
 
     public function shipmentId()

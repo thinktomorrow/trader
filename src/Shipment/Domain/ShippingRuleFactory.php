@@ -43,7 +43,7 @@ class ShippingRuleFactory
 
         }
 
-        return new ShippingRule(ShippingRuleId::fromInteger($id), $this->conditions, []);
+        return new ShippingRule(ShippingRuleId::fromInteger($id), $this->conditions, $adjusters);
     }
 
     /**

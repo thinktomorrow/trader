@@ -20,7 +20,7 @@ final class PercentageOffDiscount extends BaseDiscount implements Discount, Orde
     private $percentage;
 
     /**
-     * @var TypeId
+     * @var TypeKey
      */
     private $type;
 
@@ -32,7 +32,7 @@ final class PercentageOffDiscount extends BaseDiscount implements Discount, Orde
         $this->conditions = $conditions;
         $this->percentage = $adjusters['percentage'];
         $this->adjusters = $adjusters;
-        $this->type = TypeId::fromDiscount($this);
+        $this->type = TypeKey::fromDiscount($this);
     }
 
     public function apply(Order $order)

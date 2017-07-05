@@ -6,7 +6,7 @@ use Money\Money;
 use Thinktomorrow\Trader\Discounts\Domain\AppliedDiscount;
 use Thinktomorrow\Trader\Discounts\Domain\DiscountDescription;
 use Thinktomorrow\Trader\Discounts\Domain\DiscountId;
-use Thinktomorrow\Trader\Discounts\Domain\Types\TypeId;
+use Thinktomorrow\Trader\Discounts\Domain\Types\TypeKey;
 
 class AppliedDiscountTest extends UnitTestCase
 {
@@ -14,7 +14,7 @@ class AppliedDiscountTest extends UnitTestCase
     function it_can_create_applied_discount()
     {
         $discountId = DiscountId::fromInteger(1);
-        $discountType = TypeId::fromString('percentage_off');
+        $discountType = TypeKey::fromString('percentage_off');
         $description = new DiscountDescription('foo',[]);
         $amount = Money::EUR(20);
 

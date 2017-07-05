@@ -38,17 +38,17 @@ class ShippingMethod
         return $this->id;
     }
 
-    public function apply(Order $order): ShippingRule
+    public function apply(Order $order)
     {
         if( ! $this->applicable($order))
         {
             throw new CannotApplyShippingRuleException('Shipping method ['.$this->id().'] not applicable to order ['.$order->id().']. None of the rules match.');
         }
 
-        $shipmentRule = $this->getApplicableRule($order);
+        $shippingRule = $this->getApplicableRule($order);
 
-        $order->setShipment($this->id(),$shipmentRule->id());
-        $order->setShipmentTotal($shipmentRule->total());
+        $order->setShipment($this->id(),$shippingRule->id());
+        $order->setShipmentTotal($shippingRule->total());
     }
 
     public function applicable(Order $order): bool

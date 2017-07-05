@@ -2,55 +2,52 @@
 
 namespace Thinktomorrow\Trader\Tests\Unit;
 
+use Money\Money;
 use PHPUnit_Framework_TestCase;
-use Thinktomorrow\Trader\Discounts\Domain\Conditions\MinimumAmount;
+use Thinktomorrow\Trader\Discounts\Domain\DiscountFactory;
 use Thinktomorrow\Trader\Discounts\Domain\DiscountId;
 use Thinktomorrow\Trader\Discounts\Domain\Types\PercentageOffDiscount;
-use Thinktomorrow\Trader\Discounts\Domain\Types\PercentageOffItemDiscount;
+use Thinktomorrow\Trader\Order\Domain\Item;
 use Thinktomorrow\Trader\Order\Domain\Order;
 use Thinktomorrow\Trader\Order\Domain\OrderId;
 use Thinktomorrow\Trader\Price\Percentage;
 use Thinktomorrow\Trader\Tests\DummyContainer;
+use Thinktomorrow\Trader\Tests\Unit\Stubs\ConcretePurchasable;
 
 class UnitTestCase extends PHPUnit_Framework_TestCase
 {
     public function setUp()
     {
         parent::setUp();
-
-        // Container setup - this is the setup that should be done in the framework
-        // TODO: should also mean that our containerinterface
-        $container = new DummyContainer();
-        //$container->add();
-
     }
 
-    protected function makeOrder()
+    protected function makeOrder($subtotalAmount = 0, $id = 2)
     {
-        return new Order(OrderId::fromInteger(2));
+        $order = new Order(OrderId::fromInteger($id));
+
+        if($subtotalAmount > 0) $order->items()->add(Item::fromPurchasable(new ConcretePurchasable(20,[],Money::EUR($subtotalAmount))));
+
+        return $order;
     }
 
-    protected function makePercentageOffDiscount($id = 1, $conditions = [], $adjusters = [])
+    protected function makeDiscount($id = 1, $type =  'percentage_off', $conditions = [], $adjusters = [])
     {
-        if(empty($adjusters))
+        if(empty($adjusters) && $type == 'percentage_off')
         {
             $adjusters = [
                 'percentage' => Percentage::fromPercent(10)
             ];
         }
 
-        return new PercentageOffDiscount(DiscountId::fromInteger($id),$conditions,$adjusters);
+        return (new DiscountFactory(new DummyContainer()))->create($id,$type,$conditions,$adjusters);
     }
 
-    protected function makePercentageOffItemDiscount($id = 1, $conditions = [], $adjusters = [])
+    protected function makePercentageOffDiscount($percent = 10)
     {
-        if(empty($adjusters))
-        {
-            $adjusters = [
-                'percentage' => Percentage::fromPercent(10)
-            ];
-        }
+        $adjusters = [
+            'percentage' => Percentage::fromPercent($percent)
+        ];
 
-        return new PercentageOffItemDiscount(DiscountId::fromInteger($id),$conditions,$adjusters);
+        return $this->makeDiscount(1, 'percentage_off', [], $adjusters);
     }
 }

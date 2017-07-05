@@ -14,4 +14,12 @@ class DiscountDescriptionTest extends UnitTestCase
         $this->assertEquals('foobar',$description->type());
         $this->assertEquals(['baz' => 'bam'],$description->values());
     }
+
+    /** @test */
+    function it_prints_out_the_type()
+    {
+        $description = new DiscountDescription('foobar', ['baz' => 'bam']);
+
+        $this->assertEquals('foobar',$description->__toString());
+    }
 }

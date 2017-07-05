@@ -48,6 +48,17 @@ class Cart
         return $this->order->discounts();
     }
 
+    public function shipment()
+    {
+        return $this->order->shipmentMethodId();
+    }
+
+    public function freeShipment(): bool
+    {
+        // TODO
+        return false;
+    }
+
     public function __call($method, $params)
     {
         return $this->order->items()->{$method}(...$params);

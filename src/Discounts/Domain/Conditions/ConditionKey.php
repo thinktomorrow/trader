@@ -2,7 +2,7 @@
 
 namespace Thinktomorrow\Trader\Discounts\Domain\Conditions;
 
-final class ConditionId
+final class ConditionKey
 {
     private static $mapping = [
         'minimum_amount' => MinimumAmount::class,

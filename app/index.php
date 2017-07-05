@@ -3,10 +3,9 @@
 use Thinktomorrow\Trader\Discounts\Application\ApplyDiscountsToOrder;
 use Thinktomorrow\Trader\Discounts\Domain\DiscountCollection;
 use Thinktomorrow\Trader\Discounts\Domain\DiscountFactory;
-use Thinktomorrow\Trader\Discounts\Domain\Types\PercentageOffDiscount;
 use App\Product;
-use Thinktomorrow\Trader\Discounts\Domain\DiscountId;
 use Thinktomorrow\Trader\Price\Percentage;
+use Thinktomorrow\Trader\Shipment\Application\ApplyShippingRuleToOrder;
 use Thinktomorrow\Trader\Tests\DummyContainer;
 
 require_once __DIR__.'/../vendor/autoload.php';
@@ -51,8 +50,10 @@ $order->items()->add(
     (new ApplyDiscountsToOrder())->handle(
         $order,
         new DiscountCollection([$percentageOffItemDiscount,$percentageOffDiscount])
-//        new DiscountCollection([$percentageOffDiscount])
     );
+
+    // Add shipment cost
+    (new ApplyShippingRuleToOrder())->handle($order);
 
     $cart = new \Thinktomorrow\Trader\Order\Cart($order);
 
@@ -126,7 +127,7 @@ $order->items()->add(
             <td class="text-center">
                 <?php foreach($cart->discounts() as $discount): ?>
                     <p style="color:red;"><?= $discount->description() ?></p>
-                    <p>Korting van: <?= (new Thinktomorrow\Trader\Price\MoneyRender)->locale($discount->amount()) ?></p>
+                    <p>Globale korting van: <?= (new Thinktomorrow\Trader\Price\MoneyRender)->locale($discount->amount()) ?></p>
                 <?php endforeach; ?>
             </td>
             <td></td>
@@ -134,10 +135,10 @@ $order->items()->add(
         <tr>
             <td colspan="3"></td>
             <td class="text-center">
-<!--                <p style="color:red;">SHIPMENT COST: --><?//= $cart->shipment() ?><!--</p>-->
-<!--                --><?php //if($cart->freeShipment()): ?>
-<!--                    <strong>YEAH FREE SHIPMENT!</strong>-->
-<!--                --><?php //endif; ?>
+                <p style="color:red;">SHIPMENT COST: <?= $cart->shipment() ?></p>
+                <?php if($cart->freeShipment()): ?>
+                    <strong>YEAH FREE SHIPMENT!</strong>
+                <?php endif; ?>
             </td>
             <td></td>
         </tr>

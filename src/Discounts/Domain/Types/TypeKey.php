@@ -4,7 +4,7 @@ namespace Thinktomorrow\Trader\Discounts\Domain\Types;
 
 use Thinktomorrow\Trader\Discounts\Domain\Discount;
 
-final class TypeId
+final class TypeKey
 {
     private static $mapping = [
         'percentage_off' => PercentageOffDiscount::class,

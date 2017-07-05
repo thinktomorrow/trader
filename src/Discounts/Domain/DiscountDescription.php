@@ -17,12 +17,6 @@ class DiscountDescription
         $this->values = $values;
     }
 
-    public function get(): string
-    {
-        // TODO this should return the (translated) description
-        return $this->type;
-    }
-
     public function type(): string
     {
         // Get description type - to be used for language keys
@@ -39,6 +33,6 @@ class DiscountDescription
 
     public function __toString()
     {
-        return $this->get();
+        return $this->type();
     }
 }

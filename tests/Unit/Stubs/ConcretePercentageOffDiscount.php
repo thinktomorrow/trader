@@ -7,7 +7,7 @@ use Thinktomorrow\Trader\Discounts\Domain\AppliedDiscount;
 use Thinktomorrow\Trader\Discounts\Domain\DiscountDescription;
 use Thinktomorrow\Trader\Discounts\Domain\DiscountId;
 use Thinktomorrow\Trader\Discounts\Domain\Types\BaseDiscount;
-use Thinktomorrow\Trader\Discounts\Domain\Types\TypeId;
+use Thinktomorrow\Trader\Discounts\Domain\Types\TypeKey;
 use Thinktomorrow\Trader\Order\Domain\ItemCollection;
 use Thinktomorrow\Trader\Order\Domain\Order;
 
@@ -21,7 +21,7 @@ class ConcretePercentageOffDiscount extends BaseDiscount implements Discount
 
         $this->id = $id;
         $this->conditions = $conditions;
-        $this->type = TypeId::fromDiscount($this);
+        $this->type = TypeKey::fromDiscount($this);
     }
 
     public function id(): DiscountId
@@ -35,7 +35,7 @@ class ConcretePercentageOffDiscount extends BaseDiscount implements Discount
 
         return new AppliedDiscount(
             $this->id,
-            TypeId::fromString('stub'),
+            TypeKey::fromString('stub'),
             new DiscountDescription('foobar', []),
             $affectedItems
         );
