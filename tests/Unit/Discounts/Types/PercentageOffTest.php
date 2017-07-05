@@ -8,7 +8,7 @@ use Thinktomorrow\Trader\Discounts\Domain\Conditions\MinimumAmount;
 use Thinktomorrow\Trader\Discounts\Domain\DiscountId;
 use Thinktomorrow\Trader\Discounts\Domain\Types\PercentageOffDiscount;
 use Thinktomorrow\Trader\Order\Domain\Item;
-use Thinktomorrow\Trader\Price\Percentage;
+use Thinktomorrow\Trader\Common\Price\Percentage;
 use Thinktomorrow\Trader\Tests\Unit\Stubs\ConcretePurchasable;
 
 class PercentageOffTest extends UnitTestCase

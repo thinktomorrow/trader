@@ -3,7 +3,7 @@
 namespace Thinktomorrow\Trader\Order\Domain;
 
 use Money\Money;
-use Thinktomorrow\Trader\Price\Percentage;
+use Thinktomorrow\Trader\Common\Price\Percentage;
 
 interface Purchasable
 {

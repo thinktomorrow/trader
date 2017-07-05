@@ -9,6 +9,7 @@ final class TypeKey
     private static $mapping = [
         'percentage_off' => PercentageOffDiscount::class,
         'percentage_off_item' => PercentageOffItemDiscount::class,
+        'free_item' => FreeItemDiscount::class,
     ];
 
     /**

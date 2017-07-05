@@ -4,7 +4,7 @@ use Thinktomorrow\Trader\Discounts\Application\ApplyDiscountsToOrder;
 use Thinktomorrow\Trader\Discounts\Domain\DiscountCollection;
 use Thinktomorrow\Trader\Discounts\Domain\DiscountFactory;
 use App\Product;
-use Thinktomorrow\Trader\Price\Percentage;
+use Thinktomorrow\Trader\Common\Price\Percentage;
 use Thinktomorrow\Trader\Shipment\Application\ApplyShippingRuleToOrder;
 use Thinktomorrow\Trader\Tests\DummyContainer;
 
@@ -99,7 +99,7 @@ $order->items()->add(
                             <p><?= $item->description() ?></p>
                             <?php if($item->discounts()->any()): ?>
                                 <?php foreach($item->discounts() as $discount): ?>
-                                    <p>Korting van: <?= (new Thinktomorrow\Trader\Price\MoneyRender)->locale($discount->amount()) ?></p>
+                                    <p>Korting van: <?= (new \Thinktomorrow\Trader\Common\Price\MoneyRender)->locale($discount->amount()) ?></p>
                                 <?php endforeach; ?>
                             <?php endif; ?>
                         </div>
@@ -127,7 +127,7 @@ $order->items()->add(
             <td class="text-center">
                 <?php foreach($cart->discounts() as $discount): ?>
                     <p style="color:red;"><?= $discount->description() ?></p>
-                    <p>Globale korting van: <?= (new Thinktomorrow\Trader\Price\MoneyRender)->locale($discount->amount()) ?></p>
+                    <p>Globale korting van: <?= (new \Thinktomorrow\Trader\Common\Price\MoneyRender)->locale($discount->amount()) ?></p>
                 <?php endforeach; ?>
             </td>
             <td></td>

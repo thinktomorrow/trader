@@ -3,7 +3,6 @@
 namespace Thinktomorrow\Trader\Tests\Unit;
 
 use Thinktomorrow\Trader\Discounts\Domain\AppliedDiscount;
-use Thinktomorrow\Trader\Discounts\Domain\Conditions\MinimumAmount;
 use Thinktomorrow\Trader\Discounts\Domain\Discount;
 use Thinktomorrow\Trader\Discounts\Domain\DiscountId;
 use Thinktomorrow\Trader\Discounts\Domain\Types\TypeKey;

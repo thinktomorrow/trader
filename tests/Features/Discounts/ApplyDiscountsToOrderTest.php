@@ -11,7 +11,7 @@ use Thinktomorrow\Trader\Discounts\Domain\DiscountId;
 use Thinktomorrow\Trader\Order\Domain\Item;
 use Thinktomorrow\Trader\Order\Domain\Order;
 use Thinktomorrow\Trader\Order\Domain\OrderId;
-use Thinktomorrow\Trader\Price\Percentage;
+use Thinktomorrow\Trader\Common\Price\Percentage;
 use Thinktomorrow\Trader\Tests\Unit\Stubs\ConcretePurchasable;
 use Thinktomorrow\Trader\Tests\Unit\UnitTestCase;
 

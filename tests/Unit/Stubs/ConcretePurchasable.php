@@ -5,7 +5,7 @@ namespace Thinktomorrow\Trader\Tests\Unit\Stubs;
 use Money\Money;
 use Thinktomorrow\Trader\Order\Domain\ItemId;
 use Thinktomorrow\Trader\Order\Domain\Purchasable;
-use Thinktomorrow\Trader\Price\Percentage;
+use Thinktomorrow\Trader\Common\Price\Percentage;
 
 class ConcretePurchasable implements Purchasable
 {

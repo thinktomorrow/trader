@@ -5,7 +5,6 @@ namespace Thinktomorrow\Trader\Tests\Unit;
 use Money\Money;
 use Thinktomorrow\Trader\Discounts\Domain\Conditions\ItemWhitelist;
 use Thinktomorrow\Trader\Order\Domain\Item;
-use Thinktomorrow\Trader\Order\Domain\ItemId;
 use Thinktomorrow\Trader\Tests\Unit\Stubs\ConcretePurchasable;
 
 class ItemWhitelistTest extends UnitTestCase

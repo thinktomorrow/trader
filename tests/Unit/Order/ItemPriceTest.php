@@ -4,7 +4,7 @@ use Thinktomorrow\Trader\Tests\Unit\UnitTestCase;
 
 use Money\Money;
 use Thinktomorrow\Trader\Order\Domain\Item;
-use Thinktomorrow\Trader\Price\Percentage;
+use Thinktomorrow\Trader\Common\Price\Percentage;
 use Thinktomorrow\Trader\Tests\Unit\Stubs\ConcretePurchasable;
 
 class ItemPriceTest extends UnitTestCase

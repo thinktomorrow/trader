@@ -1,6 +1,6 @@
 <?php
 
-namespace Thinktomorrow\Trader\Price;
+namespace Thinktomorrow\Trader\Common\Price;
 
 use Money\Currencies\ISOCurrencies;
 use Money\Formatter\DecimalMoneyFormatter;

@@ -49,6 +49,11 @@ class ItemCollection implements \ArrayAccess, \Countable, \IteratorAggregate
         if($quantity > 1) $this->add($item,--$quantity);
     }
 
+    public function addMany(array $items)
+    {
+        foreach($items as $item) $this->add($item);
+    }
+
     public function offsetExists($offset)
     {
         if(!is_string($offset) && !is_int($offset)) return false;

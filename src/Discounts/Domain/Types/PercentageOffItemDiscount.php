@@ -10,12 +10,12 @@ use Thinktomorrow\Trader\Discounts\Domain\DiscountId;
 use Thinktomorrow\Trader\Discounts\Domain\ItemDiscount;
 use Thinktomorrow\Trader\Order\Domain\ItemCollection;
 use Thinktomorrow\Trader\Order\Domain\Order;
-use Thinktomorrow\Trader\Price\Percentage;
+use Thinktomorrow\Trader\Common\Price\Percentage;
 
 final class PercentageOffItemDiscount extends BaseItemDiscount implements Discount, ItemDiscount
 {
     /**
-     * @var Percentage
+     * @var \Thinktomorrow\Trader\Common\Price\Percentage
      */
     private $percentage;
 
