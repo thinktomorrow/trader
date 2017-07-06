@@ -2,23 +2,23 @@
 
 namespace Thinktomorrow\Trader\Tests\Unit;
 
-use Thinktomorrow\Trader\Discounts\Domain\DiscountDescription;
+use Thinktomorrow\Trader\Common\Domain\Description;
 
 class DiscountDescriptionTest extends UnitTestCase
 {
     /** @test */
     function it_can_create_a_description()
     {
-        $description = new DiscountDescription('foobar', ['baz' => 'bam']);
+        $description = new Description('foobar', ['baz' => 'bam']);
 
-        $this->assertEquals('foobar',$description->type());
+        $this->assertEquals('foobar',$description->key());
         $this->assertEquals(['baz' => 'bam'],$description->values());
     }
 
     /** @test */
-    function it_prints_out_the_type()
+    function it_prints_out_the_key()
     {
-        $description = new DiscountDescription('foobar', ['baz' => 'bam']);
+        $description = new Description('foobar', ['baz' => 'bam']);
 
         $this->assertEquals('foobar',$description->__toString());
     }

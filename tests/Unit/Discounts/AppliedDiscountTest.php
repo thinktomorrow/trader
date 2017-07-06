@@ -3,8 +3,8 @@
 namespace Thinktomorrow\Trader\Tests\Unit;
 
 use Money\Money;
+use Thinktomorrow\Trader\Common\Domain\Description;
 use Thinktomorrow\Trader\Discounts\Domain\AppliedDiscount;
-use Thinktomorrow\Trader\Discounts\Domain\DiscountDescription;
 use Thinktomorrow\Trader\Discounts\Domain\DiscountId;
 use Thinktomorrow\Trader\Discounts\Domain\Types\TypeKey;
 
@@ -15,7 +15,7 @@ class AppliedDiscountTest extends UnitTestCase
     {
         $discountId = DiscountId::fromInteger(1);
         $discountType = TypeKey::fromString('percentage_off');
-        $description = new DiscountDescription('foo',[]);
+        $description = new Description('foo',[]);
         $amount = Money::EUR(20);
 
         $appliedDiscount = new AppliedDiscount(
