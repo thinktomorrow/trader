@@ -1,8 +1,9 @@
 <?php
 
-namespace Thinktomorrow\Trader\Order;
+namespace Thinktomorrow\Trader\Order\Ports\Web;
 
 use Thinktomorrow\Trader\Discounts\Domain\AppliedDiscountCollection;
+use Thinktomorrow\Trader\Order\Ports\Web\CartItem;
 use Thinktomorrow\Trader\Order\Domain\Order;
 use Thinktomorrow\Trader\Common\Domain\Price\MoneyRender;
 
