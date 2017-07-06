@@ -4,10 +4,10 @@ namespace Thinktomorrow\Trader\Discounts\Domain\Types;
 
 use Assert\Assertion;
 use Money\Money;
+use Thinktomorrow\Trader\Common\Domain\Description;
 use Thinktomorrow\Trader\Discounts\Domain\Exceptions\CannotApplyDiscountToOrderException;
 use Thinktomorrow\Trader\Discounts\Domain\Discount;
 use Thinktomorrow\Trader\Discounts\Domain\AppliedDiscount;
-use Thinktomorrow\Trader\Discounts\Domain\DiscountDescription;
 use Thinktomorrow\Trader\Discounts\Domain\DiscountId;
 use Thinktomorrow\Trader\Discounts\Domain\OrderDiscount;
 use Thinktomorrow\Trader\Order\Domain\Item;
@@ -60,14 +60,14 @@ final class FreeItemDiscount extends BaseDiscount implements Discount, OrderDisc
         $order->addDiscount(new AppliedDiscount(
             $this->id,
             $this->type,
-            $this->createDiscountDescription(),
+            $this->createDescription(),
             Money::EUR(0)
         ));
     }
 
-    private function createDiscountDescription()
+    private function createDescription()
     {
-        return new DiscountDescription(
+        return new Description(
             $this->type,
             ['free_items' => $this->free_items]
         );

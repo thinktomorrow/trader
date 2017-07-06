@@ -3,6 +3,7 @@
 namespace Thinktomorrow\Trader\Discounts\Domain;
 
 use Money\Money;
+use Thinktomorrow\Trader\Common\Domain\Description;
 use Thinktomorrow\Trader\Discounts\Domain\Types\TypeKey;
 
 final class AppliedDiscount
@@ -23,11 +24,11 @@ final class AppliedDiscount
     private $amount;
 
     /**
-     * @var DiscountDescription
+     * @var Description
      */
     private $description;
 
-    public function __construct(DiscountId $discountId, TypeKey $discountType, DiscountDescription $description, Money $amount = null)
+    public function __construct(DiscountId $discountId, TypeKey $discountType, Description $description, Money $amount = null)
     {
         $this->discountId = $discountId;
         $this->discountType = $discountType;
@@ -61,16 +62,13 @@ final class AppliedDiscount
         return $this->discountType;
     }
 
+    public function description(): Description
+    {
+        return $this->description;
+    }
+
     public function amount()
     {
         return $this->amount;
-    }
-
-    /**
-     * @return DiscountDescription
-     */
-    public function description(): DiscountDescription
-    {
-        return $this->description;
     }
 }

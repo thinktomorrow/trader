@@ -4,7 +4,7 @@ namespace Thinktomorrow\Trader\Order;
 
 use Thinktomorrow\Trader\Discounts\Domain\AppliedDiscountCollection;
 use Thinktomorrow\Trader\Order\Domain\Item;
-use Thinktomorrow\Trader\Common\Price\MoneyRender;
+use Thinktomorrow\Trader\Common\Domain\Price\MoneyRender;
 
 /**
  * Class CartItem

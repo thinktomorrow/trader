@@ -2,15 +2,14 @@
 
 namespace Thinktomorrow\Trader\Discounts\Domain\Types;
 
+use Thinktomorrow\Trader\Common\Domain\Description;
 use Thinktomorrow\Trader\Discounts\Domain\Exceptions\CannotApplyDiscountToOrderException;
 use Thinktomorrow\Trader\Discounts\Domain\Discount;
 use Thinktomorrow\Trader\Discounts\Domain\AppliedDiscount;
-use Thinktomorrow\Trader\Discounts\Domain\DiscountDescription;
 use Thinktomorrow\Trader\Discounts\Domain\DiscountId;
 use Thinktomorrow\Trader\Discounts\Domain\OrderDiscount;
-use Thinktomorrow\Trader\Order\Domain\ItemCollection;
 use Thinktomorrow\Trader\Order\Domain\Order;
-use Thinktomorrow\Trader\Common\Price\Percentage;
+use Thinktomorrow\Trader\Common\Domain\Price\Percentage;
 
 final class PercentageOffDiscount extends BaseDiscount implements Discount, OrderDiscount
 {
@@ -52,14 +51,14 @@ final class PercentageOffDiscount extends BaseDiscount implements Discount, Orde
         $order->addDiscount(new AppliedDiscount(
             $this->id,
             $this->type,
-            $this->createDiscountDescription(),
+            $this->createDescription(),
             $discountAmount
         ));
     }
 
-    private function createDiscountDescription()
+    private function createDescription()
     {
-        return new DiscountDescription(
+        return new Description(
             $this->type,
             [
                 'percent' => $this->percentage->asPercent()

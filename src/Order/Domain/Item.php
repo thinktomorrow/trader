@@ -5,7 +5,7 @@ namespace Thinktomorrow\Trader\Order\Domain;
 use Money\Money;
 use Thinktomorrow\Trader\Discounts\Domain\AppliedDiscount;
 use Thinktomorrow\Trader\Discounts\Domain\AppliedDiscountCollection;
-use Thinktomorrow\Trader\Common\Price\Percentage;
+use Thinktomorrow\Trader\Common\Domain\Price\Percentage;
 
 final class Item
 {

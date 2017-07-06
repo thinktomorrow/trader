@@ -1,11 +1,14 @@
 <?php
 
+use Thinktomorrow\Trader\Common\Ports\App\DescriptionRender;
 use Thinktomorrow\Trader\Discounts\Application\ApplyDiscountsToOrder;
 use Thinktomorrow\Trader\Discounts\Domain\DiscountCollection;
 use Thinktomorrow\Trader\Discounts\Domain\DiscountFactory;
 use App\Product;
-use Thinktomorrow\Trader\Common\Price\Percentage;
+use Thinktomorrow\Trader\Common\Domain\Price\Percentage;
+use Thinktomorrow\Trader\Order\Ports\Persistence\InMemoryOrderRepository;
 use Thinktomorrow\Trader\Shipment\Application\ApplyShippingRuleToOrder;
+use Thinktomorrow\Trader\Shipment\Ports\Persistence\InMemoryShippingMethodRepository;
 use Thinktomorrow\Trader\Tests\DummyContainer;
 
 require_once __DIR__.'/../vendor/autoload.php';
@@ -53,7 +56,7 @@ $order->items()->add(
     );
 
     // Add shipment cost
-    (new ApplyShippingRuleToOrder())->handle($order);
+    //(new ApplyShippingRuleToOrder(new InMemoryOrderRepository(), new InMemoryShippingMethodRepository()))->handle($order->id());
 
     $cart = new \Thinktomorrow\Trader\Order\Cart($order);
 
@@ -99,7 +102,8 @@ $order->items()->add(
                             <p><?= $item->description() ?></p>
                             <?php if($item->discounts()->any()): ?>
                                 <?php foreach($item->discounts() as $discount): ?>
-                                    <p>Korting van: <?= (new \Thinktomorrow\Trader\Common\Price\MoneyRender)->locale($discount->amount()) ?></p>
+                                    <p><?= (new DescriptionRender)->locale($discount->description()) ?></p>
+                                    <p>Korting van: <?= (new \Thinktomorrow\Trader\Common\Domain\Price\MoneyRender)->locale($discount->amount()) ?></p>
                                 <?php endforeach; ?>
                             <?php endif; ?>
                         </div>
@@ -127,7 +131,7 @@ $order->items()->add(
             <td class="text-center">
                 <?php foreach($cart->discounts() as $discount): ?>
                     <p style="color:red;"><?= $discount->description() ?></p>
-                    <p>Globale korting van: <?= (new \Thinktomorrow\Trader\Common\Price\MoneyRender)->locale($discount->amount()) ?></p>
+                    <p>Globale korting van: <?= (new \Thinktomorrow\Trader\Common\Domain\Price\MoneyRender)->locale($discount->amount()) ?></p>
                 <?php endforeach; ?>
             </td>
             <td></td>

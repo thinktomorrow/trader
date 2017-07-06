@@ -3,7 +3,7 @@
 namespace Thinktomorrow\Trader\Order\Domain;
 
 use Money\Money;
-use Thinktomorrow\Trader\Common\Price\Percentage;
+use Thinktomorrow\Trader\Common\Domain\Price\Percentage;
 
 interface Purchasable
 {
@@ -34,7 +34,7 @@ interface Purchasable
     public function salePrice(): Money;
 
     /**
-     * @return Percentage
+     * @return \Thinktomorrow\Trader\Common\Domain\Price\Percentage
      */
     public function taxRate(): Percentage;
 }
