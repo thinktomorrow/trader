@@ -8,7 +8,7 @@ use Thinktomorrow\Trader\Shipment\Domain\Exceptions\CannotApplyShippingRuleExcep
 use Thinktomorrow\Trader\Shipment\Domain\ShippingMethodId;
 use Thinktomorrow\Trader\Shipment\Domain\ShippingMethodRepository;
 
-class ApplyShippingRuleToOrder
+class ApplyShippingMethodToOrder
 {
     /**
      * @var OrderRepository
@@ -33,8 +33,6 @@ class ApplyShippingRuleToOrder
             // get instances via repo
             $order = $this->orderRepository->find($orderId);
             $shippingMethod = $this->shippingMethodRepository->find($shippingMethodId);
-
-            // TODO find cost of implemented ShippingRule based on selected shipping method
 
             // Apply the first matching shipping rule of the selected shipping method
             $shippingMethod->apply($order);

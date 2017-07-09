@@ -34,7 +34,14 @@ interface Purchasable
     public function salePrice(): Money;
 
     /**
-     * @return \Thinktomorrow\Trader\Common\Domain\Price\Percentage
+     * @return Percentage
      */
     public function taxRate(): Percentage;
+
+    /**
+     * Tax price based on salePrice which is assumed to be the gross amount
+     *
+     * @return Money
+     */
+    public function tax(): Money;
 }

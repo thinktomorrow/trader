@@ -7,7 +7,7 @@ use Thinktomorrow\Trader\Discounts\Domain\DiscountFactory;
 use App\Product;
 use Thinktomorrow\Trader\Common\Domain\Price\Percentage;
 use Thinktomorrow\Trader\Order\Ports\Persistence\InMemoryOrderRepository;
-use Thinktomorrow\Trader\Shipment\Application\ApplyShippingRuleToOrder;
+use Thinktomorrow\Trader\Shipment\Application\ApplyShippingMethodToOrder;
 use Thinktomorrow\Trader\Shipment\Ports\Persistence\InMemoryShippingMethodRepository;
 use Thinktomorrow\Trader\Tests\DummyContainer;
 

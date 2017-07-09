@@ -43,7 +43,7 @@ class ConcretePurchasable implements Purchasable
     {
         // TODO: should this be set here on purchasable or only on Item?
         // If set here, the salePrice can be displayed on index as well, right?
-        // Also it can be optimized for reads? Keep in mind that we should also need the applied Sales as well
+        // Also it can be optimized for reads? Keep in mind that we should also need the applied Sales description as well
         // For specific text representations on productpages.
         return $this->salePrice ?: $this->price;
     }
@@ -51,5 +51,10 @@ class ConcretePurchasable implements Purchasable
     public function taxRate(): Percentage
     {
         return $this->taxRate;
+    }
+
+    public function tax(): Money
+    {
+        return $this->salePrice()->multiply($this->taxRate->asFloat());
     }
 }

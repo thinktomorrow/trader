@@ -7,7 +7,7 @@ use Thinktomorrow\Trader\Order\Domain\Item;
 use Thinktomorrow\Trader\Order\Domain\OrderId;
 use Thinktomorrow\Trader\Order\Ports\Persistence\InMemoryOrderRepository;
 use Thinktomorrow\Trader\Common\Domain\Price\Percentage;
-use Thinktomorrow\Trader\Shipment\Application\ApplyShippingRuleToOrder;
+use Thinktomorrow\Trader\Shipment\Application\ApplyShippingMethodToOrder;
 use Thinktomorrow\Trader\Shipment\Domain\ShippingMethod;
 use Thinktomorrow\Trader\Shipment\Domain\ShippingMethodId;
 use Thinktomorrow\Trader\Shipment\Domain\ShippingRule;
@@ -33,7 +33,7 @@ class ApplyShippingRuleToOrderTest extends UnitTestCase
 
     protected function makeHandler()
     {
-        return new ApplyShippingRuleToOrder(
+        return new ApplyShippingMethodToOrder(
             $this->orderRepository,
             $this->shippingMethodRepository
         );
