@@ -10,8 +10,6 @@ use Thinktomorrow\Trader\Shipment\Domain\ShippingRuleId;
 
 final class Order
 {
-    const STATUS_NEW = 1;
-
     private $id;
     private $items;
     private $discounts; // order level applied discounts
@@ -28,6 +26,8 @@ final class Order
         $this->discounts = new AppliedDiscountCollection;
         $this->discountTotal = Money::EUR(0); // TODO set currency outside of class
         $this->shipmentTotal = Money::EUR(0); // TODO set currency outside of class
+
+        // TODO IncompleteOrderStatus
     }
 
     public function id(): OrderId
