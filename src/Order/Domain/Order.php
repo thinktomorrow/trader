@@ -6,11 +6,11 @@ use Money\Money;
 use Thinktomorrow\Trader\Common\Domain\State\StatefulContract;
 use Thinktomorrow\Trader\Discounts\Domain\AppliedDiscount;
 use Thinktomorrow\Trader\Discounts\Domain\AppliedDiscountCollection;
-use Thinktomorrow\Trader\Shipment\Domain\ShippingMethodId;
-use Thinktomorrow\Trader\Shipment\Domain\ShippingRuleId;
 
 final class Order implements StatefulContract
 {
+    use PayableAndShippable;
+
     /**
      * Current state
      * @var string
@@ -21,10 +21,6 @@ final class Order implements StatefulContract
     private $items;
     private $discounts; // order level applied discounts
     private $discountTotal;
-    private $shipmentTotal;
-
-    private $shipmentMethodId;
-    private $shipmentRuleId;
 
     public function __construct(OrderId $id)
     {
@@ -33,6 +29,7 @@ final class Order implements StatefulContract
         $this->discounts = new AppliedDiscountCollection;
         $this->discountTotal = Money::EUR(0); // TODO set currency outside of class
         $this->shipmentTotal = Money::EUR(0); // TODO set currency outside of class
+        $this->paymentTotal = Money::EUR(0); // TODO set currency outside of class
 
         // Initial order state
         $this->state = OrderState::STATE_NEW;
@@ -91,34 +88,6 @@ final class Order implements StatefulContract
     public function addToDiscountTotal(Money $addition)
     {
         $this->discountTotal = $this->discountTotal->add($addition);
-    }
-
-    public function shipmentTotal(): Money
-    {
-        return $this->shipmentTotal;
-    }
-
-    public function setShipmentTotal(Money $shipmentTotal)
-    {
-        $this->shipmentTotal = $shipmentTotal;
-
-        return $this;
-    }
-
-    public function shipmentMethodId()
-    {
-        return $this->shipmentMethodId;
-    }
-
-    public function shipmentRuleId()
-    {
-        return $this->shipmentRuleId;
-    }
-
-    public function setShipment(ShippingMethodId $shipmentMethodId, ShippingRuleId $shipmentRuleId)
-    {
-        $this->shipmentMethodId = $shipmentMethodId;
-        $this->shipmentRuleId = $shipmentRuleId;
     }
 
     public function total(): Money
