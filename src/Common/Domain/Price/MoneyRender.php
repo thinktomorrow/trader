@@ -13,6 +13,9 @@ class MoneyRender
         $currencies = new ISOCurrencies();
         $moneyFormatter = new DecimalMoneyFormatter($currencies);
 
+        // TODO format according to locale preferences
+        // TODO add currency symbol
+
         return $moneyFormatter->format($money);
     }
 }

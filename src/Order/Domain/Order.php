@@ -3,13 +3,20 @@
 namespace Thinktomorrow\Trader\Order\Domain;
 
 use Money\Money;
+use Thinktomorrow\Trader\Common\Domain\State\StatefulContract;
 use Thinktomorrow\Trader\Discounts\Domain\AppliedDiscount;
 use Thinktomorrow\Trader\Discounts\Domain\AppliedDiscountCollection;
 use Thinktomorrow\Trader\Shipment\Domain\ShippingMethodId;
 use Thinktomorrow\Trader\Shipment\Domain\ShippingRuleId;
 
-final class Order
+final class Order implements StatefulContract
 {
+    /**
+     * Current state
+     * @var string
+     */
+    private $state;
+
     private $id;
     private $items;
     private $discounts; // order level applied discounts
@@ -27,12 +34,26 @@ final class Order
         $this->discountTotal = Money::EUR(0); // TODO set currency outside of class
         $this->shipmentTotal = Money::EUR(0); // TODO set currency outside of class
 
+        // Initial order state
+        $this->state = OrderState::STATE_NEW;
+
         // TODO IncompleteOrderStatus
     }
 
     public function id(): OrderId
     {
         return $this->id;
+    }
+
+    public function state(): string
+    {
+        return $this->state;
+    }
+
+    public function changeState($state)
+    {
+        // TODO: validate against our states
+        $this->state = $state;
     }
 
     public function items(): ItemCollection

@@ -3,12 +3,12 @@
 namespace Thinktomorrow\Trader\Order\Ports\Web;
 
 use Thinktomorrow\Trader\Discounts\Domain\AppliedDiscountCollection;
-use Thinktomorrow\Trader\Order\Ports\Web\CartItem;
 use Thinktomorrow\Trader\Order\Domain\Order;
 use Thinktomorrow\Trader\Common\Domain\Price\MoneyRender;
 
 /**
  * Cart data object for read-only usage in views
+ * Order presenter for shopper
  */
 class Cart
 {
