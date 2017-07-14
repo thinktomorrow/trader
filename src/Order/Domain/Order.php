@@ -6,6 +6,7 @@ use Money\Money;
 use Thinktomorrow\Trader\Common\Domain\State\StatefulContract;
 use Thinktomorrow\Trader\Discounts\Domain\AppliedDiscount;
 use Thinktomorrow\Trader\Discounts\Domain\AppliedDiscountCollection;
+use Thinktomorrow\Trader\Order\Domain\Services\SumOfItemTaxes;
 
 final class Order implements StatefulContract
 {
@@ -94,22 +95,25 @@ final class Order implements StatefulContract
     {
         return $this->subtotal()
                     ->subtract($this->discountTotal())
+                    ->add($this->paymentTotal())
                     ->add($this->shipmentTotal());
     }
 
-    public function shipmentId()
+    public function tax(): Money
     {
-        // shipment method
+        return array_reduce($this->taxRates(),function($carry, $taxRate){
+            return $carry->add($taxRate['tax']);
+        },Money::EUR(0));
     }
 
-    public function paymentId()
-    {
-        // payment method
-    }
+    /**
+     * Collection of used taxRates and their resp. tax() amount
+     * With roundings each item would add up to 295 but if subtotals are added we have a more precise tax per taxrate.
 
-    // customer
-    // email
-    // addresses
-    // shipment method
-    // payment method
+     * @return array
+     */
+    public function taxRates(): array
+    {
+        return (new SumOfItemTaxes())->forItems($this->items());
+    }
 }

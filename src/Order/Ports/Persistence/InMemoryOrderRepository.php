@@ -32,10 +32,38 @@ class InMemoryOrderRepository implements OrderRepository
         $order = self::$collection[(string)$orderId];
 
         return [
-            'total' => $order->total(),
-            'subtotal' => $order->subtotal(),
+            'total'     => $order->total(),
+            'subtotal'  => $order->subtotal(),
             'payment_total' => $order->paymentTotal(),
             'shipment_total' => $order->shipmentTotal(),
+            'tax'       => $order->tax(),
+            'tax_rates' => $order->taxRates(),
+            'reference' => $order->id()->get(), // This should be something business unique; not the id.
+            'confirmed_at' => new \DateTime('@'.strtotime('-1day')), // TODO datestamps of states should be held elsewhere no?
+            'state' => $order->state(),
+            'items' => $this->getItemValuesForMerchantOrder($orderId),
         ];
+    }
+
+    private function getItemValuesForMerchantOrder(OrderId $orderId): array
+    {
+        $order = self::$collection[(string)$orderId];
+
+        $items = [];
+
+        foreach($order->items() as $item)
+        {
+            $items[] = [
+                'name' => $item->name(),
+                'sku' => '392939', // TODO
+                'stock' => 1, // TODO
+                'stock_warning' => false, // TODO feature for later on
+                'saleprice' => $item->salePrice(),
+                'quantity' => $item->quantity(),
+                'total' => $item->total(),
+            ];
+        }
+
+        return $items;
     }
 }

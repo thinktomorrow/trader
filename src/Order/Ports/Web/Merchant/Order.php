@@ -50,10 +50,20 @@ class Order extends AbstractPresenter
         });
     }
 
-    public function taxRate()
+    public function taxRates()
     {
-        return $this->getValue('tax_rate',null,function($rate){
-            return $rate->asPercent().'%';
+        return $this->getValue('tax_rates',[],function($taxRates){
+            $rates = [];
+
+            foreach($taxRates as $key => $taxRate)
+            {
+                $rates[$key] = [
+                    'percent' => $taxRate['percent']->asPercent().'%',
+                    'tax' => (new MoneyRender())->locale($taxRate['tax'])
+                ];
+            }
+
+            return $rates;
         });
     }
 

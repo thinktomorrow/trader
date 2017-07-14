@@ -1,6 +1,6 @@
 <?php
 
-namespace Thinktomorrow\Trader\Order\Ports\Web;
+namespace Thinktomorrow\Trader\Order\Ports\Web\Shop;
 
 use Thinktomorrow\Trader\Discounts\Domain\AppliedDiscountCollection;
 use Thinktomorrow\Trader\Order\Domain\Item;

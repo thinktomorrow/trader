@@ -20,43 +20,22 @@ class OrderAssembler
         $this->orderRepository = $orderRepository;
     }
 
+    /**
+     * This data (raw) will then be transposed to a simple read-only DTO
+     * @param $orderId
+     * @return MerchantOrder
+     */
     public function forMerchant($orderId)
     {
         $data = $this->orderRepository->getValuesForMerchantOrder(OrderId::fromInteger($orderId));
-        $items = $this->orderRepository->getItemsForMerchantOrder(OrderId::fromInteger($orderId));
 
-        // This data (raw) will then be transposed to a simple read-only DTO
+        $order = new MerchantOrder();
 
-        // Get raw data from specific query
-        return new MerchantOrder([
-            'total' => Money::EUR(1290),
-            'subtotal' => Money::EUR(900),
-            'payment_total' => Money::EUR(0),
-            'shipment_total' => Money::EUR(50),
-            'tax' => Money::EUR(30),
-            'tax_rate' => Percentage::fromPercent(21),
-            'reference' => 'a782820ZIsksa',
-            'confirmed_at' => (new \DateTime('@'.strtotime('-9days'))),
-            'state' => 'confirmed',
-            'items' => [
-                [
-                    'name' => 'dude',
-                    'sku' => '123490',
-                    'stock' => 5,
-                    'stock_warning' => false,
-                    'saleprice' => Money::EUR(120),
-                    'quantity' => 2,
-                    'total' => Money::EUR(240),
-                ],
-                [
-                    'name' => 'tweede',
-                    'sku' => '1293939',
-                    'stock' => 1,
-                    'stock_warning' => true,
-                    'saleprice' => Money::EUR(820),
-                    'total' => Money::EUR(820),
-                ],
-            ],
-        ]);
+        foreach(['items','total','subtotal','payment_total','shipment_total','tax','tax_rates','reference','confirmed_at','state'] as $attribute)
+        {
+            $order->{$attribute} = $data[$attribute];
+        }
+
+        return $order;
     }
 }

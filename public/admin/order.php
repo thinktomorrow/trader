@@ -1,12 +1,34 @@
 <?php
 
+use Money\Money;
+use Thinktomorrow\Trader\Common\Domain\Price\Percentage;
 use Thinktomorrow\Trader\Order\Application\OrderAssembler;
+use Thinktomorrow\Trader\Order\Domain\Item;
+use Thinktomorrow\Trader\Order\Ports\Persistence\InMemoryOrderRepository;
+use Thinktomorrow\Trader\Tests\Unit\Stubs\ConcretePurchasable;
 
 require __DIR__.'/../../vendor/autoload.php'; ?>
 
 <?php
 
-$order = (new OrderAssembler())->forMerchant(1);
+// FAKE ADDITION OF ORDER
+$confirmedOrder = new Thinktomorrow\Trader\Order\Domain\Order(\Thinktomorrow\Trader\Order\Domain\OrderId::fromInteger(1));
+$confirmedOrder->items()->add(Item::fromPurchasable(new ConcretePurchasable(1,[],Money::EUR(50),Percentage::fromPercent(21))));
+$confirmedOrder->items()->add(Item::fromPurchasable(new ConcretePurchasable(1,[],Money::EUR(50),Percentage::fromPercent(21))));
+$confirmedOrder->items()->add(Item::fromPurchasable(new ConcretePurchasable(2,[],Money::EUR(50),Percentage::fromPercent(6))));
+$confirmedOrder->items()->add(Item::fromPurchasable(new ConcretePurchasable(1,[],Money::EUR(50),Percentage::fromPercent(21))));
+$confirmedOrder->items()->add(Item::fromPurchasable(new ConcretePurchasable(7,[],Money::EUR(50),Percentage::fromPercent(9))));
+$confirmedOrder->items()->add(Item::fromPurchasable(new ConcretePurchasable(1,[],Money::EUR(50),Percentage::fromPercent(21))));
+$confirmedOrder->items()->add(Item::fromPurchasable(new ConcretePurchasable(6,[],Money::EUR(1050),Percentage::fromPercent(21))));
+$confirmedOrder->items()->add(Item::fromPurchasable(new ConcretePurchasable(1,[],Money::EUR(50),Percentage::fromPercent(21))));
+$confirmedOrder->setShipmentTotal(Money::EUR(15));
+$confirmedOrder->setPaymentTotal(Money::EUR(10));
+
+$repo = new InMemoryOrderRepository();
+$repo->add($confirmedOrder);
+
+// FETCH ORDER FOR MERCHANT
+$order = (new OrderAssembler(new InMemoryOrderRepository()))->forMerchant(1);
 
 ?>
 
@@ -88,8 +110,16 @@ $order = (new OrderAssembler())->forMerchant(1);
                         <td align="right" colspan="3">Verzendkosten (provider):</td>
                         <td align="right"><?= $order->shipmentTotal ?></td>
                     </tr>
+                    <?php foreach($order->taxRates() as $taxRate): ?>
+
+                        <tr>
+                            <td align="right" colspan="3">Btw (<?= $taxRate['percent'] ?>):</td>
+                            <td align="right"><?= $taxRate['tax'] ?></td>
+                        </tr>
+
+                    <?php endforeach; ?>
                     <tr>
-                        <td align="right" colspan="3">Btw (percentage):</td>
+                        <td align="right" colspan="3">Btw TOTAL:</td>
                         <td align="right"><?= $order->tax ?></td>
                     </tr>
                     <tr>

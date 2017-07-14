@@ -1,6 +1,6 @@
 <?php
 
-namespace Thinktomorrow\Trader\Order\Ports\Web;
+namespace Thinktomorrow\Trader\Order\Ports\Web\Shop;
 
 use Thinktomorrow\Trader\Discounts\Domain\AppliedDiscountCollection;
 use Thinktomorrow\Trader\Order\Domain\Order;
@@ -58,10 +58,5 @@ class Cart
     {
         // TODO
         return false;
-    }
-
-    public function __call($method, $params)
-    {
-        return $this->order->items()->{$method}(...$params);
     }
 }

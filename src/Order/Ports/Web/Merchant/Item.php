@@ -21,7 +21,7 @@ class Item extends AbstractPresenter
             $flair = 'danger';
             $text = 'niet op voorraad';
 
-            if($stock > 1)
+            if($stock > 0)
             {
                 $flair = 'success';
                 $text = 'op voorraad';
