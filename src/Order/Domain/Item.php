@@ -3,6 +3,7 @@
 namespace Thinktomorrow\Trader\Order\Domain;
 
 use Money\Money;
+use Thinktomorrow\Trader\Common\Domain\Price\Cash;
 use Thinktomorrow\Trader\Discounts\Domain\AppliedDiscount;
 use Thinktomorrow\Trader\Discounts\Domain\AppliedDiscountCollection;
 use Thinktomorrow\Trader\Common\Domain\Price\Percentage;
@@ -38,7 +39,7 @@ final class Item
         $this->id = $purchasable->itemId();
         $this->purchasable = $purchasable;
         $this->discounts = new AppliedDiscountCollection;
-        $this->discountTotal = Money::EUR(0); // TODO set currency outside of class
+        $this->discountTotal = Cash::CUR(0); // TODO set currency outside of class
     }
 
     public static function fromPurchasable(Purchasable $purchasable)

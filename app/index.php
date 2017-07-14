@@ -103,7 +103,7 @@ $order->items()->add(
                             <?php if($item->discounts()->any()): ?>
                                 <?php foreach($item->discounts() as $discount): ?>
                                     <p><?= (new DescriptionRender)->locale($discount->description()) ?></p>
-                                    <p>Korting van: <?= (new \Thinktomorrow\Trader\Common\Domain\Price\MoneyRender)->locale($discount->amount()) ?></p>
+                                    <p>Korting van: <?= (new \Thinktomorrow\Trader\Common\Domain\Price\Cash)->locale($discount->amount()) ?></p>
                                 <?php endforeach; ?>
                             <?php endif; ?>
                         </div>
@@ -131,7 +131,7 @@ $order->items()->add(
             <td class="text-center">
                 <?php foreach($cart->discounts() as $discount): ?>
                     <p style="color:red;"><?= $discount->description() ?></p>
-                    <p>Globale korting van: <?= (new \Thinktomorrow\Trader\Common\Domain\Price\MoneyRender)->locale($discount->amount()) ?></p>
+                    <p>Globale korting van: <?= (new \Thinktomorrow\Trader\Common\Domain\Price\Cash)->locale($discount->amount()) ?></p>
                 <?php endforeach; ?>
             </td>
             <td></td>

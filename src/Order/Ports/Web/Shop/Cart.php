@@ -4,7 +4,7 @@ namespace Thinktomorrow\Trader\Order\Ports\Web\Shop;
 
 use Thinktomorrow\Trader\Discounts\Domain\AppliedDiscountCollection;
 use Thinktomorrow\Trader\Order\Domain\Order;
-use Thinktomorrow\Trader\Common\Domain\Price\MoneyRender;
+use Thinktomorrow\Trader\Common\Domain\Price\Cash;
 
 /**
  * Cart data object for read-only usage in views
@@ -24,12 +24,12 @@ class Cart
 
     public function subtotal(): string
     {
-        return (new MoneyRender())->locale($this->order->subtotal());
+        return (new Cash())->locale($this->order->subtotal());
     }
 
     public function total(): string
     {
-        return (new MoneyRender())->locale($this->order->total());
+        return (new Cash())->locale($this->order->total());
     }
 
     public function items(): array

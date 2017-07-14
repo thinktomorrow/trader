@@ -2,7 +2,7 @@
 
 namespace Thinktomorrow\Trader\Order\Domain\Services;
 
-use Money\Money;
+use Thinktomorrow\Trader\Common\Domain\Price\Cash;
 use Thinktomorrow\Trader\Order\Domain\ItemCollection;
 
 class SumOfItemTaxes
@@ -33,7 +33,7 @@ class SumOfItemTaxes
             $key = (string)$item->taxRate()->asPercent();
 
             if (!isset($totalsPerRate[$key])) {
-                $totalsPerRate[$key] = ['percent' => $item->taxRate(), 'total' => Money::EUR(0)];
+                $totalsPerRate[$key] = ['percent' => $item->taxRate(), 'total' => Cash::CUR(0)];
             }
 
             $totalsPerRate[$key]['total'] = $totalsPerRate[$key]['total']->add($item->total());

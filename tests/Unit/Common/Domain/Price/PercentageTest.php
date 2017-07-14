@@ -10,7 +10,7 @@ class PercentageTest extends UnitTestCase
     /** @test */
     function it_can_be_set_by_percentage()
     {
-        $percentage = \Thinktomorrow\Trader\Common\Domain\Price\Percentage::fromPercent(23);
+        $percentage = Percentage::fromPercent(23);
 
         $this->assertEquals(0.23,$percentage->asFloat());
         $this->assertEquals(23,$percentage->asPercent());

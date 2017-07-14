@@ -3,8 +3,8 @@
 namespace Thinktomorrow\Trader\Discounts\Domain\Types;
 
 use Assert\Assertion;
-use Money\Money;
 use Thinktomorrow\Trader\Common\Domain\Description;
+use Thinktomorrow\Trader\Common\Domain\Price\Cash;
 use Thinktomorrow\Trader\Discounts\Domain\Exceptions\CannotApplyDiscountToOrderException;
 use Thinktomorrow\Trader\Discounts\Domain\Discount;
 use Thinktomorrow\Trader\Discounts\Domain\AppliedDiscount;
@@ -61,7 +61,7 @@ final class FreeItemDiscount extends BaseDiscount implements Discount, OrderDisc
             $this->id,
             $this->type,
             $this->createDescription(),
-            Money::EUR(0)
+            Cash::CUR(0)
         ));
     }
 

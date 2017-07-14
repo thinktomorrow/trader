@@ -3,6 +3,7 @@
 namespace Thinktomorrow\Trader\Order\Domain;
 
 use Money\Money;
+use Thinktomorrow\Trader\Common\Domain\Price\Cash;
 use Thinktomorrow\Trader\Common\Domain\State\StatefulContract;
 use Thinktomorrow\Trader\Discounts\Domain\AppliedDiscount;
 use Thinktomorrow\Trader\Discounts\Domain\AppliedDiscountCollection;
@@ -28,9 +29,9 @@ final class Order implements StatefulContract
         $this->id = $id;
         $this->items = new ItemCollection;
         $this->discounts = new AppliedDiscountCollection;
-        $this->discountTotal = Money::EUR(0); // TODO set currency outside of class
-        $this->shipmentTotal = Money::EUR(0); // TODO set currency outside of class
-        $this->paymentTotal = Money::EUR(0); // TODO set currency outside of class
+        $this->discountTotal = Cash::CUR(0); // TODO set currency outside of class
+        $this->shipmentTotal = Cash::CUR(0); // TODO set currency outside of class
+        $this->paymentTotal = Cash::CUR(0); // TODO set currency outside of class
 
         // Initial order state
         $this->state = OrderState::STATE_NEW;
@@ -50,7 +51,8 @@ final class Order implements StatefulContract
 
     public function changeState($state)
     {
-        // TODO: validate against our states
+        OrderState::assertNewState($this, $state);
+
         $this->state = $state;
     }
 
@@ -78,7 +80,7 @@ final class Order implements StatefulContract
     {
         return array_reduce($this->items->all(), function($carry, Item $item){
             return $carry->add($item->total());
-        },Money::EUR(0)); // TODO currency should be changeable
+        },Cash::CUR(0)); // TODO currency should be changeable
     }
 
     public function discountTotal(): Money
@@ -103,7 +105,7 @@ final class Order implements StatefulContract
     {
         return array_reduce($this->taxRates(),function($carry, $taxRate){
             return $carry->add($taxRate['tax']);
-        },Money::EUR(0));
+        },Cash::CUR(0));
     }
 
     /**

@@ -2,7 +2,7 @@
 
 namespace Thinktomorrow\Trader\Order\Ports\Web\Merchant;
 
-use Thinktomorrow\Trader\Common\Domain\Price\MoneyRender;
+use Thinktomorrow\Trader\Common\Domain\Price\Cash;
 use Thinktomorrow\Trader\Common\Ports\Web\AbstractPresenter;
 
 /**
@@ -32,21 +32,21 @@ class Order extends AbstractPresenter
     public function total()
     {
         return $this->getValue('total',null,function($total){
-            return (new MoneyRender())->locale($total);
+            return (new Cash())->locale($total);
         });
     }
 
     public function subtotal()
     {
         return $this->getValue('subtotal',null,function($subtotal){
-            return (new MoneyRender())->locale($subtotal);
+            return (new Cash())->locale($subtotal);
         });
     }
 
     public function tax()
     {
         return $this->getValue('tax',null,function($tax){
-            return (new MoneyRender())->locale($tax);
+            return (new Cash())->locale($tax);
         });
     }
 
@@ -59,7 +59,7 @@ class Order extends AbstractPresenter
             {
                 $rates[$key] = [
                     'percent' => $taxRate['percent']->asPercent().'%',
-                    'tax' => (new MoneyRender())->locale($taxRate['tax'])
+                    'tax' => (new Cash())->locale($taxRate['tax'])
                 ];
             }
 
@@ -70,14 +70,14 @@ class Order extends AbstractPresenter
     public function shipmentTotal()
     {
         return $this->getValue('shipment_total',null,function($shipmentTotal){
-            return (new MoneyRender())->locale($shipmentTotal);
+            return (new Cash())->locale($shipmentTotal);
         });
     }
 
     public function paymentTotal()
     {
         return $this->getValue('payment_total',null,function($paymentTotal){
-            return (new MoneyRender())->locale($paymentTotal);
+            return (new Cash())->locale($paymentTotal);
         });
     }
 

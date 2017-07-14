@@ -5,8 +5,6 @@ namespace Thinktomorrow\Trader\Tests\Unit;
 use Money\Money;
 use PHPUnit_Framework_TestCase;
 use Thinktomorrow\Trader\Discounts\Domain\DiscountFactory;
-use Thinktomorrow\Trader\Discounts\Domain\DiscountId;
-use Thinktomorrow\Trader\Discounts\Domain\Types\PercentageOffDiscount;
 use Thinktomorrow\Trader\Order\Domain\Item;
 use Thinktomorrow\Trader\Order\Domain\Order;
 use Thinktomorrow\Trader\Order\Domain\OrderId;
@@ -16,11 +14,6 @@ use Thinktomorrow\Trader\Tests\Unit\Stubs\ConcretePurchasable;
 
 class UnitTestCase extends PHPUnit_Framework_TestCase
 {
-    public function setUp()
-    {
-        parent::setUp();
-    }
-
     protected function makeOrder($subtotalAmount = 0, $id = 2)
     {
         $order = new Order(OrderId::fromInteger($id));

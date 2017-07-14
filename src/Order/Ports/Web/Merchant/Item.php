@@ -2,7 +2,7 @@
 
 namespace Thinktomorrow\Trader\Order\Ports\Web\Merchant;
 
-use Thinktomorrow\Trader\Common\Domain\Price\MoneyRender;
+use Thinktomorrow\Trader\Common\Domain\Price\Cash;
 use Thinktomorrow\Trader\Common\Ports\Web\AbstractPresenter;
 
 class Item extends AbstractPresenter
@@ -39,28 +39,28 @@ class Item extends AbstractPresenter
     public function price()
     {
         return $this->getValue('price',null,function($price){
-            return (new MoneyRender())->locale($price);
+            return (new Cash())->locale($price);
         });
     }
 
     public function saleprice()
     {
         return $this->getValue('saleprice',null,function($price){
-            return (new MoneyRender())->locale($price);
+            return (new Cash())->locale($price);
         });
     }
 
     public function subtotal()
     {
         return $this->getValue('subtotal',null,function($price){
-            return (new MoneyRender())->locale($price);
+            return (new Cash())->locale($price);
         });
     }
 
     public function total()
     {
         return $this->getValue('total',null,function($price){
-            return (new MoneyRender())->locale($price);
+            return (new Cash())->locale($price);
         });
     }
 }

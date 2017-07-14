@@ -26,6 +26,43 @@ abstract class StateMachine
         $this->validateTransitions();
     }
 
+    /**
+     * assert the integrity of the new state
+     *
+     * @param StatefulContract $statefulContract
+     * @param $state
+     * @throws StateException
+     */
+    public static function assertNewState(StatefulContract $statefulContract, $state)
+    {
+        $machine = new static($statefulContract);
+
+        if( ! $machine->canTransitionTo($state))
+        {
+            throw StateException::invalidState($state, $statefulContract->state(), $machine);
+        }
+    }
+
+    /**
+     * Verify the new state is valid
+     *
+     * @param $state
+     * @return bool
+     */
+    public function canTransitionTo($state)
+    {
+        if(!in_array($state, $this->states)) return false;
+
+        foreach($this->transitions as $transition)
+        {
+            if(!in_array($this->statefulContract->state(),$transition['from'])) continue;
+
+            if($transition['to'] == $state) return true;
+        }
+
+        return false;
+    }
+
     public function apply($transition)
     {
         // Check valid transition request
@@ -42,8 +79,6 @@ abstract class StateMachine
         $state = $this->transitions[$transition]['to'];
 
         $this->statefulContract->changeState($state);
-
-
     }
 
     private function validateTransitions()
@@ -55,12 +90,12 @@ abstract class StateMachine
 
             foreach ($transition['from'] as $fromState) {
                 if (!in_array($fromState, $this->states)) {
-                    throw StateException::invalidState($transitionKey, $fromState, $this);
+                    throw StateException::invalidTransitionState($transitionKey, $fromState, $this);
                 }
             }
 
             if (!in_array($transition['to'], $this->states)) {
-                throw StateException::invalidState($transitionKey, $transition['to'], $this);
+                throw StateException::invalidTransitionState($transitionKey, $transition['to'], $this);
             }
         }
     }

@@ -1,6 +1,7 @@
 <?php
 
 use Money\Money;
+use Thinktomorrow\Trader\Common\Domain\Price\Cash;
 use Thinktomorrow\Trader\Common\Domain\Price\Percentage;
 use Thinktomorrow\Trader\Order\Application\OrderAssembler;
 use Thinktomorrow\Trader\Order\Domain\Item;
@@ -13,16 +14,16 @@ require __DIR__.'/../../vendor/autoload.php'; ?>
 
 // FAKE ADDITION OF ORDER
 $confirmedOrder = new Thinktomorrow\Trader\Order\Domain\Order(\Thinktomorrow\Trader\Order\Domain\OrderId::fromInteger(1));
-$confirmedOrder->items()->add(Item::fromPurchasable(new ConcretePurchasable(1,[],Money::EUR(50),Percentage::fromPercent(21))));
-$confirmedOrder->items()->add(Item::fromPurchasable(new ConcretePurchasable(1,[],Money::EUR(50),Percentage::fromPercent(21))));
-$confirmedOrder->items()->add(Item::fromPurchasable(new ConcretePurchasable(2,[],Money::EUR(50),Percentage::fromPercent(6))));
-$confirmedOrder->items()->add(Item::fromPurchasable(new ConcretePurchasable(1,[],Money::EUR(50),Percentage::fromPercent(21))));
-$confirmedOrder->items()->add(Item::fromPurchasable(new ConcretePurchasable(7,[],Money::EUR(50),Percentage::fromPercent(9))));
-$confirmedOrder->items()->add(Item::fromPurchasable(new ConcretePurchasable(1,[],Money::EUR(50),Percentage::fromPercent(21))));
-$confirmedOrder->items()->add(Item::fromPurchasable(new ConcretePurchasable(6,[],Money::EUR(1050),Percentage::fromPercent(21))));
-$confirmedOrder->items()->add(Item::fromPurchasable(new ConcretePurchasable(1,[],Money::EUR(50),Percentage::fromPercent(21))));
-$confirmedOrder->setShipmentTotal(Money::EUR(15));
-$confirmedOrder->setPaymentTotal(Money::EUR(10));
+$confirmedOrder->items()->add(Item::fromPurchasable(new ConcretePurchasable(1,[],Cash::CUR(50),Percentage::fromPercent(21))));
+$confirmedOrder->items()->add(Item::fromPurchasable(new ConcretePurchasable(1,[],Cash::CUR(50),Percentage::fromPercent(21))));
+$confirmedOrder->items()->add(Item::fromPurchasable(new ConcretePurchasable(2,[],Cash::CUR(50),Percentage::fromPercent(6))));
+$confirmedOrder->items()->add(Item::fromPurchasable(new ConcretePurchasable(1,[],Cash::CUR(50),Percentage::fromPercent(21))));
+$confirmedOrder->items()->add(Item::fromPurchasable(new ConcretePurchasable(7,[],Cash::CUR(50),Percentage::fromPercent(9))));
+$confirmedOrder->items()->add(Item::fromPurchasable(new ConcretePurchasable(12,[],Money::EUR(50),Percentage::fromPercent(21))));
+$confirmedOrder->items()->add(Item::fromPurchasable(new ConcretePurchasable(6,[],Cash::CUR(1050),Percentage::fromPercent(21))));
+$confirmedOrder->items()->add(Item::fromPurchasable(new ConcretePurchasable(1,[],Cash::CUR(50),Percentage::fromPercent(21))));
+$confirmedOrder->setShipmentTotal(Cash::CUR(15));
+$confirmedOrder->setPaymentTotal(Cash::CUR(10));
 
 $repo = new InMemoryOrderRepository();
 $repo->add($confirmedOrder);

@@ -2,6 +2,7 @@
 
 namespace Thinktomorrow\Trader\Unit;
 
+use Thinktomorrow\Trader\Common\Domain\State\StateException;
 use Thinktomorrow\Trader\Order\Domain\Order;
 use Thinktomorrow\Trader\Order\Domain\OrderId;
 use Thinktomorrow\Trader\Order\Domain\OrderState;
@@ -30,5 +31,21 @@ class OrderStateMachineTest extends UnitTestCase
 
         $this->machine->apply('abandon');
         $this->assertEquals('abandoned',$this->order->state());
+    }
+
+    /** @test */
+    function it_cannot_change_to_invalid_state_directly()
+    {
+        $this->setExpectedException(StateException::class);
+
+        $this->order->changeState('foobar');
+    }
+
+    /** @test */
+    function it_only_allows_transition_to_allowed_state()
+    {
+        $this->setExpectedException(StateException::class);
+
+        $this->order->changeState('confirmed');
     }
 }

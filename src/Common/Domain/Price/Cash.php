@@ -1,0 +1,58 @@
+<?php
+
+namespace Thinktomorrow\Trader\Common\Domain\Price;
+
+use Money\Money;
+use Money\Currency;
+use Money\Currencies\ISOCurrencies;
+use Money\Formatter\DecimalMoneyFormatter;
+use Thinktomorrow\Trader\Common\Config;
+
+class Cash
+{
+    private static $currencyCode;
+
+    /**
+     * Convenience method to allow maintaining dynamic currency.
+     * Keep in mind that this remains consistent across your application
+     *
+     * @param $amount
+     * @return Money
+     */
+    public static function CUR($amount)
+    {
+        return new Money($amount, new Currency(static::getCurrencyCode()));
+    }
+
+    private static function getCurrencyCode()
+    {
+        if( ! static::$currencyCode)
+        {
+            static::$currencyCode = (new Config)->get('currency','EUR');
+        }
+
+        return static::$currencyCode;
+    }
+
+    /**
+     * Convenience method to reset the current currency so it can be refetched from config
+     */
+    public static function resetCurrency()
+    {
+        static::$currencyCode = null;
+    }
+
+    public function locale(Money $money, $locale = 'nl_BE')
+    {
+        $currencies = new ISOCurrencies();
+        $moneyFormatter = new DecimalMoneyFormatter($currencies);
+
+        // TODO format according to locale preferences
+        // TODO add currency symbol
+
+        // TEMPORARY display just for testing
+        $symbol = $money->getCurrency()->getCode();
+
+        return $symbol . ' '.$moneyFormatter->format($money);
+    }
+}
