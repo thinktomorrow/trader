@@ -56,6 +56,16 @@ final class Order implements StatefulContract
         $this->state = $state;
     }
 
+    public function inCustomerHands(): bool
+    {
+        return (new OrderState($this))->inCustomerHands();
+    }
+
+    public function inMerchantHands(): bool
+    {
+        return (new OrderState($this))->inMerchantHands();
+    }
+
     public function items(): ItemCollection
     {
         return $this->items;

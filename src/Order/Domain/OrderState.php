@@ -40,10 +40,6 @@ class OrderState extends StateMachine
             'from' => ['new'],
             'to' => 'pending'
         ],
-        'confirm' => [
-            'from' => ['pending','abandoned'],
-            'to' => 'confirmed'
-        ],
         'abandon' => [
             'from' => ['pending'],
             'to' => 'abandoned'
@@ -52,10 +48,33 @@ class OrderState extends StateMachine
           'from' => ['pending','abandoned'],
           'to' => 'removed'
         ],
+        'confirm' => [
+            'from' => ['pending','abandoned'],
+            'to' => 'confirmed'
+        ],
+        'pay' => [
+            'from' => ['confirmed'],
+            'to' => 'paid'
+        ],
     ];
 
     public function __construct(Order $order)
     {
         parent::__construct($order);
+    }
+
+    public function inCustomerHands(): bool
+    {
+        return in_array($this->statefulContract->state(),[
+            static::STATE_NEW,
+            static::STATE_PENDING,
+            static::STATE_ABANDONED,
+            static::STATE_CONFIRMED,
+        ]);
+    }
+
+    public function inMerchantHands(): bool
+    {
+        return ! $this->inCustomerHands();
     }
 }

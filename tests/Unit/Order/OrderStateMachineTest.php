@@ -48,4 +48,23 @@ class OrderStateMachineTest extends UnitTestCase
 
         $this->order->changeState('confirmed');
     }
+
+    /** @test */
+    function it_tells_when_order_is_still_in_customer_hands_as_cart()
+    {
+        $this->assertTrue($this->order->inCustomerHands());
+        $this->assertFalse($this->order->inMerchantHands());
+    }
+
+    /** @test */
+    function it_can_tell_when_order_is_in_merchant_hands()
+    {
+        // On paid state, customer hands over control to merchant
+        $this->machine->apply('create');
+        $this->machine->apply('confirm');
+        $this->machine->apply('pay');
+
+        $this->assertTrue($this->order->inMerchantHands());
+        $this->assertFalse($this->order->inCustomerHands());
+    }
 }
