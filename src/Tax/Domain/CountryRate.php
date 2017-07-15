@@ -7,22 +7,31 @@ use Thinktomorrow\Trader\Countries\CountryId;
 
 class CountryRate
 {
-    private $standardRate;
-
     /**
      * @var CountryId
      */
     private $countryId;
 
+    /**
+     * @var string
+     */
+    private $name;
+
+    /**
+     * @var Percentage
+     */
+    private $percentage;
+
     public function __construct(string $name, Percentage $percentage, CountryId $countryId)
     {
-        $this->standardRate = new StandardRate($name, $percentage);
+        $this->name = $name;
+        $this->percentage = $percentage;
         $this->countryId = $countryId;
     }
 
     public function get(): Percentage
     {
-        return $this->standardRate->get();
+        return $this->percentage;
     }
 
     public function name()

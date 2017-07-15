@@ -9,8 +9,6 @@ use Thinktomorrow\Trader\Discounts\Application\ApplyDiscountsToOrder;
 use Thinktomorrow\Trader\Discounts\Domain\DiscountCollection;
 use Thinktomorrow\Trader\Discounts\Domain\DiscountId;
 use Thinktomorrow\Trader\Order\Domain\Item;
-use Thinktomorrow\Trader\Order\Domain\Order;
-use Thinktomorrow\Trader\Order\Domain\OrderId;
 use Thinktomorrow\Trader\Common\Domain\Price\Percentage;
 use Thinktomorrow\Trader\Tests\Unit\Stubs\ConcretePurchasable;
 use Thinktomorrow\Trader\Tests\Unit\UnitTestCase;

@@ -2,8 +2,6 @@
 
 namespace Thinktomorrow\Trader\Common\Domain\Conditions;
 
-use Thinktomorrow\Trader\Order\Domain\Order;
-
 interface Condition
 {
     /**

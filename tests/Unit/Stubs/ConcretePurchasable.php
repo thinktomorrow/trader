@@ -6,6 +6,7 @@ use Money\Money;
 use Thinktomorrow\Trader\Order\Domain\ItemId;
 use Thinktomorrow\Trader\Order\Domain\Purchasable;
 use Thinktomorrow\Trader\Common\Domain\Price\Percentage;
+use Thinktomorrow\Trader\Tax\Domain\TaxId;
 
 class ConcretePurchasable implements Purchasable
 {
@@ -14,6 +15,7 @@ class ConcretePurchasable implements Purchasable
     private $price;
     private $salePrice;
     private $taxRate;
+    private $taxId;
 
     public function __construct($id = null, $data = [], Money $price = null, Percentage $taxRate = null, Money $salePrice = null)
     {
@@ -21,6 +23,7 @@ class ConcretePurchasable implements Purchasable
         $this->data = $data;
         $this->price = $price ?: Money::EUR(120);
         $this->taxRate = !is_null($taxRate) ? $taxRate : Percentage::fromPercent(21);
+
         $this->salePrice = $salePrice ?: null;
     }
 
@@ -56,5 +59,23 @@ class ConcretePurchasable implements Purchasable
     public function tax(): Money
     {
         return $this->salePrice()->multiply($this->taxRate->asFloat());
+    }
+
+    /**
+     * @return TaxId
+     */
+    public function taxId(): TaxId
+    {
+        return $this->taxId;
+    }
+
+    /**
+     * Convenience method for testing
+     *
+     * @param $taxId
+     */
+    public function setTaxId($taxId)
+    {
+        $this->taxId = TaxId::fromInteger($taxId);
     }
 }

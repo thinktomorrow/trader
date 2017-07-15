@@ -3,7 +3,13 @@
 ## TODO
 - AlmostApplicableDiscounts
 - DiscountConditions: Should default be only one item to be discounted? (see getAffectedItemQuantity)
-
+- TaxId connection for shipment, payment, discounts. These must be changable as well
+- ApplyDiscountsToOrder should accept OrderId, not Order. (e.g. ApplySHipmentRuleToOrder)
+- taxrate regels duidelijk bepalen: 
+// RESOURCES:
+// https://www.unizo.be/advies/wat-zijn-de-btw-regels-voor-webshops-voor-verkoop-van-en-naar-het-buitenland en
+// https://ec.europa.eu/taxation_customs/sites/taxation/files/resources/documents/taxation/vat/traders/vat_community/vat_in_ec_annexi.pdf
+                                            
 - shipment costs: ZONES (LANDEN), METHODS
             //  -> RULES: conditions (zone, minimale subtotaal van bestelling, maximale subtotaal van bestelling, ...)
                           costs: baseCost (global for order)

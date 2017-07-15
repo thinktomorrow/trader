@@ -4,6 +4,7 @@ namespace Thinktomorrow\Trader\Order\Domain;
 
 use Money\Money;
 use Thinktomorrow\Trader\Common\Domain\Price\Percentage;
+use Thinktomorrow\Trader\Tax\Domain\TaxId;
 
 interface Purchasable
 {
@@ -39,9 +40,11 @@ interface Purchasable
     public function taxRate(): Percentage;
 
     /**
-     * Tax price based on salePrice which is assumed to be the gross amount
+     * Each purchasable has a reference to a TaxRate which has
+     * the possibility to be altered during the checkout.
      *
-     * @return Money
+     * @return TaxId
      */
-    public function tax(): Money;
+    public function taxId(): TaxId;
+
 }

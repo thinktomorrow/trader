@@ -7,6 +7,7 @@ use Thinktomorrow\Trader\Common\Domain\Price\Cash;
 use Thinktomorrow\Trader\Discounts\Domain\AppliedDiscount;
 use Thinktomorrow\Trader\Discounts\Domain\AppliedDiscountCollection;
 use Thinktomorrow\Trader\Common\Domain\Price\Percentage;
+use Thinktomorrow\Trader\Tax\Domain\TaxId;
 
 final class Item
 {
@@ -34,12 +35,18 @@ final class Item
 
     private $discountTotal;
 
+    /**
+     * @var Percentage
+     */
+    private $taxRate;
+
     private function __construct(Purchasable $purchasable)
     {
         $this->id = $purchasable->itemId();
         $this->purchasable = $purchasable;
         $this->discounts = new AppliedDiscountCollection;
-        $this->discountTotal = Cash::CUR(0); // TODO set currency outside of class
+        $this->discountTotal = Cash::CUR(0);
+        $this->taxRate = $purchasable->taxRate();
     }
 
     public static function fromPurchasable(Purchasable $purchasable)
@@ -78,9 +85,19 @@ final class Item
                     ->subtract($this->discountTotal());
     }
 
+    public function taxId(): TaxId
+    {
+        return $this->purchasable->taxId();
+    }
+
     public function taxRate(): Percentage
     {
-        return $this->purchasable->taxRate();
+        return $this->taxRate;
+    }
+
+    public function setTaxRate(Percentage $taxRate)
+    {
+        $this->taxRate = $taxRate;
     }
 
     public function tax(): Money

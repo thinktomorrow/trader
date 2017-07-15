@@ -34,7 +34,7 @@ class ApplyShippingMethodToOrder
             $order = $this->orderRepository->find($orderId);
             $shippingMethod = $this->shippingMethodRepository->find($shippingMethodId);
 
-            // Apply the first matching shipping rule of the selected shipping method
+            // Find the first matching shipping rule and apply it on the order
             $shippingMethod->apply($order);
         }
         catch(CannotApplyShippingRuleException $e)

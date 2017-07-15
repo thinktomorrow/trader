@@ -5,9 +5,15 @@ namespace Thinktomorrow\Trader\Tax\Domain;
 use Assert\Assertion;
 use Thinktomorrow\Trader\Common\Domain\Price\Percentage;
 use Thinktomorrow\Trader\Countries\CountryId;
+use Thinktomorrow\Trader\Order\Domain\Order;
 
-class StandardRate
+class TaxRate
 {
+    /**
+     * @var TaxId
+     */
+    private $taxId;
+
     /**
      * @var string
      */
@@ -43,14 +49,20 @@ class StandardRate
      */
     private $forBusiness;
 
-    public function __construct(string $name, Percentage $percentage, array $countryRateOverrides = [])
+    public function __construct(TaxId $taxId, string $name, Percentage $percentage, array $countryRateOverrides = [])
     {
         Assertion::allIsInstanceOf($countryRateOverrides, CountryRate::class);
 
+        $this->taxId = $taxId;
         $this->name = $name;
         $this->percentage = $percentage;
         $this->countryRateOverrides = $countryRateOverrides;
         $this->forBusiness = false;
+    }
+
+    public function id(): TaxId
+    {
+        return $this->taxId;
     }
 
     /**
