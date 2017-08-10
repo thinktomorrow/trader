@@ -3,33 +3,39 @@
 use Money\Money;
 use Thinktomorrow\Trader\Common\Domain\Price\Cash;
 use Thinktomorrow\Trader\Common\Domain\Price\Percentage;
+use Thinktomorrow\Trader\Discounts\Domain\DiscountFactory;
 use Thinktomorrow\Trader\Order\Application\OrderAssembler;
 use Thinktomorrow\Trader\Order\Domain\Item;
 use Thinktomorrow\Trader\Order\Ports\Persistence\InMemoryOrderRepository;
+use Thinktomorrow\Trader\Tests\InMemoryContainer;
 use Thinktomorrow\Trader\Tests\Unit\Stubs\ConcretePurchasable;
 
-require __DIR__.'/../../vendor/autoload.php'; ?>
-
-<?php
+require __DIR__.'/../../vendor/autoload.php';
 
 // FAKE ADDITION OF ORDER
 $confirmedOrder = new Thinktomorrow\Trader\Order\Domain\Order(\Thinktomorrow\Trader\Order\Domain\OrderId::fromInteger(1));
-$confirmedOrder->items()->add(Item::fromPurchasable(new ConcretePurchasable(1,[],Cash::CUR(50),Percentage::fromPercent(21))));
-$confirmedOrder->items()->add(Item::fromPurchasable(new ConcretePurchasable(1,[],Cash::CUR(50),Percentage::fromPercent(21))));
-$confirmedOrder->items()->add(Item::fromPurchasable(new ConcretePurchasable(2,[],Cash::CUR(50),Percentage::fromPercent(6))));
-$confirmedOrder->items()->add(Item::fromPurchasable(new ConcretePurchasable(1,[],Cash::CUR(50),Percentage::fromPercent(21))));
-$confirmedOrder->items()->add(Item::fromPurchasable(new ConcretePurchasable(7,[],Cash::CUR(50),Percentage::fromPercent(9))));
+$confirmedOrder->items()->add(Item::fromPurchasable(new ConcretePurchasable(1,[],Cash::make(50),Percentage::fromPercent(21))));
+$confirmedOrder->items()->add(Item::fromPurchasable(new ConcretePurchasable(1,[],Cash::make(50),Percentage::fromPercent(21))));
+$confirmedOrder->items()->add(Item::fromPurchasable(new ConcretePurchasable(2,[],Cash::make(50),Percentage::fromPercent(6))));
+$confirmedOrder->items()->add(Item::fromPurchasable(new ConcretePurchasable(1,[],Cash::make(50),Percentage::fromPercent(21))));
+$confirmedOrder->items()->add(Item::fromPurchasable(new ConcretePurchasable(7,[],Cash::make(50),Percentage::fromPercent(9))));
 $confirmedOrder->items()->add(Item::fromPurchasable(new ConcretePurchasable(12,[],Money::EUR(50),Percentage::fromPercent(21))));
-$confirmedOrder->items()->add(Item::fromPurchasable(new ConcretePurchasable(6,[],Cash::CUR(1050),Percentage::fromPercent(21))));
-$confirmedOrder->items()->add(Item::fromPurchasable(new ConcretePurchasable(1,[],Cash::CUR(50),Percentage::fromPercent(21))));
-$confirmedOrder->setShipmentTotal(Cash::CUR(15));
-$confirmedOrder->setPaymentTotal(Cash::CUR(10));
+$confirmedOrder->items()->add(Item::fromPurchasable(new ConcretePurchasable(6,[],Cash::make(1050),Percentage::fromPercent(21))));
+$confirmedOrder->items()->add(Item::fromPurchasable(new ConcretePurchasable(1,[],Cash::make(50),Percentage::fromPercent(21))));
+$confirmedOrder->setShipmentTotal(Cash::make(15));
+$confirmedOrder->setPaymentTotal(Cash::make(10));
+
+// Add Discount TODO: 1) persist discount, 2) return it from repo without recalculation
+$discount = (new DiscountFactory(new InMemoryContainer()))->create(1, 'percentage_off', [], ['percentage' => Percentage::fromPercent(30)]);
+$discount->apply($confirmedOrder);
 
 $repo = new InMemoryOrderRepository();
 $repo->add($confirmedOrder);
 
 // FETCH ORDER FOR MERCHANT
 $order = (new OrderAssembler(new InMemoryOrderRepository()))->forMerchant(1);
+
+
 
 ?>
 
@@ -102,6 +108,15 @@ $order = (new OrderAssembler(new InMemoryOrderRepository()))->forMerchant(1);
                     <tr>
                         <td align="right" colspan="3">Subtotaal:</td>
                         <td align="right"><?= $order->subtotal ?></td>
+                    </tr>
+                    <tr>
+                        <td align="right" colspan="3">Toegepaste kortingen:</td>
+                        <td align="right">
+                            <?php foreach($order->discounts() as $appliedDiscount): ?>
+                                <?= $appliedDiscount->description ?>
+                                <?= $appliedDiscount->amount ?>
+                            <?php endforeach; ?>
+                        </td>
                     </tr>
                     <tr>
                         <td align="right" colspan="3">Betaalkosten (provider):</td>

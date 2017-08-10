@@ -8,7 +8,7 @@ use Thinktomorrow\Trader\Order\Domain\Item;
 use Thinktomorrow\Trader\Shipment\Domain\ShippingMethod;
 use Thinktomorrow\Trader\Shipment\Domain\ShippingMethodId;
 use Thinktomorrow\Trader\Shipment\Domain\ShippingRuleFactory;
-use Thinktomorrow\Trader\Tests\DummyContainer;
+use Thinktomorrow\Trader\Tests\InMemoryContainer;
 use Thinktomorrow\Trader\Tests\Unit\Stubs\ConcretePurchasable;
 
 class ShippingMethodTest extends UnitTestCase
@@ -46,7 +46,7 @@ class ShippingMethodTest extends UnitTestCase
 
 
         $method = new ShippingMethod(ShippingMethodId::fromInteger(2),[
-            (new ShippingRuleFactory(new DummyContainer))->create(1, [
+            (new ShippingRuleFactory(new InMemoryContainer))->create(1, [
                 'minimum_amount' => Money::EUR(30)
             ],[
                 'amount' => Money::EUR(0)
@@ -63,7 +63,7 @@ class ShippingMethodTest extends UnitTestCase
         $order->items()->add(Item::fromPurchasable(new ConcretePurchasable(1,[],Money::EUR(10))));
 
         $method = new ShippingMethod(ShippingMethodId::fromInteger(2),[
-            (new ShippingRuleFactory(new DummyContainer))->create(1, [
+            (new ShippingRuleFactory(new InMemoryContainer))->create(1, [
                 'minimum_amount' => Money::EUR(30)
             ],[
                 'amount' => Money::EUR(0)

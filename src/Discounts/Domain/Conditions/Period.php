@@ -12,17 +12,31 @@ class Period extends BaseCondition implements Condition, OrderCondition
 {
     public function check(Order $order): bool
     {
-        $valid_start_at = $this->comesAfterStartAt(
+        $valid_start_at = $this->comesAfter(
             new DateTime,
             isset($this->parameters['start_at']) ? $this->parameters['start_at'] : null
         );
 
-        $valid_end_at = $this->comesBeforeEndAt(
+        $valid_end_at = $this->goesBefore(
             new DateTime,
             isset($this->parameters['end_at']) ? $this->parameters['end_at'] : null
         );
 
         return (true == $valid_start_at && true == $valid_end_at);
+    }
+
+    private function comesAfter(DateTime $datetime, DateTime $startAt = null)
+    {
+        if(!$startAt) return true;
+
+        return $startAt < $datetime;
+    }
+
+    private function goesBefore(DateTime $datetime, DateTime $endAt = null)
+    {
+        if(!$endAt) return true;
+
+        return $endAt > $datetime;
     }
 
     /**
@@ -41,19 +55,5 @@ class Period extends BaseCondition implements Condition, OrderCondition
         {
             throw new \InvalidArgumentException('DiscountCondition value for end_at must be instance of DateTime.');
         }
-    }
-
-    private function comesAfterStartAt(DateTime $datetime, DateTime $startAt = null)
-    {
-        if(!$startAt) return true;
-
-        return $startAt < $datetime;
-    }
-
-    private function comesBeforeEndAt(DateTime $datetime, DateTime $endAt = null)
-    {
-        if(!$endAt) return true;
-
-        return $endAt > $datetime;
     }
 }

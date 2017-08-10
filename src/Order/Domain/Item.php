@@ -45,7 +45,7 @@ final class Item
         $this->id = $purchasable->itemId();
         $this->purchasable = $purchasable;
         $this->discounts = new AppliedDiscountCollection;
-        $this->discountTotal = Cash::CUR(0);
+        $this->discountTotal = Cash::make(0);
         $this->taxRate = $purchasable->taxRate();
     }
 

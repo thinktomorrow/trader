@@ -14,14 +14,12 @@ class Order extends AbstractPresenter
 {
     public function items(): array
     {
-        $collection = [];
+        return $this->getValue('items',[]);
+    }
 
-        foreach($this->getValue('items',[]) as $id => $itemValues)
-        {
-            $collection[$id] = new Item($itemValues);
-        }
-
-        return $collection;
+    public function discounts(): array
+    {
+        return $this->getValue('discounts',[]);
     }
 
     public function reference()
@@ -64,6 +62,13 @@ class Order extends AbstractPresenter
             }
 
             return $rates;
+        });
+    }
+
+    public function discountTotal()
+    {
+        return $this->getValue('discount_total',null,function($discountTotal){
+            return (new Cash())->locale($discountTotal);
         });
     }
 

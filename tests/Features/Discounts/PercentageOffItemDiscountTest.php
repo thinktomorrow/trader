@@ -7,7 +7,7 @@ use Money\Money;
 use Thinktomorrow\Trader\Order\Domain\Item;
 use Thinktomorrow\Trader\Order\Domain\ItemId;
 use Thinktomorrow\Trader\Common\Domain\Price\Percentage;
-use Thinktomorrow\Trader\Tests\DummyContainer;
+use Thinktomorrow\Trader\Tests\InMemoryContainer;
 use Thinktomorrow\Trader\Tests\Unit\Stubs\ConcretePurchasable;
 use Thinktomorrow\Trader\Tests\Unit\UnitTestCase;
 
@@ -16,7 +16,7 @@ class PercentageOffItemDiscountTest extends UnitTestCase
     /** @test */
     function it_can_apply_discount_to_items()
     {
-        $discount = (new DiscountFactory(new DummyContainer()))->create(1,'percentage_off_item',[
+        $discount = (new DiscountFactory(new InMemoryContainer()))->create(1,'percentage_off_item',[
             'purchasable_ids' => [20],
             'minimum_item_quantity' => 2,
         ],[

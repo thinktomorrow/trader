@@ -23,14 +23,11 @@ final class PercentageOffItemDiscount extends BaseItemDiscount implements Discou
      */
     private $type;
 
-    public function __construct(DiscountId $id, array $conditions, array $adjusters)
+    public function __construct(DiscountId $id, array $conditions,  array $adjusters)
     {
-        $this->validateParameters($conditions, $adjusters);
+        parent::__construct($id, $conditions, $adjusters);
 
-        $this->id = $id;
-        $this->conditions = $conditions;
         $this->percentage = $adjusters['percentage'];
-        $this->adjusters = $adjusters;
         $this->type = TypeKey::fromDiscount($this);
     }
 
@@ -41,15 +38,12 @@ final class PercentageOffItemDiscount extends BaseItemDiscount implements Discou
 
     public function apply(Order $order)
     {
-        // Loop over each item to check if it applies for this discount. If so apply
-        // TODO If it could possible apply but one of the conditions isn't yet met, we can keep it
-        // as 'AlmostApplicableDiscounts'. This allows us to push incentives to the visitor
-
         foreach($order->items() as $item)
         {
-            // Check conditions first
             if( ! $this->applicable($order, $item->id()))
             {
+                // TODO If it could possible apply but one of the conditions isn't yet met, we can keep it
+                // as 'AlmostApplicableDiscounts'. This allows us to push incentives to the visitor
                 continue;
             }
 

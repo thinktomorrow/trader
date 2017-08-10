@@ -7,6 +7,7 @@ use Thinktomorrow\Trader\Discounts\Domain\Discount;
 use Thinktomorrow\Trader\Discounts\Domain\DiscountId;
 use Thinktomorrow\Trader\Discounts\Domain\Types\TypeKey;
 use Thinktomorrow\Trader\Order\Domain\Order;
+use Thinktomorrow\Trader\Tax\Domain\TaxId;
 
 class DiscountTypeTest extends UnitTestCase
 {

@@ -4,10 +4,11 @@ namespace Thinktomorrow\Trader\Order\Domain;
 
 use Money\Money;
 use Thinktomorrow\Trader\Common\Domain\Price\Cash;
+use Thinktomorrow\Trader\Common\Domain\Price\Percentage;
 use Thinktomorrow\Trader\Common\Domain\State\StatefulContract;
 use Thinktomorrow\Trader\Discounts\Domain\AppliedDiscount;
 use Thinktomorrow\Trader\Discounts\Domain\AppliedDiscountCollection;
-use Thinktomorrow\Trader\Order\Domain\Services\SumOfItemTaxes;
+use Thinktomorrow\Trader\Order\Domain\Services\SumOfTaxes;
 
 final class Order implements StatefulContract
 {
@@ -23,15 +24,16 @@ final class Order implements StatefulContract
     private $items;
     private $discounts; // order level applied discounts
     private $discountTotal;
+    private $defaultTaxPercentage;
 
     public function __construct(OrderId $id)
     {
         $this->id = $id;
         $this->items = new ItemCollection;
         $this->discounts = new AppliedDiscountCollection;
-        $this->discountTotal = Cash::CUR(0); // TODO set currency outside of class
-        $this->shipmentTotal = Cash::CUR(0); // TODO set currency outside of class
-        $this->paymentTotal = Cash::CUR(0); // TODO set currency outside of class
+        $this->discountTotal = $this->shipmentTotal = $this->paymentTotal = Cash::make(0);
+
+        $this->setDefaultTaxPercentage(Percentage::fromPercent(0));
 
         // Initial order state
         $this->state = OrderState::STATE_NEW;
@@ -90,7 +92,7 @@ final class Order implements StatefulContract
     {
         return array_reduce($this->items->all(), function($carry, Item $item){
             return $carry->add($item->total());
-        },Cash::CUR(0)); // TODO currency should be changeable
+        },Cash::make(0)); // TODO currency should be changeable
     }
 
     public function discountTotal(): Money
@@ -111,21 +113,35 @@ final class Order implements StatefulContract
                     ->add($this->shipmentTotal());
     }
 
+    public function defaultTaxPercentage(): Percentage
+    {
+        return $this->defaultTaxPercentage;
+    }
+
+    public function setDefaultTaxPercentage(Percentage $taxPercentage)
+    {
+        $this->defaultTaxPercentage = $taxPercentage;
+    }
+
     public function tax(): Money
     {
         return array_reduce($this->taxRates(),function($carry, $taxRate){
             return $carry->add($taxRate['tax']);
-        },Cash::CUR(0));
+        },Cash::make(0));
     }
 
     /**
-     * Collection of used taxRates and their resp. tax() amount
-     * With roundings each item would add up to 295 but if subtotals are added we have a more precise tax per taxrate.
-
+     * Collection of used taxRates and their resp. tax amount
+     * TODO: add shipment and discount tax as well
      * @return array
      */
     public function taxRates(): array
     {
-        return (new SumOfItemTaxes())->forItems($this->items());
+        return (new SumOfTaxes())->forOrder($this);
+
+        // Global amounts such as discountTotal, shipmentTotal and PaymentTotal also have an inclusive tax.
+        // This tax is the default one for this order
+        // TODO: determine the default tax!!!! Default tax is the one set by the admin
+        // e.g. new OrderTaxRate($defaultTaxRate,$this);
     }
 }

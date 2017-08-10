@@ -14,7 +14,7 @@ use Thinktomorrow\Trader\Common\Domain\Price\Percentage;
 final class PercentageOffDiscount extends BaseDiscount implements Discount, OrderDiscount
 {
     /**
-     * @var \Thinktomorrow\Trader\Common\Price\Percentage
+     * @var Percentage
      */
     private $percentage;
 
@@ -25,12 +25,9 @@ final class PercentageOffDiscount extends BaseDiscount implements Discount, Orde
 
     public function __construct(DiscountId $id, array $conditions,  array $adjusters)
     {
-        $this->validateParameters($conditions, $adjusters);
+        parent::__construct($id, $conditions, $adjusters);
 
-        $this->id = $id;
-        $this->conditions = $conditions;
         $this->percentage = $adjusters['percentage'];
-        $this->adjusters = $adjusters;
         $this->type = TypeKey::fromDiscount($this);
     }
 

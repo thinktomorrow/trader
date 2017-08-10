@@ -1,5 +1,10 @@
 # trader
 
+## TODO large segments
+- Sales
+- Payment
+- Customer
+
 ## TODO
 - AlmostApplicableDiscounts
 - DiscountConditions: Should default be only one item to be discounted? (see getAffectedItemQuantity)

@@ -27,12 +27,9 @@ final class FreeItemDiscount extends BaseDiscount implements Discount, OrderDisc
 
     public function __construct(DiscountId $id, array $conditions,  array $adjusters)
     {
-        $this->validateParameters($conditions, $adjusters);
+        parent::__construct($id, $conditions, $adjusters);
 
-        $this->id = $id;
-        $this->conditions = $conditions;
         $this->free_items = $adjusters['free_items'];
-        $this->adjusters = $adjusters;
         $this->type = TypeKey::fromDiscount($this);
     }
 
@@ -61,7 +58,7 @@ final class FreeItemDiscount extends BaseDiscount implements Discount, OrderDisc
             $this->id,
             $this->type,
             $this->createDescription(),
-            Cash::CUR(0)
+            Cash::make(0)
         ));
     }
 

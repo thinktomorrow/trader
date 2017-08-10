@@ -7,7 +7,7 @@ use Psr\Container\ContainerInterface;
 /**
  * Class DummyContainer
  */
-class DummyContainer implements ContainerInterface
+class InMemoryContainer implements ContainerInterface
 {
     private static $mapping = [];
 

@@ -16,10 +16,10 @@ class Cash
      * Convenience method to allow maintaining dynamic currency.
      * Keep in mind that this remains consistent across your application
      *
-     * @param $amount
+     * @param $amount integer
      * @return Money
      */
-    public static function CUR($amount)
+    public static function make($amount): Money
     {
         return new Money($amount, new Currency(static::getCurrencyCode()));
     }
@@ -35,13 +35,19 @@ class Cash
     }
 
     /**
-     * Convenience method to reset the current currency so it can be refetched from config
+     * Convenience method to reset the current currency so it can be refreshed from config
      */
     public static function resetCurrency()
     {
         static::$currencyCode = null;
     }
 
+    /**
+     * TODO this should be something like Cash(Money)->locale() so then we can have Cash::from($money)->locale('nl')
+     * @param Money $money
+     * @param string $locale
+     * @return string
+     */
     public function locale(Money $money, $locale = 'nl_BE')
     {
         $currencies = new ISOCurrencies();
@@ -51,8 +57,8 @@ class Cash
         // TODO add currency symbol
 
         // TEMPORARY display just for testing
-        $symbol = $money->getCurrency()->getCode();
+        $symbol = $money->getCurrency()->getCode() == 'EUR' ? '&euro;' : $money->getCurrency()->getCode();
 
-        return $symbol . ' '.$moneyFormatter->format($money);
+        return $symbol . $moneyFormatter->format($money);
     }
 }

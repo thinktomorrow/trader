@@ -34,6 +34,7 @@ class InMemoryOrderRepository implements OrderRepository
         return [
             'total'     => $order->total(),
             'subtotal'  => $order->subtotal(),
+            'discount_total' => $order->discountTotal(),
             'payment_total' => $order->paymentTotal(),
             'shipment_total' => $order->shipmentTotal(),
             'tax'       => $order->tax(),

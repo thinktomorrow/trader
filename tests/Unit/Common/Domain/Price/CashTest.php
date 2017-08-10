@@ -37,7 +37,7 @@ class CashTest extends UnitTestCase
     {
         $this->assertEquals('USD',$this->config->get('currency'));
 
-        $money = Cash::CUR(120);
+        $money = Cash::make(120);
 
         $this->assertInstanceOf(Money::class,$money);
         $this->assertEquals('USD',$money->getCurrency()->getCode());

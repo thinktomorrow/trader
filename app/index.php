@@ -9,7 +9,7 @@ use Thinktomorrow\Trader\Common\Domain\Price\Percentage;
 use Thinktomorrow\Trader\Order\Ports\Persistence\InMemoryOrderRepository;
 use Thinktomorrow\Trader\Shipment\Application\ApplyShippingMethodToOrder;
 use Thinktomorrow\Trader\Shipment\Ports\Persistence\InMemoryShippingMethodRepository;
-use Thinktomorrow\Trader\Tests\DummyContainer;
+use Thinktomorrow\Trader\Tests\InMemoryContainer;
 
 require_once __DIR__.'/../vendor/autoload.php';
 
@@ -38,13 +38,13 @@ $order->items()->add(
 );
 
     // Add coupon
-    $percentageOffDiscount = (new DiscountFactory(new DummyContainer()))->create(1,'percentage_off',[
+    $percentageOffDiscount = (new DiscountFactory(new InMemoryContainer()))->create(1,'percentage_off',[
             //
     ],[
             'percentage' => Percentage::fromPercent(50)
     ]);
 
-    $percentageOffItemDiscount = (new DiscountFactory(new DummyContainer()))->create(2,'percentage_off_item',[
+    $percentageOffItemDiscount = (new DiscountFactory(new InMemoryContainer()))->create(2,'percentage_off_item',[
         //
     ],[
         'percentage' => Percentage::fromPercent(25)

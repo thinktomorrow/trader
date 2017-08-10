@@ -10,12 +10,12 @@ use Thinktomorrow\Trader\Tax\Domain\TaxId;
 
 class ConcretePurchasable implements Purchasable
 {
-    private $id;
-    private $data;
-    private $price;
-    private $salePrice;
-    private $taxRate;
-    private $taxId;
+    protected $id;
+    protected $data;
+    protected $price;
+    protected $salePrice;
+    protected $taxRate;
+    protected $taxId;
 
     public function __construct($id = null, $data = [], Money $price = null, Percentage $taxRate = null, Money $salePrice = null)
     {

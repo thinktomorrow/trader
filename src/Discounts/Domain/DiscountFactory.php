@@ -4,7 +4,6 @@ namespace Thinktomorrow\Trader\Discounts\Domain;
 
 use Psr\Container\ContainerInterface;
 use Thinktomorrow\Trader\Common\Domain\Conditions\Condition;
-use Thinktomorrow\Trader\Common\Domain\Conditions\ItemCondition;
 use Thinktomorrow\Trader\Discounts\Domain\Conditions\ConditionKey;
 use Thinktomorrow\Trader\Discounts\Domain\Types\TypeKey;
 

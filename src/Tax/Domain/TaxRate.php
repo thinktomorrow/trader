@@ -5,7 +5,6 @@ namespace Thinktomorrow\Trader\Tax\Domain;
 use Assert\Assertion;
 use Thinktomorrow\Trader\Common\Domain\Price\Percentage;
 use Thinktomorrow\Trader\Countries\CountryId;
-use Thinktomorrow\Trader\Order\Domain\Order;
 
 class TaxRate
 {

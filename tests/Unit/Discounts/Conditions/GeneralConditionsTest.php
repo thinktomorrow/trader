@@ -8,7 +8,7 @@ use Thinktomorrow\Trader\Discounts\Domain\DiscountFactory;
 use Thinktomorrow\Trader\Order\Domain\Item;
 use Thinktomorrow\Trader\Order\Domain\ItemId;
 use Thinktomorrow\Trader\Common\Domain\Price\Percentage;
-use Thinktomorrow\Trader\Tests\DummyContainer;
+use Thinktomorrow\Trader\Tests\InMemoryContainer;
 use Thinktomorrow\Trader\Tests\Unit\Stubs\ConcretePurchasable;
 
 class GeneralConditionsTest extends UnitTestCase
@@ -29,7 +29,7 @@ class GeneralConditionsTest extends UnitTestCase
         $order->items()->add(Item::fromPurchasable(new ConcretePurchasable(20,[],Money::EUR(110))),2);
         $order->items()->add(Item::fromPurchasable(new ConcretePurchasable(21,[],Money::EUR(50))),1);
 
-        $discount = (new DiscountFactory(new DummyContainer()))->create(1,'percentage_off_item',[
+        $discount = (new DiscountFactory(new InMemoryContainer()))->create(1,'percentage_off_item',[
             'purchasable_ids' => [20]
         ],[
             'percentage' => Percentage::fromPercent(15),
@@ -45,7 +45,7 @@ class GeneralConditionsTest extends UnitTestCase
         $order = $this->makeOrder();
         $order->items()->add(Item::fromPurchasable(new ConcretePurchasable(1,[],Money::EUR(110))),2);
 
-        $discount = (new DiscountFactory(new DummyContainer()))->create(1,'percentage_off_item',[],[
+        $discount = (new DiscountFactory(new InMemoryContainer()))->create(1,'percentage_off_item',[],[
             'percentage' => Percentage::fromPercent(15),
         ]);
 
@@ -57,7 +57,7 @@ class GeneralConditionsTest extends UnitTestCase
     {
         $order = $this->makeOrder();
 
-        $discount = (new DiscountFactory(new DummyContainer()))->create(1,'percentage_off',[
+        $discount = (new DiscountFactory(new InMemoryContainer()))->create(1,'percentage_off',[
             'minimum_amount' => Money::EUR(50)
         ],[
             'percentage' => Percentage::fromPercent(15),
@@ -76,7 +76,7 @@ class GeneralConditionsTest extends UnitTestCase
         $order = $this->makeOrder();
         $item = Item::fromPurchasable(new ConcretePurchasable(20,[],Money::EUR(40)));
 
-        $discount = (new DiscountFactory(new DummyContainer()))->create(1,'percentage_off_item',[
+        $discount = (new DiscountFactory(new InMemoryContainer()))->create(1,'percentage_off_item',[
             'minimum_amount' => Money::EUR(50),
             'purchasable_ids' => [20]
         ],[
@@ -98,7 +98,7 @@ class GeneralConditionsTest extends UnitTestCase
     {
         $order = $this->makeOrder();
 
-        $discount = (new DiscountFactory(new DummyContainer()))->create(1,'percentage_off',[
+        $discount = (new DiscountFactory(new InMemoryContainer()))->create(1,'percentage_off',[
             'start_at' => (new \DateTime('@'.strtotime('+3 days' )))
         ],[
             'percentage' => Percentage::fromPercent(15),
@@ -107,7 +107,7 @@ class GeneralConditionsTest extends UnitTestCase
         $this->assertFalse($discount->applicable($order));
 
         // Period of discount has started
-        $discount = (new DiscountFactory(new DummyContainer()))->create(1,'percentage_off',[
+        $discount = (new DiscountFactory(new InMemoryContainer()))->create(1,'percentage_off',[
             'start_at' => (new \DateTime('@'.strtotime('-3 days' )))
         ],[
             'percentage' => Percentage::fromPercent(15),

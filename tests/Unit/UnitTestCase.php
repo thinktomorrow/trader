@@ -9,7 +9,7 @@ use Thinktomorrow\Trader\Order\Domain\Item;
 use Thinktomorrow\Trader\Order\Domain\Order;
 use Thinktomorrow\Trader\Order\Domain\OrderId;
 use Thinktomorrow\Trader\Common\Domain\Price\Percentage;
-use Thinktomorrow\Trader\Tests\DummyContainer;
+use Thinktomorrow\Trader\Tests\InMemoryContainer;
 use Thinktomorrow\Trader\Tests\Unit\Stubs\ConcretePurchasable;
 
 class UnitTestCase extends PHPUnit_Framework_TestCase
@@ -32,7 +32,7 @@ class UnitTestCase extends PHPUnit_Framework_TestCase
             ];
         }
 
-        return (new DiscountFactory(new DummyContainer()))->create($id,$type,$conditions,$adjusters);
+        return (new DiscountFactory(new InMemoryContainer()))->create($id,$type,$conditions,$adjusters);
     }
 
     protected function makePercentageOffDiscount($percent = 10)

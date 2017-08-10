@@ -26,6 +26,24 @@ abstract class StateMachine
         $this->validateTransitions();
     }
 
+    public function apply($transition)
+    {
+        // Check valid transition request
+        if(!array_key_exists($transition,$this->transitions))
+        {
+            throw StateException::invalidTransitionKey($transition, $this);
+        }
+
+        if(!in_array($this->statefulContract->state(),$this->transitions[$transition]['from']))
+        {
+            throw StateException::invalidTransition($transition, $this->statefulContract->state(), $this);
+        }
+
+        $state = $this->transitions[$transition]['to'];
+
+        $this->statefulContract->changeState($state);
+    }
+
     /**
      * assert the integrity of the new state
      *
@@ -61,24 +79,6 @@ abstract class StateMachine
         }
 
         return false;
-    }
-
-    public function apply($transition)
-    {
-        // Check valid transition request
-        if(!array_key_exists($transition,$this->transitions))
-        {
-            throw StateException::invalidTransitionKey($transition, $this);
-        }
-
-        if(!in_array($this->statefulContract->state(),$this->transitions[$transition]['from']))
-        {
-            throw StateException::invalidTransition($transition, $this->statefulContract->state(), $this);
-        }
-
-        $state = $this->transitions[$transition]['to'];
-
-        $this->statefulContract->changeState($state);
     }
 
     private function validateTransitions()

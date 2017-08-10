@@ -28,13 +28,22 @@ abstract class BaseItemDiscount
      */
     protected $adjusters;
 
+    public function __construct(DiscountId $id, array $conditions,  array $adjusters)
+    {
+        $this->validateParameters($conditions, $adjusters);
+
+        $this->id = $id;
+        $this->conditions = $conditions;
+        $this->adjusters = $adjusters;
+    }
+
     public function id(): DiscountId
     {
         return $this->id;
     }
 
     /**
-     * Do the conditions apply for the given order
+     * Do the conditions apply for the given item
      *
      * @param Order $order
      * @param ItemId $itemId
