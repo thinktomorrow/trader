@@ -57,7 +57,7 @@ final class AppliedDiscount
     /**
      * @return TypeKey
      */
-    public function discountType(): TypeKey
+    public function type(): TypeKey
     {
         return $this->discountType;
     }

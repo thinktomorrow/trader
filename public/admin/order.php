@@ -24,7 +24,7 @@ $confirmedOrder->items()->add(Item::fromPurchasable(new ConcretePurchasable(6,[]
 $confirmedOrder->items()->add(Item::fromPurchasable(new ConcretePurchasable(1,[],Cash::make(50),Percentage::fromPercent(21))));
 $confirmedOrder->setShipmentTotal(Cash::make(15));
 $confirmedOrder->setPaymentTotal(Cash::make(10));
-
+$confirmedOrder->setDefaultTaxPercentage(Percentage::fromPercent(21));
 // Add Discount TODO: 1) persist discount, 2) return it from repo without recalculation
 $discount = (new DiscountFactory(new InMemoryContainer()))->create(1, 'percentage_off', [], ['percentage' => Percentage::fromPercent(30)]);
 $discount->apply($confirmedOrder);
@@ -93,6 +93,7 @@ $order = (new OrderAssembler(new InMemoryOrderRepository()))->forMerchant(1);
                             <th>item</th>
                             <th>voorraad</th>
                             <th>bedrag</th>
+                            <th>BTW</th>
                             <th align="right">totaal</th>
                         </tr>
                     </thead>
@@ -102,15 +103,16 @@ $order = (new OrderAssembler(new InMemoryOrderRepository()))->forMerchant(1);
                             <td><?= $item->sku ?> <?= $item->name ?></td>
                             <td><?= $item->stockBadge ?></td>
                             <td><?= $item->quantity ?> x <?= $item->saleprice ?></td>
+                            <td><?= $item->taxRate ?></td>
                             <td align="right"><?= $item->total ?></td>
                         </tr>
                     <?php endforeach; ?>
                     <tr>
-                        <td align="right" colspan="3">Subtotaal:</td>
+                        <td align="right" colspan="4">Subtotaal:</td>
                         <td align="right"><?= $order->subtotal ?></td>
                     </tr>
                     <tr>
-                        <td align="right" colspan="3">Toegepaste kortingen:</td>
+                        <td align="right" colspan="4">Toegepaste kortingen:</td>
                         <td align="right">
                             <?php foreach($order->discounts() as $appliedDiscount): ?>
                                 <?= $appliedDiscount->description ?>
@@ -119,27 +121,27 @@ $order = (new OrderAssembler(new InMemoryOrderRepository()))->forMerchant(1);
                         </td>
                     </tr>
                     <tr>
-                        <td align="right" colspan="3">Betaalkosten (provider):</td>
+                        <td align="right" colspan="4">Betaalkosten (provider):</td>
                         <td align="right"><?= $order->paymentTotal ?></td>
                     </tr>
                     <tr>
-                        <td align="right" colspan="3">Verzendkosten (provider):</td>
+                        <td align="right" colspan="4">Verzendkosten (provider):</td>
                         <td align="right"><?= $order->shipmentTotal ?></td>
                     </tr>
                     <?php foreach($order->taxRates() as $taxRate): ?>
 
                         <tr>
-                            <td align="right" colspan="3">Btw (<?= $taxRate['percent'] ?>):</td>
-                            <td align="right"><?= $taxRate['tax'] ?></td>
+                            <td align="right" colspan="4">Btw (<?= $taxRate['percent'] ?>):</td>
+                            <td align="right"><?= $taxRate['tax'] ?> (<?= $taxRate['total'] ?>)</td>
                         </tr>
 
                     <?php endforeach; ?>
                     <tr>
-                        <td align="right" colspan="3">Btw TOTAL:</td>
+                        <td align="right" colspan="4">Btw TOTAL:</td>
                         <td align="right"><?= $order->tax ?></td>
                     </tr>
                     <tr>
-                        <td align="right" colspan="3">Totaal:</td>
+                        <td align="right" colspan="4">Totaal:</td>
                         <td align="right"><?= $order->total ?></td>
                     </tr>
                     </tbody>

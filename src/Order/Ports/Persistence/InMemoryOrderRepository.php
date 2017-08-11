@@ -22,7 +22,7 @@ class InMemoryOrderRepository implements OrderRepository
         self::$collection[(string)$order->id()] = $order;
     }
 
-    public function getValuesForMerchantOrder(OrderId $orderId): array
+    public function getValues(OrderId $orderId): array
     {
         if(!isset(self::$collection[(string)$orderId]))
         {
@@ -42,11 +42,10 @@ class InMemoryOrderRepository implements OrderRepository
             'reference' => $order->id()->get(), // This should be something business unique; not the id.
             'confirmed_at' => new \DateTime('@'.strtotime('-1day')), // TODO datestamps of states should be held elsewhere no?
             'state' => $order->state(),
-            'items' => $this->getItemValuesForMerchantOrder($orderId),
         ];
     }
 
-    private function getItemValuesForMerchantOrder(OrderId $orderId): array
+    public function getItemValues(OrderId $orderId): array
     {
         $order = self::$collection[(string)$orderId];
 
@@ -62,9 +61,29 @@ class InMemoryOrderRepository implements OrderRepository
                 'saleprice' => $item->salePrice(),
                 'quantity' => $item->quantity(),
                 'total' => $item->total(),
+                'taxRate' => $item->taxRate()
             ];
         }
 
         return $items;
+    }
+
+    public function getAppliedDiscounts(OrderId $orderId): array
+    {
+        $order = self::$collection[(string)$orderId];
+
+        $appliedDiscounts = [];
+
+        foreach($order->discounts() as $discount)
+        {
+            $appliedDiscounts[] = [
+                'id' => $discount->id(),
+                'type' => $discount->type(),
+                'amount' => $discount->amount(),
+                'description' => $discount->description()
+            ];
+        }
+
+        return $appliedDiscounts;
     }
 }

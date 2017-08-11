@@ -6,6 +6,7 @@
 - Customer
 
 ## TODO
+- SumOfTaxes moet nog discounts opnemen. anders wordt tax berekend op een te hoog bedrag.
 - AlmostApplicableDiscounts
 - DiscountConditions: Should default be only one item to be discounted? (see getAffectedItemQuantity)
 - TaxId connection for shipment, payment, discounts. These must be changable as well

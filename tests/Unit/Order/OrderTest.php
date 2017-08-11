@@ -6,7 +6,6 @@ use Money\Money;
 use Thinktomorrow\Trader\Common\Domain\Price\Percentage;
 use Thinktomorrow\Trader\Order\Domain\Item;
 use Thinktomorrow\Trader\Order\Domain\ItemCollection;
-use Thinktomorrow\Trader\Order\Domain\Order;
 use Thinktomorrow\Trader\Order\Domain\OrderId;
 use Thinktomorrow\Trader\Tests\Unit\Stubs\ConcretePurchasable;
 
@@ -50,7 +49,8 @@ class OrderTest extends UnitTestCase
         $this->assertEquals([
             20 => [
                 'percent' => Percentage::fromPercent(20),
-                'tax' => Money::EUR(40)
+                'tax' => Money::EUR(40),
+                'total' => Money::EUR(200),
             ]
         ],$order->taxRates());
     }
@@ -67,11 +67,13 @@ class OrderTest extends UnitTestCase
         $this->assertEquals([
             20 => [
                 'percent' => Percentage::fromPercent(20),
-                'tax' => Money::EUR(40)
+                'tax' => Money::EUR(40),
+                'total' => Money::EUR(200),
             ],
             6 => [
                 'percent' => Percentage::fromPercent(6),
-                'tax' => Money::EUR(12)
+                'tax' => Money::EUR(12),
+                'total' => Money::EUR(200),
             ]
         ],$order->taxRates());
     }

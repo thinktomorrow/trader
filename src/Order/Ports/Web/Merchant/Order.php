@@ -57,7 +57,8 @@ class Order extends AbstractPresenter
             {
                 $rates[$key] = [
                     'percent' => $taxRate['percent']->asPercent().'%',
-                    'tax' => (new Cash())->locale($taxRate['tax'])
+                    'tax' => (new Cash())->locale($taxRate['tax']),
+                    'total' => (new Cash())->locale($taxRate['total']),
                 ];
             }
 

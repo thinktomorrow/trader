@@ -26,7 +26,7 @@ class AppliedDiscountTest extends UnitTestCase
         );
 
         $this->assertSame($discountId, $appliedDiscount->discountId());
-        $this->assertSame($discountType, $appliedDiscount->discountType());
+        $this->assertSame($discountType, $appliedDiscount->type());
         $this->assertSame($description, $appliedDiscount->description());
         $this->assertSame($amount, $appliedDiscount->amount());
     }

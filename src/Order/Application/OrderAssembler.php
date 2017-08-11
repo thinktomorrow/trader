@@ -4,6 +4,8 @@ namespace Thinktomorrow\Trader\Order\Application;
 
 use Money\Money;
 use Thinktomorrow\Trader\Common\Domain\Price\Percentage;
+use Thinktomorrow\Trader\Discounts\Domain\AppliedDiscount;
+use Thinktomorrow\Trader\Discounts\Ports\Web\Discount;
 use Thinktomorrow\Trader\Order\Domain\OrderId;
 use Thinktomorrow\Trader\Order\Domain\OrderRepository;
 use Thinktomorrow\Trader\Order\Ports\Web\Merchant\Item;
@@ -34,7 +36,7 @@ class OrderAssembler
      */
     public function forMerchant($orderId)
     {
-        $data = $this->orderRepository->getValuesForMerchantOrder(OrderId::fromInteger($orderId));
+        $data = $this->orderRepository->getValues(OrderId::fromInteger($orderId));
 
         $order = new MerchantOrder();
 
@@ -43,26 +45,39 @@ class OrderAssembler
             $order->{$attribute} = $data[$attribute];
         }
 
-        $this->assembleItems($order,$data['items']);
+        $this->assembleItems($order,$orderId);
+        $this->assembleAppliedDiscounts($order, $orderId);
 
-        // TODO items should be coming from db and transposed to Web\Merchant\Item
 
-        // TODO: add applied discounts for both order and items
         // TODO: add applied shipment and payment
         // TODO: add applied Tax rule
 
         return $order;
     }
 
-    private function assembleItems(Order $order, array $itemValues)
+    private function assembleItems(Order $order, $orderId)
     {
+        $itemCollection = $this->orderRepository->getItemValues(OrderId::fromInteger($orderId));
         $items = [];
 
-        foreach($itemValues as $id => $itemValue)
+        foreach($itemCollection as $id => $itemValues)
         {
-            $items[$id] = new Item($itemValue);
+            $items[$id] = new Item($itemValues);
         }
 
         $order->items = $items;
+    }
+
+    private function assembleAppliedDiscounts($order, $orderId)
+    {
+        $discountCollection = $this->orderRepository->getAppliedDiscounts(OrderId::fromInteger($orderId));
+        $discounts = [];
+
+        foreach($discountCollection as $id => $discountValues)
+        {
+            $discounts[$id] = new Discount($discountValues);
+        }
+
+        $order->discounts = $discounts;
     }
 }

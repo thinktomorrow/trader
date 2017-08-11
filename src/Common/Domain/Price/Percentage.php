@@ -29,4 +29,9 @@ class Percentage
     {
         return $this->value;
     }
+
+    public function isPositive():bool
+    {
+        return $this->value > 0;
+    }
 }

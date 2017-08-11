@@ -63,4 +63,11 @@ class Item extends AbstractPresenter
             return (new Cash())->locale($price);
         });
     }
+
+    public function taxRate()
+    {
+        return $this->getValue('taxRate',null,function($taxRate){
+            return $taxRate->asPercent().'%';
+        });
+    }
 }

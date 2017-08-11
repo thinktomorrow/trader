@@ -42,7 +42,7 @@ class OrderRepositoryTest extends UnitTestCase
 
         $repo = new InMemoryOrderRepository();
         $repo->add($order);
-        $values = $repo->getValuesForMerchantOrder(OrderId::fromInteger(3));
+        $values = $repo->getValues(OrderId::fromInteger(3));
 
         $this->assertInternalType('array',$values);
 
@@ -79,7 +79,7 @@ class OrderRepositoryTest extends UnitTestCase
 
         $repo = new InMemoryOrderRepository();
         $repo->add($order);
-        $values = $repo->getValuesForMerchantOrder(OrderId::fromInteger(3));
+        $values = $repo->getValues(OrderId::fromInteger(3));
 
         $testedTaxRates = false;
         foreach($values['tax_rates'] as $tax_rate)

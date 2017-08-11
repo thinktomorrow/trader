@@ -8,5 +8,7 @@ interface OrderRepository
 
     public function add(Order $order);
 
-    public function getValuesForMerchantOrder(OrderId $orderId): array;
+    public function getValues(OrderId $orderId): array;
+
+    public function getItemValues(OrderId $orderId): array;
 }

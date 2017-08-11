@@ -9,6 +9,7 @@ class SumOfTaxes
 {
     public function forOrder(Order $order)
     {
+        // TODO: take discounts into account
         $totalsPerRate = $this->mergeTotals($this->itemTotalsPerRate($order),$this->globalTotalsPerRate($order));
         $totalsPerRate = $this->calculateTax($totalsPerRate);
 
@@ -48,8 +49,11 @@ class SumOfTaxes
     private function globalTotalsPerRate(Order $order): array
     {
         $defaultTaxPercentage = $order->defaultTaxPercentage();
-        $key = (string)$defaultTaxPercentage->asPercent();
+
+        if( ! $defaultTaxPercentage->isPositive()) return [];
+
         $totalsPerRate = [];
+        $key = (string)$defaultTaxPercentage->asPercent();
 
         foreach ([$order->shipmentTotal(),$order->paymentTotal()] as $global) {
 
