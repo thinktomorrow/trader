@@ -48,19 +48,19 @@ class SumOfTaxes
      */
     private function globalTotalsPerRate(Order $order): array
     {
-        $defaultTaxPercentage = $order->defaultTaxPercentage();
+        $taxPercentage = $order->taxPercentage();
 
-        if( ! $defaultTaxPercentage->isPositive()) return [];
+        if( ! $taxPercentage->isPositive()) return [];
 
         $totalsPerRate = [];
-        $key = (string)$defaultTaxPercentage->asPercent();
+        $key = (string)$taxPercentage->asPercent();
 
         foreach ([$order->shipmentTotal(),$order->paymentTotal()] as $global) {
 
             if( ! $global->isPositive()) continue;
 
             if (!isset($totalsPerRate[$key])) {
-                $totalsPerRate[$key] = ['percent' => $defaultTaxPercentage, 'total' => Cash::make(0)];
+                $totalsPerRate[$key] = ['percent' => $taxPercentage, 'total' => Cash::make(0)];
             }
 
             $totalsPerRate[$key]['total'] = $totalsPerRate[$key]['total']->add($global);

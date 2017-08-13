@@ -9,7 +9,7 @@ use Thinktomorrow\Trader\Order\Domain\Item;
 use Thinktomorrow\Trader\Order\Domain\ItemId;
 use Thinktomorrow\Trader\Common\Domain\Price\Percentage;
 use Thinktomorrow\Trader\Tests\InMemoryContainer;
-use Thinktomorrow\Trader\Tests\Unit\Stubs\ConcretePurchasable;
+use Thinktomorrow\Trader\Tests\Unit\Stubs\PurchasableStub;
 
 class GeneralConditionsTest extends UnitTestCase
 {
@@ -26,8 +26,8 @@ class GeneralConditionsTest extends UnitTestCase
     function discount_can_apply_for_specific_item()
     {
         $order = $this->makeOrder();
-        $order->items()->add(Item::fromPurchasable(new ConcretePurchasable(20,[],Money::EUR(110))),2);
-        $order->items()->add(Item::fromPurchasable(new ConcretePurchasable(21,[],Money::EUR(50))),1);
+        $order->items()->add(Item::fromPurchasable(new PurchasableStub(20,[],Money::EUR(110))),2);
+        $order->items()->add(Item::fromPurchasable(new PurchasableStub(21,[],Money::EUR(50))),1);
 
         $discount = (new DiscountFactory(new InMemoryContainer()))->create(1,'percentage_off_item',[
             'purchasable_ids' => [20]
@@ -43,7 +43,7 @@ class GeneralConditionsTest extends UnitTestCase
     function discount_cannot_apply_for_nonexisting_item()
     {
         $order = $this->makeOrder();
-        $order->items()->add(Item::fromPurchasable(new ConcretePurchasable(1,[],Money::EUR(110))),2);
+        $order->items()->add(Item::fromPurchasable(new PurchasableStub(1,[],Money::EUR(110))),2);
 
         $discount = (new DiscountFactory(new InMemoryContainer()))->create(1,'percentage_off_item',[],[
             'percentage' => Percentage::fromPercent(15),
@@ -66,7 +66,7 @@ class GeneralConditionsTest extends UnitTestCase
         $this->assertFalse($discount->applicable($order));
 
         // Add to subtotal
-        $order->items()->add(Item::fromPurchasable(new ConcretePurchasable(20,[],Money::EUR(100))));
+        $order->items()->add(Item::fromPurchasable(new PurchasableStub(20,[],Money::EUR(100))));
         $this->assertTrue($discount->applicable($order));
     }
 
@@ -74,7 +74,7 @@ class GeneralConditionsTest extends UnitTestCase
     function discount_with_minimum_amount_can_apply_to_specific_items()
     {
         $order = $this->makeOrder();
-        $item = Item::fromPurchasable(new ConcretePurchasable(20,[],Money::EUR(40)));
+        $item = Item::fromPurchasable(new PurchasableStub(20,[],Money::EUR(40)));
 
         $discount = (new DiscountFactory(new InMemoryContainer()))->create(1,'percentage_off_item',[
             'minimum_amount' => Money::EUR(50),

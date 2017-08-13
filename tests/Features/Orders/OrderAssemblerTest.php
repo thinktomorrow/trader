@@ -14,7 +14,7 @@ use Thinktomorrow\Trader\Order\Domain\Order as DomainOrder;
 use Thinktomorrow\Trader\Order\Domain\Item as DomainItem;
 use Thinktomorrow\Trader\Order\Domain\OrderId;
 use Thinktomorrow\Trader\Tests\InMemoryContainer;
-use Thinktomorrow\Trader\Tests\Unit\Stubs\ConcretePurchasable;
+use Thinktomorrow\Trader\Tests\Unit\Stubs\PurchasableStub;
 
 class OrderAssemblerTest extends FeatureTestCase
 {
@@ -50,15 +50,15 @@ class OrderAssemblerTest extends FeatureTestCase
     private function addDummyOrder($id)
     {
         $order = new DomainOrder(OrderId::fromInteger($id));
-        $order->items()->add(DomainItem::fromPurchasable(new ConcretePurchasable(1,[],Cash::make(505),Percentage::fromPercent(10))));
-        $order->items()->add(DomainItem::fromPurchasable(new ConcretePurchasable(2,[],Cash::make(1000),Percentage::fromPercent(10),Cash::make(800))),2);
+        $order->items()->add(DomainItem::fromPurchasable(new PurchasableStub(1,[],Cash::make(505),Percentage::fromPercent(10))));
+        $order->items()->add(DomainItem::fromPurchasable(new PurchasableStub(2,[],Cash::make(1000),Percentage::fromPercent(10),Cash::make(800))),2);
         $order->setShipmentTotal(Cash::make(15));
         $order->setPaymentTotal(Cash::make(10));
 
         $discount = (new DiscountFactory(new InMemoryContainer()))->create(1, 'percentage_off', [], ['percentage' => Percentage::fromPercent(30)]);
         $discount->apply($order);
 
-        $order->setDefaultTaxPercentage(Percentage::fromPercent(21));
+        $order->setTaxPercentage(Percentage::fromPercent(21));
 
         $this->container('orderRepository')->add($order);
     }

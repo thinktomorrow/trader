@@ -1,0 +1,28 @@
+version: '3'
+
+services:
+  web:
+        build: docker/web/
+        image: thinktomorrow/trader-web
+        volumes:
+            - ./:/opt
+        ports:
+            - 80:8080
+        environment:
+            XDEBUG_CONFIG: "remote_host=${DOCKER_HOST_IP}"
+            PHP_IDE_CONFIG: "serverName=docker"
+        user: ${HOST_UID}:${HOST_GID}
+
+    devtools:
+        build: docker/devtools/
+        image: thinktomorrow/trader-devtools
+        volumes:
+            - ./:/opt
+            - ${COMPOSER_HOME}:/home/.composer
+        environment:
+            COMPOSER_HOME: /home/.composer
+            XDEBUG_CONFIG: "remote_host=${DOCKER_HOST_IP}"
+            PHP_IDE_CONFIG: "serverName=docker"
+        depends_on:
+            - web
+        user: ${HOST_UID}:${HOST_GID}

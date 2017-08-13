@@ -9,7 +9,7 @@ use Thinktomorrow\Trader\Shipment\Domain\ShippingMethod;
 use Thinktomorrow\Trader\Shipment\Domain\ShippingMethodId;
 use Thinktomorrow\Trader\Shipment\Domain\ShippingRuleFactory;
 use Thinktomorrow\Trader\Tests\InMemoryContainer;
-use Thinktomorrow\Trader\Tests\Unit\Stubs\ConcretePurchasable;
+use Thinktomorrow\Trader\Tests\Unit\Stubs\PurchasableStub;
 
 class ShippingMethodTest extends UnitTestCase
 {
@@ -42,7 +42,7 @@ class ShippingMethodTest extends UnitTestCase
     function shipping_method_can_be_applied_if_one_of_the_rules_match_the_order()
     {
         $order = $this->makeOrder();
-        $order->items()->add(Item::fromPurchasable(new ConcretePurchasable(1,[],Money::EUR(31))));
+        $order->items()->add(Item::fromPurchasable(new PurchasableStub(1,[],Money::EUR(31))));
 
 
         $method = new ShippingMethod(ShippingMethodId::fromInteger(2),[
@@ -60,7 +60,7 @@ class ShippingMethodTest extends UnitTestCase
     function shipping_method_cannot_be_applied_if_none_of_the_rules_match_the_order()
     {
         $order = $this->makeOrder();
-        $order->items()->add(Item::fromPurchasable(new ConcretePurchasable(1,[],Money::EUR(10))));
+        $order->items()->add(Item::fromPurchasable(new PurchasableStub(1,[],Money::EUR(10))));
 
         $method = new ShippingMethod(ShippingMethodId::fromInteger(2),[
             (new ShippingRuleFactory(new InMemoryContainer))->create(1, [

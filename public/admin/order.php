@@ -8,23 +8,23 @@ use Thinktomorrow\Trader\Order\Application\OrderAssembler;
 use Thinktomorrow\Trader\Order\Domain\Item;
 use Thinktomorrow\Trader\Order\Ports\Persistence\InMemoryOrderRepository;
 use Thinktomorrow\Trader\Tests\InMemoryContainer;
-use Thinktomorrow\Trader\Tests\Unit\Stubs\ConcretePurchasable;
+use Thinktomorrow\Trader\Tests\Unit\Stubs\PurchasableStub;
 
 require __DIR__.'/../../vendor/autoload.php';
 
 // FAKE ADDITION OF ORDER
 $confirmedOrder = new Thinktomorrow\Trader\Order\Domain\Order(\Thinktomorrow\Trader\Order\Domain\OrderId::fromInteger(1));
-$confirmedOrder->items()->add(Item::fromPurchasable(new ConcretePurchasable(1,[],Cash::make(50),Percentage::fromPercent(21))));
-$confirmedOrder->items()->add(Item::fromPurchasable(new ConcretePurchasable(1,[],Cash::make(50),Percentage::fromPercent(21))));
-$confirmedOrder->items()->add(Item::fromPurchasable(new ConcretePurchasable(2,[],Cash::make(50),Percentage::fromPercent(6))));
-$confirmedOrder->items()->add(Item::fromPurchasable(new ConcretePurchasable(1,[],Cash::make(50),Percentage::fromPercent(21))));
-$confirmedOrder->items()->add(Item::fromPurchasable(new ConcretePurchasable(7,[],Cash::make(50),Percentage::fromPercent(9))));
-$confirmedOrder->items()->add(Item::fromPurchasable(new ConcretePurchasable(12,[],Money::EUR(50),Percentage::fromPercent(21))));
-$confirmedOrder->items()->add(Item::fromPurchasable(new ConcretePurchasable(6,[],Cash::make(1050),Percentage::fromPercent(21))));
-$confirmedOrder->items()->add(Item::fromPurchasable(new ConcretePurchasable(1,[],Cash::make(50),Percentage::fromPercent(21))));
+$confirmedOrder->items()->add(Item::fromPurchasable(new PurchasableStub(1,[],Cash::make(50),Percentage::fromPercent(21))));
+$confirmedOrder->items()->add(Item::fromPurchasable(new PurchasableStub(1,[],Cash::make(50),Percentage::fromPercent(21))));
+$confirmedOrder->items()->add(Item::fromPurchasable(new PurchasableStub(2,[],Cash::make(50),Percentage::fromPercent(6))));
+$confirmedOrder->items()->add(Item::fromPurchasable(new PurchasableStub(1,[],Cash::make(50),Percentage::fromPercent(21))));
+$confirmedOrder->items()->add(Item::fromPurchasable(new PurchasableStub(7,[],Cash::make(50),Percentage::fromPercent(9))));
+$confirmedOrder->items()->add(Item::fromPurchasable(new PurchasableStub(12,[],Money::EUR(50),Percentage::fromPercent(21))));
+$confirmedOrder->items()->add(Item::fromPurchasable(new PurchasableStub(6,[],Cash::make(1050),Percentage::fromPercent(21))));
+$confirmedOrder->items()->add(Item::fromPurchasable(new PurchasableStub(1,[],Cash::make(50),Percentage::fromPercent(21))));
 $confirmedOrder->setShipmentTotal(Cash::make(15));
 $confirmedOrder->setPaymentTotal(Cash::make(10));
-$confirmedOrder->setDefaultTaxPercentage(Percentage::fromPercent(21));
+$confirmedOrder->setTaxPercentage(Percentage::fromPercent(21));
 // Add Discount TODO: 1) persist discount, 2) return it from repo without recalculation
 $discount = (new DiscountFactory(new InMemoryContainer()))->create(1, 'percentage_off', [], ['percentage' => Percentage::fromPercent(30)]);
 $discount->apply($confirmedOrder);

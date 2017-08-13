@@ -12,6 +12,7 @@ use Thinktomorrow\Trader\Order\Ports\Web\Merchant\Item;
 use Thinktomorrow\Trader\Order\Ports\Web\Merchant\Order as MerchantOrder;
 use Thinktomorrow\Trader\Order\Ports\Web\Merchant\Order;
 
+// TODO: the assembler violates the dependency flow since it depends on concrete ports objects
 class OrderAssembler
 {
     /**

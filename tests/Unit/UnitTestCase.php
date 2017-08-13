@@ -10,7 +10,7 @@ use Thinktomorrow\Trader\Order\Domain\Order;
 use Thinktomorrow\Trader\Order\Domain\OrderId;
 use Thinktomorrow\Trader\Common\Domain\Price\Percentage;
 use Thinktomorrow\Trader\Tests\InMemoryContainer;
-use Thinktomorrow\Trader\Tests\Unit\Stubs\ConcretePurchasable;
+use Thinktomorrow\Trader\Tests\Unit\Stubs\PurchasableStub;
 
 class UnitTestCase extends PHPUnit_Framework_TestCase
 {
@@ -18,7 +18,7 @@ class UnitTestCase extends PHPUnit_Framework_TestCase
     {
         $order = new Order(OrderId::fromInteger($id));
 
-        if($subtotalAmount > 0) $order->items()->add(Item::fromPurchasable(new ConcretePurchasable(20,[],Money::EUR($subtotalAmount))));
+        if($subtotalAmount > 0) $order->items()->add(Item::fromPurchasable(new PurchasableStub(20,[],Money::EUR($subtotalAmount))));
 
         return $order;
     }

@@ -8,7 +8,7 @@ use Thinktomorrow\Trader\Order\Domain\Purchasable;
 use Thinktomorrow\Trader\Common\Domain\Price\Percentage;
 use Thinktomorrow\Trader\Tax\Domain\TaxId;
 
-class ConcretePurchasable implements Purchasable
+class PurchasableStub implements Purchasable
 {
     protected $id;
     protected $data;

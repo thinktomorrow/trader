@@ -16,7 +16,7 @@ use Thinktomorrow\Trader\Tax\Application\ApplyTaxRatesToOrder;
 use Thinktomorrow\Trader\Tax\Domain\TaxId;
 use Thinktomorrow\Trader\Tax\Domain\TaxRate;
 use Thinktomorrow\Trader\Tax\Ports\Persistence\InMemoryTaxRateRepository;
-use Thinktomorrow\Trader\Tests\Unit\Stubs\ConcretePurchasable;
+use Thinktomorrow\Trader\Tests\Unit\Stubs\PurchasableStub;
 use Thinktomorrow\Trader\Tests\Unit\UnitTestCase;
 
 class ApplyTaxRatesToOrderTest extends UnitTestCase
@@ -25,7 +25,7 @@ class ApplyTaxRatesToOrderTest extends UnitTestCase
     function it_can_alter_order_taxrates_to_meet_business_rules()
     {
         $order = $this->makeOrder();
-        $purchasable = new ConcretePurchasable(20,[],Money::EUR(240),Percentage::fromPercent(20));
+        $purchasable = new PurchasableStub(20,[],Money::EUR(240),Percentage::fromPercent(20));
         $purchasable->setTaxId(3);
         $order->items()->add(Item::fromPurchasable($purchasable));
 

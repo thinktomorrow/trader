@@ -9,7 +9,7 @@ use Thinktomorrow\Trader\Order\Domain\ItemId;
 use Thinktomorrow\Trader\Order\Domain\Order;
 use Thinktomorrow\Trader\Order\Domain\OrderId;
 use Thinktomorrow\Trader\Order\Domain\Services\SumOfTaxes;
-use Thinktomorrow\Trader\Tests\Unit\Stubs\ConcretePurchasable;
+use Thinktomorrow\Trader\Tests\Unit\Stubs\PurchasableStub;
 
 class SumOfTaxesTest extends UnitTestCase
 {
@@ -17,7 +17,7 @@ class SumOfTaxesTest extends UnitTestCase
    function one_tax_has_only_one_entry()
    {
        $order = new Order(OrderId::fromInteger(1));
-       $order->items()->add(Item::fromPurchasable(new ConcretePurchasable(20,[],Money::EUR(100),Percentage::fromPercent(10))));
+       $order->items()->add(Item::fromPurchasable(new PurchasableStub(20,[],Money::EUR(100),Percentage::fromPercent(10))));
 
        $sum = new SumOfTaxes();
        $taxes = $sum->forOrder($order);
@@ -31,8 +31,8 @@ class SumOfTaxesTest extends UnitTestCase
     function tax_are_grouped_per_rate()
     {
         $order = new Order(OrderId::fromInteger(1));
-        $order->items()->add(Item::fromPurchasable(new ConcretePurchasable(20,[],Money::EUR(100),Percentage::fromPercent(10))));
-        $order->items()->add(Item::fromPurchasable(new ConcretePurchasable(40,[],Money::EUR(200),Percentage::fromPercent(10))));
+        $order->items()->add(Item::fromPurchasable(new PurchasableStub(20,[],Money::EUR(100),Percentage::fromPercent(10))));
+        $order->items()->add(Item::fromPurchasable(new PurchasableStub(40,[],Money::EUR(200),Percentage::fromPercent(10))));
 
         $sum = new SumOfTaxes();
         $taxes = $sum->forOrder($order);
@@ -44,8 +44,8 @@ class SumOfTaxesTest extends UnitTestCase
     function multiple_rates_have_multiple_entries()
     {
         $order = new Order(OrderId::fromInteger(1));
-        $order->items()->add(Item::fromPurchasable(new ConcretePurchasable(20,[],Money::EUR(100),Percentage::fromPercent(10))));
-        $order->items()->add(Item::fromPurchasable(new ConcretePurchasable(40,[],Money::EUR(100),Percentage::fromPercent(12))));
+        $order->items()->add(Item::fromPurchasable(new PurchasableStub(20,[],Money::EUR(100),Percentage::fromPercent(10))));
+        $order->items()->add(Item::fromPurchasable(new PurchasableStub(40,[],Money::EUR(100),Percentage::fromPercent(12))));
 
         $sum = new SumOfTaxes();
         $taxes = $sum->forOrder($order);
@@ -61,11 +61,11 @@ class SumOfTaxesTest extends UnitTestCase
     function global_taxes_have_the_default_taxrate()
     {
         $order = new Order(OrderId::fromInteger(1));
-        $order->items()->add(Item::fromPurchasable(new ConcretePurchasable(20,[],Money::EUR(100),Percentage::fromPercent(21))));
+        $order->items()->add(Item::fromPurchasable(new PurchasableStub(20,[],Money::EUR(100),Percentage::fromPercent(21))));
         $order->setPaymentTotal(Money::EUR(30));
         $order->setShipmentTotal(Money::EUR(20));
 
-        $order->setDefaultTaxPercentage(Percentage::fromPercent(6));
+        $order->setTaxPercentage(Percentage::fromPercent(6));
 
         $sum = new SumOfTaxes();
         $taxes = $sum->forOrder($order);
@@ -81,11 +81,11 @@ class SumOfTaxesTest extends UnitTestCase
     function global_taxes_are_added_to_existing_rate_if_present()
     {
         $order = new Order(OrderId::fromInteger(1));
-        $order->items()->add(Item::fromPurchasable(new ConcretePurchasable(20,[],Money::EUR(100),Percentage::fromPercent(21))));
+        $order->items()->add(Item::fromPurchasable(new PurchasableStub(20,[],Money::EUR(100),Percentage::fromPercent(21))));
         $order->setPaymentTotal(Money::EUR(30));
         $order->setShipmentTotal(Money::EUR(20));
 
-        $order->setDefaultTaxPercentage(Percentage::fromPercent(21));
+        $order->setTaxPercentage(Percentage::fromPercent(21));
 
         $sum = new SumOfTaxes();
         $taxes = $sum->forOrder($order);

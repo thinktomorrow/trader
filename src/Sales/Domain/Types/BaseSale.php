@@ -5,6 +5,7 @@ namespace Thinktomorrow\Trader\Sales\Domain\Types;
 use Assert\Assertion;
 use Thinktomorrow\Trader\Common\Domain\Conditions\Condition;
 use Thinktomorrow\Trader\Order\Domain\Purchasable;
+use Thinktomorrow\Trader\Sales\Domain\EligibleForSale;
 use Thinktomorrow\Trader\Sales\Domain\SaleId;
 
 abstract class BaseSale
@@ -39,19 +40,31 @@ abstract class BaseSale
     }
 
     /**
-     * Do the sale conditions apply for the given purchasable
+     * Do the sale conditions apply for the given owner
      *
-     * @param Purchasable $purchasable
+     * @param EligibleForSale $eligibleForSale
      * @return bool
      */
-    public function applicable(Purchasable $purchasable): bool
+    public function applicable(EligibleForSale $eligibleForSale): bool
     {
+        if( ! $this->lessThanPrice($eligibleForSale)) return false;
+
         foreach($this->conditions as $condition)
         {
-            if(false == $condition->check($purchasable)) return false;
+            if(false == $condition->check($eligibleForSale)) return false;
         }
 
         return true;
+    }
+
+    private function lessThanPrice(EligibleForSale $eligibleForSale)
+    {
+        $saleAmount = $eligibleForSale->price()->multiply($this->adjusters['percentage']->asFloat());
+
+        // SaleTotal cannot be higher than original price
+        $saleTotal = $eligibleForSale->saleTotal()->add($saleAmount);
+
+        return ! ($saleTotal->greaterThan($eligibleForSale->price()));
     }
 
     /**

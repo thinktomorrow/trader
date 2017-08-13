@@ -7,7 +7,7 @@ use Thinktomorrow\Trader\Order\Domain\Item;
 use Thinktomorrow\Trader\Shipment\Domain\Conditions\MinimumAmount;
 use Thinktomorrow\Trader\Shipment\Domain\ShippingRule;
 use Thinktomorrow\Trader\Shipment\Domain\ShippingRuleId;
-use Thinktomorrow\Trader\Tests\Unit\Stubs\ConcretePurchasable;
+use Thinktomorrow\Trader\Tests\Unit\Stubs\PurchasableStub;
 
 class ShippingRuleTest extends UnitTestCase
 {
@@ -54,7 +54,7 @@ class ShippingRuleTest extends UnitTestCase
     function a_rule_can_be_applicable_to_an_order_if_conditions_are_met()
     {
         $order = $this->makeOrder();
-        $order->items()->add(Item::fromPurchasable(new ConcretePurchasable(1,[],Money::EUR(31))));
+        $order->items()->add(Item::fromPurchasable(new PurchasableStub(1,[],Money::EUR(31))));
 
         $rule = $this->createShippingRule();
 

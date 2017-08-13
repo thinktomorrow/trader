@@ -5,7 +5,7 @@ namespace Thinktomorrow\Trader\Tests\Unit;
 use Thinktomorrow\Trader\Order\Domain\Item;
 use Thinktomorrow\Trader\Order\Domain\ItemCollection;
 use Thinktomorrow\Trader\Order\Domain\ItemId;
-use Thinktomorrow\Trader\Tests\Unit\Stubs\ConcretePurchasable;
+use Thinktomorrow\Trader\Tests\Unit\Stubs\PurchasableStub;
 
 class ItemCollectionTest extends UnitTestCase
 {
@@ -21,8 +21,8 @@ class ItemCollectionTest extends UnitTestCase
     function it_can_start_with_array_of_items()
     {
         $collection = new ItemCollection(
-            Item::fromPurchasable(new ConcretePurchasable(1)),
-            Item::fromPurchasable(new ConcretePurchasable(2))
+            Item::fromPurchasable(new PurchasableStub(1)),
+            Item::fromPurchasable(new PurchasableStub(2))
         );
 
         $this->assertEquals(2,$collection->size());
@@ -32,8 +32,8 @@ class ItemCollectionTest extends UnitTestCase
     function same_items_are_added_up()
     {
         $collection = new ItemCollection(
-            Item::fromPurchasable(new ConcretePurchasable(2)),
-            Item::fromPurchasable(new ConcretePurchasable(2))
+            Item::fromPurchasable(new PurchasableStub(2)),
+            Item::fromPurchasable(new PurchasableStub(2))
         );
 
         $this->assertEquals(1,$collection->size());
@@ -44,7 +44,7 @@ class ItemCollectionTest extends UnitTestCase
     function it_can_add_an_item()
     {
         $itemCollection = new ItemCollection();
-        $item = Item::fromPurchasable(new ConcretePurchasable(99));
+        $item = Item::fromPurchasable(new PurchasableStub(99));
 
         $itemCollection->add($item);
 
@@ -56,7 +56,7 @@ class ItemCollectionTest extends UnitTestCase
     function it_can_add_an_item_with_quantity()
     {
         $itemCollection = new ItemCollection();
-        $item = Item::fromPurchasable(new ConcretePurchasable(99));
+        $item = Item::fromPurchasable(new PurchasableStub(99));
         $itemCollection->add($item,3);
 
         $this->assertEquals(1,$itemCollection->size());
@@ -67,7 +67,7 @@ class ItemCollectionTest extends UnitTestCase
     function it_can_find_an_item_by_id()
     {
         $itemCollection = new ItemCollection();
-        $item = Item::fromPurchasable(new ConcretePurchasable(99));
+        $item = Item::fromPurchasable(new PurchasableStub(99));
 
         $itemCollection->add($item);
 
@@ -78,7 +78,7 @@ class ItemCollectionTest extends UnitTestCase
     function adding_same_item_quantifies_same_item()
     {
         $itemCollection = new ItemCollection();
-        $item = Item::fromPurchasable(new ConcretePurchasable(99));
+        $item = Item::fromPurchasable(new PurchasableStub(99));
 
         $itemCollection->add($item);
         $itemCollection->add($item);

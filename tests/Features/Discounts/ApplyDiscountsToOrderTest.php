@@ -10,7 +10,7 @@ use Thinktomorrow\Trader\Discounts\Domain\DiscountCollection;
 use Thinktomorrow\Trader\Discounts\Domain\DiscountId;
 use Thinktomorrow\Trader\Order\Domain\Item;
 use Thinktomorrow\Trader\Common\Domain\Price\Percentage;
-use Thinktomorrow\Trader\Tests\Unit\Stubs\ConcretePurchasable;
+use Thinktomorrow\Trader\Tests\Unit\Stubs\PurchasableStub;
 use Thinktomorrow\Trader\Tests\Unit\UnitTestCase;
 
 class ApplyDiscountsToOrderTest extends UnitTestCase
@@ -20,7 +20,7 @@ class ApplyDiscountsToOrderTest extends UnitTestCase
     {
         // Set up order, items and discount
         $order = $this->makeOrder();
-        $order->items()->add(Item::fromPurchasable(new ConcretePurchasable(20,[],Money::EUR(240))));
+        $order->items()->add(Item::fromPurchasable(new PurchasableStub(20,[],Money::EUR(240))));
         $percentageOffDiscount = new PercentageOffDiscount(DiscountId::fromInteger(1),[],['percentage' => Percentage::fromPercent(20)]);
 
         // Apply discount to order
@@ -39,8 +39,8 @@ class ApplyDiscountsToOrderTest extends UnitTestCase
         );
 
         $order = $this->makeOrder();
-        $order->items()->add(Item::fromPurchasable(new ConcretePurchasable(20,[],Money::EUR(110))),2);
-        $order->items()->add(Item::fromPurchasable(new ConcretePurchasable(30,[],Money::EUR(240))));
+        $order->items()->add(Item::fromPurchasable(new PurchasableStub(20,[],Money::EUR(110))),2);
+        $order->items()->add(Item::fromPurchasable(new PurchasableStub(30,[],Money::EUR(240))));
 
         // Assert amount prior to item discount
         $this->assertEquals(Money::EUR(460), $order->total());

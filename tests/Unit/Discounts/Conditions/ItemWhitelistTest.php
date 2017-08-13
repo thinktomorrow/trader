@@ -5,7 +5,7 @@ namespace Thinktomorrow\Trader\Tests\Unit;
 use Money\Money;
 use Thinktomorrow\Trader\Discounts\Domain\Conditions\ItemWhitelist;
 use Thinktomorrow\Trader\Order\Domain\Item;
-use Thinktomorrow\Trader\Tests\Unit\Stubs\ConcretePurchasable;
+use Thinktomorrow\Trader\Tests\Unit\Stubs\PurchasableStub;
 
 class ItemWhitelistTest extends UnitTestCase
 {
@@ -13,7 +13,7 @@ class ItemWhitelistTest extends UnitTestCase
     function it_checks_ok_if_no_whitelist_is_enforced()
     {
         $condition = new ItemWhitelist();
-        $item = Item::fromPurchasable(new ConcretePurchasable(20,[],Money::EUR(110)),2);
+        $item = Item::fromPurchasable(new PurchasableStub(20,[],Money::EUR(110)),2);
 
         $this->assertTrue($condition->check($this->makeOrder(), $item));
     }
@@ -30,7 +30,7 @@ class ItemWhitelistTest extends UnitTestCase
     function it_checks_if_given_item_is_in_whitelist()
     {
         $order = $this->makeOrder();
-        $item = Item::fromPurchasable(new ConcretePurchasable(20,[],Money::EUR(110)),2);
+        $item = Item::fromPurchasable(new PurchasableStub(20,[],Money::EUR(110)),2);
 
         $condition = (new ItemWhitelist())->setParameters(['purchasable_ids' => [20]]);
         $this->assertTrue($condition->check($order, $item));

@@ -8,7 +8,7 @@ use Thinktomorrow\Trader\Order\Domain\Item;
 use Thinktomorrow\Trader\Order\Domain\OrderId;
 use Thinktomorrow\Trader\Order\Domain\OrderState;
 use Thinktomorrow\Trader\Order\Ports\Persistence\InMemoryOrderRepository;
-use Thinktomorrow\Trader\Tests\Unit\Stubs\ConcretePurchasable;
+use Thinktomorrow\Trader\Tests\Unit\Stubs\PurchasableStub;
 
 class OrderRepositoryTest extends UnitTestCase
 {
@@ -36,7 +36,7 @@ class OrderRepositoryTest extends UnitTestCase
     function it_returns_raw_values_for_merchant_order()
     {
         $order = $this->makeOrder(0, 3);
-        $order->items()->add(Item::fromPurchasable(new ConcretePurchasable(1,[],Money::EUR(50),Percentage::fromPercent(21))));
+        $order->items()->add(Item::fromPurchasable(new PurchasableStub(1,[],Money::EUR(50),Percentage::fromPercent(21))));
         $order->setShipmentTotal(Money::EUR(15));
         $order->setPaymentTotal(Money::EUR(10));
 
@@ -73,7 +73,7 @@ class OrderRepositoryTest extends UnitTestCase
     function merchant_order_has_tax_rates_grouped_by_rate()
     {
         $order = $this->makeOrder(0, 3);
-        $order->items()->add(Item::fromPurchasable(new ConcretePurchasable(1,[],Money::EUR(50),Percentage::fromPercent(21))));
+        $order->items()->add(Item::fromPurchasable(new PurchasableStub(1,[],Money::EUR(50),Percentage::fromPercent(21))));
         $order->setShipmentTotal(Money::EUR(15));
         $order->setPaymentTotal(Money::EUR(10));
 

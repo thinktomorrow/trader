@@ -15,7 +15,7 @@ use Thinktomorrow\Trader\Shipment\Domain\ShippingRuleFactory;
 use Thinktomorrow\Trader\Shipment\Domain\ShippingRuleId;
 use Thinktomorrow\Trader\Shipment\Ports\Persistence\InMemoryShippingMethodRepository;
 use Thinktomorrow\Trader\Tests\InMemoryContainer;
-use Thinktomorrow\Trader\Tests\Unit\Stubs\ConcretePurchasable;
+use Thinktomorrow\Trader\Tests\Unit\Stubs\PurchasableStub;
 use Thinktomorrow\Trader\Tests\Unit\UnitTestCase;
 
 class ApplyShippingRuleToOrderTest extends UnitTestCase
@@ -44,7 +44,7 @@ class ApplyShippingRuleToOrderTest extends UnitTestCase
     {
         // Set up order, items and shipment
         $order = $this->makeOrder();
-        $order->items()->add(Item::fromPurchasable(new ConcretePurchasable(20,[],Money::EUR(240))));
+        $order->items()->add(Item::fromPurchasable(new PurchasableStub(20,[],Money::EUR(240))));
 
         $this->orderRepository->add($order);
         $this->shippingMethodRepository->add(new ShippingMethod(ShippingMethodId::fromInteger(2),[]));
@@ -61,7 +61,7 @@ class ApplyShippingRuleToOrderTest extends UnitTestCase
     {
         // Set up order, items and shipment
         $order = $this->makeOrder();
-        $order->items()->add(Item::fromPurchasable(new ConcretePurchasable(20,[],Money::EUR(240))));
+        $order->items()->add(Item::fromPurchasable(new PurchasableStub(20,[],Money::EUR(240))));
 
         $this->orderRepository->add($order);
         $this->shippingMethodRepository->add(new ShippingMethod(ShippingMethodId::fromInteger(2),[

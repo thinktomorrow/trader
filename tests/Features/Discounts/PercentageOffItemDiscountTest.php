@@ -8,7 +8,7 @@ use Thinktomorrow\Trader\Order\Domain\Item;
 use Thinktomorrow\Trader\Order\Domain\ItemId;
 use Thinktomorrow\Trader\Common\Domain\Price\Percentage;
 use Thinktomorrow\Trader\Tests\InMemoryContainer;
-use Thinktomorrow\Trader\Tests\Unit\Stubs\ConcretePurchasable;
+use Thinktomorrow\Trader\Tests\Unit\Stubs\PurchasableStub;
 use Thinktomorrow\Trader\Tests\Unit\UnitTestCase;
 
 class PercentageOffItemDiscountTest extends UnitTestCase
@@ -25,7 +25,7 @@ class PercentageOffItemDiscountTest extends UnitTestCase
         ]);
 
         $order = $this->makeOrder();
-        $order->items()->add(Item::fromPurchasable(new ConcretePurchasable(20,[],Money::EUR(110))),2);
+        $order->items()->add(Item::fromPurchasable(new PurchasableStub(20,[],Money::EUR(110))),2);
 
         // Assert amount prior to item discount
         $this->assertEquals(Money::EUR(220), $order->total());

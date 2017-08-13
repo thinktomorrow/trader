@@ -4,7 +4,7 @@ namespace Thinktomorrow\Trader\Tests\Unit;
 
 use Thinktomorrow\Trader\Order\Domain\Item;
 use Thinktomorrow\Trader\Order\Domain\ItemId;
-use Thinktomorrow\Trader\Tests\Unit\Stubs\ConcretePurchasable;
+use Thinktomorrow\Trader\Tests\Unit\Stubs\PurchasableStub;
 
 class ItemTest extends UnitTestCase
 {
@@ -19,7 +19,7 @@ class ItemTest extends UnitTestCase
     /** @test */
     function it_can_add_to_quantity()
     {
-        $item = Item::fromPurchasable(new ConcretePurchasable(99));
+        $item = Item::fromPurchasable(new PurchasableStub(99));
 
         $this->assertEquals(1, $item->quantity());
         $item->add(1);
@@ -30,7 +30,7 @@ class ItemTest extends UnitTestCase
     /** @test */
     function it_can_add_multiple_to_quantity()
     {
-        $item = Item::fromPurchasable(new ConcretePurchasable(99));
+        $item = Item::fromPurchasable(new PurchasableStub(99));
 
         $this->assertEquals(1, $item->quantity());
         $item->add(5);
@@ -41,7 +41,7 @@ class ItemTest extends UnitTestCase
     /** @test */
     function it_can_remove_from_quantity()
     {
-        $item = Item::fromPurchasable(new ConcretePurchasable(99));
+        $item = Item::fromPurchasable(new PurchasableStub(99));
 
         $item->add(1);
         $this->assertEquals(2, $item->quantity());
@@ -53,7 +53,7 @@ class ItemTest extends UnitTestCase
     /** @test */
     function it_can_remove_multiple_from_quantity()
     {
-        $item = Item::fromPurchasable(new ConcretePurchasable(99));
+        $item = Item::fromPurchasable(new PurchasableStub(99));
 
         $item->add(10);
         $this->assertEquals(11, $item->quantity());
@@ -65,7 +65,7 @@ class ItemTest extends UnitTestCase
     /** @test */
     function it_can_remove_quantity_but_no_lower_than_zero()
     {
-        $item = Item::fromPurchasable(new ConcretePurchasable(99));
+        $item = Item::fromPurchasable(new PurchasableStub(99));
 
         $item->remove(1);
         $item->remove(1);

@@ -24,7 +24,7 @@ final class Order implements StatefulContract
     private $items;
     private $discounts; // order level applied discounts
     private $discountTotal;
-    private $defaultTaxPercentage;
+    private $taxPercentage; // default tax percentage for order (shipment / payment)
 
     public function __construct(OrderId $id)
     {
@@ -33,7 +33,7 @@ final class Order implements StatefulContract
         $this->discounts = new AppliedDiscountCollection;
         $this->discountTotal = $this->shipmentTotal = $this->paymentTotal = Cash::make(0);
 
-        $this->setDefaultTaxPercentage(Percentage::fromPercent(0));
+        $this->setTaxPercentage(Percentage::fromPercent(0));
 
         // Initial order state
         $this->state = OrderState::STATE_NEW;
@@ -113,14 +113,14 @@ final class Order implements StatefulContract
                     ->add($this->shipmentTotal());
     }
 
-    public function defaultTaxPercentage(): Percentage
+    public function taxPercentage(): Percentage
     {
-        return $this->defaultTaxPercentage;
+        return $this->taxPercentage;
     }
 
-    public function setDefaultTaxPercentage(Percentage $taxPercentage)
+    public function setTaxPercentage(Percentage $taxPercentage)
     {
-        $this->defaultTaxPercentage = $taxPercentage;
+        $this->taxPercentage = $taxPercentage;
     }
 
     public function tax(): Money
