@@ -12,8 +12,10 @@ class Percentage
     }
 
     /**
-     * TODO: don't encourage to set from a float number because this will give us crazy results
+     * TODO: don't encourage to set from a float number because this will give us crazy results.
+     *
      * @param $percent
+     *
      * @return Percentage
      */
     public static function fromPercent($percent)

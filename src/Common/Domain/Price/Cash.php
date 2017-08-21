@@ -2,10 +2,10 @@
 
 namespace Thinktomorrow\Trader\Common\Domain\Price;
 
-use Money\Money;
-use Money\Currency;
 use Money\Currencies\ISOCurrencies;
+use Money\Currency;
 use Money\Formatter\DecimalMoneyFormatter;
+use Money\Money;
 use Thinktomorrow\Trader\Common\Config;
 
 class Cash
@@ -16,7 +16,7 @@ class Cash
      * Convenience method to allow maintaining dynamic currency.
      * Keep in mind that this remains consistent across your application.
      *
-     * @param integer $amount
+     * @param int $amount
      *
      * @return Money
      */
