@@ -24,12 +24,10 @@ class OrderRepositoryTest extends UnitTestCase
     }
 
     /** @test */
-    public function it_throws_exception_if_order_does_not_exist()
+    public function it_returns_null_if_order_does_not_exist()
     {
-        $this->setExpectedException(\RuntimeException::class);
-
         $repo = new InMemoryOrderRepository();
-        $repo->find(OrderId::fromInteger(9));
+        $this->assertNull($repo->find(OrderId::fromInteger(9)));
     }
 
     /** @test */

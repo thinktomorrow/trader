@@ -10,18 +10,23 @@ class InMemoryOrderRepository implements OrderRepository
 {
     private static $collection = [];
 
-    public function find(OrderId $orderId): Order
+    public function find(OrderId $orderId)
     {
         if (isset(self::$collection[(string) $orderId])) {
             return self::$collection[(string) $orderId];
         }
 
-        throw new \RuntimeException('Order not found by id ['.$orderId->get().']');
+        return null;
     }
 
     public function add(Order $order)
     {
         self::$collection[(string) $order->id()] = $order;
+    }
+
+    public function remove(OrderId $orderId)
+    {
+        unset(self::$collection[(string) $orderId->get()]);
     }
 
     public function getValues(OrderId $orderId): array
