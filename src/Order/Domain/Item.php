@@ -41,18 +41,18 @@ final class Item
      */
     private $taxRate;
 
-    private function __construct(Purchasable $purchasable)
+    public function __construct(ItemId $id, Purchasable $purchasable)
     {
-        $this->id = $purchasable->itemId();
-        $this->purchasable = $purchasable;
+        $this->id = $id;
+        $this->purchasable = $purchasable; // The original product
         $this->discounts = new AppliedDiscountCollection();
         $this->discountTotal = Cash::make(0);
-        $this->taxRate = $purchasable->taxRate();
+        $this->setTaxRate($purchasable->taxRate());
     }
 
     public static function fromPurchasable(Purchasable $purchasable)
     {
-        return new self($purchasable);
+        return new self($purchasable->itemId(), $purchasable);
     }
 
     public function id(): ItemId
