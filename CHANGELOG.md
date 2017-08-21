@@ -1,13 +1,3 @@
 # Changelog
 
-### Deprecated
-- Nothing
-
-### Fixed
-- Nothing
-
-### Removed
-- Nothing
-
-### Security
-- Nothing
+Important changes will be notified in this file

@@ -1,6 +1,6 @@
 {
     "name": "thinktomorrow/trader",
-    "description": "Abstraction to deal with orders in an shop environment",
+    "description": "Generic logic for a basic shop app",
     "keywords": [
         "thinktomorrow",
         "trader"
