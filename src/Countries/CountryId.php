@@ -30,6 +30,7 @@ class CountryId
 
     /**
      * @param $otherCountryId
+     *
      * @return bool
      */
     public function equals($otherCountryId): bool

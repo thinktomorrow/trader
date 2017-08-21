@@ -19,6 +19,7 @@ class Config
     /**
      * @param $key
      * @param null $default
+     *
      * @return null
      */
     public function get($key, $default = null)
