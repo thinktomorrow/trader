@@ -65,7 +65,7 @@ class OrderAssembler
         $order->items = $items;
     }
 
-    private function assembleAppliedDiscounts($order, $orderId)
+    private function assembleAppliedDiscounts(MerchantOrder $order, $orderId)
     {
         $discountCollection = $this->orderRepository->getAppliedDiscounts(OrderId::fromInteger($orderId));
         $discounts = [];

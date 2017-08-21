@@ -2,10 +2,10 @@
 
 namespace Thinktomorrow\Trader\Common\Domain\Price;
 
-use Money\Currencies\ISOCurrencies;
-use Money\Currency;
-use Money\Formatter\DecimalMoneyFormatter;
 use Money\Money;
+use Money\Currency;
+use Money\Currencies\ISOCurrencies;
+use Money\Formatter\DecimalMoneyFormatter;
 use Thinktomorrow\Trader\Common\Config;
 
 class Cash
@@ -16,7 +16,7 @@ class Cash
      * Convenience method to allow maintaining dynamic currency.
      * Keep in mind that this remains consistent across your application.
      *
-     * @param $amount integer
+     * @param integer $amount
      *
      * @return Money
      */
@@ -25,7 +25,7 @@ class Cash
         return new Money($amount, new Currency(static::getCurrencyCode()));
     }
 
-    private static function getCurrencyCode()
+    private static function getCurrencyCode(): string
     {
         if (!static::$currencyCode) {
             static::$currencyCode = (new Config())->get('currency', 'EUR');

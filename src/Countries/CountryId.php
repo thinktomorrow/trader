@@ -28,6 +28,10 @@ class CountryId
         return $this->isoString;
     }
 
+    /**
+     * @param $otherCountryId
+     * @return bool
+     */
     public function equals($otherCountryId): bool
     {
         return get_class($otherCountryId) === get_class($this)

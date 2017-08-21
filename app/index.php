@@ -6,8 +6,6 @@ use Thinktomorrow\Trader\Common\Ports\App\DescriptionRender;
 use Thinktomorrow\Trader\Discounts\Application\ApplyDiscountsToOrder;
 use Thinktomorrow\Trader\Discounts\Domain\DiscountCollection;
 use Thinktomorrow\Trader\Discounts\Domain\DiscountFactory;
-use Thinktomorrow\Trader\Order\Ports\Persistence\InMemoryOrderRepository;
-use Thinktomorrow\Trader\Shipment\Ports\Persistence\InMemoryShippingMethodRepository;
 use Thinktomorrow\Trader\Tests\InMemoryContainer;
 
 require_once __DIR__.'/../vendor/autoload.php';

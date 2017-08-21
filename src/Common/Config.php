@@ -16,6 +16,11 @@ class Config
         $this->filepath = $filepath ?: __DIR__.'/../../config/trader.php';
     }
 
+    /**
+     * @param $key
+     * @param null $default
+     * @return null
+     */
     public function get($key, $default = null)
     {
         $this->loadFile();
