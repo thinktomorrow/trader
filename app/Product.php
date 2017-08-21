@@ -9,8 +9,6 @@ use Thinktomorrow\Trader\Common\Domain\Price\Cash;
  * Class Product
  * We can consider Product as a Read-only DTO.
  * The purchasable logic is found in the productVariant itself.
- *
- * @package App
  */
 class Product extends BaseProduct
 {

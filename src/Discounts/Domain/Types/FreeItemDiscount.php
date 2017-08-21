@@ -5,10 +5,10 @@ namespace Thinktomorrow\Trader\Discounts\Domain\Types;
 use Assert\Assertion;
 use Thinktomorrow\Trader\Common\Domain\Description;
 use Thinktomorrow\Trader\Common\Domain\Price\Cash;
-use Thinktomorrow\Trader\Discounts\Domain\Exceptions\CannotApplyDiscountToOrderException;
-use Thinktomorrow\Trader\Discounts\Domain\Discount;
 use Thinktomorrow\Trader\Discounts\Domain\AppliedDiscount;
+use Thinktomorrow\Trader\Discounts\Domain\Discount;
 use Thinktomorrow\Trader\Discounts\Domain\DiscountId;
+use Thinktomorrow\Trader\Discounts\Domain\Exceptions\CannotApplyDiscountToOrderException;
 use Thinktomorrow\Trader\Discounts\Domain\OrderDiscount;
 use Thinktomorrow\Trader\Order\Domain\Item;
 use Thinktomorrow\Trader\Order\Domain\Order;
@@ -25,7 +25,7 @@ final class FreeItemDiscount extends BaseDiscount implements Discount, OrderDisc
      */
     private $type;
 
-    public function __construct(DiscountId $id, array $conditions,  array $adjusters)
+    public function __construct(DiscountId $id, array $conditions, array $adjusters)
     {
         parent::__construct($id, $conditions, $adjusters);
 
@@ -34,22 +34,21 @@ final class FreeItemDiscount extends BaseDiscount implements Discount, OrderDisc
     }
 
     /**
-     * Adds a free product to the cart based on given conditions
+     * Adds a free product to the cart based on given conditions.
      *
      * @param Order $order
+     *
      * @throws CannotApplyDiscountToOrderException
      */
     public function apply(Order $order)
     {
         // Check conditions first
-        if( ! $this->applicable($order))
-        {
+        if (!$this->applicable($order)) {
             throw new CannotApplyDiscountToOrderException();
         }
 
         // Since the products are offered as free, make sure each item has a 0,00 price
-        foreach($this->free_items as $item)
-        {
+        foreach ($this->free_items as $item) {
             $item->addToDiscountTotal($item->subtotal()); // TODO: maybe create a method e.g. makeFree()?
             $order->items()->add($item);
         }
@@ -86,6 +85,6 @@ final class FreeItemDiscount extends BaseDiscount implements Discount, OrderDisc
             throw new \InvalidArgumentException('Invalid adjuster value \'free_items\' for discount '.get_class($this).'. Array is expected.');
         }
 
-        Assertion::allIsInstanceOf($adjusters['free_items'],Item::class);
+        Assertion::allIsInstanceOf($adjusters['free_items'], Item::class);
     }
 }

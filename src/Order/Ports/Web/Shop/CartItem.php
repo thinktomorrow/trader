@@ -2,17 +2,15 @@
 
 namespace Thinktomorrow\Trader\Order\Ports\Web\Shop;
 
+use Thinktomorrow\Trader\Common\Domain\Price\Cash;
 use Thinktomorrow\Trader\Discounts\Domain\AppliedDiscountCollection;
 use Thinktomorrow\Trader\Order\Domain\Item;
-use Thinktomorrow\Trader\Common\Domain\Price\Cash;
 
 /**
  * Class CartItem
  * Read-only Data object for item information in cart.
  * Safe to use in your views and documents.
  * This object has no behaviour and should already be localised.
- *
- * @package Thinktomorrow\Trader\Order
  */
 class CartItem
 {
@@ -65,5 +63,4 @@ class CartItem
     {
         return $this->item->discounts();
     }
-
 }

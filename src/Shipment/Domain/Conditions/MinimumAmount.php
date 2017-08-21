@@ -10,7 +10,9 @@ class MinimumAmount extends BaseCondition implements Condition
 {
     public function check(Order $order): bool
     {
-        if( ! isset($this->parameters['minimum_amount'])) return true;
+        if (!isset($this->parameters['minimum_amount'])) {
+            return true;
+        }
 
         // Check subtotal (without discount or payment costs)
         return $order->subtotal()->greaterThanOrEqual($this->parameters['minimum_amount']);

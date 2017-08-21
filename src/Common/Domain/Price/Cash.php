@@ -2,10 +2,10 @@
 
 namespace Thinktomorrow\Trader\Common\Domain\Price;
 
-use Money\Money;
-use Money\Currency;
 use Money\Currencies\ISOCurrencies;
+use Money\Currency;
 use Money\Formatter\DecimalMoneyFormatter;
+use Money\Money;
 use Thinktomorrow\Trader\Common\Config;
 
 class Cash
@@ -14,9 +14,10 @@ class Cash
 
     /**
      * Convenience method to allow maintaining dynamic currency.
-     * Keep in mind that this remains consistent across your application
+     * Keep in mind that this remains consistent across your application.
      *
      * @param $amount integer
+     *
      * @return Money
      */
     public static function make($amount): Money
@@ -26,16 +27,15 @@ class Cash
 
     private static function getCurrencyCode()
     {
-        if( ! static::$currencyCode)
-        {
-            static::$currencyCode = (new Config)->get('currency','EUR');
+        if (!static::$currencyCode) {
+            static::$currencyCode = (new Config())->get('currency', 'EUR');
         }
 
         return static::$currencyCode;
     }
 
     /**
-     * Convenience method to reset the current currency so it can be refreshed from config
+     * Convenience method to reset the current currency so it can be refreshed from config.
      */
     public static function resetCurrency()
     {
@@ -43,9 +43,11 @@ class Cash
     }
 
     /**
-     * TODO this should be something like Cash(Money)->locale() so then we can have Cash::from($money)->locale('nl')
-     * @param Money $money
+     * TODO this should be something like Cash(Money)->locale() so then we can have Cash::from($money)->locale('nl').
+     *
+     * @param Money  $money
      * @param string $locale
+     *
      * @return string
      */
     public function locale(Money $money, $locale = 'nl_BE')
@@ -59,6 +61,6 @@ class Cash
         // TEMPORARY display just for testing
         $symbol = $money->getCurrency()->getCode() == 'EUR' ? '&euro;' : $money->getCurrency()->getCode();
 
-        return $symbol . $moneyFormatter->format($money);
+        return $symbol.$moneyFormatter->format($money);
     }
 }

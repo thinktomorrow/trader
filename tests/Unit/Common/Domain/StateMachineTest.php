@@ -21,29 +21,29 @@ class StateMachineTest extends UnitTestCase
     }
 
     /** @test */
-    function it_can_setup_machine()
+    public function it_can_setup_machine()
     {
         $this->assertInstanceOf(StateMachine::class, $this->machine);
     }
 
     /** @test */
-    function it_throws_exception_if_transition_map_is_malformed()
+    public function it_throws_exception_if_transition_map_is_malformed()
     {
-        $this->setExpectedException(StateException::class,'malformed');
+        $this->setExpectedException(StateException::class, 'malformed');
 
         new MalformedStateMachine($this->dummyStatefulContract);
     }
 
     /** @test */
-    function it_throws_exception_if_transition_contains_invalid_state()
+    public function it_throws_exception_if_transition_contains_invalid_state()
     {
-        $this->setExpectedException(StateException::class,'non existing');
+        $this->setExpectedException(StateException::class, 'non existing');
 
         new MissingStateMachine($this->dummyStatefulContract);
     }
 
     /** @test */
-    function it_throws_exception_if_applying_unknown_transition()
+    public function it_throws_exception_if_applying_unknown_transition()
     {
         $this->setExpectedException(StateException::class, 'unknown transition [unknown] on Thinktomorrow\Trader\Unit\DummyStateMachine');
 
@@ -51,23 +51,23 @@ class StateMachineTest extends UnitTestCase
     }
 
     /** @test */
-    function it_throws_exception_if_applying_transition_is_disallowed()
+    public function it_throws_exception_if_applying_transition_is_disallowed()
     {
-        $this->setExpectedException(StateException::class,'Transition [complete] cannot be applied from current state [new] on Thinktomorrow\Trader\Unit\DummyStateMachine');
+        $this->setExpectedException(StateException::class, 'Transition [complete] cannot be applied from current state [new] on Thinktomorrow\Trader\Unit\DummyStateMachine');
 
         $this->machine->apply('complete');
     }
 
     /** @test */
-    function it_can_apply_transition()
+    public function it_can_apply_transition()
     {
         $dummyStatefulContract = new dummyStatefulContract();
         $machine = new DummyStateMachine($dummyStatefulContract);
 
-        $this->assertEquals('new',$dummyStatefulContract->state());
+        $this->assertEquals('new', $dummyStatefulContract->state());
 
         $machine->apply('create');
-        $this->assertEquals('pending',$dummyStatefulContract->state());
+        $this->assertEquals('pending', $dummyStatefulContract->state());
     }
 }
 
@@ -84,11 +84,11 @@ class DummyStateMachine extends StateMachine
     protected $transitions = [
         'create' => [
             'from' => ['new'],
-            'to' => 'pending',
+            'to'   => 'pending',
         ],
         'complete' => [
             'from' => ['pending'],
-            'to' => 'completed'
+            'to'   => 'completed',
         ],
     ];
 }
@@ -97,7 +97,7 @@ class MalformedStateMachine extends StateMachine
 {
     protected $transitions = [
         'complete' => [
-            'from' => 'foobar'
+            'from' => 'foobar',
         ],
     ];
 }
@@ -105,13 +105,13 @@ class MalformedStateMachine extends StateMachine
 class MissingStateMachine extends StateMachine
 {
     protected $states = [
-        'new'
+        'new',
     ];
 
     protected $transitions = [
         'create' => [
             'from' => ['new'],
-            'to' => 'pending',
+            'to'   => 'pending',
         ],
     ];
 }

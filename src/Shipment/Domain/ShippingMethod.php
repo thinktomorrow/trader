@@ -19,7 +19,7 @@ class ShippingMethod
     private $rules;
 
     /**
-     * Request cache of matching rule (avoid redundant matching logic)
+     * Request cache of matching rule (avoid redundant matching logic).
      *
      * @var ShippingRule
      */
@@ -40,32 +40,32 @@ class ShippingMethod
 
     public function apply(Order $order)
     {
-        if( ! $this->applicable($order))
-        {
+        if (!$this->applicable($order)) {
             throw new CannotApplyShippingRuleException('Shipping method ['.$this->id().'] not applicable to order ['.$order->id().']. None of the rules match.');
         }
 
         $shippingRule = $this->getApplicableRule($order);
 
-        $order->setShipment($this->id(),$shippingRule->id());
+        $order->setShipment($this->id(), $shippingRule->id());
         $order->setShipmentTotal($shippingRule->total());
     }
 
     public function applicable(Order $order): bool
     {
-        return !! $this->getApplicableRule($order);
+        return (bool) $this->getApplicableRule($order);
     }
 
     private function getApplicableRule(Order $order)
     {
         // Return early if rule has already been determined
-        if($this->applicableRule) return $this->applicableRule;
-
-        foreach($this->rules as $rule)
-        {
-            if($rule->applicable($order)) return $this->applicableRule = $rule;
+        if ($this->applicableRule) {
+            return $this->applicableRule;
         }
 
-        return null;
+        foreach ($this->rules as $rule) {
+            if ($rule->applicable($order)) {
+                return $this->applicableRule = $rule;
+            }
+        }
     }
 }

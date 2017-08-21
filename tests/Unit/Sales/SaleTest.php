@@ -12,29 +12,29 @@ use Thinktomorrow\Trader\Tests\Unit\Stubs\EligibleForSaleStub;
 class SaleTest extends UnitTestCase
 {
     /** @test */
-    function saleId_is_a_valid_identifier()
+    public function saleId_is_a_valid_identifier()
     {
         $saleId = SaleId::fromInteger(2);
 
-        $this->assertEquals(2,$saleId->get());
+        $this->assertEquals(2, $saleId->get());
     }
 
     /** @test */
-    function it_applies_sale()
+    public function it_applies_sale()
     {
         $stub = $this->makeStub(100);
         $sale = $this->makePercentageOffSale(20);
 
         $sale->apply($stub);
 
-        $this->assertCount(1,$stub->sales());
-        $this->assertEquals(Money::EUR(100),$stub->price());
-        $this->assertEquals(Money::EUR(20),$stub->saleTotal());
-        $this->assertEquals(Money::EUR(80),$stub->salePrice());
+        $this->assertCount(1, $stub->sales());
+        $this->assertEquals(Money::EUR(100), $stub->price());
+        $this->assertEquals(Money::EUR(20), $stub->saleTotal());
+        $this->assertEquals(Money::EUR(80), $stub->salePrice());
     }
 
     /** @test */
-    function it_applies_multiple_sales()
+    public function it_applies_multiple_sales()
     {
         $stub = $this->makeStub(100);
         $sale = $this->makePercentageOffSale(20);
@@ -43,14 +43,14 @@ class SaleTest extends UnitTestCase
         $sale->apply($stub);
         $sale2->apply($stub);
 
-        $this->assertCount(2,$stub->sales());
-        $this->assertEquals(Money::EUR(100),$stub->price());
-        $this->assertEquals(Money::EUR(40),$stub->saleTotal());
-        $this->assertEquals(Money::EUR(60),$stub->salePrice());
+        $this->assertCount(2, $stub->sales());
+        $this->assertEquals(Money::EUR(100), $stub->price());
+        $this->assertEquals(Money::EUR(40), $stub->saleTotal());
+        $this->assertEquals(Money::EUR(60), $stub->salePrice());
     }
 
     /** @test */
-    function percentage_sale_cannot_be_higher_than_100()
+    public function percentage_sale_cannot_be_higher_than_100()
     {
         $this->setExpectedException(\InvalidArgumentException::class);
 
@@ -58,7 +58,7 @@ class SaleTest extends UnitTestCase
     }
 
     /** @test */
-    function percentage_sale_cannot_be_lower_than_0()
+    public function percentage_sale_cannot_be_lower_than_0()
     {
         $this->setExpectedException(\InvalidArgumentException::class);
 
@@ -66,7 +66,7 @@ class SaleTest extends UnitTestCase
     }
 
     /** @test */
-    function sale_cannot_go_below_purchasable_original_price()
+    public function sale_cannot_go_below_purchasable_original_price()
     {
         $this->setExpectedException(CannotApplySale::class);
 
@@ -77,13 +77,13 @@ class SaleTest extends UnitTestCase
         $sale->apply($stub);
         $sale2->apply($stub);
 
-        $this->assertEquals(Money::EUR(100),$stub->price());
-        $this->assertEquals(Money::EUR(100),$stub->saleTotal());
-        $this->assertEquals(Money::EUR(0),$stub->salePrice());
+        $this->assertEquals(Money::EUR(100), $stub->price());
+        $this->assertEquals(Money::EUR(100), $stub->saleTotal());
+        $this->assertEquals(Money::EUR(0), $stub->salePrice());
     }
 
     /** @test */
-    function sale_cannot_go_exactly_to_purchasable_original_price()
+    public function sale_cannot_go_exactly_to_purchasable_original_price()
     {
         $stub = $this->makeStub(100);
         $sale = $this->makePercentageOffSale(50);
@@ -92,20 +92,20 @@ class SaleTest extends UnitTestCase
         $sale->apply($stub);
         $sale2->apply($stub);
 
-        $this->assertEquals(Money::EUR(100),$stub->price());
-        $this->assertEquals(Money::EUR(100),$stub->saleTotal());
-        $this->assertEquals(Money::EUR(0),$stub->salePrice());
+        $this->assertEquals(Money::EUR(100), $stub->price());
+        $this->assertEquals(Money::EUR(100), $stub->saleTotal());
+        $this->assertEquals(Money::EUR(0), $stub->salePrice());
     }
 
     private function makeStub($amount)
     {
         $price = Money::EUR($amount);
 
-        return new EligibleForSaleStub(1,[],$price);
+        return new EligibleForSaleStub(1, [], $price);
     }
 
     private function makePercentageOffSale($percent)
     {
-        return new PercentageOffSale(SaleId::fromInteger(1),[],['percentage' => Percentage::fromPercent($percent)]);
+        return new PercentageOffSale(SaleId::fromInteger(1), [], ['percentage' => Percentage::fromPercent($percent)]);
     }
 }

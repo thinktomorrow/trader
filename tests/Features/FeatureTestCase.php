@@ -6,7 +6,6 @@ use PHPUnit_Framework_TestCase;
 use Pimple\Container;
 use Thinktomorrow\Trader\Order\Ports\Persistence\InMemoryOrderRepository;
 
-
 class FeatureTestCase extends PHPUnit_Framework_TestCase
 {
     private $container;
@@ -27,9 +26,8 @@ class FeatureTestCase extends PHPUnit_Framework_TestCase
 
     private function addServicesToContainer()
     {
-        $this->container['orderRepository'] = function($c){
+        $this->container['orderRepository'] = function ($c) {
             return new InMemoryOrderRepository();
         };
     }
-
 }

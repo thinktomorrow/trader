@@ -12,6 +12,6 @@ class DescriptionRender
         // SHOULD BECOME SOMETHING AS trans() SO need to put it in ports/app/ ?
         // return trans($description->key(),$description->values(),$locale);
         // SHOULD ALSO ACCOUNT FOR TRANSLATION ALREADY GIVEN? (e.g. FROM DB)
-        return printf($description->key(),$description->values());
+        return printf($description->key(), $description->values());
     }
 }

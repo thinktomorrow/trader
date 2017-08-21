@@ -12,13 +12,15 @@ class InMemoryTaxRateRepository implements TaxRateRepository
 
     public function find(TaxId $taxId): TaxRate
     {
-        if(isset(self::$collection[(string)$taxId])) return self::$collection[(string)$taxId];
+        if (isset(self::$collection[(string) $taxId])) {
+            return self::$collection[(string) $taxId];
+        }
 
         throw new \RuntimeException('TaxRate not found by id ['.$taxId->get().']');
     }
 
     public function add(TaxRate $taxRate)
     {
-        self::$collection[(string)$taxRate->id()] = $taxRate;
+        self::$collection[(string) $taxRate->id()] = $taxRate;
     }
 }

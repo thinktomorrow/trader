@@ -2,13 +2,13 @@
 
 namespace Thinktomorrow\Trader\Order\Ports\Web\Shop;
 
+use Thinktomorrow\Trader\Common\Domain\Price\Cash;
 use Thinktomorrow\Trader\Discounts\Domain\AppliedDiscountCollection;
 use Thinktomorrow\Trader\Order\Domain\Order;
-use Thinktomorrow\Trader\Common\Domain\Price\Cash;
 
 /**
  * Cart data object for read-only usage in views
- * Order presenter for shopper
+ * Order presenter for shopper.
  */
 class Cart
 {
@@ -36,8 +36,7 @@ class Cart
     {
         $collection = [];
 
-        foreach($this->order->items() as $id => $item)
-        {
+        foreach ($this->order->items() as $id => $item) {
             $collection[$id] = new CartItem($item);
         }
 

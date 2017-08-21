@@ -6,5 +6,5 @@ use Thinktomorrow\Trader\Common\Domain\AggregateId;
 
 class SaleId
 {
- use AggregateId;
+    use AggregateId;
 }

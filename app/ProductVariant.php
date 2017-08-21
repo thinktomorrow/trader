@@ -5,9 +5,9 @@ namespace App;
 use Money\Money;
 use Thinktomorrow\Trader\Catalog\Products\ProductVariant as BaseProductVariant;
 use Thinktomorrow\Trader\Common\Domain\Price\Percentage;
+use Thinktomorrow\Trader\Order\Domain\ItemId;
 use Thinktomorrow\Trader\Order\Domain\Purchasable;
 use Thinktomorrow\Trader\Tax\Domain\TaxId;
-use Thinktomorrow\Trader\Order\Domain\ItemId;
 
 class ProductVariant extends BaseProductVariant implements Purchasable
 {
@@ -20,7 +20,7 @@ class ProductVariant extends BaseProductVariant implements Purchasable
 
     public function __construct($id = null, $data = [], Money $price = null, Percentage $taxRate = null, Money $salePrice = null)
     {
-        $this->id = $id ?: rand(1,99);
+        $this->id = $id ?: rand(1, 99);
         $this->data = $data;
         $this->price = $price ?: Money::EUR(120);
         $this->taxRate = !is_null($taxRate) ? $taxRate : Percentage::fromPercent(21);
@@ -81,7 +81,7 @@ class ProductVariant extends BaseProductVariant implements Purchasable
     }
 
     /**
-     * Convenience method for testing
+     * Convenience method for testing.
      *
      * @param $taxId
      */

@@ -33,6 +33,5 @@ class AddToCart
         $productVariant = $this->productRepository->findVariant($variant_id);
 
         $order->items()->add(Item::fromPurchasable($productVariant));
-
     }
 }

@@ -21,7 +21,7 @@ $orders = $orderRepository->all();
         </tr>
     </thead>
     <tbody>
-    <?php foreach($orders as $order): ?>
+    <?php foreach ($orders as $order): ?>
         <tr>
             <td><a href="/admin/order.php"><?= $order->reference ?></a></td>
             <td>klant</td>

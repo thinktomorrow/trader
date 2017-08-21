@@ -2,15 +2,12 @@
 
 namespace Thinktomorrow\Trader\Order\Application;
 
-use Money\Money;
-use Thinktomorrow\Trader\Common\Domain\Price\Percentage;
-use Thinktomorrow\Trader\Discounts\Domain\AppliedDiscount;
 use Thinktomorrow\Trader\Discounts\Ports\Web\Discount;
 use Thinktomorrow\Trader\Order\Domain\OrderId;
 use Thinktomorrow\Trader\Order\Domain\OrderRepository;
 use Thinktomorrow\Trader\Order\Ports\Web\Merchant\Item;
-use Thinktomorrow\Trader\Order\Ports\Web\Merchant\Order as MerchantOrder;
 use Thinktomorrow\Trader\Order\Ports\Web\Merchant\Order;
+use Thinktomorrow\Trader\Order\Ports\Web\Merchant\Order as MerchantOrder;
 
 // TODO: the assembler violates the dependency flow since it depends on concrete ports objects
 class OrderAssembler
@@ -31,8 +28,10 @@ class OrderAssembler
     }
 
     /**
-     * This data (raw) will be presented as a simple read-only DTO
+     * This data (raw) will be presented as a simple read-only DTO.
+     *
      * @param $orderId
+     *
      * @return MerchantOrder
      */
     public function forMerchant($orderId)
@@ -41,14 +40,12 @@ class OrderAssembler
 
         $order = new MerchantOrder();
 
-        foreach(['total','subtotal','discount_total', 'payment_total','shipment_total','tax','tax_rates','reference','confirmed_at','state'] as $attribute)
-        {
+        foreach (['total', 'subtotal', 'discount_total', 'payment_total', 'shipment_total', 'tax', 'tax_rates', 'reference', 'confirmed_at', 'state'] as $attribute) {
             $order->{$attribute} = $data[$attribute];
         }
 
-        $this->assembleItems($order,$orderId);
+        $this->assembleItems($order, $orderId);
         $this->assembleAppliedDiscounts($order, $orderId);
-
 
         // TODO: add applied shipment and payment
         // TODO: add applied Tax rule
@@ -61,8 +58,7 @@ class OrderAssembler
         $itemCollection = $this->orderRepository->getItemValues(OrderId::fromInteger($orderId));
         $items = [];
 
-        foreach($itemCollection as $id => $itemValues)
-        {
+        foreach ($itemCollection as $id => $itemValues) {
             $items[$id] = new Item($itemValues);
         }
 
@@ -74,8 +70,7 @@ class OrderAssembler
         $discountCollection = $this->orderRepository->getAppliedDiscounts(OrderId::fromInteger($orderId));
         $discounts = [];
 
-        foreach($discountCollection as $id => $discountValues)
-        {
+        foreach ($discountCollection as $id => $discountValues) {
             $discounts[$id] = new Discount($discountValues);
         }
 

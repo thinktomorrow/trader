@@ -1,13 +1,12 @@
 <?php
 
+use App\Product;
+use Thinktomorrow\Trader\Common\Domain\Price\Percentage;
 use Thinktomorrow\Trader\Common\Ports\App\DescriptionRender;
 use Thinktomorrow\Trader\Discounts\Application\ApplyDiscountsToOrder;
 use Thinktomorrow\Trader\Discounts\Domain\DiscountCollection;
 use Thinktomorrow\Trader\Discounts\Domain\DiscountFactory;
-use App\Product;
-use Thinktomorrow\Trader\Common\Domain\Price\Percentage;
 use Thinktomorrow\Trader\Order\Ports\Persistence\InMemoryOrderRepository;
-use Thinktomorrow\Trader\Shipment\Application\ApplyShippingMethodToOrder;
 use Thinktomorrow\Trader\Shipment\Ports\Persistence\InMemoryShippingMethodRepository;
 use Thinktomorrow\Trader\Tests\InMemoryContainer;
 
@@ -16,9 +15,9 @@ require_once __DIR__.'/../vendor/autoload.php';
     $order = new \Thinktomorrow\Trader\Order\Domain\Order(\Thinktomorrow\Trader\Order\Domain\OrderId::fromInteger(1));
 
     $order->items()->add(
-        \Thinktomorrow\Trader\Order\Domain\Item::fromPurchasable(new Product(33,[
-                'name' => 'crazy product number one',
-                'description' => 'this is a nice looking product guys!!!'
+        \Thinktomorrow\Trader\Order\Domain\Item::fromPurchasable(new Product(33, [
+                'name'        => 'crazy product number one',
+                'description' => 'this is a nice looking product guys!!!',
             ],
             \Money\Money::EUR(222),
             Percentage::fromPercent(21)
@@ -27,9 +26,9 @@ require_once __DIR__.'/../vendor/autoload.php';
     );
 
 $order->items()->add(
-    \Thinktomorrow\Trader\Order\Domain\Item::fromPurchasable(new Product(12,[
-        'name' => 'awesome product number two',
-        'description' => 'in promo! buy second to get 50% off of both'
+    \Thinktomorrow\Trader\Order\Domain\Item::fromPurchasable(new Product(12, [
+        'name'        => 'awesome product number two',
+        'description' => 'in promo! buy second to get 50% off of both',
     ],
         \Money\Money::EUR(3000),
         Percentage::fromPercent(6)
@@ -38,21 +37,21 @@ $order->items()->add(
 );
 
     // Add coupon
-    $percentageOffDiscount = (new DiscountFactory(new InMemoryContainer()))->create(1,'percentage_off',[
+    $percentageOffDiscount = (new DiscountFactory(new InMemoryContainer()))->create(1, 'percentage_off', [
             //
-    ],[
-            'percentage' => Percentage::fromPercent(50)
+    ], [
+            'percentage' => Percentage::fromPercent(50),
     ]);
 
-    $percentageOffItemDiscount = (new DiscountFactory(new InMemoryContainer()))->create(2,'percentage_off_item',[
+    $percentageOffItemDiscount = (new DiscountFactory(new InMemoryContainer()))->create(2, 'percentage_off_item', [
         //
-    ],[
-        'percentage' => Percentage::fromPercent(25)
+    ], [
+        'percentage' => Percentage::fromPercent(25),
     ]);
 
     (new ApplyDiscountsToOrder())->handle(
         $order,
-        new DiscountCollection([$percentageOffItemDiscount,$percentageOffDiscount])
+        new DiscountCollection([$percentageOffItemDiscount, $percentageOffDiscount])
     );
 
     // Add shipment cost
@@ -92,7 +91,7 @@ $order->items()->add(
         </tr>
         </thead>
         <tbody>
-        <?php foreach($cart->items() as $item): ?>
+        <?php foreach ($cart->items() as $item): ?>
             <tr>
                 <td data-th="Product">
                     <div class="row">
@@ -100,10 +99,10 @@ $order->items()->add(
                         <div class="col-sm-10">
                             <h4 class="nomargin"><?= $item->name() ?></h4>
                             <p><?= $item->description() ?></p>
-                            <?php if($item->discounts()->any()): ?>
-                                <?php foreach($item->discounts() as $discount): ?>
-                                    <p><?= (new DescriptionRender)->locale($discount->description()) ?></p>
-                                    <p>Korting van: <?= (new \Thinktomorrow\Trader\Common\Domain\Price\Cash)->locale($discount->amount()) ?></p>
+                            <?php if ($item->discounts()->any()): ?>
+                                <?php foreach ($item->discounts() as $discount): ?>
+                                    <p><?= (new DescriptionRender())->locale($discount->description()) ?></p>
+                                    <p>Korting van: <?= (new \Thinktomorrow\Trader\Common\Domain\Price\Cash())->locale($discount->amount()) ?></p>
                                 <?php endforeach; ?>
                             <?php endif; ?>
                         </div>
@@ -129,9 +128,9 @@ $order->items()->add(
         <tr>
             <td colspan="3"></td>
             <td class="text-center">
-                <?php foreach($cart->discounts() as $discount): ?>
+                <?php foreach ($cart->discounts() as $discount): ?>
                     <p style="color:red;"><?= $discount->description() ?></p>
-                    <p>Globale korting van: <?= (new \Thinktomorrow\Trader\Common\Domain\Price\Cash)->locale($discount->amount()) ?></p>
+                    <p>Globale korting van: <?= (new \Thinktomorrow\Trader\Common\Domain\Price\Cash())->locale($discount->amount()) ?></p>
                 <?php endforeach; ?>
             </td>
             <td></td>
@@ -140,7 +139,7 @@ $order->items()->add(
             <td colspan="3"></td>
             <td class="text-center">
                 <p style="color:red;">SHIPMENT COST: <?= $cart->shipment() ?></p>
-                <?php if($cart->freeShipment()): ?>
+                <?php if ($cart->freeShipment()): ?>
                     <strong>YEAH FREE SHIPMENT!</strong>
                 <?php endif; ?>
             </td>

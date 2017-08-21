@@ -9,27 +9,30 @@ use Thinktomorrow\Trader\Tax\Domain\TaxId;
 interface Purchasable
 {
     /**
-     * Unique item identifier - usually the SKU or primary key
+     * Unique item identifier - usually the SKU or primary key.
+     *
      * @return ItemId
      */
     public function itemId(): ItemId;
 
     /**
      * Collection of item details. Here you pass
-     * custom attributes as name, description
+     * custom attributes as name, description.
      *
      * @return array
      */
     public function itemData(): array;
 
     /**
-     * Unit price inclusive tax
+     * Unit price inclusive tax.
+     *
      * @return Money
      */
     public function price(): Money;
 
     /**
-     * Discounted unit price
+     * Discounted unit price.
+     *
      * @return Money
      */
     public function salePrice(): Money;
@@ -46,5 +49,4 @@ interface Purchasable
      * @return TaxId
      */
     public function taxId(): TaxId;
-
 }

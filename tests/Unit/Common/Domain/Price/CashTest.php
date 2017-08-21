@@ -33,13 +33,13 @@ class CashTest extends UnitTestCase
     }
 
     /** @test */
-    function it_can_get_money_instance_with_configurable_currency()
+    public function it_can_get_money_instance_with_configurable_currency()
     {
-        $this->assertEquals('USD',$this->config->get('currency'));
+        $this->assertEquals('USD', $this->config->get('currency'));
 
         $money = Cash::make(120);
 
-        $this->assertInstanceOf(Money::class,$money);
-        $this->assertEquals('USD',$money->getCurrency()->getCode());
+        $this->assertInstanceOf(Money::class, $money);
+        $this->assertEquals('USD', $money->getCurrency()->getCode());
     }
 }

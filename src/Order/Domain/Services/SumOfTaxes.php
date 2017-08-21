@@ -10,7 +10,7 @@ class SumOfTaxes
     public function forOrder(Order $order)
     {
         // TODO: take discounts into account
-        $totalsPerRate = $this->mergeTotals($this->itemTotalsPerRate($order),$this->globalTotalsPerRate($order));
+        $totalsPerRate = $this->mergeTotals($this->itemTotalsPerRate($order), $this->globalTotalsPerRate($order));
         $totalsPerRate = $this->calculateTax($totalsPerRate);
 
         return $totalsPerRate;
@@ -21,6 +21,7 @@ class SumOfTaxes
      * If we would take the tax amount of each item, the tax total is prone to rounding errors.
      *
      * @param Order $order
+     *
      * @return array
      */
     private function itemTotalsPerRate(Order $order): array
@@ -28,7 +29,7 @@ class SumOfTaxes
         $totalsPerRate = [];
 
         foreach ($order->items() as $item) {
-            $key = (string)$item->taxRate()->asPercent();
+            $key = (string) $item->taxRate()->asPercent();
 
             if (!isset($totalsPerRate[$key])) {
                 $totalsPerRate[$key] = ['percent' => $item->taxRate(), 'total' => Cash::make(0)];
@@ -41,23 +42,27 @@ class SumOfTaxes
     }
 
     /**
-     * Add Shipment and Payment Tax
+     * Add Shipment and Payment Tax.
      *
      * @param Order $order
+     *
      * @return array
      */
     private function globalTotalsPerRate(Order $order): array
     {
         $taxPercentage = $order->taxPercentage();
 
-        if( ! $taxPercentage->isPositive()) return [];
+        if (!$taxPercentage->isPositive()) {
+            return [];
+        }
 
         $totalsPerRate = [];
-        $key = (string)$taxPercentage->asPercent();
+        $key = (string) $taxPercentage->asPercent();
 
-        foreach ([$order->shipmentTotal(),$order->paymentTotal()] as $global) {
-
-            if( ! $global->isPositive()) continue;
+        foreach ([$order->shipmentTotal(), $order->paymentTotal()] as $global) {
+            if (!$global->isPositive()) {
+                continue;
+            }
 
             if (!isset($totalsPerRate[$key])) {
                 $totalsPerRate[$key] = ['percent' => $taxPercentage, 'total' => Cash::make(0)];
@@ -72,6 +77,7 @@ class SumOfTaxes
     /**
      * @param $main
      * @param $second
+     *
      * @return array
      */
     private function mergeTotals($main, $second): array
@@ -90,6 +96,7 @@ class SumOfTaxes
 
     /**
      * @param $totalsPerRate
+     *
      * @return mixed
      */
     private function calculateTax($totalsPerRate)

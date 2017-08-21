@@ -8,8 +8,7 @@ abstract class BaseCondition
 
     public function setParameters(array $parameters): self
     {
-        if(method_exists($this,'validateParameters'))
-        {
+        if (method_exists($this, 'validateParameters')) {
             $this->validateParameters($parameters);
         }
 

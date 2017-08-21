@@ -1,6 +1,5 @@
 <?php
 
-
 namespace Thinktomorrow\Trader\Sales\Domain;
 
 use Money\Money;
