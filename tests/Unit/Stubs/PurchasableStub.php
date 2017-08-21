@@ -3,9 +3,9 @@
 namespace Thinktomorrow\Trader\Tests\Unit\Stubs;
 
 use Money\Money;
+use Thinktomorrow\Trader\Common\Domain\Price\Percentage;
 use Thinktomorrow\Trader\Order\Domain\ItemId;
 use Thinktomorrow\Trader\Order\Domain\Purchasable;
-use Thinktomorrow\Trader\Common\Domain\Price\Percentage;
 use Thinktomorrow\Trader\Tax\Domain\TaxId;
 
 class PurchasableStub implements Purchasable
@@ -19,7 +19,7 @@ class PurchasableStub implements Purchasable
 
     public function __construct($id = null, $data = [], Money $price = null, Percentage $taxRate = null, Money $salePrice = null)
     {
-        $this->id = $id ?: rand(1,99);
+        $this->id = $id ?: rand(1, 99);
         $this->data = $data;
         $this->price = $price ?: Money::EUR(120);
         $this->taxRate = !is_null($taxRate) ? $taxRate : Percentage::fromPercent(21);
@@ -70,7 +70,7 @@ class PurchasableStub implements Purchasable
     }
 
     /**
-     * Convenience method for testing
+     * Convenience method for testing.
      *
      * @param $taxId
      */

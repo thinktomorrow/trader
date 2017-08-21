@@ -38,23 +38,23 @@ class OrderState extends StateMachine
     protected $transitions = [
         'create' => [
             'from' => ['new'],
-            'to' => 'pending'
+            'to'   => 'pending',
         ],
         'abandon' => [
             'from' => ['pending'],
-            'to' => 'abandoned'
+            'to'   => 'abandoned',
         ],
         'remove' => [
-          'from' => ['pending','abandoned'],
-          'to' => 'removed'
+          'from' => ['pending', 'abandoned'],
+          'to'   => 'removed',
         ],
         'confirm' => [
-            'from' => ['pending','abandoned'],
-            'to' => 'confirmed'
+            'from' => ['pending', 'abandoned'],
+            'to'   => 'confirmed',
         ],
         'pay' => [
             'from' => ['confirmed'],
-            'to' => 'paid'
+            'to'   => 'paid',
         ],
     ];
 
@@ -65,7 +65,7 @@ class OrderState extends StateMachine
 
     public function inCustomerHands(): bool
     {
-        return in_array($this->statefulContract->state(),[
+        return in_array($this->statefulContract->state(), [
             static::STATE_NEW,
             static::STATE_PENDING,
             static::STATE_ABANDONED,
@@ -75,6 +75,6 @@ class OrderState extends StateMachine
 
     public function inMerchantHands(): bool
     {
-        return ! $this->inCustomerHands();
+        return !$this->inCustomerHands();
     }
 }

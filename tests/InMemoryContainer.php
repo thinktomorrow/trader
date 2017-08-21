@@ -5,7 +5,7 @@ namespace Thinktomorrow\Trader\Tests;
 use Psr\Container\ContainerInterface;
 
 /**
- * Class DummyContainer
+ * Class DummyContainer.
  */
 class InMemoryContainer implements ContainerInterface
 {
@@ -13,17 +13,18 @@ class InMemoryContainer implements ContainerInterface
 
     public function get($id)
     {
-        if(!$this->has($id))
-        {
+        if (!$this->has($id)) {
             // Our Dummy container will just try to instantiate the passed id if it's a class
-            if(class_exists($id)) return new $id;
+            if (class_exists($id)) {
+                return new $id();
+            }
 
             throw new \Exception('Container could not resolve class by identifier ['.$id.']. ');
         }
 
         $class = self::$mapping[$id];
 
-        return new $class;
+        return new $class();
     }
 
     public function has($id)

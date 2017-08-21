@@ -8,18 +8,18 @@ use Thinktomorrow\Trader\Tests\Unit\Stubs\PurchasableStub;
 class PurchasableTest extends UnitTestCase
 {
     /** @test */
-    function it_can_get_itemid()
+    public function it_can_get_itemid()
     {
         $purchasable = new PurchasableStub(1);
 
-        $this->assertEquals(ItemId::fromInteger(1),$purchasable->itemId());
+        $this->assertEquals(ItemId::fromInteger(1), $purchasable->itemId());
     }
 
     /** @test */
-    function it_can_get_extra_data()
+    public function it_can_get_extra_data()
     {
-        $purchasable = new PurchasableStub(1,['foo' => 'bar']);
+        $purchasable = new PurchasableStub(1, ['foo' => 'bar']);
 
-        $this->assertEquals(['foo' => 'bar'],$purchasable->itemData());
+        $this->assertEquals(['foo' => 'bar'], $purchasable->itemData());
     }
 }

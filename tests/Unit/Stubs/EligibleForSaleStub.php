@@ -20,7 +20,7 @@ class EligibleForSaleStub implements EligibleForSale
 
     public function __construct($id = null, $data = [], Money $price = null, Percentage $taxRate = null)
     {
-        $this->id = $id ?: rand(1,99);
+        $this->id = $id ?: rand(1, 99);
         $this->data = $data;
         $this->price = $price ?: Money::EUR(120);
         $this->taxRate = !is_null($taxRate) ? $taxRate : Percentage::fromPercent(21);

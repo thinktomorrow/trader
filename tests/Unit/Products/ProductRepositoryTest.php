@@ -2,7 +2,6 @@
 
 namespace Thinktomorrow\Trader\Tests\Unit;
 
-use Money\Money;
 use Thinktomorrow\Trader\Catalog\Products\Ports\Persistence\InMemoryProductRepository;
 use Thinktomorrow\Trader\Catalog\Products\Product;
 
@@ -14,7 +13,7 @@ class ProductRepositoryTest extends UnitTestCase
     }
 
     /** @test */
-    function it_can_find_an_product()
+    public function it_can_find_an_product()
     {
         $product = $this->makeProduct();
         $repo = new InMemoryProductRepository();
@@ -25,7 +24,7 @@ class ProductRepositoryTest extends UnitTestCase
     }
 
     /** @test */
-    function it_throws_exception_if_product_does_not_exist()
+    public function it_throws_exception_if_product_does_not_exist()
     {
         $this->setExpectedException(\RuntimeException::class);
 

@@ -14,14 +14,14 @@ require __DIR__.'/../../vendor/autoload.php';
 
 // FAKE ADDITION OF ORDER
 $confirmedOrder = new Thinktomorrow\Trader\Order\Domain\Order(\Thinktomorrow\Trader\Order\Domain\OrderId::fromInteger(1));
-$confirmedOrder->items()->add(Item::fromPurchasable(new PurchasableStub(1,[],Cash::make(50),Percentage::fromPercent(21))));
-$confirmedOrder->items()->add(Item::fromPurchasable(new PurchasableStub(1,[],Cash::make(50),Percentage::fromPercent(21))));
-$confirmedOrder->items()->add(Item::fromPurchasable(new PurchasableStub(2,[],Cash::make(50),Percentage::fromPercent(6))));
-$confirmedOrder->items()->add(Item::fromPurchasable(new PurchasableStub(1,[],Cash::make(50),Percentage::fromPercent(21))));
-$confirmedOrder->items()->add(Item::fromPurchasable(new PurchasableStub(7,[],Cash::make(50),Percentage::fromPercent(9))));
-$confirmedOrder->items()->add(Item::fromPurchasable(new PurchasableStub(12,[],Money::EUR(50),Percentage::fromPercent(21))));
-$confirmedOrder->items()->add(Item::fromPurchasable(new PurchasableStub(6,[],Cash::make(1050),Percentage::fromPercent(21))));
-$confirmedOrder->items()->add(Item::fromPurchasable(new PurchasableStub(1,[],Cash::make(50),Percentage::fromPercent(21))));
+$confirmedOrder->items()->add(Item::fromPurchasable(new PurchasableStub(1, [], Cash::make(50), Percentage::fromPercent(21))));
+$confirmedOrder->items()->add(Item::fromPurchasable(new PurchasableStub(1, [], Cash::make(50), Percentage::fromPercent(21))));
+$confirmedOrder->items()->add(Item::fromPurchasable(new PurchasableStub(2, [], Cash::make(50), Percentage::fromPercent(6))));
+$confirmedOrder->items()->add(Item::fromPurchasable(new PurchasableStub(1, [], Cash::make(50), Percentage::fromPercent(21))));
+$confirmedOrder->items()->add(Item::fromPurchasable(new PurchasableStub(7, [], Cash::make(50), Percentage::fromPercent(9))));
+$confirmedOrder->items()->add(Item::fromPurchasable(new PurchasableStub(12, [], Money::EUR(50), Percentage::fromPercent(21))));
+$confirmedOrder->items()->add(Item::fromPurchasable(new PurchasableStub(6, [], Cash::make(1050), Percentage::fromPercent(21))));
+$confirmedOrder->items()->add(Item::fromPurchasable(new PurchasableStub(1, [], Cash::make(50), Percentage::fromPercent(21))));
 $confirmedOrder->setShipmentTotal(Cash::make(15));
 $confirmedOrder->setPaymentTotal(Cash::make(10));
 $confirmedOrder->setTaxPercentage(Percentage::fromPercent(21));
@@ -34,8 +34,6 @@ $repo->add($confirmedOrder);
 
 // FETCH ORDER FOR MERCHANT
 $order = (new OrderAssembler(new InMemoryOrderRepository()))->forMerchant(1);
-
-
 
 ?>
 
@@ -98,7 +96,7 @@ $order = (new OrderAssembler(new InMemoryOrderRepository()))->forMerchant(1);
                         </tr>
                     </thead>
                     <tbody>
-                    <?php foreach($order->items as $item): ?>
+                    <?php foreach ($order->items as $item): ?>
                         <tr>
                             <td><?= $item->sku ?> <?= $item->name ?></td>
                             <td><?= $item->stockBadge ?></td>
@@ -114,7 +112,7 @@ $order = (new OrderAssembler(new InMemoryOrderRepository()))->forMerchant(1);
                     <tr>
                         <td align="right" colspan="4">Toegepaste kortingen:</td>
                         <td align="right">
-                            <?php foreach($order->discounts() as $appliedDiscount): ?>
+                            <?php foreach ($order->discounts() as $appliedDiscount): ?>
                                 <?= $appliedDiscount->description ?>
                                 <?= $appliedDiscount->amount ?>
                             <?php endforeach; ?>
@@ -128,7 +126,7 @@ $order = (new OrderAssembler(new InMemoryOrderRepository()))->forMerchant(1);
                         <td align="right" colspan="4">Verzendkosten (provider):</td>
                         <td align="right"><?= $order->shipmentTotal ?></td>
                     </tr>
-                    <?php foreach($order->taxRates() as $taxRate): ?>
+                    <?php foreach ($order->taxRates() as $taxRate): ?>
 
                         <tr>
                             <td align="right" colspan="4">Btw (<?= $taxRate['percent'] ?>):</td>

@@ -2,14 +2,9 @@
 
 namespace Thinktomorrow\Trader\Tests\Features;
 
-use Thinktomorrow\Trader\Discounts\Domain\Types\PercentageOffDiscount;
-use Thinktomorrow\Trader\Discounts\Domain\Types\PercentageOffItemDiscount;
 use Money\Money;
-use Thinktomorrow\Trader\Discounts\Application\ApplyDiscountsToOrder;
-use Thinktomorrow\Trader\Discounts\Domain\DiscountCollection;
-use Thinktomorrow\Trader\Discounts\Domain\DiscountId;
-use Thinktomorrow\Trader\Order\Domain\Item;
 use Thinktomorrow\Trader\Common\Domain\Price\Percentage;
+use Thinktomorrow\Trader\Order\Domain\Item;
 use Thinktomorrow\Trader\Order\Domain\ItemId;
 use Thinktomorrow\Trader\Order\Ports\Persistence\InMemoryOrderRepository;
 use Thinktomorrow\Trader\Tax\Application\ApplyTaxRatesToOrder;
@@ -22,10 +17,10 @@ use Thinktomorrow\Trader\Tests\Unit\UnitTestCase;
 class ApplyTaxRatesToOrderTest extends UnitTestCase
 {
     /** @test */
-    function it_can_alter_order_taxrates_to_meet_business_rules()
+    public function it_can_alter_order_taxrates_to_meet_business_rules()
     {
         $order = $this->makeOrder();
-        $purchasable = new PurchasableStub(20,[],Money::EUR(240),Percentage::fromPercent(20));
+        $purchasable = new PurchasableStub(20, [], Money::EUR(240), Percentage::fromPercent(20));
         $purchasable->setTaxId(3);
         $order->items()->add(Item::fromPurchasable($purchasable));
 
@@ -33,12 +28,12 @@ class ApplyTaxRatesToOrderTest extends UnitTestCase
         (new InMemoryOrderRepository())->add($order);
 
         // Add taxrates to persistence
-        $taxRate = new TaxRate(TaxId::fromInteger(3),'foobar',Percentage::fromPercent(10));
+        $taxRate = new TaxRate(TaxId::fromInteger(3), 'foobar', Percentage::fromPercent(10));
         (new InMemoryTaxRateRepository())->add($taxRate);
 
         (new ApplyTaxRatesToOrder(new InMemoryOrderRepository(), new InMemoryTaxRateRepository()))->handle($order->id());
 
-        $this->assertEquals(Percentage::fromPercent(10),$order->items()->find(ItemId::fromInteger(20))->taxRate() );
+        $this->assertEquals(Percentage::fromPercent(10), $order->items()->find(ItemId::fromInteger(20))->taxRate());
         //$this->assertEquals(Money::EUR(240)->multiply(0.8), $order->total());
     }
 }

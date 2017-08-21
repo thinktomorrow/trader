@@ -5,11 +5,11 @@ namespace Thinktomorrow\Trader\Discounts\Domain\Conditions;
 final class ConditionKey
 {
     private static $mapping = [
-        'minimum_amount' => MinimumAmount::class,
-        'purchasable_ids' => ItemWhitelist::class,
+        'minimum_amount'        => MinimumAmount::class,
+        'purchasable_ids'       => ItemWhitelist::class,
         'minimum_item_quantity' => MinimumItemQuantity::class,
-        'start_at' => Period::class,
-        'end_at' => Period::class, // TODO avoid duplicate conditional loading!!
+        'start_at'              => Period::class,
+        'end_at'                => Period::class, // TODO avoid duplicate conditional loading!!
     ];
 
     /**
@@ -24,8 +24,7 @@ final class ConditionKey
 
     public static function fromString(string $condition)
     {
-        if(!isset(self::$mapping[$condition]))
-        {
+        if (!isset(self::$mapping[$condition])) {
             throw new \InvalidArgumentException('Invalid parameter ['.$condition.']. Not found as available Condition class.');
         }
 
@@ -34,8 +33,7 @@ final class ConditionKey
 
     public static function fromCondition(Condition $discount)
     {
-        if(false === ($key = array_search(get_class($discount),self::$mapping)))
-        {
+        if (false === ($key = array_search(get_class($discount), self::$mapping))) {
             throw new \InvalidArgumentException('Condition ['.get_class($discount).'] not found as available Condition class.');
         }
 
@@ -60,6 +58,6 @@ final class ConditionKey
     public function equals($other): bool
     {
         return get_class($other) === get_class($this)
-            && (string)$this === (string)$other;
+            && (string) $this === (string) $other;
     }
 }

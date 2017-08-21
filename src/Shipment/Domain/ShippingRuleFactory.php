@@ -18,7 +18,7 @@ class ShippingRuleFactory
     ];
 
     /**
-     * Collection of condition instances
+     * Collection of condition instances.
      *
      * @var array
      */
@@ -31,16 +31,16 @@ class ShippingRuleFactory
 
     public function create($id, array $conditions, array $adjusters)
     {
-        foreach($conditions as $condition => $value)
-        {
-            /**
+        foreach ($conditions as $condition => $value) {
+            /*
              * If condition does not map to a condition class it is an option value so
              * just skip it and use it as parameter value for our condition instances
              */
-            if( ! isset(self::$conditionMapping[$condition]) ) continue;
+            if (!isset(self::$conditionMapping[$condition])) {
+                continue;
+            }
 
             $this->conditions[] = $this->resolveConditionClass($condition, $conditions);
-
         }
 
         return new ShippingRule(ShippingRuleId::fromInteger($id), $this->conditions, $adjusters);
@@ -49,6 +49,7 @@ class ShippingRuleFactory
     /**
      * @param $condition
      * @param array $parameters
+     *
      * @return Condition
      */
     private function resolveConditionClass($condition, array $parameters): Condition

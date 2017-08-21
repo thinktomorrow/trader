@@ -9,14 +9,14 @@ class Discount extends AbstractPresenter
 {
     public function description()
     {
-        return $this->getValue('description',null,function($description){
-            return 'crazy discount: '.print_r($description->values(),true);
+        return $this->getValue('description', null, function ($description) {
+            return 'crazy discount: '.print_r($description->values(), true);
         });
     }
 
     public function amount()
     {
-        return $this->getValue('amount',null,function($amount){
+        return $this->getValue('amount', null, function ($amount) {
             return (new Cash())->locale($amount);
         });
     }

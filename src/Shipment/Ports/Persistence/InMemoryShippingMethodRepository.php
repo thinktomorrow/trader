@@ -12,13 +12,15 @@ class InMemoryShippingMethodRepository implements ShippingMethodRepository
 
     public function find(ShippingMethodId $shippingMethodId): ShippingMethod
     {
-        if(isset(self::$collection[(string)$shippingMethodId])) return self::$collection[(string)$shippingMethodId];
+        if (isset(self::$collection[(string) $shippingMethodId])) {
+            return self::$collection[(string) $shippingMethodId];
+        }
 
         throw new \RuntimeException('ShippingMethod not found by id ['.$shippingMethodId->get().']');
     }
 
     public function add(ShippingMethod $shippingMethod)
     {
-        self::$collection[(string)$shippingMethod->id()] = $shippingMethod;
+        self::$collection[(string) $shippingMethod->id()] = $shippingMethod;
     }
 }

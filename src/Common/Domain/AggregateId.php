@@ -1,5 +1,6 @@
 <?php
-declare(strict_types = 1);
+
+declare(strict_types=1);
 
 namespace Thinktomorrow\Trader\Common\Domain;
 
@@ -17,6 +18,7 @@ trait AggregateId
 
     /**
      * @param int $id
+     *
      * @return static
      */
     public static function fromInteger(int $id)
@@ -37,6 +39,6 @@ trait AggregateId
     public function equals($otherAggregateId): bool
     {
         return get_class($otherAggregateId) === get_class($this)
-            && (int)$this->get() === (int)$otherAggregateId->get();
+            && (int) $this->get() === (int) $otherAggregateId->get();
     }
 }

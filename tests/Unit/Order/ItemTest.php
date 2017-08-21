@@ -9,15 +9,15 @@ use Thinktomorrow\Trader\Tests\Unit\Stubs\PurchasableStub;
 class ItemTest extends UnitTestCase
 {
     /** @test */
-    function itemId_is_a_valid_identifier()
+    public function itemId_is_a_valid_identifier()
     {
         $itemId = ItemId::fromInteger(2);
 
-        $this->assertEquals(2,$itemId->get());
+        $this->assertEquals(2, $itemId->get());
     }
 
     /** @test */
-    function it_can_add_to_quantity()
+    public function it_can_add_to_quantity()
     {
         $item = Item::fromPurchasable(new PurchasableStub(99));
 
@@ -28,7 +28,7 @@ class ItemTest extends UnitTestCase
     }
 
     /** @test */
-    function it_can_add_multiple_to_quantity()
+    public function it_can_add_multiple_to_quantity()
     {
         $item = Item::fromPurchasable(new PurchasableStub(99));
 
@@ -39,7 +39,7 @@ class ItemTest extends UnitTestCase
     }
 
     /** @test */
-    function it_can_remove_from_quantity()
+    public function it_can_remove_from_quantity()
     {
         $item = Item::fromPurchasable(new PurchasableStub(99));
 
@@ -51,7 +51,7 @@ class ItemTest extends UnitTestCase
     }
 
     /** @test */
-    function it_can_remove_multiple_from_quantity()
+    public function it_can_remove_multiple_from_quantity()
     {
         $item = Item::fromPurchasable(new PurchasableStub(99));
 
@@ -63,7 +63,7 @@ class ItemTest extends UnitTestCase
     }
 
     /** @test */
-    function it_can_remove_quantity_but_no_lower_than_zero()
+    public function it_can_remove_quantity_but_no_lower_than_zero()
     {
         $item = Item::fromPurchasable(new PurchasableStub(99));
 

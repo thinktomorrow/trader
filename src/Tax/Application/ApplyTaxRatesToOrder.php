@@ -29,8 +29,7 @@ class ApplyTaxRatesToOrder
     {
         $order = $this->orderRepository->find($orderId);
 
-        foreach($order->items() as $item)
-        {
+        foreach ($order->items() as $item) {
             $taxRate = $this->taxRateRepository->find($item->taxId());
 
             $orderTaxRate = new OrderTaxRate($taxRate, $order);

@@ -14,7 +14,9 @@ class InMemoryProductRepository implements ProductRepository
 
     public function find($productId): Product
     {
-        if(isset(self::$collection[$productId])) return self::$collection[$productId];
+        if (isset(self::$collection[$productId])) {
+            return self::$collection[$productId];
+        }
 
         throw new \RuntimeException('Product not found by id ['.$productId.']');
     }
@@ -23,18 +25,19 @@ class InMemoryProductRepository implements ProductRepository
     {
         Assertion::allIsInstanceOf($variants, ProductVariant::class);
 
-        self::$collection[(string)$product->id()] = $product;
+        self::$collection[(string) $product->id()] = $product;
 
         // TODO: For now we don't set the connection of variants to product yet
-        foreach($variants as $variant)
-        {
+        foreach ($variants as $variant) {
             self::$variantCollection[$variant->id()] = $variant;
         }
     }
 
     public function findVariant($variantId): ProductVariant
     {
-        if(isset(self::$variantCollection[$variantId])) return self::$variantCollection[$variantId];
+        if (isset(self::$variantCollection[$variantId])) {
+            return self::$variantCollection[$variantId];
+        }
 
         throw new \RuntimeException('Product variant not found by id ['.$variantId.']');
     }

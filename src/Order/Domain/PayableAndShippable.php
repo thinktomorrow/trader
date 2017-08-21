@@ -1,8 +1,6 @@
 <?php
 
-
 namespace Thinktomorrow\Trader\Order\Domain;
-
 
 use Money\Money;
 use Thinktomorrow\Trader\Shipment\Domain\ShippingMethodId;

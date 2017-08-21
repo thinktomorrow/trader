@@ -15,9 +15,8 @@ class PercentageOffSale extends BaseSale implements Sale
     {
         $saleAmount = $eligibleForSale->price()->multiply($this->adjusters['percentage']->asFloat());
 
-        if(!$this->applicable($eligibleForSale))
-        {
-            throw new CannotApplySale('Sale cannot be applied. [Sale of '. (new Cash())->locale($saleAmount).', current saleTotal: '.(new Cash())->locale($eligibleForSale->saleTotal()).'] cannot be added to price ['.(new Cash())->locale($eligibleForSale->price()).']');
+        if (!$this->applicable($eligibleForSale)) {
+            throw new CannotApplySale('Sale cannot be applied. [Sale of '.(new Cash())->locale($saleAmount).', current saleTotal: '.(new Cash())->locale($eligibleForSale->saleTotal()).'] cannot be added to price ['.(new Cash())->locale($eligibleForSale->price()).']');
         }
 
         $eligibleForSale->addToSaleTotal($saleAmount);
@@ -39,13 +38,11 @@ class PercentageOffSale extends BaseSale implements Sale
             throw new \InvalidArgumentException('Invalid adjuster value \'percentage\' for sale '.get_class($this).'. Instance of '.Percentage::class.' is expected.');
         }
 
-        if($adjusters['percentage']->asPercent() > 100)
-        {
+        if ($adjusters['percentage']->asPercent() > 100) {
             throw new \InvalidArgumentException('Invalid adjuster value \'percentage\' for sale '.get_class($this).'. Percentage cannot be higher than 100%. ['.$adjusters['percentage']->asPercent().'%] given.');
         }
 
-        if($adjusters['percentage']->asPercent() < 0)
-        {
+        if ($adjusters['percentage']->asPercent() < 0) {
             throw new \InvalidArgumentException('Invalid adjuster value \'percentage\' for sale '.get_class($this).'. Percentage cannot be lower than 0%. ['.$adjusters['percentage']->asPercent().'%] given.');
         }
     }

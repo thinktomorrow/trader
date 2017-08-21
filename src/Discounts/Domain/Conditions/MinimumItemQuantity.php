@@ -12,8 +12,10 @@ class MinimumItemQuantity extends BaseCondition implements Condition, ItemCondit
 {
     public function check(Order $order, Item $item): bool
     {
-        if( ! isset($this->parameters['minimum_quantity'])) return true;
+        if (!isset($this->parameters['minimum_quantity'])) {
+            return true;
+        }
 
-        return $item->quantity() >= (int)$this->parameters['minimum_quantity'];
+        return $item->quantity() >= (int) $this->parameters['minimum_quantity'];
     }
 }

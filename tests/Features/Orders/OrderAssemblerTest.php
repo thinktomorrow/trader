@@ -3,29 +3,28 @@
 namespace Thinktomorrow\Trader\Tests\Features;
 
 use Assert\Assertion;
-use Money\Money;
-use Thinktomorrow\Trader\Order\Application\OrderAssembler;
-use Thinktomorrow\Trader\Order\Ports\Web\Merchant\Item;
-use Thinktomorrow\Trader\Order\Ports\Web\Merchant\Order;
 use Thinktomorrow\Trader\Common\Domain\Price\Cash;
 use Thinktomorrow\Trader\Common\Domain\Price\Percentage;
 use Thinktomorrow\Trader\Discounts\Domain\DiscountFactory;
-use Thinktomorrow\Trader\Order\Domain\Order as DomainOrder;
+use Thinktomorrow\Trader\Order\Application\OrderAssembler;
 use Thinktomorrow\Trader\Order\Domain\Item as DomainItem;
+use Thinktomorrow\Trader\Order\Domain\Order as DomainOrder;
 use Thinktomorrow\Trader\Order\Domain\OrderId;
+use Thinktomorrow\Trader\Order\Ports\Web\Merchant\Item;
+use Thinktomorrow\Trader\Order\Ports\Web\Merchant\Order;
 use Thinktomorrow\Trader\Tests\InMemoryContainer;
 use Thinktomorrow\Trader\Tests\Unit\Stubs\PurchasableStub;
 
 class OrderAssemblerTest extends FeatureTestCase
 {
     /** @test */
-    function it_can_resolve_order_for_merchant()
+    public function it_can_resolve_order_for_merchant()
     {
-        $this->assertInstanceOf(Order::class,$this->assembleMerchantOrder());
+        $this->assertInstanceOf(Order::class, $this->assembleMerchantOrder());
     }
 
     /** @test */
-    function it_resolves_merchant_order_with_expected_properties()
+    public function it_resolves_merchant_order_with_expected_properties()
     {
         $merchantOrder = $this->assembleMerchantOrder();
 
@@ -39,19 +38,19 @@ class OrderAssemblerTest extends FeatureTestCase
     }
 
     /** @test */
-    function merchant_order_contains_item_presenters()
+    public function merchant_order_contains_item_presenters()
     {
         $merchantOrder = $this->assembleMerchantOrder();
 
-        $this->assertCount(2,$merchantOrder->items());
-        $this->assertTrue(Assertion::allIsInstanceOf($merchantOrder->items(),Item::class));
+        $this->assertCount(2, $merchantOrder->items());
+        $this->assertTrue(Assertion::allIsInstanceOf($merchantOrder->items(), Item::class));
     }
 
     private function addDummyOrder($id)
     {
         $order = new DomainOrder(OrderId::fromInteger($id));
-        $order->items()->add(DomainItem::fromPurchasable(new PurchasableStub(1,[],Cash::make(505),Percentage::fromPercent(10))));
-        $order->items()->add(DomainItem::fromPurchasable(new PurchasableStub(2,[],Cash::make(1000),Percentage::fromPercent(10),Cash::make(800))),2);
+        $order->items()->add(DomainItem::fromPurchasable(new PurchasableStub(1, [], Cash::make(505), Percentage::fromPercent(10))));
+        $order->items()->add(DomainItem::fromPurchasable(new PurchasableStub(2, [], Cash::make(1000), Percentage::fromPercent(10), Cash::make(800))), 2);
         $order->setShipmentTotal(Cash::make(15));
         $order->setPaymentTotal(Cash::make(10));
 

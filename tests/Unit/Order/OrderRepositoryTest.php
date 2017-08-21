@@ -13,7 +13,7 @@ use Thinktomorrow\Trader\Tests\Unit\Stubs\PurchasableStub;
 class OrderRepositoryTest extends UnitTestCase
 {
     /** @test */
-    function it_can_find_an_order()
+    public function it_can_find_an_order()
     {
         $order = $this->makeOrder(0, 3);
         $repo = new InMemoryOrderRepository();
@@ -24,7 +24,7 @@ class OrderRepositoryTest extends UnitTestCase
     }
 
     /** @test */
-    function it_throws_exception_if_order_does_not_exist()
+    public function it_throws_exception_if_order_does_not_exist()
     {
         $this->setExpectedException(\RuntimeException::class);
 
@@ -33,10 +33,10 @@ class OrderRepositoryTest extends UnitTestCase
     }
 
     /** @test */
-    function it_returns_raw_values_for_merchant_order()
+    public function it_returns_raw_values_for_merchant_order()
     {
         $order = $this->makeOrder(0, 3);
-        $order->items()->add(Item::fromPurchasable(new PurchasableStub(1,[],Money::EUR(50),Percentage::fromPercent(21))));
+        $order->items()->add(Item::fromPurchasable(new PurchasableStub(1, [], Money::EUR(50), Percentage::fromPercent(21))));
         $order->setShipmentTotal(Money::EUR(15));
         $order->setPaymentTotal(Money::EUR(10));
 
@@ -44,18 +44,18 @@ class OrderRepositoryTest extends UnitTestCase
         $repo->add($order);
         $values = $repo->getValues(OrderId::fromInteger(3));
 
-        $this->assertInternalType('array',$values);
+        $this->assertInternalType('array', $values);
 
         // Check all expected attributes are given
-        $this->assertArrayHasKey('total',$values);
-        $this->assertArrayHasKey('subtotal',$values);
-        $this->assertArrayHasKey('payment_total',$values);
-        $this->assertArrayHasKey('shipment_total',$values);
-        $this->assertArrayHasKey('tax',$values);
-        $this->assertArrayHasKey('tax_rates',$values);
-        $this->assertArrayHasKey('reference',$values);
-        $this->assertArrayHasKey('confirmed_at',$values);
-        $this->assertArrayHasKey('state',$values);
+        $this->assertArrayHasKey('total', $values);
+        $this->assertArrayHasKey('subtotal', $values);
+        $this->assertArrayHasKey('payment_total', $values);
+        $this->assertArrayHasKey('shipment_total', $values);
+        $this->assertArrayHasKey('tax', $values);
+        $this->assertArrayHasKey('tax_rates', $values);
+        $this->assertArrayHasKey('reference', $values);
+        $this->assertArrayHasKey('confirmed_at', $values);
+        $this->assertArrayHasKey('state', $values);
 
         // Check all values are of the correct format
         $this->assertEquals(Money::EUR(75), $values['total']);
@@ -64,16 +64,16 @@ class OrderRepositoryTest extends UnitTestCase
         $this->assertEquals(Money::EUR(15), $values['shipment_total']);
         $this->assertEquals(Money::EUR(11), $values['tax']);
         $this->assertInternalType('array', $values['tax_rates']);
-        $this->assertEquals(3,$values['reference']);
-        $this->assertEquals(new \DateTime('@'.strtotime('-1days')),$values['confirmed_at']);
+        $this->assertEquals(3, $values['reference']);
+        $this->assertEquals(new \DateTime('@'.strtotime('-1days')), $values['confirmed_at']);
         $this->assertEquals(OrderState::STATE_NEW, $values['state']);
     }
 
     /** @test */
-    function merchant_order_has_tax_rates_grouped_by_rate()
+    public function merchant_order_has_tax_rates_grouped_by_rate()
     {
         $order = $this->makeOrder(0, 3);
-        $order->items()->add(Item::fromPurchasable(new PurchasableStub(1,[],Money::EUR(50),Percentage::fromPercent(21))));
+        $order->items()->add(Item::fromPurchasable(new PurchasableStub(1, [], Money::EUR(50), Percentage::fromPercent(21))));
         $order->setShipmentTotal(Money::EUR(15));
         $order->setPaymentTotal(Money::EUR(10));
 
@@ -82,12 +82,11 @@ class OrderRepositoryTest extends UnitTestCase
         $values = $repo->getValues(OrderId::fromInteger(3));
 
         $testedTaxRates = false;
-        foreach($values['tax_rates'] as $tax_rate)
-        {
+        foreach ($values['tax_rates'] as $tax_rate) {
             $testedTaxRates = true;
             $this->assertInstanceOf(Percentage::class, $tax_rate['percent']);
             $this->assertInstanceOf(Money::class, $tax_rate['tax']);
         }
-        $this->assertTrue($testedTaxRates,'tax_rates value remains untested. Make sure to at least provide one entry.');
+        $this->assertTrue($testedTaxRates, 'tax_rates value remains untested. Make sure to at least provide one entry.');
     }
 }

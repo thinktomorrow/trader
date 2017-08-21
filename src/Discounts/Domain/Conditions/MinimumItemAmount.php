@@ -13,15 +13,16 @@ class MinimumItemAmount extends BaseCondition implements Condition, ItemConditio
 {
     public function check(Order $order, Item $item): bool
     {
-        if( ! isset($this->parameters['minimum_amount'])) return true;
+        if (!isset($this->parameters['minimum_amount'])) {
+            return true;
+        }
 
         return $item->total()->greaterThanOrEqual($this->parameters['minimum_amount']);
     }
 
     protected function validateParameters(array $parameters)
     {
-        if(isset($parameters['minimum_amount']) && ! $parameters['minimum_amount'] instanceof Money)
-        {
+        if (isset($parameters['minimum_amount']) && !$parameters['minimum_amount'] instanceof Money) {
             throw new \InvalidArgumentException('DiscountCondition value for minimum amount must be instance of Money.');
         }
     }

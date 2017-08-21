@@ -2,4 +2,6 @@
 
 namespace Thinktomorrow\Trader\Shipment\Domain\Exceptions;
 
-class CannotApplyShippingRuleException extends \Exception{}
+class CannotApplyShippingRuleException extends \Exception
+{
+}

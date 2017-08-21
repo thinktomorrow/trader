@@ -16,7 +16,7 @@ class DiscountFactory
     private $container;
 
     /**
-     * Collection of condition instances
+     * Collection of condition instances.
      *
      * @var array
      */
@@ -29,17 +29,14 @@ class DiscountFactory
 
     public function create($id, string $type, array $conditions, array $adjusters)
     {
-        foreach($conditions as $condition => $value)
-        {
-            /**
+        foreach ($conditions as $condition => $value) {
+            /*
              * If condition does not map to a condition class it is an option value so
              * just skip it and use it as parameter value for our condition instances
              */
-            try{
+            try {
                 $this->conditions[] = $this->resolveConditionClass($this->getConditionClassName($condition), $conditions);
-            }
-            catch(\InvalidArgumentException $e)
-            {
+            } catch (\InvalidArgumentException $e) {
                 continue;
             }
         }
@@ -66,6 +63,7 @@ class DiscountFactory
     /**
      * @param $conditionClass
      * @param array $parameters
+     *
      * @return Condition
      */
     private function resolveConditionClass($conditionClass, array $parameters): Condition

@@ -15,7 +15,8 @@ final class Order implements StatefulContract
     use PayableAndShippable;
 
     /**
-     * Current state
+     * Current state.
+     *
      * @var string
      */
     private $state;
@@ -29,8 +30,8 @@ final class Order implements StatefulContract
     public function __construct(OrderId $id)
     {
         $this->id = $id;
-        $this->items = new ItemCollection;
-        $this->discounts = new AppliedDiscountCollection;
+        $this->items = new ItemCollection();
+        $this->discounts = new AppliedDiscountCollection();
         $this->discountTotal = $this->shipmentTotal = $this->paymentTotal = Cash::make(0);
 
         $this->setTaxPercentage(Percentage::fromPercent(0));
@@ -79,7 +80,7 @@ final class Order implements StatefulContract
     }
 
     /**
-     * Add applied discounts
+     * Add applied discounts.
      *
      * @param $discount
      */
@@ -90,9 +91,9 @@ final class Order implements StatefulContract
 
     public function subtotal(): Money
     {
-        return array_reduce($this->items->all(), function($carry, Item $item){
+        return array_reduce($this->items->all(), function ($carry, Item $item) {
             return $carry->add($item->total());
-        },Cash::make(0)); // TODO currency should be changeable
+        }, Cash::make(0)); // TODO currency should be changeable
     }
 
     public function discountTotal(): Money
@@ -125,14 +126,15 @@ final class Order implements StatefulContract
 
     public function tax(): Money
     {
-        return array_reduce($this->taxRates(),function($carry, $taxRate){
+        return array_reduce($this->taxRates(), function ($carry, $taxRate) {
             return $carry->add($taxRate['tax']);
-        },Cash::make(0));
+        }, Cash::make(0));
     }
 
     /**
      * Collection of used taxRates and their resp. tax amount
-     * TODO: add shipment and discount tax as well
+     * TODO: add shipment and discount tax as well.
+     *
      * @return array
      */
     public function taxRates(): array

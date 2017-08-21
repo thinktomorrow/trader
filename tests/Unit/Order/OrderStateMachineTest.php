@@ -22,19 +22,19 @@ class OrderStateMachineTest extends UnitTestCase
     }
 
     /** @test */
-    function it_can_apply_transition()
+    public function it_can_apply_transition()
     {
-        $this->assertEquals('new',$this->order->state());
+        $this->assertEquals('new', $this->order->state());
 
         $this->machine->apply('create');
-        $this->assertEquals('pending',$this->order->state());
+        $this->assertEquals('pending', $this->order->state());
 
         $this->machine->apply('abandon');
-        $this->assertEquals('abandoned',$this->order->state());
+        $this->assertEquals('abandoned', $this->order->state());
     }
 
     /** @test */
-    function it_cannot_change_to_invalid_state_directly()
+    public function it_cannot_change_to_invalid_state_directly()
     {
         $this->setExpectedException(StateException::class);
 
@@ -42,7 +42,7 @@ class OrderStateMachineTest extends UnitTestCase
     }
 
     /** @test */
-    function it_only_allows_transition_to_allowed_state()
+    public function it_only_allows_transition_to_allowed_state()
     {
         $this->setExpectedException(StateException::class);
 
@@ -50,14 +50,14 @@ class OrderStateMachineTest extends UnitTestCase
     }
 
     /** @test */
-    function it_tells_when_order_is_still_in_customer_hands_as_cart()
+    public function it_tells_when_order_is_still_in_customer_hands_as_cart()
     {
         $this->assertTrue($this->order->inCustomerHands());
         $this->assertFalse($this->order->inMerchantHands());
     }
 
     /** @test */
-    function it_can_tell_when_order_is_in_merchant_hands()
+    public function it_can_tell_when_order_is_in_merchant_hands()
     {
         // On paid state, customer hands over control to merchant
         $this->machine->apply('create');

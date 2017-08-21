@@ -4,29 +4,30 @@ namespace Thinktomorrow\Trader\Order\Domain;
 
 use Money\Money;
 use Thinktomorrow\Trader\Common\Domain\Price\Cash;
+use Thinktomorrow\Trader\Common\Domain\Price\Percentage;
 use Thinktomorrow\Trader\Discounts\Domain\AppliedDiscount;
 use Thinktomorrow\Trader\Discounts\Domain\AppliedDiscountCollection;
-use Thinktomorrow\Trader\Common\Domain\Price\Percentage;
 use Thinktomorrow\Trader\Tax\Domain\TaxId;
 
 final class Item
 {
     /**
-     * Unique identifier of line item
+     * Unique identifier of line item.
      *
      * @var itemId
      */
     private $id;
 
     /**
-     * Quantity of item selection
+     * Quantity of item selection.
      *
      * @var int
      */
     private $quantity = 1;
 
     /**
-     * Original purchasable product
+     * Original purchasable product.
+     *
      * @var Purchasable
      */
     private $purchasable;
@@ -44,7 +45,7 @@ final class Item
     {
         $this->id = $purchasable->itemId();
         $this->purchasable = $purchasable;
-        $this->discounts = new AppliedDiscountCollection;
+        $this->discounts = new AppliedDiscountCollection();
         $this->discountTotal = Cash::make(0);
         $this->taxRate = $purchasable->taxRate();
     }
@@ -121,7 +122,7 @@ final class Item
     }
 
     /**
-     * Add applied discounts
+     * Add applied discounts.
      *
      * @param $discount
      */
@@ -167,9 +168,10 @@ final class Item
     {
         $itemData = $this->purchasable->itemData();
 
-        if(empty($itemData) || !isset($itemData[$key])) return null;
+        if (empty($itemData) || !isset($itemData[$key])) {
+            return;
+        }
 
         return $itemData[$key];
     }
-
 }
