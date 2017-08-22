@@ -1,6 +1,6 @@
 <?php
 
-namespace Thinktomorrow\Trader\Order\Domain;
+namespace Thinktomorrow\Trader\Orders\Domain;
 
 use Money\Money;
 use Thinktomorrow\Trader\Common\Domain\Price\Percentage;
@@ -8,6 +8,14 @@ use Thinktomorrow\Trader\Tax\Domain\TaxId;
 
 interface Purchasable
 {
+    public function purchasableId(): int;
+
+    /**
+     * String representation of the purchasable object
+     * @return string
+     */
+    public function purchasableType(): string;
+
     /**
      * Unique item identifier - usually the SKU or primary key.
      *

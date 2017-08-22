@@ -4,8 +4,8 @@ namespace Thinktomorrow\Trader\Tests\Features;
 
 use Money\Money;
 use Thinktomorrow\Trader\Common\Domain\Price\Percentage;
-use Thinktomorrow\Trader\Order\Domain\Item;
-use Thinktomorrow\Trader\Order\Domain\ItemId;
+use Thinktomorrow\Trader\Orders\Domain\Item;
+use Thinktomorrow\Trader\Orders\Domain\ItemId;
 use Thinktomorrow\Trader\Order\Ports\Persistence\InMemoryOrderRepository;
 use Thinktomorrow\Trader\Tax\Application\ApplyTaxRatesToOrder;
 use Thinktomorrow\Trader\Tax\Domain\TaxId;

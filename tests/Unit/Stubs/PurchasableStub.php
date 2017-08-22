@@ -4,8 +4,8 @@ namespace Thinktomorrow\Trader\Tests\Unit\Stubs;
 
 use Money\Money;
 use Thinktomorrow\Trader\Common\Domain\Price\Percentage;
-use Thinktomorrow\Trader\Order\Domain\ItemId;
-use Thinktomorrow\Trader\Order\Domain\Purchasable;
+use Thinktomorrow\Trader\Orders\Domain\ItemId;
+use Thinktomorrow\Trader\Orders\Domain\Purchasable;
 use Thinktomorrow\Trader\Tax\Domain\TaxId;
 
 class PurchasableStub implements Purchasable
@@ -25,6 +25,16 @@ class PurchasableStub implements Purchasable
         $this->taxRate = !is_null($taxRate) ? $taxRate : Percentage::fromPercent(21);
 
         $this->salePrice = $salePrice ?: null;
+    }
+
+    public function purchasableId(): int
+    {
+        return $this->id;
+    }
+
+    public function purchasableType(): string
+    {
+        return get_class($this);
     }
 
     public function itemId(): ItemId

@@ -4,9 +4,9 @@ namespace Thinktomorrow\Trader\Tests\Unit;
 
 use Money\Money;
 use Thinktomorrow\Trader\Common\Domain\Price\Percentage;
-use Thinktomorrow\Trader\Order\Domain\Item;
-use Thinktomorrow\Trader\Order\Domain\ItemCollection;
-use Thinktomorrow\Trader\Order\Domain\OrderId;
+use Thinktomorrow\Trader\Orders\Domain\Item;
+use Thinktomorrow\Trader\Orders\Domain\ItemCollection;
+use Thinktomorrow\Trader\Orders\Domain\OrderId;
 use Thinktomorrow\Trader\Tests\Unit\Stubs\PurchasableStub;
 
 class OrderTest extends UnitTestCase

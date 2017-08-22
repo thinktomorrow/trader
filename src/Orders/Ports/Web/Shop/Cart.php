@@ -4,7 +4,7 @@ namespace Thinktomorrow\Trader\Order\Ports\Web\Shop;
 
 use Thinktomorrow\Trader\Common\Domain\Price\Cash;
 use Thinktomorrow\Trader\Discounts\Domain\AppliedDiscountCollection;
-use Thinktomorrow\Trader\Order\Domain\Order;
+use Thinktomorrow\Trader\Orders\Domain\Order;
 
 /**
  * Cart data object for read-only usage in views

@@ -1,6 +1,6 @@
 <?php
 
-namespace Thinktomorrow\Trader\Order\Domain;
+namespace Thinktomorrow\Trader\Orders\Domain;
 
 use Money\Money;
 use Thinktomorrow\Trader\Common\Domain\Price\Cash;
@@ -155,6 +155,11 @@ final class Item
         $this->validateQuantity();
 
         return $this;
+    }
+
+    public function purchasable(): Purchasable
+    {
+        return $this->purchasable;
     }
 
     private function validateQuantity()

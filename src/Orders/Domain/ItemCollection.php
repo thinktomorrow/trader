@@ -1,6 +1,6 @@
 <?php
 
-namespace Thinktomorrow\Trader\Order\Domain;
+namespace Thinktomorrow\Trader\Orders\Domain;
 
 class ItemCollection implements \ArrayAccess, \Countable, \IteratorAggregate
 {

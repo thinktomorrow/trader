@@ -5,8 +5,8 @@ namespace App;
 use Money\Money;
 use Thinktomorrow\Trader\Catalog\Products\ProductVariant as BaseProductVariant;
 use Thinktomorrow\Trader\Common\Domain\Price\Percentage;
-use Thinktomorrow\Trader\Order\Domain\ItemId;
-use Thinktomorrow\Trader\Order\Domain\Purchasable;
+use Thinktomorrow\Trader\Orders\Domain\ItemId;
+use Thinktomorrow\Trader\Orders\Domain\Purchasable;
 use Thinktomorrow\Trader\Tax\Domain\TaxId;
 
 class ProductVariant extends BaseProductVariant implements Purchasable

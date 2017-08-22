@@ -5,8 +5,8 @@ namespace Thinktomorrow\Trader\Tests\Unit;
 use Money\Money;
 use Thinktomorrow\Trader\Common\Domain\Price\Percentage;
 use Thinktomorrow\Trader\Discounts\Domain\DiscountFactory;
-use Thinktomorrow\Trader\Order\Domain\Item;
-use Thinktomorrow\Trader\Order\Domain\ItemId;
+use Thinktomorrow\Trader\Orders\Domain\Item;
+use Thinktomorrow\Trader\Orders\Domain\ItemId;
 use Thinktomorrow\Trader\Tests\InMemoryContainer;
 use Thinktomorrow\Trader\Tests\Unit\Stubs\PurchasableStub;
 

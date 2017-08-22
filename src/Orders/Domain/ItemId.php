@@ -1,10 +1,10 @@
 <?php
 
-namespace Thinktomorrow\Trader\Order\Domain;
+namespace Thinktomorrow\Trader\Orders\Domain;
 
 use Thinktomorrow\Trader\Common\Domain\AggregateId;
 
-final class OrderId
+final class ItemId
 {
     use AggregateId;
 }

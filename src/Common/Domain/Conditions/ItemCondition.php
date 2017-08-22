@@ -2,8 +2,8 @@
 
 namespace Thinktomorrow\Trader\Common\Domain\Conditions;
 
-use Thinktomorrow\Trader\Order\Domain\Item;
-use Thinktomorrow\Trader\Order\Domain\Order;
+use Thinktomorrow\Trader\Orders\Domain\Item;
+use Thinktomorrow\Trader\Orders\Domain\Order;
 
 interface ItemCondition
 {

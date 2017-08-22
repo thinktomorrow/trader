@@ -4,9 +4,9 @@ namespace Thinktomorrow\Trader\Tests\Unit;
 
 use Money\Money;
 use Thinktomorrow\Trader\Common\Domain\Price\Percentage;
-use Thinktomorrow\Trader\Order\Domain\Item;
-use Thinktomorrow\Trader\Order\Domain\OrderId;
-use Thinktomorrow\Trader\Order\Domain\OrderState;
+use Thinktomorrow\Trader\Orders\Domain\Item;
+use Thinktomorrow\Trader\Orders\Domain\OrderId;
+use Thinktomorrow\Trader\Orders\Domain\OrderState;
 use Thinktomorrow\Trader\Order\Ports\Persistence\InMemoryOrderRepository;
 use Thinktomorrow\Trader\Tests\Unit\Stubs\PurchasableStub;
 

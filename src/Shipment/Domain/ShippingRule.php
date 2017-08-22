@@ -5,7 +5,7 @@ namespace Thinktomorrow\Trader\Shipment\Domain;
 use Assert\Assertion;
 use Money\Money;
 use Thinktomorrow\Trader\Common\Domain\Conditions\Condition;
-use Thinktomorrow\Trader\Order\Domain\Order;
+use Thinktomorrow\Trader\Orders\Domain\Order;
 
 class ShippingRule
 {

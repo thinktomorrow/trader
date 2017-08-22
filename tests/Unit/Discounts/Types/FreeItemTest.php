@@ -6,7 +6,7 @@ use Money\Money;
 use Thinktomorrow\Trader\Discounts\Domain\AppliedDiscount;
 use Thinktomorrow\Trader\Discounts\Domain\DiscountId;
 use Thinktomorrow\Trader\Discounts\Domain\Types\FreeItemDiscount;
-use Thinktomorrow\Trader\Order\Domain\Item;
+use Thinktomorrow\Trader\Orders\Domain\Item;
 use Thinktomorrow\Trader\Tests\Unit\Stubs\PurchasableStub;
 
 class FreeItemTest extends UnitTestCase

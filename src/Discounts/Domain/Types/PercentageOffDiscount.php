@@ -9,7 +9,7 @@ use Thinktomorrow\Trader\Discounts\Domain\Discount;
 use Thinktomorrow\Trader\Discounts\Domain\DiscountId;
 use Thinktomorrow\Trader\Discounts\Domain\Exceptions\CannotApplyDiscountToOrderException;
 use Thinktomorrow\Trader\Discounts\Domain\OrderDiscount;
-use Thinktomorrow\Trader\Order\Domain\Order;
+use Thinktomorrow\Trader\Orders\Domain\Order;
 
 final class PercentageOffDiscount extends BaseDiscount implements Discount, OrderDiscount
 {

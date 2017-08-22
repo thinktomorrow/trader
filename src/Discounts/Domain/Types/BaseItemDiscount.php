@@ -5,9 +5,9 @@ namespace Thinktomorrow\Trader\Discounts\Domain\Types;
 use Assert\Assertion;
 use Thinktomorrow\Trader\Common\Domain\Conditions\Condition;
 use Thinktomorrow\Trader\Discounts\Domain\DiscountId;
-use Thinktomorrow\Trader\Order\Domain\Item;
-use Thinktomorrow\Trader\Order\Domain\ItemId;
-use Thinktomorrow\Trader\Order\Domain\Order;
+use Thinktomorrow\Trader\Orders\Domain\Item;
+use Thinktomorrow\Trader\Orders\Domain\ItemId;
+use Thinktomorrow\Trader\Orders\Domain\Order;
 
 abstract class BaseItemDiscount
 {

@@ -5,7 +5,7 @@ use Thinktomorrow\Trader\Common\Domain\Price\Cash;
 use Thinktomorrow\Trader\Common\Domain\Price\Percentage;
 use Thinktomorrow\Trader\Discounts\Domain\DiscountFactory;
 use Thinktomorrow\Trader\Order\Application\OrderAssembler;
-use Thinktomorrow\Trader\Order\Domain\Item;
+use Thinktomorrow\Trader\Orders\Domain\Item;
 use Thinktomorrow\Trader\Order\Ports\Persistence\InMemoryOrderRepository;
 use Thinktomorrow\Trader\Tests\InMemoryContainer;
 use Thinktomorrow\Trader\Tests\Unit\Stubs\PurchasableStub;
@@ -13,7 +13,7 @@ use Thinktomorrow\Trader\Tests\Unit\Stubs\PurchasableStub;
 require __DIR__.'/../../vendor/autoload.php';
 
 // FAKE ADDITION OF ORDER
-$confirmedOrder = new Thinktomorrow\Trader\Order\Domain\Order(\Thinktomorrow\Trader\Order\Domain\OrderId::fromInteger(1));
+$confirmedOrder = new Thinktomorrow\Trader\Orders\Domain\Order(\Thinktomorrow\Trader\Orders\Domain\OrderId::fromInteger(1));
 $confirmedOrder->items()->add(Item::fromPurchasable(new PurchasableStub(1, [], Cash::make(50), Percentage::fromPercent(21))));
 $confirmedOrder->items()->add(Item::fromPurchasable(new PurchasableStub(1, [], Cash::make(50), Percentage::fromPercent(21))));
 $confirmedOrder->items()->add(Item::fromPurchasable(new PurchasableStub(2, [], Cash::make(50), Percentage::fromPercent(6))));

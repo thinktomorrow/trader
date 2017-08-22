@@ -3,8 +3,8 @@
 namespace Thinktomorrow\Trader\Order\Application;
 
 use Thinktomorrow\Trader\Catalog\Products\ProductRepository;
-use Thinktomorrow\Trader\Order\Domain\Item;
-use Thinktomorrow\Trader\Order\Domain\OrderRepository;
+use Thinktomorrow\Trader\Orders\Domain\Item;
+use Thinktomorrow\Trader\Orders\Domain\OrderRepository;
 
 class AddToCart
 {

@@ -9,7 +9,7 @@ use Thinktomorrow\Trader\Discounts\Domain\DiscountCollection;
 use Thinktomorrow\Trader\Discounts\Domain\DiscountId;
 use Thinktomorrow\Trader\Discounts\Domain\Types\PercentageOffDiscount;
 use Thinktomorrow\Trader\Discounts\Domain\Types\PercentageOffItemDiscount;
-use Thinktomorrow\Trader\Order\Domain\Item;
+use Thinktomorrow\Trader\Orders\Domain\Item;
 use Thinktomorrow\Trader\Tests\Unit\Stubs\PurchasableStub;
 use Thinktomorrow\Trader\Tests\Unit\UnitTestCase;
 

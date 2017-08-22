@@ -1,7 +1,7 @@
 <?php
 
 use Money\Money;
-use Thinktomorrow\Trader\Order\Domain\Item;
+use Thinktomorrow\Trader\Orders\Domain\Item;
 use Thinktomorrow\Trader\Tests\Unit\Stubs\PurchasableStub;
 use Thinktomorrow\Trader\Tests\Unit\UnitTestCase;
 

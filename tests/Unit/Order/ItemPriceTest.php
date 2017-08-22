@@ -2,7 +2,7 @@
 
 use Money\Money;
 use Thinktomorrow\Trader\Common\Domain\Price\Percentage;
-use Thinktomorrow\Trader\Order\Domain\Item;
+use Thinktomorrow\Trader\Orders\Domain\Item;
 use Thinktomorrow\Trader\Tests\Unit\Stubs\PurchasableStub;
 use Thinktomorrow\Trader\Tests\Unit\UnitTestCase;
 

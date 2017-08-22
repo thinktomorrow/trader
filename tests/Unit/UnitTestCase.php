@@ -6,9 +6,9 @@ use Money\Money;
 use PHPUnit_Framework_TestCase;
 use Thinktomorrow\Trader\Common\Domain\Price\Percentage;
 use Thinktomorrow\Trader\Discounts\Domain\DiscountFactory;
-use Thinktomorrow\Trader\Order\Domain\Item;
-use Thinktomorrow\Trader\Order\Domain\Order;
-use Thinktomorrow\Trader\Order\Domain\OrderId;
+use Thinktomorrow\Trader\Orders\Domain\Item;
+use Thinktomorrow\Trader\Orders\Domain\Order;
+use Thinktomorrow\Trader\Orders\Domain\OrderId;
 use Thinktomorrow\Trader\Tests\InMemoryContainer;
 use Thinktomorrow\Trader\Tests\Unit\Stubs\PurchasableStub;
 

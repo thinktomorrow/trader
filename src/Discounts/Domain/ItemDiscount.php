@@ -2,8 +2,8 @@
 
 namespace Thinktomorrow\Trader\Discounts\Domain;
 
-use Thinktomorrow\Trader\Order\Domain\ItemId;
-use Thinktomorrow\Trader\Order\Domain\Order;
+use Thinktomorrow\Trader\Orders\Domain\ItemId;
+use Thinktomorrow\Trader\Orders\Domain\Order;
 
 interface ItemDiscount
 {

@@ -4,7 +4,7 @@ namespace Thinktomorrow\Trader\Discounts\Application;
 
 use Thinktomorrow\Trader\Discounts\Domain\DiscountCollection;
 use Thinktomorrow\Trader\Discounts\Domain\Exceptions\CannotApplyDiscountToOrderException;
-use Thinktomorrow\Trader\Order\Domain\Order;
+use Thinktomorrow\Trader\Orders\Domain\Order;
 
 class ApplyDiscountsToOrder
 {

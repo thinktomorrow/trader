@@ -1,6 +1,6 @@
 <?php
 
-namespace Thinktomorrow\Trader\Order\Domain;
+namespace Thinktomorrow\Trader\Orders\Domain;
 
 use Money\Money;
 use Thinktomorrow\Trader\Common\Domain\Price\Cash;
@@ -8,7 +8,7 @@ use Thinktomorrow\Trader\Common\Domain\Price\Percentage;
 use Thinktomorrow\Trader\Common\Domain\State\StatefulContract;
 use Thinktomorrow\Trader\Discounts\Domain\AppliedDiscount;
 use Thinktomorrow\Trader\Discounts\Domain\AppliedDiscountCollection;
-use Thinktomorrow\Trader\Order\Domain\Services\SumOfTaxes;
+use Thinktomorrow\Trader\Orders\Domain\Services\SumOfTaxes;
 
 final class Order implements StatefulContract
 {
@@ -54,6 +54,9 @@ final class Order implements StatefulContract
 
     public function changeState($state)
     {
+        // Ignore change to current state - it should not trigger events either
+        if($state === $this->state) return;
+
         OrderState::assertNewState($this, $state);
 
         $this->state = $state;

@@ -1,7 +1,7 @@
 <?php
 
-use Thinktomorrow\Trader\Order\Domain\Item;
-use Thinktomorrow\Trader\Order\Domain\ItemCollection;
+use Thinktomorrow\Trader\Orders\Domain\Item;
+use Thinktomorrow\Trader\Orders\Domain\ItemCollection;
 use Thinktomorrow\Trader\Tests\Unit\Stubs\PurchasableStub;
 use Thinktomorrow\Trader\Tests\Unit\UnitTestCase;
 

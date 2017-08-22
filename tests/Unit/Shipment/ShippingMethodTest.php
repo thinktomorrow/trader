@@ -4,7 +4,7 @@ namespace Thinktomorrow\Trader\Tests\Unit;
 
 use InvalidArgumentException;
 use Money\Money;
-use Thinktomorrow\Trader\Order\Domain\Item;
+use Thinktomorrow\Trader\Orders\Domain\Item;
 use Thinktomorrow\Trader\Shipment\Domain\ShippingMethod;
 use Thinktomorrow\Trader\Shipment\Domain\ShippingMethodId;
 use Thinktomorrow\Trader\Shipment\Domain\ShippingRuleFactory;

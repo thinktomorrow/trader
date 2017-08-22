@@ -2,8 +2,8 @@
 
 namespace Thinktomorrow\Trader\Tests\Unit;
 
-use Thinktomorrow\Trader\Order\Domain\Item;
-use Thinktomorrow\Trader\Order\Domain\ItemId;
+use Thinktomorrow\Trader\Orders\Domain\Item;
+use Thinktomorrow\Trader\Orders\Domain\ItemId;
 use Thinktomorrow\Trader\Tests\Unit\Stubs\PurchasableStub;
 
 class ItemTest extends UnitTestCase

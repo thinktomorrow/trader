@@ -3,8 +3,8 @@
 namespace Thinktomorrow\Trader\Order\Application;
 
 use Thinktomorrow\Trader\Discounts\Ports\Web\Discount;
-use Thinktomorrow\Trader\Order\Domain\OrderId;
-use Thinktomorrow\Trader\Order\Domain\OrderRepository;
+use Thinktomorrow\Trader\Orders\Domain\OrderId;
+use Thinktomorrow\Trader\Orders\Domain\OrderRepository;
 use Thinktomorrow\Trader\Order\Ports\Web\Merchant\Item;
 use Thinktomorrow\Trader\Order\Ports\Web\Merchant\Order;
 use Thinktomorrow\Trader\Order\Ports\Web\Merchant\Order as MerchantOrder;

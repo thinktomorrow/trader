@@ -4,7 +4,7 @@ namespace Thinktomorrow\Trader\Shipment\Domain\Conditions;
 
 use Thinktomorrow\Trader\Common\Domain\Conditions\BaseCondition;
 use Thinktomorrow\Trader\Common\Domain\Conditions\Condition;
-use Thinktomorrow\Trader\Order\Domain\Order;
+use Thinktomorrow\Trader\Orders\Domain\Order;
 
 class MinimumAmount extends BaseCondition implements Condition
 {

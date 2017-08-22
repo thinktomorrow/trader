@@ -1,9 +1,9 @@
 <?php
 
-namespace Thinktomorrow\Trader\Order\Domain\Services;
+namespace Thinktomorrow\Trader\Orders\Domain\Services;
 
 use Thinktomorrow\Trader\Common\Domain\Price\Cash;
-use Thinktomorrow\Trader\Order\Domain\Order;
+use Thinktomorrow\Trader\Orders\Domain\Order;
 
 class SumOfTaxes
 {

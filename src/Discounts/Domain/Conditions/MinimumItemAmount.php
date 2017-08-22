@@ -6,8 +6,8 @@ use Money\Money;
 use Thinktomorrow\Trader\Common\Domain\Conditions\BaseCondition;
 use Thinktomorrow\Trader\Common\Domain\Conditions\Condition;
 use Thinktomorrow\Trader\Common\Domain\Conditions\ItemCondition;
-use Thinktomorrow\Trader\Order\Domain\Item;
-use Thinktomorrow\Trader\Order\Domain\Order;
+use Thinktomorrow\Trader\Orders\Domain\Item;
+use Thinktomorrow\Trader\Orders\Domain\Order;
 
 class MinimumItemAmount extends BaseCondition implements Condition, ItemCondition
 {

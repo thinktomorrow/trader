@@ -6,7 +6,7 @@ use DateTime;
 use Thinktomorrow\Trader\Common\Domain\Conditions\BaseCondition;
 use Thinktomorrow\Trader\Common\Domain\Conditions\Condition;
 use Thinktomorrow\Trader\Common\Domain\Conditions\OrderCondition;
-use Thinktomorrow\Trader\Order\Domain\Order;
+use Thinktomorrow\Trader\Orders\Domain\Order;
 
 class Period extends BaseCondition implements Condition, OrderCondition
 {

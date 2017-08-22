@@ -2,9 +2,9 @@
 
 namespace Thinktomorrow\Trader\Order\Ports\Persistence;
 
-use Thinktomorrow\Trader\Order\Domain\Order;
-use Thinktomorrow\Trader\Order\Domain\OrderId;
-use Thinktomorrow\Trader\Order\Domain\OrderRepository;
+use Thinktomorrow\Trader\Orders\Domain\Order;
+use Thinktomorrow\Trader\Orders\Domain\OrderId;
+use Thinktomorrow\Trader\Orders\Domain\OrderRepository;
 
 class InMemoryOrderRepository implements OrderRepository
 {

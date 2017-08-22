@@ -69,6 +69,17 @@ class StateMachineTest extends UnitTestCase
         $machine->apply('create');
         $this->assertEquals('pending', $dummyStatefulContract->state());
     }
+
+    /** @test */
+    public function it_can_reset_same_state()
+    {
+        $dummyStatefulContract = new dummyStatefulContract();
+        $machine = new DummyStateMachine($dummyStatefulContract);
+
+        $this->assertEquals('new', $dummyStatefulContract->state());
+        $dummyStatefulContract->changeState('new');
+        $this->assertEquals('new', $dummyStatefulContract->state());
+    }
 }
 
 class DummyStateMachine extends StateMachine

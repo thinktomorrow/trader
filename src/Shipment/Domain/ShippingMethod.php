@@ -3,7 +3,7 @@
 namespace Thinktomorrow\Trader\Shipment\Domain;
 
 use Assert\Assertion;
-use Thinktomorrow\Trader\Order\Domain\Order;
+use Thinktomorrow\Trader\Orders\Domain\Order;
 use Thinktomorrow\Trader\Shipment\Domain\Exceptions\CannotApplyShippingRuleException;
 
 class ShippingMethod

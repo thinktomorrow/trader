@@ -1,8 +1,8 @@
 <?php
 
-use ThinkTomorrow\Trader\Order\Domain\Adjusters\Adjustable;
-use ThinkTomorrow\Trader\Order\Domain\Adjusters\Adjuster;
-use ThinkTomorrow\Trader\Order\Domain\Adjusters\Adjustment;
+use Thinktomorrow\Trader\Orders\Domain\Adjusters\Adjustable;
+use Thinktomorrow\Trader\Orders\Domain\Adjusters\Adjuster;
+use Thinktomorrow\Trader\Orders\Domain\Adjusters\Adjustment;
 
 class ItemSalespriceAdjuster implements Adjuster
 {

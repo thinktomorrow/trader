@@ -10,10 +10,10 @@ use Thinktomorrow\Trader\Tests\InMemoryContainer;
 
 require_once __DIR__.'/../vendor/autoload.php';
 
-    $order = new \Thinktomorrow\Trader\Order\Domain\Order(\Thinktomorrow\Trader\Order\Domain\OrderId::fromInteger(1));
+    $order = new \Thinktomorrow\Trader\Orders\Domain\Order(\Thinktomorrow\Trader\Orders\Domain\OrderId::fromInteger(1));
 
     $order->items()->add(
-        \Thinktomorrow\Trader\Order\Domain\Item::fromPurchasable(new Product(33, [
+        \Thinktomorrow\Trader\Orders\Domain\Item::fromPurchasable(new Product(33, [
                 'name'        => 'crazy product number one',
                 'description' => 'this is a nice looking product guys!!!',
             ],
@@ -24,7 +24,7 @@ require_once __DIR__.'/../vendor/autoload.php';
     );
 
 $order->items()->add(
-    \Thinktomorrow\Trader\Order\Domain\Item::fromPurchasable(new Product(12, [
+    \Thinktomorrow\Trader\Orders\Domain\Item::fromPurchasable(new Product(12, [
         'name'        => 'awesome product number two',
         'description' => 'in promo! buy second to get 50% off of both',
     ],

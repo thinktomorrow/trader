@@ -20,9 +20,11 @@ class Cash
      *
      * @return Money
      */
-    public static function make($amount): Money
+    public static function make($amount, $currencyCode = null): Money
     {
-        return new Money($amount, new Currency(static::getCurrencyCode()));
+        $currencyCode = $currencyCode ?: static::getCurrencyCode();
+
+        return new Money($amount, new Currency($currencyCode));
     }
 
     private static function getCurrencyCode(): string

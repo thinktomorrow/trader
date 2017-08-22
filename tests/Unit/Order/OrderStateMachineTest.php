@@ -3,9 +3,9 @@
 namespace Thinktomorrow\Trader\Unit;
 
 use Thinktomorrow\Trader\Common\Domain\State\StateException;
-use Thinktomorrow\Trader\Order\Domain\Order;
-use Thinktomorrow\Trader\Order\Domain\OrderId;
-use Thinktomorrow\Trader\Order\Domain\OrderState;
+use Thinktomorrow\Trader\Orders\Domain\Order;
+use Thinktomorrow\Trader\Orders\Domain\OrderId;
+use Thinktomorrow\Trader\Orders\Domain\OrderState;
 use Thinktomorrow\Trader\Tests\Unit\UnitTestCase;
 
 class OrderStateMachineTest extends UnitTestCase
@@ -39,6 +39,15 @@ class OrderStateMachineTest extends UnitTestCase
         $this->setExpectedException(StateException::class);
 
         $this->order->changeState('foobar');
+    }
+
+    /** @test */
+    public function it_ignores_change_to_current_state()
+    {
+        $this->assertEquals('new',$this->order->state());
+        $this->order->changeState('new');
+        $this->assertEquals('new',$this->order->state());
+
     }
 
     /** @test */
