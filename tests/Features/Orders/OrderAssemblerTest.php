@@ -6,12 +6,12 @@ use Assert\Assertion;
 use Thinktomorrow\Trader\Common\Domain\Price\Cash;
 use Thinktomorrow\Trader\Common\Domain\Price\Percentage;
 use Thinktomorrow\Trader\Discounts\Domain\DiscountFactory;
-use Thinktomorrow\Trader\Order\Application\OrderAssembler;
+use Thinktomorrow\Trader\Orders\Application\OrderAssembler;
 use Thinktomorrow\Trader\Orders\Domain\Item as DomainItem;
 use Thinktomorrow\Trader\Orders\Domain\Order as DomainOrder;
 use Thinktomorrow\Trader\Orders\Domain\OrderId;
-use Thinktomorrow\Trader\Order\Ports\Web\Merchant\Item;
-use Thinktomorrow\Trader\Order\Ports\Web\Merchant\Order;
+use Thinktomorrow\Trader\Orders\Ports\Web\Merchant\Item;
+use Thinktomorrow\Trader\Orders\Ports\Web\Merchant\Order;
 use Thinktomorrow\Trader\Tests\InMemoryContainer;
 use Thinktomorrow\Trader\Tests\Unit\Stubs\PurchasableStub;
 

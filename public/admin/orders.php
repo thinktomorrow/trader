@@ -1,7 +1,7 @@
 <?php require __DIR__.'/../../vendor/autoload.php'; ?>
 
 <?php
-$orderRepository = new App\Order\OrderRepository();
+$orderRepository = new App\Orders\OrderRepository();
 $orders = $orderRepository->all();
 ?>
 

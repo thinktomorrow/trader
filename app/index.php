@@ -55,7 +55,7 @@ $order->items()->add(
     // Add shipment cost
     //(new ApplyShippingRuleToOrder(new InMemoryOrderRepository(), new InMemoryShippingMethodRepository()))->handle($order->id());
 
-    $cart = new \Thinktomorrow\Trader\Order\Ports\Web\Shop\Cart($order);
+    $cart = new \Thinktomorrow\Trader\Orders\Ports\Web\Shop\Cart($order);
 
 ?>
 

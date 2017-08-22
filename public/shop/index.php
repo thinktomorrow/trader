@@ -1,7 +1,7 @@
 <?php
 
 use Thinktomorrow\Trader\Catalog\Products\Ports\Persistence\InMemoryProductRepository;
-use Thinktomorrow\Trader\Order\Application\AddToCart;
+use Thinktomorrow\Trader\Orders\Application\AddToCart;
 
 require_once __DIR__.'/../../vendor/autoload.php';
 

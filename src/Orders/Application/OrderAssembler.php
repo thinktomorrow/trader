@@ -1,13 +1,13 @@
 <?php
 
-namespace Thinktomorrow\Trader\Order\Application;
+namespace Thinktomorrow\Trader\Orders\Application;
 
 use Thinktomorrow\Trader\Discounts\Ports\Web\Discount;
 use Thinktomorrow\Trader\Orders\Domain\OrderId;
 use Thinktomorrow\Trader\Orders\Domain\OrderRepository;
-use Thinktomorrow\Trader\Order\Ports\Web\Merchant\Item;
-use Thinktomorrow\Trader\Order\Ports\Web\Merchant\Order;
-use Thinktomorrow\Trader\Order\Ports\Web\Merchant\Order as MerchantOrder;
+use Thinktomorrow\Trader\Orders\Ports\Web\Merchant\Item;
+use Thinktomorrow\Trader\Orders\Ports\Web\Merchant\Order;
+use Thinktomorrow\Trader\Orders\Ports\Web\Merchant\Order as MerchantOrder;
 
 // TODO: the assembler violates the dependency flow since it depends on concrete ports objects
 class OrderAssembler

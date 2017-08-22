@@ -3,7 +3,7 @@
 namespace App\Order;
 
 use Money\Money;
-use Thinktomorrow\Trader\Order\Ports\Web\Merchant\Order;
+use Thinktomorrow\Trader\Orders\Ports\Web\Merchant\Order;
 
 class OrderRepository
 {

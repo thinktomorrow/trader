@@ -1,6 +1,6 @@
 <?php
 
-namespace Thinktomorrow\Trader\Order\Application;
+namespace Thinktomorrow\Trader\Orders\Application;
 
 use Thinktomorrow\Trader\Catalog\Products\ProductRepository;
 use Thinktomorrow\Trader\Orders\Domain\Item;

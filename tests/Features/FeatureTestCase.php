@@ -4,7 +4,7 @@ namespace Thinktomorrow\Trader\Tests\Features;
 
 use PHPUnit_Framework_TestCase;
 use Pimple\Container;
-use Thinktomorrow\Trader\Order\Ports\Persistence\InMemoryOrderRepository;
+use Thinktomorrow\Trader\Orders\Ports\Persistence\InMemoryOrderRepository;
 
 class FeatureTestCase extends PHPUnit_Framework_TestCase
 {

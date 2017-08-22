@@ -4,7 +4,7 @@ namespace Thinktomorrow\Trader\Tests\Features;
 
 use Money\Money;
 use Thinktomorrow\Trader\Orders\Domain\Item;
-use Thinktomorrow\Trader\Order\Ports\Persistence\InMemoryOrderRepository;
+use Thinktomorrow\Trader\Orders\Ports\Persistence\InMemoryOrderRepository;
 use Thinktomorrow\Trader\Shipment\Application\ApplyShippingMethodToOrder;
 use Thinktomorrow\Trader\Shipment\Domain\ShippingMethod;
 use Thinktomorrow\Trader\Shipment\Domain\ShippingMethodId;
