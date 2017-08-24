@@ -1,18 +1,19 @@
 <?php
 
-namespace Thinktomorrow\Trader\Orders\Ports\Web\Merchant;
+namespace Thinktomorrow\Trader\Orders\Ports\Reads;
 
 use Thinktomorrow\Trader\Common\Domain\Price\Cash;
 use Thinktomorrow\Trader\Common\Ports\Web\AbstractPresenter;
+use Thinktomorrow\Trader\Orders\Application\Reads\Expanded\MerchantItem;
 
-class Item extends AbstractPresenter
+class ExpandedItem extends AbstractPresenter implements MerchantItem
 {
-    public function quantity()
+    public function quantity(): int
     {
         return $this->getValue('quantity', 1);
     }
 
-    public function stockBadge()
+    public function stockBadge(): string
     {
         return $this->getValue('stock', null, function ($stock) {
 
@@ -34,35 +35,35 @@ class Item extends AbstractPresenter
         });
     }
 
-    public function price()
+    public function price(): string
     {
         return $this->getValue('price', null, function ($price) {
-            return (new Cash())->locale($price);
+            return Cash::from($price)->locale();
         });
     }
 
-    public function saleprice()
+    public function saleprice(): string
     {
         return $this->getValue('saleprice', null, function ($price) {
-            return (new Cash())->locale($price);
+            return Cash::from($price)->locale();
         });
     }
 
-    public function subtotal()
+    public function subtotal(): string
     {
         return $this->getValue('subtotal', null, function ($price) {
-            return (new Cash())->locale($price);
+            return Cash::from($price)->locale();
         });
     }
 
-    public function total()
+    public function total(): string
     {
         return $this->getValue('total', null, function ($price) {
-            return (new Cash())->locale($price);
+            return Cash::from($price)->locale();
         });
     }
 
-    public function taxRate()
+    public function taxRate(): string
     {
         return $this->getValue('taxRate', null, function ($taxRate) {
             return $taxRate->asPercent().'%';

@@ -32,7 +32,7 @@ final class Order implements StatefulContract
         $this->id = $id;
         $this->items = new ItemCollection();
         $this->discounts = new AppliedDiscountCollection();
-        $this->discountTotal = $this->shipmentTotal = $this->paymentTotal = Cash::make(0);
+        $this->discountTotal = $this->shippingTotal = $this->paymentTotal = Cash::make(0);
 
         $this->setTaxPercentage(Percentage::fromPercent(0));
 
@@ -114,7 +114,7 @@ final class Order implements StatefulContract
         return $this->subtotal()
                     ->subtract($this->discountTotal())
                     ->add($this->paymentTotal())
-                    ->add($this->shipmentTotal());
+                    ->add($this->shippingTotal());
     }
 
     public function taxPercentage(): Percentage
@@ -144,7 +144,7 @@ final class Order implements StatefulContract
     {
         return (new SumOfTaxes())->forOrder($this);
 
-        // Global amounts such as discountTotal, shipmentTotal and PaymentTotal also have an inclusive tax.
+        // Global amounts such as discountTotal, shippingTotal and PaymentTotal also have an inclusive tax.
         // This tax is the default one for this order
         // TODO: determine the default tax!!!! Default tax is the one set by the admin
         // e.g. new OrderTaxRate($defaultTaxRate,$this);

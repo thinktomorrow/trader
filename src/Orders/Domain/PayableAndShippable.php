@@ -8,40 +8,40 @@ use Thinktomorrow\Trader\Shipment\Domain\ShippingRuleId;
 
 trait PayableAndShippable
 {
-    private $shipmentTotal;
-    private $shipmentMethodId;
-    private $shipmentRuleId;
+    private $shippingTotal;
+    private $shippingMethodId;
+    private $shippingRuleId;
 
     private $paymentTotal;
     private $paymentMethodId;
     private $paymentRuleId;
 
-    public function shipmentTotal(): Money
+    public function shippingTotal(): Money
     {
-        return $this->shipmentTotal;
+        return $this->shippingTotal;
     }
 
-    public function setShipmentTotal(Money $shipmentTotal)
+    public function setShippingTotal(Money $shippingTotal)
     {
-        $this->shipmentTotal = $shipmentTotal;
+        $this->shippingTotal = $shippingTotal;
 
         return $this;
     }
 
-    public function shipmentMethodId()
+    public function shippingMethodId()
     {
-        return $this->shipmentMethodId;
+        return $this->shippingMethodId;
     }
 
-    public function shipmentRuleId()
+    public function shippingRuleId()
     {
-        return $this->shipmentRuleId;
+        return $this->shippingRuleId;
     }
 
-    public function setShipment(ShippingMethodId $shipmentMethodId, ShippingRuleId $shipmentRuleId)
+    public function setShipping(ShippingMethodId $shipmentMethodId, ShippingRuleId $shipmentRuleId)
     {
-        $this->shipmentMethodId = $shipmentMethodId;
-        $this->shipmentRuleId = $shipmentRuleId;
+        $this->shippingMethodId = $shipmentMethodId;
+        $this->shippingRuleId = $shipmentRuleId;
     }
 
     public function paymentTotal(): Money

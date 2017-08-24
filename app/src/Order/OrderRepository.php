@@ -3,26 +3,26 @@
 namespace App\Order;
 
 use Money\Money;
-use Thinktomorrow\Trader\Orders\Ports\Web\Merchant\Order;
+use Thinktomorrow\Trader\Orders\Ports\Reads\ExpandedOrder;
 
 class OrderRepository
 {
     public function all()
     {
         return [
-            new Order([
+            new ExpandedOrder([
                 'total'        => Money::EUR(120),
                 'reference'    => '119adfei393',
                 'confirmed_at' => (new \DateTime('@'.strtotime('-9days'))),
                 'state'        => 'refunded',
             ]),
-            new Order([
+            new ExpandedOrder([
                 'total'        => Money::EUR(3900),
                 'reference'    => 'dkajepidfqsd29929',
                 'confirmed_at' => (new \DateTime('@'.strtotime('-1days'))),
                 'state'        => 'pending',
             ]),
-            new Order([
+            new ExpandedOrder([
                 'total'        => Money::EUR(0),
                 'reference'    => 'dakjdmfiqdfq',
                 'confirmed_at' => (new \DateTime('@'.strtotime('-90days'))),

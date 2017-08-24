@@ -33,6 +33,6 @@ class Product extends BaseProduct
 
     public function price()
     {
-        return (new Cash())->locale($this->defaultVariant->price());
+        return Cash::from($this->defaultVariant->price())->locale();
     }
 }

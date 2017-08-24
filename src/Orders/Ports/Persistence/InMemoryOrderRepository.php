@@ -10,13 +10,13 @@ class InMemoryOrderRepository implements OrderRepository
 {
     private static $collection = [];
 
-    public function find(OrderId $orderId)
+    public function find(OrderId $orderId): Order
     {
         if (isset(self::$collection[(string) $orderId])) {
             return self::$collection[(string) $orderId];
         }
 
-        return null;
+        throw new \RuntimeException('No order found by id ['.$orderId->get().']');
     }
 
     public function add(Order $order)
@@ -42,7 +42,7 @@ class InMemoryOrderRepository implements OrderRepository
             'subtotal'       => $order->subtotal(),
             'discount_total' => $order->discountTotal(),
             'payment_total'  => $order->paymentTotal(),
-            'shipment_total' => $order->shipmentTotal(),
+            'shipment_total' => $order->shippingTotal(),
             'tax'            => $order->tax(),
             'tax_rates'      => $order->taxRates(),
             'reference'      => $order->id()->get(), // This should be something business unique; not the id.

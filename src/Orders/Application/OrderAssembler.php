@@ -2,14 +2,15 @@
 
 namespace Thinktomorrow\Trader\Orders\Application;
 
-use Thinktomorrow\Trader\Discounts\Ports\Web\Discount;
+use Thinktomorrow\Trader\Orders\Domain\Order;
 use Thinktomorrow\Trader\Orders\Domain\OrderId;
 use Thinktomorrow\Trader\Orders\Domain\OrderRepository;
-use Thinktomorrow\Trader\Orders\Ports\Web\Merchant\Item;
-use Thinktomorrow\Trader\Orders\Ports\Web\Merchant\Order;
-use Thinktomorrow\Trader\Orders\Ports\Web\Merchant\Order as MerchantOrder;
 
-// TODO: the assembler violates the dependency flow since it depends on concrete ports objects
+/**
+ * Reconstruct order domain from persistence layer.
+ * This will reapply all rules to make sure the
+ * order is updated to current business logic
+ */
 class OrderAssembler
 {
     /**
@@ -22,58 +23,10 @@ class OrderAssembler
         $this->orderRepository = $orderRepository;
     }
 
-    public function forShop($orderId)
+    public function assemble($orderId)
     {
-        // TODO (see forMerchant as base) als use a Web/BaseOrder for common stuff
-    }
-
-    /**
-     * This data (raw) will be presented as a simple read-only DTO.
-     *
-     * @param $orderId
-     *
-     * @return MerchantOrder
-     */
-    public function forMerchant($orderId)
-    {
-        $data = $this->orderRepository->getValues(OrderId::fromInteger($orderId));
-
-        $order = new MerchantOrder();
-
-        foreach (['total', 'subtotal', 'discount_total', 'payment_total', 'shipment_total', 'tax', 'tax_rates', 'reference', 'confirmed_at', 'state'] as $attribute) {
-            $order->{$attribute} = $data[$attribute];
-        }
-
-        $this->assembleItems($order, $orderId);
-        $this->assembleAppliedDiscounts($order, $orderId);
-
-        // TODO: add applied shipment and payment
-        // TODO: add applied Tax rule
-
+        $order = $this->orderRepository->find(OrderId::fromInteger($orderId));
+        
         return $order;
-    }
-
-    private function assembleItems(Order $order, $orderId)
-    {
-        $itemCollection = $this->orderRepository->getItemValues(OrderId::fromInteger($orderId));
-        $items = [];
-
-        foreach ($itemCollection as $id => $itemValues) {
-            $items[$id] = new Item($itemValues);
-        }
-
-        $order->items = $items;
-    }
-
-    private function assembleAppliedDiscounts(MerchantOrder $order, $orderId)
-    {
-        $discountCollection = $this->orderRepository->getAppliedDiscounts(OrderId::fromInteger($orderId));
-        $discounts = [];
-
-        foreach ($discountCollection as $id => $discountValues) {
-            $discounts[$id] = new Discount($discountValues);
-        }
-
-        $order->discounts = $discounts;
     }
 }

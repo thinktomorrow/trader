@@ -33,10 +33,10 @@ class OrderTest extends UnitTestCase
     {
         $order = $this->makeOrder();
 
-        $this->assertEquals(Money::EUR(0), $order->shipmentTotal());
+        $this->assertEquals(Money::EUR(0), $order->shippingTotal());
 
-        $order->setShipmentTotal(Money::EUR(120));
-        $this->assertEquals(Money::EUR(120), $order->shipmentTotal());
+        $order->setShippingTotal(Money::EUR(120));
+        $this->assertEquals(Money::EUR(120), $order->shippingTotal());
     }
 
     /** @test */

@@ -59,7 +59,7 @@ class SumOfTaxes
         $totalsPerRate = [];
         $key = (string) $taxPercentage->asPercent();
 
-        foreach ([$order->shipmentTotal(), $order->paymentTotal()] as $global) {
+        foreach ([$order->shippingTotal(), $order->paymentTotal()] as $global) {
             if (!$global->isPositive()) {
                 continue;
             }

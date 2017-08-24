@@ -62,7 +62,7 @@ class SumOfTaxesTest extends UnitTestCase
         $order = new Order(OrderId::fromInteger(1));
         $order->items()->add(Item::fromPurchasable(new PurchasableStub(20, [], Money::EUR(100), Percentage::fromPercent(21))));
         $order->setPaymentTotal(Money::EUR(30));
-        $order->setShipmentTotal(Money::EUR(20));
+        $order->setShippingTotal(Money::EUR(20));
 
         $order->setTaxPercentage(Percentage::fromPercent(6));
 
@@ -82,7 +82,7 @@ class SumOfTaxesTest extends UnitTestCase
         $order = new Order(OrderId::fromInteger(1));
         $order->items()->add(Item::fromPurchasable(new PurchasableStub(20, [], Money::EUR(100), Percentage::fromPercent(21))));
         $order->setPaymentTotal(Money::EUR(30));
-        $order->setShipmentTotal(Money::EUR(20));
+        $order->setShippingTotal(Money::EUR(20));
 
         $order->setTaxPercentage(Percentage::fromPercent(21));
 

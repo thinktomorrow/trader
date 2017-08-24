@@ -24,10 +24,12 @@ class OrderRepositoryTest extends UnitTestCase
     }
 
     /** @test */
-    public function it_returns_null_if_order_does_not_exist()
+    public function it_throws_exception_if_order_does_not_exist()
     {
+        $this->setExpectedException(\RuntimeException::class, 'No order found');
+
         $repo = new InMemoryOrderRepository();
-        $this->assertNull($repo->find(OrderId::fromInteger(9)));
+        $repo->find(OrderId::fromInteger(9));
     }
 
     /** @test */
@@ -35,7 +37,7 @@ class OrderRepositoryTest extends UnitTestCase
     {
         $order = $this->makeOrder(0, 3);
         $order->items()->add(Item::fromPurchasable(new PurchasableStub(1, [], Money::EUR(50), Percentage::fromPercent(21))));
-        $order->setShipmentTotal(Money::EUR(15));
+        $order->setShippingTotal(Money::EUR(15));
         $order->setPaymentTotal(Money::EUR(10));
 
         $repo = new InMemoryOrderRepository();
@@ -72,7 +74,7 @@ class OrderRepositoryTest extends UnitTestCase
     {
         $order = $this->makeOrder(0, 3);
         $order->items()->add(Item::fromPurchasable(new PurchasableStub(1, [], Money::EUR(50), Percentage::fromPercent(21))));
-        $order->setShipmentTotal(Money::EUR(15));
+        $order->setShippingTotal(Money::EUR(15));
         $order->setPaymentTotal(Money::EUR(10));
 
         $repo = new InMemoryOrderRepository();

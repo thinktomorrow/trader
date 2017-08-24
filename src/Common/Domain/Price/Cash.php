@@ -11,13 +11,30 @@ use Thinktomorrow\Trader\Common\Config;
 class Cash
 {
     private static $currencyCode;
+    private static $defaultLocale;
+    private static $formatter;
+
+    /**
+     * @var Money
+     */
+    private $money;
+
+    private function __construct(Money $money)
+    {
+        $this->money = $money;
+    }
+
+    public static function from(Money $money): self
+    {
+        return new static($money);
+    }
 
     /**
      * Convenience method to allow maintaining dynamic currency.
      * Keep in mind that this remains consistent across your application.
      *
      * @param int $amount
-     *
+     * @param null $currencyCode
      * @return Money
      */
     public static function make($amount, $currencyCode = null): Money
@@ -25,6 +42,20 @@ class Cash
         $currencyCode = $currencyCode ?: static::getCurrencyCode();
 
         return new Money($amount, new Currency($currencyCode));
+    }
+
+    /**
+     * @param string $locale
+     * @return string
+     */
+    public function locale($locale = null)
+    {
+        // TODO format according to locale preferences (default is fetched from Config)
+        // TODO add currency symbol
+        $locale = $locale ?: $this->getDefaultLocale();
+
+        // TEMPORARY display just for testing
+        return $this->getSymbol().$this->getFormatter()->format($this->money);
     }
 
     private static function getCurrencyCode(): string
@@ -36,33 +67,52 @@ class Cash
         return static::$currencyCode;
     }
 
-    /**
-     * Convenience method to reset the current currency so it can be refreshed from config.
-     */
-    public static function resetCurrency()
+    private function getDefaultLocale(): string
     {
-        static::$currencyCode = null;
+        if (!static::$defaultLocale) {
+            static::$defaultLocale = (new Config())->get('locale', 'en-US');
+        }
+
+        return static::$defaultLocale;
+    }
+
+    private function getFormatter()
+    {
+        if (!static::$formatter) {
+            $currencies = new ISOCurrencies();
+            static::$formatter = new DecimalMoneyFormatter($currencies);
+        }
+
+        return static::$formatter;
     }
 
     /**
-     * TODO this should be something like Cash(Money)->locale() so then we can have Cash::from($money)->locale('nl').
-     *
-     * @param Money  $money
-     * @param string $locale
-     *
      * @return string
      */
-    public function locale(Money $money, $locale = 'nl_BE')
+    private function getSymbol(): string
     {
-        $currencies = new ISOCurrencies();
-        $moneyFormatter = new DecimalMoneyFormatter($currencies);
+        $code = $this->money->getCurrency()->getCode();
 
-        // TODO format according to locale preferences
-        // TODO add currency symbol
+        switch($code)
+        {
+            case 'EUR':
+                return '&euro;';
+                break;
+            case 'USD':
+                return '&dollar;';
+                break;
+        }
 
-        // TEMPORARY display just for testing
-        $symbol = $money->getCurrency()->getCode() == 'EUR' ? '&euro;' : $money->getCurrency()->getCode();
+        return $code;
+    }
 
-        return $symbol.$moneyFormatter->format($money);
+    /**
+     * Convenience method to reset the imported config settings
+     * so it can be refreshed from config.
+     */
+    public static function reset()
+    {
+        static::$currencyCode = null;
+        static::$defaultLocale = null;
     }
 }

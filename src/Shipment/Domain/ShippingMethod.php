@@ -46,8 +46,8 @@ class ShippingMethod
 
         $shippingRule = $this->getApplicableRule($order);
 
-        $order->setShipment($this->id(), $shippingRule->id());
-        $order->setShipmentTotal($shippingRule->total());
+        $order->setShipping($this->id(), $shippingRule->id());
+        $order->setShippingTotal($shippingRule->total());
     }
 
     public function applicable(Order $order): bool

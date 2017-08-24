@@ -6,9 +6,10 @@ interface OrderRepository
 {
     /**
      * @param OrderId $orderId
-     * @return null|Order
+     * @throws \RuntimeException
+     * @return Order
      */
-    public function find(OrderId $orderId);
+    public function find(OrderId $orderId): Order;
 
     public function add(Order $order);
 

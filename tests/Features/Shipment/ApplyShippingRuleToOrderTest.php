@@ -48,7 +48,7 @@ class ApplyShippingRuleToOrderTest extends UnitTestCase
         // Apply shipment to order
         $this->makeHandler()->handle($order->id(), ShippingMethodId::fromInteger(2));
 
-        $this->assertEquals(Money::EUR(0), $order->shipmentTotal());
+        $this->assertEquals(Money::EUR(0), $order->shippingTotal());
         $this->assertEquals(Money::EUR(240), $order->total());
     }
 
@@ -69,7 +69,7 @@ class ApplyShippingRuleToOrderTest extends UnitTestCase
         // Apply shipment to order
         $this->makeHandler()->handle($order->id(), ShippingMethodId::fromInteger(2));
 
-        $this->assertEquals(Money::EUR(24), $order->shipmentTotal());
+        $this->assertEquals(Money::EUR(24), $order->shippingTotal());
         $this->assertEquals(Money::EUR(264), $order->total());
     }
 }

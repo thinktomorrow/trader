@@ -1,9 +1,10 @@
 <?php
 
-namespace Thinktomorrow\Trader\Orders\Ports\Web\Shop;
+namespace Thinktomorrow\Trader\Orders\Ports\Reads;
 
 use Thinktomorrow\Trader\Common\Domain\Price\Cash;
 use Thinktomorrow\Trader\Discounts\Domain\AppliedDiscountCollection;
+use Thinktomorrow\Trader\Orders\Application\Reads\Cart\CartItem as CartItemContract;
 use Thinktomorrow\Trader\Orders\Domain\Item;
 
 /**
@@ -12,7 +13,7 @@ use Thinktomorrow\Trader\Orders\Domain\Item;
  * Safe to use in your views and documents.
  * This object has no behaviour and should already be localised.
  */
-class CartItem
+class CartItem implements CartItemContract
 {
     /**
      * @var Item
@@ -46,21 +47,31 @@ class CartItem
 
     public function price(): string
     {
-        return (new Cash())->locale($this->item->price());
+        return Cash::from($this->item->price())->locale();
     }
 
     public function subtotal(): string
     {
-        return (new Cash())->locale($this->item->subtotal());
+        return Cash::from($this->item->subtotal())->locale();
     }
 
     public function total(): string
     {
-        return (new Cash())->locale($this->item->total());
+        return Cash::from($this->item->total())->locale();
     }
 
-    public function discounts(): AppliedDiscountCollection
+    public function discounts(): array
     {
         return $this->item->discounts();
+    }
+
+    public function saleprice(): string
+    {
+        // TODO: Implement saleprice() method.
+    }
+
+    public function taxRate(): string
+    {
+        // TODO: Implement taxRate() method.
     }
 }
