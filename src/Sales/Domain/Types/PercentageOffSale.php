@@ -16,7 +16,7 @@ class PercentageOffSale extends BaseSale implements Sale
         $saleAmount = $eligibleForSale->price()->multiply($this->adjusters['percentage']->asFloat());
 
         if (!$this->applicable($eligibleForSale)) {
-            throw new CannotApplySale('Sale cannot be applied. [Sale of '.Cash::from($saleAmount)->locale().', current saleTotal: '.Cash::from($eligibleForSale->saleTotal())->locale().'] cannot be added to price ['. Cash::from($eligibleForSale->price())->locale().']');
+            throw new CannotApplySale('Sale cannot be applied. [Sale of '.Cash::from($saleAmount)->locale().', current saleTotal: '.Cash::from($eligibleForSale->saleTotal())->locale().'] cannot be added to price ['.Cash::from($eligibleForSale->price())->locale().']');
         }
 
         $eligibleForSale->addToSaleTotal($saleAmount);

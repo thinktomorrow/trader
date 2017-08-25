@@ -8,7 +8,7 @@ use Thinktomorrow\Trader\Discounts\Domain\DiscountCollection;
 use Thinktomorrow\Trader\Discounts\Domain\DiscountFactory;
 use Thinktomorrow\Trader\Tests\InMemoryContainer;
 
-require_once __DIR__ . '/../vendor/autoload.php';
+require_once __DIR__.'/../vendor/autoload.php';
 
     $order = new \Thinktomorrow\Trader\Orders\Domain\Order(\Thinktomorrow\Trader\Orders\Domain\OrderId::fromInteger(1));
 

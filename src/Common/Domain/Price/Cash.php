@@ -33,8 +33,9 @@ class Cash
      * Convenience method to allow maintaining dynamic currency.
      * Keep in mind that this remains consistent across your application.
      *
-     * @param int $amount
+     * @param int  $amount
      * @param null $currencyCode
+     *
      * @return Money
      */
     public static function make($amount, $currencyCode = null): Money
@@ -46,6 +47,7 @@ class Cash
 
     /**
      * @param string $locale
+     *
      * @return string
      */
     public function locale($locale = null)
@@ -93,8 +95,7 @@ class Cash
     {
         $code = $this->money->getCurrency()->getCode();
 
-        switch($code)
-        {
+        switch ($code) {
             case 'EUR':
                 return '&euro;';
                 break;

@@ -32,27 +32,27 @@ class FeatureTestCase extends PHPUnit_Framework_TestCase
 
     private function addServicesToContainer()
     {
-        $this->container->bind('orderRepository',function ($c) {
+        $this->container->bind('orderRepository', function ($c) {
             return new InMemoryOrderRepository();
         });
 
-        $this->container->bind(MerchantOrder::class,function ($c) {
+        $this->container->bind(MerchantOrder::class, function ($c) {
             return new ExpandedOrder();
         });
 
-        $this->container->bind(Cart::class,function ($c, $params) {
+        $this->container->bind(Cart::class, function ($c, $params) {
             return new \Thinktomorrow\Trader\Orders\Ports\Reads\Cart($params[0]);
         });
 
-        $this->container->bind(MerchantItem::class,function ($c) {
+        $this->container->bind(MerchantItem::class, function ($c) {
             return new ExpandedItem();
         });
 
-        $this->container->bind(Discount::class,function ($c) {
+        $this->container->bind(Discount::class, function ($c) {
             return new \Thinktomorrow\Trader\Discounts\Ports\Reads\Discount();
         });
 
-        $this->container->bind(OrderAssembler::class,function ($c) {
+        $this->container->bind(OrderAssembler::class, function ($c) {
             return new OrderAssembler($c->make('orderRepository'));
         });
     }

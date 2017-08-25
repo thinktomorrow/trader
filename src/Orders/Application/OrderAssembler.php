@@ -9,7 +9,7 @@ use Thinktomorrow\Trader\Orders\Domain\OrderRepository;
 /**
  * Reconstruct order domain from persistence layer.
  * This will reapply all rules to make sure the
- * order is updated to current business logic
+ * order is updated to current business logic.
  */
 class OrderAssembler
 {
@@ -26,7 +26,7 @@ class OrderAssembler
     public function assemble($orderId)
     {
         $order = $this->orderRepository->find(OrderId::fromInteger($orderId));
-        
+
         return $order;
     }
 }

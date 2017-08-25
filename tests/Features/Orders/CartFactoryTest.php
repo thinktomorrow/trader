@@ -54,6 +54,7 @@ class CartFactoryTest extends FeatureTestCase
         $this->addDummyOrder(1);
 
         $assembler = new CartFactory($this->container('orderRepository'), $this->container);
+
         return $assembler->create(1);
     }
 

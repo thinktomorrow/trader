@@ -11,8 +11,6 @@ use Thinktomorrow\Trader\Orders\Domain\OrderRepository;
 /**
  * Assembling an order will not refresh/update the given data.
  * It maintains the state when order was last stored to db.
- *
- * @package Thinktomorrow\Trader\Orders\Application
  */
 class CartFactory
 {
@@ -38,6 +36,7 @@ class CartFactory
      * This data (raw) will be presented as a simple read-only DTO.
      *
      * @param $orderId
+     *
      * @return MerchantOrder
      */
     public function create($orderId)
