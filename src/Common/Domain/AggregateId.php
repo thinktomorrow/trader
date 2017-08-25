@@ -20,6 +20,7 @@ trait AggregateId
 
     /**
      * @param int $id
+     *
      * @return static
      */
     public static function fromInteger(int $id)
@@ -31,6 +32,7 @@ trait AggregateId
 
     /**
      * @param string $id
+     *
      * @return static
      */
     public static function fromString(string $id)

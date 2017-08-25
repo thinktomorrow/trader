@@ -44,10 +44,9 @@ class OrderStateMachineTest extends UnitTestCase
     /** @test */
     public function it_ignores_change_to_current_state()
     {
-        $this->assertEquals('new',$this->order->state());
+        $this->assertEquals('new', $this->order->state());
         $this->order->changeState('new');
-        $this->assertEquals('new',$this->order->state());
-
+        $this->assertEquals('new', $this->order->state());
     }
 
     /** @test */

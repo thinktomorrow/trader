@@ -11,8 +11,6 @@ use Thinktomorrow\Trader\Orders\Domain\OrderRepository;
 /**
  * Assembling an order will not refresh/update the given data.
  * It maintains the state when order was last stored to db.
- *
- * @package Thinktomorrow\Trader\Orders\Application
  */
 class MerchantOrderFactory
 {
@@ -38,6 +36,7 @@ class MerchantOrderFactory
      * This data (raw) will be presented as a simple read-only DTO.
      *
      * @param $orderId
+     *
      * @return MerchantOrder
      */
     public function create($orderId)
@@ -45,7 +44,9 @@ class MerchantOrderFactory
         $values = $this->orderRepository->getValues(OrderId::fromInteger($orderId));
 
         $order = $this->resolve(MerchantOrder::class);
-        foreach ($values as $key => $value) $order->{$key} = $value;
+        foreach ($values as $key => $value) {
+            $order->{$key} = $value;
+        }
 
         $this->assembleItems($order, $orderId);
         $this->assembleAppliedDiscounts($order, $orderId);
@@ -63,7 +64,9 @@ class MerchantOrderFactory
 
         foreach ($itemCollection as $id => $itemValues) {
             $items[$id] = $this->resolve(MerchantItem::class);
-            foreach($itemValues as $key => $value) $items[$id]->{$key} = $value;
+            foreach ($itemValues as $key => $value) {
+                $items[$id]->{$key} = $value;
+            }
         }
 
         $order->items = $items;
@@ -76,7 +79,9 @@ class MerchantOrderFactory
 
         foreach ($discountCollection as $id => $discountValues) {
             $discounts[$id] = $this->resolve(DiscountPresenter::class);
-            foreach($discountValues as $key => $value) $discounts[$id]->{$key} = $value;
+            foreach ($discountValues as $key => $value) {
+                $discounts[$id]->{$key} = $value;
+            }
         }
 
         $order->discounts = $discounts;

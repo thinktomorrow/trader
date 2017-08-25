@@ -1,8 +1,6 @@
 <?php
 
-
 namespace Thinktomorrow\Trader\Orders\Ports\Reads;
-
 
 use Thinktomorrow\Trader\Common\Domain\Price\Cash;
 

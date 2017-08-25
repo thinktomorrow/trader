@@ -94,6 +94,6 @@ class InMemoryOrderRepository implements OrderRepository
 
     public function nextIdentity() : OrderId
     {
-        return OrderId::fromString((string)Uuid::uuid4());
+        return OrderId::fromString((string) Uuid::uuid4());
     }
 }

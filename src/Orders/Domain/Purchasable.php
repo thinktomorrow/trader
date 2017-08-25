@@ -11,7 +11,8 @@ interface Purchasable
     public function purchasableId(): int;
 
     /**
-     * String representation of the purchasable object
+     * String representation of the purchasable object.
+     *
      * @return string
      */
     public function purchasableType(): string;

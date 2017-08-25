@@ -2,7 +2,6 @@
 
 namespace Thinktomorrow\Trader\Orders\Ports\Reads;
 
-use Thinktomorrow\Trader\Common\Domain\Price\Cash;
 use Thinktomorrow\Trader\Common\Ports\Web\AbstractPresenter;
 use Thinktomorrow\Trader\Orders\Application\Reads\Expanded\MerchantOrder;
 
@@ -24,5 +23,4 @@ class ExpandedOrder extends AbstractPresenter implements MerchantOrder
             return $confirmedAt->format('d/m/Y H:i');
         });
     }
-
 }

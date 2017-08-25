@@ -55,7 +55,9 @@ final class Order implements StatefulContract
     public function changeState($state)
     {
         // Ignore change to current state - it should not trigger events either
-        if($state === $this->state) return;
+        if ($state === $this->state) {
+            return;
+        }
 
         OrderState::assertNewState($this, $state);
 

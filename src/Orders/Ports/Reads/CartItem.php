@@ -3,7 +3,6 @@
 namespace Thinktomorrow\Trader\Orders\Ports\Reads;
 
 use Thinktomorrow\Trader\Common\Domain\Price\Cash;
-use Thinktomorrow\Trader\Discounts\Domain\AppliedDiscountCollection;
 use Thinktomorrow\Trader\Orders\Application\Reads\Cart\CartItem as CartItemContract;
 use Thinktomorrow\Trader\Orders\Domain\Item;
 
