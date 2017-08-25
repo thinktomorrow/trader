@@ -19,7 +19,7 @@
         "psr/container": "^1.0",
         "beberlei/assert": "^2.7",
         "winzou/state-machine": "^0.3.2",
-        "Illuminate/Contracts": "^5.4",
+        "Illuminate/Contracts": "~5.4.16",
         "ramsey/uuid": "^3.7"
     },
     "require-dev": {
