@@ -22,4 +22,6 @@ interface OrderRepository
     public function getItemValues(OrderId $orderId): array;
 
     public function nextIdentity(): OrderId;
+
+    public function nextReference(): OrderReference;
 }

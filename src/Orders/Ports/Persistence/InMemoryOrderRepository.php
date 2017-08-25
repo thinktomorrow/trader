@@ -5,6 +5,7 @@ namespace Thinktomorrow\Trader\Orders\Ports\Persistence;
 use Ramsey\Uuid\Uuid;
 use Thinktomorrow\Trader\Orders\Domain\Order;
 use Thinktomorrow\Trader\Orders\Domain\OrderId;
+use Thinktomorrow\Trader\Orders\Domain\OrderReference;
 use Thinktomorrow\Trader\Orders\Domain\OrderRepository;
 
 class InMemoryOrderRepository implements OrderRepository
@@ -95,5 +96,10 @@ class InMemoryOrderRepository implements OrderRepository
     public function nextIdentity() : OrderId
     {
         return OrderId::fromString((string) Uuid::uuid4());
+    }
+
+    public function nextReference(): OrderReference
+    {
+        return OrderReference::fromString((string) Uuid::uuid4());
     }
 }
