@@ -4,8 +4,10 @@ namespace Thinktomorrow\Trader\Tests\Unit;
 
 use Money\Money;
 use Thinktomorrow\Trader\Common\Domain\Price\Percentage;
+use Thinktomorrow\Trader\Orders\Domain\CustomerId;
 use Thinktomorrow\Trader\Orders\Domain\Item;
 use Thinktomorrow\Trader\Orders\Domain\ItemCollection;
+use Thinktomorrow\Trader\Orders\Domain\Order;
 use Thinktomorrow\Trader\Orders\Domain\OrderId;
 use Thinktomorrow\Trader\Tests\Unit\Stubs\PurchasableStub;
 
@@ -19,6 +21,35 @@ class OrderTest extends UnitTestCase
 
         $this->assertEquals(2, $orderId->get());
         $this->assertTrue($orderId->equals($orderId2));
+    }
+
+    /** @test */
+    function it_can_set_a_customer()
+    {
+        $order = new Order(OrderId::fromInteger(1));
+        $order->setCustomerId(CustomerId::fromString(2));
+
+        $this->assertEquals(CustomerId::fromString(2),$order->customerId());
+    }
+
+    /** @test */
+    function it_can_check_if_there_is_a_customer()
+    {
+        $order = new Order(OrderId::fromInteger(1));
+        $this->assertFalse($order->hasCustomer());
+
+        $order->setCustomerId(CustomerId::fromString(2));
+        $this->assertTrue($order->hasCustomer());
+    }
+
+    /** @test */
+    function retrieving_customer_when_there_is_none_fails()
+    {
+        $this->setExpectedException(\RuntimeException::class,'customer');
+
+        $order = new Order(OrderId::fromInteger(1));
+
+        $order->customerId();
     }
 
     /** @test */

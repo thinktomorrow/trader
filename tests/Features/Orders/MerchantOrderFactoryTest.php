@@ -7,6 +7,7 @@ use Thinktomorrow\Trader\Common\Domain\Price\Cash;
 use Thinktomorrow\Trader\Common\Domain\Price\Percentage;
 use Thinktomorrow\Trader\Discounts\Domain\DiscountFactory;
 use Thinktomorrow\Trader\Orders\Application\Reads\Expanded\MerchantOrderFactory;
+use Thinktomorrow\Trader\Orders\Domain\CustomerId;
 use Thinktomorrow\Trader\Orders\Domain\Item as DomainItem;
 use Thinktomorrow\Trader\Orders\Domain\Order as DomainOrder;
 use Thinktomorrow\Trader\Orders\Domain\OrderId;
@@ -62,6 +63,7 @@ class MerchantOrderFactoryTest extends FeatureTestCase
     private function addDummyOrder($id)
     {
         $order = new DomainOrder(OrderId::fromInteger($id));
+        $order->setCustomerId(CustomerId::fromString(22));
         $order->items()->add(DomainItem::fromPurchasable(new PurchasableStub(1, [], Cash::make(505), Percentage::fromPercent(10))));
         $order->items()->add(DomainItem::fromPurchasable(new PurchasableStub(2, [], Cash::make(1000), Percentage::fromPercent(10), Cash::make(800))), 2);
         $order->setShippingTotal(Cash::make(15));

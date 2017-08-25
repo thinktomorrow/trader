@@ -22,6 +22,7 @@ final class Order implements StatefulContract
     private $state;
 
     private $id;
+    private $customerId;
     private $items;
     private $discounts; // order level applied discounts
     private $discountTotal;
@@ -45,6 +46,26 @@ final class Order implements StatefulContract
     public function id(): OrderId
     {
         return $this->id;
+    }
+
+    public function customerId(): CustomerId
+    {
+        if(!$this->hasCustomer())
+        {
+            throw new \RuntimeException('Requesting customer for order ['.$this->id()->get().'] but there is no customer attached.');
+        }
+
+        return $this->customerId;
+    }
+
+    public function hasCustomer(): bool
+    {
+        return !is_null($this->customerId);
+    }
+
+    public function setCustomerId(CustomerId $customerId)
+    {
+        $this->customerId = $customerId;
     }
 
     public function state(): string

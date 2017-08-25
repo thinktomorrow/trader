@@ -6,6 +6,7 @@ use Money\Money;
 use PHPUnit_Framework_TestCase;
 use Thinktomorrow\Trader\Common\Domain\Price\Percentage;
 use Thinktomorrow\Trader\Discounts\Domain\DiscountFactory;
+use Thinktomorrow\Trader\Orders\Domain\CustomerId;
 use Thinktomorrow\Trader\Orders\Domain\Item;
 use Thinktomorrow\Trader\Orders\Domain\Order;
 use Thinktomorrow\Trader\Orders\Domain\OrderId;
@@ -17,6 +18,7 @@ class UnitTestCase extends PHPUnit_Framework_TestCase
     protected function makeOrder($subtotalAmount = 0, $id = 2)
     {
         $order = new Order(OrderId::fromInteger($id));
+        $order->setCustomerId(CustomerId::fromString(22));
 
         if ($subtotalAmount > 0) {
             $order->items()->add(Item::fromPurchasable(new PurchasableStub(20, [], Money::EUR($subtotalAmount))));
