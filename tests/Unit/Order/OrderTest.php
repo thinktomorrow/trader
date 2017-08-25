@@ -9,6 +9,7 @@ use Thinktomorrow\Trader\Orders\Domain\Item;
 use Thinktomorrow\Trader\Orders\Domain\ItemCollection;
 use Thinktomorrow\Trader\Orders\Domain\Order;
 use Thinktomorrow\Trader\Orders\Domain\OrderId;
+use Thinktomorrow\Trader\Orders\Domain\OrderReference;
 use Thinktomorrow\Trader\Tests\Unit\Stubs\PurchasableStub;
 
 class OrderTest extends UnitTestCase
@@ -120,5 +121,14 @@ class OrderTest extends UnitTestCase
         $order->items()->add(Item::fromPurchasable(new PurchasableStub(3, [], Money::EUR(1050), Percentage::fromPercent(21))));
 
         $this->assertEquals(Money::EUR(294), $order->tax());
+    }
+
+    /** @test */
+    function it_can_set_a_reference()
+    {
+        $order = new Order(OrderId::fromInteger(1));
+        $order->setReference(OrderReference::fromString(2));
+
+        $this->assertEquals(OrderReference::fromString(2),$order->reference());
     }
 }

@@ -14,15 +14,12 @@ final class Order implements StatefulContract
 {
     use PayableAndShippable;
 
-    /**
-     * Current state.
-     *
-     * @var string
-     */
     private $state;
 
     private $id;
     private $customerId;
+    private $orderReference;
+
     private $items;
     private $discounts; // order level applied discounts
     private $discountTotal;
@@ -171,5 +168,25 @@ final class Order implements StatefulContract
         // This tax is the default one for this order
         // TODO: determine the default tax!!!! Default tax is the one set by the admin
         // e.g. new OrderTaxRate($defaultTaxRate,$this);
+    }
+
+    public function reference(): OrderReference
+    {
+        if(!$this->hasReference())
+        {
+            throw new \RuntimeException('Requesting reference for order ['.$this->id()->get().'] but there is no reference set.');
+        }
+
+        return $this->orderReference;
+    }
+
+    public function hasReference(): bool
+    {
+        return !is_null($this->orderReference);
+    }
+
+    public function setReference(OrderReference $orderReference)
+    {
+        $this->orderReference = $orderReference;
     }
 }
