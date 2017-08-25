@@ -2,6 +2,7 @@
 
 namespace Thinktomorrow\Trader\Orders\Ports\Persistence;
 
+use Ramsey\Uuid\Uuid;
 use Thinktomorrow\Trader\Orders\Domain\Order;
 use Thinktomorrow\Trader\Orders\Domain\OrderId;
 use Thinktomorrow\Trader\Orders\Domain\OrderRepository;
@@ -89,5 +90,10 @@ class InMemoryOrderRepository implements OrderRepository
         }
 
         return $appliedDiscounts;
+    }
+
+    public function nextIdentity() : OrderId
+    {
+        return OrderId::fromString((string)Uuid::uuid4());
     }
 }

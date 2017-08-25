@@ -15,8 +15,10 @@ class OrderTest extends UnitTestCase
     public function orderId_is_a_valid_identifier()
     {
         $orderId = OrderId::fromInteger(2);
+        $orderId2 = OrderId::fromString(2);
 
         $this->assertEquals(2, $orderId->get());
+        $this->assertTrue($orderId->equals($orderId2));
     }
 
     /** @test */

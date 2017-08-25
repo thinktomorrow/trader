@@ -3,14 +3,14 @@
 namespace Thinktomorrow\Trader\Orders\Application\Reads\Cart;
 
 use Thinktomorrow\Trader\Discounts\Domain\AppliedDiscountCollection;
-use Thinktomorrow\Trader\Shipment\Domain\ShippingMethodId;
-use Thinktomorrow\Trader\Shipment\Domain\ShippingRuleId;
 
 /**
  * Order presenter for cart.
  */
 interface Cart
 {
+    public function empty(): bool;
+
     public function items(): array;
 
     public function discounts(): AppliedDiscountCollection;
