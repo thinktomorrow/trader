@@ -2,12 +2,17 @@
 
 namespace Thinktomorrow\Trader\Common\Domain\Price;
 
+use Assert\Assertion;
+
 class Percentage
 {
     private $value;
 
     private function __construct($value)
     {
+        Assertion::notNull($value);
+        Assertion::greaterOrEqualThan($value, 0);
+
         $this->value = $value;
     }
 

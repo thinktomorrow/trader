@@ -19,6 +19,12 @@ final class Item
     private $id;
 
     /**
+     * Indicate this model is already persisted
+     * @var bool
+     */
+    private $persisted = false;
+
+    /**
      * Quantity of item selection.
      *
      * @var int
@@ -52,12 +58,25 @@ final class Item
 
     public static function fromPurchasable(Purchasable $purchasable)
     {
+        // Note: ItemId is a reference to its persistence record so here we just pass
+        // a dummy value instead which will be overwritten as soon as item is stored
+        // TODO: actually refactor so that Item does not have a itemID needed anymore??? but instead an orderID offcourse
         return new self($purchasable->itemId(), $purchasable);
     }
 
     public function id(): ItemId
     {
         return $this->id;
+    }
+
+    public function persisted(): bool
+    {
+        return $this->persisted;
+    }
+
+    public function setPersisted()
+    {
+        $this->persisted = true;
     }
 
     public function quantity(): int
@@ -160,6 +179,11 @@ final class Item
     public function purchasable(): Purchasable
     {
         return $this->purchasable;
+    }
+
+    public function purchasableId(): string
+    {
+        return $this->purchasable()->purchasableId();
     }
 
     private function validateQuantity()

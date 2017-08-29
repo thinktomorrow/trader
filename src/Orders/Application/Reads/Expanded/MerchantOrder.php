@@ -7,6 +7,10 @@ namespace Thinktomorrow\Trader\Orders\Application\Reads\Expanded;
  */
 interface MerchantOrder
 {
+    public function id(): string;
+
+    public function reference(): string;
+
     public function items(): array;
 
     public function discounts(): array;

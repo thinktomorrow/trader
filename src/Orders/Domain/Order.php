@@ -16,9 +16,9 @@ final class Order implements StatefulContract
 
     private $state;
 
-    private $id;
+    private $id; // Used by application layer (this is a uuid)
+    private $persistenceId; // Used by persistence layer (db)
     private $customerId;
-    private $orderReference;
 
     private $items;
     private $discounts; // order level applied discounts
@@ -43,6 +43,21 @@ final class Order implements StatefulContract
     public function id(): OrderId
     {
         return $this->id;
+    }
+
+    public function isPersisted(): bool
+    {
+        return !is_null($this->persistenceId);
+    }
+
+    public function setPersistenceId(int $persistenceId)
+    {
+        $this->persistenceId = $persistenceId;
+    }
+
+    public function persistenceId(): int
+    {
+        return $this->persistenceId;
     }
 
     public function customerId(): CustomerId
@@ -168,25 +183,5 @@ final class Order implements StatefulContract
         // This tax is the default one for this order
         // TODO: determine the default tax!!!! Default tax is the one set by the admin
         // e.g. new OrderTaxRate($defaultTaxRate,$this);
-    }
-
-    public function reference(): OrderReference
-    {
-        if(!$this->hasReference())
-        {
-            throw new \RuntimeException('Requesting reference for order ['.$this->id()->get().'] but there is no reference set.');
-        }
-
-        return $this->orderReference;
-    }
-
-    public function hasReference(): bool
-    {
-        return !is_null($this->orderReference);
-    }
-
-    public function setReference(OrderReference $orderReference)
-    {
-        $this->orderReference = $orderReference;
     }
 }

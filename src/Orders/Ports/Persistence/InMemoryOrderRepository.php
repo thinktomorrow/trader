@@ -21,6 +21,18 @@ class InMemoryOrderRepository implements OrderRepository
         throw new \RuntimeException('No order found by id ['.$orderId->get().']');
     }
 
+    public function findOrCreate(OrderId $orderId): Order
+    {
+        if (isset(self::$collection[(string) $orderId])) {
+            return self::$collection[(string) $orderId];
+        }
+
+        $order = new Order($this->nextIdentity());
+        $this->add($order);
+
+        return $order;
+    }
+
     public function add(Order $order)
     {
         self::$collection[(string) $order->id()] = $order;

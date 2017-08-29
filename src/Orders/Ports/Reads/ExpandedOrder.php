@@ -12,6 +12,11 @@ class ExpandedOrder extends AbstractPresenter implements MerchantOrder
 {
     use CommonOrderValues;
 
+    public function id(): string
+    {
+        return $this->getValue('id');
+    }
+
     public function reference(): string
     {
         return $this->getValue('reference');

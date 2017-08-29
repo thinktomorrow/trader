@@ -23,6 +23,16 @@ class Cart implements CartContract
         $this->order = $order;
     }
 
+    public function id(): string
+    {
+        return $this->order->id()->get();
+    }
+
+    public function reference(): string
+    {
+        return $this->order->hasReference() ? $this->order->reference()->get() : '';
+    }
+
     public function empty(): bool
     {
         return empty($this->items());
@@ -77,7 +87,17 @@ class Cart implements CartContract
 
     public function taxRates(): array
     {
-        // TODO: Implement taxRates() method.
+        $taxRates = [];
+        foreach($this->order->taxRates() as $percent => $taxRate)
+        {
+            $taxRates[$percent] = [
+                'percent' => $taxRate['percent']->asPercent(),
+                'total' => Cash::from($taxRate['total'])->locale(),
+                'tax' => Cash::from($taxRate['tax'])->locale(),
+            ];
+        }
+
+        return $taxRates;
     }
 
     public function discountTotal(): string

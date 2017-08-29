@@ -3,6 +3,7 @@
 namespace Thinktomorrow\Trader\Orders\Ports\Reads;
 
 use Thinktomorrow\Trader\Common\Domain\Price\Cash;
+use Thinktomorrow\Trader\Common\Ports\Web\GetDynamicValue;
 use Thinktomorrow\Trader\Orders\Application\Reads\Cart\CartItem as CartItemContract;
 use Thinktomorrow\Trader\Orders\Domain\Item;
 
@@ -14,6 +15,8 @@ use Thinktomorrow\Trader\Orders\Domain\Item;
  */
 class CartItem implements CartItemContract
 {
+    use GetDynamicValue;
+
     /**
      * @var Item
      */
@@ -49,6 +52,11 @@ class CartItem implements CartItemContract
         return Cash::from($this->item->price())->locale();
     }
 
+    public function saleprice(): string
+    {
+        return Cash::from($this->item->salePrice())->locale();
+    }
+
     public function subtotal(): string
     {
         return Cash::from($this->item->subtotal())->locale();
@@ -62,11 +70,6 @@ class CartItem implements CartItemContract
     public function discounts(): array
     {
         return $this->item->discounts();
-    }
-
-    public function saleprice(): string
-    {
-        // TODO: Implement saleprice() method.
     }
 
     public function taxRate(): string

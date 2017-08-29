@@ -25,6 +25,18 @@ class OrderRepositoryTest extends UnitTestCase
     }
 
     /** @test */
+    public function it_can_find_or_create_an_order()
+    {
+        $order = $this->makeOrder(0, 3);
+
+        $repo = new InMemoryOrderRepository();
+        $repo->add($order);
+
+        $this->assertEquals($order, $repo->findOrCreate(OrderId::fromInteger(3)));
+        $this->assertNotEquals($order, $repo->findOrCreate(OrderId::fromInteger(4)));
+    }
+
+    /** @test */
     public function it_can_get_next_identity()
     {
         $repo = new InMemoryOrderRepository();
@@ -36,20 +48,6 @@ class OrderRepositoryTest extends UnitTestCase
         // Check valid UUID
         $UUIDv4 = '/^[0-9A-F]{8}-[0-9A-F]{4}-4[0-9A-F]{3}-[89AB][0-9A-F]{3}-[0-9A-F]{12}$/i';
         $this->assertTrue((bool) preg_match($UUIDv4, $id->get()));
-    }
-
-    /** @test */
-    public function it_can_get_next_reference()
-    {
-        $repo = new InMemoryOrderRepository();
-
-        $reference = $repo->nextReference();
-
-        $this->assertInstanceOf(OrderReference::class, $reference);
-
-        // Check valid UUID
-        $UUIDv4 = '/^[0-9A-F]{8}-[0-9A-F]{4}-4[0-9A-F]{3}-[89AB][0-9A-F]{3}-[0-9A-F]{12}$/i';
-        $this->assertTrue((bool) preg_match($UUIDv4, $reference->get()));
     }
 
     /** @test */

@@ -9,6 +9,10 @@ use Thinktomorrow\Trader\Discounts\Domain\AppliedDiscountCollection;
  */
 interface Cart
 {
+    public function id(): string;
+
+    public function reference(): string;
+
     public function empty(): bool;
 
     public function items(): array;

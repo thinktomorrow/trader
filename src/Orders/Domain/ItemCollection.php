@@ -43,13 +43,13 @@ class ItemCollection implements \ArrayAccess, \Countable, \IteratorAggregate
 
     public function add(Item $item, $quantity = 1)
     {
-        if (isset($this->items[$item->id()->get()])) {
-            $this->items[$item->id()->get()]->add($quantity);
+        if (isset($this->items[$item->purchasableId()])) {
+            $this->items[$item->purchasableId()]->add($quantity);
 
             return;
         }
 
-        $this->items[$item->id()->get()] = $item;
+        $this->items[$item->purchasableId()] = $item;
 
         // Quantify newly added item
         if ($quantity > 1) {
