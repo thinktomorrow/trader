@@ -21,7 +21,7 @@ class ItemWhitelistTest extends UnitTestCase
     /** @test */
     public function passed_value_must_be_an_array_of_ids()
     {
-        $this->setExpectedException(\InvalidArgumentException::class);
+        $this->expectException(\InvalidArgumentException::class);
 
         (new ItemWhitelist())->setParameters(['purchasable_ids' => 'foobar']);
     }

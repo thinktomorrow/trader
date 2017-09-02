@@ -75,16 +75,19 @@ class OrderAssemblerTest extends FeatureTestCase
     /** @test */
     public function it_should_only_assemble_ongoing_orders()
     {
+        $this->markTestIncomplete();
     }
 
     /** @test */
     public function it_should_not_emit_events_during_assembly()
     {
+        $this->markTestIncomplete();
     }
 
     /** @test */
     public function non_allowed_discount_should_be_reapplied()
     {
+        $this->markTestIncomplete();
     }
 
     private function addDummyOrder($id)

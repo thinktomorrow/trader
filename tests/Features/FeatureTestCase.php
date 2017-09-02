@@ -2,18 +2,18 @@
 
 namespace Thinktomorrow\Trader\Tests\Features;
 
-use PHPUnit_Framework_TestCase;
+use PHPUnit\Framework\TestCase;
 use Thinktomorrow\Trader\Discounts\Application\Reads\Discount;
 use Thinktomorrow\Trader\Orders\Application\OrderAssembler;
 use Thinktomorrow\Trader\Orders\Application\Reads\Cart\Cart;
-use Thinktomorrow\Trader\Orders\Application\Reads\Expanded\MerchantItem;
-use Thinktomorrow\Trader\Orders\Application\Reads\Expanded\MerchantOrder;
+use Thinktomorrow\Trader\Orders\Application\Reads\Merchant\MerchantItem as MerchantItemContract;
+use Thinktomorrow\Trader\Orders\Application\Reads\Merchant\MerchantOrder as MerchantOrderContract;
 use Thinktomorrow\Trader\Orders\Ports\Persistence\InMemoryOrderRepository;
-use Thinktomorrow\Trader\Orders\Ports\Reads\ExpandedItem;
-use Thinktomorrow\Trader\Orders\Ports\Reads\ExpandedOrder;
+use Thinktomorrow\Trader\Orders\Ports\Reads\MerchantItem;
+use Thinktomorrow\Trader\Orders\Ports\Reads\MerchantOrder;
 use Thinktomorrow\Trader\Tests\IlluminateContainer;
 
-class FeatureTestCase extends PHPUnit_Framework_TestCase
+class FeatureTestCase extends TestCase
 {
     protected $container;
 
@@ -36,16 +36,16 @@ class FeatureTestCase extends PHPUnit_Framework_TestCase
             return new InMemoryOrderRepository();
         });
 
-        $this->container->bind(MerchantOrder::class, function ($c) {
-            return new ExpandedOrder();
+        $this->container->bind(MerchantOrderContract::class, function ($c) {
+            return new MerchantOrder();
+        });
+
+        $this->container->bind(MerchantItemContract::class, function ($c) {
+            return new MerchantItem();
         });
 
         $this->container->bind(Cart::class, function ($c, $params) {
             return new \Thinktomorrow\Trader\Orders\Ports\Reads\Cart($params[0]);
-        });
-
-        $this->container->bind(MerchantItem::class, function ($c) {
-            return new ExpandedItem();
         });
 
         $this->container->bind(Discount::class, function ($c) {

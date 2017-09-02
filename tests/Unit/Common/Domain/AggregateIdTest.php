@@ -20,9 +20,18 @@ class AggregateIdTest extends UnitTestCase
     }
 
     /** @test */
+    public function it_can_be_set_from_string()
+    {
+        $id = DummyId::fromString('foobar');
+
+        $this->assertEquals('foobar', $id->get());
+        $this->assertInternalType('string', $id->get());
+    }
+
+    /** @test */
     public function it_cannot_set_by_other_type_than_integer()
     {
-        $this->setExpectedException(TypeError::class);
+        $this->expectException(TypeError::class);
 
         DummyId::fromInteger('foobar');
     }

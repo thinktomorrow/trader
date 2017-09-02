@@ -36,7 +36,7 @@ class OrderStateMachineTest extends UnitTestCase
     /** @test */
     public function it_cannot_change_to_invalid_state_directly()
     {
-        $this->setExpectedException(StateException::class);
+        $this->expectException(StateException::class);
 
         $this->order->changeState('foobar');
     }
@@ -52,7 +52,7 @@ class OrderStateMachineTest extends UnitTestCase
     /** @test */
     public function it_only_allows_transition_to_allowed_state()
     {
-        $this->setExpectedException(StateException::class);
+        $this->expectException(StateException::class);
 
         $this->order->changeState('confirmed');
     }

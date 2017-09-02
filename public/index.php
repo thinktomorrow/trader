@@ -2,7 +2,7 @@
 
 use App\Product;
 use Thinktomorrow\Trader\Common\Domain\Price\Percentage;
-use Thinktomorrow\Trader\Common\Ports\App\DescriptionRender;
+use Thinktomorrow\Trader\Tests\Unit\Stubs\InMemoryDescriptionRender;
 use Thinktomorrow\Trader\Discounts\Application\ApplyDiscountsToOrder;
 use Thinktomorrow\Trader\Discounts\Domain\DiscountCollection;
 use Thinktomorrow\Trader\Discounts\Domain\DiscountFactory;
@@ -99,7 +99,7 @@ $order->items()->add(
                             <p><?= $item->description() ?></p>
                             <?php if ($item->discounts()->any()): ?>
                                 <?php foreach ($item->discounts() as $discount): ?>
-                                    <p><?= (new DescriptionRender())->locale($discount->description()) ?></p>
+                                    <p><?= (new InMemoryDescriptionRender())->locale($discount->description()) ?></p>
                                     <p>Korting van: <?= (new \Thinktomorrow\Trader\Common\Domain\Price\Cash())->locale($discount->amount()) ?></p>
                                 <?php endforeach; ?>
                             <?php endif; ?>

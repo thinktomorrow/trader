@@ -6,13 +6,17 @@ use Assert\Assertion;
 use Thinktomorrow\Trader\Common\Domain\Price\Cash;
 use Thinktomorrow\Trader\Common\Domain\Price\Percentage;
 use Thinktomorrow\Trader\Discounts\Domain\DiscountFactory;
-use Thinktomorrow\Trader\Orders\Application\Reads\Expanded\MerchantOrderFactory;
 use Thinktomorrow\Trader\Orders\Domain\CustomerId;
 use Thinktomorrow\Trader\Orders\Domain\Item as DomainItem;
 use Thinktomorrow\Trader\Orders\Domain\Order as DomainOrder;
 use Thinktomorrow\Trader\Orders\Domain\OrderId;
-use Thinktomorrow\Trader\Orders\Ports\Reads\ExpandedItem;
-use Thinktomorrow\Trader\Orders\Ports\Reads\ExpandedOrder;
+
+use Thinktomorrow\Trader\Orders\Application\Reads\Merchant\MerchantOrderFactory;
+use Thinktomorrow\Trader\Orders\Application\Reads\Merchant\MerchantItem as MerchantItemContract;
+use Thinktomorrow\Trader\Orders\Application\Reads\Merchant\MerchantOrder as MerchantOrderContract;
+use Thinktomorrow\Trader\Orders\Ports\Reads\MerchantItem;
+use Thinktomorrow\Trader\Orders\Ports\Reads\MerchantOrder;
+
 use Thinktomorrow\Trader\Tests\InMemoryContainer;
 use Thinktomorrow\Trader\Tests\Unit\Stubs\PurchasableStub;
 
@@ -21,7 +25,7 @@ class MerchantOrderFactoryTest extends FeatureTestCase
     /** @test */
     public function it_can_resolve_order_for_merchant()
     {
-        $this->assertInstanceOf(ExpandedOrder::class, $this->assembleMerchantOrder());
+        $this->assertInstanceOf(MerchantOrderContract::class, $this->assembleMerchantOrder());
     }
 
     /** @test */
@@ -44,13 +48,13 @@ class MerchantOrderFactoryTest extends FeatureTestCase
         $merchantOrder = $this->assembleMerchantOrder();
 
         $this->assertCount(2, $merchantOrder->items());
-        $this->assertTrue(Assertion::allIsInstanceOf($merchantOrder->items(), ExpandedItem::class));
+        $this->assertTrue(Assertion::allIsInstanceOf($merchantOrder->items(), MerchantItemContract::class));
     }
 
     /**
-     * @return ExpandedOrder
+     * @return MerchantOrder
      */
-    private function assembleMerchantOrder(): ExpandedOrder
+    private function assembleMerchantOrder(): MerchantOrder
     {
         $this->addDummyOrder(1);
 

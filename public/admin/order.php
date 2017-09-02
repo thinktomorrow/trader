@@ -4,7 +4,7 @@ use Money\Money;
 use Thinktomorrow\Trader\Common\Domain\Price\Cash;
 use Thinktomorrow\Trader\Common\Domain\Price\Percentage;
 use Thinktomorrow\Trader\Discounts\Domain\DiscountFactory;
-use Thinktomorrow\Trader\Orders\Application\Reads\Expanded\MerchantOrderFactory;
+use Thinktomorrow\Trader\Orders\Application\Reads\Merchant\MerchantOrderFactory;
 use Thinktomorrow\Trader\Orders\Domain\Item;
 use Thinktomorrow\Trader\Orders\Ports\Persistence\InMemoryOrderRepository;
 use Thinktomorrow\Trader\Tests\InMemoryContainer;

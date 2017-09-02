@@ -17,7 +17,7 @@ class PeriodTest extends UnitTestCase
     /** @test */
     public function passed_date_must_be_a_dateTime()
     {
-        $this->setExpectedException(\InvalidArgumentException::class);
+        $this->expectException(\InvalidArgumentException::class);
 
         (new Period())->setParameters(['start_at' => 'foobar']);
     }

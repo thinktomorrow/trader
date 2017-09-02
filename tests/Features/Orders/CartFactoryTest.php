@@ -52,11 +52,11 @@ class CartFactoryTest extends FeatureTestCase
      */
     private function assembleCart(): Cart
     {
-        $this->addDummyOrder(1);
+        $order = $this->addDummyOrder(1);
 
         $assembler = new CartFactory($this->container('orderRepository'), $this->container);
 
-        return $assembler->create(1);
+        return $assembler->create($order);
     }
 
     private function addDummyOrder($id)
@@ -74,5 +74,7 @@ class CartFactoryTest extends FeatureTestCase
         $order->setTaxPercentage(Percentage::fromPercent(21));
 
         $this->container('orderRepository')->add($order);
+
+        return $order;
     }
 }

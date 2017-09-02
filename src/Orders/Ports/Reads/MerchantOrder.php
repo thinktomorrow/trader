@@ -3,9 +3,31 @@
 namespace Thinktomorrow\Trader\Orders\Ports\Reads;
 
 use Thinktomorrow\Trader\Common\Domain\Price\Cash;
+use Thinktomorrow\Trader\Common\Ports\Web\AbstractPresenter;
+use Thinktomorrow\Trader\Orders\Application\Reads\Merchant\MerchantOrder as MerchantOrderContract;
 
-trait CommonOrderValues
+/**
+ * Order presenter for merchant.
+ */
+class MerchantOrder extends AbstractPresenter implements MerchantOrderContract
 {
+    public function id(): string
+    {
+        return $this->getValue('id');
+    }
+
+    public function reference(): string
+    {
+        return $this->getValue('reference');
+    }
+
+    public function confirmedAt(): string
+    {
+        return $this->getValue('confirmed_at', null, function ($confirmedAt) {
+            return $confirmedAt->format('d/m/Y H:i');
+        });
+    }
+
     public function items(): array
     {
         return $this->getValue('items', []);

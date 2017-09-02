@@ -19,17 +19,13 @@
         "psr/container": "^1.0",
         "beberlei/assert": "^2.7",
         "winzou/state-machine": "^0.3.2",
-        "Illuminate/Contracts": "dev-master@dev",
+        "Illuminate/Contracts": "~5.4",
         "ramsey/uuid": "^3.7"
     },
     "require-dev": {
-        "phpunit/phpunit" : "4.*",
-        "scrutinizer/ocular": "~1.1",
-        "mockery/mockery" : "~0.9",
-        "league/container": "^2.4",
-        "pimple/pimple": "^3.2",
-        "GromNaN/pimple-interop": "^1.0",
-        "illuminate/container": "dev-master@dev"
+        "phpunit/phpunit" : "~6.2",
+        "scrutinizer/ocular": "~1.4",
+        "illuminate/container": "~5.5"
     },
     "autoload": {
         "psr-4": {

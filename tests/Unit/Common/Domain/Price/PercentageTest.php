@@ -28,7 +28,7 @@ class PercentageTest extends UnitTestCase
     /** @test */
     public function value_must_be_given()
     {
-        $this->setExpectedException(\InvalidArgumentException::class);
+        $this->expectException(\InvalidArgumentException::class);
 
         Percentage::fromPercent(null);
     }
@@ -42,7 +42,7 @@ class PercentageTest extends UnitTestCase
     /** @test */
     public function value_cannot_be_below_zero()
     {
-        $this->setExpectedException(\InvalidArgumentException::class);
+        $this->expectException(\InvalidArgumentException::class);
 
         Percentage::fromPercent(-2);
     }

@@ -64,7 +64,7 @@ class OrderTest extends UnitTestCase
     /** @test */
     function retrieving_customer_when_there_is_none_fails()
     {
-        $this->setExpectedException(\RuntimeException::class,'customer');
+        $this->expectException(\RuntimeException::class,'customer');
 
         $order = new Order(OrderId::fromInteger(1));
 

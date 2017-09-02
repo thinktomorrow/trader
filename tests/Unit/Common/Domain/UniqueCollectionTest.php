@@ -84,7 +84,7 @@ class UniqueCollectionTest extends UnitTestCase
     /** @test */
     public function it_can_only_set_item_by_key_if_it_matches_the_identifier()
     {
-        $this->setExpectedException(\InvalidArgumentException::class);
+        $this->expectException(\InvalidArgumentException::class);
 
         $collection = $this->getCollection();
         $collection[3] = $discount = $this->makeDiscount(4);
@@ -93,7 +93,7 @@ class UniqueCollectionTest extends UnitTestCase
     /** @test */
     public function key_must_be_valid_object_identifier()
     {
-        $this->setExpectedException(InvalidArgumentException::class);
+        $this->expectException(InvalidArgumentException::class);
 
         $collection = $this->getCollection();
         $collection[3] = 'foobar';
@@ -102,7 +102,7 @@ class UniqueCollectionTest extends UnitTestCase
     /** @test */
     public function setting_item_must_have_explicit_key()
     {
-        $this->setExpectedException(InvalidArgumentException::class);
+        $this->expectException(InvalidArgumentException::class);
 
         $collection = $this->getCollection();
         $collection[] = $this->makeDiscount(4);

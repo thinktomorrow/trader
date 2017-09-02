@@ -3,7 +3,7 @@
 namespace Thinktomorrow\Trader\Tests\Unit;
 
 use Money\Money;
-use PHPUnit_Framework_TestCase;
+use PHPUnit\Framework\TestCase;
 use Thinktomorrow\Trader\Common\Domain\Price\Percentage;
 use Thinktomorrow\Trader\Discounts\Domain\DiscountFactory;
 use Thinktomorrow\Trader\Orders\Domain\CustomerId;
@@ -14,7 +14,7 @@ use Thinktomorrow\Trader\Orders\Domain\OrderReference;
 use Thinktomorrow\Trader\Tests\InMemoryContainer;
 use Thinktomorrow\Trader\Tests\Unit\Stubs\PurchasableStub;
 
-class UnitTestCase extends PHPUnit_Framework_TestCase
+class UnitTestCase extends TestCase
 {
     protected function makeOrder($subtotalAmount = 0, $id = 2)
     {

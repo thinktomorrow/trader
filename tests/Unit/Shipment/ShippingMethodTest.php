@@ -33,7 +33,7 @@ class ShippingMethodTest extends UnitTestCase
     /** @test */
     public function it_only_accepts_collection_with_valid_shippingrule_instances()
     {
-        $this->setExpectedException(InvalidArgumentException::class);
+        $this->expectException(InvalidArgumentException::class);
 
         new ShippingMethod(ShippingMethodId::fromInteger(2), ['foobar']);
     }

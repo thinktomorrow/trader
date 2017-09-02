@@ -4,9 +4,9 @@ namespace Thinktomorrow\Trader\Orders\Ports\Reads;
 
 use Thinktomorrow\Trader\Common\Domain\Price\Cash;
 use Thinktomorrow\Trader\Common\Ports\Web\AbstractPresenter;
-use Thinktomorrow\Trader\Orders\Application\Reads\Expanded\MerchantItem;
+use Thinktomorrow\Trader\Orders\Application\Reads\Merchant\MerchantItem as MerchantItemContract;
 
-class ExpandedItem extends AbstractPresenter implements MerchantItem
+class MerchantItem extends AbstractPresenter implements MerchantItemContract
 {
     public function quantity(): int
     {

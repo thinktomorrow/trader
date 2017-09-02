@@ -16,6 +16,6 @@ trait ResolvesFromContainer
             $parameters = [$parameters];
         }
 
-        return $this->container->makeWith($class, $parameters);
+        return $this->container->make($class, $parameters);
     }
 }
