@@ -3,6 +3,7 @@
 namespace Thinktomorrow\Trader\Orders\Ports\Persistence;
 
 use Ramsey\Uuid\Uuid;
+use Thinktomorrow\Trader\Orders\Domain\Exceptions\OrderNotFound;
 use Thinktomorrow\Trader\Orders\Domain\Order;
 use Thinktomorrow\Trader\Orders\Domain\OrderId;
 use Thinktomorrow\Trader\Orders\Domain\OrderReference;
@@ -18,7 +19,7 @@ class InMemoryOrderRepository implements OrderRepository
             return self::$collection[(string) $orderId];
         }
 
-        throw new \RuntimeException('No order found by id ['.$orderId->get().']');
+        throw new OrderNotFound('No order found by id ['.$orderId->get().']');
     }
 
     public function findOrCreate(OrderId $orderId): Order
@@ -46,7 +47,7 @@ class InMemoryOrderRepository implements OrderRepository
     public function getValues(OrderId $orderId): array
     {
         if (!isset(self::$collection[(string) $orderId])) {
-            throw new \RuntimeException('Order not found by id ['.$orderId->get().']');
+            throw new OrderNotFound('Order not found by id ['.$orderId->get().']');
         }
 
         $order = self::$collection[(string) $orderId];

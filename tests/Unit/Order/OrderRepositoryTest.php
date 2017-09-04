@@ -4,6 +4,7 @@ namespace Thinktomorrow\Trader\Tests\Unit;
 
 use Money\Money;
 use Thinktomorrow\Trader\Common\Domain\Price\Percentage;
+use Thinktomorrow\Trader\Orders\Domain\Exceptions\OrderNotFound;
 use Thinktomorrow\Trader\Orders\Domain\Item;
 use Thinktomorrow\Trader\Orders\Domain\OrderId;
 use Thinktomorrow\Trader\Orders\Domain\OrderReference;
@@ -53,7 +54,7 @@ class OrderRepositoryTest extends UnitTestCase
     /** @test */
     public function it_throws_exception_if_order_does_not_exist()
     {
-        $this->expectException(\RuntimeException::class, 'No order found');
+        $this->expectException(OrderNotFound::class, 'No order found');
 
         $repo = new InMemoryOrderRepository();
         $repo->find(OrderId::fromInteger(9));
