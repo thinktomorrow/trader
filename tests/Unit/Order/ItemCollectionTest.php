@@ -70,7 +70,7 @@ class ItemCollectionTest extends UnitTestCase
         $item = Item::fromPurchasable(new PurchasableStub(99));
         $itemCollection->add($item, 3);
 
-        $itemCollection->replace($item, 5);
+        $itemCollection->replace($item->purchasableId(), 5);
 
         $this->assertEquals(1, $itemCollection->size());
         $this->assertEquals(5, $item->quantity());
@@ -84,7 +84,7 @@ class ItemCollectionTest extends UnitTestCase
         $item = Item::fromPurchasable(new PurchasableStub(99));
         $itemCollection->add($item, 3);
 
-        $itemCollection->replace($item, -2);
+        $itemCollection->replace($item->purchasableId(), -2);
 
         $this->assertEquals(0, $itemCollection->size());
         $this->assertEquals(0, $item->quantity());
@@ -98,7 +98,7 @@ class ItemCollectionTest extends UnitTestCase
         $itemCollection = new ItemCollection();
         $item = Item::fromPurchasable(new PurchasableStub(99));
 
-        $itemCollection->replace($item, 5);
+        $itemCollection->replace($item->purchasableId(), 5);
     }
 
     /** @test */

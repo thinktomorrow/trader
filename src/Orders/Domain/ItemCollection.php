@@ -34,8 +34,13 @@ class ItemCollection implements \ArrayAccess, \Countable, \IteratorAggregate
 
     public function find(ItemId $id)
     {
+        //TODO: this should be refactored to use the purchasableID because itemID is specific to a unique item
+        // in history, while purchasable can group all records per purchasable record.
         if (!isset($this->items[$id->get()])) {
+
             return;
+            // TODO make this an exception instead of just returning void no?
+            //            throw new \DomainException('Item by purchasable id '.$id->get().' not found');
         }
 
         return $this->items[$id->get()];
@@ -64,21 +69,30 @@ class ItemCollection implements \ArrayAccess, \Countable, \IteratorAggregate
         }
     }
 
-    public function replace(Item $item, $quantity)
+    public function replace(int $purchasableId, $quantity)
     {
-        if ( ! isset($this->items[$item->purchasableId()])) {
-            throw new \InvalidArgumentException('Order does not contain given item by id ['.$item->purchasableId().']');
+        if ( ! isset($this->items[$purchasableId])) {
+            throw new \InvalidArgumentException('Order does not contain given item by id ['.$purchasableId.']');
         }
 
+        // Remove from collection entirely
+        if($quantity < 1) return $this->remove($purchasableId);
+
+        $item = $this->find(ItemId::fromString($purchasableId));
+        $item->remove($item->quantity());
+        $this->add($item, $quantity);
+    }
+
+    public function remove(int $purchasableId)
+    {
+        if ( ! isset($this->items[$purchasableId])) {
+            throw new \InvalidArgumentException('Order does not contain given item by id ['.$purchasableId.']');
+        }
+
+        $item = $this->find(ItemId::fromString($purchasableId));
         $item->remove($item->quantity());
 
-        if($quantity < 1)
-        {
-            unset($this->items[$item->purchasableId()]);
-            return;
-        }
-
-        $item->add($quantity);
+        unset($this->items[$purchasableId]);
     }
 
     public function offsetExists($offset)
