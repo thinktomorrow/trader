@@ -64,6 +64,23 @@ class ItemCollection implements \ArrayAccess, \Countable, \IteratorAggregate
         }
     }
 
+    public function replace(Item $item, $quantity)
+    {
+        if ( ! isset($this->items[$item->purchasableId()])) {
+            throw new \InvalidArgumentException('Order does not contain given item by id ['.$item->purchasableId().']');
+        }
+
+        $item->remove($item->quantity());
+
+        if($quantity < 1)
+        {
+            unset($this->items[$item->purchasableId()]);
+            return;
+        }
+
+        $item->add($quantity);
+    }
+
     public function offsetExists($offset)
     {
         if (!is_string($offset) && !is_int($offset)) {

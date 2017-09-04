@@ -64,6 +64,44 @@ class ItemCollectionTest extends UnitTestCase
     }
 
     /** @test */
+    public function it_can_replace_an_item_quantity()
+    {
+        $itemCollection = new ItemCollection();
+        $item = Item::fromPurchasable(new PurchasableStub(99));
+        $itemCollection->add($item, 3);
+
+        $itemCollection->replace($item, 5);
+
+        $this->assertEquals(1, $itemCollection->size());
+        $this->assertEquals(5, $item->quantity());
+        $this->assertEquals(5, $itemCollection->all()[99]->quantity());
+    }
+
+    /** @test */
+    public function item_below_zero_removes_item()
+    {
+        $itemCollection = new ItemCollection();
+        $item = Item::fromPurchasable(new PurchasableStub(99));
+        $itemCollection->add($item, 3);
+
+        $itemCollection->replace($item, -2);
+
+        $this->assertEquals(0, $itemCollection->size());
+        $this->assertEquals(0, $item->quantity());
+    }
+
+    /** @test */
+    public function it_cannot_replace_a_non_existing_item()
+    {
+        $this->expectException(\InvalidArgumentException::class);
+
+        $itemCollection = new ItemCollection();
+        $item = Item::fromPurchasable(new PurchasableStub(99));
+
+        $itemCollection->replace($item, 5);
+    }
+
+    /** @test */
     public function it_can_find_an_item_by_id()
     {
         $itemCollection = new ItemCollection();
