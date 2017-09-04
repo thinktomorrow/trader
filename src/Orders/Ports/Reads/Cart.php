@@ -38,6 +38,11 @@ class Cart implements CartContract
         return empty($this->items());
     }
 
+    public function size(): int
+    {
+        return count($this->items());
+    }
+
     public function subtotal(): string
     {
         return Cash::from($this->order->subtotal())->locale();

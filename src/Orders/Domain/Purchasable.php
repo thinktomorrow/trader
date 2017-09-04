@@ -8,7 +8,7 @@ use Thinktomorrow\Trader\Tax\Domain\TaxId;
 
 interface Purchasable
 {
-    public function purchasableId(): int;
+    public function purchasableId(): PurchasableId;
 
     /**
      * String representation of the purchasable object.
@@ -22,7 +22,7 @@ interface Purchasable
      *
      * @return ItemId
      */
-    public function itemId(): ItemId;
+    //public function itemId(): ItemId;
 
     /**
      * Collection of item details. Here you pass

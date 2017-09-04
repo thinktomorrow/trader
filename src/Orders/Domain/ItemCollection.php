@@ -32,15 +32,17 @@ class ItemCollection implements \ArrayAccess, \Countable, \IteratorAggregate
         return count($this->items);
     }
 
-    public function find(ItemId $id)
+    /**
+     * the purchasableID is the reference of an item because cart items are grouped per purchasable
+     * while ItemID is specific to a unique item in history and represents the persisted id.
+     *
+     * @param PurchasableId $id
+     * @return mixed|void
+     */
+    public function find(PurchasableId $id)
     {
-        //TODO: this should be refactored to use the purchasableID because itemID is specific to a unique item
-        // in history, while purchasable can group all records per purchasable record.
         if (!isset($this->items[$id->get()])) {
-
-            return;
-            // TODO make this an exception instead of just returning void no?
-            //            throw new \DomainException('Item by purchasable id '.$id->get().' not found');
+            return null;
         }
 
         return $this->items[$id->get()];
@@ -48,13 +50,13 @@ class ItemCollection implements \ArrayAccess, \Countable, \IteratorAggregate
 
     public function add(Item $item, $quantity = 1)
     {
-        if (isset($this->items[$item->purchasableId()])) {
-            $this->items[$item->purchasableId()]->add($quantity);
+        if (isset($this->items[$item->purchasableId()->get()])) {
+            $this->items[$item->purchasableId()->get()]->add($quantity);
 
             return;
         }
 
-        $this->items[$item->purchasableId()] = $item;
+        $this->items[$item->purchasableId()->get()] = $item;
 
         // Quantify newly added item
         if ($quantity > 1) {
@@ -69,30 +71,30 @@ class ItemCollection implements \ArrayAccess, \Countable, \IteratorAggregate
         }
     }
 
-    public function replace(int $purchasableId, $quantity)
+    public function replace(PurchasableId $purchasableId, $quantity)
     {
-        if ( ! isset($this->items[$purchasableId])) {
+        if ( ! isset($this->items[$purchasableId->get()])) {
             throw new \InvalidArgumentException('Order does not contain given item by id ['.$purchasableId.']');
         }
 
         // Remove from collection entirely
         if($quantity < 1) return $this->remove($purchasableId);
 
-        $item = $this->find(ItemId::fromString($purchasableId));
+        $item = $this->find($purchasableId);
         $item->remove($item->quantity());
         $this->add($item, $quantity);
     }
 
-    public function remove(int $purchasableId)
+    public function remove(PurchasableId $purchasableId)
     {
-        if ( ! isset($this->items[$purchasableId])) {
+        if ( ! isset($this->items[$purchasableId->get()])) {
             throw new \InvalidArgumentException('Order does not contain given item by id ['.$purchasableId.']');
         }
 
-        $item = $this->find(ItemId::fromString($purchasableId));
+        $item = $this->find($purchasableId);
         $item->remove($item->quantity());
 
-        unset($this->items[$purchasableId]);
+        unset($this->items[$purchasableId->get()]);
     }
 
     public function offsetExists($offset)

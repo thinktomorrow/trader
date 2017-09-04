@@ -9,6 +9,7 @@ use Thinktomorrow\Trader\Discounts\Domain\DiscountId;
 use Thinktomorrow\Trader\Discounts\Domain\Types\PercentageOffItemDiscount;
 use Thinktomorrow\Trader\Orders\Domain\Item;
 use Thinktomorrow\Trader\Orders\Domain\ItemId;
+use Thinktomorrow\Trader\Orders\Domain\PurchasableId;
 use Thinktomorrow\Trader\Tests\Unit\Stubs\PurchasableStub;
 
 class PercentageOffItemTest extends UnitTestCase
@@ -25,8 +26,8 @@ class PercentageOffItemTest extends UnitTestCase
 
         $discount->apply($order);
 
-        $this->assertCount(1, $order->items()->find(ItemId::fromInteger(20))->discounts());
-        $this->assertInstanceOf(AppliedDiscount::class, $order->items()->find(ItemId::fromInteger(20))->discounts()[1]);
+        $this->assertCount(1, $order->items()->find(PurchasableId::fromInteger(20))->discounts());
+        $this->assertInstanceOf(AppliedDiscount::class, $order->items()->find(PurchasableId::fromInteger(20))->discounts()[1]);
     }
 
     /** @test */

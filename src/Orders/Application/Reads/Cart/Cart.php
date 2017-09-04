@@ -11,6 +11,8 @@ interface Cart
 {
     public function id(): string;
 
+    public function size(): int;
+
     public function reference(): string;
 
     public function empty(): bool;

@@ -5,7 +5,7 @@ namespace Thinktomorrow\Trader\Tests\Features;
 use Money\Money;
 use Thinktomorrow\Trader\Common\Domain\Price\Percentage;
 use Thinktomorrow\Trader\Orders\Domain\Item;
-use Thinktomorrow\Trader\Orders\Domain\ItemId;
+use Thinktomorrow\Trader\Orders\Domain\PurchasableId;
 use Thinktomorrow\Trader\Orders\Ports\Persistence\InMemoryOrderRepository;
 use Thinktomorrow\Trader\Tax\Application\ApplyTaxRatesToOrder;
 use Thinktomorrow\Trader\Tax\Domain\TaxId;
@@ -33,7 +33,7 @@ class ApplyTaxRatesToOrderTest extends UnitTestCase
 
         (new ApplyTaxRatesToOrder(new InMemoryOrderRepository(), new InMemoryTaxRateRepository()))->handle($order->id());
 
-        $this->assertEquals(Percentage::fromPercent(10), $order->items()->find(ItemId::fromInteger(20))->taxRate());
+        $this->assertEquals(Percentage::fromPercent(10), $order->items()->find(PurchasableId::fromInteger(20))->taxRate());
         //$this->assertEquals(Money::EUR(240)->multiply(0.8), $order->total());
     }
 }

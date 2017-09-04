@@ -16,7 +16,7 @@ class ItemWhitelist extends BaseCondition implements Condition, ItemCondition
             return true;
         }
 
-        return in_array($item->id()->get(), $this->parameters['purchasable_ids']);
+        return in_array($item->purchasableId()->get(), $this->parameters['purchasable_ids']);
     }
 
     protected function validateParameters(array $parameters)

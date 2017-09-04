@@ -38,7 +38,7 @@ final class PercentageOffItemDiscount extends BaseItemDiscount implements Discou
     public function apply(Order $order)
     {
         foreach ($order->items() as $item) {
-            if (!$this->applicable($order, $item->id())) {
+            if (!$this->applicable($order, $item->purchasableId())) {
                 // TODO If it could possible apply but one of the conditions isn't yet met, we can keep it
                 // as 'AlmostApplicableDiscounts'. This allows us to push incentives to the visitor
                 continue;

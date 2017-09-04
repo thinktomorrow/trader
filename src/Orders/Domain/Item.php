@@ -61,7 +61,7 @@ final class Item
         // Note: ItemId is a reference to its persistence record so here we just pass
         // a dummy value instead which will be overwritten as soon as item is stored
         // TODO: actually refactor so that Item does not have a itemID needed anymore??? but instead an orderID offcourse
-        return new self($purchasable->itemId(), $purchasable);
+        return new self(ItemId::fromString('-'), $purchasable);
     }
 
     public function id(): ItemId
@@ -181,7 +181,7 @@ final class Item
         return $this->purchasable;
     }
 
-    public function purchasableId(): string
+    public function purchasableId(): PurchasableId
     {
         return $this->purchasable()->purchasableId();
     }

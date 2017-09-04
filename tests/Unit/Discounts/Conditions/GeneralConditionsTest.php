@@ -7,6 +7,7 @@ use Thinktomorrow\Trader\Common\Domain\Price\Percentage;
 use Thinktomorrow\Trader\Discounts\Domain\DiscountFactory;
 use Thinktomorrow\Trader\Orders\Domain\Item;
 use Thinktomorrow\Trader\Orders\Domain\ItemId;
+use Thinktomorrow\Trader\Orders\Domain\PurchasableId;
 use Thinktomorrow\Trader\Tests\InMemoryContainer;
 use Thinktomorrow\Trader\Tests\Unit\Stubs\PurchasableStub;
 
@@ -34,8 +35,8 @@ class GeneralConditionsTest extends UnitTestCase
             'percentage' => Percentage::fromPercent(15),
         ]);
 
-        $this->assertTrue($discount->applicable($order, ItemId::fromInteger(20)));
-        $this->assertFalse($discount->applicable($order, ItemId::fromInteger(21)));
+        $this->assertTrue($discount->applicable($order, PurchasableId::fromInteger(20)));
+        $this->assertFalse($discount->applicable($order, PurchasableId::fromInteger(21)));
     }
 
     /** @test */
@@ -48,7 +49,7 @@ class GeneralConditionsTest extends UnitTestCase
             'percentage' => Percentage::fromPercent(15),
         ]);
 
-        $this->assertFalse($discount->applicable($order, ItemId::fromInteger(2)));
+        $this->assertFalse($discount->applicable($order, PurchasableId::fromInteger(2)));
     }
 
     /** @test */
@@ -82,14 +83,14 @@ class GeneralConditionsTest extends UnitTestCase
             'percentage' => Percentage::fromPercent(15),
         ]);
 
-        $this->assertFalse($discount->applicable($order, $item->id()));
+        $this->assertFalse($discount->applicable($order, $item->purchasableId()));
 
         // Add item to order
         $order->items()->add($item);
-        $this->assertFalse($discount->applicable($order, $item->id()));
+        $this->assertFalse($discount->applicable($order, $item->purchasableId()));
 
         $item->add(1);
-        $this->assertTrue($discount->applicable($order, $item->id()));
+        $this->assertTrue($discount->applicable($order, $item->purchasableId()));
     }
 
     /** @test */

@@ -6,8 +6,8 @@ use Assert\Assertion;
 use Thinktomorrow\Trader\Common\Domain\Conditions\Condition;
 use Thinktomorrow\Trader\Discounts\Domain\DiscountId;
 use Thinktomorrow\Trader\Orders\Domain\Item;
-use Thinktomorrow\Trader\Orders\Domain\ItemId;
 use Thinktomorrow\Trader\Orders\Domain\Order;
+use Thinktomorrow\Trader\Orders\Domain\PurchasableId;
 
 abstract class BaseItemDiscount
 {
@@ -46,13 +46,13 @@ abstract class BaseItemDiscount
      * Do the conditions apply for the given item.
      *
      * @param Order  $order
-     * @param ItemId $itemId
+     * @param PurchasableId $purchasableId
      *
      * @return bool
      */
-    public function applicable(Order $order, ItemId $itemId): bool
+    public function applicable(Order $order, PurchasableId $purchasableId): bool
     {
-        if (!$item = $order->items()->find($itemId)) {
+        if (!$item = $order->items()->find($purchasableId)) {
             return false;
         }
 

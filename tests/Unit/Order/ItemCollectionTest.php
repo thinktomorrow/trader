@@ -4,7 +4,7 @@ namespace Thinktomorrow\Trader\Tests\Unit;
 
 use Thinktomorrow\Trader\Orders\Domain\Item;
 use Thinktomorrow\Trader\Orders\Domain\ItemCollection;
-use Thinktomorrow\Trader\Orders\Domain\ItemId;
+use Thinktomorrow\Trader\Orders\Domain\PurchasableId;
 use Thinktomorrow\Trader\Tests\Unit\Stubs\PurchasableStub;
 
 class ItemCollectionTest extends UnitTestCase
@@ -37,7 +37,7 @@ class ItemCollectionTest extends UnitTestCase
         );
 
         $this->assertEquals(1, $collection->size());
-        $this->assertEquals(2, $collection->find(ItemId::fromInteger(2))->quantity());
+        $this->assertEquals(2, $collection->find(PurchasableId::fromInteger(2))->quantity());
     }
 
     /** @test */
@@ -109,7 +109,7 @@ class ItemCollectionTest extends UnitTestCase
 
         $itemCollection->add($item);
 
-        $this->assertSame($item, $itemCollection->find($item->id()));
+        $this->assertSame($item, $itemCollection->find($item->purchasableId()));
     }
 
     /** @test */
@@ -121,7 +121,7 @@ class ItemCollectionTest extends UnitTestCase
         $itemCollection->add($item);
         $itemCollection->add($item);
 
-        $this->assertSame($item, $itemCollection->find($item->id()));
+        $this->assertSame($item, $itemCollection->find($item->purchasableId()));
         $this->assertEquals(2, $item->quantity());
     }
 }

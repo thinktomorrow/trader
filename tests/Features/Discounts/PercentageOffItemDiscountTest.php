@@ -6,7 +6,7 @@ use Money\Money;
 use Thinktomorrow\Trader\Common\Domain\Price\Percentage;
 use Thinktomorrow\Trader\Discounts\Domain\DiscountFactory;
 use Thinktomorrow\Trader\Orders\Domain\Item;
-use Thinktomorrow\Trader\Orders\Domain\ItemId;
+use Thinktomorrow\Trader\Orders\Domain\PurchasableId;
 use Thinktomorrow\Trader\Tests\InMemoryContainer;
 use Thinktomorrow\Trader\Tests\Unit\Stubs\PurchasableStub;
 use Thinktomorrow\Trader\Tests\Unit\UnitTestCase;
@@ -33,7 +33,7 @@ class PercentageOffItemDiscountTest extends UnitTestCase
         // Apply discount
         $discount->apply($order);
 
-        $this->assertEquals(Money::EUR(110)->multiply(0.2), $order->items()->find(ItemId::fromInteger(20))->discountTotal());
+        $this->assertEquals(Money::EUR(110)->multiply(0.2), $order->items()->find(PurchasableId::fromInteger(20))->discountTotal());
         $this->assertEquals(Money::EUR(110)->multiply(0.8)->add(Money::EUR(110)), $order->total());
     }
 }
