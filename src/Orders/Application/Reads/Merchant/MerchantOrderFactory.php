@@ -3,6 +3,7 @@
 namespace Thinktomorrow\Trader\Orders\Application\Reads\Merchant;
 
 use Illuminate\Contracts\Container\Container;
+use Money\Money;
 use Thinktomorrow\Trader\Common\Application\ResolvesFromContainer;
 use Thinktomorrow\Trader\Discounts\Application\Reads\Discount as DiscountPresenter;
 use Thinktomorrow\Trader\Orders\Domain\OrderId;
@@ -35,34 +36,33 @@ class MerchantOrderFactory
     /**
      * This data (raw) will be presented as a simple read-only DTO.
      *
-     * @param $orderId
+     * @param MerchantOrderResource $order
      *
      * @return MerchantOrder
      */
-    public function create($orderId)
+    public function create(MerchantOrderResource $order)
     {
-        $values = $this->orderRepository->getValues(OrderId::fromInteger($orderId));
+        $values = $order->merchantValues();
 
-        $order = $this->resolve(MerchantOrder::class);
+        $merchantOrder = $this->resolve(MerchantOrder::class);
         foreach ($values as $key => $value) {
-            $order->{$key} = $value;
+            $merchantOrder->{$key} = $value;
         }
 
-        $this->assembleItems($order, $orderId);
-        $this->assembleAppliedDiscounts($order, $orderId);
+        $this->assembleItems($merchantOrder, $order->merchantItemValues());
+        $this->assembleAppliedDiscounts($merchantOrder, $order->merchantDiscountValues());
 
         // TODO: add applied shipment and payment
         // TODO: add applied Tax rule
 
-        return $order;
+        return $merchantOrder;
     }
 
-    private function assembleItems(MerchantOrder $order, $orderId)
+    private function assembleItems(MerchantOrder $order, array $itemValues)
     {
-        $itemCollection = $this->orderRepository->getItemValues(OrderId::fromInteger($orderId));
         $items = [];
 
-        foreach ($itemCollection as $id => $itemValues) {
+        foreach ($itemValues as $id => $itemValues) {
             $items[$id] = $this->resolve(MerchantItem::class);
             foreach ($itemValues as $key => $value) {
                 $items[$id]->{$key} = $value;
@@ -72,12 +72,11 @@ class MerchantOrderFactory
         $order->items = $items;
     }
 
-    private function assembleAppliedDiscounts(MerchantOrder $order, $orderId)
+    private function assembleAppliedDiscounts(MerchantOrder $order, array $appliedDiscounts)
     {
-        $discountCollection = $this->orderRepository->getAppliedDiscounts(OrderId::fromInteger($orderId));
         $discounts = [];
 
-        foreach ($discountCollection as $id => $discountValues) {
+        foreach ($appliedDiscounts as $id => $discountValues) {
             $discounts[$id] = $this->resolve(DiscountPresenter::class);
             foreach ($discountValues as $key => $value) {
                 $discounts[$id]->{$key} = $value;

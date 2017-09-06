@@ -19,9 +19,5 @@ interface OrderRepository
 
     public function remove(OrderId $orderId);
 
-    public function getValues(OrderId $orderId): array;
-
-    public function getItemValues(OrderId $orderId): array;
-
     public function nextIdentity(): OrderId;
 }

@@ -3,11 +3,13 @@
 namespace Thinktomorrow\Trader\Tests\Features;
 
 use Assert\Assertion;
+use Money\Money;
 use Thinktomorrow\Trader\Common\Domain\Price\Cash;
 use Thinktomorrow\Trader\Common\Domain\Price\Percentage;
 use Thinktomorrow\Trader\Discounts\Domain\DiscountFactory;
 use Thinktomorrow\Trader\Orders\Domain\CustomerId;
 use Thinktomorrow\Trader\Orders\Domain\Item as DomainItem;
+use Thinktomorrow\Trader\Orders\Domain\Item;
 use Thinktomorrow\Trader\Orders\Domain\Order as DomainOrder;
 use Thinktomorrow\Trader\Orders\Domain\OrderId;
 
@@ -17,6 +19,7 @@ use Thinktomorrow\Trader\Orders\Application\Reads\Merchant\MerchantOrder as Merc
 use Thinktomorrow\Trader\Orders\Ports\Reads\MerchantItem;
 use Thinktomorrow\Trader\Orders\Ports\Reads\MerchantOrder;
 
+use Thinktomorrow\Trader\Orders\Ports\Reads\MerchantOrderResource;
 use Thinktomorrow\Trader\Tests\InMemoryContainer;
 use Thinktomorrow\Trader\Tests\Unit\Stubs\PurchasableStub;
 
@@ -51,15 +54,38 @@ class MerchantOrderFactoryTest extends FeatureTestCase
         $this->assertTrue(Assertion::allIsInstanceOf($merchantOrder->items(), MerchantItemContract::class));
     }
 
+    /** @test */
+    public function merchant_order_has_tax_rates_grouped_by_rate()
+    {
+        $this->markTestIncomplete();
+
+        $order = $this->addDummyOrder(2);
+        $order->items()->add(Item::fromPurchasable(new PurchasableStub(1, [], Money::EUR(50), Percentage::fromPercent(21))));
+        $order->setShippingTotal(Money::EUR(15));
+        $order->setPaymentTotal(Money::EUR(10));
+
+        $merchantOrder = (new MerchantOrderFactory($this->container('orderRepository'), $this->container))
+            ->create(new MerchantOrderResource($order));
+
+        $testedTaxRates = false;
+        foreach ($merchantOrder->taxRates() as $tax_rate) {
+            $testedTaxRates = true;
+            $this->assertInstanceOf(Percentage::class, $tax_rate['percent']);
+            $this->assertInstanceOf(Money::class, $tax_rate['tax']);
+        }
+        $this->assertTrue($testedTaxRates, 'tax_rates value remains untested. Make sure to at least provide one entry.');
+    }
+
     /**
      * @return MerchantOrder
      */
     private function assembleMerchantOrder(): MerchantOrder
     {
-        $this->addDummyOrder(1);
+        $order = $this->addDummyOrder(1);
+        $resource = new MerchantOrderResource($order);
 
         $assembler = new MerchantOrderFactory($this->container('orderRepository'), $this->container);
-        $merchantOrder = $assembler->create(1);
+        $merchantOrder = $assembler->create($resource);
 
         return $merchantOrder;
     }
@@ -79,5 +105,7 @@ class MerchantOrderFactoryTest extends FeatureTestCase
         $order->setTaxPercentage(Percentage::fromPercent(21));
 
         $this->container('orderRepository')->add($order);
+
+        return $order;
     }
 }
