@@ -22,7 +22,7 @@ class AggregateIdTest extends UnitTestCase
     /** @test */
     function it_cannot_set_by_other_type_than_integer()
     {
-        $this->setExpectedException(TypeError::class);
+        $this->expectException(TypeError::class);
 
         DummyId::fromInteger('foobar');
     }

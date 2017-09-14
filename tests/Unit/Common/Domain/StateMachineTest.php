@@ -29,7 +29,7 @@ class StateMachineTest extends UnitTestCase
     /** @test */
     function it_throws_exception_if_transition_map_is_malformed()
     {
-        $this->setExpectedException(StateException::class,'malformed');
+        $this->expectException(StateException::class,'malformed');
 
         new MalformedStateMachine($this->dummyStatefulContract);
     }
@@ -37,7 +37,7 @@ class StateMachineTest extends UnitTestCase
     /** @test */
     function it_throws_exception_if_transition_contains_invalid_state()
     {
-        $this->setExpectedException(StateException::class,'non existing');
+        $this->expectException(StateException::class,'non existing');
 
         new MissingStateMachine($this->dummyStatefulContract);
     }
@@ -45,7 +45,7 @@ class StateMachineTest extends UnitTestCase
     /** @test */
     function it_throws_exception_if_applying_unknown_transition()
     {
-        $this->setExpectedException(StateException::class, 'unknown transition [unknown] on Thinktomorrow\Trader\Unit\DummyStateMachine');
+        $this->expectException(StateException::class, 'unknown transition [unknown] on Thinktomorrow\Trader\Unit\DummyStateMachine');
 
         $this->machine->apply('unknown');
     }
@@ -53,7 +53,7 @@ class StateMachineTest extends UnitTestCase
     /** @test */
     function it_throws_exception_if_applying_transition_is_disallowed()
     {
-        $this->setExpectedException(StateException::class,'Transition [complete] cannot be applied from current state [new] on Thinktomorrow\Trader\Unit\DummyStateMachine');
+        $this->expectException(StateException::class,'Transition [complete] cannot be applied from current state [new] on Thinktomorrow\Trader\Unit\DummyStateMachine');
 
         $this->machine->apply('complete');
     }

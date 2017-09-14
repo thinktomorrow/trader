@@ -27,7 +27,7 @@ class ProductRepositoryTest extends UnitTestCase
     /** @test */
     function it_throws_exception_if_product_does_not_exist()
     {
-        $this->setExpectedException(\RuntimeException::class);
+        $this->expectException(\RuntimeException::class);
 
         $repo = new InMemoryProductRepository();
         $repo->find(9);

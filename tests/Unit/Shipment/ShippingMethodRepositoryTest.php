@@ -22,7 +22,7 @@ class ShippingMethodRepositoryTest extends UnitTestCase
 
     function it_throws_exception_if_order_does_not_exist()
     {
-        $this->setExpectedException(\RuntimeException::class);
+        $this->expectException(\RuntimeException::class);
 
         $repo = new InMemoryShippingMethodRepository();
         $repo->find(ShippingMethodId::fromInteger(3));

@@ -14,7 +14,7 @@ class DiscountTypeTest extends UnitTestCase
     /** @test */
     function it_only_accepts_available_type_keys()
     {
-        $this->setExpectedException(\InvalidArgumentException::class);
+        $this->expectException(\InvalidArgumentException::class);
 
         TypeKey::fromString('test');
     }
@@ -22,7 +22,7 @@ class DiscountTypeTest extends UnitTestCase
     /** @test */
     function it_only_accepts_available_discount_classnames()
     {
-        $this->setExpectedException(\InvalidArgumentException::class);
+        $this->expectException(\InvalidArgumentException::class);
 
         TypeKey::fromDiscount(new UnknownDiscount(DiscountId::fromInteger(1),[],[]));
     }

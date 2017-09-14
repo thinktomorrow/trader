@@ -45,7 +45,7 @@ class ArrayableItemCollectionTest extends UnitTestCase
     /** @test */
     function set_item_by_key_must_be_item()
     {
-        $this->setExpectedException(InvalidArgumentException::class);
+        $this->expectException(InvalidArgumentException::class);
 
         $collection = $this->getCollection();
         $collection[3] = 'foobar';
@@ -54,7 +54,7 @@ class ArrayableItemCollectionTest extends UnitTestCase
     /** @test */
     function setting_item_must_have_explicit_key()
     {
-        $this->setExpectedException(InvalidArgumentException::class);
+        $this->expectException(InvalidArgumentException::class);
 
         $collection = $this->getCollection();
         $collection[] = Item::fromPurchasable(new PurchasableStub(1));;

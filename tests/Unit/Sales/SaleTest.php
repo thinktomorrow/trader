@@ -52,7 +52,7 @@ class SaleTest extends UnitTestCase
     /** @test */
     function percentage_sale_cannot_be_higher_than_100()
     {
-        $this->setExpectedException(\InvalidArgumentException::class);
+        $this->expectException(\InvalidArgumentException::class);
 
         $this->makePercentageOffSale(120);
     }
@@ -60,7 +60,7 @@ class SaleTest extends UnitTestCase
     /** @test */
     function percentage_sale_cannot_be_lower_than_0()
     {
-        $this->setExpectedException(\InvalidArgumentException::class);
+        $this->expectException(\InvalidArgumentException::class);
 
         $this->makePercentageOffSale(-10);
     }
@@ -68,7 +68,7 @@ class SaleTest extends UnitTestCase
     /** @test */
     function sale_cannot_go_below_purchasable_original_price()
     {
-        $this->setExpectedException(CannotApplySale::class);
+        $this->expectException(CannotApplySale::class);
 
         $stub = $this->makeStub(100);
         $sale = $this->makePercentageOffSale(80);
