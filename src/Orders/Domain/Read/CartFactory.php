@@ -1,12 +1,10 @@
 <?php
 
-namespace Thinktomorrow\Trader\Orders\Application\Reads\Cart;
+namespace Thinktomorrow\Trader\Orders\Domain\Read;
 
 use Illuminate\Contracts\Container\Container;
 use Thinktomorrow\Trader\Common\Application\ResolvesFromContainer;
-use Thinktomorrow\Trader\Discounts\Application\Reads\Discount as DiscountPresenter;
 use Thinktomorrow\Trader\Orders\Domain\Order;
-use Thinktomorrow\Trader\Orders\Domain\OrderId;
 use Thinktomorrow\Trader\Orders\Domain\OrderRepository;
 
 /**

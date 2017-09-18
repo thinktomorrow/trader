@@ -4,7 +4,7 @@ namespace Thinktomorrow\Trader\Orders\Ports\Read;
 
 use Thinktomorrow\Trader\Common\Domain\Price\Cash;
 use Thinktomorrow\Trader\Discounts\Domain\AppliedDiscountCollection;
-use Thinktomorrow\Trader\Orders\Application\Reads\Cart\Cart as CartContract;
+use Thinktomorrow\Trader\Orders\Domain\Read\Cart as CartContract;
 use Thinktomorrow\Trader\Orders\Domain\Order;
 
 /**

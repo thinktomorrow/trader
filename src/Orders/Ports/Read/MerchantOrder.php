@@ -4,7 +4,7 @@ namespace Thinktomorrow\Trader\Orders\Ports\Read;
 
 use Thinktomorrow\Trader\Common\Domain\Price\Cash;
 use Thinktomorrow\Trader\Common\Ports\Web\AbstractPresenter;
-use Thinktomorrow\Trader\Orders\Application\Reads\Merchant\MerchantOrder as MerchantOrderContract;
+use Thinktomorrow\Trader\Orders\Domain\Read\MerchantOrder as MerchantOrderContract;
 
 /**
  * Order presenter for merchant.

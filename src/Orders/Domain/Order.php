@@ -3,6 +3,7 @@
 namespace Thinktomorrow\Trader\Orders\Domain;
 
 use Money\Money;
+use Thinktomorrow\Trader\Common\Config;
 use Thinktomorrow\Trader\Common\Domain\Price\Cash;
 use Thinktomorrow\Trader\Common\Domain\Price\Percentage;
 use Thinktomorrow\Trader\Common\Domain\State\StatefulContract;
@@ -32,7 +33,7 @@ final class Order implements StatefulContract
         $this->discounts = new AppliedDiscountCollection();
         $this->discountTotal = $this->shippingTotal = $this->paymentTotal = Cash::make(0);
 
-        $this->setTaxPercentage(Percentage::fromPercent(0));
+        $this->setTaxPercentage(Percentage::fromPercent((new Config())->get('tax_percentage', 0))); // TODO get from config
 
         // Initial order state
         $this->state = OrderState::STATE_NEW;

@@ -1,8 +1,8 @@
 <?php
 
-namespace Thinktomorrow\Trader\Orders\Application\Reads\Merchant;
+namespace Thinktomorrow\Trader\Orders\Domain\Read\CartItem;
 
-interface MerchantItem
+interface CartItem
 {
     public function quantity(): int;
 

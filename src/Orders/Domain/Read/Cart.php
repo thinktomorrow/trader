@@ -1,6 +1,6 @@
 <?php
 
-namespace Thinktomorrow\Trader\Orders\Application\Reads\Cart;
+namespace Thinktomorrow\Trader\Orders\Domain\Read;
 
 use Thinktomorrow\Trader\Discounts\Domain\AppliedDiscountCollection;
 

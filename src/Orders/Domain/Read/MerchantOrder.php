@@ -1,6 +1,6 @@
 <?php
 
-namespace Thinktomorrow\Trader\Orders\Application\Reads\Merchant;
+namespace Thinktomorrow\Trader\Orders\Domain\Read;
 
 /**
  * Order presenter for merchant.

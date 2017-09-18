@@ -4,7 +4,7 @@ namespace Thinktomorrow\Trader\Orders\Ports\Read;
 
 use Thinktomorrow\Trader\Common\Domain\Price\Cash;
 use Thinktomorrow\Trader\Common\Ports\Web\AbstractPresenter;
-use Thinktomorrow\Trader\Orders\Application\Reads\Merchant\MerchantItem as MerchantItemContract;
+use Thinktomorrow\Trader\Orders\Domain\Read\MerchantItem as MerchantItemContract;
 
 class MerchantItem extends AbstractPresenter implements MerchantItemContract
 {
