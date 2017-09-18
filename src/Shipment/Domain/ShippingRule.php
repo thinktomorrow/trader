@@ -4,8 +4,8 @@ namespace Thinktomorrow\Trader\Shipment\Domain;
 
 use Assert\Assertion;
 use Money\Money;
-use Thinktomorrow\Trader\Order\Domain\Order;
 use Thinktomorrow\Trader\Common\Domain\Conditions\Condition;
+use Thinktomorrow\Trader\Orders\Domain\Order;
 
 class ShippingRule
 {
@@ -41,9 +41,10 @@ class ShippingRule
 
     public function applicable(Order $order): bool
     {
-        foreach($this->conditions as $condition)
-        {
-            if( false == $condition->check($order)) return false;
+        foreach ($this->conditions as $condition) {
+            if (false == $condition->check($order)) {
+                return false;
+            }
         }
 
         return true;

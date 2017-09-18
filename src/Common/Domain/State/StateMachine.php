@@ -5,7 +5,7 @@ namespace Thinktomorrow\Trader\Common\Domain\State;
 abstract class StateMachine
 {
     /**
-     * States and transitions should be set on the specific state Machine
+     * States and transitions should be set on the specific state Machine.
      *
      * @var array
      */
@@ -29,13 +29,11 @@ abstract class StateMachine
     public function apply($transition)
     {
         // Check valid transition request
-        if(!array_key_exists($transition,$this->transitions))
-        {
+        if (!array_key_exists($transition, $this->transitions)) {
             throw StateException::invalidTransitionKey($transition, $this);
         }
 
-        if(!in_array($this->statefulContract->state(),$this->transitions[$transition]['from']))
-        {
+        if (!in_array($this->statefulContract->state(), $this->transitions[$transition]['from'])) {
             throw StateException::invalidTransition($transition, $this->statefulContract->state(), $this);
         }
 
@@ -45,37 +43,43 @@ abstract class StateMachine
     }
 
     /**
-     * assert the integrity of the new state
+     * assert the integrity of the new state.
      *
      * @param StatefulContract $statefulContract
      * @param $state
+     *
      * @throws StateException
      */
     public static function assertNewState(StatefulContract $statefulContract, $state)
     {
         $machine = new static($statefulContract);
 
-        if( ! $machine->canTransitionTo($state))
-        {
+        if (!$machine->canTransitionTo($state)) {
             throw StateException::invalidState($state, $statefulContract->state(), $machine);
         }
     }
 
     /**
-     * Verify the new state is valid
+     * Verify the new state is valid.
      *
      * @param $state
+     *
      * @return bool
      */
     public function canTransitionTo($state)
     {
-        if(!in_array($state, $this->states)) return false;
+        if (!in_array($state, $this->states)) {
+            return false;
+        }
 
-        foreach($this->transitions as $transition)
-        {
-            if(!in_array($this->statefulContract->state(),$transition['from'])) continue;
+        foreach ($this->transitions as $transition) {
+            if (!in_array($this->statefulContract->state(), $transition['from'])) {
+                continue;
+            }
 
-            if($transition['to'] == $state) return true;
+            if ($transition['to'] == $state) {
+                return true;
+            }
         }
 
         return false;

@@ -65,9 +65,10 @@ class TaxRate
     }
 
     /**
-     * Sender country
+     * Sender country.
      *
      * @param CountryId $countryId
+     *
      * @return $this
      */
     public function fromCountry(CountryId $countryId)
@@ -78,9 +79,10 @@ class TaxRate
     }
 
     /**
-     * Customer billing country
+     * Customer billing country.
      *
      * @param CountryId $countryId
+     *
      * @return $this
      */
     public function forBillingCountry(CountryId $countryId)
@@ -92,9 +94,10 @@ class TaxRate
 
     /**
      * Customer shipping country.
-     * This is important for determining the 0% EU tax rule
+     * This is important for determining the 0% EU tax rule.
      *
      * @param CountryId $countryId
+     *
      * @return $this
      */
     public function forShipmentCountry(CountryId $countryId)
@@ -105,7 +108,7 @@ class TaxRate
     }
 
     /**
-     * flag to indicate tax should be calculated for a valid business customer
+     * flag to indicate tax should be calculated for a valid business customer.
      *
      * @return $this
      */
@@ -118,13 +121,18 @@ class TaxRate
 
     public function get(): Percentage
     {
-        if($this->eligibleForTaxExemption()) return Percentage::fromPercent(0);
-        
-        if(is_null($this->billingCountryId)) return $this->percentage;
+        if ($this->eligibleForTaxExemption()) {
+            return Percentage::fromPercent(0);
+        }
 
-        foreach($this->countryRateOverrides as $countryRate)
-        {
-            if($countryRate->matchesCountry($this->billingCountryId)) return $countryRate->get();
+        if (is_null($this->billingCountryId)) {
+            return $this->percentage;
+        }
+
+        foreach ($this->countryRateOverrides as $countryRate) {
+            if ($countryRate->matchesCountry($this->billingCountryId)) {
+                return $countryRate->get();
+            }
         }
 
         return $this->percentage;
@@ -134,16 +142,17 @@ class TaxRate
     {
         // Valid business outside the sender country receives tax exemption
         // TODO: is this shipment address that needs to be different of billing address?
-        if($this->forBusiness)
-        {
-            if(!$this->billingCountryId || !$this->senderCountryId) return false;
+        if ($this->forBusiness) {
+            if (!$this->billingCountryId || !$this->senderCountryId) {
+                return false;
+            }
 
-            return ! $this->billingCountryId->equals($this->senderCountryId);
+            return !$this->billingCountryId->equals($this->senderCountryId);
         }
 
         // TODO: rule for consumers outside europe or in Norway and Swissland also qualify for this.
         // @ref: https://ecom-support.lightspeedhq.com/hc/nl/articles/115005022268-BTW-regels-hoe-werkt-het-precies-
-        
+
         return false;
     }
 

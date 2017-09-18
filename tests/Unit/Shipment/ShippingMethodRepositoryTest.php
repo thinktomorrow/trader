@@ -2,15 +2,14 @@
 
 namespace Thinktomorrow\Trader\Tests\Unit;
 
-use Thinktomorrow\Trader\Shipment\Domain\ShipmentId;
-use Thinktomorrow\Trader\Shipment\Ports\Persistence\InMemoryShippingMethodRepository;
 use Thinktomorrow\Trader\Shipment\Domain\ShippingMethod;
 use Thinktomorrow\Trader\Shipment\Domain\ShippingMethodId;
+use Thinktomorrow\Trader\Shipment\Ports\Persistence\InMemoryShippingMethodRepository;
 
 class ShippingMethodRepositoryTest extends UnitTestCase
 {
     /** @test */
-    function it_can_find_a_shippingMethod()
+    public function it_can_find_a_shippingMethod()
     {
         $shippingMethod = new ShippingMethod(ShippingMethodId::fromInteger(3));
         $repo = new InMemoryShippingMethodRepository();
@@ -20,7 +19,7 @@ class ShippingMethodRepositoryTest extends UnitTestCase
         $this->assertEquals($shippingMethod, $repo->find(ShippingMethodId::fromInteger(3)));
     }
 
-    function it_throws_exception_if_order_does_not_exist()
+    public function it_throws_exception_if_order_does_not_exist()
     {
         $this->expectException(\RuntimeException::class);
 

@@ -2,8 +2,8 @@
 
 namespace Thinktomorrow\Trader\Shipment\Application;
 
-use Thinktomorrow\Trader\Order\Domain\OrderId;
-use Thinktomorrow\Trader\Order\Domain\OrderRepository;
+use Thinktomorrow\Trader\Orders\Domain\OrderId;
+use Thinktomorrow\Trader\Orders\Domain\OrderRepository;
 use Thinktomorrow\Trader\Shipment\Domain\Exceptions\CannotApplyShippingRuleException;
 use Thinktomorrow\Trader\Shipment\Domain\ShippingMethodId;
 use Thinktomorrow\Trader\Shipment\Domain\ShippingMethodRepository;
@@ -28,7 +28,7 @@ class ApplyShippingMethodToOrder
 
     public function handle(OrderId $orderId, ShippingMethodId $shippingMethodId)
     {
-        try{
+        try {
 
             // get instances via repo
             $order = $this->orderRepository->find($orderId);
@@ -36,9 +36,7 @@ class ApplyShippingMethodToOrder
 
             // Find the first matching shipping rule and apply it to the order
             $shippingMethod->apply($order);
-        }
-        catch(CannotApplyShippingRuleException $e)
-        {
+        } catch (CannotApplyShippingRuleException $e) {
             //
         }
     }

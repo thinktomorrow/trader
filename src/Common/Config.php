@@ -13,14 +13,20 @@ class Config
 
     public function __construct($filepath = null)
     {
-        $this->filepath = $filepath?:  __DIR__.'/../../config/trader.php';
+        $this->filepath = $filepath ?: __DIR__.'/../../config/trader.php';
     }
 
+    /**
+     * @param $key
+     * @param null $default
+     *
+     * @return null
+     */
     public function get($key, $default = null)
     {
         $this->loadFile();
 
-        return ( isset(static::$config[$key]) ) ? static::$config[$key] : $default;
+        return (isset(static::$config[$key])) ? static::$config[$key] : $default;
     }
 
     public function refreshSource($filepath)
@@ -31,7 +37,9 @@ class Config
 
     private function loadFile()
     {
-        if(static::$config) return;
+        if (static::$config) {
+            return;
+        }
 
         static::$config = include $this->filepath;
     }

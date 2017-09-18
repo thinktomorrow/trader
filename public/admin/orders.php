@@ -1,7 +1,7 @@
 <?php require __DIR__.'/../../vendor/autoload.php'; ?>
 
 <?php
-$orderRepository = new App\Order\OrderRepository();
+$orderRepository = new App\Orders\OrderRepository();
 $orders = $orderRepository->all();
 ?>
 
@@ -21,7 +21,7 @@ $orders = $orderRepository->all();
         </tr>
     </thead>
     <tbody>
-    <?php foreach($orders as $order): ?>
+    <?php foreach ($orders as $order): ?>
         <tr>
             <td><a href="/admin/order.php"><?= $order->reference ?></a></td>
             <td>klant</td>

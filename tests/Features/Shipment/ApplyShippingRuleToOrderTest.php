@@ -3,16 +3,12 @@
 namespace Thinktomorrow\Trader\Tests\Features;
 
 use Money\Money;
-use Thinktomorrow\Trader\Order\Domain\Item;
-use Thinktomorrow\Trader\Order\Domain\OrderId;
-use Thinktomorrow\Trader\Order\Ports\Persistence\InMemoryOrderRepository;
-use Thinktomorrow\Trader\Common\Domain\Price\Percentage;
+use Thinktomorrow\Trader\Orders\Domain\Item;
+use Thinktomorrow\Trader\Orders\Ports\Persistence\InMemoryOrderRepository;
 use Thinktomorrow\Trader\Shipment\Application\ApplyShippingMethodToOrder;
 use Thinktomorrow\Trader\Shipment\Domain\ShippingMethod;
 use Thinktomorrow\Trader\Shipment\Domain\ShippingMethodId;
-use Thinktomorrow\Trader\Shipment\Domain\ShippingRule;
 use Thinktomorrow\Trader\Shipment\Domain\ShippingRuleFactory;
-use Thinktomorrow\Trader\Shipment\Domain\ShippingRuleId;
 use Thinktomorrow\Trader\Shipment\Ports\Persistence\InMemoryShippingMethodRepository;
 use Thinktomorrow\Trader\Tests\InMemoryContainer;
 use Thinktomorrow\Trader\Tests\Unit\Stubs\PurchasableStub;
@@ -40,41 +36,40 @@ class ApplyShippingRuleToOrderTest extends UnitTestCase
     }
 
     /** @test */
-    function empty_order_means_no_shipping_costs()
+    public function empty_order_means_no_shipping_costs()
     {
         // Set up order, items and shipment
         $order = $this->makeOrder();
-        $order->items()->add(Item::fromPurchasable(new PurchasableStub(20,[],Money::EUR(240))));
+        $order->items()->add(Item::fromPurchasable(new PurchasableStub(20, [], Money::EUR(240))));
 
         $this->orderRepository->add($order);
-        $this->shippingMethodRepository->add(new ShippingMethod(ShippingMethodId::fromInteger(2),[]));
+        $this->shippingMethodRepository->add(new ShippingMethod(ShippingMethodId::fromInteger(2), []));
 
         // Apply shipment to order
-        $this->makeHandler()->handle($order->id(),ShippingMethodId::fromInteger(2));
+        $this->makeHandler()->handle($order->id(), ShippingMethodId::fromInteger(2));
 
-        $this->assertEquals(Money::EUR(0),$order->shipmentTotal());
+        $this->assertEquals(Money::EUR(0), $order->shippingTotal());
         $this->assertEquals(Money::EUR(240), $order->total());
     }
 
     /** @test */
-    function it_can_apply_shippingcost_to_order()
+    public function it_can_apply_shippingcost_to_order()
     {
         // Set up order, items and shipment
         $order = $this->makeOrder();
-        $order->items()->add(Item::fromPurchasable(new PurchasableStub(20,[],Money::EUR(240))));
+        $order->items()->add(Item::fromPurchasable(new PurchasableStub(20, [], Money::EUR(240))));
 
         $this->orderRepository->add($order);
-        $this->shippingMethodRepository->add(new ShippingMethod(ShippingMethodId::fromInteger(2),[
-            (new ShippingRuleFactory(new InMemoryContainer))->create(1,[],[
-                'amount' => Money::EUR(24)
-            ])
+        $this->shippingMethodRepository->add(new ShippingMethod(ShippingMethodId::fromInteger(2), [
+            (new ShippingRuleFactory(new InMemoryContainer()))->create(1, [], [
+                'amount' => Money::EUR(24),
+            ]),
         ]));
 
         // Apply shipment to order
         $this->makeHandler()->handle($order->id(), ShippingMethodId::fromInteger(2));
 
-        $this->assertEquals(Money::EUR(24),$order->shipmentTotal());
+        $this->assertEquals(Money::EUR(24), $order->shippingTotal());
         $this->assertEquals(Money::EUR(264), $order->total());
-
     }
 }

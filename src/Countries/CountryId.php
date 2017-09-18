@@ -13,7 +13,7 @@ class CountryId
 
     private function __construct(string $isoString)
     {
-        Assertion::length($isoString,2);
+        Assertion::length($isoString, 2);
 
         $this->isoString = $isoString;
     }
@@ -28,10 +28,15 @@ class CountryId
         return $this->isoString;
     }
 
+    /**
+     * @param $otherCountryId
+     *
+     * @return bool
+     */
     public function equals($otherCountryId): bool
     {
         return get_class($otherCountryId) === get_class($this)
-                && (string)$this->get() === (string)$otherCountryId->get();
+                && (string) $this->get() === (string) $otherCountryId->get();
     }
 
     public function __toString()

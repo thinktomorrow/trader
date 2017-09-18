@@ -18,7 +18,7 @@ class CashTest extends UnitTestCase
         $this->config = new Config(__DIR__.'/../../../Stubs/configStub.php');
 
         // Reset the applied currency to avoid interference with other tests
-        Cash::resetCurrency();
+        Cash::reset();
     }
 
     public function tearDown()
@@ -27,19 +27,36 @@ class CashTest extends UnitTestCase
         $this->config->refreshSource(__DIR__.'/../../config/trader.php');
 
         // Reset the applied currency to avoid interference with other tests
-        Cash::resetCurrency();
+        Cash::reset();
 
         parent::tearDown();
     }
 
     /** @test */
-    function it_can_get_money_instance_with_configurable_currency()
+    public function it_can_get_money_instance_with_configurable_currency()
     {
-        $this->assertEquals('USD',$this->config->get('currency'));
+        $this->assertEquals('USD', $this->config->get('currency'));
 
         $money = Cash::make(120);
 
-        $this->assertInstanceOf(Money::class,$money);
-        $this->assertEquals('USD',$money->getCurrency()->getCode());
+        $this->assertInstanceOf(Money::class, $money);
+        $this->assertEquals('USD', $money->getCurrency()->getCode());
+    }
+
+    /** @test */
+    public function it_can_represent_localised_money()
+    {
+        $cash = Cash::from(Money::EUR(120));
+        $this->assertEquals('&euro;1.20', $cash->locale('nl_BE'));
+
+        $cash = Cash::from(Money::USD(120));
+        $this->assertEquals('&dollar;1.20', $cash->locale('nl_BE'));
+    }
+
+    /** @test */
+    public function by_default_currency_code_is_used_as_symbol()
+    {
+        $cash = Cash::from(Money::AMD(120));
+        $this->assertEquals('AMD1.20', $cash->locale('nl_BE'));
     }
 }

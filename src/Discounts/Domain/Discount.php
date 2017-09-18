@@ -2,7 +2,7 @@
 
 namespace Thinktomorrow\Trader\Discounts\Domain;
 
-use Thinktomorrow\Trader\Order\Domain\Order;
+use Thinktomorrow\Trader\Orders\Domain\Order;
 
 interface Discount
 {

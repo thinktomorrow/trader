@@ -23,20 +23,20 @@ class ConfigTest extends UnitTestCase
     }
 
     /** @test */
-    function if_key_not_found_it_returns_null()
+    public function if_key_not_found_it_returns_null()
     {
         $this->assertNull($this->config->get('unknown'));
     }
 
     /** @test */
-    function default_can_be_set_at_runtime()
+    public function default_can_be_set_at_runtime()
     {
-        $this->assertEquals('foozball',$this->config->get('unknown','foozball'));
+        $this->assertEquals('foozball', $this->config->get('unknown', 'foozball'));
     }
 
     /** @test */
-    function it_can_get_value_from_config()
+    public function it_can_get_value_from_config()
     {
-        $this->assertEquals('foobar',$this->config->get('fool'));
+        $this->assertEquals('foobar', $this->config->get('fool'));
     }
 }

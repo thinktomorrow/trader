@@ -3,13 +3,13 @@
 namespace Thinktomorrow\Trader\Discounts\Domain\Types;
 
 use Thinktomorrow\Trader\Common\Domain\Description;
-use Thinktomorrow\Trader\Discounts\Domain\Exceptions\CannotApplyDiscountToOrderException;
-use Thinktomorrow\Trader\Discounts\Domain\Discount;
-use Thinktomorrow\Trader\Discounts\Domain\AppliedDiscount;
-use Thinktomorrow\Trader\Discounts\Domain\DiscountId;
-use Thinktomorrow\Trader\Discounts\Domain\OrderDiscount;
-use Thinktomorrow\Trader\Order\Domain\Order;
 use Thinktomorrow\Trader\Common\Domain\Price\Percentage;
+use Thinktomorrow\Trader\Discounts\Domain\AppliedDiscount;
+use Thinktomorrow\Trader\Discounts\Domain\Discount;
+use Thinktomorrow\Trader\Discounts\Domain\DiscountId;
+use Thinktomorrow\Trader\Discounts\Domain\Exceptions\CannotApplyDiscountToOrderException;
+use Thinktomorrow\Trader\Discounts\Domain\OrderDiscount;
+use Thinktomorrow\Trader\Orders\Domain\Order;
 
 final class PercentageOffDiscount extends BaseDiscount implements Discount, OrderDiscount
 {
@@ -23,7 +23,7 @@ final class PercentageOffDiscount extends BaseDiscount implements Discount, Orde
      */
     private $type;
 
-    public function __construct(DiscountId $id, array $conditions,  array $adjusters)
+    public function __construct(DiscountId $id, array $conditions, array $adjusters)
     {
         parent::__construct($id, $conditions, $adjusters);
 
@@ -34,15 +34,16 @@ final class PercentageOffDiscount extends BaseDiscount implements Discount, Orde
     public function apply(Order $order)
     {
         // Check conditions first
-        if( ! $this->applicable($order))
-        {
+        if (!$this->applicable($order)) {
             throw new CannotApplyDiscountToOrderException();
         }
 
         $discountAmount = $order->subtotal()->multiply($this->percentage->asFloat());
 
         // Protect against negative overflow where order total would dive under zero
-        if($discountAmount->greaterThan($order->subtotal())) $discountAmount = $order->subtotal();
+        if ($discountAmount->greaterThan($order->subtotal())) {
+            $discountAmount = $order->subtotal();
+        }
 
         $order->addToDiscountTotal($discountAmount);
         $order->addDiscount(new AppliedDiscount(
@@ -58,7 +59,7 @@ final class PercentageOffDiscount extends BaseDiscount implements Discount, Orde
         return new Description(
             $this->type,
             [
-                'percent' => $this->percentage->asPercent()
+                'percent' => $this->percentage->asPercent(),
             ]
         );
     }

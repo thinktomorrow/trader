@@ -11,11 +11,11 @@ use Thinktomorrow\Trader\Discounts\Domain\Types\TypeKey;
 class AppliedDiscountTest extends UnitTestCase
 {
     /** @test */
-    function it_can_create_applied_discount()
+    public function it_can_create_applied_discount()
     {
         $discountId = DiscountId::fromInteger(1);
         $discountType = TypeKey::fromString('percentage_off');
-        $description = new Description('foo',[]);
+        $description = new Description('foo', []);
         $amount = Money::EUR(20);
 
         $appliedDiscount = new AppliedDiscount(

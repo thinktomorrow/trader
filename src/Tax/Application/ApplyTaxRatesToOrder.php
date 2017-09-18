@@ -2,8 +2,8 @@
 
 namespace Thinktomorrow\Trader\Tax\Application;
 
-use Thinktomorrow\Trader\Order\Domain\OrderId;
-use Thinktomorrow\Trader\Order\Domain\OrderRepository;
+use Thinktomorrow\Trader\Orders\Domain\OrderId;
+use Thinktomorrow\Trader\Orders\Domain\OrderRepository;
 use Thinktomorrow\Trader\Tax\Domain\OrderTaxRate;
 use Thinktomorrow\Trader\Tax\Domain\TaxRateRepository;
 
@@ -29,8 +29,7 @@ class ApplyTaxRatesToOrder
     {
         $order = $this->orderRepository->find($orderId);
 
-        foreach($order->items() as $item)
-        {
+        foreach ($order->items() as $item) {
             $taxRate = $this->taxRateRepository->find($item->taxId());
 
             $orderTaxRate = new OrderTaxRate($taxRate, $order);

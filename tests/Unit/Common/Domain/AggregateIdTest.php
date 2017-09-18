@@ -11,16 +11,25 @@ class AggregateIdTest extends UnitTestCase
     }
 
     /** @test */
-    function it_can_get_id_as_integer()
+    public function it_can_get_id_as_integer()
     {
         $id = $this->getId(2);
 
-        $this->assertEquals(2,$id->get());
-        $this->assertInternalType('integer',$id->get());
+        $this->assertEquals(2, $id->get());
+        $this->assertInternalType('integer', $id->get());
     }
 
     /** @test */
-    function it_cannot_set_by_other_type_than_integer()
+    public function it_can_be_set_from_string()
+    {
+        $id = DummyId::fromString('foobar');
+
+        $this->assertEquals('foobar', $id->get());
+        $this->assertInternalType('string', $id->get());
+    }
+
+    /** @test */
+    public function it_cannot_set_by_other_type_than_integer()
     {
         $this->expectException(TypeError::class);
 
@@ -28,7 +37,7 @@ class AggregateIdTest extends UnitTestCase
     }
 
     /** @test */
-    function it_can_compair_two_objects()
+    public function it_can_compair_two_objects()
     {
         $this->assertTrue($this->getId(1)->equals($this->getId(1)));
         $this->assertFalse($this->getId(1)->equals($this->getId(2)));

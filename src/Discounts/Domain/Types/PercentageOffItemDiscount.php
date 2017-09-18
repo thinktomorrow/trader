@@ -3,13 +3,12 @@
 namespace Thinktomorrow\Trader\Discounts\Domain\Types;
 
 use Thinktomorrow\Trader\Common\Domain\Description;
-use Thinktomorrow\Trader\Discounts\Domain\Discount;
+use Thinktomorrow\Trader\Common\Domain\Price\Percentage;
 use Thinktomorrow\Trader\Discounts\Domain\AppliedDiscount;
-use Thinktomorrow\Trader\Discounts\Domain\DiscountConditions;
+use Thinktomorrow\Trader\Discounts\Domain\Discount;
 use Thinktomorrow\Trader\Discounts\Domain\DiscountId;
 use Thinktomorrow\Trader\Discounts\Domain\ItemDiscount;
-use Thinktomorrow\Trader\Order\Domain\Order;
-use Thinktomorrow\Trader\Common\Domain\Price\Percentage;
+use Thinktomorrow\Trader\Orders\Domain\Order;
 
 final class PercentageOffItemDiscount extends BaseItemDiscount implements Discount, ItemDiscount
 {
@@ -23,7 +22,7 @@ final class PercentageOffItemDiscount extends BaseItemDiscount implements Discou
      */
     private $type;
 
-    public function __construct(DiscountId $id, array $conditions,  array $adjusters)
+    public function __construct(DiscountId $id, array $conditions, array $adjusters)
     {
         parent::__construct($id, $conditions, $adjusters);
 
@@ -38,10 +37,8 @@ final class PercentageOffItemDiscount extends BaseItemDiscount implements Discou
 
     public function apply(Order $order)
     {
-        foreach($order->items() as $item)
-        {
-            if( ! $this->applicable($order, $item->id()))
-            {
+        foreach ($order->items() as $item) {
+            if (!$this->applicable($order, $item->purchasableId())) {
                 // TODO If it could possible apply but one of the conditions isn't yet met, we can keep it
                 // as 'AlmostApplicableDiscounts'. This allows us to push incentives to the visitor
                 continue;
@@ -51,7 +48,9 @@ final class PercentageOffItemDiscount extends BaseItemDiscount implements Discou
                                    ->multiply($this->percentage->asFloat());
 
             // Protect against negative overflow where order total would dive under zero
-            if($discountAmount->greaterThan($item->subtotal())) $discountAmount = $item->subtotal();
+            if ($discountAmount->greaterThan($item->subtotal())) {
+                $discountAmount = $item->subtotal();
+            }
 
             // TODO: how to get reasons of nonapplicable? like: you need extra 40,- to benefit from this promo.
             // Like when you enter couponcode and you want the reason for non-acceptance
@@ -73,7 +72,7 @@ final class PercentageOffItemDiscount extends BaseItemDiscount implements Discou
         return new Description(
             $this->type,
             [
-                'percent' => $this->percentage->asPercent()
+                'percent' => $this->percentage->asPercent(),
             ]
         );
     }

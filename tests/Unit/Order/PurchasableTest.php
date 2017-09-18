@@ -2,24 +2,25 @@
 
 namespace Thinktomorrow\Trader\Tests\Unit;
 
-use Thinktomorrow\Trader\Order\Domain\ItemId;
+use Thinktomorrow\Trader\Orders\Domain\ItemId;
+use Thinktomorrow\Trader\Orders\Domain\PurchasableId;
 use Thinktomorrow\Trader\Tests\Unit\Stubs\PurchasableStub;
 
 class PurchasableTest extends UnitTestCase
 {
     /** @test */
-    function it_can_get_itemid()
+    public function it_can_get_purchasableId()
     {
         $purchasable = new PurchasableStub(1);
 
-        $this->assertEquals(ItemId::fromInteger(1),$purchasable->itemId());
+        $this->assertEquals(PurchasableId::fromInteger(1), $purchasable->purchasableId());
     }
 
     /** @test */
-    function it_can_get_extra_data()
+    public function it_can_get_extra_data()
     {
-        $purchasable = new PurchasableStub(1,['foo' => 'bar']);
+        $purchasable = new PurchasableStub(1, ['foo' => 'bar']);
 
-        $this->assertEquals(['foo' => 'bar'],$purchasable->itemData());
+        $this->assertEquals(['foo' => 'bar'], $purchasable->itemData());
     }
 }

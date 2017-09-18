@@ -3,7 +3,7 @@
 namespace Thinktomorrow\Trader\Tests\Unit;
 
 use Money\Money;
-use Thinktomorrow\Trader\Order\Domain\Item;
+use Thinktomorrow\Trader\Orders\Domain\Item;
 use Thinktomorrow\Trader\Shipment\Domain\Conditions\MinimumAmount;
 use Thinktomorrow\Trader\Shipment\Domain\ShippingRule;
 use Thinktomorrow\Trader\Shipment\Domain\ShippingRuleId;
@@ -12,38 +12,38 @@ use Thinktomorrow\Trader\Tests\Unit\Stubs\PurchasableStub;
 class ShippingRuleTest extends UnitTestCase
 {
     /** @test */
-    function it_has_an_aggregate_id()
+    public function it_has_an_aggregate_id()
     {
         $id = ShippingRuleId::fromInteger(2);
 
-        $this->assertEquals(2,$id->get());
+        $this->assertEquals(2, $id->get());
         $this->assertEquals($id, ShippingRuleId::fromInteger(2));
     }
 
     /** @test */
-    function it_can_create_a_rule()
+    public function it_can_create_a_rule()
     {
         $condition = new MinimumAmount();
         $id = ShippingRuleId::fromInteger(1);
 
-        $rule = new ShippingRule($id,[$condition],['amount' => Money::EUR(120)]);
+        $rule = new ShippingRule($id, [$condition], ['amount' => Money::EUR(120)]);
 
         $this->assertSame($condition, $rule->conditions()[0]);
         $this->assertSame($id, $rule->id());
     }
 
     /** @test */
-    function a_rule_without_conditions_is_by_default_applicable_to_an_order()
+    public function a_rule_without_conditions_is_by_default_applicable_to_an_order()
     {
         $order = $this->makeOrder();
 
-        $rule = new ShippingRule(ShippingRuleId::fromInteger(1),[],['amount' => Money::EUR(30)]);
+        $rule = new ShippingRule(ShippingRuleId::fromInteger(1), [], ['amount' => Money::EUR(30)]);
 
         $this->assertTrue($rule->applicable($order));
     }
 
     /** @test */
-    function a_rule_is_not_applicable_if_conditions_are_not_met()
+    public function a_rule_is_not_applicable_if_conditions_are_not_met()
     {
         $rule = $this->createShippingRule();
 
@@ -51,10 +51,10 @@ class ShippingRuleTest extends UnitTestCase
     }
 
     /** @test */
-    function a_rule_can_be_applicable_to_an_order_if_conditions_are_met()
+    public function a_rule_can_be_applicable_to_an_order_if_conditions_are_met()
     {
         $order = $this->makeOrder();
-        $order->items()->add(Item::fromPurchasable(new PurchasableStub(1,[],Money::EUR(31))));
+        $order->items()->add(Item::fromPurchasable(new PurchasableStub(1, [], Money::EUR(31))));
 
         $rule = $this->createShippingRule();
 
@@ -73,5 +73,4 @@ class ShippingRuleTest extends UnitTestCase
 
         return $rule;
     }
-
 }

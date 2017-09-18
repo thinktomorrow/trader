@@ -5,9 +5,9 @@ namespace Thinktomorrow\Trader\Discounts\Domain\Types;
 use Assert\Assertion;
 use Thinktomorrow\Trader\Common\Domain\Conditions\Condition;
 use Thinktomorrow\Trader\Discounts\Domain\DiscountId;
-use Thinktomorrow\Trader\Order\Domain\Item;
-use Thinktomorrow\Trader\Order\Domain\ItemId;
-use Thinktomorrow\Trader\Order\Domain\Order;
+use Thinktomorrow\Trader\Orders\Domain\Item;
+use Thinktomorrow\Trader\Orders\Domain\Order;
+use Thinktomorrow\Trader\Orders\Domain\PurchasableId;
 
 abstract class BaseItemDiscount
 {
@@ -28,7 +28,7 @@ abstract class BaseItemDiscount
      */
     protected $adjusters;
 
-    public function __construct(DiscountId $id, array $conditions,  array $adjusters)
+    public function __construct(DiscountId $id, array $conditions, array $adjusters)
     {
         $this->validateParameters($conditions, $adjusters);
 
@@ -43,19 +43,23 @@ abstract class BaseItemDiscount
     }
 
     /**
-     * Do the conditions apply for the given item
+     * Do the conditions apply for the given item.
      *
-     * @param Order $order
-     * @param ItemId $itemId
+     * @param Order  $order
+     * @param PurchasableId $purchasableId
+     *
      * @return bool
      */
-    public function applicable(Order $order, ItemId $itemId): bool
+    public function applicable(Order $order, PurchasableId $purchasableId): bool
     {
-        if( ! $item = $order->items()->find($itemId) ) return false;
+        if (!$item = $order->items()->find($purchasableId)) {
+            return false;
+        }
 
-        foreach($this->conditions as $condition)
-        {
-            if(false == $condition->check($order, $item)) return false;
+        foreach ($this->conditions as $condition) {
+            if (false == $condition->check($order, $item)) {
+                return false;
+            }
         }
 
         return true;
@@ -63,20 +67,22 @@ abstract class BaseItemDiscount
 
     /**
      * On how many items does the discount apply?
-     * By default an item discount applies to the total quantity of each item
+     * By default an item discount applies to the total quantity of each item.
      *
      * @param Item $item
+     *
      * @return int
      */
     public function getAffectedItemQuantity(Item $item)
     {
         $maximum = $item->quantity();
 
-        if(isset($this->adjusters['maximum_affected_quantity']))
-        {
+        if (isset($this->adjusters['maximum_affected_quantity'])) {
             $forced_maximum = (int) $this->adjusters['maximum_affected_quantity'];
 
-            if($forced_maximum < $maximum) $maximum = $forced_maximum;
+            if ($forced_maximum < $maximum) {
+                $maximum = $forced_maximum;
+            }
         }
 
         return $maximum;

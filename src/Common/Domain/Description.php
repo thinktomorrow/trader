@@ -20,7 +20,8 @@ class Description
     }
 
     /**
-     * Values to be used to fill the language placeholders
+     * Values to be used to fill the language placeholders.
+     *
      * @return array
      */
     public function values(): array

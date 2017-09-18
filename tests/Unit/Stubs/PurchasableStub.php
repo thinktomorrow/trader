@@ -3,9 +3,10 @@
 namespace Thinktomorrow\Trader\Tests\Unit\Stubs;
 
 use Money\Money;
-use Thinktomorrow\Trader\Order\Domain\ItemId;
-use Thinktomorrow\Trader\Order\Domain\Purchasable;
 use Thinktomorrow\Trader\Common\Domain\Price\Percentage;
+use Thinktomorrow\Trader\Orders\Domain\ItemId;
+use Thinktomorrow\Trader\Orders\Domain\Purchasable;
+use Thinktomorrow\Trader\Orders\Domain\PurchasableId;
 use Thinktomorrow\Trader\Tax\Domain\TaxId;
 
 class PurchasableStub implements Purchasable
@@ -19,7 +20,9 @@ class PurchasableStub implements Purchasable
 
     public function __construct($id = null, $data = [], Money $price = null, Percentage $taxRate = null, Money $salePrice = null)
     {
-        $this->id = $id ?: rand(1,99);
+        $id = $id ?: rand(1, 99);
+        $this->id = PurchasableId::fromString($id);
+
         $this->data = $data;
         $this->price = $price ?: Money::EUR(120);
         $this->taxRate = !is_null($taxRate) ? $taxRate : Percentage::fromPercent(21);
@@ -27,10 +30,20 @@ class PurchasableStub implements Purchasable
         $this->salePrice = $salePrice ?: null;
     }
 
-    public function itemId(): ItemId
+    public function purchasableId(): PurchasableId
     {
-        return ItemId::fromInteger($this->id);
+        return $this->id;
     }
+
+    public function purchasableType(): string
+    {
+        return get_class($this);
+    }
+
+//    public function itemId(): ItemId
+//    {
+//        return ItemId::fromInteger($this->id);
+//    }
 
     public function itemData(): array
     {
@@ -70,7 +83,7 @@ class PurchasableStub implements Purchasable
     }
 
     /**
-     * Convenience method for testing
+     * Convenience method for testing.
      *
      * @param $taxId
      */

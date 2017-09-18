@@ -3,7 +3,7 @@
 namespace Thinktomorrow\Trader\Tax\Domain;
 
 use Thinktomorrow\Trader\Common\Domain\Price\Percentage;
-use Thinktomorrow\Trader\Order\Domain\Order;
+use Thinktomorrow\Trader\Orders\Domain\Order;
 
 class OrderTaxRate
 {

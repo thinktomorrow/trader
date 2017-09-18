@@ -1,8 +1,6 @@
 <?php
 
-
 namespace Thinktomorrow\Trader\Tax\Domain;
-
 
 interface TaxRateRepository
 {

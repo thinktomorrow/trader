@@ -6,7 +6,7 @@ use Assert\Assertion;
 use Thinktomorrow\Trader\Common\Domain\Conditions\Condition;
 use Thinktomorrow\Trader\Common\Domain\Conditions\ItemCondition;
 use Thinktomorrow\Trader\Discounts\Domain\DiscountId;
-use Thinktomorrow\Trader\Order\Domain\Order;
+use Thinktomorrow\Trader\Orders\Domain\Order;
 
 abstract class BaseDiscount
 {
@@ -25,7 +25,7 @@ abstract class BaseDiscount
      */
     protected $adjusters;
 
-    public function __construct(DiscountId $id,array $conditions,  array $adjusters)
+    public function __construct(DiscountId $id, array $conditions, array $adjusters)
     {
         $this->validateParameters($conditions, $adjusters);
 
@@ -40,16 +40,18 @@ abstract class BaseDiscount
     }
 
     /**
-     * Do the conditions apply for the given order
+     * Do the conditions apply for the given order.
      *
      * @param Order $order
+     *
      * @return bool
      */
     public function applicable(Order $order): bool
     {
-        foreach($this->conditions as $condition)
-        {
-            if(false == $condition->check($order)) return false;
+        foreach ($this->conditions as $condition) {
+            if (false == $condition->check($order)) {
+                return false;
+            }
         }
 
         return true;
