@@ -5,8 +5,8 @@ namespace Thinktomorrow\Trader\Tests\Features;
 use Assert\Assertion;
 use Money\Money;
 use Thinktomorrow\Trader\Order\Application\OrderAssembler;
-use Thinktomorrow\Trader\Order\Ports\Web\Merchant\Item;
-use Thinktomorrow\Trader\Order\Ports\Web\Merchant\Order;
+use Thinktomorrow\Trader\Order\Ports\Read\MerchantItem;
+use Thinktomorrow\Trader\Order\Ports\Read\MerchantOrder;
 use Thinktomorrow\Trader\Common\Domain\Price\Cash;
 use Thinktomorrow\Trader\Common\Domain\Price\Percentage;
 use Thinktomorrow\Trader\Discounts\Domain\DiscountFactory;
@@ -21,7 +21,7 @@ class OrderAssemblerTest extends FeatureTestCase
     /** @test */
     function it_can_resolve_order_for_merchant()
     {
-        $this->assertInstanceOf(Order::class,$this->assembleMerchantOrder());
+        $this->assertInstanceOf(MerchantOrder::class,$this->assembleMerchantOrder());
     }
 
     /** @test */
@@ -44,7 +44,7 @@ class OrderAssemblerTest extends FeatureTestCase
         $merchantOrder = $this->assembleMerchantOrder();
 
         $this->assertCount(2,$merchantOrder->items());
-        $this->assertTrue(Assertion::allIsInstanceOf($merchantOrder->items(),Item::class));
+        $this->assertTrue(Assertion::allIsInstanceOf($merchantOrder->items(),MerchantItem::class));
     }
 
     private function addDummyOrder($id)
@@ -64,9 +64,9 @@ class OrderAssemblerTest extends FeatureTestCase
     }
 
     /**
-     * @return Order
+     * @return MerchantOrder
      */
-    private function assembleMerchantOrder(): Order
+    private function assembleMerchantOrder(): MerchantOrder
     {
         $this->addDummyOrder(1);
 

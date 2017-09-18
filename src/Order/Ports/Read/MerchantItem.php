@@ -1,11 +1,11 @@
 <?php
 
-namespace Thinktomorrow\Trader\Order\Ports\Web\Merchant;
+namespace Thinktomorrow\Trader\Order\Ports\Read;
 
 use Thinktomorrow\Trader\Common\Domain\Price\Cash;
 use Thinktomorrow\Trader\Common\Ports\Web\AbstractPresenter;
 
-class Item extends AbstractPresenter
+class MerchantItem extends AbstractPresenter
 {
     public function quantity()
     {

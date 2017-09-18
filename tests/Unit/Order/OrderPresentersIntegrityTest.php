@@ -1,3 +1,3 @@
 <?php
 
-// TODO check integrity of MerchantOrder vs Order. Both must contain same data and totals
+// TODO check integrity of MerchantOrder vs MerchantOrder. Both must contain same data and totals

@@ -1,16 +1,16 @@
 <?php
 
-namespace Thinktomorrow\Trader\Order\Ports\Web\Merchant;
+namespace Thinktomorrow\Trader\Order\Ports\Read;
 
 use Thinktomorrow\Trader\Common\Domain\Price\Cash;
 use Thinktomorrow\Trader\Common\Ports\Web\AbstractPresenter;
 
 /**
- * Order presenter for merchant
+ * MerchantOrder presenter for merchant
  *
- * @package src\Order
+ * @package src\MerchantOrder
  */
-class Order extends AbstractPresenter
+class MerchantOrder extends AbstractPresenter
 {
     public function items(): array
     {

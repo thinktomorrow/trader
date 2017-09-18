@@ -1684,8 +1684,8 @@ mixin(Cart.prototype, Storage.prototype);
 /**
  * Adds an item to the cart. This fires an "add" event.
  *
- * @param {object} data Item data
- * @return {number} Item location in the cart
+ * @param {object} data MerchantItem data
+ * @return {number} MerchantItem location in the cart
  */
 Cart.prototype.add = function add(data) {
     var that = this,
@@ -1823,7 +1823,7 @@ Cart.prototype.total = function total(config) {
 /**
  * Remove an item from the cart. This fires a "remove" event.
  *
- * @param {number} idx Item index to remove.
+ * @param {number} idx MerchantItem index to remove.
  * @return {boolean}
  */
 Cart.prototype.remove = function remove(idx) {
@@ -2058,7 +2058,7 @@ var parser = {
  * Creates a new product.
  *
  * @constructor
- * @param {object} data Item data
+ * @param {object} data MerchantItem data
  */
 function Product(data) {
     data.quantity = parser.quantity(data.quantity);

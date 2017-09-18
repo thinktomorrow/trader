@@ -50,7 +50,7 @@ class ApplyTaxRatesToOrder
         // NOTE: each element should already have a TaxId reference!!!!!
         // So what does this class do???? Maybe alter the prices for non-VAT purchases???
 
-        // Order->isBusiness() and order->
+        // MerchantOrder->isBusiness() and order->
 
         // get the billing address of the order, if given
 

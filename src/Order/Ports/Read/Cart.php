@@ -1,14 +1,15 @@
 <?php
 
-namespace Thinktomorrow\Trader\Order\Ports\Web\Shop;
+namespace Thinktomorrow\Trader\Order\Ports\Read;
 
 use Thinktomorrow\Trader\Discounts\Domain\AppliedDiscountCollection;
 use Thinktomorrow\Trader\Order\Domain\Order;
 use Thinktomorrow\Trader\Common\Domain\Price\Cash;
+use Thinktomorrow\Trader\Order\Ports\Read\CartItem;
 
 /**
  * Cart data object for read-only usage in views
- * Order presenter for shopper
+ * MerchantOrder presenter for shopper
  */
 class Cart
 {
@@ -36,7 +37,7 @@ class Cart
     {
         $collection = [];
 
-        foreach($this->order->items() as $id => $item)
+        foreach ($this->order->items() as $id => $item)
         {
             $collection[$id] = new CartItem($item);
         }

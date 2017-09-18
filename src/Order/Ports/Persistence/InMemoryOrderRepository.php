@@ -14,7 +14,7 @@ class InMemoryOrderRepository implements OrderRepository
     {
         if(isset(self::$collection[(string)$orderId])) return self::$collection[(string)$orderId];
 
-        throw new \RuntimeException('Order not found by id ['.$orderId->get().']');
+        throw new \RuntimeException('MerchantOrder not found by id ['.$orderId->get().']');
     }
 
     public function add(Order $order)
@@ -26,7 +26,7 @@ class InMemoryOrderRepository implements OrderRepository
     {
         if(!isset(self::$collection[(string)$orderId]))
         {
-            throw new \RuntimeException('Order not found by id ['.$orderId->get().']');
+            throw new \RuntimeException('MerchantOrder not found by id ['.$orderId->get().']');
         }
 
         $order = self::$collection[(string)$orderId];

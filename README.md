@@ -10,7 +10,7 @@
 - AlmostApplicableDiscounts
 - DiscountConditions: Should default be only one item to be discounted? (see getAffectedItemQuantity)
 - TaxId connection for shipment, payment, discounts. These must be changable as well
-- ApplyDiscountsToOrder should accept OrderId, not Order. (e.g. ApplySHipmentRuleToOrder)
+- ApplyDiscountsToOrder should accept OrderId, not MerchantOrder. (e.g. ApplySHipmentRuleToOrder)
 - taxrate regels duidelijk bepalen: 
 // RESOURCES:
 // https://www.unizo.be/advies/wat-zijn-de-btw-regels-voor-webshops-voor-verkoop-van-en-naar-het-buitenland en
@@ -41,7 +41,7 @@ allow to add / override conditions
 ## Cart
 
 Cart: available singleton
--> Order
+-> MerchantOrder
 -> Customer
 
 application layer: alle acties + events + saves

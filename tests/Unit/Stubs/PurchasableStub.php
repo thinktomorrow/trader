@@ -44,7 +44,7 @@ class PurchasableStub implements Purchasable
 
     public function salePrice(): Money
     {
-        // TODO: should this be set here on purchasable or only on Item?
+        // TODO: should this be set here on purchasable or only on MerchantItem?
         // If set here, the salePrice can be displayed on index as well, right?
         // Also it can be optimized for reads? Keep in mind that we should also need the applied Sales description as well
         // For specific text representations on productpages.

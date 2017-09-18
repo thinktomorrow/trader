@@ -2,15 +2,11 @@
 
 namespace Thinktomorrow\Trader\Order\Application;
 
-use Money\Money;
-use Thinktomorrow\Trader\Common\Domain\Price\Percentage;
-use Thinktomorrow\Trader\Discounts\Domain\AppliedDiscount;
 use Thinktomorrow\Trader\Discounts\Ports\Web\Discount;
 use Thinktomorrow\Trader\Order\Domain\OrderId;
 use Thinktomorrow\Trader\Order\Domain\OrderRepository;
-use Thinktomorrow\Trader\Order\Ports\Web\Merchant\Item;
-use Thinktomorrow\Trader\Order\Ports\Web\Merchant\Order as MerchantOrder;
-use Thinktomorrow\Trader\Order\Ports\Web\Merchant\Order;
+use Thinktomorrow\Trader\Order\Ports\Read\MerchantItem;
+use Thinktomorrow\Trader\Order\Ports\Read\MerchantOrder;
 
 // TODO: the assembler violates the dependency flow since it depends on concrete ports objects
 class OrderAssembler
@@ -56,14 +52,14 @@ class OrderAssembler
         return $order;
     }
 
-    private function assembleItems(Order $order, $orderId)
+    private function assembleItems(MerchantOrder $order, $orderId)
     {
         $itemCollection = $this->orderRepository->getItemValues(OrderId::fromInteger($orderId));
         $items = [];
 
         foreach($itemCollection as $id => $itemValues)
         {
-            $items[$id] = new Item($itemValues);
+            $items[$id] = new MerchantItem($itemValues);
         }
 
         $order->items = $items;

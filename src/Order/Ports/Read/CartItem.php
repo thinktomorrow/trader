@@ -1,6 +1,6 @@
 <?php
 
-namespace Thinktomorrow\Trader\Order\Ports\Web\Shop;
+namespace Thinktomorrow\Trader\Order\Ports\Read;
 
 use Thinktomorrow\Trader\Discounts\Domain\AppliedDiscountCollection;
 use Thinktomorrow\Trader\Order\Domain\Item;
@@ -12,7 +12,7 @@ use Thinktomorrow\Trader\Common\Domain\Price\Cash;
  * Safe to use in your views and documents.
  * This object has no behaviour and should already be localised.
  *
- * @package Thinktomorrow\Trader\Order
+ * @package Thinktomorrow\Trader\MerchantOrder
  */
 class CartItem
 {
