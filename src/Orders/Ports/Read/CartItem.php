@@ -1,21 +1,22 @@
 <?php
 
-namespace Thinktomorrow\Trader\Order\Ports\Read;
+namespace Thinktomorrow\Trader\Orders\Ports\Read;
 
-use Thinktomorrow\Trader\Discounts\Domain\AppliedDiscountCollection;
-use Thinktomorrow\Trader\Order\Domain\Item;
 use Thinktomorrow\Trader\Common\Domain\Price\Cash;
+use Thinktomorrow\Trader\Common\Ports\Web\GetDynamicValue;
+use Thinktomorrow\Trader\Orders\Application\Reads\Cart\CartItem as CartItemContract;
+use Thinktomorrow\Trader\Orders\Domain\Item;
 
 /**
  * Class CartItem
  * Read-only Data object for item information in cart.
  * Safe to use in your views and documents.
  * This object has no behaviour and should already be localised.
- *
- * @package Thinktomorrow\Trader\MerchantOrder
  */
-class CartItem
+class CartItem implements CartItemContract
 {
+    use GetDynamicValue;
+
     /**
      * @var Item
      */
@@ -29,6 +30,11 @@ class CartItem
     public function id()
     {
         return $this->item->id();
+    }
+
+    public function purchasableId()
+    {
+        return $this->item->purchasableId();
     }
 
     public function quantity(): int
@@ -48,22 +54,31 @@ class CartItem
 
     public function price(): string
     {
-        return (new Cash())->locale($this->item->price());
+        return Cash::from($this->item->price())->locale();
+    }
+
+    public function saleprice(): string
+    {
+        return Cash::from($this->item->salePrice())->locale();
     }
 
     public function subtotal(): string
     {
-        return (new Cash())->locale($this->item->subtotal());
+        return Cash::from($this->item->subtotal())->locale();
     }
 
     public function total(): string
     {
-        return (new Cash())->locale($this->item->total());
+        return Cash::from($this->item->total())->locale();
     }
 
-    public function discounts(): AppliedDiscountCollection
+    public function discounts(): array
     {
         return $this->item->discounts();
     }
 
+    public function taxRate(): string
+    {
+        // TODO: Implement taxRate() method.
+    }
 }

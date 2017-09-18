@@ -16,10 +16,10 @@ use Thinktomorrow\Trader\Orders\Domain\OrderId;
 use Thinktomorrow\Trader\Orders\Application\Reads\Merchant\MerchantOrderFactory;
 use Thinktomorrow\Trader\Orders\Application\Reads\Merchant\MerchantItem as MerchantItemContract;
 use Thinktomorrow\Trader\Orders\Application\Reads\Merchant\MerchantOrder as MerchantOrderContract;
-use Thinktomorrow\Trader\Orders\Ports\Reads\MerchantItem;
-use Thinktomorrow\Trader\Orders\Ports\Reads\MerchantOrder;
+use Thinktomorrow\Trader\Orders\Ports\Read\MerchantItem;
+use Thinktomorrow\Trader\Orders\Ports\Read\MerchantOrder;
 
-use Thinktomorrow\Trader\Orders\Ports\Reads\MerchantOrderResource;
+use Thinktomorrow\Trader\Orders\Ports\Read\MerchantOrderResource;
 use Thinktomorrow\Trader\Tests\InMemoryContainer;
 use Thinktomorrow\Trader\Tests\Unit\Stubs\PurchasableStub;
 

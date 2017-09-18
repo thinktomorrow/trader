@@ -1,6 +1,6 @@
 <?php
 
-namespace Thinktomorrow\Trader\Orders\Ports\Reads;
+namespace Thinktomorrow\Trader\Orders\Ports\Read;
 
 use Thinktomorrow\Trader\Orders\Application\Reads\Merchant\MerchantOrderResource as MerchantOrderResourceContract;
 use Thinktomorrow\Trader\Orders\Domain\Order;
