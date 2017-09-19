@@ -16,6 +16,11 @@ abstract class BaseDiscount
     protected $id;
 
     /**
+     * @var TypeKey
+     */
+    protected $type;
+
+    /**
      * @var Condition[]
      */
     protected $conditions;
@@ -32,11 +37,28 @@ abstract class BaseDiscount
         $this->id = $id;
         $this->conditions = $conditions;
         $this->adjusters = $adjusters;
+
+        $this->type = TypeKey::fromDiscount($this);
     }
 
     public function id(): DiscountId
     {
         return $this->id;
+    }
+
+    public function type(): TypeKey
+    {
+        return $this->type;
+    }
+
+    public function conditions(): array
+    {
+        return $this->conditions;
+    }
+
+    public function adjusters(): array
+    {
+        return $this->adjusters;
     }
 
     /**

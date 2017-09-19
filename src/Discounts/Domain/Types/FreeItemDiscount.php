@@ -20,17 +20,12 @@ final class FreeItemDiscount extends BaseDiscount implements Discount, OrderDisc
      */
     private $free_items;
 
-    /**
-     * @var TypeKey
-     */
-    private $type;
-
     public function __construct(DiscountId $id, array $conditions, array $adjusters)
     {
         parent::__construct($id, $conditions, $adjusters);
 
         $this->free_items = $adjusters['free_items'];
-        $this->type = TypeKey::fromDiscount($this);
+        //$this->type = TypeKey::fromDiscount($this);
     }
 
     /**

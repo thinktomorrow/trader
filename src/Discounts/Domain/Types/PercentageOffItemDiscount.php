@@ -17,17 +17,12 @@ final class PercentageOffItemDiscount extends BaseItemDiscount implements Discou
      */
     private $percentage;
 
-    /**
-     * @var TypeKey
-     */
-    private $type;
-
     public function __construct(DiscountId $id, array $conditions, array $adjusters)
     {
         parent::__construct($id, $conditions, $adjusters);
 
         $this->percentage = $adjusters['percentage'];
-        $this->type = TypeKey::fromDiscount($this);
+        //$this->type = TypeKey::fromDiscount($this);
     }
 
     public function id(): DiscountId
