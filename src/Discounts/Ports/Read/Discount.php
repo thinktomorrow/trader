@@ -5,7 +5,7 @@ namespace Thinktomorrow\Trader\Discounts\Ports\Read;
 use Thinktomorrow\Trader\Common\Domain\Price\Cash;
 use Thinktomorrow\Trader\Common\Ports\Web\AbstractPresenter;
 
-class Discount extends AbstractPresenter implements \Thinktomorrow\Trader\Discounts\Application\Reads\Discount
+class Discount extends AbstractPresenter implements \Thinktomorrow\Trader\Discounts\Domain\Read\Discount
 {
     public function description(): string
     {

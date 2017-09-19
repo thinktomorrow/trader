@@ -4,7 +4,7 @@ namespace Thinktomorrow\Trader\Orders\Domain\Read;
 
 use Illuminate\Contracts\Container\Container;
 use Thinktomorrow\Trader\Common\Application\ResolvesFromContainer;
-use Thinktomorrow\Trader\Discounts\Application\Reads\Discount as DiscountPresenter;
+use Thinktomorrow\Trader\Discounts\Domain\Read\Discount as DiscountPresenter;
 use Thinktomorrow\Trader\Orders\Domain\Order;
 use Thinktomorrow\Trader\Orders\Domain\OrderRepository;
 

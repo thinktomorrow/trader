@@ -6,7 +6,6 @@ interface OrderRepository
 {
     /**
      * @param OrderId $orderId
-     *
      * @throws \RuntimeException
      *
      * @return Order
