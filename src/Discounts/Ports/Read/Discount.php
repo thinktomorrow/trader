@@ -1,6 +1,6 @@
 <?php
 
-namespace Thinktomorrow\Trader\Discounts\Ports\Reads;
+namespace Thinktomorrow\Trader\Discounts\Ports\Read;
 
 use Thinktomorrow\Trader\Common\Domain\Price\Cash;
 use Thinktomorrow\Trader\Common\Ports\Web\AbstractPresenter;

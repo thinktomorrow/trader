@@ -16,7 +16,7 @@ class MinimumAmount extends BaseCondition implements Condition, OrderCondition
             return true;
         }
 
-        // Check subtotal (without shipment costs)
+        // Check subtotal (without shipment / payment costs)
         return $order->subtotal()->greaterThanOrEqual($this->parameters['minimum_amount']);
     }
 

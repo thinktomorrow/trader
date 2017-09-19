@@ -36,7 +36,7 @@ final class Order implements StatefulContract
         $this->setTaxPercentage(Percentage::fromPercent((new Config())->get('tax_percentage', 0))); // TODO get from config
 
         // Initial order state
-        $this->state = OrderState::STATE_NEW;
+        $this->state = OrderState::NEW;
 
         // TODO IncompleteOrderStatus
     }

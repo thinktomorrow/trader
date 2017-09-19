@@ -4,12 +4,12 @@ namespace Thinktomorrow\Trader\Tests\Features;
 
 use Money\Money;
 use Thinktomorrow\Trader\Orders\Domain\Item;
-use Thinktomorrow\Trader\Orders\Ports\Persistence\InMemoryOrderRepository;
+use Thinktomorrow\Trader\Tests\Unit\InMemoryOrderRepository;
 use Thinktomorrow\Trader\Shipment\Application\ApplyShippingMethodToOrder;
 use Thinktomorrow\Trader\Shipment\Domain\ShippingMethod;
 use Thinktomorrow\Trader\Shipment\Domain\ShippingMethodId;
 use Thinktomorrow\Trader\Shipment\Domain\ShippingRuleFactory;
-use Thinktomorrow\Trader\Shipment\Ports\Persistence\InMemoryShippingMethodRepository;
+use Thinktomorrow\Trader\Tests\Unit\InMemoryShippingMethodRepository;
 use Thinktomorrow\Trader\Tests\InMemoryContainer;
 use Thinktomorrow\Trader\Tests\Unit\Stubs\PurchasableStub;
 use Thinktomorrow\Trader\Tests\Unit\UnitTestCase;

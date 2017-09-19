@@ -4,12 +4,13 @@ namespace Thinktomorrow\Trader\Orders\Domain\Read;
 
 use Illuminate\Contracts\Container\Container;
 use Thinktomorrow\Trader\Common\Application\ResolvesFromContainer;
+use Thinktomorrow\Trader\Discounts\Application\Reads\Discount as DiscountPresenter;
 use Thinktomorrow\Trader\Orders\Domain\Order;
 use Thinktomorrow\Trader\Orders\Domain\OrderRepository;
 
 /**
  * Assembling an order will not refresh/update the given data.
- * It maintains the state when order was last stored to db.
+ * It displays the data from order as given.
  */
 class CartFactory
 {

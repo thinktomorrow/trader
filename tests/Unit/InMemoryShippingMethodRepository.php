@@ -1,6 +1,6 @@
 <?php
 
-namespace Thinktomorrow\Trader\Shipment\Ports\Persistence;
+namespace Thinktomorrow\Trader\Tests\Unit;
 
 use Thinktomorrow\Trader\Shipment\Domain\ShippingMethod;
 use Thinktomorrow\Trader\Shipment\Domain\ShippingMethodId;

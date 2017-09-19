@@ -23,7 +23,7 @@ class MerchantOrder extends AbstractPresenter implements MerchantOrderContract
 
     public function confirmedAt(): string
     {
-        return $this->getValue('confirmed_at', null, function ($confirmedAt) {
+        return $this->getValue('confirmed_at', '', function ($confirmedAt) {
             return $confirmedAt->format('d/m/Y H:i');
         });
     }
@@ -108,24 +108,6 @@ class MerchantOrder extends AbstractPresenter implements MerchantOrderContract
     {
         return $this->getValue('payment_total', null, function ($paymentTotal) {
             return Cash::from($paymentTotal)->locale();
-        });
-    }
-
-    public function stateBadge(): string
-    {
-        return $this->getValue('state', null, function ($state) {
-
-            // TODO translate state
-
-            $flair = 'default';
-            if ($state == 'paid' || $state == 'confirmed') {
-                $flair = 'success';
-            }
-            if ($state == 'refunded' || $state == 'cancelled') {
-                $flair = 'danger';
-            }
-
-            return "<span class='label label-{$flair}'>{$state}</span>";
         });
     }
 }

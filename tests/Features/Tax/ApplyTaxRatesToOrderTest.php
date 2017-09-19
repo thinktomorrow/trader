@@ -6,11 +6,11 @@ use Money\Money;
 use Thinktomorrow\Trader\Common\Domain\Price\Percentage;
 use Thinktomorrow\Trader\Orders\Domain\Item;
 use Thinktomorrow\Trader\Orders\Domain\PurchasableId;
-use Thinktomorrow\Trader\Orders\Ports\Persistence\InMemoryOrderRepository;
+use Thinktomorrow\Trader\Tests\Unit\InMemoryOrderRepository;
 use Thinktomorrow\Trader\Tax\Application\ApplyTaxRatesToOrder;
 use Thinktomorrow\Trader\Tax\Domain\TaxId;
 use Thinktomorrow\Trader\Tax\Domain\TaxRate;
-use Thinktomorrow\Trader\Tax\Ports\Persistence\InMemoryTaxRateRepository;
+use Thinktomorrow\Trader\Tests\Unit\InMemoryTaxRateRepository;
 use Thinktomorrow\Trader\Tests\Unit\Stubs\PurchasableStub;
 use Thinktomorrow\Trader\Tests\Unit\UnitTestCase;
 

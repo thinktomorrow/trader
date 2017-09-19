@@ -9,7 +9,7 @@ use Thinktomorrow\Trader\Orders\Domain\Item;
 use Thinktomorrow\Trader\Orders\Domain\OrderId;
 use Thinktomorrow\Trader\Orders\Domain\OrderReference;
 use Thinktomorrow\Trader\Orders\Domain\OrderState;
-use Thinktomorrow\Trader\Orders\Ports\Persistence\InMemoryOrderRepository;
+use Thinktomorrow\Trader\Tests\Unit\InMemoryOrderRepository;
 use Thinktomorrow\Trader\Tests\Unit\Stubs\PurchasableStub;
 
 class OrderRepositoryTest extends UnitTestCase

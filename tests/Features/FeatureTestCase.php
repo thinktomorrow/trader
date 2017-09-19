@@ -8,7 +8,7 @@ use Thinktomorrow\Trader\Orders\Application\OrderAssembler;
 use Thinktomorrow\Trader\Orders\Domain\Read\Cart;
 use Thinktomorrow\Trader\Orders\Domain\Read\MerchantItem as MerchantItemContract;
 use Thinktomorrow\Trader\Orders\Domain\Read\MerchantOrder as MerchantOrderContract;
-use Thinktomorrow\Trader\Orders\Ports\Persistence\InMemoryOrderRepository;
+use Thinktomorrow\Trader\Tests\Unit\InMemoryOrderRepository;
 use Thinktomorrow\Trader\Orders\Ports\Read\MerchantItem;
 use Thinktomorrow\Trader\Orders\Ports\Read\MerchantOrder;
 use Thinktomorrow\Trader\Tests\IlluminateContainer;
@@ -49,11 +49,7 @@ class FeatureTestCase extends TestCase
         });
 
         $this->container->bind(Discount::class, function ($c) {
-            return new \Thinktomorrow\Trader\Discounts\Ports\Reads\Discount();
-        });
-
-        $this->container->bind(OrderAssembler::class, function ($c) {
-            return new OrderAssembler($c->make('orderRepository'));
+            return new \Thinktomorrow\Trader\Discounts\Ports\Read\Discount();
         });
     }
 }

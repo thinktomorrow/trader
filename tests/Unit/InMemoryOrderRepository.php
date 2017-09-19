@@ -1,6 +1,6 @@
 <?php
 
-namespace Thinktomorrow\Trader\Orders\Ports\Persistence;
+namespace Thinktomorrow\Trader\Tests\Unit;
 
 use Ramsey\Uuid\Uuid;
 use Thinktomorrow\Trader\Orders\Domain\Exceptions\OrderNotFound;

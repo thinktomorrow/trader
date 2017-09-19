@@ -7,54 +7,57 @@ use Thinktomorrow\Trader\Common\Domain\State\StateMachine;
 class OrderState extends StateMachine
 {
     // Incomplete states - order is still in customer hands
-    const STATE_NEW = 'new';
-    const STATE_PENDING = 'pending';
-    const STATE_ABANDONED = 'abandoned';
-    const STATE_CONFIRMED = 'confirmed'; // ready for payment
+    const NEW = 'new'; // Order exists but without items
+    const PENDING = 'pending'; // order still in cart
+    const ABANDONED = 'abandoned'; // order has been stale for too long
+    const REMOVED = 'removed'; // order is in queue to be removed
 
     // Complete states - order can be processed by merchant
-    const STATE_PAID = 'paid';
-    const STATE_PROCESSED = 'processed'; // ready for pickup
-    const STATE_SHIPPED = 'shipped';
-    const STATE_FULLFILLED = 'fullfilled'; // delivered
-    const STATE_RETURNED = 'returned';
-    const STATE_REFUNDED = 'refunded';
+    const CONFIRMED = 'confirmed'; // ready for payment - unpaid
+    const CANCELLED = 'cancelled'; // customer cancelled order
+    const PAID = 'paid'; // payment received by merchant or acquirer
+    const PROCESSED = 'processed'; // ready for pickup
+    const SHIPPED = 'shipped'; // picked up
+    const FULLFILLED = 'fullfilled'; // delivered to customer
+    const REFUNDED = 'refunded';
+    const RETURNED = 'returned';
 
     protected $states = [
-        self::STATE_NEW,
-        self::STATE_PENDING,
-        'abandoned',
-        'confirmed',
-        'removed',
+        self::NEW,
+        self::PENDING,
+        self::ABANDONED,
+        self::REMOVED,
 
-        'paid', // paid
-        'readyForPickup',
-        'pickedUp',
-        'void', // ??? cancel between payment and receiving the payment by merchant
-        'returned',
-        'refunded',
+        self::CONFIRMED,
+        self::CANCELLED,
+        self::PAID,
+        self::PROCESSED,
+        self::SHIPPED,
+        self::FULLFILLED,
+        self::REFUNDED,
+        self::RETURNED,
     ];
 
     protected $transitions = [
         'create' => [
-            'from' => ['new'],
-            'to'   => 'pending',
+            'from' => [self::NEW],
+            'to'   => self::PENDING,
         ],
         'abandon' => [
-            'from' => ['pending'],
-            'to'   => 'abandoned',
+            'from' => [self::PENDING],
+            'to'   => self::ABANDONED,
         ],
         'remove' => [
-          'from' => ['pending', 'abandoned'],
-          'to'   => 'removed',
+          'from' => [self::PENDING, self::ABANDONED],
+          'to'   => self::REMOVED,
         ],
         'confirm' => [
-            'from' => ['pending', 'abandoned'],
-            'to'   => 'confirmed',
+            'from' => [self::PENDING, self::ABANDONED],
+            'to'   => self::CONFIRMED,
         ],
         'pay' => [
-            'from' => ['confirmed'],
-            'to'   => 'paid',
+            'from' => [self::CONFIRMED],
+            'to'   => self::PAID,
         ],
     ];
 
@@ -66,10 +69,10 @@ class OrderState extends StateMachine
     public function inCustomerHands(): bool
     {
         return in_array($this->statefulContract->state(), [
-            static::STATE_NEW,
-            static::STATE_PENDING,
-            static::STATE_ABANDONED,
-            static::STATE_CONFIRMED,
+            static::NEW,
+            static::PENDING,
+            static::ABANDONED,
+            static::CONFIRMED,
         ]);
     }
 
