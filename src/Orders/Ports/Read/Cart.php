@@ -30,7 +30,7 @@ class Cart implements CartContract
 
     public function reference(): string
     {
-        return $this->order->hasReference() ? $this->order->reference()->get() : '';
+        return $this->order->hasReference() ? $this->order->reference() : '';
     }
 
     public function empty(): bool
@@ -41,16 +41,6 @@ class Cart implements CartContract
     public function size(): int
     {
         return count($this->items());
-    }
-
-    public function subtotal(): string
-    {
-        return Cash::from($this->order->subtotal())->locale();
-    }
-
-    public function total(): string
-    {
-        return Cash::from($this->order->total())->locale();
     }
 
     public function items(): array
@@ -71,7 +61,7 @@ class Cart implements CartContract
 
     public function freeShipment(): bool
     {
-        // TODO
+        // TODO check if order applies for free shipment...
         return false;
     }
 
@@ -83,6 +73,26 @@ class Cart implements CartContract
     public function shippingRuleId(): int
     {
         return $this->order->shippingRuleId();
+    }
+
+    public function shippingAddressId()
+    {
+        return $this->order->shippingAddressId();
+    }
+
+    public function billingAddressId()
+    {
+        return $this->order->billingAddressId();
+    }
+
+    public function subtotal(): string
+    {
+        return Cash::from($this->order->subtotal())->locale();
+    }
+
+    public function total(): string
+    {
+        return Cash::from($this->order->total())->locale();
     }
 
     public function tax(): string

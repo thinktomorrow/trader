@@ -11,6 +11,10 @@ interface MerchantOrder
 
     public function reference(): string;
 
+    public function empty(): bool;
+
+    public function size(): int;
+
     public function items(): array;
 
     public function discounts(): array;

@@ -8,6 +8,16 @@ use Thinktomorrow\Trader\Orders\Domain\Read\MerchantItem as MerchantItemContract
 
 class MerchantItem extends AbstractPresenter implements MerchantItemContract
 {
+    public function purchasableId(): int
+    {
+        return $this->getValue('purchasable_id');
+    }
+
+    public function purchasableType(): string
+    {
+        return $this->getValue('purchasable_type');
+    }
+
     public function quantity(): int
     {
         return $this->getValue('quantity', 1);

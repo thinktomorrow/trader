@@ -32,9 +32,14 @@ class CartItem implements CartItemContract
         return $this->item->id();
     }
 
-    public function purchasableId()
+    public function purchasableId(): int
     {
-        return $this->item->purchasableId();
+        return $this->item->purchasableId()->get();
+    }
+
+    public function purchasableType(): string
+    {
+        return $this->item->purchasableType();
     }
 
     public function quantity(): int

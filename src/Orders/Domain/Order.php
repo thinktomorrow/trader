@@ -19,6 +19,7 @@ final class Order implements StatefulContract
 
     private $id; // Used by application layer (this is a uuid)
     private $persistenceId; // Used by persistence layer (db)
+    private $reference;
     private $customerId;
 
     private $items;
@@ -59,6 +60,25 @@ final class Order implements StatefulContract
     public function persistenceId(): int
     {
         return $this->persistenceId;
+    }
+
+    /**
+     * Unique merchant reference to order
+     * @param string $reference
+     */
+    public function setReference(string $reference)
+    {
+        $this->reference = $reference;
+    }
+
+    public function hasReference(): bool
+    {
+        return !!$this->reference;
+    }
+
+    public function reference(): string
+    {
+        return $this->reference;
     }
 
     public function customerId(): CustomerId
@@ -108,6 +128,11 @@ final class Order implements StatefulContract
         return (new OrderState($this))->inMerchantHands();
     }
 
+    public function empty(): bool
+    {
+        return count($this->items) < 1;
+    }
+
     public function items(): ItemCollection
     {
         return $this->items;
@@ -132,7 +157,7 @@ final class Order implements StatefulContract
     {
         return array_reduce($this->items->all(), function ($carry, Item $item) {
             return $carry->add($item->total());
-        }, Cash::make(0)); // TODO currency should be changeable
+        }, Cash::make(0));
     }
 
     public function discountTotal(): Money

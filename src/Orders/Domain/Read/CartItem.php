@@ -4,6 +4,10 @@ namespace Thinktomorrow\Trader\Orders\Domain\Read\CartItem;
 
 interface CartItem
 {
+    public function purchasableId(): int;
+
+    public function purchasableType(): string;
+
     public function quantity(): int;
 
     public function price(): string;

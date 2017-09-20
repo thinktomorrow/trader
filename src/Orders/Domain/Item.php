@@ -176,14 +176,19 @@ final class Item
         return $this;
     }
 
-    public function purchasable(): Purchasable
-    {
-        return $this->purchasable;
-    }
-
     public function purchasableId(): PurchasableId
     {
         return $this->purchasable()->purchasableId();
+    }
+
+    public function purchasableType(): string
+    {
+        return $this->purchasable()->purchasableType();
+    }
+
+    public function purchasable(): Purchasable
+    {
+        return $this->purchasable;
     }
 
     private function validateQuantity()

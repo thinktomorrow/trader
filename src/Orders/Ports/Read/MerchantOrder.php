@@ -28,6 +28,16 @@ class MerchantOrder extends AbstractPresenter implements MerchantOrderContract
         });
     }
 
+    public function empty(): bool
+    {
+        return empty($this->items());
+    }
+
+    public function size(): int
+    {
+        return count($this->items());
+    }
+
     public function items(): array
     {
         return $this->getValue('items', []);
@@ -50,6 +60,16 @@ class MerchantOrder extends AbstractPresenter implements MerchantOrderContract
         return $this->getValue('shippingRuleId', null, function ($shippingRuleId) {
             return $shippingRuleId->get();
         });
+    }
+
+    public function shippingAddressId()
+    {
+        return $this->getValue('shippingAddressId', null);
+    }
+
+    public function billingAddressId()
+    {
+        return $this->getValue('billingAddressId', null);
     }
 
     public function total(): string
@@ -80,7 +100,7 @@ class MerchantOrder extends AbstractPresenter implements MerchantOrderContract
 
             foreach ($taxRates as $key => $taxRate) {
                 $rates[$key] = [
-                    'percent' => $taxRate['percent']->asPercent().'%',
+                    'percent' => $taxRate['percent']->asPercent(),
                     'tax'     => Cash::from($taxRate['tax'])->locale(),
                     'total'   => Cash::from($taxRate['total'])->locale(),
                 ];

@@ -3,7 +3,7 @@
 namespace Thinktomorrow\Trader\Tests;
 
 use PHPUnit\Framework\TestCase;
-use Thinktomorrow\Trader\Discounts\Domain\Reads\Discount;
+use Thinktomorrow\Trader\Discounts\Domain\Read\Discount;
 use Thinktomorrow\Trader\Orders\Domain\Read\Cart;
 use Thinktomorrow\Trader\Orders\Domain\Read\MerchantItem as MerchantItemContract;
 use Thinktomorrow\Trader\Orders\Domain\Read\MerchantOrder as MerchantOrderContract;
@@ -12,6 +12,8 @@ use Thinktomorrow\Trader\Orders\Ports\Read\MerchantOrder;
 
 class FeatureTestCase extends TestCase
 {
+    use ShoppingHelpers;
+
     protected $container;
 
     public function setUp()
