@@ -4,6 +4,8 @@ namespace Thinktomorrow\Trader\Shipment\Domain;
 
 use Psr\Container\ContainerInterface;
 use Thinktomorrow\Trader\Common\Domain\Conditions\Condition;
+use Thinktomorrow\Trader\Shipment\Domain\Conditions\Country;
+use Thinktomorrow\Trader\Shipment\Domain\Conditions\MaximumAmount;
 use Thinktomorrow\Trader\Shipment\Domain\Conditions\MinimumAmount;
 
 class ShippingRuleFactory
@@ -14,15 +16,10 @@ class ShippingRuleFactory
     private $container;
 
     private static $conditionMapping = [
+        'country'        => Country::class,
         'minimum_amount' => MinimumAmount::class,
+        'maximum_amount' => MaximumAmount::class,
     ];
-
-    /**
-     * Collection of condition instances.
-     *
-     * @var array
-     */
-    private $conditions = [];
 
     public function __construct(ContainerInterface $container)
     {
@@ -31,19 +28,11 @@ class ShippingRuleFactory
 
     public function create($id, array $conditions, array $adjusters)
     {
-        foreach ($conditions as $condition => $value) {
-            /*
-             * If condition does not map to a condition class it is an option value so
-             * just skip it and use it as parameter value for our condition instances
-             */
-            if (!isset(self::$conditionMapping[$condition])) {
-                continue;
-            }
-
-            $this->conditions[] = $this->resolveConditionClass($condition, $conditions);
-        }
-
-        return new ShippingRule(ShippingRuleId::fromInteger($id), $this->conditions, $adjusters);
+        return new ShippingRule(
+            ShippingRuleId::fromInteger($id),
+            $this->createConditions($conditions),
+            $adjusters
+        );
     }
 
     /**
@@ -56,9 +45,35 @@ class ShippingRuleFactory
     {
         $class = self::$conditionMapping[$condition];
 
-        $instance = $this->container->get($class);
+        $instance = ($this->container->has($class))
+            ? $this->container->get($class)
+            : new $class;
+
         $instance->setParameters($parameters);
 
         return $instance;
+    }
+
+    /**
+     * @param array $conditions
+     * @return array
+     */
+    private function createConditions(array $conditions): array
+    {
+        $conditionObjects = [];
+
+        foreach ($conditions as $condition => $value) {
+            /*
+             * If condition does not map to a condition class it is an option value so
+             * just skip it and use it as parameter value for our condition instances
+             */
+            if (!isset(self::$conditionMapping[$condition])) {
+                continue;
+            }
+
+            $conditionObjects[] = $this->resolveConditionClass($condition, $conditions);
+        }
+
+        return $conditionObjects;
     }
 }

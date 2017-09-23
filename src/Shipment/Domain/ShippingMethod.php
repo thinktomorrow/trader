@@ -47,6 +47,9 @@ class ShippingMethod
         $shippingRule = $this->getApplicableRule($order);
 
         $order->setShipping($this->id(), $shippingRule->id());
+
+        // TODO: Adjuster should be altering the order, not straight in the shippingMethod. This way the adjustment logic
+        // Is more flexible and also usable for discounts, sales,...
         $order->setShippingTotal($shippingRule->total());
     }
 

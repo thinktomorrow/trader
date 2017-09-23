@@ -48,28 +48,19 @@ class MerchantOrder extends AbstractPresenter implements MerchantOrderContract
         return $this->getValue('discounts', []);
     }
 
-    public function shipmentMethodId(): int
+    public function hasShipping(): bool
     {
-        return $this->getValue('shippingMethodId', null, function ($shippingMethodId) {
-            return $shippingMethodId->get();
-        });
+        return ($this->getValue('shippingmethod_id') && $this->getValue('shippingrule_id'));
+    }
+
+    public function shippingMethodId(): int
+    {
+        return $this->getValue('shippingmethod_id');
     }
 
     public function shippingRuleId(): int
     {
-        return $this->getValue('shippingRuleId', null, function ($shippingRuleId) {
-            return $shippingRuleId->get();
-        });
-    }
-
-    public function shippingAddressId()
-    {
-        return $this->getValue('shippingAddressId', null);
-    }
-
-    public function billingAddressId()
-    {
-        return $this->getValue('billingAddressId', null);
+        return $this->getValue('shippingrule_id');
     }
 
     public function total(): string

@@ -65,14 +65,19 @@ class Cart implements CartContract
         return false;
     }
 
+    public function hasShipping(): bool
+    {
+        return ($this->order->shippingMethodId() && $this->order->shippingRuleId());
+    }
+
     public function shippingMethodId(): int
     {
-        return $this->order->shippingMethodId();
+        return $this->order->shippingMethodId()->get();
     }
 
     public function shippingRuleId(): int
     {
-        return $this->order->shippingRuleId();
+        return $this->order->shippingRuleId()->get();
     }
 
     public function shippingAddressId()
