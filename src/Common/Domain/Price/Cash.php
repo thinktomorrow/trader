@@ -24,8 +24,10 @@ class Cash
         $this->money = $money;
     }
 
-    public static function from(Money $money): self
+    public static function from($money, $currencyCode = null): self
     {
+        if( ! $money instanceof Money) $money = static::make($money, $currencyCode);
+
         return new static($money);
     }
 
