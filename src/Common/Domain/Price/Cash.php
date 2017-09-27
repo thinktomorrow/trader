@@ -48,6 +48,26 @@ class Cash
     }
 
     /**
+     * Get full string representation of amount in desired locale
+     *
+     * @param 	int 	$decimals
+     * @param 	string 	$dec_point
+     * @param 	string 	$thousands_sep
+     * @return  string
+     */
+    public function toFormat($decimals = 2, $dec_point = ',', $thousands_sep = '.')
+    {
+        // Format of decimals for currency; this could be given from the currency instead of hardcoded here
+        $currency_decimals = 2;
+
+        // First convert the integer amount to the expected decimal number according to the currency.
+        $amount = $this->money->getAmount() / (10 ** $currency_decimals);
+        $amount = floatval($amount);
+
+        return number_format( $amount, $decimals, $dec_point, $thousands_sep);
+    }
+
+    /**
      * @param string $locale
      *
      * @return string

@@ -54,6 +54,15 @@ class CashTest extends UnitTestCase
     }
 
     /** @test */
+    public function it_can_represent_money_in_specific_format()
+    {
+        $this->assertEquals('1,20', Cash::from(Money::EUR(120))->toFormat(2,','));
+        $this->assertEquals('1,234.56', Cash::from(Money::EUR(123456))->toFormat(2,'.',','));
+        $this->assertEquals('1.234', Cash::from(Money::EUR(123444))->toFormat(0,'.','.'));
+        $this->assertEquals('15', Cash::from(Money::EUR(1455))->toFormat(0)); // format rounds off
+    }
+
+    /** @test */
     public function by_default_currency_code_is_used_as_symbol()
     {
         $cash = Cash::from(Money::AMD(120));
