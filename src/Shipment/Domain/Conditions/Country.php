@@ -15,11 +15,11 @@ class Country extends BaseCondition implements Condition
 
     public function check(Order $order): bool
     {
-        if (!isset($this->parameters['country_id'])) {
+        if (!isset($this->parameters['country'])) {
             return true;
         }
 
         // TODO: match country to order shipping country
-        return $this->parameters['country_id'] == $order->shippingAddress('country_id');
+        return $this->parameters['country'] == $order->shippingAddress('country_id');
     }
 }

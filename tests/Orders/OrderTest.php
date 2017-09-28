@@ -108,6 +108,16 @@ class OrderTest extends UnitTestCase
     }
 
     /** @test */
+    public function it_can_set_shipping_address()
+    {
+        $order = $this->makeOrder();
+
+        $order->setShippingAddress(['country_id' => 'BE']);
+        $this->assertEquals(['country_id' => 'BE'], $order->shippingAddress());
+        $this->assertEquals('BE', $order->shippingAddress('country_id'));
+    }
+
+    /** @test */
     public function it_sums_up_all_given_tax_rates()
     {
         $order = $this->makeOrder();

@@ -12,11 +12,13 @@ trait PayableAndShippable
     private $shippingMethodId;
     private $shippingRuleId;
     private $shippingAddressId;
+    private $shippingAddress;
 
     private $paymentTotal;
     private $paymentMethodId;
     private $paymentRuleId;
     private $billingAddressId;
+    private $billingAddress;
 
     public function shippingTotal(): Money
     {
@@ -44,6 +46,40 @@ trait PayableAndShippable
     {
         $this->shippingMethodId = $shipmentMethodId;
         $this->shippingRuleId = $shipmentRuleId;
+    }
+
+    public function shippingAddress($key = null)
+    {
+        if($key)
+        {
+            return isset($this->shippingAddress[$key]) ? $this->shippingAddress[$key] : null;
+        }
+
+        return $this->shippingAddress;
+    }
+
+    public function billingAddress($key = null)
+    {
+        if($key)
+        {
+            return isset($this->billingAddress[$key]) ? $this->billingAddress[$key] : null;
+        }
+
+        return $this->billingAddress;
+    }
+
+    public function setShippingAddress(array $address)
+    {
+        $this->shippingAddress = $address;
+
+        return $this;
+    }
+
+    public function setBillingAddress(array $address)
+    {
+        $this->billingAddress = $address;
+
+        return $this;
     }
 
     public function shippingAddressId()
