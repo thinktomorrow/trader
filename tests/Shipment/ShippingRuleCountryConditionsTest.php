@@ -15,7 +15,7 @@ class ShippingRuleCountryConditionsTest extends UnitTestCase
     public function a_rule_is_not_applicable_if_conditions_are_not_met()
     {
         $order = $this->makeOrder()->setShippingAddress([
-            'country_id' => 'BE',
+            'country_key' => 'BE',
         ]);
 
         $rule = $this->createShippingRule();
@@ -26,7 +26,7 @@ class ShippingRuleCountryConditionsTest extends UnitTestCase
     public function a_rule_can_be_applicable_to_an_order_if_conditions_are_met()
     {
         $order = $this->makeOrder()->setShippingAddress([
-            'country_id' => 'NL',
+            'country_key' => 'NL',
         ]);
 
         $rule = $this->createShippingRule();

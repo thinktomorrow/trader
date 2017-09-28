@@ -112,9 +112,9 @@ class OrderTest extends UnitTestCase
     {
         $order = $this->makeOrder();
 
-        $order->setShippingAddress(['country_id' => 'BE']);
-        $this->assertEquals(['country_id' => 'BE'], $order->shippingAddress());
-        $this->assertEquals('BE', $order->shippingAddress('country_id'));
+        $order->setShippingAddress(['country_key' => 'BE']);
+        $this->assertEquals(['country_key' => 'BE'], $order->shippingAddress());
+        $this->assertEquals('BE', $order->shippingAddress('country_key'));
     }
 
     /** @test */

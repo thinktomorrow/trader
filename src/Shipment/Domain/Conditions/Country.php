@@ -20,6 +20,6 @@ class Country extends BaseCondition implements Condition
         }
 
         // TODO: match country to order shipping country
-        return $this->parameters['country'] == $order->shippingAddress('country_id');
+        return $this->parameters['country'] == $order->shippingAddress('country_key');
     }
 }
