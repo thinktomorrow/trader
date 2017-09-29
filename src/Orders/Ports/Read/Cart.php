@@ -80,6 +80,21 @@ class Cart implements CartContract
         return $this->order->shippingRuleId()->get();
     }
 
+    public function hasPayment(): bool
+    {
+        return ($this->order->paymentMethodId() && $this->order->paymentRuleId());
+    }
+
+    public function paymentMethodId(): int
+    {
+        return $this->order->paymentMethodId()->get();
+    }
+
+    public function paymentRuleId(): int
+    {
+        return $this->order->paymentRuleId()->get();
+    }
+
     public function shippingAddressId()
     {
         return $this->order->shippingAddressId();
