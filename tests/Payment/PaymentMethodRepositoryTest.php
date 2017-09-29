@@ -1,0 +1,30 @@
+<?php
+
+namespace Thinktomorrow\Trader\Tests\Payment;
+
+use Thinktomorrow\Trader\Payment\Domain\PaymentMethod;
+use Thinktomorrow\Trader\Payment\Domain\PaymentMethodId;
+use Thinktomorrow\Trader\Tests\InMemoryPaymentMethodRepository;
+use Thinktomorrow\Trader\Tests\UnitTestCase;
+
+class PaymentMethodRepositoryTest extends UnitTestCase
+{
+    /** @test */
+    public function it_can_find_a_paymentMethod()
+    {
+        $paymentMethod = new PaymentMethod(PaymentMethodId::fromInteger(3));
+        $repo = new InMemoryPaymentMethodRepository();
+
+        $repo->add($paymentMethod);
+
+        $this->assertEquals($paymentMethod, $repo->find(PaymentMethodId::fromInteger(3)));
+    }
+
+    public function it_throws_exception_if_order_does_not_exist()
+    {
+        $this->expectException(\RuntimeException::class);
+
+        $repo = new InMemoryPaymentMethodRepository();
+        $repo->find(PaymentMethodId::fromInteger(3));
+    }
+}
