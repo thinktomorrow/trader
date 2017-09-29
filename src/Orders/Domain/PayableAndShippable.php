@@ -3,6 +3,8 @@
 namespace Thinktomorrow\Trader\Orders\Domain;
 
 use Money\Money;
+use Thinktomorrow\Trader\Payment\Domain\PaymentMethodId;
+use Thinktomorrow\Trader\Payment\Domain\PaymentRuleId;
 use Thinktomorrow\Trader\Shipment\Domain\ShippingMethodId;
 use Thinktomorrow\Trader\Shipment\Domain\ShippingRuleId;
 
