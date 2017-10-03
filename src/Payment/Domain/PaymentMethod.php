@@ -25,17 +25,29 @@ class PaymentMethod
      */
     private $applicableRule;
 
-    public function __construct(PaymentMethodId $id, array $rules = [])
+    /**
+     * Unique string identifier
+     * @var string
+     */
+    private $code;
+
+    public function __construct(PaymentMethodId $id, string $code, array $rules = [])
     {
         Assertion::allIsInstanceOf($rules, PaymentRule::class);
 
         $this->id = $id;
+        $this->code = $code;
         $this->rules = $rules;
     }
 
     public function id(): PaymentMethodId
     {
         return $this->id;
+    }
+
+    public function code(): string
+    {
+        return $this->code;
     }
 
     public function apply(Order $order)

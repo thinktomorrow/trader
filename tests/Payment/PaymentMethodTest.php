@@ -24,9 +24,17 @@ class PaymentMethodTest extends UnitTestCase
     }
 
     /** @test */
+    public function it_has_a_code_reference()
+    {
+        $method = new PaymentMethod(PaymentMethodId::fromInteger(2), 'foobar');
+
+        $this->assertEquals('foobar',$method->code());
+    }
+
+    /** @test */
     public function without_rules_a_method_is_not_applicable_to_an_order()
     {
-        $method = new PaymentMethod(PaymentMethodId::fromInteger(2));
+        $method = new PaymentMethod(PaymentMethodId::fromInteger(2), 'foobar');
 
         $this->assertFalse($method->applicable($this->makeOrder()));
     }
@@ -36,7 +44,7 @@ class PaymentMethodTest extends UnitTestCase
     {
         $this->expectException(InvalidArgumentException::class);
 
-        new PaymentMethod(PaymentMethodId::fromInteger(2), ['foobar']);
+        new PaymentMethod(PaymentMethodId::fromInteger(2), 'bazz', ['foobar']);
     }
 
     /** @test */
@@ -45,7 +53,7 @@ class PaymentMethodTest extends UnitTestCase
         $order = $this->makeOrder();
         $order->items()->add(Item::fromPurchasable(new PurchasableStub(1, [], Money::EUR(31))));
 
-        $method = new PaymentMethod(PaymentMethodId::fromInteger(2), [
+        $method = new PaymentMethod(PaymentMethodId::fromInteger(2), 'foobar', [
             (new PaymentRuleFactory(new InMemoryContainer()))->create(1, [
                 'minimum_amount' => Money::EUR(30),
             ], [
@@ -62,7 +70,7 @@ class PaymentMethodTest extends UnitTestCase
         $order = $this->makeOrder();
         $order->items()->add(Item::fromPurchasable(new PurchasableStub(1, [], Money::EUR(10))));
 
-        $method = new PaymentMethod(PaymentMethodId::fromInteger(2), [
+        $method = new PaymentMethod(PaymentMethodId::fromInteger(2), 'foobar', [
             (new PaymentRuleFactory(new InMemoryContainer()))->create(1, [
                 'minimum_amount' => Money::EUR(30),
             ], [

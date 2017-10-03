@@ -23,9 +23,17 @@ class ShippingMethodTest extends UnitTestCase
     }
 
     /** @test */
+    public function it_has_a_code_reference()
+    {
+        $method = new ShippingMethod(ShippingMethodId::fromInteger(2), 'foobar');
+
+        $this->assertEquals('foobar',$method->code());
+    }
+
+    /** @test */
     public function without_rules_a_method_is_not_applicable_to_an_order()
     {
-        $method = new ShippingMethod(ShippingMethodId::fromInteger(2));
+        $method = new ShippingMethod(ShippingMethodId::fromInteger(2), 'foobar');
 
         $this->assertFalse($method->applicable($this->makeOrder()));
     }
@@ -35,7 +43,7 @@ class ShippingMethodTest extends UnitTestCase
     {
         $this->expectException(InvalidArgumentException::class);
 
-        new ShippingMethod(ShippingMethodId::fromInteger(2), ['foobar']);
+        new ShippingMethod(ShippingMethodId::fromInteger(2), 'bazz', ['foobar']);
     }
 
     /** @test */
@@ -44,7 +52,7 @@ class ShippingMethodTest extends UnitTestCase
         $order = $this->makeOrder();
         $order->items()->add(Item::fromPurchasable(new PurchasableStub(1, [], Money::EUR(31))));
 
-        $method = new ShippingMethod(ShippingMethodId::fromInteger(2), [
+        $method = new ShippingMethod(ShippingMethodId::fromInteger(2), 'foobar', [
             (new ShippingRuleFactory(new InMemoryContainer()))->create(1, [
                 'minimum_amount' => Money::EUR(30),
             ], [
@@ -61,7 +69,7 @@ class ShippingMethodTest extends UnitTestCase
         $order = $this->makeOrder();
         $order->items()->add(Item::fromPurchasable(new PurchasableStub(1, [], Money::EUR(10))));
 
-        $method = new ShippingMethod(ShippingMethodId::fromInteger(2), [
+        $method = new ShippingMethod(ShippingMethodId::fromInteger(2), 'foobar', [
             (new ShippingRuleFactory(new InMemoryContainer()))->create(1, [
                 'minimum_amount' => Money::EUR(30),
             ], [

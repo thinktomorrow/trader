@@ -11,7 +11,7 @@ class ShippingMethodRepositoryTest extends UnitTestCase
     /** @test */
     public function it_can_find_a_shippingMethod()
     {
-        $shippingMethod = new ShippingMethod(ShippingMethodId::fromInteger(3));
+        $shippingMethod = new ShippingMethod(ShippingMethodId::fromInteger(3), 'foobar');
         $repo = new InMemoryShippingMethodRepository();
 
         $repo->add($shippingMethod);

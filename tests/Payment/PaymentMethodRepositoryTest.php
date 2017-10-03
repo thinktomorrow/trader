@@ -12,7 +12,7 @@ class PaymentMethodRepositoryTest extends UnitTestCase
     /** @test */
     public function it_can_find_a_paymentMethod()
     {
-        $paymentMethod = new PaymentMethod(PaymentMethodId::fromInteger(3));
+        $paymentMethod = new PaymentMethod(PaymentMethodId::fromInteger(3), 'foobar');
         $repo = new InMemoryPaymentMethodRepository();
 
         $repo->add($paymentMethod);

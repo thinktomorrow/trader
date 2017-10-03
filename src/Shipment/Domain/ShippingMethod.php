@@ -25,17 +25,30 @@ class ShippingMethod
      */
     private $applicableRule;
 
-    public function __construct(ShippingMethodId $id, array $rules = [])
+    /**
+     * Unique string identifier.
+     * Can be used by your application to identify a method
+     * @var string
+     */
+    private $code;
+
+    public function __construct(ShippingMethodId $id, string $code, array $rules = [])
     {
         Assertion::allIsInstanceOf($rules, ShippingRule::class);
 
         $this->id = $id;
+        $this->code = $code;
         $this->rules = $rules;
     }
 
     public function id(): ShippingMethodId
     {
         return $this->id;
+    }
+
+    public function code(): string
+    {
+        return $this->code;
     }
 
     public function apply(Order $order)
