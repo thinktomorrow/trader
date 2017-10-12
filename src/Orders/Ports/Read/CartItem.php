@@ -4,6 +4,7 @@ namespace Thinktomorrow\Trader\Orders\Ports\Read;
 
 use Thinktomorrow\Trader\Common\Domain\Price\Cash;
 use Thinktomorrow\Trader\Common\Ports\Web\GetDynamicValue;
+use Thinktomorrow\Trader\Orders\Domain\Purchasable;
 use Thinktomorrow\Trader\Orders\Domain\Read\CartItem\CartItem as CartItemContract;
 use Thinktomorrow\Trader\Orders\Domain\Item;
 
@@ -30,6 +31,11 @@ class CartItem implements CartItemContract
     public function id()
     {
         return $this->item->id();
+    }
+
+    public function purchasable(): Purchasable
+    {
+        return $this->item->purchasable();
     }
 
     public function purchasableId(): int
