@@ -24,15 +24,16 @@ class BillingCountryRule implements TaxRule
 
     public function applicable(): bool
     {
-        if( !$this->order ) return false;
+        if (!$this->order) {
+            return false;
+        }
 
-        return (bool)($this->getEligibleCountryRate());
+        return (bool) ($this->getEligibleCountryRate());
     }
 
     public function apply(Percentage $taxPercentage): Percentage
     {
-        if($countryRate = $this->getEligibleCountryRate())
-        {
+        if ($countryRate = $this->getEligibleCountryRate()) {
             return $countryRate->get();
         }
 
@@ -46,7 +47,5 @@ class BillingCountryRule implements TaxRule
                 return $countryRate;
             }
         }
-
-        return null;
     }
 }

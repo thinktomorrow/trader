@@ -47,7 +47,7 @@ class ShippingRuleFactory
 
         $instance = ($this->container->has($class))
             ? $this->container->get($class)
-            : new $class;
+            : new $class();
 
         $instance->setParameters($parameters);
 
@@ -56,6 +56,7 @@ class ShippingRuleFactory
 
     /**
      * @param array $conditions
+     *
      * @return array
      */
     private function createConditions(array $conditions): array

@@ -6,9 +6,7 @@ use Money\Money;
 use Thinktomorrow\Trader\Common\Domain\Price\Percentage;
 use Thinktomorrow\Trader\Discounts\Domain\DiscountFactory;
 use Thinktomorrow\Trader\Orders\Domain\Item;
-use Thinktomorrow\Trader\Orders\Domain\ItemId;
 use Thinktomorrow\Trader\Orders\Domain\PurchasableId;
-use Thinktomorrow\Trader\Tests\InMemoryContainer;
 use Thinktomorrow\Trader\Tests\Stubs\PurchasableStub;
 
 class GeneralConditionsTest extends UnitTestCase

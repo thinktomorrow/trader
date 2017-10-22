@@ -36,7 +36,7 @@ class PercentageTest extends UnitTestCase
     /** @test */
     public function value_can_be_zero()
     {
-        $this->assertEquals(0,Percentage::fromPercent(0)->asPercent());
+        $this->assertEquals(0, Percentage::fromPercent(0)->asPercent());
     }
 
     /** @test */

@@ -4,17 +4,10 @@ namespace Thinktomorrow\Trader\Tests;
 
 use Assert\Assertion;
 use Thinktomorrow\Trader\Common\Domain\Price\Cash;
-use Thinktomorrow\Trader\Common\Domain\Price\Percentage;
-use Thinktomorrow\Trader\Discounts\Domain\DiscountFactory;
 use Thinktomorrow\Trader\Orders\Domain\Order;
 use Thinktomorrow\Trader\Orders\Domain\Read\Cart;
 use Thinktomorrow\Trader\Orders\Domain\Read\CartFactory;
 use Thinktomorrow\Trader\Orders\Domain\Read\CartItem\CartItem;
-use Thinktomorrow\Trader\Orders\Domain\CustomerId;
-use Thinktomorrow\Trader\Orders\Domain\Item as DomainItem;
-use Thinktomorrow\Trader\Orders\Domain\Order as DomainOrder;
-use Thinktomorrow\Trader\Orders\Domain\OrderId;
-use Thinktomorrow\Trader\Tests\Stubs\PurchasableStub;
 
 class CartFactoryTest extends FeatureTestCase
 {
@@ -25,7 +18,7 @@ class CartFactoryTest extends FeatureTestCase
     }
 
     /** @test */
-    function cart_displays_totals_as_localized_strings()
+    public function cart_displays_totals_as_localized_strings()
     {
         $cart = $this->cart($order = $this->purchase(1));
 
@@ -74,7 +67,9 @@ class CartFactoryTest extends FeatureTestCase
 
     private function cart(Order $order = null): Cart
     {
-        if(!$order) $order = $this->purchase(1);
+        if (!$order) {
+            $order = $this->purchase(1);
+        }
 
         return (new CartFactory($this->container('orderRepository'), $this->container))->create($order);
     }

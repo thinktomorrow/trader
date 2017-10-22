@@ -10,7 +10,7 @@ use Thinktomorrow\Trader\Tests\UnitTestCase;
 
 class PaymentRuleCountryConditionsTest extends UnitTestCase
 {
-   /** @test */
+    /** @test */
     public function a_rule_is_not_applicable_if_conditions_are_not_met()
     {
         $order = $this->makeOrder()->setBillingAddress([

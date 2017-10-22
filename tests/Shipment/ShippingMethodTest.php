@@ -8,7 +8,6 @@ use Thinktomorrow\Trader\Orders\Domain\Item;
 use Thinktomorrow\Trader\Shipment\Domain\ShippingMethod;
 use Thinktomorrow\Trader\Shipment\Domain\ShippingMethodId;
 use Thinktomorrow\Trader\Shipment\Domain\ShippingRuleFactory;
-use Thinktomorrow\Trader\Tests\InMemoryContainer;
 use Thinktomorrow\Trader\Tests\Stubs\PurchasableStub;
 
 class ShippingMethodTest extends UnitTestCase
@@ -27,7 +26,7 @@ class ShippingMethodTest extends UnitTestCase
     {
         $method = new ShippingMethod(ShippingMethodId::fromInteger(2), 'foobar');
 
-        $this->assertEquals('foobar',$method->code());
+        $this->assertEquals('foobar', $method->code());
     }
 
     /** @test */

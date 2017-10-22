@@ -15,7 +15,7 @@ class CashTest extends UnitTestCase
     {
         parent::setUp();
 
-        $this->config = new Config(__DIR__ . '/../../../_stubs/configStub.php');
+        $this->config = new Config(__DIR__.'/../../../_stubs/configStub.php');
 
         // Reset the applied currency to avoid interference with other tests
         Cash::reset();
@@ -56,9 +56,9 @@ class CashTest extends UnitTestCase
     /** @test */
     public function it_can_represent_money_in_specific_format()
     {
-        $this->assertEquals('1,20', Cash::from(Money::EUR(120))->toFormat(2,','));
-        $this->assertEquals('1,234.56', Cash::from(Money::EUR(123456))->toFormat(2,'.',','));
-        $this->assertEquals('1.234', Cash::from(Money::EUR(123444))->toFormat(0,'.','.'));
+        $this->assertEquals('1,20', Cash::from(Money::EUR(120))->toFormat(2, ','));
+        $this->assertEquals('1,234.56', Cash::from(Money::EUR(123456))->toFormat(2, '.', ','));
+        $this->assertEquals('1.234', Cash::from(Money::EUR(123444))->toFormat(0, '.', '.'));
         $this->assertEquals('15', Cash::from(Money::EUR(1455))->toFormat(0)); // format rounds off
     }
 

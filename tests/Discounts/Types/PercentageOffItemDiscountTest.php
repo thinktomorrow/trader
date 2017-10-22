@@ -7,7 +7,6 @@ use Thinktomorrow\Trader\Common\Domain\Price\Percentage;
 use Thinktomorrow\Trader\Discounts\Domain\DiscountFactory;
 use Thinktomorrow\Trader\Orders\Domain\Item;
 use Thinktomorrow\Trader\Orders\Domain\PurchasableId;
-use Thinktomorrow\Trader\Tests\InMemoryContainer;
 use Thinktomorrow\Trader\Tests\Stubs\PurchasableStub;
 
 class PercentageOffItemDiscountTest extends UnitTestCase
@@ -37,7 +36,7 @@ class PercentageOffItemDiscountTest extends UnitTestCase
     }
 
     /** @test */
-    function it_can_()
+    public function it_can_()
     {
         $this->markTestIncomplete('Add tests for each discount type');
     }

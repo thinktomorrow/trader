@@ -27,7 +27,8 @@ class ShippingMethod
 
     /**
      * Unique string identifier.
-     * Can be used by your application to identify a method
+     * Can be used by your application to identify a method.
+     *
      * @var string
      */
     private $code;

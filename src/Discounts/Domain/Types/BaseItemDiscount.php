@@ -67,7 +67,7 @@ abstract class BaseItemDiscount
     /**
      * Do the conditions apply for the given item.
      *
-     * @param Order  $order
+     * @param Order         $order
      * @param PurchasableId $purchasableId
      *
      * @return bool

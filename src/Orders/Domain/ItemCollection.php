@@ -37,12 +37,13 @@ class ItemCollection implements \ArrayAccess, \Countable, \IteratorAggregate
      * while ItemID is specific to a unique item in history and represents the persisted id.
      *
      * @param PurchasableId $id
+     *
      * @return mixed|void
      */
     public function find(PurchasableId $id)
     {
         if (!isset($this->items[$id->get()])) {
-            return null;
+            return;
         }
 
         return $this->items[$id->get()];
@@ -73,12 +74,14 @@ class ItemCollection implements \ArrayAccess, \Countable, \IteratorAggregate
 
     public function replace(PurchasableId $purchasableId, $quantity)
     {
-        if ( ! isset($this->items[$purchasableId->get()])) {
+        if (!isset($this->items[$purchasableId->get()])) {
             throw new \InvalidArgumentException('Order does not contain given item by id ['.$purchasableId.']');
         }
 
         // Remove from collection entirely
-        if($quantity < 1) return $this->remove($purchasableId);
+        if ($quantity < 1) {
+            return $this->remove($purchasableId);
+        }
 
         $item = $this->find($purchasableId);
         $item->remove($item->quantity());
@@ -87,7 +90,7 @@ class ItemCollection implements \ArrayAccess, \Countable, \IteratorAggregate
 
     public function remove(PurchasableId $purchasableId)
     {
-        if ( ! isset($this->items[$purchasableId->get()])) {
+        if (!isset($this->items[$purchasableId->get()])) {
             throw new \InvalidArgumentException('Order does not contain given item by id ['.$purchasableId.']');
         }
 

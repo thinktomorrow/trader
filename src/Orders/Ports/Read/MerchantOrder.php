@@ -50,7 +50,7 @@ class MerchantOrder extends AbstractPresenter implements MerchantOrderContract
 
     public function hasShipping(): bool
     {
-        return ($this->getValue('shippingmethod_id') && $this->getValue('shippingrule_id'));
+        return $this->getValue('shippingmethod_id') && $this->getValue('shippingrule_id');
     }
 
     public function shippingMethodId(): int
@@ -65,7 +65,7 @@ class MerchantOrder extends AbstractPresenter implements MerchantOrderContract
 
     public function hasPayment(): bool
     {
-        return ($this->getValue('paymentmethod_id') && $this->getValue('paymentrule_id'));
+        return $this->getValue('paymentmethod_id') && $this->getValue('paymentrule_id');
     }
 
     public function paymentMethodId(): int

@@ -30,13 +30,13 @@ trait PayableAndShippable
 
     /**
      * Is this order a business order?
-     * This could imply different invoice / tax rules
+     * This could imply different invoice / tax rules.
      *
      * @return bool
      */
     public function business(): bool
     {
-        return !!$this->business;
+        return (bool) $this->business;
     }
 
     public function setBusiness($business = true)
@@ -77,7 +77,9 @@ trait PayableAndShippable
     public function shippingCountryId(): CountryId
     {
         // note: This assumes that country identifier has country_key as naming
-        if(!$country_key = $this->shippingAddress('country_key')) return $this->fallbackCountryId();
+        if (!$country_key = $this->shippingAddress('country_key')) {
+            return $this->fallbackCountryId();
+        }
 
         return CountryId::fromIsoString($country_key);
     }
@@ -85,14 +87,16 @@ trait PayableAndShippable
     public function billingCountryId(): CountryId
     {
         // note: This assumes that country identifier has country_key as naming
-        if(!$country_key = $this->billingAddress('country_key')) return $this->fallbackCountryId();
+        if (!$country_key = $this->billingAddress('country_key')) {
+            return $this->fallbackCountryId();
+        }
 
         return CountryId::fromIsoString($country_key);
     }
 
     public function fallbackCountryId(): CountryId
     {
-        return $this->fallbackCountryId ?? CountryId::fromIsoString( (new Config())->get('country_id','BE') );
+        return $this->fallbackCountryId ?? CountryId::fromIsoString((new Config())->get('country_id', 'BE'));
     }
 
     public function setFallbackCountryId(CountryId $fallbackCountryId)
@@ -104,8 +108,7 @@ trait PayableAndShippable
 
     public function shippingAddress($key = null)
     {
-        if($key)
-        {
+        if ($key) {
             return isset($this->shippingAddress[$key]) ? $this->shippingAddress[$key] : null;
         }
 
@@ -114,8 +117,7 @@ trait PayableAndShippable
 
     public function billingAddress($key = null)
     {
-        if($key)
-        {
+        if ($key) {
             return isset($this->billingAddress[$key]) ? $this->billingAddress[$key] : null;
         }
 

@@ -2,15 +2,8 @@
 
 namespace Thinktomorrow\Trader\Tests;
 
-use Money\Money;
-use Thinktomorrow\Trader\Common\Domain\Price\Percentage;
 use Thinktomorrow\Trader\Orders\Domain\Exceptions\OrderNotFound;
-use Thinktomorrow\Trader\Orders\Domain\Item;
 use Thinktomorrow\Trader\Orders\Domain\OrderId;
-use Thinktomorrow\Trader\Orders\Domain\OrderReference;
-use Thinktomorrow\Trader\Orders\Domain\OrderState;
-use Thinktomorrow\Trader\Tests\InMemoryOrderRepository;
-use Thinktomorrow\Trader\Tests\Stubs\PurchasableStub;
 
 class OrderRepositoryTest extends UnitTestCase
 {
@@ -59,5 +52,4 @@ class OrderRepositoryTest extends UnitTestCase
         $repo = new InMemoryOrderRepository();
         $repo->find(OrderId::fromInteger(9));
     }
-
 }

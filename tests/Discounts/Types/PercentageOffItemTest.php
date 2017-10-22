@@ -8,7 +8,6 @@ use Thinktomorrow\Trader\Discounts\Domain\AppliedDiscount;
 use Thinktomorrow\Trader\Discounts\Domain\DiscountId;
 use Thinktomorrow\Trader\Discounts\Domain\Types\PercentageOffItemDiscount;
 use Thinktomorrow\Trader\Orders\Domain\Item;
-use Thinktomorrow\Trader\Orders\Domain\ItemId;
 use Thinktomorrow\Trader\Orders\Domain\PurchasableId;
 use Thinktomorrow\Trader\Tests\Stubs\PurchasableStub;
 

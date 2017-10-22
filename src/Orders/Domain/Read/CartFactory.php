@@ -35,6 +35,7 @@ class CartFactory
      * This data (raw) will be presented as a simple read-only DTO.
      *
      * @param Order $order
+     *
      * @return Cart
      */
     public function create(Order $order): Cart

@@ -28,7 +28,7 @@ class PaymentMethodTest extends UnitTestCase
     {
         $method = new PaymentMethod(PaymentMethodId::fromInteger(2), 'foobar');
 
-        $this->assertEquals('foobar',$method->code());
+        $this->assertEquals('foobar', $method->code());
     }
 
     /** @test */

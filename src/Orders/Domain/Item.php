@@ -19,7 +19,8 @@ final class Item
     private $id;
 
     /**
-     * Indicate this model is already persisted
+     * Indicate this model is already persisted.
+     *
      * @var bool
      */
     private $persisted = false;
