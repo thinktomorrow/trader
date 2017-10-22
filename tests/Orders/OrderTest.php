@@ -3,7 +3,9 @@
 namespace Thinktomorrow\Trader\Tests;
 
 use Money\Money;
+use Thinktomorrow\Trader\Common\Config;
 use Thinktomorrow\Trader\Common\Domain\Price\Percentage;
+use Thinktomorrow\Trader\Countries\CountryId;
 use Thinktomorrow\Trader\Orders\Domain\CustomerId;
 use Thinktomorrow\Trader\Orders\Domain\Item;
 use Thinktomorrow\Trader\Orders\Domain\ItemCollection;
@@ -115,6 +117,49 @@ class OrderTest extends UnitTestCase
         $order->setShippingAddress(['country_key' => 'BE']);
         $this->assertEquals(['country_key' => 'BE'], $order->shippingAddress());
         $this->assertEquals('BE', $order->shippingAddress('country_key'));
+    }
+
+    /** @test */
+    public function shipping_country_is_retrieved_as_country_id()
+    {
+        $order = $this->makeOrder();
+        $order->setShippingAddress(['country_key' => 'BE']);
+        $this->assertEquals(CountryId::fromIsoString('BE'), $order->shippingCountryId());
+    }
+
+    /** @test */
+    public function it_can_set_billing_address()
+    {
+        $order = $this->makeOrder();
+
+        $order->setBillingAddress(['country_key' => 'NL']);
+        $this->assertEquals(['country_key' => 'NL'], $order->billingAddress());
+        $this->assertEquals('NL', $order->billingAddress('country_key'));
+    }
+
+    /** @test */
+    public function billing_country_is_retrieved_as_country_id()
+    {
+        $order = $this->makeOrder();
+        $order->setBillingAddress(['country_key' => 'NL']);
+        $this->assertEquals(CountryId::fromIsoString('NL'), $order->billingCountryId());
+    }
+
+    /** @test */
+    public function fallback_country_id_can_be_set_explicitly()
+    {
+        $order = $this->makeOrder();
+        $order->setFallbackCountryId(CountryId::fromIsoString('NL'));
+        $this->assertEquals(CountryId::fromIsoString('NL'), $order->fallbackCountryId());
+    }
+
+    /** @test */
+    public function if_fallback_country_is_not_set_the_default_is_taken()
+    {
+        (new Config())->set('country_id','DK');
+
+        $order = $this->makeOrder();
+        $this->assertEquals(CountryId::fromIsoString('DK'), $order->fallbackCountryId());
     }
 
     /** @test */

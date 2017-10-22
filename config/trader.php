@@ -23,4 +23,12 @@ return [
      */
     'tax_percentage' => 21,
 
+    /**
+     * Default country
+     * In case the country of the customer or order is not set yet,
+     * we use this default country as a fallback for e.g. tax logic
+     * Format used is the 2-chars ISO string.
+     */
+    'country_id' => 'BE',
+
 ];

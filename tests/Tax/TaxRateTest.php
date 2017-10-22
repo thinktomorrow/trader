@@ -1,20 +1,20 @@
 <?php
 
-namespace Thinktomorrow\Trader\Tests;
+namespace Thinktomorrow\Trader\Tests\Tax;
 
 use Thinktomorrow\Trader\Common\Domain\Price\Percentage;
 use Thinktomorrow\Trader\Countries\CountryId;
 use Thinktomorrow\Trader\Tax\Domain\CountryRate;
 use Thinktomorrow\Trader\Tax\Domain\TaxId;
 use Thinktomorrow\Trader\Tax\Domain\TaxRate;
-use Thinktomorrow\Trader\Tests\UnitTestCase;
+use Thinktomorrow\Trader\Tests\FeatureTestCase;
 
-class TaxRateTest extends UnitTestCase
+class TaxRateTest extends FeatureTestCase
 {
     /** @test */
     public function it_can_return_the_rate_percentage()
     {
-        $rate = new TaxRate(TaxId::fromInteger(1), 'foobar', Percentage::fromPercent(21));
+        $rate = new TaxRate($this->container, TaxId::fromInteger(1), 'foobar', Percentage::fromPercent(21));
 
         $this->assertEquals('foobar', $rate->name());
         $this->assertEquals(Percentage::fromPercent(21), $rate->get());
@@ -23,48 +23,31 @@ class TaxRateTest extends UnitTestCase
     /** @test */
     public function given_country_rate_can_override_the_standard_rate()
     {
-        $rate = new TaxRate(TaxId::fromInteger(1), 'foobar', Percentage::fromPercent(21), [
+        $order = $this->makeOrder();
+        $order->setBillingAddress(['country_key' => 'NL']);
+
+        $rate = new TaxRate($this->container, TaxId::fromInteger(1), 'foobar', Percentage::fromPercent(21), [
             new CountryRate('NL', Percentage::fromPercent(10), CountryId::fromIsoString('NL')),
         ]);
 
-        $this->assertEquals(Percentage::fromPercent(10), $rate->forBillingCountry(CountryId::fromIsoString('NL'))->get());
+        $this->assertEquals(Percentage::fromPercent(10), $rate->get(null, $order));
     }
 
     /** @test */
-    public function business_inside_sender_country_has_to_pay_tax()
+    public function it_can_set_rate_to_zero_for_business_from_other_country_than_merchant()
     {
-        $rate = new TaxRate(TaxId::fromInteger(1), 'foobar', Percentage::fromPercent(21), []);
-        $rate->fromCountry(CountryId::fromIsoString('BE'));
+        $order = $this->makeOrder()->setBusiness()->setBillingAddress(['country_key' => 'NL']);
+        $rate = new TaxRate($this->container, TaxId::fromInteger(1), 'foobar', Percentage::fromPercent(21), []);
 
-        $this->assertEquals(Percentage::fromPercent(21),
-            $rate->forBusiness()
-                ->forBillingCountry(CountryId::fromIsoString('BE'))
-                ->get()
-        );
+        $this->assertEquals(Percentage::fromPercent(0), $rate->setMerchantCountry(CountryId::fromIsoString('BE'))->get(null, $order));
     }
 
     /** @test */
-    public function it_can_set_rate_to_zero_for_business_outside_of_sender_country()
+    public function business_inside_same_country_as_merchant_has_to_pay_tax()
     {
-        $rate = new TaxRate(TaxId::fromInteger(1), 'foobar', Percentage::fromPercent(21), []);
-        $rate->fromCountry(CountryId::fromIsoString('BE'));
+        $order = $this->makeOrder()->setBusiness()->setBillingAddress(['country_key' => 'BE']);
+        $rate = new TaxRate($this->container, TaxId::fromInteger(1), 'foobar', Percentage::fromPercent(21), []);
 
-        $this->assertEquals(Percentage::fromPercent(0),
-            $rate->forBusiness()
-                 ->forBillingCountry(CountryId::fromIsoString('NL'))
-                 ->get()
-        );
+        $this->assertEquals(Percentage::fromPercent(21), $rate->setMerchantCountry(CountryId::fromIsoString('BE'))->get(null, $order));
     }
-
-    /* @test */
-//    function it_can_set_rate_to_zero_for_consumers_outside_of_europe()
-//    {
-//        $rate = new StandardRate('foobar', Percentage::fromPercent(21),[]);
-//        $rate->fromCountry(CountryId::fromIsoString('BE'));
-//
-//        $this->assertEquals(Percentage::fromPercent(0),
-//            $rate->forBillingCountry(CountryId::fromIsoString('US'))
-//                ->get()
-//        );
-//    }
 }

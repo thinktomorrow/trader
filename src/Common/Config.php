@@ -14,6 +14,8 @@ class Config
     public function __construct($filepath = null)
     {
         $this->filepath = $filepath ?: __DIR__.'/../../config/trader.php';
+
+        $this->loadFile();
     }
 
     /**
@@ -24,9 +26,18 @@ class Config
      */
     public function get($key, $default = null)
     {
-        $this->loadFile();
-
         return (isset(static::$config[$key])) ? static::$config[$key] : $default;
+    }
+
+    /**
+     * Set a config value at runtime
+     *
+     * @param $key
+     * @param $value
+     */
+    public function set($key, $value)
+    {
+        static::$config[$key] = $value;
     }
 
     public function refreshSource($filepath)

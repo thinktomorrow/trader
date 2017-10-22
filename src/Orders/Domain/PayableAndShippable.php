@@ -3,6 +3,8 @@
 namespace Thinktomorrow\Trader\Orders\Domain;
 
 use Money\Money;
+use Thinktomorrow\Trader\Common\Config;
+use Thinktomorrow\Trader\Countries\CountryId;
 use Thinktomorrow\Trader\Payment\Domain\PaymentMethodId;
 use Thinktomorrow\Trader\Payment\Domain\PaymentRuleId;
 use Thinktomorrow\Trader\Shipment\Domain\ShippingMethodId;
@@ -10,6 +12,8 @@ use Thinktomorrow\Trader\Shipment\Domain\ShippingRuleId;
 
 trait PayableAndShippable
 {
+    private $business = false; // bool
+
     private $shippingTotal;
     private $shippingMethodId;
     private $shippingRuleId;
@@ -21,6 +25,26 @@ trait PayableAndShippable
     private $paymentRuleId;
     private $billingAddressId;
     private $billingAddress;
+
+    private $fallbackCountryId;
+
+    /**
+     * Is this order a business order?
+     * This could imply different invoice / tax rules
+     *
+     * @return bool
+     */
+    public function business(): bool
+    {
+        return !!$this->business;
+    }
+
+    public function setBusiness($business = true)
+    {
+        $this->business = $business;
+
+        return $this;
+    }
 
     public function shippingTotal(): Money
     {
@@ -48,6 +72,34 @@ trait PayableAndShippable
     {
         $this->shippingMethodId = $shipmentMethodId;
         $this->shippingRuleId = $shipmentRuleId;
+    }
+
+    public function shippingCountryId(): CountryId
+    {
+        // note: This assumes that country identifier has country_key as naming
+        if(!$country_key = $this->shippingAddress('country_key')) return $this->fallbackCountryId();
+
+        return CountryId::fromIsoString($country_key);
+    }
+
+    public function billingCountryId(): CountryId
+    {
+        // note: This assumes that country identifier has country_key as naming
+        if(!$country_key = $this->billingAddress('country_key')) return $this->fallbackCountryId();
+
+        return CountryId::fromIsoString($country_key);
+    }
+
+    public function fallbackCountryId(): CountryId
+    {
+        return $this->fallbackCountryId ?? CountryId::fromIsoString( (new Config())->get('country_id','BE') );
+    }
+
+    public function setFallbackCountryId(CountryId $fallbackCountryId)
+    {
+        $this->fallbackCountryId = $fallbackCountryId;
+
+        return $this;
     }
 
     public function shippingAddress($key = null)
