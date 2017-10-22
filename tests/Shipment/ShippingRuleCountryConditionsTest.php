@@ -3,15 +3,13 @@
 namespace Thinktomorrow\Trader\Tests;
 
 use Money\Money;
-use Thinktomorrow\Trader\Orders\Domain\Item;
 use Thinktomorrow\Trader\Shipment\Domain\Conditions\Country;
 use Thinktomorrow\Trader\Shipment\Domain\ShippingRule;
 use Thinktomorrow\Trader\Shipment\Domain\ShippingRuleId;
-use Thinktomorrow\Trader\Tests\Stubs\PurchasableStub;
 
 class ShippingRuleCountryConditionsTest extends UnitTestCase
 {
-   /** @test */
+    /** @test */
     public function a_rule_is_not_applicable_if_conditions_are_not_met()
     {
         $order = $this->makeOrder()->setShippingAddress([

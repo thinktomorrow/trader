@@ -26,7 +26,8 @@ class PaymentMethod
     private $applicableRule;
 
     /**
-     * Unique string identifier
+     * Unique string identifier.
+     *
      * @var string
      */
     private $code;

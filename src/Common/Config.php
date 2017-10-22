@@ -30,7 +30,7 @@ class Config
     }
 
     /**
-     * Set a config value at runtime
+     * Set a config value at runtime.
      *
      * @param $key
      * @param $value

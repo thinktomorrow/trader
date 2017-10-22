@@ -63,7 +63,8 @@ final class Order implements StatefulContract
     }
 
     /**
-     * Unique merchant reference to order
+     * Unique merchant reference to order.
+     *
      * @param string $reference
      */
     public function setReference(string $reference)
@@ -73,7 +74,7 @@ final class Order implements StatefulContract
 
     public function hasReference(): bool
     {
-        return !!$this->reference;
+        return (bool) $this->reference;
     }
 
     public function reference(): string
@@ -83,8 +84,7 @@ final class Order implements StatefulContract
 
     public function customerId(): CustomerId
     {
-        if(!$this->hasCustomer())
-        {
+        if (!$this->hasCustomer()) {
             throw new \RuntimeException('Requesting customer for order ['.$this->id()->get().'] but there is no customer attached.');
         }
 

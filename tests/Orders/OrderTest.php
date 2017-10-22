@@ -26,16 +26,16 @@ class OrderTest extends UnitTestCase
     }
 
     /** @test */
-    function it_can_set_a_persistence_id()
+    public function it_can_set_a_persistence_id()
     {
         $order = new Order(OrderId::fromInteger(1));
         $order->setPersistenceId(2);
 
-        $this->assertEquals(2,$order->persistenceId());
+        $this->assertEquals(2, $order->persistenceId());
     }
 
     /** @test */
-    function it_can_check_if_there_is_a_persistence_id()
+    public function it_can_check_if_there_is_a_persistence_id()
     {
         $order = new Order(OrderId::fromInteger(1));
         $this->assertFalse($order->isPersisted());
@@ -45,16 +45,16 @@ class OrderTest extends UnitTestCase
     }
 
     /** @test */
-    function it_can_set_a_customer()
+    public function it_can_set_a_customer()
     {
         $order = new Order(OrderId::fromInteger(1));
         $order->setCustomerId(CustomerId::fromString(2));
 
-        $this->assertEquals(CustomerId::fromString(2),$order->customerId());
+        $this->assertEquals(CustomerId::fromString(2), $order->customerId());
     }
 
     /** @test */
-    function it_can_check_if_there_is_a_customer()
+    public function it_can_check_if_there_is_a_customer()
     {
         $order = new Order(OrderId::fromInteger(1));
         $this->assertFalse($order->hasCustomer());
@@ -64,9 +64,9 @@ class OrderTest extends UnitTestCase
     }
 
     /** @test */
-    function retrieving_customer_when_there_is_none_fails()
+    public function retrieving_customer_when_there_is_none_fails()
     {
-        $this->expectException(\RuntimeException::class,'customer');
+        $this->expectException(\RuntimeException::class, 'customer');
 
         $order = new Order(OrderId::fromInteger(1));
 
@@ -156,7 +156,7 @@ class OrderTest extends UnitTestCase
     /** @test */
     public function if_fallback_country_is_not_set_the_default_is_taken()
     {
-        (new Config())->set('country_id','DK');
+        (new Config())->set('country_id', 'DK');
 
         $order = $this->makeOrder();
         $this->assertEquals(CountryId::fromIsoString('DK'), $order->fallbackCountryId());

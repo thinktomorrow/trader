@@ -29,22 +29,26 @@ class InMemoryDescriptionRender implements DescriptionRender
 
     public function locale($locale = null): string
     {
-        if(!$this->description) return '';
-        if(!$locale) $locale = $this->defaultLocale;
+        if (!$this->description) {
+            return '';
+        }
+        if (!$locale) {
+            $locale = $this->defaultLocale;
+        }
 
         $translation = $this->description->key();
 
-        if( ! isset($this->translations[$locale]))
-        {
-            if($locale == $this->defaultLocale || !isset($this->translations[$this->defaultLocale])) return '';
+        if (!isset($this->translations[$locale])) {
+            if ($locale == $this->defaultLocale || !isset($this->translations[$this->defaultLocale])) {
+                return '';
+            }
 
             $locale = $this->defaultLocale;
         }
 
         $translations = $this->translations[$locale];
 
-        if(isset($translations[$this->description->key()]))
-        {
+        if (isset($translations[$this->description->key()])) {
             $translation = $translations[$this->description->key()];
         }
 

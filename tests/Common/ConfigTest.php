@@ -11,13 +11,13 @@ class ConfigTest extends UnitTestCase
     {
         parent::setUp();
 
-        $this->config = new Config(__DIR__ . '/../_stubs/configStub.php');
+        $this->config = new Config(__DIR__.'/../_stubs/configStub.php');
     }
 
     public function tearDown()
     {
         // Make sure to reset the config to the proper config
-        $this->config->refreshSource(__DIR__ . '/../../config/trader.php');
+        $this->config->refreshSource(__DIR__.'/../../config/trader.php');
 
         parent::tearDown();
     }

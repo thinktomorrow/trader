@@ -26,7 +26,9 @@ class Cash
 
     public static function from($money, $currencyCode = null): self
     {
-        if( ! $money instanceof Money) $money = static::make($money, $currencyCode);
+        if (!$money instanceof Money) {
+            $money = static::make($money, $currencyCode);
+        }
 
         return new static($money);
     }
@@ -48,12 +50,13 @@ class Cash
     }
 
     /**
-     * Get full string representation of amount in desired locale
+     * Get full string representation of amount in desired locale.
      *
-     * @param 	int 	$decimals
-     * @param 	string 	$dec_point
-     * @param 	string 	$thousands_sep
-     * @return  string
+     * @param int    $decimals
+     * @param string $dec_point
+     * @param string $thousands_sep
+     *
+     * @return string
      */
     public function toFormat($decimals = 2, $dec_point = ',', $thousands_sep = '.')
     {
@@ -64,7 +67,7 @@ class Cash
         $amount = $this->money->getAmount() / (10 ** $currency_decimals);
         $amount = floatval($amount);
 
-        return number_format( $amount, $decimals, $dec_point, $thousands_sep);
+        return number_format($amount, $decimals, $dec_point, $thousands_sep);
     }
 
     /**

@@ -75,7 +75,7 @@ class TaxRate
     }
 
     /**
-     * Merchant country
+     * Merchant country.
      *
      * @param CountryId $countryId
      *
@@ -89,7 +89,7 @@ class TaxRate
     }
 
     /**
-     * Enforces rates for specific billing countries
+     * Enforces rates for specific billing countries.
      *
      * @return array
      */
@@ -99,10 +99,11 @@ class TaxRate
     }
 
     /**
-     * Get the applicable taxRate based on current context
+     * Get the applicable taxRate based on current context.
      *
      * @param Taxable|null $taxable
-     * @param Order|null $order
+     * @param Order|null   $order
+     *
      * @return Percentage
      */
     public function get(Taxable $taxable = null, Order $order = null): Percentage
@@ -115,12 +116,10 @@ class TaxRate
             BillingCountryRule::class,
         ];
 
-        foreach($rulenames as $rulename)
-        {
+        foreach ($rulenames as $rulename) {
             $rule = $this->resolve($rulename);
 
-            if($rule->context($this, $taxable, $order)->applicable())
-            {
+            if ($rule->context($this, $taxable, $order)->applicable()) {
                 return $rule->apply($percentage);
             }
         }

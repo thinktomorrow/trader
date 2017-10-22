@@ -4,10 +4,10 @@ use Money\Money;
 use Thinktomorrow\Trader\Common\Domain\Price\Cash;
 use Thinktomorrow\Trader\Common\Domain\Price\Percentage;
 use Thinktomorrow\Trader\Discounts\Domain\DiscountFactory;
-use Thinktomorrow\Trader\Orders\Domain\Read\MerchantOrderFactory;
 use Thinktomorrow\Trader\Orders\Domain\Item;
-use Thinktomorrow\Trader\Tests\Unit\InMemoryOrderRepository;
+use Thinktomorrow\Trader\Orders\Domain\Read\MerchantOrderFactory;
 use Thinktomorrow\Trader\Tests\InMemoryContainer;
+use Thinktomorrow\Trader\Tests\Unit\InMemoryOrderRepository;
 use Thinktomorrow\Trader\Tests\Unit\Stubs\PurchasableStub;
 
 require __DIR__.'/../../vendor/autoload.php';

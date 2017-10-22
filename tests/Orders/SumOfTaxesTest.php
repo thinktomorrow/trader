@@ -4,7 +4,6 @@ namespace Thinktomorrow\Trader\Tests;
 
 use Money\Money;
 use Thinktomorrow\Trader\Common\Domain\Price\Percentage;
-use Thinktomorrow\Trader\Orders\Domain\CustomerId;
 use Thinktomorrow\Trader\Orders\Domain\Item;
 use Thinktomorrow\Trader\Orders\Domain\Order;
 use Thinktomorrow\Trader\Orders\Domain\OrderId;
@@ -104,5 +103,4 @@ class SumOfTaxesTest extends UnitTestCase
 
         return $order;
     }
-
 }

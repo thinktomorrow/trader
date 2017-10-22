@@ -4,8 +4,8 @@ namespace Thinktomorrow\Trader\Orders\Ports\Read;
 
 use Thinktomorrow\Trader\Common\Domain\Price\Cash;
 use Thinktomorrow\Trader\Discounts\Domain\AppliedDiscountCollection;
-use Thinktomorrow\Trader\Orders\Domain\Read\Cart as CartContract;
 use Thinktomorrow\Trader\Orders\Domain\Order;
+use Thinktomorrow\Trader\Orders\Domain\Read\Cart as CartContract;
 
 /**
  * Cart data object for read-only usage in views
@@ -67,7 +67,7 @@ class Cart implements CartContract
 
     public function hasShipping(): bool
     {
-        return ($this->order->shippingMethodId() && $this->order->shippingRuleId());
+        return $this->order->shippingMethodId() && $this->order->shippingRuleId();
     }
 
     public function shippingMethodId(): int
@@ -82,7 +82,7 @@ class Cart implements CartContract
 
     public function hasPayment(): bool
     {
-        return ($this->order->paymentMethodId() && $this->order->paymentRuleId());
+        return $this->order->paymentMethodId() && $this->order->paymentRuleId();
     }
 
     public function paymentMethodId(): int
@@ -123,12 +123,11 @@ class Cart implements CartContract
     public function taxRates(): array
     {
         $taxRates = [];
-        foreach($this->order->taxRates() as $percent => $taxRate)
-        {
+        foreach ($this->order->taxRates() as $percent => $taxRate) {
             $taxRates[$percent] = [
                 'percent' => $taxRate['percent']->asPercent(),
-                'total' => Cash::from($taxRate['total'])->locale(),
-                'tax' => Cash::from($taxRate['tax'])->locale(),
+                'total'   => Cash::from($taxRate['total'])->locale(),
+                'tax'     => Cash::from($taxRate['tax'])->locale(),
             ];
         }
 

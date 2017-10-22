@@ -2,7 +2,6 @@
 
 namespace Thinktomorrow\Trader\Tests;
 
-use Thinktomorrow\Trader\Orders\Domain\ItemId;
 use Thinktomorrow\Trader\Orders\Domain\PurchasableId;
 use Thinktomorrow\Trader\Tests\Stubs\PurchasableStub;
 
