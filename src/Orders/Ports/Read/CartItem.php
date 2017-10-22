@@ -6,7 +6,7 @@ use Thinktomorrow\Trader\Common\Domain\Price\Cash;
 use Thinktomorrow\Trader\Common\Ports\Web\GetDynamicValue;
 use Thinktomorrow\Trader\Orders\Domain\Item;
 use Thinktomorrow\Trader\Orders\Domain\Purchasable;
-use Thinktomorrow\Trader\Orders\Domain\Read\CartItem\CartItem as CartItemContract;
+use Thinktomorrow\Trader\Orders\Domain\Read\CartItem as CartItemContract;
 
 /**
  * Class CartItem

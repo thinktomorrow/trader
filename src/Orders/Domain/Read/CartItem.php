@@ -1,6 +1,6 @@
 <?php
 
-namespace Thinktomorrow\Trader\Orders\Domain\Read\CartItem;
+namespace Thinktomorrow\Trader\Orders\Domain\Read;
 
 use Thinktomorrow\Trader\Orders\Domain\Purchasable;
 
