@@ -4,7 +4,6 @@ namespace Thinktomorrow\Trader\Tests\Stubs;
 
 use Money\Money;
 use Thinktomorrow\Trader\Common\Domain\Price\Percentage;
-use Thinktomorrow\Trader\Orders\Domain\ItemId;
 use Thinktomorrow\Trader\Orders\Domain\Purchasable;
 use Thinktomorrow\Trader\Orders\Domain\PurchasableId;
 use Thinktomorrow\Trader\Tax\Domain\TaxId;

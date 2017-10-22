@@ -8,6 +8,7 @@ use Thinktomorrow\Trader\Orders\Domain\Item;
 use Thinktomorrow\Trader\Shipment\Domain\ShippingMethod;
 use Thinktomorrow\Trader\Shipment\Domain\ShippingMethodId;
 use Thinktomorrow\Trader\Shipment\Domain\ShippingRuleFactory;
+use Thinktomorrow\Trader\Tests\Stubs\InMemoryContainer;
 use Thinktomorrow\Trader\Tests\Stubs\PurchasableStub;
 
 class ShippingMethodTest extends UnitTestCase

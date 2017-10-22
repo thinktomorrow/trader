@@ -4,6 +4,7 @@ namespace Thinktomorrow\Trader\Tests;
 
 use Thinktomorrow\Trader\Orders\Domain\Exceptions\OrderNotFound;
 use Thinktomorrow\Trader\Orders\Domain\OrderId;
+use Thinktomorrow\Trader\Tests\Stubs\InMemoryOrderRepository;
 
 class OrderRepositoryTest extends UnitTestCase
 {

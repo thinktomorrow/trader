@@ -1,6 +1,6 @@
 <?php
 
-namespace Thinktomorrow\Trader\Tests;
+namespace Thinktomorrow\Trader\Tests\Stubs;
 
 use Thinktomorrow\Trader\Tax\Domain\TaxId;
 use Thinktomorrow\Trader\Tax\Domain\TaxRate;

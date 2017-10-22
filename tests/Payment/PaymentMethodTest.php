@@ -8,7 +8,7 @@ use Thinktomorrow\Trader\Orders\Domain\Item;
 use Thinktomorrow\Trader\Payment\Domain\PaymentMethod;
 use Thinktomorrow\Trader\Payment\Domain\PaymentMethodId;
 use Thinktomorrow\Trader\Payment\Domain\PaymentRuleFactory;
-use Thinktomorrow\Trader\Tests\InMemoryContainer;
+use Thinktomorrow\Trader\Tests\Stubs\InMemoryContainer;
 use Thinktomorrow\Trader\Tests\Stubs\PurchasableStub;
 use Thinktomorrow\Trader\Tests\UnitTestCase;
 

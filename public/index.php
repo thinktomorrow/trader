@@ -5,7 +5,7 @@ use Thinktomorrow\Trader\Common\Domain\Price\Percentage;
 use Thinktomorrow\Trader\Discounts\Application\ApplyDiscountsToOrder;
 use Thinktomorrow\Trader\Discounts\Domain\DiscountCollection;
 use Thinktomorrow\Trader\Discounts\Domain\DiscountFactory;
-use Thinktomorrow\Trader\Tests\InMemoryContainer;
+use Thinktomorrow\Trader\Tests\Stubs\InMemoryContainer;
 use Thinktomorrow\Trader\Tests\Unit\Stubs\InMemoryDescriptionRender;
 
 require_once __DIR__.'/../vendor/autoload.php';

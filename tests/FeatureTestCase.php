@@ -9,6 +9,7 @@ use Thinktomorrow\Trader\Orders\Domain\Read\MerchantItem as MerchantItemContract
 use Thinktomorrow\Trader\Orders\Domain\Read\MerchantOrder as MerchantOrderContract;
 use Thinktomorrow\Trader\Orders\Ports\Read\MerchantItem;
 use Thinktomorrow\Trader\Orders\Ports\Read\MerchantOrder;
+use Thinktomorrow\Trader\Tests\Stubs\InMemoryOrderRepository;
 
 class FeatureTestCase extends TestCase
 {

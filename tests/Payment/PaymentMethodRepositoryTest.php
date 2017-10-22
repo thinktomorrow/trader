@@ -4,7 +4,7 @@ namespace Thinktomorrow\Trader\Tests\Payment;
 
 use Thinktomorrow\Trader\Payment\Domain\PaymentMethod;
 use Thinktomorrow\Trader\Payment\Domain\PaymentMethodId;
-use Thinktomorrow\Trader\Tests\InMemoryPaymentMethodRepository;
+use Thinktomorrow\Trader\Tests\Stubs\InMemoryPaymentMethodRepository;
 use Thinktomorrow\Trader\Tests\UnitTestCase;
 
 class PaymentMethodRepositoryTest extends UnitTestCase

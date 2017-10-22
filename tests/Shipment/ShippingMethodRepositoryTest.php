@@ -4,6 +4,7 @@ namespace Thinktomorrow\Trader\Tests;
 
 use Thinktomorrow\Trader\Shipment\Domain\ShippingMethod;
 use Thinktomorrow\Trader\Shipment\Domain\ShippingMethodId;
+use Thinktomorrow\Trader\Tests\Stubs\InMemoryShippingMethodRepository;
 
 class ShippingMethodRepositoryTest extends UnitTestCase
 {

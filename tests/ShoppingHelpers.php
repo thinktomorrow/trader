@@ -10,6 +10,7 @@ use Thinktomorrow\Trader\Orders\Domain\CustomerId;
 use Thinktomorrow\Trader\Orders\Domain\Item;
 use Thinktomorrow\Trader\Orders\Domain\Order;
 use Thinktomorrow\Trader\Orders\Domain\OrderId;
+use Thinktomorrow\Trader\Tests\Stubs\InMemoryContainer;
 use Thinktomorrow\Trader\Tests\Stubs\PurchasableStub;
 
 trait ShoppingHelpers
