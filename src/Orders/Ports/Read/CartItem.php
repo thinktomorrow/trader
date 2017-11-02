@@ -19,6 +19,12 @@ class CartItem implements CartItemContract
     use GetDynamicValue;
 
     /**
+     * Custom values for purchasable
+     * @var array
+     */
+    private $values;
+
+    /**
      * @var Item
      */
     private $item;
@@ -26,6 +32,7 @@ class CartItem implements CartItemContract
     public function __construct(Item $item)
     {
         $this->item = $item;
+        $this->values = $item->purchasable()->itemData();
     }
 
     public function id()
