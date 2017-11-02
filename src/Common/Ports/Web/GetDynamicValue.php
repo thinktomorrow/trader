@@ -10,8 +10,6 @@ trait GetDynamicValue
             $value = $this->values[$key];
         }
         else{
-            $value = $default;
-
             // If key is not found as is, we assume we want to find a nested value
             if(false === strpos($key, '.'))
             {
@@ -19,20 +17,20 @@ trait GetDynamicValue
                 $key = strtolower(preg_replace('/(?<!^)[A-Z]/', '.$0', $key));
             }
 
-            if(false !== strpos($key, '.'))
+            // At this point no nesting we want to give back the default
+            if(false === strpos($key, '.')) return $default;
+
+            $keys = explode('.', $key);
+
+            $value = $this->getValue(array_shift($keys));
+            foreach($keys as $nestedKey)
             {
-                $keys = explode('.', $key);
+                // Normalize to array
+                if(is_object($value)) $value = (array) $value;
 
-                $value = $this->getValue(array_shift($keys));
-                foreach($keys as $nestedKey)
-                {
-                    // Normalize to array
-                    if(is_object($value)) $value = (array) $value;
+                if(!isset($value[$nestedKey])) return $default;
 
-                    if(!isset($value[$nestedKey])) return $default;
-
-                    $value = $value[$nestedKey];
-                }
+                $value = $value[$nestedKey];
             }
         }
 
