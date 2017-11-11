@@ -118,6 +118,15 @@ final class Order implements StatefulContract
         $this->state = $state;
     }
 
+    /**
+     * Force a state without safety checks of the domain
+     * @param $state
+     */
+    public function forceState($state)
+    {
+        $this->state = $state;
+    }
+
     public function inCustomerHands(): bool
     {
         return (new OrderState($this))->inCustomerHands();
