@@ -69,6 +69,8 @@ class ShippingMethod
 
     public function applicable(Order $order): bool
     {
+        if(empty($this->rules)) return true;
+
         return (bool) $this->getApplicableRule($order);
     }
 

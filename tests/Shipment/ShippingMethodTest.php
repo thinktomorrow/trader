@@ -31,11 +31,11 @@ class ShippingMethodTest extends UnitTestCase
     }
 
     /** @test */
-    public function without_rules_a_method_is_not_applicable_to_an_order()
+    public function without_rules_a_method_is_always_applicable_to_an_order()
     {
         $method = new ShippingMethod(ShippingMethodId::fromInteger(2), 'foobar');
 
-        $this->assertFalse($method->applicable($this->makeOrder()));
+        $this->assertTrue($method->applicable($this->makeOrder()));
     }
 
     /** @test */
