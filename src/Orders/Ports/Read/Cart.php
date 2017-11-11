@@ -33,6 +33,11 @@ class Cart implements CartContract
         return $this->order->hasReference() ? $this->order->reference() : '';
     }
 
+    public function isBusiness(): bool
+    {
+        return $this->order->isBusiness();
+    }
+
     public function empty(): bool
     {
         return empty($this->items());

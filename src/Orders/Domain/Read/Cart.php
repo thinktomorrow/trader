@@ -13,6 +13,8 @@ interface Cart
 
     public function reference(): string;
 
+    public function isBusiness(): bool;
+
     public function size(): int;
 
     public function empty(): bool;

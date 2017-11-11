@@ -10,11 +10,42 @@ use Thinktomorrow\Trader\Orders\Domain\CustomerId;
 use Thinktomorrow\Trader\Orders\Domain\Item;
 use Thinktomorrow\Trader\Orders\Domain\Order;
 use Thinktomorrow\Trader\Orders\Domain\OrderId;
+use Thinktomorrow\Trader\Orders\Domain\Read\Cart;
+use Thinktomorrow\Trader\Orders\Domain\Read\CartFactory;
+use Thinktomorrow\Trader\Orders\Domain\Read\MerchantOrder;
 use Thinktomorrow\Trader\Tests\Stubs\InMemoryContainer;
 use Thinktomorrow\Trader\Tests\Stubs\PurchasableStub;
 
 trait ShoppingHelpers
 {
+    /**
+     * Really? Yes really
+     */
+    protected function dd()
+    {
+        die(var_dump(func_get_args()));
+    }
+
+    protected function cart(Order $order = null): Cart
+    {
+        if (!$order) {
+            $order = $this->purchase(1);
+        }
+
+        return (new CartFactory($this->container('orderRepository'), $this->container))->create($order);
+    }
+
+    protected function merchantOrder(Order $order = null): MerchantOrder
+    {
+        if (!$order) {
+            $order = $this->purchase(1);
+        }
+
+        return new \Thinktomorrow\Trader\Orders\Ports\Read\MerchantOrder([
+            'is_business' => $order->isBusiness(),
+        ]);
+    }
+
     protected function purchase($id)
     {
         $order = new Order(OrderId::fromInteger($id));

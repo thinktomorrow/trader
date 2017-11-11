@@ -11,6 +11,8 @@ interface MerchantOrder
 
     public function reference(): string;
 
+    public function isBusiness(): bool;
+
     public function empty(): bool;
 
     public function size(): int;
@@ -34,4 +36,8 @@ interface MerchantOrder
     public function paymentTotal(): string;
 
     public function confirmedAt(): string;
+
+    public function paidAt(): string;
+
+    public function shippedAt(): string;
 }

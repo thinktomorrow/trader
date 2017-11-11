@@ -34,7 +34,7 @@ trait PayableAndShippable
      *
      * @return bool
      */
-    public function business(): bool
+    public function isBusiness(): bool
     {
         return (bool) $this->business;
     }

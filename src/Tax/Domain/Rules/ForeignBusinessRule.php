@@ -24,7 +24,7 @@ class ForeignBusinessRule implements TaxRule
 
     public function applicable(): bool
     {
-        if (!$this->order || !$this->order->business()) {
+        if (!$this->order || !$this->order->isBusiness()) {
             return false;
         }
 

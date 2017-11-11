@@ -35,10 +35,4 @@ class PercentageOffItemDiscountTest extends UnitTestCase
         $this->assertEquals(Money::EUR(110)->multiply(0.2), $order->items()->find(PurchasableId::fromInteger(20))->discountTotal());
         $this->assertEquals(Money::EUR(110)->multiply(0.8)->add(Money::EUR(110)), $order->total());
     }
-
-    /** @test */
-    public function it_can_()
-    {
-        $this->markTestIncomplete('Add tests for each discount type');
-    }
 }

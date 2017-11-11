@@ -64,13 +64,4 @@ class CartFactoryTest extends FeatureTestCase
         }
         $this->assertTrue($testedTaxRates, 'tax_rates value remains untested. Make sure to at least provide one entry.');
     }
-
-    private function cart(Order $order = null): Cart
-    {
-        if (!$order) {
-            $order = $this->purchase(1);
-        }
-
-        return (new CartFactory($this->container('orderRepository'), $this->container))->create($order);
-    }
 }
