@@ -32,11 +32,11 @@ class PaymentMethodTest extends UnitTestCase
     }
 
     /** @test */
-    public function without_rules_a_method_is_always_applicable_to_an_order()
+    public function without_rules_a_method_is_not_applicable_to_an_order()
     {
         $method = new PaymentMethod(PaymentMethodId::fromInteger(2), 'foobar');
 
-        $this->assertTrue($method->applicable($this->makeOrder()));
+        $this->assertFalse($method->applicable($this->makeOrder()));
     }
 
     /** @test */
