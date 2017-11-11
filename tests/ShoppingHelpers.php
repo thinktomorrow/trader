@@ -19,7 +19,7 @@ use Thinktomorrow\Trader\Tests\Stubs\PurchasableStub;
 trait ShoppingHelpers
 {
     /**
-     * Really? Yes really
+     * Really? Yes really.
      */
     protected function dd()
     {

@@ -23,7 +23,7 @@ class MerchantOrder extends AbstractPresenter implements MerchantOrderContract
 
     public function isBusiness(): bool
     {
-        return $this->getValue('is_business',false);
+        return $this->getValue('is_business', false);
     }
 
     public function confirmedAt(): string

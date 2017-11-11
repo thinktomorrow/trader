@@ -68,7 +68,9 @@ class PaymentMethod
 
     public function applicable(Order $order): bool
     {
-        if(empty($this->rules)) return true;
+        if (empty($this->rules)) {
+            return true;
+        }
 
         return (bool) $this->getApplicableRule($order);
     }

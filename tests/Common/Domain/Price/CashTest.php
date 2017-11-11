@@ -15,7 +15,7 @@ class CashTest extends UnitTestCase
     {
         parent::setUp();
 
-        $this->config = new Config(__DIR__ . '/../../../Stubs/configStub.php');
+        $this->config = new Config(__DIR__.'/../../../Stubs/configStub.php');
 
         // Reset the applied currency to avoid interference with other tests
         Cash::reset();

@@ -4,9 +4,7 @@ namespace Thinktomorrow\Trader\Tests;
 
 use Assert\Assertion;
 use Thinktomorrow\Trader\Common\Domain\Price\Cash;
-use Thinktomorrow\Trader\Orders\Domain\Order;
 use Thinktomorrow\Trader\Orders\Domain\Read\Cart;
-use Thinktomorrow\Trader\Orders\Domain\Read\CartFactory;
 use Thinktomorrow\Trader\Orders\Domain\Read\CartItem;
 
 class CartFactoryTest extends FeatureTestCase

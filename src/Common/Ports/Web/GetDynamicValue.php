@@ -8,27 +8,30 @@ trait GetDynamicValue
     {
         if (isset($this->values[$key])) {
             $value = $this->values[$key];
-        }
-        else{
+        } else {
             // If key is not found as is, we assume we want to find a nested value
-            if(false === strpos($key, '.'))
-            {
+            if (false === strpos($key, '.')) {
                 // Replace camelCase with dot syntax
                 $key = strtolower(preg_replace('/(?<!^)[A-Z]/', '.$0', $key));
             }
 
             // At this point no nesting we want to give back the default
-            if(false === strpos($key, '.')) return $default;
+            if (false === strpos($key, '.')) {
+                return $default;
+            }
 
             $keys = explode('.', $key);
 
             $value = $this->getValue(array_shift($keys));
-            foreach($keys as $nestedKey)
-            {
+            foreach ($keys as $nestedKey) {
                 // Normalize to array
-                if(is_object($value)) $value = (array) $value;
+                if (is_object($value)) {
+                    $value = (array) $value;
+                }
 
-                if(!isset($value[$nestedKey])) return $default;
+                if (!isset($value[$nestedKey])) {
+                    return $default;
+                }
 
                 $value = $value[$nestedKey];
             }
@@ -54,21 +57,22 @@ trait GetDynamicValue
     }
 
     /**
-     * Catch fake methods such as brand() which refers to the value brand
+     * Catch fake methods such as brand() which refers to the value brand.
      *
      * @param $method
      * @param $args
+     *
      * @return mixed|null
      */
-    public function __call($method, $args){
+    public function __call($method, $args)
+    {
 
         // Only assume fake methods is they are passed no arguments
-        if( !$args)
-        {
+        if (!$args) {
             return $this->getValue($method);
         }
 
-        throw new \RuntimeException('Unknown method ' . $method);
+        throw new \RuntimeException('Unknown method '.$method);
     }
 
     private function snakeToCamelcase($value)

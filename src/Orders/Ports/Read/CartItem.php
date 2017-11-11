@@ -19,7 +19,8 @@ class CartItem implements CartItemContract
     use GetDynamicValue;
 
     /**
-     * Custom values for purchasable
+     * Custom values for purchasable.
+     *
      * @var array
      */
     private $values;
