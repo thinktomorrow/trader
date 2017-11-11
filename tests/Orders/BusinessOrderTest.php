@@ -4,7 +4,6 @@ namespace Thinktomorrow\Trader\Tests;
 
 use Thinktomorrow\Trader\Orders\Domain\Order;
 use Thinktomorrow\Trader\Orders\Domain\OrderId;
-use Thinktomorrow\Trader\Orders\Domain\Read\CartFactory;
 
 class BusinessOrderTest extends FeatureTestCase
 {

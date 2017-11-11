@@ -11,7 +11,7 @@ class ConfigTest extends UnitTestCase
     {
         parent::setUp();
 
-        $this->config = new Config(__DIR__ . '/../Stubs/configStub.php');
+        $this->config = new Config(__DIR__.'/../Stubs/configStub.php');
     }
 
     public function tearDown()

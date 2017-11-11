@@ -41,7 +41,7 @@ trait PayableAndShippable
 
     public function setBusiness($business = true)
     {
-        $this->business = !!$business;
+        $this->business = (bool) $business;
 
         return $this;
     }
