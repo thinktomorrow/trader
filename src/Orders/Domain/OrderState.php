@@ -27,15 +27,8 @@ class OrderState extends StateMachine
         self::PENDING,
         self::ABANDONED,
         self::REMOVED,
-
         self::CONFIRMED,
-        self::CANCELLED,
         self::PAID,
-        self::PROCESSED,
-        self::SHIPPED,
-        self::FULLFILLED,
-        self::REFUNDED,
-        self::RETURNED,
     ];
 
     protected $transitions = [

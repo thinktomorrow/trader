@@ -3,13 +3,15 @@
 namespace Thinktomorrow\Trader\Orders\Ports\Read;
 
 use Thinktomorrow\Trader\Common\Domain\Price\Cash;
+use Thinktomorrow\Trader\Common\Domain\State\StatefulContract;
 use Thinktomorrow\Trader\Common\Ports\Web\AbstractPresenter;
+use Thinktomorrow\Trader\Orders\Domain\MerchantOrderState;
 use Thinktomorrow\Trader\Orders\Domain\Read\MerchantOrder as MerchantOrderContract;
 
 /**
  * Order presenter for merchant.
  */
-class MerchantOrder extends AbstractPresenter implements MerchantOrderContract
+class MerchantOrder extends AbstractPresenter implements MerchantOrderContract, StatefulContract
 {
     public function id(): string
     {
@@ -154,5 +156,31 @@ class MerchantOrder extends AbstractPresenter implements MerchantOrderContract
         return $this->getValue('payment_total', null, function ($paymentTotal) {
             return Cash::from($paymentTotal)->locale();
         });
+    }
+
+    public function state(): string
+    {
+        return $this->getValue('state');
+    }
+
+    public function changeState($state)
+    {
+        // Ignore change to current state - it should not trigger events either
+        if ($state === $this->values['state']) {
+            return;
+        }
+
+        MerchantOrderState::assertNewState($this, $state);
+
+        $this->values['state'] = $state;
+    }
+
+    /**
+     * Force a state without safety checks of the domain
+     * @param $state
+     */
+    public function forceState($state)
+    {
+        $this->values['state'] = $state;
     }
 }
