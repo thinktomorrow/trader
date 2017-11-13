@@ -4,6 +4,7 @@ namespace Thinktomorrow\Trader\Orders\Ports\Read;
 
 use Thinktomorrow\Trader\Common\Domain\Price\Cash;
 use Thinktomorrow\Trader\Discounts\Domain\AppliedDiscountCollection;
+use Thinktomorrow\Trader\Orders\Domain\MerchantOrderState;
 use Thinktomorrow\Trader\Orders\Domain\Order;
 use Thinktomorrow\Trader\Orders\Domain\OrderState;
 use Thinktomorrow\Trader\Orders\Domain\Read\Cart as CartContract;
@@ -41,7 +42,7 @@ class Cart implements CartContract
 
     public function isConfirmed(): bool
     {
-        return $this->order->state() == OrderState::CONFIRMED;
+        return $this->order->state() == OrderState::CONFIRMED || $this->order->state() == MerchantOrderState::PAID;
     }
 
     public function empty(): bool

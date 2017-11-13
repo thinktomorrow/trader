@@ -15,6 +15,8 @@ interface Cart
 
     public function isBusiness(): bool;
 
+    public function isConfirmed(): bool;
+
     public function size(): int;
 
     public function empty(): bool;
