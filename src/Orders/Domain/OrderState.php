@@ -14,13 +14,12 @@ class OrderState extends StateMachine
 
     // Complete states - order can be processed by merchant
     const CONFIRMED = 'confirmed'; // ready for payment - unpaid
-    const CANCELLED = 'cancelled'; // customer cancelled order
-    const PAID = 'paid'; // payment received by merchant or acquirer
-    const PROCESSED = 'processed'; // ready for pickup
-    const SHIPPED = 'shipped'; // picked up
-    const FULLFILLED = 'fullfilled'; // delivered to customer
-    const REFUNDED = 'refunded';
-    const RETURNED = 'returned';
+//    const CANCELLED = 'cancelled'; // customer cancelled order
+//    const PROCESSED = 'processed'; // ready for pickup
+//    const SHIPPED = 'shipped'; // picked up
+//    const FULLFILLED = 'fullfilled'; // delivered to customer
+//    const REFUNDED = 'refunded';
+//    const RETURNED = 'returned';
 
     protected $states = [
         self::NEW,
@@ -28,7 +27,7 @@ class OrderState extends StateMachine
         self::ABANDONED,
         self::REMOVED,
         self::CONFIRMED,
-        self::PAID,
+//        self::PAID,
     ];
 
     protected $transitions = [
@@ -48,10 +47,6 @@ class OrderState extends StateMachine
             'from' => [self::PENDING, self::ABANDONED],
             'to'   => self::CONFIRMED,
         ],
-        'pay' => [
-            'from' => [self::CONFIRMED],
-            'to'   => self::PAID,
-        ],
     ];
 
     public function __construct(Order $order)
@@ -65,7 +60,7 @@ class OrderState extends StateMachine
             static::NEW,
             static::PENDING,
             static::ABANDONED,
-            static::CONFIRMED,
+            static::CONFIRMED, // Should stay the same, but customer can still change cart prior to payment
         ]);
     }
 

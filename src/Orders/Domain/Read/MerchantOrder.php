@@ -9,6 +9,8 @@ interface MerchantOrder
 {
     public function id(): string;
 
+    public function persistenceId(): int;
+
     public function reference(): string;
 
     public function isBusiness(): bool;

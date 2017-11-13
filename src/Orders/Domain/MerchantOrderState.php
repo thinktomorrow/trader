@@ -9,6 +9,7 @@ use Thinktomorrow\Trader\Orders\Domain\Read\MerchantOrder;
 class MerchantOrderState extends StateMachine
 {
     // Complete states - order can be processed by merchant
+    const CONFIRMED = 'confirmed';
     const PAID = 'paid'; // payment received by merchant or acquirer
     const HALTED_FOR_PROCESS = 'halted_for_process'; // Something is wrong with the order (e.g. outdated order,  out of stock, ...)
     const READY_FOR_PROCESS = 'ready_for_process';
@@ -20,6 +21,7 @@ class MerchantOrderState extends StateMachine
     const REFUNDED = 'refunded';
 
     protected $states = [
+        self::CONFIRMED,
         self::PAID,
         self::CANCELLED,
         self::HALTED_FOR_PROCESS,
@@ -32,8 +34,12 @@ class MerchantOrderState extends StateMachine
     ];
 
     protected $transitions = [
+        'pay' => [
+            'from' => [self::CONFIRMED],
+            'to'   => self::PAID,
+        ],
         'cancel' => [
-            'from' => [self::PAID, self::READY_FOR_PROCESS, self::PROCESSED],
+            'from' => [self::CONFIRMED, self::PAID, self::READY_FOR_PROCESS, self::PROCESSED],
             'to'    => self::CANCELLED,
         ],
         'halt' => [

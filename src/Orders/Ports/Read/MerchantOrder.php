@@ -18,6 +18,11 @@ class MerchantOrder extends AbstractPresenter implements MerchantOrderContract, 
         return $this->getValue('id');
     }
 
+    public function persistenceId(): int
+    {
+        return $this->getValue('persistenceId');
+    }
+
     public function reference(): string
     {
         return $this->getValue('reference');

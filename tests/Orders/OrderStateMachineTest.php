@@ -63,16 +63,4 @@ class OrderStateMachineTest extends UnitTestCase
         $this->assertTrue($this->order->inCustomerHands());
         $this->assertFalse($this->order->inMerchantHands());
     }
-
-    /** @test */
-    public function it_can_tell_when_order_is_in_merchant_hands()
-    {
-        // On paid state, customer hands over control to merchant
-        $this->machine->apply('create');
-        $this->machine->apply('confirm');
-        $this->machine->apply('pay');
-
-        $this->assertTrue($this->order->inMerchantHands());
-        $this->assertFalse($this->order->inCustomerHands());
-    }
 }
