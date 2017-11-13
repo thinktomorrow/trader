@@ -20,4 +20,6 @@ interface OrderRepository
     public function remove(OrderId $orderId);
 
     public function nextIdentity(): OrderId;
+
+    public function storeProviderValues(array $provider_values);
 }

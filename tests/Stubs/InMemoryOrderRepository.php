@@ -53,4 +53,9 @@ class InMemoryOrderRepository implements OrderRepository
     {
         return OrderReference::fromString((string) Uuid::uuid4());
     }
+
+    public function storeProviderValues(array $provider_values)
+    {
+        // TODO: Implement storeProviderValues() method.
+    }
 }
