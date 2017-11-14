@@ -2,6 +2,7 @@
 
 namespace Thinktomorrow\Trader\Orders\Ports\Read;
 
+use Money\Money;
 use Thinktomorrow\Trader\Common\Domain\Price\Cash;
 use Thinktomorrow\Trader\Common\Domain\State\StatefulContract;
 use Thinktomorrow\Trader\Common\Ports\Web\AbstractPresenter;
@@ -156,11 +157,21 @@ class MerchantOrder extends AbstractPresenter implements MerchantOrderContract, 
         });
     }
 
+    public function shippingTotalAsMoney(): Money
+    {
+        return $this->getValue('shipment_total');
+    }
+
     public function paymentTotal(): string
     {
         return $this->getValue('payment_total', null, function ($paymentTotal) {
             return Cash::from($paymentTotal)->locale();
         });
+    }
+
+    public function paymentTotalAsMoney(): Money
+    {
+        return $this->getValue('payment_total');
     }
 
     public function state(): string
