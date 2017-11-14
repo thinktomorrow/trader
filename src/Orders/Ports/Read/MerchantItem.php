@@ -66,7 +66,9 @@ class MerchantItem extends AbstractPresenter implements MerchantItemContract
 
     public function salePriceAmount(): string
     {
-        return (string) $this->getValue('saleprice',$this->getValue('price',null));
+        return (string) $this->getValue('saleprice', $this->price(), function ($price) {
+            return Cash::make($price)->getAmount();
+        });
     }
 
     public function subtotal(): string
