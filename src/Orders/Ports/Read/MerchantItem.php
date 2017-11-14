@@ -52,11 +52,21 @@ class MerchantItem extends AbstractPresenter implements MerchantItemContract
         });
     }
 
+    public function onSale(): bool
+    {
+        return (bool) $this->getValue('onsale');
+    }
+
     public function saleprice(): string
     {
-        return $this->getValue('saleprice', null, function ($price) {
+        return $this->getValue('saleprice', $this->price(), function ($price) {
             return Cash::from($price)->locale();
         });
+    }
+
+    public function salePriceAmount(): string
+    {
+        return (string) $this->getValue('saleprice',$this->getValue('price',null));
     }
 
     public function subtotal(): string

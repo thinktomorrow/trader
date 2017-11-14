@@ -71,6 +71,11 @@ class CartItem implements CartItemContract
         return $this->item->description();
     }
 
+    public function onSale(): bool
+    {
+        return (bool) $this->item->onsale();
+    }
+
     public function price(): string
     {
         return Cash::from($this->item->price())->locale();

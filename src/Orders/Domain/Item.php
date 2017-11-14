@@ -85,6 +85,11 @@ final class Item
         return $this->quantity;
     }
 
+    public function onsale(): bool
+    {
+        return $this->salePrice()->greaterThan($this->price());
+    }
+
     public function price(): Money
     {
         return $this->purchasable->price();
