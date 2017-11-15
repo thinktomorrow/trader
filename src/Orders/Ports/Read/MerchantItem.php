@@ -3,6 +3,7 @@
 namespace Thinktomorrow\Trader\Orders\Ports\Read;
 
 use Thinktomorrow\Trader\Common\Domain\Price\Cash;
+use Thinktomorrow\Trader\Common\Domain\Price\Percentage;
 use Thinktomorrow\Trader\Common\Ports\Web\AbstractPresenter;
 use Thinktomorrow\Trader\Orders\Domain\Read\MerchantItem as MerchantItemContract;
 
@@ -52,11 +53,29 @@ class MerchantItem extends AbstractPresenter implements MerchantItemContract
         });
     }
 
+    public function onSale(): bool
+    {
+        return (bool) $this->getValue('onsale');
+    }
+
     public function saleprice(): string
     {
-        return $this->getValue('saleprice', null, function ($price) {
-            return Cash::from($price)->locale();
-        });
+        if(($salePrice = $this->getValue('saleprice')) && $salePrice->isPositive())
+        {
+            return Cash::from($salePrice)->locale();
+        }
+
+        return $this->price();
+    }
+
+    public function salePriceAmount(): string
+    {
+        if(($salePrice = $this->getValue('saleprice')) && $salePrice->isPositive())
+        {
+            return (string) $salePrice->getAmount();
+        }
+
+        return (string) $this->getValue('price')->getAmount();
     }
 
     public function subtotal(): string
