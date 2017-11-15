@@ -29,7 +29,7 @@ class MerchantOrderStateMachineTest extends UnitTestCase
         $this->assertEquals('paid', $this->merchantOrder->state());
 
         $this->machine->apply('queue');
-        $this->assertEquals(MerchantOrderState::READY_FOR_PROCESS, $this->merchantOrder->state());
+        $this->assertEquals(MerchantOrderState::QUEUED_FOR_PROCESS, $this->merchantOrder->state());
     }
 
     /** @test */

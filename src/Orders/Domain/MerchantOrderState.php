@@ -12,7 +12,7 @@ class MerchantOrderState extends StateMachine
     const CONFIRMED = 'confirmed';
     const PAID = 'paid'; // payment received by merchant or acquirer
     const HALTED_FOR_PROCESS = 'halted_for_process'; // Something is wrong with the order (e.g. outdated order,  out of stock, ...)
-    const READY_FOR_PROCESS = 'ready_for_process';
+    const QUEUED_FOR_PROCESS = 'queued_for_process';
     const PROCESSED = 'processed'; // ready for pickup
     const CANCELLED = 'cancelled'; // customer cancelled order after payment
     const SHIPPED = 'shipped'; // in hands of delivery service
@@ -25,7 +25,7 @@ class MerchantOrderState extends StateMachine
         self::PAID,
         self::CANCELLED,
         self::HALTED_FOR_PROCESS,
-        self::READY_FOR_PROCESS,
+        self::QUEUED_FOR_PROCESS,
         self::PROCESSED,
         self::SHIPPED,
         self::FULFILLED,
@@ -39,7 +39,7 @@ class MerchantOrderState extends StateMachine
             'to'   => self::PAID,
         ],
         'cancel' => [
-            'from' => [self::CONFIRMED, self::PAID, self::READY_FOR_PROCESS, self::PROCESSED],
+            'from' => [self::CONFIRMED, self::PAID, self::QUEUED_FOR_PROCESS, self::PROCESSED],
             'to'    => self::CANCELLED,
         ],
         'halt' => [
@@ -48,10 +48,10 @@ class MerchantOrderState extends StateMachine
         ],
         'queue' => [
             'from' => [self::PAID, self::HALTED_FOR_PROCESS],
-            'to'    => self::READY_FOR_PROCESS,
+            'to'    => self::QUEUED_FOR_PROCESS,
         ],
         'process' => [
-            'from' => [self::PAID, self::READY_FOR_PROCESS],
+            'from' => [self::PAID, self::QUEUED_FOR_PROCESS],
             'to'    => self::PROCESSED,
         ],
         'ship' => [

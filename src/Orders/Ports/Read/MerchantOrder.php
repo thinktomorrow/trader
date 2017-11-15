@@ -33,24 +33,24 @@ class MerchantOrder extends AbstractPresenter implements MerchantOrderContract, 
         return $this->getValue('is_business', false);
     }
 
-    public function confirmedAt(): string
+    public function confirmedAt($format = 'd/m/Y H:i'): string
     {
-        return $this->getValue('confirmed_at', '', function ($confirmedAt) {
-            return $confirmedAt->format('d/m/Y H:i');
+        return $this->getValue('confirmed_at', '', function ($confirmedAt) use($format) {
+            return $confirmedAt->format($format);
         });
     }
 
-    public function paidAt(): string
+    public function paidAt($format = 'd/m/Y H:i'): string
     {
-        return $this->getValue('paid_at', '', function ($paidAt) {
-            return $paidAt->format('d/m/Y H:i');
+        return $this->getValue('paid_at', '', function ($paidAt) use($format) {
+            return $paidAt->format($format);
         });
     }
 
-    public function shippedAt(): string
+    public function shippedAt($format = 'd/m/Y H:i'): string
     {
-        return $this->getValue('shipped_at', '', function ($shippedAt) {
-            return $shippedAt->format('d/m/Y H:i');
+        return $this->getValue('shipped_at', '', function ($shippedAt) use($format) {
+            return $shippedAt->format($format);
         });
     }
 
