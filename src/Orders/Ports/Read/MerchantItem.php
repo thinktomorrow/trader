@@ -75,7 +75,7 @@ class MerchantItem extends AbstractPresenter implements MerchantItemContract
 
     public function taxRate(): string
     {
-        return $this->getValue('taxRate', null, function ($taxRate) {
+        return $this->getValue('taxRate', '', function ($taxRate) {
             return $taxRate->asPercent().'%';
         });
     }
