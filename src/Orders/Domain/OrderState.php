@@ -60,6 +60,7 @@ class OrderState extends StateMachine
             static::NEW,
             static::PENDING,
             static::ABANDONED,
+            static::REMOVED,
             static::CONFIRMED, // Should stay the same, but customer can still change cart prior to payment
         ]);
     }

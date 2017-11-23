@@ -76,4 +76,20 @@ class MerchantOrderState extends StateMachine
     {
         parent::__construct($order);
     }
+
+    public function inCustomerHands(): bool
+    {
+        return in_array($this->statefulContract->state(), [
+            OrderState::NEW,
+            OrderState::PENDING,
+            OrderState::ABANDONED,
+            OrderState::REMOVED,
+            OrderState::CONFIRMED, // Should stay the same, but customer can still change cart prior to payment
+        ]);
+    }
+
+    public function inMerchantHands(): bool
+    {
+        return !$this->inCustomerHands();
+    }
 }

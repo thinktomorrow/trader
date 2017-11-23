@@ -199,4 +199,14 @@ class MerchantOrder extends AbstractPresenter implements MerchantOrderContract, 
     {
         $this->values['state'] = $state;
     }
+
+    public function inCustomerHands(): bool
+    {
+        return (new MerchantOrderState($this))->inCustomerHands();
+    }
+
+    public function inMerchantHands(): bool
+    {
+        return ! $this->inCustomerHands();
+    }
 }
