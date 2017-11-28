@@ -8,9 +8,9 @@ use Thinktomorrow\Trader\Payment\Domain\Conditions\MinimumAmount;
 use Thinktomorrow\Trader\Payment\Domain\PaymentRule;
 use Thinktomorrow\Trader\Payment\Domain\PaymentRuleId;
 use Thinktomorrow\Trader\Tests\Stubs\PurchasableStub;
-use Thinktomorrow\Trader\Tests\UnitTestCase;
+use Thinktomorrow\Trader\Tests\TestCase;
 
-class PaymentRuleTest extends UnitTestCase
+class PaymentRuleTest extends TestCase
 {
     /** @test */
     public function it_has_an_aggregate_id()
@@ -55,7 +55,7 @@ class PaymentRuleTest extends UnitTestCase
     public function a_rule_can_be_applicable_to_an_order_if_conditions_are_met()
     {
         $order = $this->makeOrder();
-        $order->items()->add(Item::fromPurchasable(new PurchasableStub(1, [], Money::EUR(31))));
+        $order->items()->add($this->getItem(null, null, new PurchasableStub(1, [], Money::EUR(31))));
 
         $rule = $this->createPaymentRule();
 

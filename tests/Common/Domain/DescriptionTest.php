@@ -1,9 +1,9 @@
 <?php
 
 use Thinktomorrow\Trader\Common\Domain\Description;
-use Thinktomorrow\Trader\Tests\UnitTestCase;
+use Thinktomorrow\Trader\Tests\TestCase;
 
-class DescriptionTest extends UnitTestCase
+class DescriptionTest extends TestCase
 {
     /** @test */
     public function it_can_be_instantiated()

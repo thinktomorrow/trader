@@ -13,7 +13,7 @@ use Thinktomorrow\Trader\Orders\Domain\Order;
 use Thinktomorrow\Trader\Orders\Domain\OrderId;
 use Thinktomorrow\Trader\Tests\Stubs\PurchasableStub;
 
-class OrderTest extends UnitTestCase
+class OrderTest extends TestCase
 {
     /** @test */
     public function orderId_is_a_valid_identifier()
@@ -97,9 +97,9 @@ class OrderTest extends UnitTestCase
     public function it_returns_the_tax()
     {
         $order = $this->makeOrder();
-        $order->items()->add(Item::fromPurchasable(new PurchasableStub(1, [], Money::EUR(200), Percentage::fromPercent(20))));
+        $order->items()->add($this->getItem(null, Percentage::fromPercent(20), new PurchasableStub(1, [], Money::EUR(200))));
 
-        $this->assertEquals(Money::EUR(40), $order->tax());
+        $this->assertEquals(Money::EUR(40), $order->taxTotal());
         $this->assertEquals([
             20 => [
                 'percent' => Percentage::fromPercent(20),
@@ -166,11 +166,11 @@ class OrderTest extends UnitTestCase
     public function it_sums_up_all_given_tax_rates()
     {
         $order = $this->makeOrder();
-        $order->items()->add(Item::fromPurchasable(new PurchasableStub(1, [], Money::EUR(200), Percentage::fromPercent(20))));
-        $order->items()->add(Item::fromPurchasable(new PurchasableStub(2, [], Money::EUR(100), Percentage::fromPercent(6))));
-        $order->items()->add(Item::fromPurchasable(new PurchasableStub(3, [], Money::EUR(100), Percentage::fromPercent(6))));
+        $order->items()->add($this->getItem(null, Percentage::fromPercent(20), new PurchasableStub(1, [], Money::EUR(200))));
+        $order->items()->add($this->getItem(null, Percentage::fromPercent(6), new PurchasableStub(2, [], Money::EUR(100))));
+        $order->items()->add($this->getItem(null, Percentage::fromPercent(6), new PurchasableStub(3, [], Money::EUR(100))));
 
-        $this->assertEquals(Money::EUR(40)->add(Money::EUR(12)), $order->tax());
+        $this->assertEquals(Money::EUR(40)->add(Money::EUR(12)), $order->taxTotal());
         $this->assertEquals([
             20 => [
                 'percent' => Percentage::fromPercent(20),
@@ -189,10 +189,10 @@ class OrderTest extends UnitTestCase
     public function it_sums_up_the_taxes()
     {
         $order = $this->makeOrder();
-        $order->items()->add(Item::fromPurchasable(new PurchasableStub(1, [], Money::EUR(300), Percentage::fromPercent(21))));
-        $order->items()->add(Item::fromPurchasable(new PurchasableStub(2, [], Money::EUR(50), Percentage::fromPercent(21))));
-        $order->items()->add(Item::fromPurchasable(new PurchasableStub(3, [], Money::EUR(1050), Percentage::fromPercent(21))));
+        $order->items()->add($this->getItem(null, Percentage::fromPercent(21), new PurchasableStub(1, [], Money::EUR(300))));
+        $order->items()->add($this->getItem(null, Percentage::fromPercent(21), new PurchasableStub(2, [], Money::EUR(50))));
+        $order->items()->add($this->getItem(null, Percentage::fromPercent(21), new PurchasableStub(3, [], Money::EUR(1050))));
 
-        $this->assertEquals(Money::EUR(294), $order->tax());
+        $this->assertEquals(Money::EUR(294), $order->taxTotal());
     }
 }

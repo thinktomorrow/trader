@@ -197,7 +197,7 @@ final class Order implements StatefulContract
         $this->taxPercentage = $taxPercentage;
     }
 
-    public function tax(): Money
+    public function taxTotal(): Money
     {
         return array_reduce($this->taxRates(), function ($carry, $taxRate) {
             return $carry->add($taxRate['tax']);

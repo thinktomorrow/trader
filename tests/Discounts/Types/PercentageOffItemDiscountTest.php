@@ -5,12 +5,11 @@ namespace Thinktomorrow\Trader\Tests;
 use Money\Money;
 use Thinktomorrow\Trader\Common\Domain\Price\Percentage;
 use Thinktomorrow\Trader\Discounts\Domain\DiscountFactory;
-use Thinktomorrow\Trader\Orders\Domain\Item;
 use Thinktomorrow\Trader\Orders\Domain\PurchasableId;
 use Thinktomorrow\Trader\Tests\Stubs\InMemoryContainer;
 use Thinktomorrow\Trader\Tests\Stubs\PurchasableStub;
 
-class PercentageOffItemDiscountTest extends UnitTestCase
+class PercentageOffItemDiscountTest extends TestCase
 {
     /** @test */
     public function it_can_apply_discount_to_items()
@@ -24,7 +23,7 @@ class PercentageOffItemDiscountTest extends UnitTestCase
         ]);
 
         $order = $this->makeOrder();
-        $order->items()->add(Item::fromPurchasable(new PurchasableStub(20, [], Money::EUR(110))), 2);
+        $order->items()->add($this->getItem(null, null, new PurchasableStub(20, [], Money::EUR(110))), 2);
 
         // Assert amount prior to item discount
         $this->assertEquals(Money::EUR(220), $order->total());

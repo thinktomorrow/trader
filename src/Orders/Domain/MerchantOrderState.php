@@ -6,7 +6,7 @@ use Thinktomorrow\Trader\Common\Domain\State\StateMachine;
 use Thinktomorrow\Trader\Orders\Domain\Read\MerchantOrder;
 
 
-class MerchantOrderState extends StateMachine
+class MerchantOrderStateOld extends StateMachine
 {
     // Complete states - order can be processed by merchant
     const CONFIRMED = 'confirmed';

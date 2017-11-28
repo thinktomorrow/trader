@@ -1,9 +1,9 @@
 <?php
 
 use Thinktomorrow\Trader\Common\Domain\AggregateId;
-use Thinktomorrow\Trader\Tests\UnitTestCase;
+use Thinktomorrow\Trader\Tests\TestCase;
 
-class AggregateIdTest extends UnitTestCase
+class AggregateIdTest extends TestCase
 {
     private function getId($id = 1)
     {

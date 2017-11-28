@@ -138,9 +138,9 @@ trait PayableAndShippable
         return $this;
     }
 
-    public function shippingAddressId()
+    public function shippingAddressId(): int
     {
-        return $this->shippingAddressId;
+        return $this->shippingAddressId ?? 0;
     }
 
     public function setShippingAddressId($shippingAddressId)
@@ -148,9 +148,9 @@ trait PayableAndShippable
         $this->shippingAddressId = $shippingAddressId;
     }
 
-    public function billingAddressId()
+    public function billingAddressId(): int
     {
-        return $this->billingAddressId;
+        return $this->billingAddressId ?? 0;
     }
 
     public function setBillingAddressId($billingAddressId)

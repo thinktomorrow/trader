@@ -8,7 +8,7 @@ use Thinktomorrow\Trader\Discounts\Domain\DiscountId;
 use Thinktomorrow\Trader\Discounts\Domain\Types\TypeKey;
 use Thinktomorrow\Trader\Orders\Domain\Order;
 
-class DiscountTypeTest extends UnitTestCase
+class DiscountTypeTest extends TestCase
 {
     /** @test */
     public function it_only_accepts_available_type_keys()

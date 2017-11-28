@@ -3,9 +3,9 @@
 namespace Thinktomorrow\Trader\Tests\Common;
 
 use Thinktomorrow\Trader\Common\Ports\Web\GetDynamicValue;
-use Thinktomorrow\Trader\Tests\UnitTestCase;
+use Thinktomorrow\Trader\Tests\TestCase;
 
-class GetDynamicValueTest extends UnitTestCase
+class GetDynamicValueTest extends TestCase
 {
     private $stub;
 

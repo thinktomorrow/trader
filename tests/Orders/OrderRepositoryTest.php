@@ -6,7 +6,7 @@ use Thinktomorrow\Trader\Orders\Domain\Exceptions\OrderNotFound;
 use Thinktomorrow\Trader\Orders\Domain\OrderId;
 use Thinktomorrow\Trader\Tests\Stubs\InMemoryOrderRepository;
 
-class OrderRepositoryTest extends UnitTestCase
+class OrderRepositoryTest extends TestCase
 {
     /** @test */
     public function it_can_find_an_order()

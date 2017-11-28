@@ -3,15 +3,15 @@
 use Thinktomorrow\Trader\Orders\Domain\Item;
 use Thinktomorrow\Trader\Orders\Domain\ItemCollection;
 use Thinktomorrow\Trader\Tests\Stubs\PurchasableStub;
-use Thinktomorrow\Trader\Tests\UnitTestCase;
+use Thinktomorrow\Trader\Tests\TestCase;
 
-class ArrayableItemCollectionTest extends UnitTestCase
+class ArrayableItemCollectionTest extends TestCase
 {
     private function getCollection()
     {
         return new ItemCollection(
-            Item::fromPurchasable(new PurchasableStub(1)),
-            Item::fromPurchasable(new PurchasableStub(2))
+            $this->getItem(null, null, new PurchasableStub(1)),
+            $this->getItem(null, null, new PurchasableStub(2))
         );
     }
 
@@ -35,7 +35,7 @@ class ArrayableItemCollectionTest extends UnitTestCase
     public function it_can_set_item_by_key()
     {
         $collection = $this->getCollection();
-        $collection[3] = $item = Item::fromPurchasable(new PurchasableStub(1));
+        $collection[3] = $item = $this->getItem(null, null, new PurchasableStub(1));
 
         $this->assertCount(3, $collection);
         $this->assertSame($item, $collection[3]);
@@ -56,7 +56,7 @@ class ArrayableItemCollectionTest extends UnitTestCase
         $this->expectException(InvalidArgumentException::class);
 
         $collection = $this->getCollection();
-        $collection[] = Item::fromPurchasable(new PurchasableStub(1));
+        $collection[] = $this->getItem(null, null, new PurchasableStub(1));
     }
 
     /** @test */

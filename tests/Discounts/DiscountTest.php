@@ -5,7 +5,7 @@ namespace Thinktomorrow\Trader\Tests;
 use Money\Money;
 use Thinktomorrow\Trader\Discounts\Domain\DiscountId;
 
-class DiscountTest extends UnitTestCase
+class DiscountTest extends TestCase
 {
     /** @test */
     public function discountId_is_a_valid_identifier()

@@ -9,7 +9,7 @@ use Thinktomorrow\Trader\Sales\Domain\SaleId;
 use Thinktomorrow\Trader\Sales\Domain\Types\PercentageOffSale;
 use Thinktomorrow\Trader\Tests\Stubs\EligibleForSaleStub;
 
-class SaleTest extends UnitTestCase
+class SaleTest extends TestCase
 {
     /** @test */
     public function saleId_is_a_valid_identifier()

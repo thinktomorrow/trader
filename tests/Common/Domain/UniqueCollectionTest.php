@@ -1,9 +1,9 @@
 <?php
 
 use Thinktomorrow\Trader\Common\Domain\UniqueCollection;
-use Thinktomorrow\Trader\Tests\UnitTestCase;
+use Thinktomorrow\Trader\Tests\TestCase;
 
-class UniqueCollectionTest extends UnitTestCase
+class UniqueCollectionTest extends TestCase
 {
     private $discount;
     private $discount2;

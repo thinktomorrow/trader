@@ -32,6 +32,11 @@ class ItemCollection implements \ArrayAccess, \Countable, \IteratorAggregate
         return count($this->items);
     }
 
+    public function first()
+    {
+        return reset($this->items);
+    }
+
     /**
      * the purchasableID is the reference of an item because cart items are grouped per purchasable
      * while ItemID is specific to a unique item in history and represents the persisted id.

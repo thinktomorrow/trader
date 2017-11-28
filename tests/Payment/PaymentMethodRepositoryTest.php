@@ -5,9 +5,9 @@ namespace Thinktomorrow\Trader\Tests\Payment;
 use Thinktomorrow\Trader\Payment\Domain\PaymentMethod;
 use Thinktomorrow\Trader\Payment\Domain\PaymentMethodId;
 use Thinktomorrow\Trader\Tests\Stubs\InMemoryPaymentMethodRepository;
-use Thinktomorrow\Trader\Tests\UnitTestCase;
+use Thinktomorrow\Trader\Tests\TestCase;
 
-class PaymentMethodRepositoryTest extends UnitTestCase
+class PaymentMethodRepositoryTest extends TestCase
 {
     /** @test */
     public function it_can_find_a_paymentMethod()

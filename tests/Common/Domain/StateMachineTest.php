@@ -5,9 +5,9 @@ namespace Thinktomorrow\Trader\Unit;
 use Thinktomorrow\Trader\Common\Domain\State\StateException;
 use Thinktomorrow\Trader\Common\Domain\State\StatefulContract;
 use Thinktomorrow\Trader\Common\Domain\State\StateMachine;
-use Thinktomorrow\Trader\Tests\UnitTestCase;
+use Thinktomorrow\Trader\Tests\TestCase;
 
-class StateMachineTest extends UnitTestCase
+class StateMachineTest extends TestCase
 {
     private $dummyStatefulContract;
     private $machine;

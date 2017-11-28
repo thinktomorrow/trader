@@ -1,9 +1,9 @@
 <?php
 
 use Thinktomorrow\Trader\Common\Config;
-use Thinktomorrow\Trader\Tests\UnitTestCase;
+use Thinktomorrow\Trader\Tests\TestCase;
 
-class ConfigTest extends UnitTestCase
+class ConfigTest extends TestCase
 {
     private $config;
 

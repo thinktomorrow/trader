@@ -6,7 +6,7 @@ use Thinktomorrow\Trader\Shipment\Domain\ShippingMethod;
 use Thinktomorrow\Trader\Shipment\Domain\ShippingMethodId;
 use Thinktomorrow\Trader\Tests\Stubs\InMemoryShippingMethodRepository;
 
-class ShippingMethodRepositoryTest extends UnitTestCase
+class ShippingMethodRepositoryTest extends TestCase
 {
     /** @test */
     public function it_can_find_a_shippingMethod()

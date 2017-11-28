@@ -5,9 +5,9 @@ namespace Thinktomorrow\Trader\Tests\Price;
 use Money\Money;
 use Thinktomorrow\Trader\Common\Config;
 use Thinktomorrow\Trader\Common\Domain\Price\Cash;
-use Thinktomorrow\Trader\Tests\UnitTestCase;
+use Thinktomorrow\Trader\Tests\TestCase;
 
-class CashTest extends UnitTestCase
+class CashTest extends TestCase
 {
     private $config;
 

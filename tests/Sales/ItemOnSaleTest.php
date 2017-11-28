@@ -3,9 +3,9 @@
 use Money\Money;
 use Thinktomorrow\Trader\Orders\Domain\Item;
 use Thinktomorrow\Trader\Tests\Stubs\PurchasableStub;
-use Thinktomorrow\Trader\Tests\UnitTestCase;
+use Thinktomorrow\Trader\Tests\TestCase;
 
-class ItemOnSaleTest extends UnitTestCase
+class ItemOnSaleTest extends TestCase
 {
     /** @test */
     public function purchasable_can_have_sale_price()
@@ -23,7 +23,7 @@ class ItemOnSaleTest extends UnitTestCase
         $salePrice = Money::EUR(99);
         $purchasable = new PurchasableStub(1, [], \Money\Money::EUR(100), \Thinktomorrow\Trader\Common\Domain\Price\Percentage::fromPercent(6), $salePrice);
 
-        $item = Item::fromPurchasable($purchasable);
+        $item = $this->getItem(null, null, $purchasable);
 
         $this->assertEquals($salePrice, $item->total());
     }

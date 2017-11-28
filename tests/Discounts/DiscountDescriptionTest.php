@@ -4,7 +4,7 @@ namespace Thinktomorrow\Trader\Tests;
 
 use Thinktomorrow\Trader\Common\Domain\Description;
 
-class DiscountDescriptionTest extends UnitTestCase
+class DiscountDescriptionTest extends TestCase
 {
     /** @test */
     public function it_can_create_a_description()

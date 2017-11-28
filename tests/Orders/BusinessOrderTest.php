@@ -5,7 +5,7 @@ namespace Thinktomorrow\Trader\Tests;
 use Thinktomorrow\Trader\Orders\Domain\Order;
 use Thinktomorrow\Trader\Orders\Domain\OrderId;
 
-class BusinessOrderTest extends FeatureTestCase
+class BusinessOrderTest extends TestCase
 {
     /** @test */
     public function order_is_not_a_business_one_by_default()
@@ -26,11 +26,9 @@ class BusinessOrderTest extends FeatureTestCase
     public function merchantorder_and_cart_reflect_the_business_flag()
     {
         $order = new Order(OrderId::fromInteger(1));
-        $this->assertFalse($this->cart($order)->isBusiness());
-        $this->assertFalse($this->merchantOrder($order)->isBusiness());
+        $this->assertFalse($this->getOrder($order)->isBusiness());
 
         $order->setBusiness();
-        $this->assertTrue($this->cart($order)->isBusiness());
-        $this->assertTrue($this->merchantOrder($order)->isBusiness());
+        $this->assertTrue($this->getOrder($order)->isBusiness());
     }
 }

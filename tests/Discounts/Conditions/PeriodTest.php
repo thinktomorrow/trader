@@ -4,7 +4,7 @@ namespace Thinktomorrow\Trader\Tests;
 
 use Thinktomorrow\Trader\Discounts\Domain\Conditions\Period;
 
-class PeriodTest extends UnitTestCase
+class PeriodTest extends TestCase
 {
     /** @test */
     public function it_checks_ok_if_no_period_is_enforced()

@@ -3,9 +3,9 @@
 use Thinktomorrow\Trader\Common\Domain\Description;
 use Thinktomorrow\Trader\Common\Domain\DescriptionRender;
 use Thinktomorrow\Trader\Tests\Stubs\InMemoryDescriptionRender;
-use Thinktomorrow\Trader\Tests\UnitTestCase;
+use Thinktomorrow\Trader\Tests\TestCase;
 
-class DescriptionRenderTest extends UnitTestCase
+class DescriptionRenderTest extends TestCase
 {
     /** @test */
     public function it_can_be_instantiated()

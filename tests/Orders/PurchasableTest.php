@@ -5,7 +5,7 @@ namespace Thinktomorrow\Trader\Tests;
 use Thinktomorrow\Trader\Orders\Domain\PurchasableId;
 use Thinktomorrow\Trader\Tests\Stubs\PurchasableStub;
 
-class PurchasableTest extends UnitTestCase
+class PurchasableTest extends TestCase
 {
     /** @test */
     public function it_can_get_purchasableId()

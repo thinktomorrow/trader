@@ -3,9 +3,9 @@
 namespace Thinktomorrow\Trader\Tests\Price;
 
 use Thinktomorrow\Trader\Common\Domain\Price\Percentage;
-use Thinktomorrow\Trader\Tests\UnitTestCase;
+use Thinktomorrow\Trader\Tests\TestCase;
 
-class PercentageTest extends UnitTestCase
+class PercentageTest extends TestCase
 {
     /** @test */
     public function it_can_be_set_by_percentage()

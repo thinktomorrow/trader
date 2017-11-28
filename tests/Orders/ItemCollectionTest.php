@@ -2,12 +2,11 @@
 
 namespace Thinktomorrow\Trader\Tests;
 
-use Thinktomorrow\Trader\Orders\Domain\Item;
 use Thinktomorrow\Trader\Orders\Domain\ItemCollection;
 use Thinktomorrow\Trader\Orders\Domain\PurchasableId;
 use Thinktomorrow\Trader\Tests\Stubs\PurchasableStub;
 
-class ItemCollectionTest extends UnitTestCase
+class ItemCollectionTest extends TestCase
 {
     /** @test */
     public function it_starts_with_empty_items()
@@ -21,8 +20,8 @@ class ItemCollectionTest extends UnitTestCase
     public function it_can_start_with_array_of_items()
     {
         $collection = new ItemCollection(
-            Item::fromPurchasable(new PurchasableStub(1)),
-            Item::fromPurchasable(new PurchasableStub(2))
+            $this->getItem(null, null, new PurchasableStub(1)),
+            $this->getItem(null, null, new PurchasableStub(2))
         );
 
         $this->assertEquals(2, $collection->size());
@@ -32,8 +31,8 @@ class ItemCollectionTest extends UnitTestCase
     public function same_items_are_added_up()
     {
         $collection = new ItemCollection(
-            Item::fromPurchasable(new PurchasableStub(2)),
-            Item::fromPurchasable(new PurchasableStub(2))
+            $this->getItem(null, null, new PurchasableStub(2)),
+            $this->getItem(null, null, new PurchasableStub(2))
         );
 
         $this->assertEquals(1, $collection->size());
@@ -44,7 +43,7 @@ class ItemCollectionTest extends UnitTestCase
     public function it_can_add_an_item()
     {
         $itemCollection = new ItemCollection();
-        $item = Item::fromPurchasable(new PurchasableStub(99));
+        $item = $this->getItem(null, null, new PurchasableStub(99));
 
         $itemCollection->add($item);
 
@@ -56,7 +55,7 @@ class ItemCollectionTest extends UnitTestCase
     public function it_can_add_an_item_with_quantity()
     {
         $itemCollection = new ItemCollection();
-        $item = Item::fromPurchasable(new PurchasableStub(99));
+        $item = $this->getItem(null, null, new PurchasableStub(99));
         $itemCollection->add($item, 3);
 
         $this->assertEquals(1, $itemCollection->size());
@@ -67,7 +66,7 @@ class ItemCollectionTest extends UnitTestCase
     public function it_can_replace_an_item_quantity()
     {
         $itemCollection = new ItemCollection();
-        $item = Item::fromPurchasable(new PurchasableStub(99));
+        $item = $this->getItem(null, null, new PurchasableStub(99));
         $itemCollection->add($item, 3);
 
         $itemCollection->replace($item->purchasableId(), 5);
@@ -81,7 +80,7 @@ class ItemCollectionTest extends UnitTestCase
     public function item_below_zero_removes_item()
     {
         $itemCollection = new ItemCollection();
-        $item = Item::fromPurchasable(new PurchasableStub(99));
+        $item = $this->getItem(null, null, new PurchasableStub(99));
         $itemCollection->add($item, 3);
 
         $itemCollection->replace($item->purchasableId(), -2);
@@ -96,7 +95,7 @@ class ItemCollectionTest extends UnitTestCase
         $this->expectException(\InvalidArgumentException::class);
 
         $itemCollection = new ItemCollection();
-        $item = Item::fromPurchasable(new PurchasableStub(99));
+        $item = $this->getItem(null, null, new PurchasableStub(99));
 
         $itemCollection->replace($item->purchasableId(), 5);
     }
@@ -105,7 +104,7 @@ class ItemCollectionTest extends UnitTestCase
     public function it_can_find_an_item_by_id()
     {
         $itemCollection = new ItemCollection();
-        $item = Item::fromPurchasable(new PurchasableStub(99));
+        $item = $this->getItem(null, null, new PurchasableStub(99));
 
         $itemCollection->add($item);
 
@@ -116,7 +115,7 @@ class ItemCollectionTest extends UnitTestCase
     public function adding_same_item_quantifies_same_item()
     {
         $itemCollection = new ItemCollection();
-        $item = Item::fromPurchasable(new PurchasableStub(99));
+        $item = $this->getItem(null, null, new PurchasableStub(99));
 
         $itemCollection->add($item);
         $itemCollection->add($item);

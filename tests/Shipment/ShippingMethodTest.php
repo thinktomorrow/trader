@@ -11,7 +11,7 @@ use Thinktomorrow\Trader\Shipment\Domain\ShippingRuleFactory;
 use Thinktomorrow\Trader\Tests\Stubs\InMemoryContainer;
 use Thinktomorrow\Trader\Tests\Stubs\PurchasableStub;
 
-class ShippingMethodTest extends UnitTestCase
+class ShippingMethodTest extends TestCase
 {
     /** @test */
     public function it_has_an_aggregate_id()
@@ -50,7 +50,7 @@ class ShippingMethodTest extends UnitTestCase
     public function shipping_method_can_be_applied_if_one_of_the_rules_match_the_order()
     {
         $order = $this->makeOrder();
-        $order->items()->add(Item::fromPurchasable(new PurchasableStub(1, [], Money::EUR(31))));
+        $order->items()->add($this->getItem(null, null, new PurchasableStub(1, [], Money::EUR(31))));
 
         $method = new ShippingMethod(ShippingMethodId::fromInteger(2), 'foobar', [
             (new ShippingRuleFactory(new InMemoryContainer()))->create(1, [
@@ -67,7 +67,7 @@ class ShippingMethodTest extends UnitTestCase
     public function shipping_method_cannot_be_applied_if_none_of_the_rules_match_the_order()
     {
         $order = $this->makeOrder();
-        $order->items()->add(Item::fromPurchasable(new PurchasableStub(1, [], Money::EUR(10))));
+        $order->items()->add($this->getItem(null, null, new PurchasableStub(1, [], Money::EUR(10))));
 
         $method = new ShippingMethod(ShippingMethodId::fromInteger(2), 'foobar', [
             (new ShippingRuleFactory(new InMemoryContainer()))->create(1, [

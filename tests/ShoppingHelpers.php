@@ -8,11 +8,9 @@ use Thinktomorrow\Trader\Common\Domain\Price\Percentage;
 use Thinktomorrow\Trader\Discounts\Domain\DiscountFactory;
 use Thinktomorrow\Trader\Orders\Domain\CustomerId;
 use Thinktomorrow\Trader\Orders\Domain\Item;
+use Thinktomorrow\Trader\Orders\Domain\ItemId;
 use Thinktomorrow\Trader\Orders\Domain\Order;
 use Thinktomorrow\Trader\Orders\Domain\OrderId;
-use Thinktomorrow\Trader\Orders\Domain\Read\Cart;
-use Thinktomorrow\Trader\Orders\Domain\Read\CartFactory;
-use Thinktomorrow\Trader\Orders\Domain\Read\MerchantOrder;
 use Thinktomorrow\Trader\Tests\Stubs\InMemoryContainer;
 use Thinktomorrow\Trader\Tests\Stubs\PurchasableStub;
 
@@ -26,24 +24,27 @@ trait ShoppingHelpers
         die(var_dump(func_get_args()));
     }
 
-    protected function cart(Order $order = null): Cart
+    protected function getItem($itemId = null, $taxRate = null, $purchasable = null): Item
     {
-        if (!$order) {
-            $order = $this->purchase(1);
-        }
+        if(!$itemId) $itemId = ItemId::fromInteger(1);
+        if(!$taxRate) $taxRate = Percentage::fromPercent(21);
+        if(!$purchasable) $purchasable = new PurchasableStub(20, [], Money::EUR(110));
 
-        return (new CartFactory($this->container('orderRepository'), $this->container))->create($order);
+        return new Item($itemId, $taxRate, $purchasable);
     }
 
-    protected function merchantOrder(Order $order = null): MerchantOrder
+    protected function getOrder(Order $order = null): Order
     {
         if (!$order) {
             $order = $this->purchase(1);
         }
 
-        return new \Thinktomorrow\Trader\Orders\Ports\Read\MerchantOrder([
-            'is_business' => $order->isBusiness(),
-        ]);
+        return $order;
+    }
+
+    protected function getCleanOrder(): Order
+    {
+        return new Order(OrderId::fromInteger(20));
     }
 
     protected function purchase($id)
@@ -51,8 +52,8 @@ trait ShoppingHelpers
         $order = new Order(OrderId::fromInteger($id));
         $order->setReference('foobar');
         $order->setCustomerId(CustomerId::fromString(2));
-        $order->items()->add(Item::fromPurchasable(new PurchasableStub(1, [], Cash::make(505), Percentage::fromPercent(10))));
-        $order->items()->add(Item::fromPurchasable(new PurchasableStub(2, [], Cash::make(1000), Percentage::fromPercent(10), Cash::make(800))), 2);
+        $order->items()->add($this->getItem(null, null, new PurchasableStub(1, [], Cash::make(505), Percentage::fromPercent(10))));
+        $order->items()->add($this->getItem(null, null, new PurchasableStub(2, [], Cash::make(1000), Percentage::fromPercent(10), Cash::make(800))), 2);
         $order->setShippingTotal(Cash::make(15));
         $order->setPaymentTotal(Cash::make(10));
 
@@ -72,7 +73,7 @@ trait ShoppingHelpers
         $order->setCustomerId(CustomerId::fromString(22));
 
         if ($subtotalAmount > 0) {
-            $order->items()->add(Item::fromPurchasable(new PurchasableStub(20, [], Money::EUR($subtotalAmount))));
+            $order->items()->add($this->getItem(null, null, new PurchasableStub(20, [], Money::EUR($subtotalAmount))));
         }
 
         return $order;

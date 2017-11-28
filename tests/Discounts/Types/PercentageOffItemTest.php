@@ -7,17 +7,16 @@ use Thinktomorrow\Trader\Common\Domain\Price\Percentage;
 use Thinktomorrow\Trader\Discounts\Domain\AppliedDiscount;
 use Thinktomorrow\Trader\Discounts\Domain\DiscountId;
 use Thinktomorrow\Trader\Discounts\Domain\Types\PercentageOffItemDiscount;
-use Thinktomorrow\Trader\Orders\Domain\Item;
 use Thinktomorrow\Trader\Orders\Domain\PurchasableId;
 use Thinktomorrow\Trader\Tests\Stubs\PurchasableStub;
 
-class PercentageOffItemTest extends UnitTestCase
+class PercentageOffItemTest extends TestCase
 {
     /** @test */
     public function it_can_create_discount()
     {
         $order = $this->makeOrder();
-        $order->items()->add(Item::fromPurchasable(new PurchasableStub(20, [], Money::EUR(100))));
+        $order->items()->add($this->getItem(null, null, new PurchasableStub(20, [], Money::EUR(100))));
 
         $discount = new PercentageOffItemDiscount(DiscountId::fromInteger(1), [], [
             'percentage' => Percentage::fromPercent(10),
@@ -33,7 +32,7 @@ class PercentageOffItemTest extends UnitTestCase
     public function it_should_not_allow_to_go_below_ordered_subtotal()
     {
         $order = $this->makeOrder();
-        $item = Item::fromPurchasable(new PurchasableStub(20, [], Money::EUR(100)));
+        $item = $this->getItem(null, null, new PurchasableStub(20, [], Money::EUR(100)));
         $order->items()->add($item, 2);
 
         $discount = new PercentageOffItemDiscount(DiscountId::fromInteger(1), [], [

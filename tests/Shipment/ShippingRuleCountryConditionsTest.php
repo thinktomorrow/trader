@@ -7,7 +7,7 @@ use Thinktomorrow\Trader\Shipment\Domain\Conditions\Country;
 use Thinktomorrow\Trader\Shipment\Domain\ShippingRule;
 use Thinktomorrow\Trader\Shipment\Domain\ShippingRuleId;
 
-class ShippingRuleCountryConditionsTest extends UnitTestCase
+class ShippingRuleCountryConditionsTest extends TestCase
 {
     /** @test */
     public function a_rule_is_not_applicable_if_conditions_are_not_met()

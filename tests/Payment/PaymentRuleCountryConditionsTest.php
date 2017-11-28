@@ -6,9 +6,9 @@ use Money\Money;
 use Thinktomorrow\Trader\Payment\Domain\Conditions\Country;
 use Thinktomorrow\Trader\Payment\Domain\PaymentRule;
 use Thinktomorrow\Trader\Payment\Domain\PaymentRuleId;
-use Thinktomorrow\Trader\Tests\UnitTestCase;
+use Thinktomorrow\Trader\Tests\TestCase;
 
-class PaymentRuleCountryConditionsTest extends UnitTestCase
+class PaymentRuleCountryConditionsTest extends TestCase
 {
     /** @test */
     public function a_rule_is_not_applicable_if_conditions_are_not_met()

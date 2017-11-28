@@ -8,6 +8,7 @@ use Thinktomorrow\Trader\Common\Domain\Price\Percentage;
 use Thinktomorrow\Trader\Discounts\Domain\AppliedDiscount;
 use Thinktomorrow\Trader\Discounts\Domain\AppliedDiscountCollection;
 use Thinktomorrow\Trader\Tax\Domain\TaxId;
+use Thinktomorrow\Trader\Tax\Domain\TaxRate;
 
 final class Item
 {
@@ -48,21 +49,13 @@ final class Item
      */
     private $taxRate;
 
-    public function __construct(ItemId $id, Purchasable $purchasable)
+    public function __construct(ItemId $id, Percentage $taxRate, Purchasable $purchasable)
     {
         $this->id = $id;
+        $this->taxRate = $taxRate;
         $this->purchasable = $purchasable; // The original product
         $this->discounts = new AppliedDiscountCollection();
         $this->discountTotal = Cash::make(0);
-        $this->setTaxRate($purchasable->taxRate());
-    }
-
-    public static function fromPurchasable(Purchasable $purchasable)
-    {
-        // Note: ItemId is a reference to its persistence record so here we just pass
-        // a dummy value instead which will be overwritten as soon as item is stored
-        // TODO: actually refactor so that Item does not have a itemID needed anymore??? but instead an orderID offcourse
-        return new self(ItemId::fromString('-'), $purchasable);
     }
 
     public function id(): ItemId
@@ -97,12 +90,12 @@ final class Item
 
     public function salePrice(): Money
     {
-        return $this->purchasable->salePrice();
+        return $this->purchasable->salePrice()->isPositive() ? $this->purchasable->salePrice() : $this->price();
     }
 
     public function subtotal(): Money
     {
-        return $this->purchasable->salePrice()->multiply($this->quantity());
+        return $this->salePrice()->multiply($this->quantity());
     }
 
     public function total(): Money
@@ -121,12 +114,7 @@ final class Item
         return $this->taxRate;
     }
 
-    public function setTaxRate(Percentage $taxRate)
-    {
-        $this->taxRate = $taxRate;
-    }
-
-    public function tax(): Money
+    public function taxTotal(): Money
     {
         return $this->total()->multiply($this->taxRate()->asFloat());
     }

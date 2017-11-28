@@ -3,24 +3,13 @@
 namespace Thinktomorrow\Trader\Tax\Domain;
 
 use Assert\Assertion;
-use Illuminate\Contracts\Container\Container;
-use Thinktomorrow\Trader\Common\Application\ResolvesFromContainer;
 use Thinktomorrow\Trader\Common\Config;
 use Thinktomorrow\Trader\Common\Domain\Price\Percentage;
 use Thinktomorrow\Trader\Countries\CountryId;
 use Thinktomorrow\Trader\Orders\Domain\Order;
-use Thinktomorrow\Trader\Tax\Domain\Rules\BillingCountryRule;
-use Thinktomorrow\Trader\Tax\Domain\Rules\ForeignBusinessRule;
 
 class TaxRate
 {
-    use ResolvesFromContainer;
-
-    /**
-     * @var Container
-     */
-    private $container;
-
     /**
      * @var TaxId
      */
@@ -45,18 +34,22 @@ class TaxRate
      * @var Merchant CountryId
      */
     private $merchantCountryId;
+    /**
+     * @var array
+     */
+    private $rules;
 
-    public function __construct(Container $container, TaxId $taxId, string $name, Percentage $percentage, array $billingCountryRates = [])
+    public function __construct(TaxId $taxId, string $name, Percentage $percentage, array $billingCountryRates = [], array $rules = [])
     {
         Assertion::allIsInstanceOf($billingCountryRates, CountryRate::class);
 
-        $this->container = $container;
         $this->taxId = $taxId;
         $this->name = $name;
         $this->percentage = $percentage;
         $this->billingCountryRates = $billingCountryRates;
 
         $this->merchantCountryId = CountryId::fromIsoString((new Config())->get('country_id', 'BE'));
+        $this->rules = $rules;
     }
 
     public function id(): TaxId
@@ -110,15 +103,7 @@ class TaxRate
     {
         $percentage = $this->percentage;
 
-        // Todo: how to provide custom behaviour per project? - we could expose these rules to be managed outside in project scope...
-        $rulenames = [
-            ForeignBusinessRule::class,
-            BillingCountryRule::class,
-        ];
-
-        foreach ($rulenames as $rulename) {
-            $rule = $this->resolve($rulename);
-
+        foreach ($this->rules as $rule) {
             if ($rule->context($this, $taxable, $order)->applicable()) {
                 return $rule->apply($percentage);
             }
