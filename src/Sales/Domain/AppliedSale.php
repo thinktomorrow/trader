@@ -44,7 +44,9 @@ class AppliedSale
 
     public function data($key = null)
     {
-        if(!is_null($key)) return $this->data[$key];
+        if (!is_null($key)) {
+            return $this->data[$key];
+        }
 
         return $this->data;
     }
