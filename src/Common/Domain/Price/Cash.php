@@ -85,6 +85,19 @@ class Cash
         return $this->getSymbol().$this->getFormatter()->format($this->money);
     }
 
+    public function asPercentage(Money $other, $precision = 2): Percentage
+    {
+        if(!$this->money->isSameCurrency($other))
+        {
+            throw new \InvalidArgumentException('Money::asPercentage expects Money value of the same currency');
+        }
+        if($other->getAmount() <= 0) return 0;
+
+        $percentage = (float) sprintf("%.".$precision."f", ($this->money->getAmount() * 100) / $other->getAmount());
+
+        return Percentage::fromPercent($percentage);
+    }
+
     private static function getCurrencyCode(): string
     {
         if (!static::$currencyCode) {

@@ -5,6 +5,7 @@ namespace Thinktomorrow\Trader\Tests\Price;
 use Money\Money;
 use Thinktomorrow\Trader\Common\Config;
 use Thinktomorrow\Trader\Common\Domain\Price\Cash;
+use Thinktomorrow\Trader\Common\Domain\Price\Percentage;
 use Thinktomorrow\Trader\Tests\TestCase;
 
 class CashTest extends TestCase
@@ -67,5 +68,24 @@ class CashTest extends TestCase
     {
         $cash = Cash::from(Money::AMD(120));
         $this->assertEquals('AMD1.20', $cash->locale('nl_BE'));
+    }
+
+    /** @test */
+    function it_can_get_percentage_of_money_values()
+    {
+        $cash = Cash::from(Money::EUR(51));
+        $this->assertEquals(Percentage::fromPercent(51), $cash->asPercentage(Money::EUR(100)));
+    }
+
+    /** @test */
+    function it_can_get_percentage_with_specificity_of_2_decimals()
+    {
+        $cash = Cash::from(Money::EUR(55));
+
+        // Specificity of 2 decimals by default
+        $this->assertEquals(Percentage::fromPercent(45.83), $cash->asPercentage(Money::EUR(120), 2));
+
+        // Percentage can be rounded off
+        $this->assertEquals(Percentage::fromPercent(46), $cash->asPercentage(Money::EUR(120), 0));
     }
 }

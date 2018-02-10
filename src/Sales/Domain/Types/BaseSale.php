@@ -24,13 +24,21 @@ abstract class BaseSale
      */
     protected $adjusters;
 
-    public function __construct(SaleId $id, array $conditions, array $adjusters)
+    /**
+     * @var array
+     */
+    protected $data;
+
+    public function __construct(SaleId $id, array $conditions, array $adjusters, array $data = [])
     {
         $this->validateParameters($conditions, $adjusters);
 
         $this->id = $id;
         $this->conditions = $conditions;
         $this->adjusters = $adjusters;
+
+        // Custom data, e.g. sales text for display on site.
+        $this->data = $data;
     }
 
     public function id(): SaleId
@@ -62,10 +70,8 @@ abstract class BaseSale
 
     private function lessThanPrice(EligibleForSale $eligibleForSale)
     {
-        $saleAmount = $eligibleForSale->price()->multiply($this->adjusters['percentage']->asFloat());
-
         // SaleTotal cannot be higher than original price
-        $saleTotal = $eligibleForSale->saleTotal()->add($saleAmount);
+        $saleTotal = $eligibleForSale->saleTotal()->add($this->saleAmount($eligibleForSale));
 
         return !($saleTotal->greaterThan($eligibleForSale->price()));
     }
