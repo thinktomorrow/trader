@@ -9,7 +9,7 @@ use Thinktomorrow\Trader\Sales\Domain\EligibleForSale;
 use Thinktomorrow\Trader\Sales\Domain\Exceptions\CannotApplySale;
 use Thinktomorrow\Trader\Sales\Domain\Sale;
 
-class FixedAmountOffSale extends BaseSale implements Sale
+class FixedAmountSale extends BaseSale implements Sale
 {
     public function apply(EligibleForSale $eligibleForSale)
     {
@@ -31,7 +31,7 @@ class FixedAmountOffSale extends BaseSale implements Sale
 
     public function saleAmount(EligibleForSale $eligibleForSale): Money
     {
-        return $this->adjusters['amount'];
+        return $eligibleForSale->price()->subtract($this->adjusters['amount']);
     }
 
     /**

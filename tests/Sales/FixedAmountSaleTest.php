@@ -5,27 +5,27 @@ namespace Thinktomorrow\Trader\Tests;
 use Money\Money;
 use Thinktomorrow\Trader\Sales\Domain\Exceptions\CannotApplySale;
 
-class FixedAmountOffSaleTest extends TestCase
+class FixedAmountSaleTest extends TestCase
 {
     /** @test */
-    public function fixed_amount_off_sale_cannot_be_negative()
+    public function fixed_amount_sale_cannot_be_negative()
     {
         $this->expectException(\InvalidArgumentException::class);
 
-        $this->makeFixedAmountOffSale(-10);
+        $this->makeFixedAmountSale(-10);
     }
 
     /** @test */
-    public function fixed_amount_off_is_subtracted_from_original_price()
+    public function fixed_amount_is_subtracted_from_original_price()
     {
         $stub = $this->makeEligibleForSaleStub(100);
-        $sale = $this->makeFixedAmountOffSale(80);
+        $sale = $this->makeFixedAmountSale(60);
 
         $sale->apply($stub);
 
         $this->assertEquals(Money::EUR(100), $stub->price());
-        $this->assertEquals(Money::EUR(80), $stub->saleTotal());
-        $this->assertEquals(Money::EUR(20), $stub->salePrice());
+        $this->assertEquals(Money::EUR(40), $stub->saleTotal());
+        $this->assertEquals(Money::EUR(60), $stub->salePrice());
     }
 
     /** @test */
@@ -34,22 +34,18 @@ class FixedAmountOffSaleTest extends TestCase
         $this->expectException(CannotApplySale::class);
 
         $stub = $this->makeEligibleForSaleStub(100);
-        $sale = $this->makeFixedAmountOffSale(80);
-        $sale2 = $this->makeFixedAmountOffSale(80);
+        $sale = $this->makeFixedAmountSale(120);
 
         $sale->apply($stub);
-        $sale2->apply($stub);
     }
 
     /** @test */
-    public function sale_can_go_exactly_to_purchasable_original_price()
+    public function fixed_amount_sale_can_go_to_zero()
     {
         $stub = $this->makeEligibleForSaleStub(100);
-        $sale = $this->makeFixedAmountOffSale(50);
-        $sale2 = $this->makeFixedAmountOffSale(50);
+        $sale = $this->makeFixedAmountSale(0);
 
         $sale->apply($stub);
-        $sale2->apply($stub);
 
         $this->assertEquals(Money::EUR(100), $stub->price());
         $this->assertEquals(Money::EUR(100), $stub->saleTotal());

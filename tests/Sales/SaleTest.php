@@ -87,7 +87,6 @@ class SaleTest extends TestCase
         $this->assertEquals(SaleId::fromString("1"), $appliedSale->saleId());
     }
 
-
     /** @test */
     public function when_applied_an_applied_sale_is_kept_with_custom_data()
     {
