@@ -11,6 +11,9 @@ use Thinktomorrow\Trader\Orders\Domain\Item;
 use Thinktomorrow\Trader\Orders\Domain\ItemId;
 use Thinktomorrow\Trader\Orders\Domain\Order;
 use Thinktomorrow\Trader\Orders\Domain\OrderId;
+use Thinktomorrow\Trader\Sales\Domain\SaleId;
+use Thinktomorrow\Trader\Sales\Domain\Types\PercentageOffSale;
+use Thinktomorrow\Trader\Tests\Stubs\EligibleForSaleStub;
 use Thinktomorrow\Trader\Tests\Stubs\InMemoryContainer;
 use Thinktomorrow\Trader\Tests\Stubs\PurchasableStub;
 
@@ -77,6 +80,18 @@ trait ShoppingHelpers
         }
 
         return $order;
+    }
+
+    protected function makeEligibleForSaleStub($amount)
+    {
+        $price = Money::EUR($amount);
+
+        return new EligibleForSaleStub(1, [], $price);
+    }
+
+    protected function makePercentageOffSale($percent)
+    {
+        return new PercentageOffSale(SaleId::fromInteger(1), [], ['percentage' => Percentage::fromPercent($percent)]);
     }
 
     protected function makeDiscount($id = 1, $type = 'percentage_off', $conditions = [], $adjusters = [])

@@ -5,7 +5,6 @@ namespace Thinktomorrow\Trader\Orders\Domain;
 use Thinktomorrow\Trader\Common\Domain\State\StateMachine;
 use Thinktomorrow\Trader\Orders\Domain\Read\MerchantOrder;
 
-
 class MerchantOrderStateOld extends StateMachine
 {
     // Complete states - order can be processed by merchant
