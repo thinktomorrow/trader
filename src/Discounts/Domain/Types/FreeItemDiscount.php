@@ -8,7 +8,7 @@ use Thinktomorrow\Trader\Common\Domain\Price\Cash;
 use Thinktomorrow\Trader\Discounts\Domain\AppliedDiscount;
 use Thinktomorrow\Trader\Discounts\Domain\Discount;
 use Thinktomorrow\Trader\Discounts\Domain\DiscountId;
-use Thinktomorrow\Trader\Discounts\Domain\Exceptions\CannotApplyDiscountToOrderException;
+use Thinktomorrow\Trader\Discounts\Domain\Exceptions\CannotApplyDiscount;
 use Thinktomorrow\Trader\Discounts\Domain\OrderDiscount;
 use Thinktomorrow\Trader\Orders\Domain\Item;
 use Thinktomorrow\Trader\Orders\Domain\Order;
@@ -33,13 +33,13 @@ final class FreeItemDiscount extends BaseDiscount implements Discount, OrderDisc
      *
      * @param Order $order
      *
-     * @throws CannotApplyDiscountToOrderException
+     * @throws CannotApplyDiscount
      */
     public function apply(Order $order)
     {
         // Check conditions first
         if (!$this->applicable($order)) {
-            throw new CannotApplyDiscountToOrderException();
+            throw new CannotApplyDiscount();
         }
 
         // Since the products are offered as free, make sure each item has a 0,00 price

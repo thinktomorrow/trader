@@ -2,6 +2,6 @@
 
 namespace Thinktomorrow\Trader\Discounts\Domain\Exceptions;
 
-class CannotApplyDiscountToOrderException extends \Exception
+class CannotApplyDiscount extends \Exception
 {
 }

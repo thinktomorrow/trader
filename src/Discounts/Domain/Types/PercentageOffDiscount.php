@@ -7,7 +7,7 @@ use Thinktomorrow\Trader\Common\Domain\Price\Percentage;
 use Thinktomorrow\Trader\Discounts\Domain\AppliedDiscount;
 use Thinktomorrow\Trader\Discounts\Domain\Discount;
 use Thinktomorrow\Trader\Discounts\Domain\DiscountId;
-use Thinktomorrow\Trader\Discounts\Domain\Exceptions\CannotApplyDiscountToOrderException;
+use Thinktomorrow\Trader\Discounts\Domain\Exceptions\CannotApplyDiscount;
 use Thinktomorrow\Trader\Discounts\Domain\OrderDiscount;
 use Thinktomorrow\Trader\Orders\Domain\Order;
 
@@ -30,7 +30,7 @@ final class PercentageOffDiscount extends BaseDiscount implements Discount, Orde
     {
         // Check conditions first
         if (!$this->applicable($order)) {
-            throw new CannotApplyDiscountToOrderException();
+            throw new CannotApplyDiscount();
         }
 
         $discountAmount = $order->subtotal()->multiply($this->percentage->asFloat());
