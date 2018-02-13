@@ -1,0 +1,60 @@
+<?php
+
+namespace Thinktomorrow\Trader\Tests;
+
+use Money\Money;
+use Thinktomorrow\Trader\Sales\Domain\Exceptions\CannotApplySale;
+
+class FixedCustomAmountSaleTest extends TestCase
+{
+    /** @test */
+    public function fixed_custom_amount_sale_cannot_be_negative()
+    {
+        $stub = $this->makeEligibleForSaleStub(100);
+        $stub->original_saleprice = Money::EUR(-10);
+
+        $sale = $this->makeFixedCustomAmountSale();
+        $this->assertFalse($sale->applicable($stub));
+    }
+
+    /** @test */
+    public function fixed_custom_amount_is_set_as_new_saleprice()
+    {
+        $stub = $this->makeEligibleForSaleStub(100);
+        $stub->original_saleprice = Money::EUR(60);
+
+        $sale = $this->makeFixedCustomAmountSale();
+
+        $sale->apply($stub);
+
+        $this->assertEquals(Money::EUR(100), $stub->price());
+        $this->assertEquals(Money::EUR(40), $stub->saleTotal());
+        $this->assertEquals(Money::EUR(60), $stub->salePrice());
+    }
+
+    /** @test */
+    public function sale_cannot_be_higher_than_original_price()
+    {
+        $this->expectException(CannotApplySale::class);
+
+        $stub = $this->makeEligibleForSaleStub(100);
+        $stub->original_saleprice = Money::EUR(120);
+        $sale = $this->makeFixedCustomAmountSale();
+
+        $sale->apply($stub);
+    }
+
+    /** @test */
+    public function fixed_custom_amount_sale_can_go_to_zero()
+    {
+        $stub = $this->makeEligibleForSaleStub(100);
+        $stub->original_saleprice = Money::EUR(0);
+        $sale = $this->makeFixedCustomAmountSale();
+
+        $sale->apply($stub);
+
+        $this->assertEquals(Money::EUR(100), $stub->price());
+        $this->assertEquals(Money::EUR(100), $stub->saleTotal());
+        $this->assertEquals(Money::EUR(0), $stub->salePrice());
+    }
+}

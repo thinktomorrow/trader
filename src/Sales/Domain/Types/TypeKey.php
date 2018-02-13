@@ -7,9 +7,10 @@ use Thinktomorrow\Trader\Sales\Domain\Sale;
 final class TypeKey
 {
     private static $mapping = [
-        'percentage_off'   => PercentageOffSale::class,
-        'fixed_amount_off' => FixedAmountOffSale::class,
-        'fixed_amount'     => FixedAmountSale::class,
+        'percentage_off'      => PercentageOffSale::class,
+        'fixed_amount_off'    => FixedAmountOffSale::class,
+        'fixed_amount'        => FixedAmountSale::class,
+        'fixed_custom_amount' => FixedCustomAmountSale::class, // Saleprice as set per item
     ];
 
     /**
@@ -34,7 +35,7 @@ final class TypeKey
     public static function fromSale(Sale $sale)
     {
         if (false === ($key = array_search(get_class($sale), self::$mapping))) {
-            throw new \InvalidArgumentException('Sale ['.get_class($sale).'] not found as available sale type.');
+            throw new \InvalidArgumentException('Sale [' . get_class($sale) . '] not found as available sale type.');
         }
 
         return new self($key);

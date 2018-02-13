@@ -14,6 +14,7 @@ use Thinktomorrow\Trader\Orders\Domain\OrderId;
 use Thinktomorrow\Trader\Sales\Domain\SaleId;
 use Thinktomorrow\Trader\Sales\Domain\Types\FixedAmountOffSale;
 use Thinktomorrow\Trader\Sales\Domain\Types\FixedAmountSale;
+use Thinktomorrow\Trader\Sales\Domain\Types\FixedCustomAmountSale;
 use Thinktomorrow\Trader\Sales\Domain\Types\PercentageOffSale;
 use Thinktomorrow\Trader\Tests\Stubs\EligibleForSaleStub;
 use Thinktomorrow\Trader\Tests\Stubs\InMemoryContainer;
@@ -104,6 +105,11 @@ trait ShoppingHelpers
     protected function makeFixedAmountSale($amount, array $data = [])
     {
         return new FixedAmountSale(SaleId::fromInteger(1), [], ['amount' => Money::EUR($amount)], $data);
+    }
+
+    protected function makeFixedCustomAmountSale(array $data = [])
+    {
+        return new FixedCustomAmountSale(SaleId::fromInteger(1), [], [], $data);
     }
 
     protected function makeDiscount($id = 1, $type = 'percentage_off', $conditions = [], $adjusters = [])

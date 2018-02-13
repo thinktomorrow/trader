@@ -10,19 +10,21 @@ use Thinktomorrow\Trader\Sales\Domain\EligibleForSale;
 class EligibleForSaleStub implements EligibleForSale
 {
     protected $id;
-    protected $data;
-    protected $price;
-    protected $saleTotal;
-    protected $taxRate;
-    protected $taxId;
 
-    protected $appliedSales = [];
+    public $data;
+    public $price;
+    public $original_saleprice;
+    public $saleTotal;
+    public $taxRate;
+    public $taxId;
+    public $appliedSales = [];
 
     public function __construct($id = null, $data = [], Money $price = null, Percentage $taxRate = null)
     {
         $this->id = $id ?: rand(1, 99);
         $this->data = $data;
         $this->price = $price ?: Money::EUR(120);
+        $this->original_saleprice = Money::EUR(0);
         $this->taxRate = !is_null($taxRate) ? $taxRate : Percentage::fromPercent(21);
 
         $this->saleTotal = Money::EUR(0);
@@ -31,6 +33,11 @@ class EligibleForSaleStub implements EligibleForSale
     public function price(): Money
     {
         return $this->price;
+    }
+
+    public function originalSalePrice(): Money
+    {
+        return $this->original_saleprice;
     }
 
     public function salePrice(): Money

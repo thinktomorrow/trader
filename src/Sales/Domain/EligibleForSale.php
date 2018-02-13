@@ -8,6 +8,8 @@ interface EligibleForSale
 {
     public function price(): Money;
 
+    public function originalSalePrice(): Money;
+
     public function salePrice(): Money;
 
     public function saleTotal(): Money;
