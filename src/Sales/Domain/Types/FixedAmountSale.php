@@ -22,7 +22,7 @@ class FixedAmountSale extends BaseSale implements Sale
         $eligibleForSale->addToSaleTotal($saleAmount);
         $eligibleForSale->addSale(new AppliedSale(
             $this->id,
-            get_class($this),
+            TypeKey::fromSale($this)->get(),
             $saleAmount,
             Cash::from($saleAmount)->asPercentage($eligibleForSale->price(), 0),
             $this->data

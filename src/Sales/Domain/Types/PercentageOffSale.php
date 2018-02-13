@@ -23,7 +23,7 @@ class PercentageOffSale extends BaseSale implements Sale
         $eligibleForSale->addToSaleTotal($saleAmount);
         $eligibleForSale->addSale(new AppliedSale(
             $this->id,
-            get_class($this),
+            TypeKey::fromSale($this)->get(),
             $saleAmount,
             $this->adjusters['percentage'],
             $this->data

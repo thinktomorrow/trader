@@ -42,12 +42,46 @@ class AppliedSale
         return $this->salePercentage;
     }
 
-    public function data($key = null)
+    public function data($key = null, $default = null)
     {
-        if (!is_null($key)) {
+        if(is_null($key)) return $this->data;
+
+        if (!is_null($key) && isset($this->data[$key])) {
             return $this->data[$key];
         }
 
-        return $this->data;
+        return $this->handleNestedKeysViaDotSyntax($key, $default);
+    }
+
+    /**
+     * collects from nested array via dot syntax.
+     * Taken from the mkiha GetModelValue functionality
+     */
+    private function handleNestedKeysViaDotSyntax($key, $default = null)
+    {
+        $keys = explode('.', $key);
+
+        if (($firstKey = array_shift($keys)) && !isset($this->data[$firstKey])) {
+            return $default;
+        }
+        $value = $this->data[$firstKey];
+
+        foreach ($keys as $nestedKey) {
+            // Normalize to array
+            if (is_object($value)) {
+                $value = method_exists($value, 'toArray')
+                    ? $value->toArray()
+                    : (array)$value;
+            }
+
+            if (!isset($value[$nestedKey])) {
+                $value = $default;
+                break;
+            }
+
+            $value = $value[$nestedKey];
+        }
+
+        return $value;
     }
 }
