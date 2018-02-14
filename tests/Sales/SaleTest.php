@@ -6,7 +6,6 @@ use Money\Money;
 use Thinktomorrow\Trader\Common\Domain\Price\Percentage;
 use Thinktomorrow\Trader\Sales\Domain\AppliedSale;
 use Thinktomorrow\Trader\Sales\Domain\SaleId;
-use Thinktomorrow\Trader\Sales\Domain\Types\PercentageOffSale;
 use Thinktomorrow\Trader\Tests\Stubs\PurchasableStub;
 
 class SaleTest extends TestCase
