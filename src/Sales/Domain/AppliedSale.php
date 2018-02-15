@@ -4,9 +4,12 @@ namespace Thinktomorrow\Trader\Sales\Domain;
 
 use Money\Money;
 use Thinktomorrow\Trader\Common\Domain\Price\Percentage;
+use Thinktomorrow\Trader\Common\Helpers\HandlesArrayDotSyntax;
 
 class AppliedSale
 {
+    use HandlesArrayDotSyntax;
+
     private $id;
     private $type;
     private $saleAmount;
@@ -50,38 +53,6 @@ class AppliedSale
             return $this->data[$key];
         }
 
-        return $this->handleNestedKeysViaDotSyntax($key, $default);
-    }
-
-    /**
-     * collects from nested array via dot syntax.
-     * Taken from the mkiha GetModelValue functionality
-     */
-    private function handleNestedKeysViaDotSyntax($key, $default = null)
-    {
-        $keys = explode('.', $key);
-
-        if (($firstKey = array_shift($keys)) && !isset($this->data[$firstKey])) {
-            return $default;
-        }
-        $value = $this->data[$firstKey];
-
-        foreach ($keys as $nestedKey) {
-            // Normalize to array
-            if (is_object($value)) {
-                $value = method_exists($value, 'toArray')
-                    ? $value->toArray()
-                    : (array)$value;
-            }
-
-            if (!isset($value[$nestedKey])) {
-                $value = $default;
-                break;
-            }
-
-            $value = $value[$nestedKey];
-        }
-
-        return $value;
+        return $this->handlesArrayDotSyntax($key, $default);
     }
 }

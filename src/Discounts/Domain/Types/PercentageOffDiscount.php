@@ -2,61 +2,49 @@
 
 namespace Thinktomorrow\Trader\Discounts\Domain\Types;
 
-use Thinktomorrow\Trader\Common\Domain\Description;
+use Money\Money;
+use Thinktomorrow\Trader\Common\Domain\Price\Cash;
 use Thinktomorrow\Trader\Common\Domain\Price\Percentage;
 use Thinktomorrow\Trader\Discounts\Domain\AppliedDiscount;
 use Thinktomorrow\Trader\Discounts\Domain\Discount;
-use Thinktomorrow\Trader\Discounts\Domain\DiscountId;
 use Thinktomorrow\Trader\Discounts\Domain\Exceptions\CannotApplyDiscount;
-use Thinktomorrow\Trader\Discounts\Domain\OrderDiscount;
+use Thinktomorrow\Trader\Discounts\Domain\EligibleForDiscount;
+use Thinktomorrow\Trader\Orders\Domain\Item;
 use Thinktomorrow\Trader\Orders\Domain\Order;
 
-final class PercentageOffDiscount extends BaseDiscount implements Discount, OrderDiscount
+final class PercentageOffDiscount extends BaseDiscount implements Discount
 {
-    /**
-     * @var Percentage
-     */
-    private $percentage;
-
-    public function __construct(DiscountId $id, array $conditions, array $adjusters)
+    public function apply(Order $order, EligibleForDiscount $eligibleForDiscount)
     {
-        parent::__construct($id, $conditions, $adjusters);
-
-        $this->percentage = $adjusters['percentage'];
-        //$this->type = TypeKey::fromDiscount($this);
-    }
-
-    public function apply(Order $order)
-    {
-        // Check conditions first
-        if (!$this->applicable($order)) {
-            throw new CannotApplyDiscount();
+        if (!$this->applicable($order, $eligibleForDiscount)) {
+            throw new CannotApplyDiscount('Discount cannot be applied. One or more conditions have failed.');
         }
 
-        $discountAmount = $order->subtotal()->multiply($this->percentage->asFloat());
+        $discountAmount = $this->discountAmount($order, $eligibleForDiscount);
 
-        // Protect against negative overflow where order total would dive under zero
-        if ($discountAmount->greaterThan($order->subtotal())) {
-            $discountAmount = $order->subtotal();
-        }
-
-        $order->addToDiscountTotal($discountAmount);
-        $order->addDiscount(new AppliedDiscount(
+        $eligibleForDiscount->addToDiscountTotal($discountAmount);
+        $eligibleForDiscount->addDiscount(new AppliedDiscount(
             $this->id,
-            $this->type,
-            $this->createDescription(),
-            $discountAmount
+            TypeKey::fromDiscount($this)->get(),
+            $discountAmount,
+            Cash::from($discountAmount)->asPercentage($eligibleForDiscount->discountBasePrice(), 0),
+            $this->data
         ));
     }
 
-    private function createDescription()
+    public function discountAmount(Order $order, EligibleForDiscount $eligibleForDiscount): Money
     {
-        return new Description(
-            $this->type,
-            [
-                'percent' => $this->percentage->asPercent(),
-            ]
-        );
+        // IF ORDERDISCOUNT USE GLOBAL DISCOUNT BUT CHECK IF WE HAVE A ITEM_WHITELIST OR ITEM_BLACKLIST TO CALCULATE THE DISCOUNT AMOUNT UPON
+        if($this->isItemDiscount($eligibleForDiscount) || ( !$this->usesCondition('item_whitelist') && !$this->usesCondition('item_blacklist')) )
+        {
+            return $eligibleForDiscount->discountBasePrice()->multiply($this->adjusters['percentage']->asFloat());
+        }
+
+        $discountBasePrice = Cash::make(0);
+        $discountBasePrice = $this->conditionallyAddToDiscountBasePrice($discountBasePrice, $order, 'item_whitelist');
+        $discountBasePrice = $this->conditionallyAddToDiscountBasePrice($discountBasePrice, $order, 'item_blacklist');
+
+        return $discountBasePrice->multiply($this->adjusters['percentage']->asFloat());
     }
 
     /**
@@ -73,5 +61,19 @@ final class PercentageOffDiscount extends BaseDiscount implements Discount, Orde
         if (!$adjusters['percentage'] instanceof Percentage) {
             throw new \InvalidArgumentException('Invalid adjuster value \'percentage\' for discount '.get_class($this).'. Instance of '.Percentage::class.' is expected.');
         }
+    }
+
+    private function conditionallyAddToDiscountBasePrice(Money $discountBasePrice, Order $order, string $condition_key)
+    {
+        if( ! $condition = $this->getCondition($condition_key)) return $discountBasePrice;
+
+        foreach($order->items() as $item)
+        {
+            if ($condition->check($order, $item)) {
+                $discountBasePrice = $discountBasePrice->add($item->total());
+            }
+        }
+
+        return $discountBasePrice;
     }
 }

@@ -5,7 +5,10 @@ namespace Thinktomorrow\Trader\Tests;
 use Money\Money;
 use Thinktomorrow\Trader\Common\Domain\Price\Cash;
 use Thinktomorrow\Trader\Common\Domain\Price\Percentage;
+use Thinktomorrow\Trader\Discounts\Domain\Conditions\ConditionKey;
 use Thinktomorrow\Trader\Discounts\Domain\DiscountFactory;
+use Thinktomorrow\Trader\Discounts\Domain\DiscountId;
+use Thinktomorrow\Trader\Discounts\Domain\Types\PercentageOffDiscount;
 use Thinktomorrow\Trader\Orders\Domain\CustomerId;
 use Thinktomorrow\Trader\Orders\Domain\Item;
 use Thinktomorrow\Trader\Orders\Domain\ItemId;
@@ -85,6 +88,20 @@ trait ShoppingHelpers
         return $order;
     }
 
+    /**
+     * @return array
+     */
+    protected function prepOrderWithItem($itemPrice = 100, $salePrice = 0): array
+    {
+        $purchasable = new PurchasableStub(1, [], Money::EUR($itemPrice), Percentage::fromPercent(10), Money::EUR($salePrice));
+        $item = $this->getItem(null, null, $purchasable);
+
+        $order = $this->makeOrder();
+        $order->items()->add($item);
+
+        return array($order, $item);
+    }
+
     protected function makeEligibleForSaleStub($amount)
     {
         $price = Money::EUR($amount);
@@ -112,23 +129,21 @@ trait ShoppingHelpers
         return new FixedCustomAmountSale(SaleId::fromInteger(1), [], [], $data);
     }
 
-    protected function makeDiscount($id = 1, $type = 'percentage_off', $conditions = [], $adjusters = [])
+    protected function makePercentageOffDiscount($percent = 10, $conditions = [], $data = [], $id = null)
     {
-        if (empty($adjusters) && $type == 'percentage_off') {
-            $adjusters = [
-                'percentage' => Percentage::fromPercent(10),
-            ];
+        if(!empty($conditions))
+        {
+            foreach($conditions as $type => $parameters){
+                $class = ConditionKey::fromString($type)->class();
+                $conditions[$type] = (new $class())->setParameters([$type => $parameters]);
+            };
         }
 
-        return (new DiscountFactory(new InMemoryContainer()))->create($id, $type, $conditions, $adjusters);
-    }
-
-    protected function makePercentageOffDiscount($percent = 10)
-    {
-        $adjusters = [
-            'percentage' => Percentage::fromPercent($percent),
-        ];
-
-        return $this->makeDiscount(1, 'percentage_off', [], $adjusters);
+        return new PercentageOffDiscount(
+            DiscountId::fromInteger($id ?? rand(1,99)),
+            $conditions,
+            ['percentage' => Percentage::fromPercent($percent)],
+            $data
+        );
     }
 }

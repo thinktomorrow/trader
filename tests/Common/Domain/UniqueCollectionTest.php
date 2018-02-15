@@ -10,8 +10,8 @@ class UniqueCollectionTest extends TestCase
 
     private function getCollection()
     {
-        $this->discount = $this->makeDiscount(1);
-        $this->discount2 = $this->makeDiscount(2);
+        $this->discount = $this->makePercentageOffDiscount(10, [], [], 1);
+        $this->discount2 = $this->makePercentageOffDiscount(10, [], [], 2);
 
         return new UniqueCollection([$this->discount, $this->discount2]);
     }
@@ -49,7 +49,7 @@ class UniqueCollectionTest extends TestCase
     /** @test */
     public function it_can_add_an_item()
     {
-        $discount = $this->makeDiscount(5);
+        $discount = $this->makePercentageOffDiscount(10, [], [], 5);
         $collection = $this->getCollection();
         $collection->add($discount);
 
@@ -62,8 +62,8 @@ class UniqueCollectionTest extends TestCase
     {
         $collection = $this->getCollection();
 
-        $discount = $this->makeDiscount(5);
-        $discount2 = $this->makeDiscount(10);
+        $discount = $this->makePercentageOffDiscount(10, [], [], 5);
+        $discount2 = $this->makePercentageOffDiscount(10, [], [], 10);
         $collection->addMany([$discount, $discount2]);
 
         $this->assertEquals(4, $collection->size());
@@ -75,7 +75,7 @@ class UniqueCollectionTest extends TestCase
     public function it_can_set_item_by_key()
     {
         $collection = $this->getCollection();
-        $collection[3] = $discount = $this->makeDiscount(3);
+        $collection[3] = $discount = $this->makePercentageOffDiscount(10, [], [], 3);
 
         $this->assertCount(3, $collection);
         $this->assertSame($discount, $collection[3]);
@@ -87,7 +87,7 @@ class UniqueCollectionTest extends TestCase
         $this->expectException(\InvalidArgumentException::class);
 
         $collection = $this->getCollection();
-        $collection[3] = $discount = $this->makeDiscount(4);
+        $collection[3] = $discount = $this->makePercentageOffDiscount(10, [], [], 4);
     }
 
     /** @test */
@@ -105,7 +105,7 @@ class UniqueCollectionTest extends TestCase
         $this->expectException(InvalidArgumentException::class);
 
         $collection = $this->getCollection();
-        $collection[] = $this->makeDiscount(4);
+        $collection[] = $this->makePercentageOffDiscount(10, [], [], 4);
     }
 
     /** @test */

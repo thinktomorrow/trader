@@ -2,10 +2,10 @@
 
 namespace Thinktomorrow\Trader\Discounts\Domain;
 
+use Thinktomorrow\Trader\EligibleForDiscount;
 use Thinktomorrow\Trader\Orders\Domain\Order;
-use Thinktomorrow\Trader\Orders\Domain\PurchasableId;
 
-interface ItemDiscount
+interface ItemDiscountOLD
 {
-    public function applicable(Order $order, PurchasableId $purchasableId): bool;
+    public function applicable(Order $order, EligibleForDiscount $eligibleForDiscount): bool;
 }

@@ -13,6 +13,8 @@ class FreeItemTest extends TestCase
     /** @test */
     public function it_can_apply_discount()
     {
+        $this->markTestIncomplete();
+
         $item = $this->getItem(null, null, new PurchasableStub(20, [], Money::EUR(100)));
         $item2 = $this->getItem(null, null, new PurchasableStub(22, [], Money::EUR(80)));
 

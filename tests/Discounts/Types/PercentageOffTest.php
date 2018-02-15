@@ -7,42 +7,75 @@ use Thinktomorrow\Trader\Common\Domain\Price\Percentage;
 use Thinktomorrow\Trader\Discounts\Domain\AppliedDiscount;
 use Thinktomorrow\Trader\Discounts\Domain\Conditions\MinimumAmount;
 use Thinktomorrow\Trader\Discounts\Domain\DiscountId;
+use Thinktomorrow\Trader\Discounts\Domain\Exceptions\CannotApplyDiscount;
 use Thinktomorrow\Trader\Discounts\Domain\Types\PercentageOffDiscount;
 use Thinktomorrow\Trader\Tests\Stubs\PurchasableStub;
 
 class PercentageOffTest extends TestCase
 {
-    // TODO MAKE GENERAL TESTCASE SO EACH DISCOUNTTYPE CAN USE IT
-
     /** @test */
-    public function it_can_create_discount()
+    public function percentage_off_discount_cannot_be_negative()
     {
-        $order = $this->makeOrder();
+        $this->expectException(\InvalidArgumentException::class);
 
-        $discount = new PercentageOffDiscount(DiscountId::fromInteger(1), [
-            new MinimumAmount(),
-        ], [
-            'percentage' => Percentage::fromPercent(10),
-        ]);
-
-        $discount->apply($order);
-
-        $this->assertCount(1, $order->discounts());
-        $this->assertInstanceOf(AppliedDiscount::class, $order->discounts()[1]);
+        $this->makePercentageOffDiscount(-10);
     }
 
     /** @test */
-    public function it_should_not_allow_to_go_below_ordered_subtotal()
+    public function percentage_off_is_subtracted_from_original_price()
     {
-        $order = $this->makeOrder();
-        $order->items()->add($this->getItem(null, null, new PurchasableStub(20, [], Money::EUR(100))));
+        list($order, $item) = $this->prepOrderWithItem(100);
+        $discount = $this->makePercentageOffDiscount(40);
 
-        $discount = new PercentageOffDiscount(DiscountId::fromInteger(1), [], [
-            'percentage' => Percentage::fromPercent(110),
-        ]);
+        $discount->apply($order, $order);
 
-        $discount->apply($order);
+        $this->assertEquals(Money::EUR(100), $order->subtotal());
+        $this->assertEquals(Money::EUR(100), $order->discountBasePrice());
+        $this->assertEquals(Money::EUR(40), $order->discountTotal());
+        $this->assertEquals(Money::EUR(60), $order->total());
+        $this->assertCount(1, $order->discounts());
+    }
 
-        $this->assertEquals(Money::EUR(0), $order->total());
+    /** @test */
+    public function for_item_discount_percentage_off_is_subtracted_from_sale_price()
+    {
+        list($order, $item) = $this->prepOrderWithItem(100, 90);
+        $discount = $this->makePercentageOffDiscount(10);
+
+        $discount->apply($order, $item);
+
+        $this->assertCount(1, $item->discounts());
+        $this->assertEquals(Money::EUR(90), $item->discountBasePrice());
+        $this->assertEquals(Money::EUR(9), $item->discountTotal());
+
+        $this->assertCount(0, $order->discounts());
+        $this->assertEquals(Money::EUR(81), $order->subtotal());
+        $this->assertEquals(Money::EUR(0), $order->discountTotal());
+        $this->assertEquals(Money::EUR(81), $order->total());
+    }
+
+    /** @test */
+    public function discount_cannot_be_higher_than_original_price()
+    {
+        $this->expectException(CannotApplyDiscount::class);
+
+        list($order, $item) = $this->prepOrderWithItem(100);
+        $discount = $this->makePercentageOffDiscount(120);
+
+        $discount->apply($order, $item);
+    }
+
+    /** @test */
+    public function percentage_off_discount_can_go_to_zero()
+    {
+        list($order, $item) = $this->prepOrderWithItem(100);
+        $discount = $this->makePercentageOffDiscount(0);
+
+        $discount->apply($order, $item);
+
+        $this->assertEquals(Money::EUR(100), $order->subtotal());
+        $this->assertEquals(Money::EUR(100), $order->discountBasePrice());
+        $this->assertEquals(Money::EUR(0), $order->discountTotal());
+        $this->assertEquals(Money::EUR(100), $order->total());
     }
 }

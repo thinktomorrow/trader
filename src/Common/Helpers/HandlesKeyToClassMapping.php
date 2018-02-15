@@ -1,6 +1,6 @@
 <?php
 
-namespace Thinktomorrow\Trader\Common\Domain;
+namespace Thinktomorrow\Trader\Common\Helpers;
 
 trait HandlesKeyToClassMapping
 {
@@ -54,5 +54,10 @@ trait HandlesKeyToClassMapping
     {
         return get_class($other) === get_class($this)
             && (string)$this === (string)$other;
+    }
+
+    public function equalsClass($other): bool
+    {
+        return get_class($other) === $this->class();
     }
 }

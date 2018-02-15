@@ -7,10 +7,11 @@ use Thinktomorrow\Trader\Common\Domain\Price\Cash;
 use Thinktomorrow\Trader\Common\Domain\Price\Percentage;
 use Thinktomorrow\Trader\Discounts\Domain\AppliedDiscount;
 use Thinktomorrow\Trader\Discounts\Domain\AppliedDiscountCollection;
+use Thinktomorrow\Trader\Discounts\Domain\EligibleForDiscount;
 use Thinktomorrow\Trader\Tax\Domain\TaxId;
 use Thinktomorrow\Trader\Tax\Domain\TaxRate;
 
-final class Item
+final class Item implements EligibleForDiscount
 {
     /**
      * Unique identifier of line item.
@@ -40,7 +41,7 @@ final class Item
      */
     private $purchasable;
 
-    private $discounts;
+    private $discounts = [];
 
     private $discountTotal;
 
@@ -54,7 +55,6 @@ final class Item
         $this->id = $id;
         $this->taxRate = $taxRate;
         $this->purchasable = $purchasable; // The original product
-        $this->discounts = new AppliedDiscountCollection();
         $this->discountTotal = Cash::make(0);
     }
 
@@ -129,7 +129,12 @@ final class Item
         return $this->getFromPurchasable('description');
     }
 
-    public function discounts(): AppliedDiscountCollection
+    public function discountBasePrice(): Money
+    {
+        return $this->salePrice();
+    }
+
+    public function discounts(): array
     {
         return $this->discounts;
     }
@@ -141,7 +146,7 @@ final class Item
      */
     public function addDiscount(AppliedDiscount $discount)
     {
-        $this->discounts->add($discount);
+        $this->discounts[] = $discount;
     }
 
     public function discountTotal(): Money

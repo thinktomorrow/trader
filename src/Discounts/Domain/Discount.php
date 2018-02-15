@@ -2,11 +2,16 @@
 
 namespace Thinktomorrow\Trader\Discounts\Domain;
 
+use Money\Money;
 use Thinktomorrow\Trader\Orders\Domain\Order;
 
 interface Discount
 {
     public function id(): DiscountId;
 
-    public function apply(Order $order);
+    public function applicable(Order $order, EligibleForDiscount $eligibleForDiscount): bool;
+
+    public function apply(Order $order, EligibleForDiscount $eligibleForDiscount);
+
+    public function discountAmount(Order $order, EligibleForDiscount $eligibleForDiscount): Money;
 }

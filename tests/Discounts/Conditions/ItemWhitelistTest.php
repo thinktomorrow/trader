@@ -4,13 +4,12 @@ namespace Thinktomorrow\Trader\Tests;
 
 use Money\Money;
 use Thinktomorrow\Trader\Discounts\Domain\Conditions\ItemWhitelist;
-use Thinktomorrow\Trader\Orders\Domain\Item;
 use Thinktomorrow\Trader\Tests\Stubs\PurchasableStub;
 
 class ItemWhitelistTest extends TestCase
 {
     /** @test */
-    public function it_checks_ok_if_no_whitelist_is_enforced()
+    public function item_discount_passes_if_no_whitelist_is_enforced()
     {
         $condition = new ItemWhitelist();
         $item = $this->getItem(null, null, new PurchasableStub(20, [], Money::EUR(110)), 2);
@@ -23,16 +22,42 @@ class ItemWhitelistTest extends TestCase
     {
         $this->expectException(\InvalidArgumentException::class);
 
-        (new ItemWhitelist())->setParameters(['purchasable_ids' => 'foobar']);
+        (new ItemWhitelist())->setParameters(['item_whitelist' => 'foobar']);
     }
 
     /** @test */
-    public function it_checks_if_given_item_is_in_whitelist()
+    public function item_discount_passes_if_given_item_is_in_whitelist()
     {
         $order = $this->makeOrder();
         $item = $this->getItem(null, null, new PurchasableStub(20, [], Money::EUR(110)), 2);
 
-        $condition = (new ItemWhitelist())->setParameters(['purchasable_ids' => [20]]);
+        $condition = (new ItemWhitelist())->setParameters(['item_whitelist' => [20]]);
         $this->assertTrue($condition->check($order, $item));
+    }
+
+    /** @test */
+    public function item_discount_does_not_pass_if_given_item_is_not_in_whitelist()
+    {
+        $order = $this->makeOrder();
+        $item = $this->getItem(null, null, new PurchasableStub(20, [], Money::EUR(110)), 2);
+
+        $condition = (new ItemWhitelist())->setParameters(['item_whitelist' => [5]]);
+        $this->assertFalse($condition->check($order, $item));
+    }
+
+    /** @test */
+    public function order_discount_uses_whitelist_for_scoping_discount_baseprice()
+    {
+        list($order, $item) = $this->prepOrderWithItem(100);
+        $item2 = $this->getItem(null,null,new PurchasableStub(20, [], Money::EUR(30)));
+        $order->items()->add($item2);
+
+        $discount = $this->makePercentageOffDiscount(50, ['item_whitelist' => [20]]);
+
+        $discount->apply($order, $order);
+
+        $this->assertEquals(Money::EUR(130), $order->subtotal());
+        $this->assertEquals(Money::EUR(15), $order->discountTotal()); // 50% of discountBasePrice (which is 30)
+        $this->assertEquals(Money::EUR(115), $order->total());
     }
 }

@@ -4,18 +4,16 @@ namespace Thinktomorrow\Trader\Discounts\Domain\Conditions;
 
 use Thinktomorrow\Trader\Common\Domain\Conditions\BaseCondition;
 use Thinktomorrow\Trader\Common\Domain\Conditions\Condition;
+use Thinktomorrow\Trader\Common\Domain\Conditions\ItemCondition;
 use Thinktomorrow\Trader\Discounts\Domain\EligibleForDiscount;
 use Thinktomorrow\Trader\Orders\Domain\Item;
 use Thinktomorrow\Trader\Orders\Domain\Order;
 
-class ItemWhitelist extends BaseCondition implements Condition
+class ItemBlacklist extends BaseCondition implements Condition
 {
     public function check(Order $order, EligibleForDiscount $eligibleForDiscount): bool
     {
-        /** If condition runs for an orderdiscount, we ignore the whitelist as
-         * condition because it is used to calculate the discount baseprice
-         */
-        if (!isset($this->parameters['item_whitelist']) || $this->forOrderDiscount($eligibleForDiscount)) {
+        if (!isset($this->parameters['item_blacklist'])) {
             return true;
         }
 
@@ -24,13 +22,13 @@ class ItemWhitelist extends BaseCondition implements Condition
 
     private function checkItem(Order $order, Item $item): bool
     {
-        return in_array($item->purchasableId()->get(), $this->parameters['item_whitelist']);
+        return !in_array($item->purchasableId()->get(), $this->parameters['item_blacklist']);
     }
 
     protected function validateParameters(array $parameters)
     {
-        if (isset($parameters['item_whitelist']) && !is_array($parameters['item_whitelist'])) {
-            throw new \InvalidArgumentException('Condition value for item_whitelist must be an array of ids. '.gettype($parameters['item_whitelist']).' given.');
+        if (isset($parameters['item_blacklist']) && !is_array($parameters['item_blacklist'])) {
+            throw new \InvalidArgumentException('Condition value for item_blacklist must be an array of ids. '.gettype($parameters['item_blacklist']).' given.');
         }
     }
 }

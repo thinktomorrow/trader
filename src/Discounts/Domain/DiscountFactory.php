@@ -8,7 +8,7 @@ use Thinktomorrow\Trader\Discounts\Domain\Conditions\ConditionKey;
 use Thinktomorrow\Trader\Discounts\Domain\Types\TypeKey;
 
 // TODO this could be using same common code as ShippingRuleFactory
-class DiscountFactory
+class DiscountFactoryOLD
 {
     /**
      * @var ContainerInterface

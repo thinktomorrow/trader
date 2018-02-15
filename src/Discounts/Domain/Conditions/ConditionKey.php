@@ -2,7 +2,8 @@
 
 namespace Thinktomorrow\Trader\Discounts\Domain\Conditions;
 
-use Thinktomorrow\Trader\Common\Domain\HandlesKeyToClassMapping;
+use Thinktomorrow\Trader\Common\Domain\Conditions\Condition;
+use Thinktomorrow\Trader\Common\Helpers\HandlesKeyToClassMapping;
 
 final class ConditionKey
 {
@@ -10,7 +11,8 @@ final class ConditionKey
 
     protected static $mapping = [
         'minimum_amount'        => MinimumAmount::class,
-        'purchasable_ids'       => ItemWhitelist::class,
+        'item_whitelist'        => ItemWhitelist::class,
+        'item_blacklist'        => ItemBlacklist::class,
         'minimum_item_quantity' => MinimumItemQuantity::class,
         'start_at'              => Period::class,
         'end_at'                => Period::class, // TODO avoid duplicate conditional loading!!

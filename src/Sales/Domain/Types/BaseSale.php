@@ -55,7 +55,7 @@ abstract class BaseSale
      */
     public function applicable(EligibleForSale $eligibleForSale): bool
     {
-        if (!$this->lessThanPrice($eligibleForSale) || $this->saleAmountBelowZero($eligibleForSale)) {
+        if ($this->greaterThanPrice($eligibleForSale) || $this->saleAmountBelowZero($eligibleForSale)) {
             return false;
         }
 
@@ -68,12 +68,12 @@ abstract class BaseSale
         return true;
     }
 
-    private function lessThanPrice(EligibleForSale $eligibleForSale)
+    private function greaterThanPrice(EligibleForSale $eligibleForSale)
     {
         // SaleTotal cannot be higher than original price
         $saleTotal = $eligibleForSale->saleTotal()->add($this->saleAmount($eligibleForSale));
 
-        return !($saleTotal->greaterThan($eligibleForSale->price()));
+        return $saleTotal->greaterThan($eligibleForSale->price());
     }
 
     private function saleAmountBelowZero(EligibleForSale $eligibleForSale)

@@ -6,18 +6,19 @@ use Money\Money;
 use Thinktomorrow\Trader\Common\Domain\Conditions\BaseCondition;
 use Thinktomorrow\Trader\Common\Domain\Conditions\Condition;
 use Thinktomorrow\Trader\Common\Domain\Conditions\OrderCondition;
+use Thinktomorrow\Trader\Discounts\Domain\EligibleForDiscount;
 use Thinktomorrow\Trader\Orders\Domain\Order;
 
-class MinimumAmount extends BaseCondition implements Condition, OrderCondition
+class MinimumAmount extends BaseCondition implements Condition
 {
-    public function check(Order $order): bool
+    public function check(Order $order, EligibleForDiscount $eligibleForDiscount): bool
     {
         if (!isset($this->parameters['minimum_amount'])) {
             return true;
         }
 
         // Check subtotal (without shipment / payment costs)
-        return $order->subtotal()->greaterThanOrEqual($this->parameters['minimum_amount']);
+        return $eligibleForDiscount->subtotal()->greaterThanOrEqual($this->parameters['minimum_amount']);
     }
 
     protected function validateParameters(array $parameters)

@@ -5,7 +5,10 @@ namespace Thinktomorrow\Trader\Discounts\Domain\Types;
 use Assert\Assertion;
 use Thinktomorrow\Trader\Common\Domain\Conditions\Condition;
 use Thinktomorrow\Trader\Common\Domain\Conditions\ItemCondition;
+use Thinktomorrow\Trader\Discounts\Domain\Conditions\ConditionKey;
 use Thinktomorrow\Trader\Discounts\Domain\DiscountId;
+use Thinktomorrow\Trader\Discounts\Domain\EligibleForDiscount;
+use Thinktomorrow\Trader\Orders\Domain\Item;
 use Thinktomorrow\Trader\Orders\Domain\Order;
 
 abstract class BaseDiscount
@@ -14,11 +17,6 @@ abstract class BaseDiscount
      * @var DiscountId
      */
     protected $id;
-
-    /**
-     * @var TypeKey
-     */
-    protected $type;
 
     /**
      * @var Condition[]
@@ -30,7 +28,12 @@ abstract class BaseDiscount
      */
     protected $adjusters;
 
-    public function __construct(DiscountId $id, array $conditions, array $adjusters)
+    /**
+     * @var array
+     */
+    protected $data;
+
+    public function __construct(DiscountId $id, array $conditions, array $adjusters, array $data = [])
     {
         $this->validateParameters($conditions, $adjusters);
 
@@ -38,7 +41,8 @@ abstract class BaseDiscount
         $this->conditions = $conditions;
         $this->adjusters = $adjusters;
 
-        $this->type = TypeKey::fromDiscount($this);
+        // Custom data, e.g. discount text for display on site or shopping cart
+        $this->data = $data;
     }
 
     public function id(): DiscountId
@@ -46,37 +50,71 @@ abstract class BaseDiscount
         return $this->id;
     }
 
-    public function type(): TypeKey
+    protected function isOrderDiscount(EligibleForDiscount $eligibleForDiscount): bool
     {
-        return $this->type;
+        return $eligibleForDiscount instanceof Order;
     }
 
-    public function conditions(): array
+    protected function isItemDiscount(EligibleForDiscount $eligibleForDiscount): bool
     {
-        return $this->conditions;
+        return $eligibleForDiscount instanceof Item;
     }
 
-    public function adjusters(): array
+    protected function usesCondition(string $condition_key)
     {
-        return $this->adjusters;
+        foreach($this->conditions as $condition)
+        {
+            if(ConditionKey::fromString($condition_key)->equalsClass($condition))
+            {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    protected function getCondition(string $condition_key)
+    {
+        if(!isset($this->conditions[$condition_key])) return null;
+
+        return $this->conditions[$condition_key];
     }
 
     /**
-     * Do the conditions apply for the given order.
+     * Do the conditions apply for the given discountable object.
      *
      * @param Order $order
      *
      * @return bool
      */
-    public function applicable(Order $order): bool
+    public function applicable(Order $order, EligibleForDiscount $eligibleForDiscount): bool
     {
+        if ($this->greaterThanPrice($order, $eligibleForDiscount) || $this->discountAmountBelowZero($order, $eligibleForDiscount)) {
+            return false;
+        }
+
         foreach ($this->conditions as $condition) {
-            if (false == $condition->check($order)) {
+            if (false == $condition->check($order, $eligibleForDiscount)) {
                 return false;
             }
         }
 
         return true;
+    }
+
+    private function greaterThanPrice(Order $order, EligibleForDiscount $eligibleForDiscount)
+    {
+        // Protect against negative overflow where order total would dive under zero - DiscountTotal cannot be higher than original price
+        $discountTotal = $eligibleForDiscount->discountTotal()->add($this->discountAmount($order, $eligibleForDiscount));
+
+        return $discountTotal->greaterThan($eligibleForDiscount->discountBasePrice());
+    }
+
+    private function discountAmountBelowZero(Order $order, EligibleForDiscount $eligibleForDiscount)
+    {
+        $discountTotal = $eligibleForDiscount->discountTotal()->add($this->discountAmount($order, $eligibleForDiscount));
+
+        return $discountTotal->isNegative();
     }
 
     /**
@@ -86,6 +124,5 @@ abstract class BaseDiscount
     protected function validateParameters(array $conditions, array $adjusters)
     {
         Assertion::allIsInstanceOf($conditions, Condition::class);
-        Assertion::allNotIsInstanceOf($conditions, ItemCondition::class);
     }
 }

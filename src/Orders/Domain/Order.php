@@ -8,10 +8,10 @@ use Thinktomorrow\Trader\Common\Domain\Price\Cash;
 use Thinktomorrow\Trader\Common\Domain\Price\Percentage;
 use Thinktomorrow\Trader\Common\Domain\State\StatefulContract;
 use Thinktomorrow\Trader\Discounts\Domain\AppliedDiscount;
-use Thinktomorrow\Trader\Discounts\Domain\AppliedDiscountCollection;
+use Thinktomorrow\Trader\Discounts\Domain\EligibleForDiscount;
 use Thinktomorrow\Trader\Orders\Domain\Services\SumOfTaxes;
 
-final class Order implements StatefulContract
+final class Order implements StatefulContract, EligibleForDiscount
 {
     use PayableAndShippable;
 
@@ -23,7 +23,7 @@ final class Order implements StatefulContract
     private $customerId;
 
     private $items;
-    private $discounts; // order level applied discounts
+    private $discounts = []; // order level applied discounts
     private $discountTotal;
     private $taxPercentage; // default tax percentage for order (shipment / payment)
 
@@ -31,7 +31,6 @@ final class Order implements StatefulContract
     {
         $this->id = $id;
         $this->items = new ItemCollection();
-        $this->discounts = new AppliedDiscountCollection();
         $this->discountTotal = $this->shippingTotal = $this->paymentTotal = Cash::make(0);
 
         $this->setTaxPercentage(Percentage::fromPercent((new Config())->get('tax_percentage', 0))); // TODO get from config
@@ -147,26 +146,21 @@ final class Order implements StatefulContract
         return $this->items;
     }
 
-    public function discounts(): AppliedDiscountCollection
-    {
-        return $this->discounts;
-    }
-
-    /**
-     * Add applied discounts.
-     *
-     * @param $discount
-     */
-    public function addDiscount(AppliedDiscount $discount)
-    {
-        $this->discounts->add($discount);
-    }
-
     public function subtotal(): Money
     {
         return array_reduce($this->items->all(), function ($carry, Item $item) {
             return $carry->add($item->total());
         }, Cash::make(0));
+    }
+
+    /**
+     * Baseprice where discount will be calculated on
+     *
+     * @return Money
+     */
+    public function discountBasePrice(): Money
+    {
+        return $this->subtotal();
     }
 
     public function discountTotal(): Money
@@ -177,6 +171,22 @@ final class Order implements StatefulContract
     public function addToDiscountTotal(Money $addition)
     {
         $this->discountTotal = $this->discountTotal->add($addition);
+    }
+
+
+    public function discounts(): array
+    {
+        return $this->discounts;
+    }
+
+    /**
+     * Add applied discounts.
+     *
+     * @param $appliedDiscount
+     */
+    public function addDiscount(AppliedDiscount $appliedDiscount)
+    {
+        $this->discounts[] = $appliedDiscount;
     }
 
     public function total(): Money

@@ -2,10 +2,11 @@
 
 namespace Thinktomorrow\Trader\Tests;
 
-use Thinktomorrow\Trader\Discounts\Domain\AppliedDiscount;
+use Money\Money;
 use Thinktomorrow\Trader\Discounts\Domain\Discount;
 use Thinktomorrow\Trader\Discounts\Domain\DiscountId;
 use Thinktomorrow\Trader\Discounts\Domain\Types\TypeKey;
+use Thinktomorrow\Trader\Discounts\Domain\EligibleForDiscount;
 use Thinktomorrow\Trader\Orders\Domain\Order;
 
 class DiscountTypeTest extends TestCase
@@ -53,7 +54,18 @@ class UnknownDiscount implements Discount
     {
     }
 
-    public function apply(Order $order): AppliedDiscount
+    public function applicable(Order $order, EligibleForDiscount $eligibleForDiscount): bool
     {
+        // TODO: Implement applicable() method.
+    }
+
+    public function apply(Order $order, EligibleForDiscount $eligibleForDiscount)
+    {
+        // TODO: Implement apply() method.
+    }
+
+    public function discountAmount(Order $order, EligibleForDiscount $eligibleForDiscount): Money
+    {
+        // TODO: Implement discountAmount() method.
     }
 }

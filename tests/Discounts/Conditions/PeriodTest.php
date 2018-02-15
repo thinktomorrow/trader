@@ -55,4 +55,21 @@ class PeriodTest extends TestCase
         ]);
         $this->assertTrue($condition->check($this->makeOrder()));
     }
+
+    /** @test */
+    public function it_can_be_applied_if_within_given_period()
+    {
+        $order = $this->makeOrder();
+
+        $discount = $this->makePercentageOffDiscount(15, [
+            'start_at' => (new \DateTime('@'.strtotime('+3 days')))
+        ]);
+
+        $discount2 = $this->makePercentageOffDiscount(15, [
+            'start_at' => (new \DateTime('@'.strtotime('-3 days'))),
+        ]);
+
+        $this->assertFalse($discount->applicable($order, $order));
+        $this->assertTrue($discount2->applicable($order, $order));
+    }
 }

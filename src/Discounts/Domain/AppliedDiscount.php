@@ -3,11 +3,14 @@
 namespace Thinktomorrow\Trader\Discounts\Domain;
 
 use Money\Money;
-use Thinktomorrow\Trader\Common\Domain\Description;
+use Thinktomorrow\Trader\Common\Domain\Price\Percentage;
+use Thinktomorrow\Trader\Common\Helpers\HandlesArrayDotSyntax;
 use Thinktomorrow\Trader\Discounts\Domain\Types\TypeKey;
 
 final class AppliedDiscount
 {
+    use HandlesArrayDotSyntax;
+
     /**
      * @var DiscountId
      */
@@ -21,19 +24,25 @@ final class AppliedDiscount
     /**
      * @var Money
      */
-    private $amount;
+    private $discountAmount;
 
     /**
-     * @var Description
+     * @var Percentage
      */
-    private $description;
+    private $discountPercentage;
 
-    public function __construct(DiscountId $discountId, TypeKey $discountType, Description $description, Money $amount = null)
+    /**
+     * @var array
+     */
+    private $data;
+
+    public function __construct(DiscountId $discountId, string $discountType, Money $discountAmount = null, Percentage $discountPercentage, array $data = [])
     {
         $this->discountId = $discountId;
         $this->discountType = $discountType;
-        $this->description = $description;
-        $this->amount = $amount;
+        $this->discountAmount = $discountAmount;
+        $this->discountPercentage = $discountPercentage;
+        $this->data = $data;
     }
 
     /**
@@ -45,30 +54,39 @@ final class AppliedDiscount
     }
 
     /**
-     * unique identifier for applied discount.
-     *
-     * @return DiscountId
+     * @return string
      */
-    public function id(): DiscountId
-    {
-        return $this->discountId();
-    }
-
-    /**
-     * @return TypeKey
-     */
-    public function type(): TypeKey
+    public function discountType(): string
     {
         return $this->discountType;
     }
 
-    public function description(): Description
+    /**
+     * Gives the value of the discount in terms of money. Not in all cases the discount is
+     * a discount of the price, it can also be a free shipment, free item and such. To
+     * determine the highest discount in these cases, we need to be able to translate
+     * these discounts to their 'amount' impact so we can compare them.
+     *
+     * @return Money
+     */
+    public function discountAmount(): Money
     {
-        return $this->description;
+        return $this->discountAmount;
     }
 
-    public function amount()
+    public function discountPercentage(): Percentage
     {
-        return $this->amount;
+        return $this->discountPercentage;
+    }
+
+    public function data($key = null, $default = null)
+    {
+        if(is_null($key)) return $this->data;
+
+        if (!is_null($key) && isset($this->data[$key])) {
+            return $this->data[$key];
+        }
+
+        return $this->handlesArrayDotSyntax($key, $default);
     }
 }
