@@ -26,6 +26,7 @@ final class Order implements StatefulContract, EligibleForDiscount
     private $discounts = []; // order level applied discounts
     private $discountTotal;
     private $taxPercentage; // default tax percentage for order (shipment / payment)
+    private $couponCode;
 
     public function __construct(OrderId $id)
     {
@@ -98,6 +99,18 @@ final class Order implements StatefulContract, EligibleForDiscount
     public function setCustomerId(CustomerId $customerId)
     {
         $this->customerId = $customerId;
+    }
+
+    public function enteredCouponCode()
+    {
+        return $this->couponCode;
+    }
+
+    public function enterCouponCode($couponCode)
+    {
+        $this->couponCode = $couponCode;
+
+        return $this;
     }
 
     public function state(): string

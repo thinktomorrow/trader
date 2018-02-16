@@ -91,7 +91,7 @@ class Cash
             throw new \InvalidArgumentException('Money::asPercentage expects Money value of the same currency');
         }
         if ($other->getAmount() <= 0) {
-            return 0;
+            return Percentage::fromPercent(0);
         }
 
         $percentage = (float) sprintf("%.".$precision."f", ($this->money->getAmount() * 100) / $other->getAmount());

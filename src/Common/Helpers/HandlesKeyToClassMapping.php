@@ -19,16 +19,16 @@ trait HandlesKeyToClassMapping
 
     public static function fromString(string $type)
     {
-        if (!isset(self::$mapping[$type])) {
+        if (!isset(static::$mapping[$type])) {
             throw new \InvalidArgumentException('Invalid type [' . $type . ']. Not found as available class.');
         }
 
-        return new self($type);
+        return new static($type);
     }
 
     public static function fromInstance($instance)
     {
-        if (false === ($key = array_search(get_class($instance), self::$mapping))) {
+        if (false === ($key = array_search(get_class($instance), static::$mapping))) {
             throw new \InvalidArgumentException('Class [' . get_class($instance) . '] not found as available type string.');
         }
 
@@ -47,7 +47,7 @@ trait HandlesKeyToClassMapping
 
     public function class(): string
     {
-        return self::$mapping[$this->type];
+        return static::$mapping[$this->type];
     }
 
     public function equals($other): bool

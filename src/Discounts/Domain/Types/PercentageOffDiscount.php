@@ -9,10 +9,9 @@ use Thinktomorrow\Trader\Discounts\Domain\AppliedDiscount;
 use Thinktomorrow\Trader\Discounts\Domain\Discount;
 use Thinktomorrow\Trader\Discounts\Domain\Exceptions\CannotApplyDiscount;
 use Thinktomorrow\Trader\Discounts\Domain\EligibleForDiscount;
-use Thinktomorrow\Trader\Orders\Domain\Item;
 use Thinktomorrow\Trader\Orders\Domain\Order;
 
-final class PercentageOffDiscount extends BaseDiscount implements Discount
+class PercentageOffDiscount extends BaseDiscount implements Discount
 {
     public function apply(Order $order, EligibleForDiscount $eligibleForDiscount)
     {
@@ -25,7 +24,7 @@ final class PercentageOffDiscount extends BaseDiscount implements Discount
         $eligibleForDiscount->addToDiscountTotal($discountAmount);
         $eligibleForDiscount->addDiscount(new AppliedDiscount(
             $this->id,
-            TypeKey::fromDiscount($this)->get(),
+            $this->getType(),
             $discountAmount,
             Cash::from($discountAmount)->asPercentage($eligibleForDiscount->discountBasePrice(), 0),
             $this->data
@@ -41,8 +40,8 @@ final class PercentageOffDiscount extends BaseDiscount implements Discount
         }
 
         $discountBasePrice = Cash::make(0);
-        $discountBasePrice = $this->conditionallyAddToDiscountBasePrice($discountBasePrice, $order, 'item_whitelist');
-        $discountBasePrice = $this->conditionallyAddToDiscountBasePrice($discountBasePrice, $order, 'item_blacklist');
+        $discountBasePrice = $this->conditionallyAdjustDiscountBasePrice($discountBasePrice, $order, 'item_whitelist');
+        $discountBasePrice = $this->conditionallyAdjustDiscountBasePrice($discountBasePrice, $order, 'item_blacklist');
 
         return $discountBasePrice->multiply($this->adjusters['percentage']->asFloat());
     }
@@ -61,19 +60,5 @@ final class PercentageOffDiscount extends BaseDiscount implements Discount
         if (!$adjusters['percentage'] instanceof Percentage) {
             throw new \InvalidArgumentException('Invalid adjuster value \'percentage\' for discount '.get_class($this).'. Instance of '.Percentage::class.' is expected.');
         }
-    }
-
-    private function conditionallyAddToDiscountBasePrice(Money $discountBasePrice, Order $order, string $condition_key)
-    {
-        if( ! $condition = $this->getCondition($condition_key)) return $discountBasePrice;
-
-        foreach($order->items() as $item)
-        {
-            if ($condition->check($order, $item)) {
-                $discountBasePrice = $discountBasePrice->add($item->total());
-            }
-        }
-
-        return $discountBasePrice;
     }
 }

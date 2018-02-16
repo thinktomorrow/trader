@@ -3,8 +3,8 @@
 namespace Thinktomorrow\Trader\Discounts\Domain\Types;
 
 use Assert\Assertion;
+use Money\Money;
 use Thinktomorrow\Trader\Common\Domain\Conditions\Condition;
-use Thinktomorrow\Trader\Common\Domain\Conditions\ItemCondition;
 use Thinktomorrow\Trader\Discounts\Domain\Conditions\ConditionKey;
 use Thinktomorrow\Trader\Discounts\Domain\DiscountId;
 use Thinktomorrow\Trader\Discounts\Domain\EligibleForDiscount;
@@ -64,7 +64,7 @@ abstract class BaseDiscount
     {
         foreach($this->conditions as $condition)
         {
-            if(ConditionKey::fromString($condition_key)->equalsClass($condition))
+            if($this->getConditionKey($condition_key)->equalsClass($condition))
             {
                 return true;
             }
@@ -124,5 +124,29 @@ abstract class BaseDiscount
     protected function validateParameters(array $conditions, array $adjusters)
     {
         Assertion::allIsInstanceOf($conditions, Condition::class);
+    }
+
+    protected function conditionallyAdjustDiscountBasePrice(Money $discountBasePrice, Order $order, string $condition_key)
+    {
+        if( ! $condition = $this->getCondition($condition_key)) return $discountBasePrice;
+
+        foreach($order->items() as $item)
+        {
+            if ($condition->check($order, $item)) {
+                $discountBasePrice = $discountBasePrice->add($item->total());
+            }
+        }
+
+        return $discountBasePrice;
+    }
+
+    protected function getType(): string
+    {
+        return TypeKey::fromDiscount($this)->get();
+    }
+
+    protected function getConditionKey($string): ConditionKey
+    {
+        return ConditionKey::fromString($string);
     }
 }

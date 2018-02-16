@@ -5,7 +5,7 @@ namespace Thinktomorrow\Trader\Discounts\Domain\Conditions;
 use Thinktomorrow\Trader\Common\Domain\Conditions\Condition;
 use Thinktomorrow\Trader\Common\Helpers\HandlesKeyToClassMapping;
 
-final class ConditionKey
+class ConditionKey
 {
     use HandlesKeyToClassMapping;
 

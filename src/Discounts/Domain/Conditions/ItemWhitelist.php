@@ -29,7 +29,11 @@ class ItemWhitelist extends BaseCondition implements Condition
 
     protected function validateParameters(array $parameters)
     {
-        if (isset($parameters['item_whitelist']) && !is_array($parameters['item_whitelist'])) {
+        if ( ! isset($parameters['item_whitelist'])) {
+            throw new \InvalidArgumentException('Condition parameter item_whitelist is missing.');
+        }
+
+        if (!is_array($parameters['item_whitelist'])) {
             throw new \InvalidArgumentException('Condition value for item_whitelist must be an array of ids. '.gettype($parameters['item_whitelist']).' given.');
         }
     }

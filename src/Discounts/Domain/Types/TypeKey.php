@@ -5,7 +5,7 @@ namespace Thinktomorrow\Trader\Discounts\Domain\Types;
 use Thinktomorrow\Trader\Common\Helpers\HandlesKeyToClassMapping;
 use Thinktomorrow\Trader\Discounts\Domain\Discount;
 
-final class TypeKey
+class TypeKey
 {
     use HandlesKeyToClassMapping;
 
