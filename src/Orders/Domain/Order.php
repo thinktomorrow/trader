@@ -25,6 +25,7 @@ final class Order implements StatefulContract, EligibleForDiscount
     private $items;
     private $discounts = []; // order level applied discounts
     private $discountTotal;
+    private $discountPercentage;
     private $taxPercentage; // default tax percentage for order (shipment / payment)
     private $couponCode;
 
@@ -33,6 +34,7 @@ final class Order implements StatefulContract, EligibleForDiscount
         $this->id = $id;
         $this->items = new ItemCollection();
         $this->discountTotal = $this->shippingTotal = $this->paymentTotal = Cash::make(0);
+        $this->discountPercentage = Percentage::fromPercent(0);
 
         $this->setTaxPercentage(Percentage::fromPercent((new Config())->get('tax_percentage', 0))); // TODO get from config
 
@@ -176,6 +178,16 @@ final class Order implements StatefulContract, EligibleForDiscount
         return $this->subtotal();
     }
 
+    public function discountPercentage(): Percentage
+    {
+        return $this->discountPercentage;
+    }
+
+    public function setDiscountPercentage(Percentage $percentage)
+    {
+        $this->discountPercentage = $percentage;
+    }
+
     public function discountTotal(): Money
     {
         return $this->discountTotal;
@@ -185,7 +197,6 @@ final class Order implements StatefulContract, EligibleForDiscount
     {
         $this->discountTotal = $this->discountTotal->add($addition);
     }
-
 
     public function discounts(): array
     {
@@ -200,6 +211,13 @@ final class Order implements StatefulContract, EligibleForDiscount
     public function addDiscount(AppliedDiscount $appliedDiscount)
     {
         $this->discounts[] = $appliedDiscount;
+    }
+
+    public function removeDiscounts()
+    {
+        $this->discountTotal = Cash::make(0);
+        $this->discountPercentage = Percentage::fromPercent(0);
+        $this->discounts = [];
     }
 
     public function total(): Money

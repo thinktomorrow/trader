@@ -26,6 +26,7 @@ class PercentageOffDiscount extends BaseDiscount implements Discount
             $this->id,
             $this->getType(),
             $discountAmount,
+            $this->discountBasePrice($order, $eligibleForDiscount),
             Cash::from($discountAmount)->asPercentage($eligibleForDiscount->discountBasePrice(), 0),
             $this->data
         ));
@@ -33,17 +34,22 @@ class PercentageOffDiscount extends BaseDiscount implements Discount
 
     public function discountAmount(Order $order, EligibleForDiscount $eligibleForDiscount): Money
     {
+        return $this->discountBasePrice($order, $eligibleForDiscount)->multiply($this->adjusters['percentage']->asFloat());
+    }
+
+    public function discountBasePrice(Order $order, EligibleForDiscount $eligibleForDiscount): Money
+    {
         // IF ORDERDISCOUNT USE GLOBAL DISCOUNT BUT CHECK IF WE HAVE A ITEM_WHITELIST OR ITEM_BLACKLIST TO CALCULATE THE DISCOUNT AMOUNT UPON
         if($this->isItemDiscount($eligibleForDiscount) || ( !$this->usesCondition('item_whitelist') && !$this->usesCondition('item_blacklist')) )
         {
-            return $eligibleForDiscount->discountBasePrice()->multiply($this->adjusters['percentage']->asFloat());
+            return $eligibleForDiscount->discountBasePrice();
         }
 
         $discountBasePrice = Cash::make(0);
         $discountBasePrice = $this->conditionallyAdjustDiscountBasePrice($discountBasePrice, $order, 'item_whitelist');
         $discountBasePrice = $this->conditionallyAdjustDiscountBasePrice($discountBasePrice, $order, 'item_blacklist');
 
-        return $discountBasePrice->multiply($this->adjusters['percentage']->asFloat());
+        return $discountBasePrice;
     }
 
     /**

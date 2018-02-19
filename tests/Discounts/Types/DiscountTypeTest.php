@@ -68,4 +68,9 @@ class UnknownDiscount implements Discount
     {
         // TODO: Implement discountAmount() method.
     }
+
+    public function discountBasePrice(Order $order, EligibleForDiscount $eligibleForDiscount): Money
+    {
+        // TODO: Implement discountBasePrice() method.
+    }
 }

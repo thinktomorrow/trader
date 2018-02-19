@@ -16,12 +16,14 @@ class AppliedDiscountTest extends TestCase
         $discountId = DiscountId::fromInteger(1);
         $data = ['foobar'];
         $amount = Money::EUR(20);
+        $discountBasePrice = Money::EUR(40);
         $percentage = Percentage::fromPercent(15);
 
         $appliedDiscount = new AppliedDiscount(
             $discountId,
             'foobar',
             $amount,
+            $discountBasePrice,
             $percentage,
             $data
         );
@@ -29,6 +31,7 @@ class AppliedDiscountTest extends TestCase
         $this->assertSame($discountId, $appliedDiscount->discountId());
         $this->assertSame('foobar', $appliedDiscount->discountType());
         $this->assertSame($amount, $appliedDiscount->discountAmount());
+        $this->assertSame($discountBasePrice, $appliedDiscount->discountBasePrice());
         $this->assertSame($percentage, $appliedDiscount->discountPercentage());
         $this->assertSame($data, $appliedDiscount->data());
     }

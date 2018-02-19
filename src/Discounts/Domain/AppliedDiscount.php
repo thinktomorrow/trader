@@ -27,6 +27,11 @@ final class AppliedDiscount
     private $discountAmount;
 
     /**
+     * @var Money
+     */
+    private $discountBasePrice;
+
+    /**
      * @var Percentage
      */
     private $discountPercentage;
@@ -36,11 +41,12 @@ final class AppliedDiscount
      */
     private $data;
 
-    public function __construct(DiscountId $discountId, string $discountType, Money $discountAmount = null, Percentage $discountPercentage, array $data = [])
+    public function __construct(DiscountId $discountId, string $discountType, Money $discountAmount = null, Money $discountBasePrice = null, Percentage $discountPercentage, array $data = [])
     {
         $this->discountId = $discountId;
         $this->discountType = $discountType;
         $this->discountAmount = $discountAmount;
+        $this->discountBasePrice = $discountBasePrice;
         $this->discountPercentage = $discountPercentage;
         $this->data = $data;
     }
@@ -72,6 +78,11 @@ final class AppliedDiscount
     public function discountAmount(): Money
     {
         return $this->discountAmount;
+    }
+
+    public function discountBasePrice(): Money
+    {
+        return $this->discountBasePrice;
     }
 
     public function discountPercentage(): Percentage

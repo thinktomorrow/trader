@@ -14,4 +14,6 @@ interface Discount
     public function apply(Order $order, EligibleForDiscount $eligibleForDiscount);
 
     public function discountAmount(Order $order, EligibleForDiscount $eligibleForDiscount): Money;
+
+    public function discountBasePrice(Order $order, EligibleForDiscount $eligibleForDiscount): Money;
 }

@@ -80,6 +80,11 @@ abstract class BaseDiscount
         return $this->conditions[$condition_key];
     }
 
+    public function discountBasePrice(Order $order, EligibleForDiscount $eligibleForDiscount): Money
+    {
+        return $eligibleForDiscount->discountBasePrice();
+    }
+
     /**
      * Do the conditions apply for the given discountable object.
      *
