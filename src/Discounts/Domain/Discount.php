@@ -16,4 +16,6 @@ interface Discount
     public function discountAmount(Order $order, EligibleForDiscount $eligibleForDiscount): Money;
 
     public function discountBasePrice(Order $order, EligibleForDiscount $eligibleForDiscount): Money;
+
+    public function usesCondition(string $condition_key): bool;
 }

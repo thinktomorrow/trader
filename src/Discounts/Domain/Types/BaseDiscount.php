@@ -60,7 +60,7 @@ abstract class BaseDiscount
         return $eligibleForDiscount instanceof Item;
     }
 
-    protected function usesCondition(string $condition_key)
+    public function usesCondition(string $condition_key): bool
     {
         foreach($this->conditions as $condition)
         {

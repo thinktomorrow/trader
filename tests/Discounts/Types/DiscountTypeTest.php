@@ -73,4 +73,9 @@ class UnknownDiscount implements Discount
     {
         // TODO: Implement discountBasePrice() method.
     }
+
+    public function usesCondition(string $condition_key): bool
+    {
+        return false;
+    }
 }
