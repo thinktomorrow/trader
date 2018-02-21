@@ -12,7 +12,8 @@ class ItemWhitelist extends BaseCondition implements Condition
 {
     public function check(Order $order, EligibleForDiscount $eligibleForDiscount): bool
     {
-        /** If condition runs for an orderdiscount, we ignore the whitelist as
+        /**
+         * If condition runs for an orderdiscount, we ignore the whitelist as
          * condition because it is used to calculate the discount baseprice
          */
         if (!isset($this->parameters['item_whitelist']) || $this->forOrderDiscount($eligibleForDiscount)) {

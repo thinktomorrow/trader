@@ -46,5 +46,21 @@ class ItemBlacklistTest extends TestCase
         $this->assertFalse($condition->check($order, $item));
     }
 
+    /** @test */
+    public function order_discount_uses_blacklist_for_scoping_discount_baseprice()
+    {
+        list($order, $item) = $this->prepOrderWithItem(100);
+        $item2 = $this->getItem(null,null,new PurchasableStub(20, [], Money::EUR(30)));
+        $order->items()->add($item2);
+
+        $discount = $this->makePercentageOffDiscount(50, ['item_blacklist' => [20]]);
+
+        $discount->apply($order, $order);
+
+        $this->assertEquals(Money::EUR(130), $order->subtotal());
+        $this->assertEquals(Money::EUR(50), $order->discountTotal()); // Only first item is accepted so 50% of 100
+        $this->assertEquals(Money::EUR(80), $order->total());
+    }
+
 
 }

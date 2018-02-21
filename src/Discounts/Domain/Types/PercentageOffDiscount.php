@@ -45,11 +45,7 @@ class PercentageOffDiscount extends BaseDiscount implements Discount
             return $eligibleForDiscount->discountBasePrice();
         }
 
-        $discountBasePrice = Cash::make(0);
-        $discountBasePrice = $this->conditionallyAdjustDiscountBasePrice($discountBasePrice, $order, 'item_whitelist');
-        $discountBasePrice = $this->conditionallyAdjustDiscountBasePrice($discountBasePrice, $order, 'item_blacklist');
-
-        return $discountBasePrice;
+        return $this->adjustDiscountBasePriceByConditions(Cash::make(0), $order, $this->conditions);
     }
 
     /**

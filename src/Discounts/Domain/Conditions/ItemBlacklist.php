@@ -13,7 +13,11 @@ class ItemBlacklist extends BaseCondition implements Condition
 {
     public function check(Order $order, EligibleForDiscount $eligibleForDiscount): bool
     {
-        if (!isset($this->parameters['item_blacklist'])) {
+        /**
+         * If condition runs for an orderdiscount, we ignore the blacklist as
+         * condition because it is used to calculate the discount baseprice
+         */
+        if (!isset($this->parameters['item_blacklist']) || $this->forOrderDiscount($eligibleForDiscount)) {
             return true;
         }
 

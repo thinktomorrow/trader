@@ -10,6 +10,7 @@ use Thinktomorrow\Trader\Discounts\Domain\DiscountId;
 use Thinktomorrow\Trader\Discounts\Domain\EligibleForDiscount;
 use Thinktomorrow\Trader\Orders\Domain\Item;
 use Thinktomorrow\Trader\Orders\Domain\Order;
+use Thinktomorrow\Trader\Discounts\Domain\AdjustDiscountBasePrice;
 
 abstract class BaseDiscount
 {
@@ -131,18 +132,12 @@ abstract class BaseDiscount
         Assertion::allIsInstanceOf($conditions, Condition::class);
     }
 
-    protected function conditionallyAdjustDiscountBasePrice(Money $discountBasePrice, Order $order, string $condition_key)
+    protected function adjustDiscountBasePriceByConditions(Money $discountBasePrice, Order $order, array $conditions = [])
     {
-        if( ! $condition = $this->getCondition($condition_key)) return $discountBasePrice;
-
-        foreach($order->items() as $item)
-        {
-            if ($condition->check($order, $item)) {
-                $discountBasePrice = $discountBasePrice->add($item->total());
-            }
-        }
-
-        return $discountBasePrice;
+        return (new AdjustDiscountBasePrice())->setDiscountBasePrice($discountBasePrice)
+                                              ->setOrder($order)
+                                              ->addConditions($conditions)
+                                              ->discountBasePrice();
     }
 
     protected function getType(): string
