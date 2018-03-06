@@ -8,6 +8,7 @@ use Thinktomorrow\Trader\Common\Domain\Price\Percentage;
 use Thinktomorrow\Trader\Discounts\Domain\Conditions\ConditionKey;
 use Thinktomorrow\Trader\Discounts\Domain\DiscountFactory;
 use Thinktomorrow\Trader\Discounts\Domain\DiscountId;
+use Thinktomorrow\Trader\Discounts\Domain\Types\FixedAmountOffDiscount;
 use Thinktomorrow\Trader\Discounts\Domain\Types\PercentageOffDiscount;
 use Thinktomorrow\Trader\Orders\Domain\CustomerId;
 use Thinktomorrow\Trader\Orders\Domain\Item;
@@ -143,6 +144,24 @@ trait ShoppingHelpers
             DiscountId::fromInteger($id ?? rand(1,99)),
             $conditions,
             ['percentage' => Percentage::fromPercent($percent)],
+            $data
+        );
+    }
+
+    protected function makeFixedAmountOffDiscount($amount, $conditions = [], $data = [], $id = null)
+    {
+        if(!empty($conditions))
+        {
+            foreach($conditions as $type => $parameters){
+                $class = ConditionKey::fromString($type)->class();
+                $conditions[$type] = (new $class())->setParameters([$type => $parameters]);
+            };
+        }
+
+        return new FixedAmountOffDiscount(
+            DiscountId::fromInteger($id ?? rand(1,99)),
+            $conditions,
+            ['amount' => Money::EUR($amount)],
             $data
         );
     }

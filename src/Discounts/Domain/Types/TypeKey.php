@@ -11,6 +11,7 @@ class TypeKey
 
     protected static $mapping = [
         'percentage_off'      => PercentageOffDiscount::class,
+        'fixed_amount_off'    => FixedAmountOffDiscount::class,
         'percentage_off_item' => PercentageOffItemDiscount::class,
         'free_item'           => FreeItemDiscount::class,
     ];

@@ -1,0 +1,69 @@
+<?php
+
+namespace Thinktomorrow\Trader\Discounts\Domain\Types;
+
+use Money\Money;
+use Thinktomorrow\Trader\Common\Domain\Price\Cash;
+use Thinktomorrow\Trader\Common\Domain\Price\Percentage;
+use Thinktomorrow\Trader\Discounts\Domain\AppliedDiscount;
+use Thinktomorrow\Trader\Discounts\Domain\Discount;
+use Thinktomorrow\Trader\Discounts\Domain\Exceptions\CannotApplyDiscount;
+use Thinktomorrow\Trader\Discounts\Domain\EligibleForDiscount;
+use Thinktomorrow\Trader\Orders\Domain\Order;
+
+class FixedAmountOffDiscount extends BaseDiscount implements Discount
+{
+    public function apply(Order $order, EligibleForDiscount $eligibleForDiscount)
+    {
+        if (!$this->applicable($order, $eligibleForDiscount)) {
+            throw new CannotApplyDiscount('Discount cannot be applied. One or more conditions have failed.');
+        }
+
+        $discountAmount = $this->discountAmount($order, $eligibleForDiscount);
+
+        $eligibleForDiscount->addToDiscountTotal($discountAmount);
+        $eligibleForDiscount->addDiscount(new AppliedDiscount(
+            $this->id,
+            $this->getType(),
+            $discountAmount,
+            $this->discountBasePrice($order, $eligibleForDiscount),
+            Cash::from($discountAmount)->asPercentage($eligibleForDiscount->discountBasePrice(), 0),
+            $this->data
+        ));
+    }
+
+    public function discountAmount(Order $order, EligibleForDiscount $eligibleForDiscount): Money
+    {
+        return $this->adjusters['amount'];
+    }
+
+    public function discountBasePrice(Order $order, EligibleForDiscount $eligibleForDiscount): Money
+    {
+        // IF ORDERDISCOUNT USE GLOBAL DISCOUNT BUT CHECK IF WE HAVE A ITEM_WHITELIST OR ITEM_BLACKLIST TO CALCULATE THE DISCOUNT AMOUNT UPON
+        if($this->isItemDiscount($eligibleForDiscount) || ( !$this->usesCondition('item_whitelist') && !$this->usesCondition('item_blacklist')) )
+        {
+            return $eligibleForDiscount->discountBasePrice();
+        }
+
+        return $this->adjustDiscountBasePriceByConditions(Cash::make(0), $order, $this->conditions);
+    }
+
+    /**
+     * @param array $conditions
+     * @param array $adjusters
+     */
+    protected function validateParameters(array $conditions, array $adjusters)
+    {
+        parent::validateParameters($conditions, $adjusters);
+
+        if (!isset($adjusters['amount'])) {
+            throw new \InvalidArgumentException('Missing adjuster value \'amount\', required for discount '.get_class($this));
+        }
+        if (!$adjusters['amount'] instanceof Money) {
+            throw new \InvalidArgumentException('Invalid adjuster value \'amount\' for discount '.get_class($this).'. Instance of '.Money::class.' is expected.');
+        }
+        if ($adjusters['amount']->isNegative()) {
+            throw new \InvalidArgumentException('Adjuster value \'amount\' cannot be negative. '.$adjusters['amount']->getAmount().' is given.');
+        }
+    }
+}
