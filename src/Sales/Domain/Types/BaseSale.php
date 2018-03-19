@@ -4,6 +4,7 @@ namespace Thinktomorrow\Trader\Sales\Domain\Types;
 
 use Assert\Assertion;
 use Thinktomorrow\Trader\Common\Domain\Conditions\Condition;
+use Thinktomorrow\Trader\Sales\Domain\Conditions\ConditionKey;
 use Thinktomorrow\Trader\Sales\Domain\EligibleForSale;
 use Thinktomorrow\Trader\Sales\Domain\SaleId;
 
@@ -68,6 +69,19 @@ abstract class BaseSale
         return true;
     }
 
+    public function usesCondition(string $condition_key): bool
+    {
+        foreach($this->conditions as $condition)
+        {
+            if($this->getConditionKey($condition_key)->equalsClass($condition))
+            {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
     private function greaterThanPrice(EligibleForSale $eligibleForSale)
     {
         // SaleTotal cannot be higher than original price
@@ -90,5 +104,22 @@ abstract class BaseSale
     protected function validateParameters(array $conditions, array $adjusters)
     {
         Assertion::allIsInstanceOf($conditions, Condition::class);
+    }
+
+    protected function getCondition(string $condition_key)
+    {
+        if(!isset($this->conditions[$condition_key])) return null;
+
+        return $this->conditions[$condition_key];
+    }
+
+    protected function getType(): string
+    {
+        return TypeKey::fromSale($this)->get();
+    }
+
+    protected function getConditionKey($string): ConditionKey
+    {
+        return ConditionKey::fromString($string);
     }
 }

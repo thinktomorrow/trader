@@ -20,16 +20,16 @@ class FixedCustomAmountSaleTest extends TestCase
     /** @test */
     public function fixed_custom_amount_is_set_as_new_saleprice()
     {
-        $stub = $this->makeEligibleForSaleStub(100);
-        $stub->original_saleprice = Money::EUR(60);
+        $stub = $this->makeEligibleForSaleStub(120);
+        $stub->original_saleprice = Money::EUR(35);
 
         $sale = $this->makeFixedCustomAmountSale();
 
         $sale->apply($stub);
 
-        $this->assertEquals(Money::EUR(100), $stub->price());
-        $this->assertEquals(Money::EUR(40), $stub->saleTotal());
-        $this->assertEquals(Money::EUR(60), $stub->salePrice());
+        $this->assertEquals(Money::EUR(120), $stub->price());
+        $this->assertEquals(Money::EUR(85), $stub->saleTotal());
+        $this->assertEquals(Money::EUR(35), $stub->salePrice());
     }
 
     /** @test */
