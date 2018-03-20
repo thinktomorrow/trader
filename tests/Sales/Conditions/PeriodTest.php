@@ -1,9 +1,9 @@
 <?php
 
-namespace Thinktomorrow\Trader\Tests\Discounts\Conditions;
+namespace Thinktomorrow\Trader\Tests\Sales\Conditions;
 
 use Thinktomorrow\Trader\Tests\TestCase;
-use Thinktomorrow\Trader\Discounts\Domain\Conditions\Period;
+use Thinktomorrow\Trader\Sales\Domain\Conditions\Period;
 
 class PeriodTest extends TestCase
 {
@@ -12,7 +12,7 @@ class PeriodTest extends TestCase
     {
         $condition = new Period();
 
-        $this->assertTrue($condition->check($this->makeOrder()));
+        $this->assertTrue($condition->check($this->makeEligibleForSaleStub()));
     }
 
     /** @test */
@@ -28,49 +28,49 @@ class PeriodTest extends TestCase
     {
         // Start at yesterday
         $condition = (new Period())->setParameters(['start_at' => new \DateTime('@'.strtotime('-1 day'))]);
-        $this->assertTrue($condition->check($this->makeOrder()));
+        $this->assertTrue($condition->check($this->makeEligibleForSaleStub()));
 
         // Start at tomorrow
         $condition = (new Period())->setParameters(['start_at' => new \DateTime('@'.strtotime('+1 day'))]);
-        $this->assertFalse($condition->check($this->makeOrder()));
+        $this->assertFalse($condition->check($this->makeEligibleForSaleStub()));
 
         // End at tomorrow
         $condition = (new Period())->setParameters(['end_at' => new \DateTime('@'.strtotime('+1 day'))]);
-        $this->assertTrue($condition->check($this->makeOrder()));
+        $this->assertTrue($condition->check($this->makeEligibleForSaleStub()));
 
         // End at yesterday
         $condition = (new Period())->setParameters(['end_at' => new \DateTime('@'.strtotime('-1 day'))]);
-        $this->assertFalse($condition->check($this->makeOrder()));
+        $this->assertFalse($condition->check($this->makeEligibleForSaleStub()));
 
         // Current time falls out of given period
         $condition = (new Period())->setParameters([
             'start_at' => new \DateTime('@'.strtotime('+1 day')),
             'end_at'   => new \DateTime('@'.strtotime('+2 day')),
         ]);
-        $this->assertFalse($condition->check($this->makeOrder()));
+        $this->assertFalse($condition->check($this->makeEligibleForSaleStub()));
 
         // Current time falls in given period
         $condition = (new Period())->setParameters([
             'start_at' => new \DateTime('@'.strtotime('-1 day')),
             'end_at'   => new \DateTime('@'.strtotime('+1 day')),
         ]);
-        $this->assertTrue($condition->check($this->makeOrder()));
+        $this->assertTrue($condition->check($this->makeEligibleForSaleStub()));
     }
 
     /** @test */
     public function it_can_be_applied_if_within_given_period()
     {
-        $order = $this->makeOrder();
+        $stub = $this->makeEligibleForSaleStub();
 
-        $discount = $this->makePercentageOffDiscount(15, [
+        $sale = $this->makePercentageOffSale(15, [
             'start_at' => (new \DateTime('@'.strtotime('+3 days')))
         ]);
 
-        $discount2 = $this->makePercentageOffDiscount(15, [
+        $sale2 = $this->makePercentageOffSale(15, [
             'start_at' => (new \DateTime('@'.strtotime('-3 days'))),
         ]);
 
-        $this->assertFalse($discount->applicable($order, $order));
-        $this->assertTrue($discount2->applicable($order, $order));
+        $this->assertFalse($sale->applicable($stub));
+        $this->assertTrue($sale2->applicable($stub));
     }
 }

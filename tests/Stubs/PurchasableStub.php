@@ -6,14 +6,17 @@ use Money\Money;
 use Thinktomorrow\Trader\Common\Domain\Price\Percentage;
 use Thinktomorrow\Trader\Orders\Domain\Purchasable;
 use Thinktomorrow\Trader\Orders\Domain\PurchasableId;
+use Thinktomorrow\Trader\Sales\Domain\AppliedSale;
+use Thinktomorrow\Trader\Sales\Domain\EligibleForSale;
 use Thinktomorrow\Trader\Tax\Domain\TaxId;
 
-class PurchasableStub implements Purchasable
+class PurchasableStub implements Purchasable, EligibleForSale
 {
     protected $id;
     protected $data;
     protected $price;
     protected $salePrice;
+    protected $saleTotal;
     protected $taxRate;
     protected $taxId;
 
@@ -27,6 +30,7 @@ class PurchasableStub implements Purchasable
         $this->taxRate = !is_null($taxRate) ? $taxRate : Percentage::fromPercent(21);
 
         $this->salePrice = $salePrice ?: null;
+        $this->saleTotal = Money::EUR(0);
     }
 
     public function purchasableId(): PurchasableId
@@ -89,5 +93,30 @@ class PurchasableStub implements Purchasable
     public function setTaxId($taxId)
     {
         $this->taxId = TaxId::fromInteger($taxId);
+    }
+
+    public function originalSalePrice(): Money
+    {
+        return $this->salePrice();
+    }
+
+    public function saleTotal(): Money
+    {
+        return $this->saleTotal;
+    }
+
+    public function addToSaleTotal(Money $addition)
+    {
+        $this->saleTotal = $this->saleTotal->add($addition);
+    }
+
+    public function sales(): array
+    {
+        return [];
+    }
+
+    public function addSale(AppliedSale $sale)
+    {
+        //
     }
 }

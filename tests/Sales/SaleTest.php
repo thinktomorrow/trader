@@ -90,7 +90,7 @@ class SaleTest extends TestCase
     public function when_applied_an_applied_sale_is_kept_with_custom_data()
     {
         $stub = $this->makeEligibleForSaleStub(100);
-        $sale = $this->makePercentageOffSale(20, ['foo' => 'bar']);
+        $sale = $this->makePercentageOffSale(20, [], ['foo' => 'bar']);
 
         $sale->apply($stub);
 

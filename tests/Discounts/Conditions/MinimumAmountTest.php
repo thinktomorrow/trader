@@ -1,8 +1,9 @@
 <?php
 
-namespace Thinktomorrow\Trader\Tests;
+namespace Thinktomorrow\Trader\Tests\Discounts\Conditions;
 
 use Money\Money;
+use Thinktomorrow\Trader\Tests\TestCase;
 
 class MinimumAmountTest extends TestCase
 {

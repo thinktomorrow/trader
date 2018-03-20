@@ -5,7 +5,8 @@ namespace Thinktomorrow\Trader\Tests;
 use Money\Money;
 use Thinktomorrow\Trader\Common\Domain\Price\Cash;
 use Thinktomorrow\Trader\Common\Domain\Price\Percentage;
-use Thinktomorrow\Trader\Discounts\Domain\Conditions\ConditionKey;
+use Thinktomorrow\Trader\Discounts\Domain\Conditions\ConditionKey as DiscountConditionKey;
+use Thinktomorrow\Trader\Sales\Domain\Conditions\ConditionKey as SaleConditionKey;
 use Thinktomorrow\Trader\Discounts\Domain\DiscountFactory;
 use Thinktomorrow\Trader\Discounts\Domain\DiscountId;
 use Thinktomorrow\Trader\Discounts\Domain\Types\FixedAmountOffDiscount;
@@ -103,16 +104,24 @@ trait ShoppingHelpers
         return array($order, $item);
     }
 
-    protected function makeEligibleForSaleStub($amount)
+    protected function makeEligibleForSaleStub($amount = 100)
     {
         $price = Money::EUR($amount);
 
         return new EligibleForSaleStub(1, [], $price);
     }
 
-    protected function makePercentageOffSale($percent, array $data = [])
+    protected function makePercentageOffSale($percent, $conditions = [], array $data = [])
     {
-        return new PercentageOffSale(SaleId::fromInteger(1), [], ['percentage' => Percentage::fromPercent($percent)], $data);
+        if(!empty($conditions))
+        {
+            foreach($conditions as $type => $parameters){
+                $class = SaleConditionKey::fromString($type)->class();
+                $conditions[$type] = (new $class())->setParameters([$type => $parameters]);
+            };
+        }
+
+        return new PercentageOffSale(SaleId::fromInteger(1), $conditions, ['percentage' => Percentage::fromPercent($percent)], $data);
     }
 
     protected function makeFixedAmountOffSale($amount, array $data = [])
@@ -135,7 +144,7 @@ trait ShoppingHelpers
         if(!empty($conditions))
         {
             foreach($conditions as $type => $parameters){
-                $class = ConditionKey::fromString($type)->class();
+                $class = DiscountConditionKey::fromString($type)->class();
                 $conditions[$type] = (new $class())->setParameters([$type => $parameters]);
             };
         }
@@ -153,7 +162,7 @@ trait ShoppingHelpers
         if(!empty($conditions))
         {
             foreach($conditions as $type => $parameters){
-                $class = ConditionKey::fromString($type)->class();
+                $class = DiscountConditionKey::fromString($type)->class();
                 $conditions[$type] = (new $class())->setParameters([$type => $parameters]);
             };
         }

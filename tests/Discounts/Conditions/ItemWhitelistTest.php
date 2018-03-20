@@ -1,10 +1,11 @@
 <?php
 
-namespace Thinktomorrow\Trader\Tests;
+namespace Thinktomorrow\Trader\Tests\Discounts\Conditions;
 
 use Money\Money;
-use Thinktomorrow\Trader\Discounts\Domain\Conditions\ItemWhitelist;
+use Thinktomorrow\Trader\Tests\TestCase;
 use Thinktomorrow\Trader\Tests\Stubs\PurchasableStub;
+use Thinktomorrow\Trader\Discounts\Domain\Conditions\ItemWhitelist;
 
 class ItemWhitelistTest extends TestCase
 {
