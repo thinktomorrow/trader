@@ -8,7 +8,9 @@ interface EligibleForSale
 {
     public function price(): Money;
 
-    public function originalSalePrice(): Money;
+    public function hasOriginalSalePrice():bool;
+
+    public function originalSalePrice(): ?Money;
 
     public function salePrice(): Money;
 

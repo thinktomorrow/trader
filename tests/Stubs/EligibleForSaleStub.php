@@ -35,7 +35,12 @@ class EligibleForSaleStub implements EligibleForSale
         return $this->price;
     }
 
-    public function originalSalePrice(): Money
+    public function hasOriginalSalePrice(): bool
+    {
+        return $this->original_saleprice && !$this->original_saleprice->isNegative();
+    }
+
+    public function originalSalePrice(): ?Money
     {
         return $this->original_saleprice;
     }

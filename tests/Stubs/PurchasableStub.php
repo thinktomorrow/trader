@@ -95,7 +95,12 @@ class PurchasableStub implements Purchasable, EligibleForSale
         $this->taxId = TaxId::fromInteger($taxId);
     }
 
-    public function originalSalePrice(): Money
+    public function hasOriginalSalePrice(): bool
+    {
+        return !$this->salePrice()->isNegative();
+    }
+
+    public function originalSalePrice(): ?Money
     {
         return $this->salePrice();
     }

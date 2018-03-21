@@ -49,6 +49,13 @@ class Cash
         return new Money($amount, new Currency($currencyCode));
     }
 
+    public static function zero($currencyCode = null): Money
+    {
+        $currencyCode = $currencyCode ?: static::getCurrencyCode();
+
+        return new Money(0, new Currency($currencyCode));
+    }
+
     /**
      * Get full string representation of amount in desired locale.
      *

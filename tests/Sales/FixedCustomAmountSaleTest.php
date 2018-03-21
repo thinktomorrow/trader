@@ -57,4 +57,20 @@ class FixedCustomAmountSaleTest extends TestCase
         $this->assertEquals(Money::EUR(100), $stub->saleTotal());
         $this->assertEquals(Money::EUR(0), $stub->salePrice());
     }
+
+    /** @test */
+    public function fixed_custom_amount_sale_is_not_applied_if_original_saleprice_is_zero()
+    {
+        $this->expectException(CannotApplySale::class);
+
+        $stub = $this->makeEligibleForSaleStub(100);
+        $stub->original_saleprice = null;
+        $sale = $this->makeFixedCustomAmountSale();
+
+        $sale->apply($stub);
+
+        $this->assertEquals(Money::EUR(100), $stub->price());
+        $this->assertEquals(Money::EUR(0), $stub->saleTotal());
+        $this->assertEquals(Money::EUR(100), $stub->salePrice());
+    }
 }
