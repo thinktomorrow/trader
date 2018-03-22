@@ -143,10 +143,10 @@ class Cash
 
         switch ($code) {
             case 'EUR':
-                return '&euro;';
+                return '€';
                 break;
             case 'USD':
-                return '&dollar;';
+                return '$';
                 break;
         }
 

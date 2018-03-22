@@ -48,10 +48,10 @@ class CashTest extends TestCase
     public function it_can_represent_localised_money()
     {
         $cash = Cash::from(Money::EUR(120));
-        $this->assertEquals('&euro;1.20', $cash->locale('nl_BE'));
+        $this->assertEquals('€1.20', $cash->locale('nl_BE'));
 
         $cash = Cash::from(Money::USD(120));
-        $this->assertEquals('&dollar;1.20', $cash->locale('nl_BE'));
+        $this->assertEquals('$1.20', $cash->locale('nl_BE'));
     }
 
     /** @test */
