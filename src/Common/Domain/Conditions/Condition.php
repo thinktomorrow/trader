@@ -12,4 +12,11 @@ interface Condition
      * @return mixed
      */
     public function setParameters(array $parameters);
+
+    /**
+     * Get parameter values as normalized values, ready for form input
+     *
+     * @return mixed
+     */
+    public function getParameterValues(): array;
 }

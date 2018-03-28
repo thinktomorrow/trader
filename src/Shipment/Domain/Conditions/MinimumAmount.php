@@ -17,4 +17,11 @@ class MinimumAmount extends BaseCondition implements Condition
         // Check subtotal (without discount or payment costs)
         return $order->subtotal()->greaterThanOrEqual($this->parameters['minimum_amount']);
     }
+
+    public function getParameterValues(): array
+    {
+        return [
+            'minimum_amount' => $this->parameters['minimum_amount']->getAmount()
+        ];
+    }
 }

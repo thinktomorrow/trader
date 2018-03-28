@@ -24,4 +24,11 @@ class MinimumItemQuantity extends BaseCondition implements Condition
     {
         return $item->quantity() >= (int) $this->parameters['minimum_quantity'];
     }
+
+    public function getParameterValues(): array
+    {
+        return [
+            'minimum_quantity' => $this->parameters['minimum_quantity']->getAmount()
+        ];
+    }
 }

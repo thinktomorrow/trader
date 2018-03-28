@@ -43,6 +43,14 @@ class Period extends BaseCondition implements Condition, OrderCondition
         return $endAt > $datetime;
     }
 
+    public function getParameterValues(): array
+    {
+        return [
+            'start_at' => $this->parameters['start_at']->format('Y-m-d H:i:s'),
+            'end_at' => $this->parameters['end_at']->format('Y-m-d H:i:s')
+        ];
+    }
+
     /**
      * Validation of required parameters.
      *

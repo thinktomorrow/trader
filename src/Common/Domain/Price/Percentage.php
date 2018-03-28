@@ -45,4 +45,9 @@ class Percentage
     {
         return $this->value > 0;
     }
+
+    public function __toString()
+    {
+        return $this->asPercent();
+    }
 }

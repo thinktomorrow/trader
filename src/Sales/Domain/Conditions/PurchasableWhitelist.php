@@ -24,6 +24,13 @@ class PurchasableWhitelist extends BaseCondition implements Condition, SaleCondi
         return in_array($purchasable->purchasableId()->get(), $this->parameters['purchasable_whitelist']);
     }
 
+    public function getParameterValues(): array
+    {
+        return [
+            'purchasable_whitelist' => $this->parameters['purchasable_whitelist']
+        ];
+    }
+
     /**
      * Validation of required parameters.
      *

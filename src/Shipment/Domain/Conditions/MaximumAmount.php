@@ -17,4 +17,11 @@ class MaximumAmount extends BaseCondition implements Condition
         // Check subtotal (without discount or payment costs)
         return $order->subtotal()->lessThanOrEqual($this->parameters['maximum_amount']);
     }
+
+    public function getParameterValues(): array
+    {
+        return [
+            'maximum_amount' => $this->parameters['maximum_amount']->getAmount()
+        ];
+    }
 }

@@ -16,4 +16,11 @@ class Country extends BaseCondition implements Condition
 
         return $this->parameters['country'] == $order->billingAddress('country_key');
     }
+
+    public function getParameterValues(): array
+    {
+        return [
+            'country' => $this->parameters['country']
+        ];
+    }
 }

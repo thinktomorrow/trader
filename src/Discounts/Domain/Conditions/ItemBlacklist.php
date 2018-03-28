@@ -24,6 +24,13 @@ class ItemBlacklist extends BaseCondition implements Condition
         return $this->checkItem($order, $eligibleForDiscount);
     }
 
+    public function getParameterValues(): array
+    {
+        return [
+            'item_blacklist' => $this->parameters['item_blacklist']
+        ];
+    }
+
     private function checkItem(Order $order, Item $item): bool
     {
         return !in_array($item->purchasableId()->get(), $this->parameters['item_blacklist']);
