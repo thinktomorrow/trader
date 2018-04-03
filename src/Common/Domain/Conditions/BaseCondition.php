@@ -21,6 +21,11 @@ abstract class BaseCondition implements Condition
         return $this;
     }
 
+    public function getParameters(): array
+    {
+        return $this->parameters;
+    }
+
     protected function forOrderDiscount(EligibleForDiscount $eligibleForDiscount): bool
     {
         return $eligibleForDiscount instanceof Order;

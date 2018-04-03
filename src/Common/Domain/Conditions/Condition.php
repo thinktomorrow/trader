@@ -14,7 +14,15 @@ interface Condition
     public function setParameters(array $parameters): Condition;
 
     /**
+     * Get parameter values
+     *
+     * @return array
+     */
+    public function getParameters(): array;
+
+    /**
      * Get parameter values as normalized values, ready for form input
+     * Objects are transposed to their primitive values.
      *
      * @return mixed
      */
