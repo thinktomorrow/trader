@@ -11,7 +11,7 @@ interface Condition
      *
      * @return mixed
      */
-    public function setParameters(array $parameters);
+    public function setParameters(array $parameters): Condition;
 
     /**
      * Get parameter values as normalized values, ready for form input
@@ -19,4 +19,11 @@ interface Condition
      * @return mixed
      */
     public function getParameterValues(): array;
+
+    /**
+     * Set parameter values from normalized values
+     *
+     * @return mixed
+     */
+    public function setParameterValues(array $values): Condition;
 }

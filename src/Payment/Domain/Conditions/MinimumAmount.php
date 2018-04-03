@@ -4,6 +4,7 @@ namespace Thinktomorrow\Trader\Payment\Domain\Conditions;
 
 use Thinktomorrow\Trader\Common\Domain\Conditions\BaseCondition;
 use Thinktomorrow\Trader\Common\Domain\Conditions\Condition;
+use Thinktomorrow\Trader\Common\Domain\Price\Cash;
 use Thinktomorrow\Trader\Orders\Domain\Order;
 
 class MinimumAmount extends BaseCondition implements Condition
@@ -23,5 +24,18 @@ class MinimumAmount extends BaseCondition implements Condition
         return [
             'minimum_amount' => $this->parameters['minimum_amount']->getAmount()
         ];
+    }
+
+    public function setParameterValues(array $values): Condition
+    {
+        if(!isset($values['minimum_amount'])){
+            throw new \InvalidArgumentException('Raw condition value for minimum_amount is missing');
+        }
+
+        $this->setParameters([
+            'minimum_amount' => Cash::make($values['minimum_amount']),
+        ]);
+
+        return $this;
     }
 }

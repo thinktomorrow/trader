@@ -6,11 +6,11 @@ use Thinktomorrow\Trader\Discounts\Domain\EligibleForDiscount;
 use Thinktomorrow\Trader\Orders\Domain\Item;
 use Thinktomorrow\Trader\Orders\Domain\Order;
 
-abstract class BaseCondition
+abstract class BaseCondition implements Condition
 {
     protected $parameters = [];
 
-    public function setParameters(array $parameters): self
+    public function setParameters(array $parameters): Condition
     {
         if (method_exists($this, 'validateParameters')) {
             $this->validateParameters($parameters);

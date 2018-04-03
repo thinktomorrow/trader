@@ -43,4 +43,19 @@ class PurchasableWhitelistTest extends TestCase
         $condition = (new PurchasableWhitelist())->setParameters(['purchasable_whitelist' => [5]]);
         $this->assertFalse($condition->check($stub));
     }
+
+    /** @test */
+    public function it_can_set_parameters_from_raw_values()
+    {
+        // Current time falls out of given period
+        $condition1 = (new PurchasableWhitelist())->setParameters([
+            'purchasable_whitelist' => [5, 10],
+        ]);
+
+        $condition2 = (new PurchasableWhitelist())->setParameterValues([
+            'purchasable_whitelist' => [5, 10],
+        ]);
+
+        $this->assertEquals($condition1, $condition2);
+    }
 }

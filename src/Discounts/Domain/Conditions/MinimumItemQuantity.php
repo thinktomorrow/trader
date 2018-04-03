@@ -28,7 +28,20 @@ class MinimumItemQuantity extends BaseCondition implements Condition
     public function getParameterValues(): array
     {
         return [
-            'minimum_quantity' => $this->parameters['minimum_quantity']->getAmount()
+            'minimum_quantity' => $this->parameters['minimum_quantity'],
         ];
+    }
+
+    public function setParameterValues(array $values): Condition
+    {
+        if(!isset($values['minimum_quantity'])){
+            throw new \InvalidArgumentException('Raw condition value for minimum_quantity is missing');
+        }
+
+        $this->setParameters([
+            'minimum_quantity' => (int) $values['minimum_quantity'],
+        ]);
+
+        return $this;
     }
 }

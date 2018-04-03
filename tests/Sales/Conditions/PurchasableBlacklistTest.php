@@ -43,4 +43,19 @@ class PurchasableBlacklistTest extends TestCase
         $condition = (new PurchasableBlacklist())->setParameters(['purchasable_blacklist' => [2]]);
         $this->assertFalse($condition->check($stub));
     }
+
+    /** @test */
+    public function it_can_set_parameters_from_raw_values()
+    {
+        // Current time falls out of given period
+        $condition1 = (new PurchasableBlacklist())->setParameters([
+            'purchasable_blacklist' => [5, 10],
+        ]);
+
+        $condition2 = (new PurchasableBlacklist())->setParameterValues([
+            'purchasable_blacklist' => [5, 10],
+        ]);
+
+        $this->assertEquals($condition1, $condition2);
+    }
 }

@@ -3,6 +3,7 @@
 namespace Thinktomorrow\Trader\Discounts\Domain\Conditions;
 
 use DateTime;
+use DateTimeImmutable;
 use Thinktomorrow\Trader\Common\Domain\Conditions\BaseCondition;
 use Thinktomorrow\Trader\Common\Domain\Conditions\Condition;
 use Thinktomorrow\Trader\Common\Domain\Conditions\OrderCondition;
@@ -13,19 +14,19 @@ class Period extends BaseCondition implements Condition, OrderCondition
     public function check(Order $order): bool
     {
         $valid_start_at = $this->comesAfter(
-            new DateTime(),
+            new DateTimeImmutable(),
             isset($this->parameters['start_at']) ? $this->parameters['start_at'] : null
         );
 
         $valid_end_at = $this->goesBefore(
-            new DateTime(),
+            new DateTimeImmutable(),
             isset($this->parameters['end_at']) ? $this->parameters['end_at'] : null
         );
 
         return true == $valid_start_at && true == $valid_end_at;
     }
 
-    private function comesAfter(DateTime $datetime, DateTime $startAt = null)
+    private function comesAfter(DateTimeImmutable $datetime, DateTimeImmutable $startAt = null)
     {
         if (!$startAt) {
             return true;
@@ -34,7 +35,7 @@ class Period extends BaseCondition implements Condition, OrderCondition
         return $startAt < $datetime;
     }
 
-    private function goesBefore(DateTime $datetime, DateTime $endAt = null)
+    private function goesBefore(DateTimeImmutable $datetime, DateTimeImmutable $endAt = null)
     {
         if (!$endAt) {
             return true;
@@ -51,6 +52,20 @@ class Period extends BaseCondition implements Condition, OrderCondition
         ];
     }
 
+    public function setParameterValues(array $values): Condition
+    {
+        if(!isset($values['start_at']) || !isset($values['end_at'])){
+            throw new \InvalidArgumentException('Raw condition value for start_at or end_at is missing');
+        }
+
+        $this->setParameters([
+            'start_at' => DateTimeImmutable::createFromFormat('Y-m-d H:i:s', $values['start_at']),
+            'end_at' => DateTimeImmutable::createFromFormat('Y-m-d H:i:s', $values['end_at']),
+        ]);
+
+        return $this;
+    }
+
     /**
      * Validation of required parameters.
      *
@@ -58,12 +73,12 @@ class Period extends BaseCondition implements Condition, OrderCondition
      */
     protected function validateParameters(array $parameters)
     {
-        if (isset($parameters['start_at']) && !$parameters['start_at'] instanceof \DateTime) {
-            throw new \InvalidArgumentException('DiscountCondition value for start_at must be instance of DateTime.');
+        if (isset($parameters['start_at']) && !$parameters['start_at'] instanceof DateTimeImmutable) {
+            throw new \InvalidArgumentException('DiscountCondition value for start_at must be instance of DateTimeImmutable.');
         }
 
-        if (isset($parameters['end_at']) && !$parameters['end_at'] instanceof \DateTime) {
-            throw new \InvalidArgumentException('DiscountCondition value for end_at must be instance of DateTime.');
+        if (isset($parameters['end_at']) && !$parameters['end_at'] instanceof DateTimeImmutable) {
+            throw new \InvalidArgumentException('DiscountCondition value for end_at must be instance of DateTimeImmutable.');
         }
     }
 }

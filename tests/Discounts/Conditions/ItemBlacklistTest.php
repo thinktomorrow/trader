@@ -62,5 +62,20 @@ class ItemBlacklistTest extends TestCase
         $this->assertEquals(Money::EUR(80), $order->total());
     }
 
+    /** @test */
+    public function it_can_set_parameters_from_raw_values()
+    {
+        // Current time falls out of given period
+        $condition1 = (new ItemBlacklist())->setParameters([
+            'item_blacklist' => [5, 10],
+        ]);
+
+        $condition2 = (new ItemBlacklist())->setParameterValues([
+            'item_blacklist' => [5, 10],
+        ]);
+
+        $this->assertEquals($condition1, $condition2);
+    }
+
 
 }

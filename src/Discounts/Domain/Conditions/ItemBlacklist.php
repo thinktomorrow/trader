@@ -31,6 +31,19 @@ class ItemBlacklist extends BaseCondition implements Condition
         ];
     }
 
+    public function setParameterValues(array $values): Condition
+    {
+        if(!isset($values['item_blacklist'])){
+            throw new \InvalidArgumentException('Raw condition value for item_blacklist is missing');
+        }
+
+        $this->setParameters([
+            'item_blacklist' => $values['item_blacklist'],
+        ]);
+
+        return $this;
+    }
+
     private function checkItem(Order $order, Item $item): bool
     {
         return !in_array($item->purchasableId()->get(), $this->parameters['item_blacklist']);

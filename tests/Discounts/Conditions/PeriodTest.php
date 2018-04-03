@@ -27,32 +27,32 @@ class PeriodTest extends TestCase
     public function it_checks_if_given_datetime_is_within_period()
     {
         // Start at yesterday
-        $condition = (new Period())->setParameters(['start_at' => new \DateTime('@'.strtotime('-1 day'))]);
+        $condition = (new Period())->setParameters(['start_at' => new \DateTimeImmutable('@'.strtotime('-1 day'))]);
         $this->assertTrue($condition->check($this->makeOrder()));
 
         // Start at tomorrow
-        $condition = (new Period())->setParameters(['start_at' => new \DateTime('@'.strtotime('+1 day'))]);
+        $condition = (new Period())->setParameters(['start_at' => new \DateTimeImmutable('@'.strtotime('+1 day'))]);
         $this->assertFalse($condition->check($this->makeOrder()));
 
         // End at tomorrow
-        $condition = (new Period())->setParameters(['end_at' => new \DateTime('@'.strtotime('+1 day'))]);
+        $condition = (new Period())->setParameters(['end_at' => new \DateTimeImmutable('@'.strtotime('+1 day'))]);
         $this->assertTrue($condition->check($this->makeOrder()));
 
         // End at yesterday
-        $condition = (new Period())->setParameters(['end_at' => new \DateTime('@'.strtotime('-1 day'))]);
+        $condition = (new Period())->setParameters(['end_at' => new \DateTimeImmutable('@'.strtotime('-1 day'))]);
         $this->assertFalse($condition->check($this->makeOrder()));
 
         // Current time falls out of given period
         $condition = (new Period())->setParameters([
-            'start_at' => new \DateTime('@'.strtotime('+1 day')),
-            'end_at'   => new \DateTime('@'.strtotime('+2 day')),
+            'start_at' => new \DateTimeImmutable('@'.strtotime('+1 day')),
+            'end_at'   => new \DateTimeImmutable('@'.strtotime('+2 day')),
         ]);
         $this->assertFalse($condition->check($this->makeOrder()));
 
         // Current time falls in given period
         $condition = (new Period())->setParameters([
-            'start_at' => new \DateTime('@'.strtotime('-1 day')),
-            'end_at'   => new \DateTime('@'.strtotime('+1 day')),
+            'start_at' => new \DateTimeImmutable('@'.strtotime('-1 day')),
+            'end_at'   => new \DateTimeImmutable('@'.strtotime('+1 day')),
         ]);
         $this->assertTrue($condition->check($this->makeOrder()));
     }
@@ -63,14 +63,31 @@ class PeriodTest extends TestCase
         $order = $this->makeOrder();
 
         $discount = $this->makePercentageOffDiscount(15, [
-            'start_at' => (new \DateTime('@'.strtotime('+3 days')))
+            'start_at' => (new \DateTimeImmutable('@'.strtotime('+3 days')))
         ]);
 
         $discount2 = $this->makePercentageOffDiscount(15, [
-            'start_at' => (new \DateTime('@'.strtotime('-3 days'))),
+            'start_at' => (new \DateTimeImmutable('@'.strtotime('-3 days'))),
         ]);
 
         $this->assertFalse($discount->applicable($order, $order));
         $this->assertTrue($discount2->applicable($order, $order));
+    }
+
+    /** @test */
+    public function it_can_set_parameters_from_raw_values()
+    {
+        // Current time falls out of given period
+        $condition1 = (new Period())->setParameters([
+            'start_at' => new \DateTimeImmutable('@'.strtotime('+1 day')),
+            'end_at'   => new \DateTimeImmutable('@'.strtotime('+2 day')),
+        ]);
+
+        $condition2 = (new Period())->setParameterValues([
+            'start_at' => (new \DateTimeImmutable('@'.strtotime('+1 day')))->format('Y-m-d H:i:s'),
+            'end_at'   => (new \DateTimeImmutable('@'.strtotime('+2 day')))->format('Y-m-d H:i:s'),
+        ]);
+
+        $this->assertEquals($condition1, $condition2);
     }
 }

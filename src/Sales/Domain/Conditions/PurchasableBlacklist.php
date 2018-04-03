@@ -31,6 +31,19 @@ class PurchasableBlacklist extends BaseCondition implements Condition, SaleCondi
         ];
     }
 
+    public function setParameterValues(array $values): Condition
+    {
+        if(!isset($values['purchasable_blacklist'])){
+            throw new \InvalidArgumentException('Raw condition value for purchasable_blacklist is missing');
+        }
+
+        $this->setParameters([
+            'purchasable_blacklist' => $values['purchasable_blacklist'],
+        ]);
+
+        return $this;
+    }
+
     /**
      * Validation of required parameters.
      *
