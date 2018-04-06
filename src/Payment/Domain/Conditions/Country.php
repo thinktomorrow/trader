@@ -16,24 +16,4 @@ class Country extends BaseCondition implements Condition
 
         return $this->parameters['country'] == $order->billingAddress('country_key');
     }
-
-    public function getParameterValues(): array
-    {
-        return [
-            'country' => $this->parameters['country']
-        ];
-    }
-
-    public function setParameterValues(array $values): Condition
-    {
-        if(!isset($values['country'])){
-            throw new \InvalidArgumentException('Raw condition value for country is missing');
-        }
-
-        $this->setParameters([
-            'country' => $values['country'],
-        ]);
-
-        return $this;
-    }
 }

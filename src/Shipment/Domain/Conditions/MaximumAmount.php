@@ -26,11 +26,9 @@ class MaximumAmount extends BaseCondition implements Condition
         ];
     }
 
-    public function setParameterValues(array $values): Condition
+    public function setParameterValues($values): Condition
     {
-        if(!isset($values['maximum_amount'])){
-            throw new \InvalidArgumentException('Raw condition value for maximum_amount is missing');
-        }
+        $values = $this->normalizeParameters($values);
 
         $this->setParameters([
             'maximum_amount' => Cash::make($values['maximum_amount']),

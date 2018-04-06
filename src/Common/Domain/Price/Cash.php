@@ -88,7 +88,6 @@ class Cash
         // TODO add currency symbol
         $locale = $locale ?: $this->getDefaultLocale();
 
-        // TEMPORARY display just for testing
         return $this->getSymbol().$this->getFormatter()->format($this->money);
     }
 

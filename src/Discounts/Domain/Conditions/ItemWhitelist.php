@@ -23,26 +23,6 @@ class ItemWhitelist extends BaseCondition implements Condition
         return $this->checkItem($order, $eligibleForDiscount);
     }
 
-    public function getParameterValues(): array
-    {
-        return [
-            'item_whitelist' => $this->parameters['item_whitelist']
-        ];
-    }
-
-    public function setParameterValues(array $values): Condition
-    {
-        if(!isset($values['item_whitelist'])){
-            throw new \InvalidArgumentException('Raw condition value for item_whitelist is missing');
-        }
-
-        $this->setParameters([
-            'item_whitelist' => $values['item_whitelist'],
-        ]);
-
-        return $this;
-    }
-
     private function checkItem(Order $order, Item $item): bool
     {
         return in_array($item->purchasableId()->get(), $this->parameters['item_whitelist']);

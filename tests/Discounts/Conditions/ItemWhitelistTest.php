@@ -42,7 +42,7 @@ class ItemWhitelistTest extends TestCase
         $order = $this->makeOrder();
         $item = $this->getItem(null, null, new PurchasableStub(20, [], Money::EUR(110)), 2);
 
-        $condition = (new ItemWhitelist())->setParameters(['item_whitelist' => [5]]);
+        $condition = (new ItemWhitelist())->setParameters([5]);
         $this->assertFalse($condition->check($order, $item));
     }
 
@@ -74,6 +74,9 @@ class ItemWhitelistTest extends TestCase
             'item_whitelist' => [5, 10],
         ]);
 
+        $condition3 = (new ItemWhitelist())->setParameterValues([5, 10]);
+
         $this->assertEquals($condition1, $condition2);
+        $this->assertEquals($condition1, $condition3);
     }
 }

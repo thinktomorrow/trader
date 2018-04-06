@@ -26,11 +26,9 @@ class MinimumAmount extends BaseCondition implements Condition
         ];
     }
 
-    public function setParameterValues(array $values): Condition
+    public function setParameterValues($values): Condition
     {
-        if(!isset($values['minimum_amount'])){
-            throw new \InvalidArgumentException('Raw condition value for minimum_amount is missing');
-        }
+        $values = $this->normalizeParameters($values);
 
         $this->setParameters([
             'minimum_amount' => Cash::make($values['minimum_amount']),

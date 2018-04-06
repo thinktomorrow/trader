@@ -24,14 +24,15 @@ interface Condition
      * Get parameter values as normalized values, ready for form input
      * Objects are transposed to their primitive values.
      *
-     * @return mixed
+     * @return array
      */
     public function getParameterValues(): array;
 
     /**
      * Set parameter values from normalized values
      *
-     * @return mixed
+     * @param array|mixed $values
+     * @return Condition
      */
-    public function setParameterValues(array $values): Condition;
+    public function setParameterValues($values): Condition;
 }

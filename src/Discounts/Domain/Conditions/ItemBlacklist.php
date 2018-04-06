@@ -4,7 +4,6 @@ namespace Thinktomorrow\Trader\Discounts\Domain\Conditions;
 
 use Thinktomorrow\Trader\Common\Domain\Conditions\BaseCondition;
 use Thinktomorrow\Trader\Common\Domain\Conditions\Condition;
-use Thinktomorrow\Trader\Common\Domain\Conditions\ItemCondition;
 use Thinktomorrow\Trader\Discounts\Domain\EligibleForDiscount;
 use Thinktomorrow\Trader\Orders\Domain\Item;
 use Thinktomorrow\Trader\Orders\Domain\Order;
@@ -22,26 +21,6 @@ class ItemBlacklist extends BaseCondition implements Condition
         }
 
         return $this->checkItem($order, $eligibleForDiscount);
-    }
-
-    public function getParameterValues(): array
-    {
-        return [
-            'item_blacklist' => $this->parameters['item_blacklist']
-        ];
-    }
-
-    public function setParameterValues(array $values): Condition
-    {
-        if(!isset($values['item_blacklist'])){
-            throw new \InvalidArgumentException('Raw condition value for item_blacklist is missing');
-        }
-
-        $this->setParameters([
-            'item_blacklist' => $values['item_blacklist'],
-        ]);
-
-        return $this;
     }
 
     private function checkItem(Order $order, Item $item): bool

@@ -52,8 +52,12 @@ class Period extends BaseCondition implements Condition, OrderCondition
         ];
     }
 
-    public function setParameterValues(array $values): Condition
+    public function setParameterValues($values): Condition
     {
+        if(!is_array($values)){
+            throw new \InvalidArgumentException('Passed parameter values should be an array.' . gettype($values) . ' given.');
+        }
+
         $this->setParameters([
             'start_at' => $values['start_at'] ? DateTimeImmutable::createFromFormat('Y-m-d H:i:s', $values['start_at']) : null,
             'end_at' => $values['end_at'] ? DateTimeImmutable::createFromFormat('Y-m-d H:i:s', $values['end_at']) : null,

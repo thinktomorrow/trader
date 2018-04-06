@@ -47,6 +47,16 @@ class ItemBlacklistTest extends TestCase
     }
 
     /** @test */
+    public function parameter_can_be_passed_as_non_assoc_array_as_well()
+    {
+        $order = $this->makeOrder();
+        $item = $this->getItem(null, null, new PurchasableStub(5, [], Money::EUR(110)), 2);
+
+        $condition = (new ItemBlacklist())->setParameters([5]);
+        $this->assertFalse($condition->check($order, $item));
+    }
+
+    /** @test */
     public function order_discount_uses_blacklist_for_scoping_discount_baseprice()
     {
         list($order, $item) = $this->prepOrderWithItem(100);
@@ -74,7 +84,10 @@ class ItemBlacklistTest extends TestCase
             'item_blacklist' => [5, 10],
         ]);
 
+        $condition3 = (new ItemBlacklist())->setParameterValues([5, 10]);
+
         $this->assertEquals($condition1, $condition2);
+        $this->assertEquals($condition1, $condition3);
     }
 
 
