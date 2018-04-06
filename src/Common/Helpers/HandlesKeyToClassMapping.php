@@ -20,7 +20,7 @@ trait HandlesKeyToClassMapping
     public static function fromString(string $type)
     {
         if (!isset(static::$mapping[$type])) {
-            throw new \InvalidArgumentException('Invalid type [' . $type . ']. Not found as available class.');
+            throw new \InvalidArgumentException('Invalid type [' . $type . ']. Not found as available class mapping.');
         }
 
         return new static($type);

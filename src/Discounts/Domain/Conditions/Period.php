@@ -54,13 +54,9 @@ class Period extends BaseCondition implements Condition, OrderCondition
 
     public function setParameterValues(array $values): Condition
     {
-        if(!isset($values['start_at']) || !isset($values['end_at'])){
-            throw new \InvalidArgumentException('Raw condition value for start_at or end_at is missing');
-        }
-
         $this->setParameters([
-            'start_at' => DateTimeImmutable::createFromFormat('Y-m-d H:i:s', $values['start_at']),
-            'end_at' => DateTimeImmutable::createFromFormat('Y-m-d H:i:s', $values['end_at']),
+            'start_at' => $values['start_at'] ? DateTimeImmutable::createFromFormat('Y-m-d H:i:s', $values['start_at']) : null,
+            'end_at' => $values['end_at'] ? DateTimeImmutable::createFromFormat('Y-m-d H:i:s', $values['end_at']) : null,
         ]);
 
         return $this;
