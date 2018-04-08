@@ -3,7 +3,7 @@
 namespace Thinktomorrow\Trader\Discounts\Domain;
 
 use Money\Money;
-use Thinktomorrow\Trader\Common\Domain\Price\Percentage;
+use Thinktomorrow\Trader\Common\Price\Percentage;
 use Thinktomorrow\Trader\Common\Helpers\HandlesArrayDotSyntax;
 use Thinktomorrow\Trader\Discounts\Domain\Types\TypeKey;
 

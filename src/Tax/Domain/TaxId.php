@@ -2,7 +2,7 @@
 
 namespace Thinktomorrow\Trader\Tax\Domain;
 
-use Thinktomorrow\Trader\Common\Domain\AggregateId;
+use Thinktomorrow\Trader\Common\AggregateId;
 
 class TaxId
 {

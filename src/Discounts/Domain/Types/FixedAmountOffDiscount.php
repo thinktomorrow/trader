@@ -2,9 +2,11 @@
 
 namespace Thinktomorrow\Trader\Discounts\Domain\Types;
 
+use Assert\Assertion;
 use Money\Money;
-use Thinktomorrow\Trader\Common\Domain\Price\Cash;
-use Thinktomorrow\Trader\Common\Domain\Price\Percentage;
+use Thinktomorrow\Trader\Common\Adjusters\Adjuster;
+use Thinktomorrow\Trader\Common\Adjusters\Amount;
+use Thinktomorrow\Trader\Common\Price\Cash;
 use Thinktomorrow\Trader\Discounts\Domain\AppliedDiscount;
 use Thinktomorrow\Trader\Discounts\Domain\Discount;
 use Thinktomorrow\Trader\Discounts\Domain\Exceptions\CannotApplyDiscount;
@@ -34,7 +36,7 @@ class FixedAmountOffDiscount extends BaseDiscount implements Discount
 
     public function discountAmount(Order $order, EligibleForDiscount $eligibleForDiscount): Money
     {
-        return $this->adjusters['amount'];
+        return $this->adjuster->getParameter('amount');
     }
 
     public function discountBasePrice(Order $order, EligibleForDiscount $eligibleForDiscount): Money
@@ -48,22 +50,10 @@ class FixedAmountOffDiscount extends BaseDiscount implements Discount
         return $this->adjustDiscountBasePriceByConditions(Cash::make(0), $order, $this->conditions);
     }
 
-    /**
-     * @param array $conditions
-     * @param array $adjusters
-     */
-    protected function validateParameters(array $conditions, array $adjusters)
+    protected function validateParameters(array $conditions, Adjuster $adjuster)
     {
-        parent::validateParameters($conditions, $adjusters);
+        parent::validateParameters($conditions, $adjuster);
 
-        if (!isset($adjusters['amount'])) {
-            throw new \InvalidArgumentException('Missing adjuster value \'amount\', required for discount '.get_class($this));
-        }
-        if (!$adjusters['amount'] instanceof Money) {
-            throw new \InvalidArgumentException('Invalid adjuster value \'amount\' for discount '.get_class($this).'. Instance of '.Money::class.' is expected.');
-        }
-        if ($adjusters['amount']->isNegative()) {
-            throw new \InvalidArgumentException('Adjuster value \'amount\' cannot be negative. '.$adjusters['amount']->getAmount().' is given.');
-        }
+        Assertion::isInstanceOf($adjuster, Amount::class);
     }
 }

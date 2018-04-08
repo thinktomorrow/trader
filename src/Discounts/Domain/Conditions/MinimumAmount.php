@@ -3,13 +3,12 @@
 namespace Thinktomorrow\Trader\Discounts\Domain\Conditions;
 
 use Money\Money;
-use Thinktomorrow\Trader\Common\Domain\Conditions\BaseCondition;
-use Thinktomorrow\Trader\Common\Domain\Conditions\Condition;
-use Thinktomorrow\Trader\Common\Domain\Price\Cash;
+use Thinktomorrow\Trader\Common\Contracts\HasParameters;
+use Thinktomorrow\Trader\Common\Price\Cash;
 use Thinktomorrow\Trader\Discounts\Domain\EligibleForDiscount;
 use Thinktomorrow\Trader\Orders\Domain\Order;
 
-class MinimumAmount extends BaseCondition implements Condition
+class MinimumAmount extends BaseCondition implements DiscountCondition
 {
     public function check(Order $order, EligibleForDiscount $eligibleForDiscount): bool
     {
@@ -28,7 +27,7 @@ class MinimumAmount extends BaseCondition implements Condition
         ];
     }
 
-    public function setParameterValues($values): Condition
+    public function setParameterValues($values): HasParameters
     {
         $values = $this->normalizeParameters($values);
 

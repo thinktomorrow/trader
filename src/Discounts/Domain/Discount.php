@@ -3,9 +3,10 @@
 namespace Thinktomorrow\Trader\Discounts\Domain;
 
 use Money\Money;
+use Thinktomorrow\Trader\Common\Contracts\HasType;
 use Thinktomorrow\Trader\Orders\Domain\Order;
 
-interface Discount
+interface Discount extends HasType
 {
     public function id(): DiscountId;
 

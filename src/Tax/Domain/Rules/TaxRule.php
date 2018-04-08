@@ -2,7 +2,7 @@
 
 namespace Thinktomorrow\Trader\Tax\Domain\Rules;
 
-use Thinktomorrow\Trader\Common\Domain\Price\Percentage;
+use Thinktomorrow\Trader\Common\Price\Percentage;
 use Thinktomorrow\Trader\Orders\Domain\Order;
 use Thinktomorrow\Trader\Tax\Domain\Taxable;
 use Thinktomorrow\Trader\Tax\Domain\TaxRate;

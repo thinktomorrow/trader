@@ -3,7 +3,11 @@
 namespace Thinktomorrow\Trader\Tests;
 
 use Money\Money;
+use Thinktomorrow\Trader\Common\Adjusters\Percentage;
+use Thinktomorrow\Trader\Common\Price\Percentage as PercentageValue;
 use Thinktomorrow\Trader\Sales\Domain\Exceptions\CannotApplySale;
+use Thinktomorrow\Trader\Sales\Domain\SaleId;
+use Thinktomorrow\Trader\Sales\Domain\Types\FixedCustomAmountSale;
 
 class FixedCustomAmountSaleTest extends TestCase
 {
@@ -72,5 +76,18 @@ class FixedCustomAmountSaleTest extends TestCase
         $this->assertEquals(Money::EUR(100), $stub->price());
         $this->assertEquals(Money::EUR(0), $stub->saleTotal());
         $this->assertEquals(Money::EUR(100), $stub->salePrice());
+    }
+
+    /** @test */
+    function it_requires_an_amount_adjuster()
+    {
+        $this->expectException(\InvalidArgumentException::class);
+
+        new FixedCustomAmountSale(
+            SaleId::fromInteger(1),
+            [],
+            (new Percentage())->setParameters(PercentageValue::fromPercent(5)),
+            []
+        );
     }
 }

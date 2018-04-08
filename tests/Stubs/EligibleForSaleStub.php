@@ -3,7 +3,7 @@
 namespace Thinktomorrow\Trader\Tests\Stubs;
 
 use Money\Money;
-use Thinktomorrow\Trader\Common\Domain\Price\Percentage;
+use Thinktomorrow\Trader\Common\Price\Percentage;
 use Thinktomorrow\Trader\Sales\Domain\AppliedSale;
 use Thinktomorrow\Trader\Sales\Domain\EligibleForSale;
 

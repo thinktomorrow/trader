@@ -2,8 +2,11 @@
 
 namespace Thinktomorrow\Trader\Sales\Domain\Types;
 
+use Assert\Assertion;
 use Money\Money;
-use Thinktomorrow\Trader\Common\Domain\Price\Cash;
+use Thinktomorrow\Trader\Common\Adjusters\Adjuster;
+use Thinktomorrow\Trader\Common\Adjusters\Amount;
+use Thinktomorrow\Trader\Common\Price\Cash;
 use Thinktomorrow\Trader\Sales\Domain\AppliedSale;
 use Thinktomorrow\Trader\Sales\Domain\EligibleForSale;
 use Thinktomorrow\Trader\Sales\Domain\Exceptions\CannotApplySale;
@@ -41,5 +44,12 @@ class FixedCustomAmountSale extends BaseSale implements Sale
         if( ! $eligibleForSale->hasOriginalSalePrice()) return Cash::zero();
 
         return $eligibleForSale->price()->subtract($eligibleForSale->originalSalePrice());
+    }
+
+    protected function validateParameters(array $conditions, Adjuster $adjuster)
+    {
+        parent::validateParameters($conditions, $adjuster);
+
+        Assertion::isInstanceOf($adjuster, Amount::class);
     }
 }

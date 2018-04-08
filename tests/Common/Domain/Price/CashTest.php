@@ -4,8 +4,8 @@ namespace Thinktomorrow\Trader\Tests\Price;
 
 use Money\Money;
 use Thinktomorrow\Trader\Common\Config;
-use Thinktomorrow\Trader\Common\Domain\Price\Cash;
-use Thinktomorrow\Trader\Common\Domain\Price\Percentage;
+use Thinktomorrow\Trader\Common\Price\Cash;
+use Thinktomorrow\Trader\Common\Price\Percentage;
 use Thinktomorrow\Trader\Tests\TestCase;
 
 class CashTest extends TestCase

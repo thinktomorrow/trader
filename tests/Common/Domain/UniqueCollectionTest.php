@@ -1,6 +1,6 @@
 <?php
 
-use Thinktomorrow\Trader\Common\Domain\UniqueCollection;
+use Thinktomorrow\Trader\Common\UniqueCollection;
 use Thinktomorrow\Trader\Tests\TestCase;
 
 class UniqueCollectionTest extends TestCase

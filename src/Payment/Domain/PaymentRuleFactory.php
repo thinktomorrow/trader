@@ -3,7 +3,7 @@
 namespace Thinktomorrow\Trader\Payment\Domain;
 
 use Psr\Container\ContainerInterface;
-use Thinktomorrow\Trader\Common\Domain\Conditions\Condition;
+use Thinktomorrow\Trader\Common\Contracts\HasParameters;
 use Thinktomorrow\Trader\Payment\Domain\Conditions\Country;
 use Thinktomorrow\Trader\Payment\Domain\Conditions\MaximumAmount;
 use Thinktomorrow\Trader\Payment\Domain\Conditions\MinimumAmount;
@@ -39,9 +39,9 @@ class PaymentRuleFactory
      * @param $condition
      * @param array $parameters
      *
-     * @return Condition
+     * @return HasParameters
      */
-    private function resolveConditionClass($condition, array $parameters): Condition
+    private function resolveConditionClass($condition, array $parameters): HasParameters
     {
         $class = self::$conditionMapping[$condition];
 

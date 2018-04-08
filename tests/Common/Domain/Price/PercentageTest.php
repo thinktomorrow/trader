@@ -2,7 +2,7 @@
 
 namespace Thinktomorrow\Trader\Tests\Price;
 
-use Thinktomorrow\Trader\Common\Domain\Price\Percentage;
+use Thinktomorrow\Trader\Common\Price\Percentage;
 use Thinktomorrow\Trader\Tests\TestCase;
 
 class PercentageTest extends TestCase

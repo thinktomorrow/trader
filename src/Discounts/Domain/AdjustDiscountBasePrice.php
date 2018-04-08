@@ -5,7 +5,7 @@ declare(strict_types = 1);
 namespace Thinktomorrow\Trader\Discounts\Domain;
 
 use Money\Money;
-use Thinktomorrow\Trader\Common\Domain\Conditions\Condition;
+use Thinktomorrow\Trader\Common\Contracts\HasParameters;
 use Thinktomorrow\Trader\Orders\Domain\Item;
 use Thinktomorrow\Trader\Orders\Domain\Order;
 
@@ -21,7 +21,7 @@ class AdjustDiscountBasePrice
     {
         foreach($conditions as $condition)
         {
-            if( ! $condition instanceof Condition) continue;
+            if( ! $condition instanceof HasParameters) continue;
 
             $this->addCondition($condition);
         }
@@ -37,7 +37,7 @@ class AdjustDiscountBasePrice
      *            -> not subtracted yet -> already added -> subtract
      *                                  -> not added yet -> ignore
      */
-    public function addCondition(Condition $condition)
+    public function addCondition(HasParameters $condition)
     {
         if(!$this->order) throw new \DomainException('Order value is required. Add it via setOrder method.');
 

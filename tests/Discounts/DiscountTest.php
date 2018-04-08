@@ -3,7 +3,7 @@
 namespace Thinktomorrow\Trader\Tests;
 
 use Money\Money;
-use Thinktomorrow\Trader\Common\Domain\Price\Percentage;
+use Thinktomorrow\Trader\Common\Price\Percentage;
 use Thinktomorrow\Trader\Discounts\Domain\AppliedDiscount;
 use Thinktomorrow\Trader\Discounts\Domain\DiscountId;
 use Thinktomorrow\Trader\Discounts\Domain\Exceptions\CannotApplyDiscount;
@@ -52,7 +52,7 @@ class DiscountTest extends TestCase
     /** @test */
     public function discount_cannot_go_below_order_subtotal()
     {
-        $this->expectException(CannotApplyDiscount::class);
+        $this->expectException(\InvalidArgumentException::class);
 
         $discount = $this->makePercentageOffDiscount(120);
         list($order, $item) = $this->prepOrderWithItem(50);
@@ -63,7 +63,7 @@ class DiscountTest extends TestCase
     /** @test */
     public function discount_cannot_go_below_item_subtotal()
     {
-        $this->expectException(CannotApplyDiscount::class);
+        $this->expectException(\InvalidArgumentException::class);
 
         $discount = $this->makePercentageOffDiscount(120);
         list($order, $item) = $this->prepOrderWithItem(100);

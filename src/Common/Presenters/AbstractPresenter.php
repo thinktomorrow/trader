@@ -1,10 +1,12 @@
 <?php
 
-namespace Thinktomorrow\Trader\Common\Ports\Web;
+namespace Thinktomorrow\Trader\Common\Presenters;
+
+use Thinktomorrow\Trader\Common\Presenters\GetDynamicValue;
 
 abstract class AbstractPresenter
 {
-    use GetDynamicValue;
+    use Thinktomorrow\Trader\Common\Presenters\GetDynamicValue;
 
     protected $values;
 

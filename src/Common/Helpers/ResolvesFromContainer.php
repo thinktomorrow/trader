@@ -1,6 +1,6 @@
 <?php
 
-namespace Thinktomorrow\Trader\Common\Application;
+namespace Thinktomorrow\Trader\Common\Helpers;
 
 trait ResolvesFromContainer
 {

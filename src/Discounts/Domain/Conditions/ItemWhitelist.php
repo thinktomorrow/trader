@@ -2,13 +2,11 @@
 
 namespace Thinktomorrow\Trader\Discounts\Domain\Conditions;
 
-use Thinktomorrow\Trader\Common\Domain\Conditions\BaseCondition;
-use Thinktomorrow\Trader\Common\Domain\Conditions\Condition;
 use Thinktomorrow\Trader\Discounts\Domain\EligibleForDiscount;
 use Thinktomorrow\Trader\Orders\Domain\Item;
 use Thinktomorrow\Trader\Orders\Domain\Order;
 
-class ItemWhitelist extends BaseCondition implements Condition
+class ItemWhitelist extends BaseCondition implements DiscountCondition
 {
     public function check(Order $order, EligibleForDiscount $eligibleForDiscount): bool
     {

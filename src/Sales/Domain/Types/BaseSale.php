@@ -3,40 +3,34 @@
 namespace Thinktomorrow\Trader\Sales\Domain\Types;
 
 use Assert\Assertion;
-use Thinktomorrow\Trader\Common\Domain\Conditions\Condition;
+use Thinktomorrow\Trader\Common\Adjusters\Adjuster;
+use Thinktomorrow\Trader\Common\Conditions\Condition;
 use Thinktomorrow\Trader\Sales\Domain\Conditions\ConditionKey;
+use Thinktomorrow\Trader\Sales\Domain\Conditions\SaleCondition;
 use Thinktomorrow\Trader\Sales\Domain\EligibleForSale;
 use Thinktomorrow\Trader\Sales\Domain\SaleId;
 
 abstract class BaseSale
 {
-    /**
-     * @var SaleId
-     */
+    /** @var SaleId */
     protected $id;
 
-    /**
-     * @var Condition[]
-     */
+    /** @var Condition[] */
     protected $conditions;
 
-    /**
-     * @var array
-     */
-    protected $adjusters;
+    /** @var Adjuster */
+    protected $adjuster;
 
-    /**
-     * @var array
-     */
+    /** @var array */
     protected $data;
 
-    public function __construct(SaleId $id, array $conditions, array $adjusters, array $data = [])
+    public function __construct(SaleId $id, array $conditions, Adjuster $adjuster, array $data = [])
     {
-        $this->validateParameters($conditions, $adjusters);
+        $this->validateParameters($conditions, $adjuster);
 
         $this->id = $id;
         $this->conditions = $conditions;
-        $this->adjusters = $adjusters;
+        $this->adjuster = $adjuster;
 
         // Custom data, e.g. sales text for display on site.
         $this->data = $data;
@@ -99,11 +93,11 @@ abstract class BaseSale
 
     /**
      * @param array $conditions
-     * @param array $adjusters
+     * @param Adjuster $adjuster
      */
-    protected function validateParameters(array $conditions, array $adjusters)
+    protected function validateParameters(array $conditions, Adjuster $adjuster)
     {
-        Assertion::allIsInstanceOf($conditions, Condition::class);
+        Assertion::allIsInstanceOf($conditions, SaleCondition::class);
     }
 
     protected function getCondition(string $condition_key)

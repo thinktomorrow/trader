@@ -2,13 +2,11 @@
 
 namespace Thinktomorrow\Trader\Sales\Domain\Conditions;
 
-use Thinktomorrow\Trader\Common\Domain\Conditions\BaseCondition;
-use Thinktomorrow\Trader\Common\Domain\Conditions\Condition;
-use Thinktomorrow\Trader\Common\Domain\Conditions\SaleCondition;
+use Thinktomorrow\Trader\Common\Conditions\BaseCondition;
 use Thinktomorrow\Trader\Orders\Domain\Purchasable;
 use Thinktomorrow\Trader\Sales\Domain\EligibleForSale;
 
-class PurchasableWhitelist extends BaseCondition implements Condition, SaleCondition
+class PurchasableWhitelist extends BaseCondition implements SaleCondition
 {
     public function check(EligibleForSale $eligibleForSale): bool
     {

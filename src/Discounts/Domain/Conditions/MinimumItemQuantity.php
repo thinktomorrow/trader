@@ -2,14 +2,12 @@
 
 namespace Thinktomorrow\Trader\Discounts\Domain\Conditions;
 
-use Thinktomorrow\Trader\Common\Domain\Conditions\BaseCondition;
-use Thinktomorrow\Trader\Common\Domain\Conditions\Condition;
-use Thinktomorrow\Trader\Common\Domain\Conditions\ItemCondition;
+use Thinktomorrow\Trader\Common\Contracts\HasParameters;
 use Thinktomorrow\Trader\Discounts\Domain\EligibleForDiscount;
 use Thinktomorrow\Trader\Orders\Domain\Item;
 use Thinktomorrow\Trader\Orders\Domain\Order;
 
-class MinimumItemQuantity extends BaseCondition implements Condition
+class MinimumItemQuantity extends BaseCondition implements DiscountCondition
 {
     public function check(Order $order, EligibleForDiscount $eligibleForDiscount): bool
     {
@@ -25,7 +23,7 @@ class MinimumItemQuantity extends BaseCondition implements Condition
         return $item->quantity() >= (int) $this->parameters['minimum_quantity'];
     }
 
-    public function setParameterValues($values): Condition
+    public function setParameterValues($values): HasParameters
     {
         $parameters = parent::setParameterValues($values);
 

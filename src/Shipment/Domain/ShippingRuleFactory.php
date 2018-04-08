@@ -3,7 +3,7 @@
 namespace Thinktomorrow\Trader\Shipment\Domain;
 
 use Psr\Container\ContainerInterface;
-use Thinktomorrow\Trader\Common\Domain\Conditions\Condition;
+use Thinktomorrow\Trader\Common\Contracts\HasParameters;
 use Thinktomorrow\Trader\Shipment\Domain\Conditions\Country;
 use Thinktomorrow\Trader\Shipment\Domain\Conditions\MaximumAmount;
 use Thinktomorrow\Trader\Shipment\Domain\Conditions\MinimumAmount;
@@ -39,9 +39,9 @@ class ShippingRuleFactory
      * @param $condition
      * @param array $parameters
      *
-     * @return Condition
+     * @return HasParameters
      */
-    private function resolveConditionClass($condition, array $parameters): Condition
+    private function resolveConditionClass($condition, array $parameters): HasParameters
     {
         $class = self::$conditionMapping[$condition];
 

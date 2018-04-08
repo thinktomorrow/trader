@@ -3,7 +3,10 @@
 namespace Thinktomorrow\Trader\Tests;
 
 use Money\Money;
+use Thinktomorrow\Trader\Common\Adjusters\Amount;
 use Thinktomorrow\Trader\Sales\Domain\Exceptions\CannotApplySale;
+use Thinktomorrow\Trader\Sales\Domain\SaleId;
+use Thinktomorrow\Trader\Sales\Domain\Types\PercentageOffSale;
 
 class PercentageOffSaleTest extends TestCase
 {
@@ -21,6 +24,19 @@ class PercentageOffSaleTest extends TestCase
         $this->expectException(\InvalidArgumentException::class);
 
         $this->makePercentageOffSale(-10);
+    }
+
+    /** @test */
+    function it_requires_a_percentage_adjuster()
+    {
+        $this->expectException(\InvalidArgumentException::class);
+
+        new PercentageOffSale(
+            SaleId::fromInteger(1),
+            [],
+            (new Amount())->setParameters(Money::EUR(10)),
+            []
+        );
     }
 
     /** @test */

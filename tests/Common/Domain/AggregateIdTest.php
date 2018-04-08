@@ -1,6 +1,6 @@
 <?php
 
-use Thinktomorrow\Trader\Common\Domain\AggregateId;
+use Thinktomorrow\Trader\Common\AggregateId;
 use Thinktomorrow\Trader\Tests\TestCase;
 
 class AggregateIdTest extends TestCase

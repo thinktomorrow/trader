@@ -2,16 +2,14 @@
 
 namespace Thinktomorrow\Trader\Discounts\Domain\Conditions;
 
-use DateTime;
 use DateTimeImmutable;
-use Thinktomorrow\Trader\Common\Domain\Conditions\BaseCondition;
-use Thinktomorrow\Trader\Common\Domain\Conditions\Condition;
-use Thinktomorrow\Trader\Common\Domain\Conditions\OrderCondition;
+use Thinktomorrow\Trader\Common\Contracts\HasParameters;
+use Thinktomorrow\Trader\Discounts\Domain\EligibleForDiscount;
 use Thinktomorrow\Trader\Orders\Domain\Order;
 
-class Period extends BaseCondition implements Condition, OrderCondition
+class Period extends BaseCondition implements DiscountCondition
 {
-    public function check(Order $order): bool
+    public function check(Order $order, EligibleForDiscount $eligibleForDiscount): bool
     {
         $valid_start_at = $this->comesAfter(
             new DateTimeImmutable(),
@@ -52,7 +50,7 @@ class Period extends BaseCondition implements Condition, OrderCondition
         ];
     }
 
-    public function setParameterValues($values): Condition
+    public function setParameterValues($values): HasParameters
     {
         if(!is_array($values)){
             throw new \InvalidArgumentException('Passed parameter values should be an array.' . gettype($values) . ' given.');

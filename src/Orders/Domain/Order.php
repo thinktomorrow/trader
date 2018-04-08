@@ -4,9 +4,9 @@ namespace Thinktomorrow\Trader\Orders\Domain;
 
 use Money\Money;
 use Thinktomorrow\Trader\Common\Config;
-use Thinktomorrow\Trader\Common\Domain\Price\Cash;
-use Thinktomorrow\Trader\Common\Domain\Price\Percentage;
-use Thinktomorrow\Trader\Common\Domain\State\StatefulContract;
+use Thinktomorrow\Trader\Common\Price\Cash;
+use Thinktomorrow\Trader\Common\Price\Percentage;
+use Thinktomorrow\Trader\Common\State\StatefulContract;
 use Thinktomorrow\Trader\Discounts\Domain\AppliedDiscount;
 use Thinktomorrow\Trader\Discounts\Domain\EligibleForDiscount;
 use Thinktomorrow\Trader\Orders\Domain\Services\SumOfTaxes;

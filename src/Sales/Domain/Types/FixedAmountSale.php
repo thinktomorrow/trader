@@ -2,8 +2,11 @@
 
 namespace Thinktomorrow\Trader\Sales\Domain\Types;
 
+use Assert\Assertion;
 use Money\Money;
-use Thinktomorrow\Trader\Common\Domain\Price\Cash;
+use Thinktomorrow\Trader\Common\Adjusters\Adjuster;
+use Thinktomorrow\Trader\Common\Adjusters\Amount;
+use Thinktomorrow\Trader\Common\Price\Cash;
 use Thinktomorrow\Trader\Sales\Domain\AppliedSale;
 use Thinktomorrow\Trader\Sales\Domain\EligibleForSale;
 use Thinktomorrow\Trader\Sales\Domain\Exceptions\CannotApplySale;
@@ -31,26 +34,13 @@ class FixedAmountSale extends BaseSale implements Sale
 
     public function saleAmount(EligibleForSale $eligibleForSale): Money
     {
-        return $eligibleForSale->price()->subtract($this->adjusters['amount']);
+        return $eligibleForSale->price()->subtract($this->adjuster->getParameter('amount'));
     }
 
-    /**
-     * @param array $conditions
-     * @param array $adjusters
-     */
-    protected function validateParameters(array $conditions, array $adjusters)
+    protected function validateParameters(array $conditions, Adjuster $adjuster)
     {
-        parent::validateParameters($conditions, $adjusters);
+        parent::validateParameters($conditions, $adjuster);
 
-        if (!isset($adjusters['amount'])) {
-            throw new \InvalidArgumentException('Missing adjuster value \'amount\', required for sale '.get_class($this));
-        }
-        if (!$adjusters['amount'] instanceof Money) {
-            throw new \InvalidArgumentException('Invalid adjuster value \'amount\' for sale '.get_class($this).'. Instance of '.Money::class.' is expected.');
-        }
-
-        if ($adjusters['amount']->getAmount() < 0) {
-            throw new \InvalidArgumentException('Invalid adjuster value \'amount\' for sale '.get_class($this).'. Percentage cannot be lower than 0. ['.$adjusters['amount']->getAmount().'] given.');
-        }
+        Assertion::isInstanceOf($adjuster, Amount::class);
     }
 }

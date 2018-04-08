@@ -1,6 +1,6 @@
 <?php
 
-namespace Thinktomorrow\Trader\Common\Domain\Price;
+namespace Thinktomorrow\Trader\Common\Price;
 
 use Assert\Assertion;
 

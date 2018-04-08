@@ -2,9 +2,11 @@
 
 namespace Thinktomorrow\Trader\Discounts\Domain\Types;
 
+use Assert\Assertion;
 use Money\Money;
-use Thinktomorrow\Trader\Common\Domain\Price\Cash;
-use Thinktomorrow\Trader\Common\Domain\Price\Percentage;
+use Thinktomorrow\Trader\Common\Adjusters\Adjuster;
+use Thinktomorrow\Trader\Common\Adjusters\Percentage;
+use Thinktomorrow\Trader\Common\Price\Cash;
 use Thinktomorrow\Trader\Discounts\Domain\AppliedDiscount;
 use Thinktomorrow\Trader\Discounts\Domain\Discount;
 use Thinktomorrow\Trader\Discounts\Domain\Exceptions\CannotApplyDiscount;
@@ -34,7 +36,8 @@ class PercentageOffDiscount extends BaseDiscount implements Discount
 
     public function discountAmount(Order $order, EligibleForDiscount $eligibleForDiscount): Money
     {
-        return $this->discountBasePrice($order, $eligibleForDiscount)->multiply($this->adjusters['percentage']->asFloat());
+        return $this->discountBasePrice($order, $eligibleForDiscount)
+                    ->multiply($this->adjuster->getParameter('percentage')->asFloat());
     }
 
     public function discountBasePrice(Order $order, EligibleForDiscount $eligibleForDiscount): Money
@@ -48,19 +51,10 @@ class PercentageOffDiscount extends BaseDiscount implements Discount
         return $this->adjustDiscountBasePriceByConditions(Cash::make(0), $order, $this->conditions);
     }
 
-    /**
-     * @param array $conditions
-     * @param array $adjusters
-     */
-    protected function validateParameters(array $conditions, array $adjusters)
+    protected function validateParameters(array $conditions, Adjuster $adjuster)
     {
-        parent::validateParameters($conditions, $adjusters);
+        parent::validateParameters($conditions, $adjuster);
 
-        if (!isset($adjusters['percentage'])) {
-            throw new \InvalidArgumentException('Missing adjuster value \'percentage\', required for discount '.get_class($this));
-        }
-        if (!$adjusters['percentage'] instanceof Percentage) {
-            throw new \InvalidArgumentException('Invalid adjuster value \'percentage\' for discount '.get_class($this).'. Instance of '.Percentage::class.' is expected.');
-        }
+        Assertion::isInstanceOf($adjuster, Percentage::class);
     }
 }

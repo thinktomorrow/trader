@@ -1,7 +1,7 @@
 <?php
 
 use Money\Money;
-use Thinktomorrow\Trader\Common\Domain\Price\Percentage;
+use Thinktomorrow\Trader\Common\Price\Percentage;
 use Thinktomorrow\Trader\Orders\Domain\Item;
 use Thinktomorrow\Trader\Tests\Stubs\PurchasableStub;
 use Thinktomorrow\Trader\Tests\TestCase;

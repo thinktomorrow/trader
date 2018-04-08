@@ -2,7 +2,7 @@
 
 namespace Thinktomorrow\Trader\Unit;
 
-use Thinktomorrow\Trader\Common\Domain\State\StateException;
+use Thinktomorrow\Trader\Common\State\StateException;
 use Thinktomorrow\Trader\Orders\Domain\Order;
 use Thinktomorrow\Trader\Orders\Domain\OrderId;
 use Thinktomorrow\Trader\Orders\Domain\OrderState;

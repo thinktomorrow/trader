@@ -3,13 +3,14 @@
 namespace Thinktomorrow\Trader\Tests;
 
 use Money\Money;
-use Thinktomorrow\Trader\Common\Domain\Price\Percentage;
+use Thinktomorrow\Trader\Common\Price\Percentage;
 use Thinktomorrow\Trader\Discounts\Domain\AppliedDiscount;
 use Thinktomorrow\Trader\Discounts\Domain\DiscountId;
-use Thinktomorrow\Trader\Discounts\Domain\Types\TypeKey;
 
 class AppliedDiscountTest extends TestCase
 {
+    use ShoppingHelpers;
+
     /** @test */
     public function it_can_create_applied_discount()
     {
@@ -34,5 +35,21 @@ class AppliedDiscountTest extends TestCase
         $this->assertSame($discountBasePrice, $appliedDiscount->discountBasePrice());
         $this->assertSame($percentage, $appliedDiscount->discountPercentage());
         $this->assertSame($data, $appliedDiscount->data());
+    }
+
+    /** @test */
+    function it_can_apply_fixed_amount_on_order()
+    {
+        $order = $this->makeOrder(100);
+        $fixedAmountOff = $this->makeFixedAmountOffDiscount(40);
+        $fixedAmountOff->apply($order, $order);
+
+        $this->assertCount(1, $order->discounts());
+        $appliedDiscount = reset($order->discounts());
+
+        $this->assertEquals(Money::EUR(60), $order->total());
+        $this->assertEquals(Money::EUR(40), $appliedDiscount->discountAmount());
+        $this->assertEquals(Money::EUR(100), $appliedDiscount->discountBasePrice());
+        $this->assertEquals(Percentage::fromPercent(40), $appliedDiscount->discountPercentage());
     }
 }

@@ -1,6 +1,6 @@
 <?php
 
-namespace Thinktomorrow\Trader\Common\Ports\Web;
+namespace Thinktomorrow\Trader\Common\Presenters;
 
 trait GetDynamicValue
 {
@@ -66,8 +66,7 @@ trait GetDynamicValue
      */
     public function __call($method, $args)
     {
-
-        // Only assume fake methods is they are passed no arguments
+        // Only assume fake methods if they are passed no arguments
         if (!$args) {
             return $this->getValue($method);
         }

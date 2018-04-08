@@ -2,9 +2,9 @@
 
 namespace Thinktomorrow\Trader\Unit;
 
-use Thinktomorrow\Trader\Common\Domain\State\StateException;
-use Thinktomorrow\Trader\Common\Domain\State\StatefulContract;
-use Thinktomorrow\Trader\Common\Domain\State\StateMachine;
+use Thinktomorrow\Trader\Common\State\StateException;
+use Thinktomorrow\Trader\Common\State\StatefulContract;
+use Thinktomorrow\Trader\Common\State\StateMachine;
 use Thinktomorrow\Trader\Tests\TestCase;
 
 class StateMachineTest extends TestCase

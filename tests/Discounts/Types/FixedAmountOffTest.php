@@ -3,7 +3,11 @@
 namespace Thinktomorrow\Trader\Tests;
 
 use Money\Money;
+use Thinktomorrow\Trader\Common\Adjusters\Percentage;
+use Thinktomorrow\Trader\Common\Price\Percentage as PercentageValue;
+use Thinktomorrow\Trader\Discounts\Domain\DiscountId;
 use Thinktomorrow\Trader\Discounts\Domain\Exceptions\CannotApplyDiscount;
+use Thinktomorrow\Trader\Discounts\Domain\Types\FixedAmountOffDiscount;
 
 class FixedAmountOffTest extends TestCase
 {
@@ -71,5 +75,18 @@ class FixedAmountOffTest extends TestCase
         $this->assertEquals(Money::EUR(100), $order->discountBasePrice());
         $this->assertEquals(Money::EUR(0), $order->discountTotal());
         $this->assertEquals(Money::EUR(100), $order->total());
+    }
+
+    /** @test */
+    function it_requires_an_amount_adjuster()
+    {
+        $this->expectException(\InvalidArgumentException::class);
+
+        new FixedAmountOffDiscount(
+            DiscountId::fromInteger(1),
+            [],
+            (new Percentage())->setParameters(PercentageValue::fromPercent(5)),
+            []
+        );
     }
 }

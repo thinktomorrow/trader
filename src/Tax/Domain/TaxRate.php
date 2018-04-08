@@ -4,7 +4,7 @@ namespace Thinktomorrow\Trader\Tax\Domain;
 
 use Assert\Assertion;
 use Thinktomorrow\Trader\Common\Config;
-use Thinktomorrow\Trader\Common\Domain\Price\Percentage;
+use Thinktomorrow\Trader\Common\Price\Percentage;
 use Thinktomorrow\Trader\Countries\CountryId;
 use Thinktomorrow\Trader\Orders\Domain\Order;
 

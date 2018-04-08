@@ -2,7 +2,7 @@
 
 namespace Thinktomorrow\Trader\Tests\Common;
 
-use Thinktomorrow\Trader\Common\Ports\Web\GetDynamicValue;
+use Thinktomorrow\Trader\Common\Presenters\GetDynamicValue;
 use Thinktomorrow\Trader\Tests\TestCase;
 
 class GetDynamicValueTest extends TestCase

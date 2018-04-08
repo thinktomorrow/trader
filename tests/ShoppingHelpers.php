@@ -3,8 +3,10 @@
 namespace Thinktomorrow\Trader\Tests;
 
 use Money\Money;
-use Thinktomorrow\Trader\Common\Domain\Price\Cash;
-use Thinktomorrow\Trader\Common\Domain\Price\Percentage;
+use Thinktomorrow\Trader\Common\Adjusters\Amount;
+use Thinktomorrow\Trader\Common\Adjusters\Percentage;
+use Thinktomorrow\Trader\Common\Price\Percentage as PercentageValue;
+use Thinktomorrow\Trader\Common\Price\Cash;
 use Thinktomorrow\Trader\Discounts\Domain\Conditions\ConditionKey as DiscountConditionKey;
 use Thinktomorrow\Trader\Sales\Domain\Conditions\ConditionKey as SaleConditionKey;
 use Thinktomorrow\Trader\Discounts\Domain\DiscountFactory;
@@ -38,7 +40,7 @@ trait ShoppingHelpers
     protected function getItem($itemId = null, $taxRate = null, $purchasable = null): Item
     {
         if(!$itemId) $itemId = ItemId::fromInteger(1);
-        if(!$taxRate) $taxRate = Percentage::fromPercent(21);
+        if(!$taxRate) $taxRate = PercentageValue::fromPercent(21);
         if(!$purchasable) $purchasable = new PurchasableStub(20, [], Money::EUR(110));
 
         return new Item($itemId, $taxRate, $purchasable);
@@ -63,15 +65,15 @@ trait ShoppingHelpers
         $order = new Order(OrderId::fromInteger($id));
         $order->setReference('foobar');
         $order->setCustomerId(CustomerId::fromString(2));
-        $order->items()->add($this->getItem(null, null, new PurchasableStub(1, [], Cash::make(505), Percentage::fromPercent(10))));
-        $order->items()->add($this->getItem(null, null, new PurchasableStub(2, [], Cash::make(1000), Percentage::fromPercent(10), Cash::make(800))), 2);
+        $order->items()->add($this->getItem(null, null, new PurchasableStub(1, [], Cash::make(505), PercentageValue::fromPercent(10))));
+        $order->items()->add($this->getItem(null, null, new PurchasableStub(2, [], Cash::make(1000), PercentageValue::fromPercent(10), Cash::make(800))), 2);
         $order->setShippingTotal(Cash::make(15));
         $order->setPaymentTotal(Cash::make(10));
 
-        $discount = (new DiscountFactory(new InMemoryContainer()))->create(1, 'percentage_off', [], ['percentage' => Percentage::fromPercent(30)]);
+        $discount = (new DiscountFactory(new InMemoryContainer()))->create(1, 'percentage_off', [], ['percentage' => PercentageValue::fromPercent(30)]);
         $discount->apply($order);
 
-        $order->setTaxPercentage(Percentage::fromPercent(21));
+        $order->setTaxPercentage(PercentageValue::fromPercent(21));
 
         $this->container('orderRepository')->add($order);
 
@@ -95,7 +97,7 @@ trait ShoppingHelpers
      */
     protected function prepOrderWithItem($itemPrice = 100, $salePrice = 0): array
     {
-        $purchasable = new PurchasableStub(1, [], Money::EUR($itemPrice), Percentage::fromPercent(10), Money::EUR($salePrice));
+        $purchasable = new PurchasableStub(1, [], Money::EUR($itemPrice), PercentageValue::fromPercent(10), Money::EUR($salePrice));
         $item = $this->getItem(null, null, $purchasable);
 
         $order = $this->makeOrder();
@@ -121,22 +123,37 @@ trait ShoppingHelpers
             };
         }
 
-        return new PercentageOffSale(SaleId::fromInteger(1), $conditions, ['percentage' => Percentage::fromPercent($percent)], $data);
+        return new PercentageOffSale(
+            SaleId::fromInteger(1),
+            $conditions,
+            (new Percentage())->setParameters(PercentageValue::fromPercent($percent)),
+            $data
+        );
     }
 
     protected function makeFixedAmountOffSale($amount, array $data = [])
     {
-        return new FixedAmountOffSale(SaleId::fromInteger(1), [], ['amount' => Money::EUR($amount)], $data);
+        return new FixedAmountOffSale(
+            SaleId::fromInteger(1),
+            [],
+            (new Amount())->setParameters(Money::EUR($amount)),
+            $data
+        );
     }
 
     protected function makeFixedAmountSale($amount, array $data = [])
     {
-        return new FixedAmountSale(SaleId::fromInteger(1), [], ['amount' => Money::EUR($amount)], $data);
+        return new FixedAmountSale(
+            SaleId::fromInteger(1),
+            [],
+            (new Amount())->setParameters(Money::EUR($amount)),
+            $data
+        );
     }
 
     protected function makeFixedCustomAmountSale(array $data = [])
     {
-        return new FixedCustomAmountSale(SaleId::fromInteger(1), [], [], $data);
+        return new FixedCustomAmountSale(SaleId::fromInteger(1), [], (new Amount())->setParameters(Money::EUR(10)), $data);
     }
 
     protected function makePercentageOffDiscount($percent = 10, $conditions = [], $data = [], $id = null)
@@ -152,7 +169,7 @@ trait ShoppingHelpers
         return new PercentageOffDiscount(
             DiscountId::fromInteger($id ?? rand(1,99)),
             $conditions,
-            ['percentage' => Percentage::fromPercent($percent)],
+            (new Percentage())->setParameterValues($percent),
             $data
         );
     }
@@ -170,7 +187,7 @@ trait ShoppingHelpers
         return new FixedAmountOffDiscount(
             DiscountId::fromInteger($id ?? rand(1,99)),
             $conditions,
-            ['amount' => Money::EUR($amount)],
+            (new Amount())->setParameters(Money::EUR($amount)),
             $data
         );
     }

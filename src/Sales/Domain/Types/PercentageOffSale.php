@@ -2,9 +2,11 @@
 
 namespace Thinktomorrow\Trader\Sales\Domain\Types;
 
+use Assert\Assertion;
 use Money\Money;
-use Thinktomorrow\Trader\Common\Domain\Price\Cash;
-use Thinktomorrow\Trader\Common\Domain\Price\Percentage;
+use Thinktomorrow\Trader\Common\Adjusters\Adjuster;
+use Thinktomorrow\Trader\Common\Adjusters\Percentage;
+use Thinktomorrow\Trader\Common\Price\Cash;
 use Thinktomorrow\Trader\Sales\Domain\AppliedSale;
 use Thinktomorrow\Trader\Sales\Domain\EligibleForSale;
 use Thinktomorrow\Trader\Sales\Domain\Exceptions\CannotApplySale;
@@ -25,37 +27,20 @@ class PercentageOffSale extends BaseSale implements Sale
             $this->id,
             TypeKey::fromSale($this)->get(),
             $saleAmount,
-            $this->adjusters['percentage'],
+            $this->adjuster->getParameter('percentage'),
             $this->data
         ));
     }
 
     public function saleAmount(EligibleForSale $eligibleForSale): Money
     {
-        return $eligibleForSale->price()->multiply($this->adjusters['percentage']->asFloat());
+        return $eligibleForSale->price()->multiply($this->adjuster->getParameter('percentage')->asFloat());
     }
 
-    /**
-     * @param array $conditions
-     * @param array $adjusters
-     */
-    protected function validateParameters(array $conditions, array $adjusters)
+    protected function validateParameters(array $conditions, Adjuster $adjuster)
     {
-        parent::validateParameters($conditions, $adjusters);
+        parent::validateParameters($conditions, $adjuster);
 
-        if (!isset($adjusters['percentage'])) {
-            throw new \InvalidArgumentException('Missing adjuster value \'percentage\', required for sale '.get_class($this));
-        }
-        if (!$adjusters['percentage'] instanceof Percentage) {
-            throw new \InvalidArgumentException('Invalid adjuster value \'percentage\' for sale '.get_class($this).'. Instance of '.Percentage::class.' is expected.');
-        }
-
-        if ($adjusters['percentage']->asPercent() > 100) {
-            throw new \InvalidArgumentException('Invalid adjuster value \'percentage\' for sale '.get_class($this).'. Percentage cannot be higher than 100%. ['.$adjusters['percentage']->asPercent().'%] given.');
-        }
-
-        if ($adjusters['percentage']->asPercent() < 0) {
-            throw new \InvalidArgumentException('Invalid adjuster value \'percentage\' for sale '.get_class($this).'. Percentage cannot be lower than 0%. ['.$adjusters['percentage']->asPercent().'%] given.');
-        }
-    }
+        Assertion::isInstanceOf($adjuster, Percentage::class);
+     }
 }

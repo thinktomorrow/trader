@@ -2,14 +2,12 @@
 
 namespace Thinktomorrow\Trader\Sales\Domain\Conditions;
 
-use DateTime;
 use DateTimeImmutable;
-use Thinktomorrow\Trader\Common\Domain\Conditions\BaseCondition;
-use Thinktomorrow\Trader\Common\Domain\Conditions\Condition;
-use Thinktomorrow\Trader\Common\Domain\Conditions\SaleCondition;
+use Thinktomorrow\Trader\Common\Conditions\BaseCondition;
+use Thinktomorrow\Trader\Common\Contracts\HasParameters;
 use Thinktomorrow\Trader\Sales\Domain\EligibleForSale;
 
-class Period extends BaseCondition implements Condition, SaleCondition
+class Period extends BaseCondition implements SaleCondition
 {
     public function check(EligibleForSale $eligibleForSale): bool
     {
@@ -52,7 +50,7 @@ class Period extends BaseCondition implements Condition, SaleCondition
         ];
     }
 
-    public function setParameterValues($values): Condition
+    public function setParameterValues($values): HasParameters
     {
         if(!is_array($values)){
             throw new \InvalidArgumentException('Passed parameter values should be an array.' . gettype($values) . ' given.');

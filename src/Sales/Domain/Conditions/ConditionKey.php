@@ -2,7 +2,7 @@
 
 namespace Thinktomorrow\Trader\Sales\Domain\Conditions;
 
-use Thinktomorrow\Trader\Common\Domain\Conditions\Condition;
+use Thinktomorrow\Trader\Common\Contracts\HasParameters;
 use Thinktomorrow\Trader\Common\Helpers\HandlesKeyToClassMapping;
 
 class ConditionKey
@@ -14,7 +14,7 @@ class ConditionKey
         'end_at'                => Period::class,
     ];
 
-    public static function fromCondition(Condition $condition)
+    public static function fromCondition(HasParameters $condition)
     {
         return static::fromInstance($condition);
     }

@@ -2,8 +2,8 @@
 
 namespace Thinktomorrow\Trader\Orders\Domain;
 
-use Thinktomorrow\Trader\Common\Domain\State\StatefulContract;
-use Thinktomorrow\Trader\Common\Domain\State\StateMachine;
+use Thinktomorrow\Trader\Common\State\StatefulContract;
+use Thinktomorrow\Trader\Common\State\StateMachine;
 
 class OrderState extends StateMachine
 {

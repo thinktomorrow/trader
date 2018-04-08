@@ -4,7 +4,7 @@ namespace Thinktomorrow\Trader\Discounts\Domain\Types;
 
 use Assert\Assertion;
 use Money\Money;
-use Thinktomorrow\Trader\Common\Domain\Price\Cash;
+use Thinktomorrow\Trader\Common\Price\Cash;
 use Thinktomorrow\Trader\Discounts\Domain\AppliedDiscount;
 use Thinktomorrow\Trader\Discounts\Domain\Discount;
 use Thinktomorrow\Trader\Discounts\Domain\EligibleForDiscount;
@@ -29,7 +29,7 @@ final class FreeItemDiscount extends BaseDiscount implements Discount
         }
 
         // Since the products are offered as free, make sure each item has a 0,00 price
-        foreach ($this->adjusters['free_items'] as $item) {
+        foreach ($this->adjuster['free_items'] as $item) {
 
             $discountAmount = $item->discountBasePrice();
 

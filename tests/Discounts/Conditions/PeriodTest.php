@@ -12,7 +12,7 @@ class PeriodTest extends TestCase
     {
         $condition = new Period();
 
-        $this->assertTrue($condition->check($this->makeOrder()));
+        $this->assertTrue($condition->check($order = $this->makeOrder(), $order));
     }
 
     /** @test */
@@ -28,33 +28,33 @@ class PeriodTest extends TestCase
     {
         // Start at yesterday
         $condition = (new Period())->setParameters(['start_at' => new \DateTimeImmutable('@'.strtotime('-1 day'))]);
-        $this->assertTrue($condition->check($this->makeOrder()));
+        $this->assertTrue($condition->check($order = $this->makeOrder(), $order));
 
         // Start at tomorrow
         $condition = (new Period())->setParameters(['start_at' => new \DateTimeImmutable('@'.strtotime('+1 day'))]);
-        $this->assertFalse($condition->check($this->makeOrder()));
+        $this->assertFalse($condition->check($order = $this->makeOrder(), $order));
 
         // End at tomorrow
         $condition = (new Period())->setParameters(['end_at' => new \DateTimeImmutable('@'.strtotime('+1 day'))]);
-        $this->assertTrue($condition->check($this->makeOrder()));
+        $this->assertTrue($condition->check($order = $this->makeOrder(), $order));
 
         // End at yesterday
         $condition = (new Period())->setParameters(['end_at' => new \DateTimeImmutable('@'.strtotime('-1 day'))]);
-        $this->assertFalse($condition->check($this->makeOrder()));
+        $this->assertFalse($condition->check($order = $this->makeOrder(), $order));
 
         // Current time falls out of given period
         $condition = (new Period())->setParameters([
             'start_at' => new \DateTimeImmutable('@'.strtotime('+1 day')),
             'end_at'   => new \DateTimeImmutable('@'.strtotime('+2 day')),
         ]);
-        $this->assertFalse($condition->check($this->makeOrder()));
+        $this->assertFalse($condition->check($order = $this->makeOrder(), $order));
 
         // Current time falls in given period
         $condition = (new Period())->setParameters([
             'start_at' => new \DateTimeImmutable('@'.strtotime('-1 day')),
             'end_at'   => new \DateTimeImmutable('@'.strtotime('+1 day')),
         ]);
-        $this->assertTrue($condition->check($this->makeOrder()));
+        $this->assertTrue($condition->check($order = $this->makeOrder(), $order));
     }
 
     /** @test */

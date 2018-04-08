@@ -78,4 +78,9 @@ class UnknownDiscount implements Discount
     {
         return false;
     }
+
+    public function getType(): string
+    {
+        return 'unknown';
+    }
 }

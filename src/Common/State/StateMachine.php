@@ -1,6 +1,6 @@
 <?php
 
-namespace Thinktomorrow\Trader\Common\Domain\State;
+namespace Thinktomorrow\Trader\Common\State;
 
 abstract class StateMachine
 {

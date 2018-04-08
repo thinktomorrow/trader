@@ -3,7 +3,7 @@
 namespace Thinktomorrow\Trader\Sales\Domain;
 
 use Money\Money;
-use Thinktomorrow\Trader\Common\Domain\Price\Percentage;
+use Thinktomorrow\Trader\Common\Price\Percentage;
 use Thinktomorrow\Trader\Common\Helpers\HandlesArrayDotSyntax;
 
 class AppliedSale

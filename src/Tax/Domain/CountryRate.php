@@ -2,7 +2,7 @@
 
 namespace Thinktomorrow\Trader\Tax\Domain;
 
-use Thinktomorrow\Trader\Common\Domain\Price\Percentage;
+use Thinktomorrow\Trader\Common\Price\Percentage;
 use Thinktomorrow\Trader\Countries\CountryId;
 
 class CountryRate

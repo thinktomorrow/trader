@@ -4,7 +4,7 @@ namespace Thinktomorrow\Trader\Payment\Domain;
 
 use Assert\Assertion;
 use Money\Money;
-use Thinktomorrow\Trader\Common\Domain\Conditions\Condition;
+use Thinktomorrow\Trader\Common\Contracts\HasParameters;
 use Thinktomorrow\Trader\Orders\Domain\Order;
 
 class PaymentRule
@@ -71,7 +71,7 @@ class PaymentRule
      */
     private function validateParameters(array $conditions, array $adjusters)
     {
-        Assertion::allIsInstanceOf($conditions, Condition::class);
+        Assertion::allIsInstanceOf($conditions, HasParameters::class);
 
         if (!isset($adjusters['amount']) || !$adjusters['amount'] instanceof Money) {
             throw new \InvalidArgumentException('Invalid or missing amount. paymentRule requires at least an amount adjuster of type Money.');

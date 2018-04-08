@@ -3,7 +3,10 @@
 namespace Thinktomorrow\Trader\Tests;
 
 use Money\Money;
+use Thinktomorrow\Trader\Common\Adjusters\Amount;
+use Thinktomorrow\Trader\Discounts\Domain\DiscountId;
 use Thinktomorrow\Trader\Discounts\Domain\Exceptions\CannotApplyDiscount;
+use Thinktomorrow\Trader\Discounts\Domain\Types\PercentageOffDiscount;
 
 class PercentageOffTest extends TestCase
 {
@@ -51,7 +54,7 @@ class PercentageOffTest extends TestCase
     /** @test */
     public function discount_cannot_be_higher_than_original_price()
     {
-        $this->expectException(CannotApplyDiscount::class);
+        $this->expectException(\InvalidArgumentException::class);
 
         list($order, $item) = $this->prepOrderWithItem(100);
         $discount = $this->makePercentageOffDiscount(120);
@@ -71,5 +74,18 @@ class PercentageOffTest extends TestCase
         $this->assertEquals(Money::EUR(100), $order->discountBasePrice());
         $this->assertEquals(Money::EUR(0), $order->discountTotal());
         $this->assertEquals(Money::EUR(100), $order->total());
+    }
+
+    /** @test */
+    function it_requires_a_percentage_adjuster()
+    {
+        $this->expectException(\InvalidArgumentException::class);
+
+        new PercentageOffDiscount(
+            DiscountId::fromInteger(1),
+            [],
+            (new Amount())->setParameters(Money::EUR(10)),
+            []
+        );
     }
 }

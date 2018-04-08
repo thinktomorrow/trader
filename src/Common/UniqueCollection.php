@@ -1,6 +1,6 @@
 <?php
 
-namespace Thinktomorrow\Trader\Common\Domain;
+namespace Thinktomorrow\Trader\Common;
 
 class UniqueCollection implements \ArrayAccess, \Countable, \IteratorAggregate
 {
