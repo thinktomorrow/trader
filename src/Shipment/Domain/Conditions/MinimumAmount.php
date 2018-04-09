@@ -7,7 +7,7 @@ use Thinktomorrow\Trader\Common\Contracts\HasParameters;
 use Thinktomorrow\Trader\Common\Price\Cash;
 use Thinktomorrow\Trader\Orders\Domain\Order;
 
-class MinimumAmount extends BaseCondition implements HasParameters
+class MinimumAmount extends BaseCondition implements ShipmentCondition
 {
     public function check(Order $order): bool
     {

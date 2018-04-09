@@ -7,7 +7,7 @@ use Thinktomorrow\Trader\Common\Price\Cash;
 use Thinktomorrow\Trader\Common\Conditions\BaseCondition;
 use Thinktomorrow\Trader\Orders\Domain\Order;
 
-class MaximumAmount extends BaseCondition implements HasParameters
+class MaximumAmount extends BaseCondition implements PaymentCondition
 {
     public function check(Order $order): bool
     {

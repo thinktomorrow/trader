@@ -22,3 +22,4 @@ Important changes will be notified in this file
 - Moved `AbstractPresenter` and `GetDynamicValue` to `Common\Presenters` folder.
 - Conditions no longer require nested associative array of parameters. If condition asks for a single
 parameter, this can be added as such. 
+

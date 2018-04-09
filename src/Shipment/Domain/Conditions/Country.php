@@ -3,10 +3,9 @@
 namespace Thinktomorrow\Trader\Shipment\Domain\Conditions;
 
 use Thinktomorrow\Trader\Common\Conditions\BaseCondition;
-use Thinktomorrow\Trader\Common\Contracts\HasParameters;
 use Thinktomorrow\Trader\Orders\Domain\Order;
 
-class Country extends BaseCondition implements HasParameters
+class Country extends BaseCondition implements ShipmentCondition
 {
     public function check(Order $order): bool
     {
