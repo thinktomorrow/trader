@@ -44,8 +44,9 @@ class AppliedDiscountTest extends TestCase
         $fixedAmountOff = $this->makeFixedAmountOffDiscount(40);
         $fixedAmountOff->apply($order, $order);
 
-        $this->assertCount(1, $order->discounts());
-        $appliedDiscount = reset($order->discounts());
+        $discounts = $order->discounts();
+        $this->assertCount(1, $discounts);
+        $appliedDiscount = reset($discounts);
 
         $this->assertEquals(Money::EUR(60), $order->total());
         $this->assertEquals(Money::EUR(40), $appliedDiscount->discountAmount());
