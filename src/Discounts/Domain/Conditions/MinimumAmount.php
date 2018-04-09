@@ -32,7 +32,9 @@ class MinimumAmount extends BaseCondition implements DiscountCondition
         $values = $this->normalizeParameters($values);
 
         $this->setParameters([
-            'minimum_amount' => Cash::make($values['minimum_amount']),
+            'minimum_amount' => $values['minimum_amount'] instanceof Money
+                ? $values['minimum_amount']
+                : Cash::make($values['minimum_amount']),
         ]);
 
         return $this;
