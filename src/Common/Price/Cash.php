@@ -100,7 +100,7 @@ class Cash
             return Percentage::fromPercent(0);
         }
 
-        $percentage = (float) sprintf("%.".$precision."f", ($this->money->getAmount() * 100) / $other->getAmount());
+        $percentage = (float) sprintf('%.'.$precision.'f', ($this->money->getAmount() * 100) / $other->getAmount());
 
         return Percentage::fromPercent($percentage);
     }

@@ -6,8 +6,6 @@ use Money\Money;
 use Thinktomorrow\Trader\Common\Price\Percentage;
 use Thinktomorrow\Trader\Discounts\Domain\AppliedDiscount;
 use Thinktomorrow\Trader\Discounts\Domain\DiscountId;
-use Thinktomorrow\Trader\Discounts\Domain\Exceptions\CannotApplyDiscount;
-use Thinktomorrow\Trader\Tests\Stubs\PurchasableStub;
 
 class DiscountTest extends TestCase
 {

@@ -2,8 +2,8 @@
 
 namespace Thinktomorrow\Trader\Tests\Discounts\Conditions;
 
-use Thinktomorrow\Trader\Tests\TestCase;
 use Thinktomorrow\Trader\Discounts\Domain\Conditions\Period;
+use Thinktomorrow\Trader\Tests\TestCase;
 
 class PeriodTest extends TestCase
 {
@@ -63,7 +63,7 @@ class PeriodTest extends TestCase
         $order = $this->makeOrder();
 
         $discount = $this->makePercentageOffDiscount(15, [
-            'start_at' => (new \DateTimeImmutable('@'.strtotime('+3 days')))
+            'start_at' => (new \DateTimeImmutable('@'.strtotime('+3 days'))),
         ]);
 
         $discount2 = $this->makePercentageOffDiscount(15, [

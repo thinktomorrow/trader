@@ -3,7 +3,6 @@
 namespace Thinktomorrow\Trader\Tests;
 
 use Money\Money;
-use Thinktomorrow\Trader\Orders\Domain\Item;
 use Thinktomorrow\Trader\Shipment\Domain\Conditions\MinimumAmount;
 use Thinktomorrow\Trader\Shipment\Domain\ShippingRule;
 use Thinktomorrow\Trader\Shipment\Domain\ShippingRuleId;

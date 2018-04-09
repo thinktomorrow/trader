@@ -46,19 +46,19 @@ class Period extends BaseCondition implements DiscountCondition
     {
         return [
             'start_at' => $this->parameters['start_at']->format('Y-m-d H:i:s'),
-            'end_at' => $this->parameters['end_at']->format('Y-m-d H:i:s')
+            'end_at'   => $this->parameters['end_at']->format('Y-m-d H:i:s'),
         ];
     }
 
     public function setParameterValues($values): HasParameters
     {
-        if(!is_array($values)){
-            throw new \InvalidArgumentException('Passed parameter values should be an array.' . gettype($values) . ' given.');
+        if (!is_array($values)) {
+            throw new \InvalidArgumentException('Passed parameter values should be an array.'.gettype($values).' given.');
         }
 
         $this->setParameters([
             'start_at' => $values['start_at'] ? DateTimeImmutable::createFromFormat('Y-m-d H:i:s', $values['start_at']) : null,
-            'end_at' => $values['end_at'] ? DateTimeImmutable::createFromFormat('Y-m-d H:i:s', $values['end_at']) : null,
+            'end_at'   => $values['end_at'] ? DateTimeImmutable::createFromFormat('Y-m-d H:i:s', $values['end_at']) : null,
         ]);
 
         return $this;

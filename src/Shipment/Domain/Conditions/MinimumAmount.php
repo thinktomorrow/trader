@@ -22,7 +22,7 @@ class MinimumAmount extends BaseCondition implements ShipmentCondition
     public function getParameterValues(): array
     {
         return [
-            'minimum_amount' => $this->parameters['minimum_amount']->getAmount()
+            'minimum_amount' => $this->parameters['minimum_amount']->getAmount(),
         ];
     }
 

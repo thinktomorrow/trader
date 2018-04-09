@@ -4,7 +4,6 @@ namespace Thinktomorrow\Trader\Tests\Payment;
 
 use InvalidArgumentException;
 use Money\Money;
-use Thinktomorrow\Trader\Orders\Domain\Item;
 use Thinktomorrow\Trader\Payment\Domain\PaymentMethod;
 use Thinktomorrow\Trader\Payment\Domain\PaymentMethodId;
 use Thinktomorrow\Trader\Payment\Domain\PaymentRuleFactory;

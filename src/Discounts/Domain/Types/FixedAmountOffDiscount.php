@@ -9,8 +9,8 @@ use Thinktomorrow\Trader\Common\Adjusters\Amount;
 use Thinktomorrow\Trader\Common\Price\Cash;
 use Thinktomorrow\Trader\Discounts\Domain\AppliedDiscount;
 use Thinktomorrow\Trader\Discounts\Domain\Discount;
-use Thinktomorrow\Trader\Discounts\Domain\Exceptions\CannotApplyDiscount;
 use Thinktomorrow\Trader\Discounts\Domain\EligibleForDiscount;
+use Thinktomorrow\Trader\Discounts\Domain\Exceptions\CannotApplyDiscount;
 use Thinktomorrow\Trader\Orders\Domain\Order;
 
 class FixedAmountOffDiscount extends BaseDiscount implements Discount
@@ -42,8 +42,7 @@ class FixedAmountOffDiscount extends BaseDiscount implements Discount
     public function discountBasePrice(Order $order, EligibleForDiscount $eligibleForDiscount): Money
     {
         // IF ORDERDISCOUNT USE GLOBAL DISCOUNT BUT CHECK IF WE HAVE A ITEM_WHITELIST OR ITEM_BLACKLIST TO CALCULATE THE DISCOUNT AMOUNT UPON
-        if($this->isItemDiscount($eligibleForDiscount) || ( !$this->usesCondition('item_whitelist') && !$this->usesCondition('item_blacklist')) )
-        {
+        if ($this->isItemDiscount($eligibleForDiscount) || (!$this->usesCondition('item_whitelist') && !$this->usesCondition('item_blacklist'))) {
             return $eligibleForDiscount->discountBasePrice();
         }
 

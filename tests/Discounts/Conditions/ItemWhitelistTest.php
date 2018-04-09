@@ -3,9 +3,9 @@
 namespace Thinktomorrow\Trader\Tests\Discounts\Conditions;
 
 use Money\Money;
-use Thinktomorrow\Trader\Tests\TestCase;
-use Thinktomorrow\Trader\Tests\Stubs\PurchasableStub;
 use Thinktomorrow\Trader\Discounts\Domain\Conditions\ItemWhitelist;
+use Thinktomorrow\Trader\Tests\Stubs\PurchasableStub;
+use Thinktomorrow\Trader\Tests\TestCase;
 
 class ItemWhitelistTest extends TestCase
 {
@@ -50,7 +50,7 @@ class ItemWhitelistTest extends TestCase
     public function order_discount_uses_whitelist_for_scoping_discount_baseprice()
     {
         list($order, $item) = $this->prepOrderWithItem(100);
-        $item2 = $this->getItem(null,null,new PurchasableStub(20, [], Money::EUR(30)));
+        $item2 = $this->getItem(null, null, new PurchasableStub(20, [], Money::EUR(30)));
         $order->items()->add($item2);
 
         $discount = $this->makePercentageOffDiscount(50, ['item_whitelist' => [20]]);

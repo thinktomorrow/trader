@@ -5,10 +5,9 @@ namespace Thinktomorrow\Trader\Tests;
 use Money\Money;
 use Thinktomorrow\Trader\Common\Adjusters\Amount;
 use Thinktomorrow\Trader\Common\Adjusters\Percentage;
-use Thinktomorrow\Trader\Common\Price\Percentage as PercentageValue;
 use Thinktomorrow\Trader\Common\Price\Cash;
+use Thinktomorrow\Trader\Common\Price\Percentage as PercentageValue;
 use Thinktomorrow\Trader\Discounts\Domain\Conditions\ConditionKey as DiscountConditionKey;
-use Thinktomorrow\Trader\Sales\Domain\Conditions\ConditionKey as SaleConditionKey;
 use Thinktomorrow\Trader\Discounts\Domain\DiscountFactory;
 use Thinktomorrow\Trader\Discounts\Domain\DiscountId;
 use Thinktomorrow\Trader\Discounts\Domain\Types\FixedAmountOffDiscount;
@@ -18,6 +17,7 @@ use Thinktomorrow\Trader\Orders\Domain\Item;
 use Thinktomorrow\Trader\Orders\Domain\ItemId;
 use Thinktomorrow\Trader\Orders\Domain\Order;
 use Thinktomorrow\Trader\Orders\Domain\OrderId;
+use Thinktomorrow\Trader\Sales\Domain\Conditions\ConditionKey as SaleConditionKey;
 use Thinktomorrow\Trader\Sales\Domain\SaleId;
 use Thinktomorrow\Trader\Sales\Domain\Types\FixedAmountOffSale;
 use Thinktomorrow\Trader\Sales\Domain\Types\FixedAmountSale;
@@ -39,9 +39,15 @@ trait ShoppingHelpers
 
     protected function getItem($itemId = null, $taxRate = null, $purchasable = null): Item
     {
-        if(!$itemId) $itemId = ItemId::fromInteger(1);
-        if(!$taxRate) $taxRate = PercentageValue::fromPercent(21);
-        if(!$purchasable) $purchasable = new PurchasableStub(20, [], Money::EUR(110));
+        if (!$itemId) {
+            $itemId = ItemId::fromInteger(1);
+        }
+        if (!$taxRate) {
+            $taxRate = PercentageValue::fromPercent(21);
+        }
+        if (!$purchasable) {
+            $purchasable = new PurchasableStub(20, [], Money::EUR(110));
+        }
 
         return new Item($itemId, $taxRate, $purchasable);
     }
@@ -103,7 +109,7 @@ trait ShoppingHelpers
         $order = $this->makeOrder();
         $order->items()->add($item);
 
-        return array($order, $item);
+        return [$order, $item];
     }
 
     protected function makeEligibleForSaleStub($amount = 100)
@@ -115,12 +121,11 @@ trait ShoppingHelpers
 
     protected function makePercentageOffSale($percent, $conditions = [], array $data = [])
     {
-        if(!empty($conditions))
-        {
-            foreach($conditions as $type => $parameters){
+        if (!empty($conditions)) {
+            foreach ($conditions as $type => $parameters) {
                 $class = SaleConditionKey::fromString($type)->class();
                 $conditions[$type] = (new $class())->setParameters([$type => $parameters]);
-            };
+            }
         }
 
         return new PercentageOffSale(
@@ -158,16 +163,15 @@ trait ShoppingHelpers
 
     protected function makePercentageOffDiscount($percent = 10, $conditions = [], $data = [], $id = null)
     {
-        if(!empty($conditions))
-        {
-            foreach($conditions as $type => $parameters){
+        if (!empty($conditions)) {
+            foreach ($conditions as $type => $parameters) {
                 $class = DiscountConditionKey::fromString($type)->class();
                 $conditions[$type] = (new $class())->setParameters([$type => $parameters]);
-            };
+            }
         }
 
         return new PercentageOffDiscount(
-            DiscountId::fromInteger($id ?? rand(1,99)),
+            DiscountId::fromInteger($id ?? rand(1, 99)),
             $conditions,
             (new Percentage())->setParameterValues($percent),
             $data
@@ -176,16 +180,15 @@ trait ShoppingHelpers
 
     protected function makeFixedAmountOffDiscount($amount, $conditions = [], $data = [], $id = null)
     {
-        if(!empty($conditions))
-        {
-            foreach($conditions as $type => $parameters){
+        if (!empty($conditions)) {
+            foreach ($conditions as $type => $parameters) {
                 $class = DiscountConditionKey::fromString($type)->class();
                 $conditions[$type] = (new $class())->setParameters([$type => $parameters]);
-            };
+            }
         }
 
         return new FixedAmountOffDiscount(
-            DiscountId::fromInteger($id ?? rand(1,99)),
+            DiscountId::fromInteger($id ?? rand(1, 99)),
             $conditions,
             (new Amount())->setParameters(Money::EUR($amount)),
             $data
