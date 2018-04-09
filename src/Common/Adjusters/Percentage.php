@@ -10,7 +10,7 @@ class Percentage extends BaseAdjuster implements Adjuster
     public function getRawParameters(): array
     {
         return [
-            'percentage' => $this->parameters['percentage']->asPercent()
+            'percentage' => $this->parameters['percentage']->asPercent(),
         ];
     }
 

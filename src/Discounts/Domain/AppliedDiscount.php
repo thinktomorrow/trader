@@ -3,8 +3,8 @@
 namespace Thinktomorrow\Trader\Discounts\Domain;
 
 use Money\Money;
-use Thinktomorrow\Trader\Common\Price\Percentage;
 use Thinktomorrow\Trader\Common\Helpers\HandlesArrayDotSyntax;
+use Thinktomorrow\Trader\Common\Price\Percentage;
 use Thinktomorrow\Trader\Discounts\Domain\Types\TypeKey;
 
 final class AppliedDiscount
@@ -92,7 +92,9 @@ final class AppliedDiscount
 
     public function data($key = null, $default = null)
     {
-        if(is_null($key)) return $this->data;
+        if (is_null($key)) {
+            return $this->data;
+        }
 
         if (!is_null($key) && isset($this->data[$key])) {
             return $this->data[$key];

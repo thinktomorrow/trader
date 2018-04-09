@@ -27,7 +27,7 @@ class PercentageOffSaleTest extends TestCase
     }
 
     /** @test */
-    function it_requires_a_percentage_adjuster()
+    public function it_requires_a_percentage_adjuster()
     {
         $this->expectException(\InvalidArgumentException::class);
 

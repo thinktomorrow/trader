@@ -5,7 +5,6 @@ namespace Thinktomorrow\Trader\Tests;
 use Money\Money;
 use Thinktomorrow\Trader\Common\Adjusters\Amount;
 use Thinktomorrow\Trader\Discounts\Domain\DiscountId;
-use Thinktomorrow\Trader\Discounts\Domain\Exceptions\CannotApplyDiscount;
 use Thinktomorrow\Trader\Discounts\Domain\Types\PercentageOffDiscount;
 
 class PercentageOffTest extends TestCase
@@ -77,7 +76,7 @@ class PercentageOffTest extends TestCase
     }
 
     /** @test */
-    function it_requires_a_percentage_adjuster()
+    public function it_requires_a_percentage_adjuster()
     {
         $this->expectException(\InvalidArgumentException::class);
 

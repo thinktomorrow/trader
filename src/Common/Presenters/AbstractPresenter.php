@@ -2,8 +2,6 @@
 
 namespace Thinktomorrow\Trader\Common\Presenters;
 
-use Thinktomorrow\Trader\Common\Presenters\GetDynamicValue;
-
 abstract class AbstractPresenter
 {
     use Thinktomorrow\Trader\Common\Presenters\GetDynamicValue;

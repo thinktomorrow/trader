@@ -11,7 +11,7 @@ class Amount extends BaseAdjuster implements Adjuster
     public function getRawParameters(): array
     {
         return [
-            'amount' => $this->parameters['amount']->getAmount()
+            'amount' => $this->parameters['amount']->getAmount(),
         ];
     }
 

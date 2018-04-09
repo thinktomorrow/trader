@@ -71,14 +71,14 @@ class CashTest extends TestCase
     }
 
     /** @test */
-    function it_can_get_percentage_of_money_values()
+    public function it_can_get_percentage_of_money_values()
     {
         $cash = Cash::from(Money::EUR(51));
         $this->assertEquals(Percentage::fromPercent(51), $cash->asPercentage(Money::EUR(100)));
     }
 
     /** @test */
-    function it_can_get_percentage_with_specificity_of_2_decimals()
+    public function it_can_get_percentage_with_specificity_of_2_decimals()
     {
         $cash = Cash::from(Money::EUR(55));
 

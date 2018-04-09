@@ -6,7 +6,6 @@ use Money\Money;
 use Thinktomorrow\Trader\Common\Price\Cash;
 use Thinktomorrow\Trader\Common\Price\Percentage;
 use Thinktomorrow\Trader\Discounts\Domain\AppliedDiscount;
-use Thinktomorrow\Trader\Discounts\Domain\AppliedDiscountCollection;
 use Thinktomorrow\Trader\Discounts\Domain\EligibleForDiscount;
 use Thinktomorrow\Trader\Tax\Domain\TaxId;
 use Thinktomorrow\Trader\Tax\Domain\TaxRate;

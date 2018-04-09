@@ -18,7 +18,7 @@ class FixedCustomAmountSale extends BaseSale implements Sale
     {
         $applicable = parent::applicable($eligibleForSale);
 
-        return ($applicable && $eligibleForSale->hasOriginalSalePrice());
+        return $applicable && $eligibleForSale->hasOriginalSalePrice();
     }
 
     public function apply(EligibleForSale $eligibleForSale)
@@ -41,7 +41,9 @@ class FixedCustomAmountSale extends BaseSale implements Sale
 
     public function saleAmount(EligibleForSale $eligibleForSale): Money
     {
-        if( ! $eligibleForSale->hasOriginalSalePrice()) return Cash::zero();
+        if (!$eligibleForSale->hasOriginalSalePrice()) {
+            return Cash::zero();
+        }
 
         return $eligibleForSale->price()->subtract($eligibleForSale->originalSalePrice());
     }

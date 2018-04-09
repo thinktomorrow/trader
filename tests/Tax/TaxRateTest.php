@@ -30,7 +30,7 @@ class TaxRateTest extends TestCase
 
         $rate = new TaxRate(TaxId::fromInteger(1), 'foobar', Percentage::fromPercent(21), [
             new CountryRate('NL', Percentage::fromPercent(10), CountryId::fromIsoString('NL')),
-        ],[
+        ], [
             $this->container(BillingCountryRule::class),
         ]);
 
@@ -41,8 +41,8 @@ class TaxRateTest extends TestCase
     public function it_can_set_rate_to_zero_for_business_from_other_country_than_merchant()
     {
         $order = $this->makeOrder()->setBusiness()->setBillingAddress(['country_key' => 'NL']);
-        $rate = new TaxRate(TaxId::fromInteger(1), 'foobar', Percentage::fromPercent(21), [],[
-            $this->container(ForeignBusinessRule::class)
+        $rate = new TaxRate(TaxId::fromInteger(1), 'foobar', Percentage::fromPercent(21), [], [
+            $this->container(ForeignBusinessRule::class),
         ]);
 
         $this->assertEquals(Percentage::fromPercent(0), $rate->setMerchantCountry(CountryId::fromIsoString('BE'))->get(null, $order));
