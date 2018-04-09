@@ -53,4 +53,18 @@ class AppliedDiscountTest extends TestCase
         $this->assertEquals(Money::EUR(100), $appliedDiscount->discountBasePrice());
         $this->assertEquals(Percentage::fromPercent(40), $appliedDiscount->discountPercentage());
     }
+
+    /** @test */
+    public function applied_discount_has_reference_to_used_conditions()
+    {
+        $order = $this->makeOrder(100);
+        $fixedAmountOff = $this->makeFixedAmountOffDiscount(40, ['minimum_amount' => Money::EUR(20)]);
+        $fixedAmountOff->apply($order, $order);
+
+        $discounts = $order->discounts();
+        $appliedDiscount = reset($discounts);
+
+        $this->assertCount(1, $appliedDiscount->data('conditions'));
+        $this->assertEquals(20, $appliedDiscount->data('conditions.minimum_amount'));
+    }
 }

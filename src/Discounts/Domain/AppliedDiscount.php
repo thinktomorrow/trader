@@ -90,6 +90,11 @@ final class AppliedDiscount
         return $this->discountPercentage;
     }
 
+    public function isCouponDiscount(): bool
+    {
+        return !is_null($this->data('conditions.coupon_code'));
+    }
+
     public function data($key = null, $default = null)
     {
         if (is_null($key)) {

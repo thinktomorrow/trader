@@ -38,7 +38,7 @@ final class FreeItemDiscount extends BaseDiscount implements Discount
                 TypeKey::fromDiscount($this)->get(),
                 $discountAmount,
                 Cash::from($discountAmount)->asPercentage($eligibleForDiscount->discountBasePrice(), 0),
-                $this->data
+                $this->mergeRawConditions($this->data)
             ));
 
             // Add free item to order

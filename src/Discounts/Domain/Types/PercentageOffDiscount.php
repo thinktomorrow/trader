@@ -30,7 +30,7 @@ class PercentageOffDiscount extends BaseDiscount implements Discount
             $discountAmount,
             $this->discountBasePrice($order, $eligibleForDiscount),
             Cash::from($discountAmount)->asPercentage($eligibleForDiscount->discountBasePrice(), 0),
-            $this->data
+            $this->mergeRawConditions($this->data)
         ));
     }
 

@@ -112,6 +112,22 @@ abstract class BaseDiscount
             ->discountBasePrice();
     }
 
+    protected function mergeRawConditions(array $array): array
+    {
+        $conditions = [];
+
+        foreach($this->conditions as $condition)
+        {
+            $conditions = array_merge($conditions, $condition->getRawParameters());
+        }
+
+        if(!empty($conditions)){
+            $array = array_merge(['conditions' => $conditions], $array);
+        }
+
+        return $array;
+    }
+
     protected function getCondition(string $condition_key)
     {
         if (!isset($this->conditions[$condition_key])) {
