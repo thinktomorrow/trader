@@ -65,10 +65,8 @@ abstract class BaseSale
 
     public function usesCondition(string $condition_key): bool
     {
-        foreach($this->conditions as $condition)
-        {
-            if($this->getConditionKey($condition_key)->equalsClass($condition))
-            {
+        foreach ($this->conditions as $condition) {
+            if ($this->getConditionKey($condition_key)->equalsClass($condition)) {
                 return true;
             }
         }
@@ -92,7 +90,7 @@ abstract class BaseSale
     }
 
     /**
-     * @param array $conditions
+     * @param array    $conditions
      * @param Adjuster $adjuster
      */
     protected function validateParameters(array $conditions, Adjuster $adjuster)
@@ -102,7 +100,9 @@ abstract class BaseSale
 
     protected function getCondition(string $condition_key)
     {
-        if(!isset($this->conditions[$condition_key])) return null;
+        if (!isset($this->conditions[$condition_key])) {
+            return;
+        }
 
         return $this->conditions[$condition_key];
     }

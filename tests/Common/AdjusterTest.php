@@ -10,15 +10,15 @@ use Thinktomorrow\Trader\Tests\TestCase;
 
 class AdjusterTest extends TestCase
 {
-   /** @test */
-   function it_can_create_an_adjuster()
-   {
-       $adjuster = new Amount();
-       $this->assertInstanceOf(Amount::class, $adjuster);
-   }
+    /** @test */
+    public function it_can_create_an_adjuster()
+    {
+        $adjuster = new Amount();
+        $this->assertInstanceOf(Amount::class, $adjuster);
+    }
 
     /** @test */
-    function it_can_get_the_type()
+    public function it_can_get_the_type()
     {
         // Guesses by className
         $adjuster = new Amount();
@@ -30,7 +30,7 @@ class AdjusterTest extends TestCase
     }
 
     /** @test */
-    function it_can_handle_parameters()
+    public function it_can_handle_parameters()
     {
         $adjuster1 = (new Amount())->setParameters(Money::EUR(50));
         $adjuster2 = (new Amount())->setParameters(['amount' => Money::EUR(50)]);
@@ -41,7 +41,7 @@ class AdjusterTest extends TestCase
     }
 
     /** @test */
-    function invalid_parameter_gives_exception()
+    public function invalid_parameter_gives_exception()
     {
         $this->expectException(\InvalidArgumentException::class);
 
@@ -49,7 +49,7 @@ class AdjusterTest extends TestCase
     }
 
     /** @test */
-    function it_can_get_parameter_by_key()
+    public function it_can_get_parameter_by_key()
     {
         $parameter = PercentageValue::fromPercent(25);
         $adjuster = (new Percentage())->setParameters($parameter);
@@ -57,5 +57,4 @@ class AdjusterTest extends TestCase
         $this->assertSame($parameter, $adjuster->getParameter('percentage'));
         $this->assertSame($parameter, $adjuster->getParameter());
     }
-
 }

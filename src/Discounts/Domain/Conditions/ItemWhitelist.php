@@ -10,7 +10,7 @@ class ItemWhitelist extends BaseCondition implements DiscountCondition
 {
     public function check(Order $order, EligibleForDiscount $eligibleForDiscount): bool
     {
-        /**
+        /*
          * If condition runs for an orderdiscount, we ignore the whitelist as
          * condition because it is used to calculate the discount baseprice
          */
@@ -28,7 +28,7 @@ class ItemWhitelist extends BaseCondition implements DiscountCondition
 
     protected function validateParameters(array $parameters)
     {
-        if ( ! isset($parameters['item_whitelist'])) {
+        if (!isset($parameters['item_whitelist'])) {
             throw new \InvalidArgumentException('Condition parameter item_whitelist is missing.');
         }
 

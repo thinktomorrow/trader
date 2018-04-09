@@ -42,5 +42,5 @@ class PercentageOffSale extends BaseSale implements Sale
         parent::validateParameters($conditions, $adjuster);
 
         Assertion::isInstanceOf($adjuster, Percentage::class);
-     }
+    }
 }

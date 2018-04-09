@@ -30,7 +30,6 @@ final class FreeItemDiscount extends BaseDiscount implements Discount
 
         // Since the products are offered as free, make sure each item has a 0,00 price
         foreach ($this->adjuster['free_items'] as $item) {
-
             $discountAmount = $item->discountBasePrice();
 
             $eligibleForDiscount->addToDiscountTotal($discountAmount);

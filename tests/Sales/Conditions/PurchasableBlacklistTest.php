@@ -4,8 +4,8 @@ namespace Thinktomorrow\Trader\Tests\Sales\Conditions;
 
 use Money\Money;
 use Thinktomorrow\Trader\Sales\Domain\Conditions\PurchasableBlacklist;
-use Thinktomorrow\Trader\Tests\TestCase;
 use Thinktomorrow\Trader\Tests\Stubs\PurchasableStub;
+use Thinktomorrow\Trader\Tests\TestCase;
 
 class PurchasableBlacklistTest extends TestCase
 {
@@ -13,7 +13,7 @@ class PurchasableBlacklistTest extends TestCase
     public function purchasable_sale_passes_if_no_blacklist_is_enforced()
     {
         $condition = new PurchasableBlacklist();
-        $stub = new PurchasableStub(2,[], Money::EUR(120));
+        $stub = new PurchasableStub(2, [], Money::EUR(120));
 
         $this->assertTrue($condition->check($stub));
     }
@@ -29,7 +29,7 @@ class PurchasableBlacklistTest extends TestCase
     /** @test */
     public function purchasable_sale_passes_if_given_purchasable_is_not_in_blacklist()
     {
-        $stub = new PurchasableStub(2,[], Money::EUR(120));
+        $stub = new PurchasableStub(2, [], Money::EUR(120));
 
         $condition = (new PurchasableBlacklist())->setParameters(['purchasable_blacklist' => [5]]);
         $this->assertTrue($condition->check($stub));
@@ -38,7 +38,7 @@ class PurchasableBlacklistTest extends TestCase
     /** @test */
     public function purchasable_sale_does_not_pass_if_given_purchasable_is_in_blacklist()
     {
-        $stub = new PurchasableStub(2,[], Money::EUR(120));
+        $stub = new PurchasableStub(2, [], Money::EUR(120));
 
         $condition = (new PurchasableBlacklist())->setParameters(['purchasable_blacklist' => [2]]);
         $this->assertFalse($condition->check($stub));

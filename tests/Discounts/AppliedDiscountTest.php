@@ -38,7 +38,7 @@ class AppliedDiscountTest extends TestCase
     }
 
     /** @test */
-    function it_can_apply_fixed_amount_on_order()
+    public function it_can_apply_fixed_amount_on_order()
     {
         $order = $this->makeOrder(100);
         $fixedAmountOff = $this->makeFixedAmountOffDiscount(40);

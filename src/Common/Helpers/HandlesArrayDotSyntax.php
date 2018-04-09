@@ -6,7 +6,7 @@ trait HandlesArrayDotSyntax
 {
     /**
      * collects from nested array via dot syntax.
-     * Taken from the mkiha GetModelValue functionality
+     * Taken from the mkiha GetModelValue functionality.
      *
      * Note: this assumes a data array property which contains the full data array
      */
@@ -24,7 +24,7 @@ trait HandlesArrayDotSyntax
             if (is_object($value)) {
                 $value = method_exists($value, 'toArray')
                     ? $value->toArray()
-                    : (array)$value;
+                    : (array) $value;
             }
 
             if (!isset($value[$nestedKey])) {

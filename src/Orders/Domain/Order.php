@@ -133,7 +133,8 @@ final class Order implements StatefulContract, EligibleForDiscount
     }
 
     /**
-     * Force a state without safety checks of the domain
+     * Force a state without safety checks of the domain.
+     *
      * @param $state
      */
     public function forceState($state)
@@ -169,7 +170,7 @@ final class Order implements StatefulContract, EligibleForDiscount
     }
 
     /**
-     * Baseprice where discount will be calculated on
+     * Baseprice where discount will be calculated on.
      *
      * @return Money
      */

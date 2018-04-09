@@ -1,8 +1,6 @@
 <?php
 
-
 namespace Thinktomorrow\Trader\Common\Helpers;
-
 
 use Thinktomorrow\Trader\Common\Contracts\HasParameters;
 
@@ -15,7 +13,9 @@ trait HandlesParameters
 
     public function getParameter(string $key = null)
     {
-        if($key) return $this->parameters[$key];
+        if ($key) {
+            return $this->parameters[$key];
+        }
 
         return reset($this->parameters);
     }
@@ -52,6 +52,7 @@ trait HandlesParameters
 
     /**
      * @param mixed $parameters
+     *
      * @return array
      */
     protected function normalizeParameters($parameters): array

@@ -78,7 +78,7 @@ class FixedAmountOffTest extends TestCase
     }
 
     /** @test */
-    function it_requires_an_amount_adjuster()
+    public function it_requires_an_amount_adjuster()
     {
         $this->expectException(\InvalidArgumentException::class);
 

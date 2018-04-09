@@ -6,13 +6,13 @@ use Assert\Assertion;
 use Money\Money;
 use Thinktomorrow\Trader\Common\Adjusters\Adjuster;
 use Thinktomorrow\Trader\Common\Conditions\Condition;
+use Thinktomorrow\Trader\Discounts\Domain\AdjustDiscountBasePrice;
 use Thinktomorrow\Trader\Discounts\Domain\Conditions\ConditionKey;
 use Thinktomorrow\Trader\Discounts\Domain\Conditions\DiscountCondition;
 use Thinktomorrow\Trader\Discounts\Domain\DiscountId;
 use Thinktomorrow\Trader\Discounts\Domain\EligibleForDiscount;
 use Thinktomorrow\Trader\Orders\Domain\Item;
 use Thinktomorrow\Trader\Orders\Domain\Order;
-use Thinktomorrow\Trader\Discounts\Domain\AdjustDiscountBasePrice;
 
 abstract class BaseDiscount
 {
@@ -85,10 +85,8 @@ abstract class BaseDiscount
 
     public function usesCondition(string $condition_key): bool
     {
-        foreach($this->conditions as $condition)
-        {
-            if($this->getConditionKey($condition_key)->equalsClass($condition))
-            {
+        foreach ($this->conditions as $condition) {
+            if ($this->getConditionKey($condition_key)->equalsClass($condition)) {
                 return true;
             }
         }
@@ -116,7 +114,9 @@ abstract class BaseDiscount
 
     protected function getCondition(string $condition_key)
     {
-        if(!isset($this->conditions[$condition_key])) return null;
+        if (!isset($this->conditions[$condition_key])) {
+            return;
+        }
 
         return $this->conditions[$condition_key];
     }

@@ -10,7 +10,7 @@ class ItemBlacklist extends BaseCondition implements DiscountCondition
 {
     public function check(Order $order, EligibleForDiscount $eligibleForDiscount): bool
     {
-        /**
+        /*
          * If condition runs for an orderdiscount, we ignore the blacklist as
          * condition because it is used to calculate the discount baseprice
          */

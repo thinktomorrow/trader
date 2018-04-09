@@ -11,12 +11,13 @@ interface HasParameters
      * format by setting the parameter key as the object type.
      *
      * @param mixed $parameters
+     *
      * @return HasParameters
      */
-    public function setParameters($parameters): HasParameters;
+    public function setParameters($parameters): self;
 
     /**
-     * Get parameter values
+     * Get parameter values.
      *
      * @return array
      */
@@ -27,6 +28,7 @@ interface HasParameters
      * parameter value is should be returned.
      *
      * @param string|null $key
+     *
      * @return mixed
      */
     public function getParameter(string $key = null);
@@ -40,10 +42,11 @@ interface HasParameters
     public function getParameterValues(): array;
 
     /**
-     * Set parameter values from normalized values
+     * Set parameter values from normalized values.
      *
      * @param mixed $values
+     *
      * @return HasParameters
      */
-    public function setParameterValues($values): HasParameters;
+    public function setParameterValues($values): self;
 }

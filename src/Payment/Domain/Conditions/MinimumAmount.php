@@ -2,8 +2,8 @@
 
 namespace Thinktomorrow\Trader\Payment\Domain\Conditions;
 
-use Thinktomorrow\Trader\Common\Contracts\HasParameters;
 use Thinktomorrow\Trader\Common\Conditions\BaseCondition;
+use Thinktomorrow\Trader\Common\Contracts\HasParameters;
 use Thinktomorrow\Trader\Common\Price\Cash;
 use Thinktomorrow\Trader\Orders\Domain\Order;
 
@@ -22,7 +22,7 @@ class MinimumAmount extends BaseCondition implements PaymentCondition
     public function getParameterValues(): array
     {
         return [
-            'minimum_amount' => $this->parameters['minimum_amount']->getAmount()
+            'minimum_amount' => $this->parameters['minimum_amount']->getAmount(),
         ];
     }
 

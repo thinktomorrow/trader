@@ -65,35 +65,35 @@ class OrderState extends StateMachine
             'to'   => self::PAID,
         ],
         'cancel' => [
-            'from' => [self::CONFIRMED, self::PAID, self::QUEUED_FOR_PROCESS, self::PROCESSED],
+            'from'  => [self::CONFIRMED, self::PAID, self::QUEUED_FOR_PROCESS, self::PROCESSED],
             'to'    => self::CANCELLED,
         ],
         'halt' => [
-            'from' => [self::PAID],
+            'from'  => [self::PAID],
             'to'    => self::HALTED_FOR_PROCESS,
         ],
         'queue' => [
-            'from' => [self::PAID, self::HALTED_FOR_PROCESS],
+            'from'  => [self::PAID, self::HALTED_FOR_PROCESS],
             'to'    => self::QUEUED_FOR_PROCESS,
         ],
         'process' => [
-            'from' => [self::PAID, self::QUEUED_FOR_PROCESS],
+            'from'  => [self::PAID, self::QUEUED_FOR_PROCESS],
             'to'    => self::PROCESSED,
         ],
         'ship' => [
-            'from' => [self::PROCESSED],
+            'from'  => [self::PROCESSED],
             'to'    => self::SHIPPED,
         ],
         'fulfill' => [
-            'from' => [self::SHIPPED],
+            'from'  => [self::SHIPPED],
             'to'    => self::FULFILLED,
         ],
         'return' => [
-            'from' => [self::SHIPPED, self::FULFILLED],
+            'from'  => [self::SHIPPED, self::FULFILLED],
             'to'    => self::RETURNED,
         ],
         'refund' => [
-            'from' => [self::SHIPPED, self::FULFILLED, self::RETURNED],
+            'from'  => [self::SHIPPED, self::FULFILLED, self::RETURNED],
             'to'    => self::REFUNDED,
         ],
     ];

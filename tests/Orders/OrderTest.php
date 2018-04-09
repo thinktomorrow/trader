@@ -7,7 +7,6 @@ use Thinktomorrow\Trader\Common\Config;
 use Thinktomorrow\Trader\Common\Price\Percentage;
 use Thinktomorrow\Trader\Countries\CountryId;
 use Thinktomorrow\Trader\Orders\Domain\CustomerId;
-use Thinktomorrow\Trader\Orders\Domain\Item;
 use Thinktomorrow\Trader\Orders\Domain\ItemCollection;
 use Thinktomorrow\Trader\Orders\Domain\Order;
 use Thinktomorrow\Trader\Orders\Domain\OrderId;
