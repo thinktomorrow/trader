@@ -2,8 +2,8 @@
 
 namespace Thinktomorrow\Trader\Payment\Domain\Conditions;
 
-use Thinktomorrow\Trader\Orders\Domain\Order;
 use Thinktomorrow\Trader\Common\Conditions\Condition;
+use Thinktomorrow\Trader\Orders\Domain\Order;
 
 interface PaymentCondition extends Condition
 {

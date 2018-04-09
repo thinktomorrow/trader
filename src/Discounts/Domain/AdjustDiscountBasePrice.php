@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace Thinktomorrow\Trader\Discounts\Domain;
 
@@ -19,9 +19,10 @@ class AdjustDiscountBasePrice
 
     public function addConditions(array $conditions)
     {
-        foreach($conditions as $condition)
-        {
-            if( ! $condition instanceof HasParameters) continue;
+        foreach ($conditions as $condition) {
+            if (!$condition instanceof HasParameters) {
+                continue;
+            }
 
             $this->addCondition($condition);
         }
@@ -35,27 +36,28 @@ class AdjustDiscountBasePrice
      *                                  -> not subtracted yet -> add
      * CHECK FAIL -> already subtracted -> ignore
      *            -> not subtracted yet -> already added -> subtract
-     *                                  -> not added yet -> ignore
+     *                                  -> not added yet -> ignore.
      */
     public function addCondition(HasParameters $condition)
     {
-        if(!$this->order) throw new \DomainException('Order value is required. Add it via setOrder method.');
-
-        foreach($this->order->items() as $item)
-        {
+        if (!$this->order) {
+            throw new \DomainException('Order value is required. Add it via setOrder method.');
+        }
+        foreach ($this->order->items() as $item) {
             if ($condition->check($this->order, $item)) {
-
-                if($this->alreadyIncluded($item) || $this->alreadyExcluded($item)) continue;
+                if ($this->alreadyIncluded($item) || $this->alreadyExcluded($item)) {
+                    continue;
+                }
 
                 $this->discountBasePrice = $this->discountBasePrice->add($item->total());
 
                 $this->markAsIncluded($item);
-            }
-            else{
-                if($this->alreadyExcluded($item)) continue;
+            } else {
+                if ($this->alreadyExcluded($item)) {
+                    continue;
+                }
 
-                if($this->alreadyIncluded($item))
-                {
+                if ($this->alreadyIncluded($item)) {
                     // Subtraction is only possible if the item was already added in the first place
                     $this->discountBasePrice = $this->discountBasePrice->subtract($item->total());
                 }

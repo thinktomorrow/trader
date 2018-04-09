@@ -5,7 +5,7 @@ namespace Thinktomorrow\Trader\Common\Contracts;
 interface HasParameters
 {
     /**
-     * Get parameter values
+     * Get parameter values.
      *
      * @return array
      */
@@ -16,6 +16,7 @@ interface HasParameters
      * parameter value should be returned.
      *
      * @param string|null $key
+     *
      * @return mixed
      */
     public function getParameter(string $key = null);
@@ -27,9 +28,10 @@ interface HasParameters
      * format by setting the parameter key as the object type.
      *
      * @param mixed $parameters
+     *
      * @return HasParameters
      */
-    public function setParameters($parameters): HasParameters;
+    public function setParameters($parameters): self;
 
     /**
      * Get parameter values as normalized values, ready for form input
@@ -44,15 +46,17 @@ interface HasParameters
      * parameter value should be returned.
      *
      * @param string|null $key
+     *
      * @return mixed
      */
     public function getRawParameter(string $key = null);
 
     /**
-     * Set parameter values from raw, non-object values
+     * Set parameter values from raw, non-object values.
      *
      * @param mixed $values
+     *
      * @return HasParameters
      */
-    public function setRawParameters($values): HasParameters;
+    public function setRawParameters($values): self;
 }

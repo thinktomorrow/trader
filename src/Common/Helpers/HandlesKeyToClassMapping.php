@@ -5,13 +5,12 @@ namespace Thinktomorrow\Trader\Common\Helpers;
 trait HandlesKeyToClassMapping
 {
     /**
-     * This requires the class to have a mapping array of the following kind:
+     * This requires the class to have a mapping array of the following kind:.
      *
      *  protected static $mapping = [
      *       // key => classname
      *  ];
      */
-
     public function __construct(string $type)
     {
         $this->type = $type;
@@ -20,7 +19,7 @@ trait HandlesKeyToClassMapping
     public static function fromString(string $type)
     {
         if (!isset(static::$mapping[$type])) {
-            throw new \InvalidArgumentException('Invalid type [' . $type . ']. Not found as available class mapping.');
+            throw new \InvalidArgumentException('Invalid type ['.$type.']. Not found as available class mapping.');
         }
 
         return new static($type);
@@ -29,7 +28,7 @@ trait HandlesKeyToClassMapping
     public static function fromInstance($instance)
     {
         if (false === ($key = array_search(get_class($instance), static::$mapping))) {
-            throw new \InvalidArgumentException('Class [' . get_class($instance) . '] not found as available type string.');
+            throw new \InvalidArgumentException('Class ['.get_class($instance).'] not found as available type string.');
         }
 
         return new self($key);
@@ -53,7 +52,7 @@ trait HandlesKeyToClassMapping
     public function equals($other): bool
     {
         return get_class($other) === get_class($this)
-            && (string)$this === (string)$other;
+            && (string) $this === (string) $other;
     }
 
     public function equalsClass($other): bool

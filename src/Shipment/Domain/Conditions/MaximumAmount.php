@@ -2,10 +2,10 @@
 
 namespace Thinktomorrow\Trader\Shipment\Domain\Conditions;
 
+use Thinktomorrow\Trader\Common\Conditions\BaseCondition;
+use Thinktomorrow\Trader\Common\Contracts\HasParameters;
 use Thinktomorrow\Trader\Common\Price\Cash;
 use Thinktomorrow\Trader\Orders\Domain\Order;
-use Thinktomorrow\Trader\Common\Contracts\HasParameters;
-use Thinktomorrow\Trader\Common\Conditions\BaseCondition;
 
 class MaximumAmount extends BaseCondition implements ShipmentCondition
 {
@@ -22,7 +22,7 @@ class MaximumAmount extends BaseCondition implements ShipmentCondition
     public function getRawParameters(): array
     {
         return [
-            'maximum_amount' => $this->parameters['maximum_amount']->getAmount()
+            'maximum_amount' => $this->parameters['maximum_amount']->getAmount(),
         ];
     }
 

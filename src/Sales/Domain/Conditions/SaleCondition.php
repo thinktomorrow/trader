@@ -11,6 +11,7 @@ interface SaleCondition extends Condition
      * Check if this condition matches the given order.
      *
      * @param EligibleForSale $eligibleForSale
+     *
      * @return bool
      */
     public function check(EligibleForSale $eligibleForSale): bool;

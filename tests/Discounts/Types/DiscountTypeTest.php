@@ -5,8 +5,8 @@ namespace Thinktomorrow\Trader\Tests;
 use Money\Money;
 use Thinktomorrow\Trader\Discounts\Domain\Discount;
 use Thinktomorrow\Trader\Discounts\Domain\DiscountId;
-use Thinktomorrow\Trader\Discounts\Domain\Types\TypeKey;
 use Thinktomorrow\Trader\Discounts\Domain\EligibleForDiscount;
+use Thinktomorrow\Trader\Discounts\Domain\Types\TypeKey;
 use Thinktomorrow\Trader\Orders\Domain\Order;
 
 class DiscountTypeTest extends TestCase

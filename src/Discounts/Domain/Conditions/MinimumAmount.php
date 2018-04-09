@@ -23,7 +23,7 @@ class MinimumAmount extends BaseCondition implements DiscountCondition
     public function getRawParameters(): array
     {
         return [
-            'minimum_amount' => $this->parameters['minimum_amount']->getAmount()
+            'minimum_amount' => $this->parameters['minimum_amount']->getAmount(),
         ];
     }
 

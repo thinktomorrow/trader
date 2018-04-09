@@ -4,7 +4,7 @@ namespace Thinktomorrow\Trader\Discounts\Domain;
 
 use Thinktomorrow\Trader\Orders\Domain\Order;
 
-interface OrderDiscountOLD
+interface OrderDiscount
 {
     public function applicable(Order $order): bool;
 }

@@ -83,7 +83,7 @@ class SaleTest extends TestCase
         $this->assertEquals(Money::EUR(20), $appliedSale->saleAmount());
         $this->assertEquals(Percentage::fromPercent(20), $appliedSale->salePercentage());
         $this->assertEquals('percentage_off', $appliedSale->saleType());
-        $this->assertEquals(SaleId::fromString("1"), $appliedSale->saleId());
+        $this->assertEquals(SaleId::fromString('1'), $appliedSale->saleId());
     }
 
     /** @test */
