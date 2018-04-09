@@ -28,12 +28,12 @@ class MinimumAmountTest extends TestCase
             'minimum_amount' => Money::EUR(50),
         ]);
 
-        $condition2 = (new MinimumAmount())->setParameterValues([
+        $condition2 = (new MinimumAmount())->setRawParameters([
             'minimum_amount' => 50,
         ]);
 
         // Parameter as set as single value
-        $condition3 = (new MinimumAmount())->setParameterValues(50);
+        $condition3 = (new MinimumAmount())->setRawParameters(50);
 
         $this->assertEquals($condition1, $condition2);
         $this->assertEquals($condition1, $condition3);

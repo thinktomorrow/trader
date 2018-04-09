@@ -42,7 +42,7 @@ class Period extends BaseCondition implements SaleCondition
         return $endAt > $datetime;
     }
 
-    public function getParameterValues(): array
+    public function getRawParameters(): array
     {
         return [
             'start_at' => $this->parameters['start_at']->format('Y-m-d H:i:s'),
@@ -50,7 +50,7 @@ class Period extends BaseCondition implements SaleCondition
         ];
     }
 
-    public function setParameterValues($values): HasParameters
+    public function setRawParameters($values): HasParameters
     {
         if(!is_array($values)){
             throw new \InvalidArgumentException('Passed parameter values should be an array.' . gettype($values) . ' given.');

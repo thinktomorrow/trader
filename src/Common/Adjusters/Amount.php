@@ -8,14 +8,14 @@ use Thinktomorrow\Trader\Common\Price\Cash;
 
 class Amount extends BaseAdjuster implements Adjuster
 {
-    public function getParameterValues(): array
+    public function getRawParameters(): array
     {
         return [
             'amount' => $this->parameters['amount']->getAmount()
         ];
     }
 
-    public function setParameterValues($values): HasParameters
+    public function setRawParameters($values): HasParameters
     {
         $values = $this->normalizeParameters($values);
 

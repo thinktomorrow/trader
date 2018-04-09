@@ -80,11 +80,11 @@ class ItemBlacklistTest extends TestCase
             'item_blacklist' => [5, 10],
         ]);
 
-        $condition2 = (new ItemBlacklist())->setParameterValues([
+        $condition2 = (new ItemBlacklist())->setRawParameters([
             'item_blacklist' => [5, 10],
         ]);
 
-        $condition3 = (new ItemBlacklist())->setParameterValues([5, 10]);
+        $condition3 = (new ItemBlacklist())->setRawParameters([5, 10]);
 
         $this->assertEquals($condition1, $condition2);
         $this->assertEquals($condition1, $condition3);

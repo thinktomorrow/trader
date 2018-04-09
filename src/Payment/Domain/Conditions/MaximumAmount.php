@@ -19,14 +19,14 @@ class MaximumAmount extends BaseCondition implements PaymentCondition
         return $order->subtotal()->lessThanOrEqual($this->parameters['maximum_amount']);
     }
 
-    public function getParameterValues(): array
+    public function getRawParameters(): array
     {
         return [
             'maximum_amount' => $this->parameters['maximum_amount']->getAmount()
         ];
     }
 
-    public function setParameterValues($values): HasParameters
+    public function setRawParameters($values): HasParameters
     {
         $values = $this->normalizeParameters($values);
 

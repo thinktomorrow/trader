@@ -20,14 +20,14 @@ class MinimumAmount extends BaseCondition implements DiscountCondition
         return $eligibleForDiscount->subtotal()->greaterThanOrEqual($this->parameters['minimum_amount']);
     }
 
-    public function getParameterValues(): array
+    public function getRawParameters(): array
     {
         return [
             'minimum_amount' => $this->parameters['minimum_amount']->getAmount()
         ];
     }
 
-    public function setParameterValues($values): HasParameters
+    public function setRawParameters($values): HasParameters
     {
         $values = $this->normalizeParameters($values);
 

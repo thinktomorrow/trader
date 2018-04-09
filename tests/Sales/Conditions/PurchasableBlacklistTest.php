@@ -52,11 +52,11 @@ class PurchasableBlacklistTest extends TestCase
             'purchasable_blacklist' => [5, 10],
         ]);
 
-        $condition2 = (new PurchasableBlacklist())->setParameterValues([
+        $condition2 = (new PurchasableBlacklist())->setRawParameters([
             'purchasable_blacklist' => [5, 10],
         ]);
 
-        $condition3 = (new PurchasableBlacklist())->setParameterValues([5, 10]);
+        $condition3 = (new PurchasableBlacklist())->setRawParameters([5, 10]);
 
         $this->assertEquals($condition1, $condition2);
         $this->assertEquals($condition1, $condition3);

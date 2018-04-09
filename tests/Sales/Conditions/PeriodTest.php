@@ -83,7 +83,7 @@ class PeriodTest extends TestCase
             'end_at'   => new \DateTimeImmutable('@'.strtotime('+2 day')),
         ]);
 
-        $condition2 = (new Period())->setParameterValues([
+        $condition2 = (new Period())->setRawParameters([
             'start_at' => (new \DateTimeImmutable('@'.strtotime('+1 day')))->format('Y-m-d H:i:s'),
             'end_at'   => (new \DateTimeImmutable('@'.strtotime('+2 day')))->format('Y-m-d H:i:s'),
         ]);

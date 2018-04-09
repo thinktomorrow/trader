@@ -7,14 +7,14 @@ use Thinktomorrow\Trader\Common\Price\Percentage as PercentageValue;
 
 class Percentage extends BaseAdjuster implements Adjuster
 {
-    public function getParameterValues(): array
+    public function getRawParameters(): array
     {
         return [
             'percentage' => $this->parameters['percentage']->asPercent()
         ];
     }
 
-    public function setParameterValues($values): HasParameters
+    public function setRawParameters($values): HasParameters
     {
         $values = $this->normalizeParameters($values);
 

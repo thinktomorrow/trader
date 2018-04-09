@@ -70,11 +70,11 @@ class ItemWhitelistTest extends TestCase
             'item_whitelist' => [5, 10],
         ]);
 
-        $condition2 = (new ItemWhitelist())->setParameterValues([
+        $condition2 = (new ItemWhitelist())->setRawParameters([
             'item_whitelist' => [5, 10],
         ]);
 
-        $condition3 = (new ItemWhitelist())->setParameterValues([5, 10]);
+        $condition3 = (new ItemWhitelist())->setRawParameters([5, 10]);
 
         $this->assertEquals($condition1, $condition2);
         $this->assertEquals($condition1, $condition3);

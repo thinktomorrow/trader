@@ -16,12 +16,12 @@ class MaximumAmountTest extends TestCase
             'maximum_amount' => Money::EUR(50),
         ]);
 
-        $condition2 = (new MaximumAmount())->setParameterValues([
+        $condition2 = (new MaximumAmount())->setRawParameters([
             'maximum_amount' => 50,
         ]);
 
         // Parameter as set as single value
-        $condition3 = (new MaximumAmount())->setParameterValues(50);
+        $condition3 = (new MaximumAmount())->setRawParameters(50);
 
         $this->assertEquals($condition1, $condition2);
         $this->assertEquals($condition1, $condition3);

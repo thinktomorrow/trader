@@ -38,12 +38,19 @@ trait HandlesParameters
         return $this;
     }
 
-    public function getParameterValues(): array
+    public function getRawParameters(): array
     {
         return $this->parameters;
     }
 
-    public function setParameterValues($values): HasParameters
+    public function getRawParameter(string $key = null)
+    {
+        $rawParameters = $this->getRawParameters();
+
+        return ($key) ? $rawParameters[$key] : reset($rawParameters);
+    }
+
+    public function setRawParameters($values): HasParameters
     {
         $this->setParameters($this->normalizeParameters($values));
 

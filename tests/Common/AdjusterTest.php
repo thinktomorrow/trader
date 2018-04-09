@@ -34,7 +34,7 @@ class AdjusterTest extends TestCase
     {
         $adjuster1 = (new Amount())->setParameters(Money::EUR(50));
         $adjuster2 = (new Amount())->setParameters(['amount' => Money::EUR(50)]);
-        $adjuster3 = (new Amount())->setParameterValues(50);
+        $adjuster3 = (new Amount())->setRawParameters(50);
 
         $this->assertEquals($adjuster1, $adjuster2);
         $this->assertEquals($adjuster1, $adjuster3);
@@ -56,6 +56,16 @@ class AdjusterTest extends TestCase
 
         $this->assertSame($parameter, $adjuster->getParameter('percentage'));
         $this->assertSame($parameter, $adjuster->getParameter());
+    }
+
+    /** @test */
+    function it_can_get_raw_parameter_by_key()
+    {
+        $parameter = PercentageValue::fromPercent(25);
+        $adjuster = (new Percentage())->setParameters($parameter);
+
+        $this->assertEquals(25, $adjuster->getRawParameter('percentage'));
+        $this->assertEquals(25, $adjuster->getRawParameter());
     }
 
 }

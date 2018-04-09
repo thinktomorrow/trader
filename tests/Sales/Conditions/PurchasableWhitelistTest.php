@@ -52,11 +52,11 @@ class PurchasableWhitelistTest extends TestCase
             'purchasable_whitelist' => [5, 10],
         ]);
 
-        $condition2 = (new PurchasableWhitelist())->setParameterValues([
+        $condition2 = (new PurchasableWhitelist())->setRawParameters([
             'purchasable_whitelist' => [5, 10],
         ]);
 
-        $condition3 = (new PurchasableWhitelist())->setParameterValues([5, 10]);
+        $condition3 = (new PurchasableWhitelist())->setRawParameters([5, 10]);
 
 
         $this->assertEquals($condition1, $condition2);

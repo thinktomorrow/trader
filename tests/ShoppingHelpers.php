@@ -169,7 +169,7 @@ trait ShoppingHelpers
         return new PercentageOffDiscount(
             DiscountId::fromInteger($id ?? rand(1,99)),
             $conditions,
-            (new Percentage())->setParameterValues($percent),
+            (new Percentage())->setRawParameters($percent),
             $data
         );
     }

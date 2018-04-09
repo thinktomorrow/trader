@@ -23,9 +23,9 @@ class MinimumItemQuantity extends BaseCondition implements DiscountCondition
         return $item->quantity() >= (int) $this->parameters['minimum_quantity'];
     }
 
-    public function setParameterValues($values): HasParameters
+    public function setRawParameters($values): HasParameters
     {
-        $parameters = parent::setParameterValues($values);
+        $parameters = parent::setRawParameters($values);
 
         $this->setParameters([
             'minimum_quantity' => (int) $parameters['minimum_quantity'],
