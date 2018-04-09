@@ -57,8 +57,16 @@ class Period extends BaseCondition implements DiscountCondition
         }
 
         $this->setParameters([
-            'start_at' => $values['start_at'] ? DateTimeImmutable::createFromFormat('Y-m-d H:i:s', $values['start_at']) : null,
-            'end_at' => $values['end_at'] ? DateTimeImmutable::createFromFormat('Y-m-d H:i:s', $values['end_at']) : null,
+            'start_at' => $values['start_at']
+                ? (!$values['start_at'] instanceof \DateTimeInterface
+                    ? DateTimeImmutable::createFromFormat('Y-m-d H:i:s', $values['start_at'])
+                    : $values['start_at'])
+                : null,
+            'end_at' => $values['end_at']
+                ? (!$values['end_at'] instanceof \DateTimeInterface
+                    ? DateTimeImmutable::createFromFormat('Y-m-d H:i:s', $values['end_at'])
+                    : $values['end_at'])
+                : null,
         ]);
 
         return $this;
