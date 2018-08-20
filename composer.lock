@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "content-hash": "8931a61d24479e76a4df8bf65f3c4abd",
+    "content-hash": "bc4b43c76786413267dda80fff8f0c38",
     "packages": [
         {
             "name": "beberlei/assert",
@@ -808,6 +808,54 @@
                 "reflection"
             ],
             "time": "2018-01-03T07:38:00+00:00"
+        },
+        {
+            "name": "thinktomorrow/magic-attributes",
+            "version": "dev-master",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/thinktomorrow/magic-attributes.git",
+                "reference": "384847891140991fff6a2ab7212b2274ffc59aee"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/thinktomorrow/magic-attributes/zipball/384847891140991fff6a2ab7212b2274ffc59aee",
+                "reference": "384847891140991fff6a2ab7212b2274ffc59aee",
+                "shasum": ""
+            },
+            "require": {
+                "php": "^7.1"
+            },
+            "require-dev": {
+                "illuminate/database": "^5.6",
+                "mockery/mockery": "^1.1",
+                "phpunit/phpunit": "^7.2"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "Thinktomorrow\\MagicAttributes\\": "src"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Ben Cavens",
+                    "email": "ben@thinktomorrow.be",
+                    "homepage": "https://thinktomorrow.be",
+                    "role": "Developer"
+                }
+            ],
+            "description": "Magic assistance for retrieving nested properties",
+            "homepage": "https://github.com/thinktomorrow/magic-attributes",
+            "keywords": [
+                "magic-attributes",
+                "think tomorrow"
+            ],
+            "time": "2018-08-15 08:55:26"
         },
         {
             "name": "winzou/state-machine",
@@ -3206,7 +3254,9 @@
     ],
     "aliases": [],
     "minimum-stability": "stable",
-    "stability-flags": [],
+    "stability-flags": {
+        "thinktomorrow/magic-attributes": 20
+    },
     "prefer-stable": false,
     "prefer-lowest": false,
     "platform": {
