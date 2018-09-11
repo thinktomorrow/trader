@@ -107,4 +107,16 @@ class DiscountTest extends TestCase
         $this->assertTrue($discount->usesCondition('minimum_amount'));
         $this->assertFalse($discount->usesCondition('item_blacklist'));
     }
+
+    /** @test */
+    public function it_can_read_extra_data()
+    {
+        $discount = $this->makePercentageOffDiscount(15, ['minimum_amount' => Money::EUR(50)], ['foo' => 'bar']);
+
+        $this->assertEquals(['foo' => 'bar'], $discount->data());
+        $this->assertEquals('bar', $discount->data('foo'));
+
+        // Null if not found
+        $this->assertNull($discount->data('unknown'));
+    }
 }

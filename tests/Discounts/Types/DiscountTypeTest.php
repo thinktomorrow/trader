@@ -79,6 +79,11 @@ class UnknownDiscount implements Discount
         return false;
     }
 
+    public function data($key = null)
+    {
+        return 'value';
+    }
+
     public function getType(): string
     {
         return 'unknown';

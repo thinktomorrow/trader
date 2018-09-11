@@ -94,6 +94,15 @@ abstract class BaseDiscount
         return false;
     }
 
+    public function data($key = null)
+    {
+        if(!$key) return $this->data;
+
+        if(isset($this->data[$key])) return $this->data[$key];
+
+        return null;
+    }
+
     protected function isOrderDiscount(EligibleForDiscount $eligibleForDiscount): bool
     {
         return $eligibleForDiscount instanceof Order;

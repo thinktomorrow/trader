@@ -19,4 +19,6 @@ interface Discount extends HasType
     public function discountBasePrice(Order $order, EligibleForDiscount $eligibleForDiscount): Money;
 
     public function usesCondition(string $condition_key): bool;
+
+    public function data($key = null);
 }
