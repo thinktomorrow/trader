@@ -45,8 +45,8 @@ class Period extends BaseCondition implements SaleCondition
     public function getRawParameters(): array
     {
         return [
-            'start_at' => $this->parameters['start_at']->format('Y-m-d H:i:s'),
-            'end_at'   => $this->parameters['end_at']->format('Y-m-d H:i:s'),
+            'start_at' => $this->parameters['start_at'] ? $this->parameters['start_at']->format('Y-m-d H:i:s') : null,
+            'end_at'   => $this->parameters['end_at'] ? $this->parameters['end_at']->format('Y-m-d H:i:s') : null,
         ];
     }
 
