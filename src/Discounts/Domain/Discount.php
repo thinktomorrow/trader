@@ -4,6 +4,7 @@ namespace Thinktomorrow\Trader\Discounts\Domain;
 
 use Money\Money;
 use Thinktomorrow\Trader\Common\Contracts\HasType;
+use Thinktomorrow\Trader\Discounts\Domain\Bases\DiscountBase;
 use Thinktomorrow\Trader\Orders\Domain\Order;
 
 interface Discount extends HasType

@@ -23,6 +23,8 @@ use Thinktomorrow\Trader\Sales\Domain\Types\FixedAmountOffSale;
 use Thinktomorrow\Trader\Sales\Domain\Types\FixedAmountSale;
 use Thinktomorrow\Trader\Sales\Domain\Types\FixedCustomAmountSale;
 use Thinktomorrow\Trader\Sales\Domain\Types\PercentageOffSale;
+use Thinktomorrow\Trader\Tests\Stubs\PaymentDiscountDummy;
+use Thinktomorrow\Trader\Tests\Stubs\ShippingDiscountDummy;
 use Thinktomorrow\Trader\Tests\Stubs\EligibleForSaleStub;
 use Thinktomorrow\Trader\Tests\Stubs\InMemoryContainer;
 use Thinktomorrow\Trader\Tests\Stubs\PurchasableStub;
@@ -192,6 +194,26 @@ trait ShoppingHelpers
             $conditions,
             (new Amount())->setParameters(Money::EUR($amount)),
             $data
+        );
+    }
+
+    protected function makeShippingDiscount($percent)
+    {
+        return new ShippingDiscountDummy(
+            DiscountId::fromInteger($id ?? rand(1, 99)),
+            [],
+            (new Percentage())->setRawParameters($percent),
+            []
+        );
+    }
+
+    protected function makePaymentDiscount($percent)
+    {
+        return new PaymentDiscountDummy(
+            DiscountId::fromInteger($id ?? rand(1, 99)),
+            [],
+            (new Percentage())->setRawParameters($percent),
+            []
         );
     }
 }

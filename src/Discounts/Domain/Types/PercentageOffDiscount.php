@@ -21,6 +21,7 @@ class PercentageOffDiscount extends BaseDiscount implements Discount
             throw new CannotApplyDiscount('Discount cannot be applied. One or more conditions have failed.');
         }
 
+        $discountBasePrice = $eligibleForDiscount->discountBasePrice();
         $discountAmount = $this->discountAmount($order, $eligibleForDiscount);
 
         $eligibleForDiscount->addToDiscountTotal($discountAmount);
@@ -28,16 +29,22 @@ class PercentageOffDiscount extends BaseDiscount implements Discount
             $this->id,
             $this->getType(),
             $discountAmount,
-            $this->discountBasePrice($order, $eligibleForDiscount),
-            Cash::from($discountAmount)->asPercentage($eligibleForDiscount->discountBasePrice(), 0),
+            $discountBasePrice,
+            Cash::from($discountAmount)->asPercentage($discountBasePrice, 0),
             $this->mergeRawConditions($this->data)
         ));
     }
 
     public function discountAmount(Order $order, EligibleForDiscount $eligibleForDiscount): Money
     {
-        return $this->discountBasePrice($order, $eligibleForDiscount)
-                    ->multiply($this->adjuster->getParameter('percentage')->asFloat());
+        $discountBasePrice = $this->discountBasePrice($order, $eligibleForDiscount);
+        $discountBasePriceMinusDiscounts = $discountBasePrice->subtract($eligibleForDiscount->discountTotal());
+
+        $discountAmount = $discountBasePrice->multiply($this->adjuster->getParameter('percentage')->asFloat());
+
+        return $discountBasePriceMinusDiscounts->lessThanOrEqual($discountAmount)
+            ? $discountBasePriceMinusDiscounts
+            : $discountAmount;
     }
 
     public function discountBasePrice(Order $order, EligibleForDiscount $eligibleForDiscount): Money

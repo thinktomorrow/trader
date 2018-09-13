@@ -3,6 +3,8 @@
 namespace Thinktomorrow\Trader\Tests;
 
 use Money\Money;
+use Thinktomorrow\Trader\Discounts\Domain\Bases\Base;
+use Thinktomorrow\Trader\Discounts\Domain\Bases\DiscountBase;
 use Thinktomorrow\Trader\Discounts\Domain\Discount;
 use Thinktomorrow\Trader\Discounts\Domain\DiscountId;
 use Thinktomorrow\Trader\Discounts\Domain\EligibleForDiscount;

@@ -34,9 +34,18 @@ class FixedAmountOffDiscount extends BaseDiscount implements Discount
         ));
     }
 
+    /**
+     * Max amount possible is the max of the base price
+     *
+     * @param Order $order
+     * @param EligibleForDiscount $eligibleForDiscount
+     * @return Money
+     */
     public function discountAmount(Order $order, EligibleForDiscount $eligibleForDiscount): Money
     {
-        return $this->adjuster->getParameter('amount');
+        return $this->discountBasePrice($order, $eligibleForDiscount)->lessThanOrEqual($this->adjuster->getParameter('amount'))
+            ? $this->discountBasePrice($order, $eligibleForDiscount)
+            : $this->adjuster->getParameter('amount');
     }
 
     public function discountBasePrice(Order $order, EligibleForDiscount $eligibleForDiscount): Money

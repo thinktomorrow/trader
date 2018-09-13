@@ -13,7 +13,9 @@ use Thinktomorrow\Trader\Orders\Domain\Services\SumOfTaxes;
 
 final class Order implements StatefulContract, EligibleForDiscount
 {
-    use PayableAndShippable;
+    use PayableAndShippable,
+        HasShippingCost,
+        HasPaymentCost;
 
     private $state;
 
@@ -23,9 +25,12 @@ final class Order implements StatefulContract, EligibleForDiscount
     private $customerId;
 
     private $items;
-    private $discounts = []; // order level applied discounts
+
+    // Basket discounts - not including shipping and payment discounts.
+    private $discounts = []; // basket level applied discounts
     private $discountTotal;
     private $discountPercentage;
+
     private $taxPercentage; // default tax percentage for order (shipment / payment)
     private $couponCode;
 
@@ -35,13 +40,15 @@ final class Order implements StatefulContract, EligibleForDiscount
         $this->items = new ItemCollection();
         $this->discountTotal = $this->shippingTotal = $this->paymentTotal = Cash::make(0);
         $this->discountPercentage = Percentage::fromPercent(0);
-
         $this->setTaxPercentage(Percentage::fromPercent((new Config())->get('tax_percentage', 0))); // TODO get from config
 
         // Initial order state
         $this->state = OrderState::NEW;
 
         // TODO IncompleteOrderStatus
+
+        $this->shippingCost = new ShippingCost();
+        $this->paymentCost = new PaymentCost();
     }
 
     public function id(): OrderId
@@ -220,6 +227,26 @@ final class Order implements StatefulContract, EligibleForDiscount
         $this->discountPercentage = Percentage::fromPercent(0);
         $this->discounts = [];
     }
+
+//    public function basketDiscountTotal(): Money
+//    {
+//        // not including shipping and payment discounts
+//        return $this->discountTotal;
+//    }
+//
+//    public function basketDiscounts(): array
+//    {
+//        // not including shipping and payment discounts
+//        return $this->discounts;
+//    }
+//
+//    public function removeBasketDiscounts()
+//    {
+//        // not including shipping and payment discounts
+//        $this->discountTotal = Cash::make(0);
+//        $this->discountPercentage = Percentage::fromPercent(0);
+//        $this->discounts = [];
+//    }
 
     public function total(): Money
     {
