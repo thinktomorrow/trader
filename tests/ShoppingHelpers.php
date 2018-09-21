@@ -23,11 +23,11 @@ use Thinktomorrow\Trader\Sales\Domain\Types\FixedAmountOffSale;
 use Thinktomorrow\Trader\Sales\Domain\Types\FixedAmountSale;
 use Thinktomorrow\Trader\Sales\Domain\Types\FixedCustomAmountSale;
 use Thinktomorrow\Trader\Sales\Domain\Types\PercentageOffSale;
-use Thinktomorrow\Trader\Tests\Stubs\PaymentDiscountDummy;
-use Thinktomorrow\Trader\Tests\Stubs\ShippingDiscountDummy;
 use Thinktomorrow\Trader\Tests\Stubs\EligibleForSaleStub;
 use Thinktomorrow\Trader\Tests\Stubs\InMemoryContainer;
+use Thinktomorrow\Trader\Tests\Stubs\PaymentDiscountDummy;
 use Thinktomorrow\Trader\Tests\Stubs\PurchasableStub;
+use Thinktomorrow\Trader\Tests\Stubs\ShippingDiscountDummy;
 
 trait ShoppingHelpers
 {

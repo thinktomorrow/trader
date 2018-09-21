@@ -2,7 +2,6 @@
 
 namespace Thinktomorrow\Trader\Orders\Domain;
 
-use Money\Money;
 use Thinktomorrow\Trader\Common\Config;
 use Thinktomorrow\Trader\Countries\CountryId;
 use Thinktomorrow\Trader\Payment\Domain\PaymentMethodId;

@@ -12,15 +12,12 @@ namespace Thinktomorrow\Trader\Discounts\Domain\Types;
  * Different types of discounts. Default is the generic 'basket' type which points to
  * all the order discounts. Shipping and payment types point out to specific
  * shipping discounts and payment discounts resp.
- *
- * @package Thinktomorrow\Trader\Discounts\Domain\Types
  */
 class BaseTypeKey
 {
     /**
-     *
-     *
      * @param EligibleForDiscount $eligibleForDiscount
+     *
      * @return EligibleForDiscount
      */
     const BASKET = 'basket';

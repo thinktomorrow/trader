@@ -3,8 +3,6 @@
 namespace Thinktomorrow\Trader\Tests\Discounts;
 
 use Money\Money;
-use Thinktomorrow\Trader\Common\Adjusters\Percentage;
-use Thinktomorrow\Trader\Discounts\Domain\DiscountId;
 use Thinktomorrow\Trader\Tests\TestCase;
 
 class ShippingDiscountTest extends TestCase

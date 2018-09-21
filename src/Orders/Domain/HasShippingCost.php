@@ -23,6 +23,7 @@ trait HasShippingCost
      * @deprecated use setShippingSubtotal() instead
      *
      * @param Money $shippingTotal
+     *
      * @return $this
      */
     public function setShippingTotal(Money $shippingTotal)

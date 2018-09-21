@@ -38,10 +38,11 @@ class FixedAmountOffDiscount extends BaseDiscount implements Discount
     }
 
     /**
-     * Max amount possible is the max of the base price
+     * Max amount possible is the max of the base price.
      *
-     * @param Order $order
+     * @param Order               $order
      * @param EligibleForDiscount $eligibleForDiscount
+     *
      * @return Money
      */
     public function discountAmount(Order $order, EligibleForDiscount $eligibleForDiscount): Money
@@ -53,7 +54,7 @@ class FixedAmountOffDiscount extends BaseDiscount implements Discount
 
     public function discountBasePrice(Order $order, EligibleForDiscount $eligibleForDiscount): Money
     {
-        if($this->isOrderDiscount($eligibleForDiscount) &&  ! empty($this->conditions)) {
+        if ($this->isOrderDiscount($eligibleForDiscount) && !empty($this->conditions)) {
             return $this->adjustDiscountBasePriceByConditions(
                 Cash::make(0), $eligibleForDiscount, $this->conditions
             );
