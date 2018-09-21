@@ -6,6 +6,7 @@ use Money\Money;
 use Thinktomorrow\Trader\Common\Price\Percentage;
 use Thinktomorrow\Trader\Discounts\Domain\AppliedDiscount;
 use Thinktomorrow\Trader\Discounts\Domain\DiscountId;
+use Thinktomorrow\Trader\Discounts\Domain\Types\BaseTypeKey;
 
 class DiscountTest extends TestCase
 {
@@ -95,7 +96,7 @@ class DiscountTest extends TestCase
         $discount->apply($order, $item);
 
         $appliedDiscount = $item->discounts()[0];
-        $this->assertEquals(['foo' => 'bar'], $appliedDiscount->data());
+        $this->assertEquals(['foo' => 'bar', 'basetype' => BaseTypeKey::BASKET], $appliedDiscount->data());
         $this->assertEquals('bar', $appliedDiscount->data('foo'));
     }
 

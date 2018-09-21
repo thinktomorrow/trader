@@ -1,13 +1,17 @@
 <?php
 
-namespace Thinktomorrow\Trader\Tests;
+namespace Thinktomorrow\Trader\Tests\Discounts\Types;
 
 use Money\Money;
+use Thinktomorrow\Trader\Common\Adjusters\Amount;
 use Thinktomorrow\Trader\Common\Adjusters\Percentage;
 use Thinktomorrow\Trader\Common\Price\Percentage as PercentageValue;
 use Thinktomorrow\Trader\Discounts\Domain\DiscountId;
+use Thinktomorrow\Trader\Discounts\Domain\EligibleForDiscount;
 use Thinktomorrow\Trader\Discounts\Domain\Exceptions\CannotApplyDiscount;
 use Thinktomorrow\Trader\Discounts\Domain\Types\FixedAmountOffDiscount;
+use Thinktomorrow\Trader\Orders\Domain\Order;
+use Thinktomorrow\Trader\Tests\TestCase;
 
 class FixedAmountOffTest extends TestCase
 {
@@ -53,14 +57,34 @@ class FixedAmountOffTest extends TestCase
     }
 
     /** @test */
-    public function discount_cannot_be_higher_than_original_price()
+    public function discount_is_trimmed_if_higher_than_original_price()
     {
-        $this->expectException(CannotApplyDiscount::class);
+//        $this->expectException(CannotApplyDiscount::class);
 
         list($order, $item) = $this->prepOrderWithItem(100);
         $discount = $this->makeFixedAmountOffDiscount(120);
 
         $discount->apply($order, $item);
+
+        $this->assertEquals(Money::EUR(100), $item->discounts()[0]->discountAmount());
+        $this->assertEquals(Money::EUR(100), $item->discountTotal());
+        $this->assertEquals(Money::EUR(0), $order->total());
+    }
+
+    /** @test */
+    public function discount_cannot_be_higher_than_original_price()
+    {
+        $this->expectException(CannotApplyDiscount::class);
+
+        $order = $this->makeOrder(100);
+        $discount = new FixedAmountOffDiscountWithoutFlexibleAmount(
+            DiscountId::fromInteger(rand(1, 99)),
+            [],
+            (new Amount())->setParameters(Money::EUR(120)),
+            []
+        );
+
+        $discount->apply($order, $order);
     }
 
     /** @test */
@@ -88,5 +112,13 @@ class FixedAmountOffTest extends TestCase
             (new Percentage())->setParameters(PercentageValue::fromPercent(5)),
             []
         );
+    }
+}
+
+class FixedAmountOffDiscountWithoutFlexibleAmount extends FixedAmountOffDiscount
+{
+    public function discountAmount(Order $order, EligibleForDiscount $eligibleForDiscount): Money
+    {
+        return $this->adjuster->getParameter('amount');
     }
 }

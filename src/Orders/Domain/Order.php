@@ -13,7 +13,9 @@ use Thinktomorrow\Trader\Orders\Domain\Services\SumOfTaxes;
 
 final class Order implements StatefulContract, EligibleForDiscount
 {
-    use PayableAndShippable;
+    use PayableAndShippable,
+        HasShippingCost,
+        HasPaymentCost;
 
     private $state;
 
@@ -23,9 +25,12 @@ final class Order implements StatefulContract, EligibleForDiscount
     private $customerId;
 
     private $items;
-    private $discounts = []; // order level applied discounts
+
+    // Basket discounts - not including shipping and payment discounts.
+    private $discounts = []; // basket level applied discounts
     private $discountTotal;
     private $discountPercentage;
+
     private $taxPercentage; // default tax percentage for order (shipment / payment)
     private $couponCode;
 
@@ -33,15 +38,17 @@ final class Order implements StatefulContract, EligibleForDiscount
     {
         $this->id = $id;
         $this->items = new ItemCollection();
-        $this->discountTotal = $this->shippingTotal = $this->paymentTotal = Cash::make(0);
+        $this->discountTotal = Cash::make(0);
         $this->discountPercentage = Percentage::fromPercent(0);
-
-        $this->setTaxPercentage(Percentage::fromPercent((new Config())->get('tax_percentage', 0))); // TODO get from config
+        $this->setTaxPercentage(Percentage::fromPercent((new Config())->get('tax_percentage', 0)));
 
         // Initial order state
         $this->state = OrderState::NEW;
 
         // TODO IncompleteOrderStatus
+
+        $this->shippingCost = new ShippingCost();
+        $this->paymentCost = new PaymentCost();
     }
 
     public function id(): OrderId
@@ -167,6 +174,15 @@ final class Order implements StatefulContract, EligibleForDiscount
         return array_reduce($this->items->all(), function ($carry, Item $item) {
             return $carry->add($item->total());
         }, Cash::make(0));
+    }
+
+    public function combinedDiscounts(): array
+    {
+        return array_merge(
+            $this->discounts(),
+            $this->shippingDiscounts(),
+            $this->paymentDiscounts()
+        );
     }
 
     /**

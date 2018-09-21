@@ -21,6 +21,7 @@ class PercentageOffDiscount extends BaseDiscount implements Discount
             throw new CannotApplyDiscount('Discount cannot be applied. One or more conditions have failed.');
         }
 
+        $discountBasePrice = $eligibleForDiscount->discountBasePrice();
         $discountAmount = $this->discountAmount($order, $eligibleForDiscount);
 
         $eligibleForDiscount->addToDiscountTotal($discountAmount);
@@ -28,26 +29,36 @@ class PercentageOffDiscount extends BaseDiscount implements Discount
             $this->id,
             $this->getType(),
             $discountAmount,
-            $this->discountBasePrice($order, $eligibleForDiscount),
-            Cash::from($discountAmount)->asPercentage($eligibleForDiscount->discountBasePrice(), 0),
-            $this->mergeRawConditions($this->data)
+            $discountBasePrice,
+            Cash::from($discountAmount)->asPercentage($discountBasePrice, 0),
+            array_merge(
+                $this->mergeRawConditions($this->data),
+                ['basetype' => $this->getBaseType()]
+            )
         ));
     }
 
     public function discountAmount(Order $order, EligibleForDiscount $eligibleForDiscount): Money
     {
-        return $this->discountBasePrice($order, $eligibleForDiscount)
-                    ->multiply($this->adjuster->getParameter('percentage')->asFloat());
+        $discountBasePrice = $this->discountBasePrice($order, $eligibleForDiscount);
+        $discountBasePriceMinusDiscounts = $discountBasePrice->subtract($eligibleForDiscount->discountTotal());
+
+        $discountAmount = $discountBasePrice->multiply($this->adjuster->getParameter('percentage')->asFloat());
+
+        return $discountBasePriceMinusDiscounts->lessThanOrEqual($discountAmount)
+            ? $discountBasePriceMinusDiscounts
+            : $discountAmount;
     }
 
     public function discountBasePrice(Order $order, EligibleForDiscount $eligibleForDiscount): Money
     {
-        // IF ORDERDISCOUNT USE GLOBAL DISCOUNT BUT CHECK IF WE HAVE A ITEM_WHITELIST OR ITEM_BLACKLIST TO CALCULATE THE DISCOUNT AMOUNT UPON
-        if ($this->isItemDiscount($eligibleForDiscount) || (!$this->usesCondition('item_whitelist') && !$this->usesCondition('item_blacklist'))) {
-            return $eligibleForDiscount->discountBasePrice();
+        if($this->isOrderDiscount($eligibleForDiscount) &&  ! empty($this->conditions)) {
+            return $this->adjustDiscountBasePriceByConditions(
+                Cash::make(0), $eligibleForDiscount, $this->conditions
+            );
         }
 
-        return $this->adjustDiscountBasePriceByConditions(Cash::make(0), $order, $this->conditions);
+        return $eligibleForDiscount->discountBasePrice();
     }
 
     protected function validateParameters(array $conditions, Adjuster $adjuster)

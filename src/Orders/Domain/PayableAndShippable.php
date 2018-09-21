@@ -14,13 +14,11 @@ trait PayableAndShippable
 {
     private $business = false; // bool
 
-    private $shippingTotal;
     private $shippingMethodId;
     private $shippingRuleId;
     private $shippingAddressId;
     private $shippingAddress;
 
-    private $paymentTotal;
     private $paymentMethodId;
     private $paymentRuleId;
     private $billingAddressId;
@@ -42,18 +40,6 @@ trait PayableAndShippable
     public function setBusiness($business = true)
     {
         $this->business = (bool) $business;
-
-        return $this;
-    }
-
-    public function shippingTotal(): Money
-    {
-        return $this->shippingTotal;
-    }
-
-    public function setShippingTotal(Money $shippingTotal)
-    {
-        $this->shippingTotal = $shippingTotal;
 
         return $this;
     }
@@ -156,18 +142,6 @@ trait PayableAndShippable
     public function setBillingAddressId($billingAddressId)
     {
         $this->billingAddressId = $billingAddressId;
-    }
-
-    public function paymentTotal(): Money
-    {
-        return $this->paymentTotal;
-    }
-
-    public function setPaymentTotal(Money $paymentTotal)
-    {
-        $this->paymentTotal = $paymentTotal;
-
-        return $this;
     }
 
     public function paymentMethodId()

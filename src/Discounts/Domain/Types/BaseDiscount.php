@@ -7,6 +7,9 @@ use Money\Money;
 use Thinktomorrow\Trader\Common\Adjusters\Adjuster;
 use Thinktomorrow\Trader\Common\Conditions\Condition;
 use Thinktomorrow\Trader\Discounts\Domain\AdjustDiscountBasePrice;
+use Thinktomorrow\Trader\Discounts\Domain\Bases\Base;
+use Thinktomorrow\Trader\Discounts\Domain\Bases\DiscountBase;
+use Thinktomorrow\Trader\Discounts\Domain\Bases\OrderBase;
 use Thinktomorrow\Trader\Discounts\Domain\Conditions\ConditionKey;
 use Thinktomorrow\Trader\Discounts\Domain\Conditions\DiscountCondition;
 use Thinktomorrow\Trader\Discounts\Domain\DiscountId;
@@ -56,6 +59,25 @@ abstract class BaseDiscount
     public function id(): DiscountId
     {
         return $this->id;
+    }
+
+    public function getBaseType(): string
+    {
+        return BaseTypeKey::BASKET;
+    }
+
+    public function getBase(Order $order): EligibleForDiscount
+    {
+        switch($this->getBaseType()){
+            case BaseTypeKey::SHIPPING:
+                return $order->shippingCost();
+            break;
+            case BaseTypeKey::PAYMENT:
+                return $order->paymentCost();
+            break;
+        }
+
+        return $order;
     }
 
     public function getType(): string
@@ -157,7 +179,7 @@ abstract class BaseDiscount
         // Protect against negative overflow where order total would dive under zero - DiscountTotal cannot be higher than original price
         $discountTotal = $eligibleForDiscount->discountTotal()->add($this->discountAmount($order, $eligibleForDiscount));
 
-        return $discountTotal->greaterThan($eligibleForDiscount->discountBasePrice());
+        return $discountTotal->greaterThan($this->discountBasePrice($order, $eligibleForDiscount));
     }
 
     private function discountAmountBelowZero(Order $order, EligibleForDiscount $eligibleForDiscount)
