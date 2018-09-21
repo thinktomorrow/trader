@@ -10,7 +10,7 @@ trait GetDynamicValue
 
     public function getValue($key, $default = null, $closure = null)
     {
-        return $this->attr('values.' . $key, $default, $closure);
+        return $this->attr('values.'.$key, $default, $closure);
     }
 
     public function __get($name)
