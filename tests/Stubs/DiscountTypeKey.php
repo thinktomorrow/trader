@@ -8,6 +8,6 @@ class DiscountTypeKey extends TypeKey
 {
     protected static $mapping = [
         'percentage_off_shipping' => ShippingDiscountDummy::class,
-        'percentage_off_payment' => PaymentDiscountDummy::class,
+        'percentage_off_payment'  => PaymentDiscountDummy::class,
     ];
 }

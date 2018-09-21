@@ -52,7 +52,7 @@ class PercentageOffDiscount extends BaseDiscount implements Discount
 
     public function discountBasePrice(Order $order, EligibleForDiscount $eligibleForDiscount): Money
     {
-        if($this->isOrderDiscount($eligibleForDiscount) &&  ! empty($this->conditions)) {
+        if ($this->isOrderDiscount($eligibleForDiscount) && !empty($this->conditions)) {
             return $this->adjustDiscountBasePriceByConditions(
                 Cash::make(0), $eligibleForDiscount, $this->conditions
             );

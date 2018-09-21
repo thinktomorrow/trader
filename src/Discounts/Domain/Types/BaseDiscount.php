@@ -7,9 +7,6 @@ use Money\Money;
 use Thinktomorrow\Trader\Common\Adjusters\Adjuster;
 use Thinktomorrow\Trader\Common\Conditions\Condition;
 use Thinktomorrow\Trader\Discounts\Domain\AdjustDiscountBasePrice;
-use Thinktomorrow\Trader\Discounts\Domain\Bases\Base;
-use Thinktomorrow\Trader\Discounts\Domain\Bases\DiscountBase;
-use Thinktomorrow\Trader\Discounts\Domain\Bases\OrderBase;
 use Thinktomorrow\Trader\Discounts\Domain\Conditions\ConditionKey;
 use Thinktomorrow\Trader\Discounts\Domain\Conditions\DiscountCondition;
 use Thinktomorrow\Trader\Discounts\Domain\DiscountId;
@@ -68,7 +65,7 @@ abstract class BaseDiscount
 
     public function getBase(Order $order): EligibleForDiscount
     {
-        switch($this->getBaseType()){
+        switch ($this->getBaseType()) {
             case BaseTypeKey::SHIPPING:
                 return $order->shippingCost();
             break;

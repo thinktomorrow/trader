@@ -23,6 +23,7 @@ trait HasPaymentCost
      * @deprecated use setPaymentSubtotal() instead
      *
      * @param Money $paymentTotal
+     *
      * @return $this
      */
     public function setPaymentTotal(Money $paymentTotal)
