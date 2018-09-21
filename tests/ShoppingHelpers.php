@@ -75,8 +75,8 @@ trait ShoppingHelpers
         $order->setCustomerId(CustomerId::fromString(2));
         $order->items()->add($this->getItem(null, null, new PurchasableStub(1, [], Cash::make(505), PercentageValue::fromPercent(10))));
         $order->items()->add($this->getItem(null, null, new PurchasableStub(2, [], Cash::make(1000), PercentageValue::fromPercent(10), Cash::make(800))), 2);
-        $order->setShippingTotal(Cash::make(15));
-        $order->setPaymentTotal(Cash::make(10));
+        $order->setShippingSubTotal(Cash::make(15));
+        $order->setPaymentSubTotal(Cash::make(10));
 
         $discount = (new DiscountFactory(new InMemoryContainer()))->create(1, 'percentage_off', [], ['percentage' => PercentageValue::fromPercent(30)]);
         $discount->apply($order);

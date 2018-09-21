@@ -56,6 +56,21 @@ class UnknownDiscount implements Discount
     {
     }
 
+    public function getBaseType(): string
+    {
+        return 'basket';
+    }
+
+    public function getBase(Order $order): EligibleForDiscount
+    {
+        return $order;
+    }
+
+    public function getType(): string
+    {
+        return 'unknown';
+    }
+
     public function applicable(Order $order, EligibleForDiscount $eligibleForDiscount): bool
     {
         // TODO: Implement applicable() method.
@@ -84,10 +99,5 @@ class UnknownDiscount implements Discount
     public function data($key = null)
     {
         return 'value';
-    }
-
-    public function getType(): string
-    {
-        return 'unknown';
     }
 }

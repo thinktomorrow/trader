@@ -61,22 +61,29 @@ abstract class BaseDiscount
         return $this->id;
     }
 
+    public function getBaseType(): string
+    {
+        return BaseTypeKey::BASKET;
+    }
+
+    public function getBase(Order $order): EligibleForDiscount
+    {
+        switch($this->getBaseType()){
+            case BaseTypeKey::SHIPPING:
+                return $order->shippingCost();
+            break;
+            case BaseTypeKey::PAYMENT:
+                return $order->paymentCost();
+            break;
+        }
+
+        return $order;
+    }
+
     public function getType(): string
     {
         return TypeKey::fromDiscount($this)->get();
     }
-
-    /**
-     * The base gives you the origin on where the discount is calculated upon.
-     *
-     * Default is the eligibleForDiscount object itself the base for the discount calculation.
-     * However it is possible that certain parts of this object deliver the base for
-     * discount calculation. E.g. shipping costs, payment costs of the order.
-     *
-     * @param EligibleForDiscount $eligibleForDiscount
-     * @return EligibleForDiscount
-     */
-    //
 
     public function discountBasePrice(Order $order, EligibleForDiscount $eligibleForDiscount): Money
     {

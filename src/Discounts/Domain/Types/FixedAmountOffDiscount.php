@@ -30,7 +30,10 @@ class FixedAmountOffDiscount extends BaseDiscount implements Discount
             $discountAmount,
             $this->discountBasePrice($order, $eligibleForDiscount),
             Cash::from($discountAmount)->asPercentage($eligibleForDiscount->discountBasePrice(), 0),
-            $this->mergeRawConditions($this->data)
+            array_merge(
+                $this->mergeRawConditions($this->data),
+                ['basetype' => $this->getBaseType()]
+            )
         ));
     }
 
@@ -50,12 +53,13 @@ class FixedAmountOffDiscount extends BaseDiscount implements Discount
 
     public function discountBasePrice(Order $order, EligibleForDiscount $eligibleForDiscount): Money
     {
-        // IF ORDERDISCOUNT USE GLOBAL DISCOUNT BUT CHECK IF WE HAVE A ITEM_WHITELIST OR ITEM_BLACKLIST TO CALCULATE THE DISCOUNT AMOUNT UPON
-        if ($this->isItemDiscount($eligibleForDiscount) || (!$this->usesCondition('item_whitelist') && !$this->usesCondition('item_blacklist'))) {
-            return $eligibleForDiscount->discountBasePrice();
+        if($this->isOrderDiscount($eligibleForDiscount) &&  ! empty($this->conditions)) {
+            return $this->adjustDiscountBasePriceByConditions(
+                Cash::make(0), $eligibleForDiscount, $this->conditions
+            );
         }
 
-        return $this->adjustDiscountBasePriceByConditions(Cash::make(0), $order, $this->conditions);
+        return $eligibleForDiscount->discountBasePrice();
     }
 
     protected function validateParameters(array $conditions, Adjuster $adjuster)

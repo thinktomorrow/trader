@@ -38,9 +38,9 @@ final class Order implements StatefulContract, EligibleForDiscount
     {
         $this->id = $id;
         $this->items = new ItemCollection();
-        $this->discountTotal = $this->shippingTotal = $this->paymentTotal = Cash::make(0);
+        $this->discountTotal = Cash::make(0);
         $this->discountPercentage = Percentage::fromPercent(0);
-        $this->setTaxPercentage(Percentage::fromPercent((new Config())->get('tax_percentage', 0))); // TODO get from config
+        $this->setTaxPercentage(Percentage::fromPercent((new Config())->get('tax_percentage', 0)));
 
         // Initial order state
         $this->state = OrderState::NEW;
@@ -176,6 +176,15 @@ final class Order implements StatefulContract, EligibleForDiscount
         }, Cash::make(0));
     }
 
+    public function combinedDiscounts(): array
+    {
+        return array_merge(
+            $this->discounts(),
+            $this->shippingDiscounts(),
+            $this->paymentDiscounts()
+        );
+    }
+
     /**
      * Baseprice where discount will be calculated on.
      *
@@ -227,26 +236,6 @@ final class Order implements StatefulContract, EligibleForDiscount
         $this->discountPercentage = Percentage::fromPercent(0);
         $this->discounts = [];
     }
-
-//    public function basketDiscountTotal(): Money
-//    {
-//        // not including shipping and payment discounts
-//        return $this->discountTotal;
-//    }
-//
-//    public function basketDiscounts(): array
-//    {
-//        // not including shipping and payment discounts
-//        return $this->discounts;
-//    }
-//
-//    public function removeBasketDiscounts()
-//    {
-//        // not including shipping and payment discounts
-//        $this->discountTotal = Cash::make(0);
-//        $this->discountPercentage = Percentage::fromPercent(0);
-//        $this->discounts = [];
-//    }
 
     public function total(): Money
     {

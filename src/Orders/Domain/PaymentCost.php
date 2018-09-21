@@ -26,6 +26,7 @@ class PaymentCost implements EligibleForDiscount
     {
         $this->subtotal = Cash::make(0);
         $this->discountTotal = Cash::make(0);
+        $this->discounts = [];
     }
 
     public function discountBasePrice(): Money

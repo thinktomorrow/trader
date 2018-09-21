@@ -11,6 +11,12 @@ interface Discount extends HasType
 {
     public function id(): DiscountId;
 
+    public function getBaseType(): string;
+
+    public function getBase(Order $order): EligibleForDiscount;
+
+    public function getType(): string;
+
     public function applicable(Order $order, EligibleForDiscount $eligibleForDiscount): bool;
 
     public function apply(Order $order, EligibleForDiscount $eligibleForDiscount);

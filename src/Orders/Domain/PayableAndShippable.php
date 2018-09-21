@@ -19,7 +19,6 @@ trait PayableAndShippable
     private $shippingAddressId;
     private $shippingAddress;
 
-    private $paymentTotal;
     private $paymentMethodId;
     private $paymentRuleId;
     private $billingAddressId;
