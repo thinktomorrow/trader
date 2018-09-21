@@ -96,11 +96,13 @@ abstract class BaseDiscount
 
     public function data($key = null)
     {
-        if(!$key) return $this->data;
+        if (!$key) {
+            return $this->data;
+        }
 
-        if(isset($this->data[$key])) return $this->data[$key];
-
-        return null;
+        if (isset($this->data[$key])) {
+            return $this->data[$key];
+        }
     }
 
     protected function isOrderDiscount(EligibleForDiscount $eligibleForDiscount): bool
@@ -125,12 +127,11 @@ abstract class BaseDiscount
     {
         $conditions = [];
 
-        foreach($this->conditions as $condition)
-        {
+        foreach ($this->conditions as $condition) {
             $conditions = array_merge($conditions, $condition->getRawParameters());
         }
 
-        if(!empty($conditions)){
+        if (!empty($conditions)) {
             $array = array_merge(['conditions' => $conditions], $array);
         }
 
