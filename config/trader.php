@@ -2,6 +2,12 @@
 
 return [
 
+    /**
+     * Prepends a marker to cart references, invoice numbers or payment references.
+     * This makes it easy to detect any testing identifiers outside of the application.
+     */
+    'environment-prefix' => '',
+
     /*
      * Currency code that should be used in your application. e.g. EUR, USD, CAD
      * This should be set once in the beginning and never to be touched again

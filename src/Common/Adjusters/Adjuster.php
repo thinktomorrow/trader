@@ -1,10 +1,8 @@
 <?php
 
-namespace Thinktomorrow\Trader\Common\Adjusters;
+namespace Optiphar\Cart\Adjusters;
 
-use Thinktomorrow\Trader\Common\Contracts\HasParameters;
-use Thinktomorrow\Trader\Common\Contracts\HasType;
-
-interface Adjuster extends HasParameters, HasType
+interface Adjuster
 {
+    public function adjust(object $object): void;
 }

@@ -1,24 +1,32 @@
 paths:
-  - ./src
+    - ./src/Find
 exclude_files:
-  - .*test.*
+    - .*test.*
 layers:
-  - name: Ports
-    collectors:
-      - type: className
-        regex: .*\\Ports\\.*
-  - name: Domain
-    collectors:
-      - type: className
-        regex: .*\\Domain\\.*
-  - name: Application
-    collectors:
-      - type: className
-        regex: .*\\Application\\.*
+    -   name: Ports
+        collectors:
+            -   type: className
+                regex: .*\\Ports\\.*
+    -   name: Domain
+        collectors:
+            -   type: className
+                regex: .*\\Domain\\.*
+    -   name: Application
+        collectors:
+            -   type: className
+                regex: .*\\Application\\.*
+    -   name: Reads
+        collectors:
+            -   type: className
+                regex: .*\\Reads\\.*
 ruleset:
-  Ports:
-    - Application
-    - Domain
-  Application:
-    - Domain
-  Domain:
+    Ports:
+        - Application
+        - Domain
+        - Reads
+    Reads:
+        - Domain
+        - Reads
+    Application:
+        - Domain
+    Domain:
