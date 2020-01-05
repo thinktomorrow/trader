@@ -3,7 +3,7 @@
 namespace Thinktomorrow\Trader\Tests\Common\States;
 
 use PHPUnit\Framework\TestCase;
-use Thinktomorrow\Trader\Common\States\StateException;
+use Thinktomorrow\Trader\Common\Domain\States\StateException;
 
 class StateMachineTest extends TestCase
 {

@@ -1,6 +1,8 @@
 <?php
 
-namespace Optiphar\Cart;
+declare(strict_types=1);
+
+namespace Thinktomorrow\Trader\Purchase\Cart\Domain;
 
 use Assert\Assertion;
 use Illuminate\Support\Collection;
@@ -68,7 +70,7 @@ class CartItems extends Collection implements \ArrayAccess, \Countable, \Iterato
         return $discounts;
     }
 
-    public function find($cartItemId): ?CartItem
+    public function findItem($cartItemId): ?CartItem
     {
         if (!isset($this->items[$cartItemId])) {
             return null;
@@ -77,7 +79,7 @@ class CartItems extends Collection implements \ArrayAccess, \Countable, \Iterato
         return $this->items[$cartItemId];
     }
 
-    public function findByProduct($productId): ?CartItem
+    public function findItemByProduct($productId): ?CartItem
     {
         foreach($this->items as $item) {
             if($item->productId() == $productId) {
@@ -88,7 +90,7 @@ class CartItems extends Collection implements \ArrayAccess, \Countable, \Iterato
         return null;
     }
 
-    public function add(CartItem $item, $quantity = 1)
+    public function addItem(CartItem $item, $quantity = 1)
     {
         if (isset($this->items[$item->id()])) {
             $quantity += $this->items[$item->id()]->quantity();
@@ -100,14 +102,14 @@ class CartItems extends Collection implements \ArrayAccess, \Countable, \Iterato
         $this->items[$item->id()]->setQuantity($quantity);
     }
 
-    public function addMany(array $items)
+    public function addManyItems(array $items)
     {
         foreach ($items as $item) {
             $this->add($item);
         }
     }
 
-    public function replace($cartItemId, $quantity)
+    public function replaceItem($cartItemId, $quantity)
     {
         if (!isset($this->items[$cartItemId])) {
             throw new \InvalidArgumentException('Cart does not contain given item by id ['.$cartItemId.']');
@@ -120,7 +122,7 @@ class CartItems extends Collection implements \ArrayAccess, \Countable, \Iterato
         $this->find($cartItemId)->setQuantity($quantity);
     }
 
-    public function remove($cartItemId)
+    public function removeItem($cartItemId)
     {
         if (!isset($this->items[$cartItemId])) {
             throw new \InvalidArgumentException('Order does not contain given item by id ['.$cartItemId.']');

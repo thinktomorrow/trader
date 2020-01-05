@@ -7,7 +7,7 @@ namespace Thinktomorrow\Trader\Purchase\Cart\Domain;
 use Money\Money;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
-use Thinktomorrow\Trader\Common\Cash\RendersMoney;
+use Thinktomorrow\Trader\Common\Domain\Cash\RendersMoney;
 use Thinktomorrow\MagicAttributes\HasMagicAttributes;
 
 class Cart

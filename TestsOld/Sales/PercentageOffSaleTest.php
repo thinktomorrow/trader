@@ -3,7 +3,7 @@
 namespace Thinktomorrow\Trader\TestsOld;
 
 use Money\Money;
-use Thinktomorrow\Trader\Common\Adjusters\Amount;
+use Thinktomorrow\Trader\Common\Domain\Adjusters\Amount;
 use Thinktomorrow\Trader\Sales\Domain\Exceptions\CannotApplySale;
 use Thinktomorrow\Trader\Sales\Domain\SaleId;
 use Thinktomorrow\Trader\Sales\Domain\Types\PercentageOffSale;

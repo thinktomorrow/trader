@@ -48,7 +48,6 @@ class DbCurrentCartSource implements CurrentCartSource
         }
 
         // New cart so make a new reference
-        dd($this->cartRepository->nextReference());
         $this->setReference($this->cartRepository->nextReference());
 
         return Cart::empty($this->cartReference);
@@ -59,12 +58,14 @@ class DbCurrentCartSource implements CurrentCartSource
         return $this->cartReference;
     }
 
-    public function setReference(CartReference $cartReference): void
+    public function setReference(CartReference $cartReference): CurrentCartSource
     {
         $this->cartReference = $cartReference;
+
+        return $this;
     }
 
-    public function set(Cart $cart): void
+    public function set(Cart $cart): CurrentCartSource
     {
         /** In case the cart is abandoned, we consider it to be revived after a change to the cart has occurred */
         if ($cart->state()->is(CartState::ABANDONED)) {
@@ -78,6 +79,8 @@ class DbCurrentCartSource implements CurrentCartSource
         $this->cartReferenceSource->set($cart->reference()->get());
 
         $this->clearCachedCart();
+
+        return $this;
     }
 
     private function clearCachedCart()

@@ -3,7 +3,7 @@
 namespace Thinktomorrow\Trader\TestsOld;
 
 use Money\Money;
-use Thinktomorrow\Trader\Common\Adjusters\Percentage;
+use Thinktomorrow\Trader\Common\Domain\Adjusters\Percentage;
 use Thinktomorrow\Trader\Common\Price\Percentage as PercentageValue;
 use Thinktomorrow\Trader\Sales\Domain\Exceptions\CannotApplySale;
 use Thinktomorrow\Trader\Sales\Domain\SaleId;

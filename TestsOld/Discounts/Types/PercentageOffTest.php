@@ -3,7 +3,7 @@
 namespace Thinktomorrow\Trader\TestsOld;
 
 use Money\Money;
-use Thinktomorrow\Trader\Common\Adjusters\Amount;
+use Thinktomorrow\Trader\Common\Domain\Adjusters\Amount;
 use Thinktomorrow\Trader\Discounts\Domain\DiscountId;
 use Thinktomorrow\Trader\Discounts\Domain\Types\PercentageOffDiscount;
 

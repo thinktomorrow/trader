@@ -46,9 +46,6 @@ class CartFactory
         // Item guards
         AddedAsFreeItemGuard::class,
         StockAndAvailabilityGuard::class,
-        MedicineGuard::class,
-        CatalogGuard::class,
-        DutchTaxRateAdjuster::class,
         BusinessAdjuster::class,
 
         // Apply the cart discounts.

@@ -12,9 +12,9 @@ interface CurrentCartSource
 
     public function getReference(): ?CartReference;
 
-    public function setReference(CartReference $cartReference): void;
+    public function setReference(CartReference $cartReference): self;
 
-    public function set(Cart $cart): void;
+    public function set(Cart $cart): self;
 
     public function forget(): void;
 }

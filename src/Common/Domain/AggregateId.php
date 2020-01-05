@@ -17,10 +17,6 @@ class AggregateId
      */
     public static function fromString(string $id)
     {
-        if((int) $id < 1) {
-            throw new \InvalidArgumentException('Aggregate id must be a positive string (not zero or below). ['.$id.'] was passed instead.');
-        }
-
         $aggregateId = new static();
         $aggregateId->id = $id;
 

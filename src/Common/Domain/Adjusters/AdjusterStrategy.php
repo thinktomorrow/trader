@@ -1,10 +1,10 @@
 <?php
 
+declare(strict_types=1);
 
-namespace Thinktomorrow\Trader\Common\Adjusters;
+namespace Thinktomorrow\Trader\Common\Domain\Adjusters;
 
 use Assert\Assertion;
-use Optiphar\Cart\Adjusters\Adjuster;
 
 /**
  * Strategy of different actions called adjusters on an object in order to shape it to its final state.

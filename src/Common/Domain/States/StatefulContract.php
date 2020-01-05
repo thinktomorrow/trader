@@ -1,6 +1,6 @@
 <?php
 
-namespace Thinktomorrow\Trader\Common\States;
+namespace Thinktomorrow\Trader\Common\Domain\States;
 
 interface StatefulContract
 {

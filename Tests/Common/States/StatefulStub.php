@@ -2,7 +2,7 @@
 
 namespace Thinktomorrow\Trader\Tests\Common\States;
 
-use Thinktomorrow\Trader\Common\States\StatefulContract;
+use Thinktomorrow\Trader\Common\Domain\States\StatefulContract;
 
 class StatefulStub implements StatefulContract
 {

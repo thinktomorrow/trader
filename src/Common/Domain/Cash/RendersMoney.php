@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Thinktomorrow\Trader\Common\Cash;
+namespace Thinktomorrow\Trader\Common\Domain\Cash;
 
 use Money\Money;
 use Optiphar\Cashier\Cash;

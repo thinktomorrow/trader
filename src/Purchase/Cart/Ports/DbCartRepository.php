@@ -8,6 +8,8 @@ use Illuminate\Support\Collection;
 use Thinktomorrow\Trader\Purchase\Cart\Domain\Cart;
 use Thinktomorrow\Trader\Purchase\Cart\Domain\CartReference;
 use Thinktomorrow\Trader\Purchase\Cart\Domain\CartRepository;
+use Thinktomorrow\Trader\Common\Domain\References\ReferenceValue;
+use Thinktomorrow\Trader\Purchase\Cart\Domain\Exceptions\CorruptCartModel;
 use Thinktomorrow\Trader\Purchase\Cart\Domain\Exceptions\CartModelNotFound;
 
 class DbCartRepository implements CartRepository
@@ -15,9 +17,13 @@ class DbCartRepository implements CartRepository
     /** @var CartFactory */
     private $cartFactory;
 
-    public function __construct(CartFactory $cartFactory)
+    /** @var ReferenceValue */
+    private $referenceValue;
+
+    public function __construct(CartFactory $cartFactory, ReferenceValue $referenceValue)
     {
         $this->cartFactory = $cartFactory;
+        $this->referenceValue = $referenceValue;
 
         $this->model = new CartModel();
     }
@@ -96,7 +102,13 @@ class DbCartRepository implements CartRepository
 
     public function nextReference(): CartReference
     {
-        return CartReference::fromString((string)$this->generateOrderReference());
+        $cartReference = $this->referenceValue->generate()->get();
+
+        while(CartModel::findByReference(CartReference::fromString($cartReference))){
+            $cartReference = $this->referenceValue->generate()->get();
+        }
+
+        return CartReference::fromString($cartReference);
     }
 
     private function composeCart(CartReference $cartReference, CartModel $model)
@@ -114,22 +126,6 @@ class DbCartRepository implements CartRepository
             : $this->cartFactory->createFresh($cartReference, $data);
 
         return $cart;
-    }
-
-    private function generateOrderReference(): string
-    {
-        $order_reference = $this->createRandomString();
-
-        while(CartModel::findByReference(CartReference::fromString($order_reference))){
-            $order_reference = $this->createRandomString();
-        }
-
-        return $order_reference;
-    }
-
-    private function createRandomString()
-    {
-        return config('optiphar.order-ref-prefix') . time() . '-' .str_pad( (string) mt_rand(1,999),3,"0",STR_PAD_LEFT);
     }
 
     private function refreshAllowed($cartState = null): bool

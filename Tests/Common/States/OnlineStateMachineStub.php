@@ -2,7 +2,7 @@
 
 namespace Thinktomorrow\Trader\Tests\Common\States;
 
-use Thinktomorrow\Trader\Common\States\StateMachine;
+use Thinktomorrow\Trader\Common\Domain\States\StateMachine;
 
 class OnlineStateMachineStub extends StateMachine
 {

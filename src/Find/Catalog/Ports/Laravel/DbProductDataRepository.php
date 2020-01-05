@@ -1,6 +1,6 @@
 <?php
 
-namespace Thinktomorrow\Trader\Find\Catalog\Ports;
+namespace Thinktomorrow\Trader\Find\Catalog\Ports\Laravel;
 
 use Illuminate\Support\Facades\DB;
 use Thinktomorrow\Trader\Find\Catalog\Domain\Product;

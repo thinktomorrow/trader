@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Thinktomorrow\Trader\Find\Catalog\Reads;
 
 use Assert\Assertion;
-use Thinktomorrow\Trader\Common\Adjusters\AdjusterStrategy;
+use Thinktomorrow\Trader\Common\Domain\Adjusters\AdjusterStrategy;
 
 class ProductFactory
 {

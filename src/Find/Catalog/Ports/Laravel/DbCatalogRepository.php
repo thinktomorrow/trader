@@ -1,6 +1,6 @@
 <?php
 
-namespace Thinktomorrow\Trader\Find\Catalog\Ports;
+namespace Thinktomorrow\Trader\Find\Catalog\Ports\Laravel;
 
 use Thinktomorrow\Trader\Find\Catalog\Reads\CatalogRepository;
 

@@ -3,8 +3,8 @@
 namespace Thinktomorrow\Trader\TestsOld\Discounts\Types;
 
 use Money\Money;
-use Thinktomorrow\Trader\Common\Adjusters\Amount;
-use Thinktomorrow\Trader\Common\Adjusters\Percentage;
+use Thinktomorrow\Trader\Common\Domain\Adjusters\Amount;
+use Thinktomorrow\Trader\Common\Domain\Adjusters\Percentage;
 use Thinktomorrow\Trader\Common\Price\Percentage as PercentageValue;
 use Thinktomorrow\Trader\Discounts\Domain\DiscountId;
 use Thinktomorrow\Trader\Discounts\Domain\EligibleForDiscount;

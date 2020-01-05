@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Optiphar\Cart;
+namespace Thinktomorrow\Trader\Purchase\Cart\Domain;
 
 use Money\Money;
 use Optiphar\Cashier\Cash;
