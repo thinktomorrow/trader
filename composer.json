@@ -37,7 +37,7 @@
     },
   "autoload-dev": {
       "psr-4": {
-        "Thinktomorrow\\Trader\\Tests\\": "Tests"
+        "Thinktomorrow\\Trader\\Tests\\": "tests/"
       },
       "classmap":[]
   },

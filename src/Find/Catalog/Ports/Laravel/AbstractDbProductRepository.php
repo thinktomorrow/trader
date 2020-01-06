@@ -76,8 +76,10 @@ abstract class AbstractDbProductRepository
     protected function createProductFromRecord(object $record): Product
     {
         return $this->container->makeWith(Product::class, [
-            'id'   => $record->id,
-            'data' => (array)json_decode($record->data),
+            'record' => $record,
+//            'id'   => $record->id,
+//            'data' => (array)json_decode($record->data),
+//            'attributes' =>
         ]);
     }
 }
