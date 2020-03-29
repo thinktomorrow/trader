@@ -1,15 +1,13 @@
-<?php
-
-declare(strict_types=1);
+<?php declare(strict_types=1);
 
 namespace Thinktomorrow\Trader\Purchase\Cart\Domain;
 
-use Illuminate\Contracts\Support\Arrayable;
-use Optiphar\Discounts\EligibleForDiscount;
+use Thinktomorrow\Trader\Common\Cash\RendersMoney;
 use Thinktomorrow\MagicAttributes\HasMagicAttributes;
+use Thinktomorrow\Trader\Purchase\Discounts\Domain\Discountable;
 
 /** An applied cart discount */
-class CartPayment implements Arrayable, EligibleForDiscount
+class CartPayment implements Discountable
 {
     use HasMagicAttributes, CartMethodDefaults, RendersMoney;
 }

@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace Thinktomorrow\Trader\Purchase\Cart\Ports;
 
@@ -50,7 +50,7 @@ class DbCurrentCartSource implements CurrentCartSource
         // New cart so make a new reference
         $this->setReference($this->cartRepository->nextReference());
 
-        return Cart::empty($this->cartReference);
+        return $this->cartRepository->emptyCart($this->cartReference);
     }
 
     public function getReference(): ?CartReference

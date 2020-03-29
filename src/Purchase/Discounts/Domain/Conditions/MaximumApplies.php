@@ -4,7 +4,7 @@ namespace Optiphar\Discounts\Conditions;
 
 use Optiphar\Cart\Cart;
 use Optiphar\Discounts\Condition;
-use Optiphar\Discounts\EligibleForDiscount;
+use Optiphar\Discounts\Discountable;
 use Optiphar\Promos\Common\Domain\Rules\Rule;
 use Optiphar\Promos\Common\Domain\Rules\MaximumRedemption;
 
@@ -22,7 +22,7 @@ class MaximumApplies implements Condition
         $this->current_applies = $current_applies;
     }
 
-    public function check(Cart $cart, EligibleForDiscount $eligibleForDiscount): bool
+    public function check(Cart $cart, Discountable $eligibleForDiscount): bool
     {
         return $this->current_applies < $this->maximum_applies;
     }

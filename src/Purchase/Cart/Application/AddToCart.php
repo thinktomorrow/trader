@@ -2,36 +2,43 @@
 
 namespace Thinktomorrow\Trader\Purchase\Cart\Application;
 
+use Thinktomorrow\Trader\Purchase\PurchasableItem;
+use Thinktomorrow\Trader\Purchase\Cart\Domain\CartItemFactory;
+use Thinktomorrow\Trader\Purchase\Cart\Domain\CurrentCartSource;
+use Thinktomorrow\Trader\Purchase\Items\Domain\PurchasableItemId;
+use Thinktomorrow\Trader\Purchase\Items\Domain\PurchasableItemRepository;
+
 class AddToCart
 {
     /** @var CurrentCart */
-    private $currentCart;
+    private $currentCartSource;
 
-    /** @var ProductReadRepository */
-    private $productReadRepository;
+    /** @var PurchasableItemRepository */
+    private $purchasableItemsRepository;
 
-    /** @var CartFactory */
-    private $cartItemsFactory;
+    /** @var CartItemFactory */
+    private $cartItemFactory;
 
-    public function __construct(CurrentCart $currentCart, ProductReadRepository $productReadRepository, CartItemsFactory $cartItemsFactory)
+    public function __construct(CurrentCartSource $currentCartSource, PurchasableItemRepository $purchasableItemsRepository, CartItemFactory $cartItemFactory)
     {
-        $this->currentCart = $currentCart;
-        $this->productReadRepository = $productReadRepository;
-        $this->cartItemsFactory = $cartItemsFactory;
+        $this->currentCartSource = $currentCartSource;
+        $this->purchasableItemsRepository = $purchasableItemsRepository;
+        $this->cartItemFactory = $cartItemFactory;
     }
 
-    public function handle(int $productId, int $quantity)
+    public function handle(PurchasableItemId $purchasableItemId, int $quantity)
     {
-        if( ! $product = $this->productReadRepository->find($productId)) {
-            throw new AddedProductNotFound('No product found for id ['.$productId.'].');
-        }
+        $cart = $this->currentCartSource->get();
+        $purchasableItem = $this->purchasableItemsRepository->findById($purchasableItemId, $cart->channel(), $cart->locale());
 
-        $cart = $this->currentCart->get();
-
-        $cartItem = $this->cartItemsFactory->createItem($product->id, $product, 0);
+        $cartItem = $this->cartItemFactory->create(
+            $purchasableItem->purchasableItemId()->get(),
+            $purchasableItem,
+            []
+        );
 
         $cart->items()->add($cartItem, $quantity);
-
-        $this->currentCart->save($cart);
+dd($cart->total());
+        $this->currentCartSource->save($cart);
     }
 }

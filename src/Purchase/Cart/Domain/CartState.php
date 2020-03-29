@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace Thinktomorrow\Trader\Purchase\Cart\Domain;
 
@@ -13,6 +13,9 @@ class CartState
     // cart has successfully returned from payment provider and is considered confirmed by customer.
     // Not per se paid yet. From this state on, the cart cannot be altered anymore.
     const CONFIRMED = 'confirmed';
+
+    // The cart has been successfully paid and the cart can be considered an 'order'.
+    const PAID = 'paid';
 
     private $state;
 

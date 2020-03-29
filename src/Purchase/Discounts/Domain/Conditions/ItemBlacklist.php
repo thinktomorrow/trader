@@ -5,7 +5,7 @@ namespace Optiphar\Discounts\Conditions;
 use Thinktomorrow\Trader\Purchase\Cart\Cart;
 use Thinktomorrow\Trader\Purchase\Cart\CartItem;
 use Optiphar\Discounts\Condition;
-use Optiphar\Discounts\EligibleForDiscount;
+use Optiphar\Discounts\Discountable;
 use Optiphar\Promos\Common\Domain\Rules\Rule;
 
 class ItemBlacklist implements Condition
@@ -18,7 +18,7 @@ class ItemBlacklist implements Condition
         $this->productIds = $productIds;
     }
 
-    public function check(Cart $cart, EligibleForDiscount $eligibleForDiscount): bool
+    public function check(Cart $cart, Discountable $eligibleForDiscount): bool
     {
         if (empty($this->productIds)) {
             return true;

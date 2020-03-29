@@ -21,4 +21,6 @@ interface CartRepository
     public function save(Cart $cart): void;
 
     public function nextReference(): CartReference;
+
+    public function emptyCart(CartReference $cartReference): Cart;
 }

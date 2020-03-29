@@ -9,7 +9,7 @@ use Optiphar\Cashier\Cash;
 use Optiphar\Cashier\TaxRate;
 use Optiphar\Discounts\Discount;
 use Optiphar\Discounts\DiscountId;
-use Optiphar\Discounts\EligibleForDiscount;
+use Optiphar\Discounts\Discountable;
 use Optiphar\Discounts\Exceptions\CannotApplyDiscount;
 use Optiphar\Promos\Common\Domain\Promo;
 
@@ -64,7 +64,7 @@ class FixedAmountOffDiscount extends BaseDiscount implements Discount
         return $this->discountAmount($cart, $cart);
     }
 
-    public function discountAmount(Cart $cart, EligibleForDiscount $eligibleForDiscount): Money
+    public function discountAmount(Cart $cart, Discountable $eligibleForDiscount): Money
     {
         $discountBasePrice = $eligibleForDiscount->discountBasePriceAsMoney($this->conditions);
         $discountBasePriceMinusDiscounts = $discountBasePrice->subtract($eligibleForDiscount->discountTotalAsMoney());

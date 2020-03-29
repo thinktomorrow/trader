@@ -1,39 +1,16 @@
 <?php
 
-declare(strict_types=1);
-
 namespace Thinktomorrow\Trader\Find\Catalog\Domain;
 
-class Product
+use Money\Money;
+use Thinktomorrow\Trader\Common\Domain\Taxes\TaxRate;
+use Thinktomorrow\Trader\Purchase\Items\Domain\PurchasableItem;
+
+interface Product extends PurchasableItem
 {
-    /** @var ProductVariantId */
-    private $productVariantId;
+    public function id();
 
-    public function __construct(ProductVariantId $productVariantId)
-    {
-        $this->productVariantId = $productVariantId;
-    }
+    public function price(): Money;
 
-    public function getProductVariantIds(): ProductVariantId
-    {
-        return $this->productVariantId;
-    }
-
-    // title, description, seo
-    // images
-    // variants: image, option, price, amount, sku
-    // channel availability
-    // type
-    // vendor
-    // collections (category pages)
-    // tags
-    // sales
-
-    // extra:
-    // product series
-    // product line
-    // custom attribute: cnk (unique)
-    // ean
-    // product bundle
-
+    public function taxRate(): TaxRate;
 }

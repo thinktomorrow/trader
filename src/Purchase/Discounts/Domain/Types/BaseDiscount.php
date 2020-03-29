@@ -8,7 +8,7 @@ use Thinktomorrow\Trader\Purchase\Cart\Cart;
 use Optiphar\Discounts\Condition;
 use Optiphar\Discounts\Conditions\ConditionKey;
 use Optiphar\Discounts\DiscountId;
-use Optiphar\Discounts\EligibleForDiscount;
+use Optiphar\Discounts\Discountable;
 
 abstract class BaseDiscount
 {
@@ -64,7 +64,7 @@ abstract class BaseDiscount
         return $this->applicable($cart, $cart);
     }
 
-    public function applicable(Cart $cart, EligibleForDiscount $eligibleForDiscount): bool
+    public function applicable(Cart $cart, Discountable $eligibleForDiscount): bool
     {
         if ($this->greaterThanPrice($cart, $eligibleForDiscount) || $this->discountAmountBelowZero($cart, $eligibleForDiscount)) {
             return false;
@@ -135,7 +135,7 @@ abstract class BaseDiscount
         return ConditionKey::fromString($string);
     }
 
-    private function greaterThanPrice(Cart $cart, EligibleForDiscount $eligibleForDiscount): bool
+    private function greaterThanPrice(Cart $cart, Discountable $eligibleForDiscount): bool
     {
         // Protect against negative overflow where total would dive under zero - Discount total cannot be higher than discount base.
         $discountTotal = $eligibleForDiscount->discountTotalAsMoney()->add($this->discountAmount($cart, $eligibleForDiscount));
@@ -143,7 +143,7 @@ abstract class BaseDiscount
         return $discountTotal->greaterThan($eligibleForDiscount->discountBasePriceAsMoney($this->conditions));
     }
 
-    private function discountAmountBelowZero(Cart $cart, EligibleForDiscount $eligibleForDiscount): bool
+    private function discountAmountBelowZero(Cart $cart, Discountable $eligibleForDiscount): bool
     {
         $discountTotal = $eligibleForDiscount->discountTotalAsMoney()->add($this->discountAmount($cart, $eligibleForDiscount));
 

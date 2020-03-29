@@ -1,15 +1,12 @@
-<?php
-
+<?php declare(strict_types=1);
 
 namespace Thinktomorrow\Trader\Purchase\Cart\Domain;
 
-
+use Money\Money;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
-use Money\Money;
-use Optiphar\Cashier\Cash;
-use Optiphar\Cashier\Percentage;
-use Optiphar\Cashier\TaxRate;
+use Thinktomorrow\Trader\Common\Domain\Taxes\TaxRate;
+use Thinktomorrow\Trader\Purchase\Discounts\Domain\AppliedDiscount;
 
 trait CartMethodDefaults
 {
@@ -22,13 +19,13 @@ trait CartMethodDefaults
     /** @var Collection */
     private $discounts;
 
-    /** @var Percentage */
+    /** @var TaxRate */
     private $taxRate;
 
     /** @var array */
     private $data;
 
-    public function __construct(string $method, Money $subTotal, Percentage $taxRate, array $data)
+    public function __construct(string $method, Money $subTotal, TaxRate $taxRate, array $data)
     {
         $this->method   = $method;
         $this->subTotal = $subTotal;
@@ -209,7 +206,7 @@ trait CartMethodDefaults
 
     public function discountTotal(): Money {
 
-        return $this->discounts()->reduce(function($carry, CartDiscount $discount){
+        return $this->discounts()->reduce(function($carry, AppliedDiscount $discount){
             return $carry->add($discount->total());
         }, Money::EUR(0));
     }
@@ -219,7 +216,7 @@ trait CartMethodDefaults
         return $this->subTotal;
     }
 
-    public function taxRate(): Percentage
+    public function taxRate(): TaxRate
     {
         return $this->taxRate;
     }
@@ -245,23 +242,28 @@ trait CartMethodDefaults
     public function subTotalAsString(): string { return $this->renderMoney($this->subTotal()); }
     public function taxTotalAsString(): string { return $this->renderMoney($this->taxTotal()); }
 
-
-    public function discountBasePriceAsMoney(array $conditions): Money
+    /**
+     * Total amount on which the discounts should be calculated.
+     *
+     * @param array $conditions
+     * @return Money
+     */
+    public function discountableTotal(array $conditions): Money
     {
         return $this->subTotal();
     }
 
-    public function discountTotalAsMoney(): Money
+    public function discountableQuantity(array $conditions): int
     {
-        return $this->discountTotal();
+        return 1;
     }
 
-    public function discounts(): Collection
+    public function discounts(): array
     {
         return $this->discounts;
     }
 
-    public function addDiscount(CartDiscount $discount)
+    public function addDiscount(AppliedDiscount $discount)
     {
         $this->discounts->push($discount);
     }

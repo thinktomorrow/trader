@@ -13,7 +13,7 @@ use Optiphar\Cashier\TaxRate;
 use Optiphar\Discounts\Discount;
 use Optiphar\Discounts\DiscountId;
 use Optiphar\Promos\Common\Domain\Promo;
-use Optiphar\Discounts\EligibleForDiscount;
+use Optiphar\Discounts\Discountable;
 
 class CheapestProductPercentageOffDiscount extends BaseDiscount implements Discount
 {
@@ -58,7 +58,7 @@ class CheapestProductPercentageOffDiscount extends BaseDiscount implements Disco
         return false;
     }
 
-    public function applicable(Cart $cart, EligibleForDiscount $eligibleForDiscount): bool
+    public function applicable(Cart $cart, Discountable $eligibleForDiscount): bool
     {
         if(false === parent::applicable($cart, $eligibleForDiscount)) return false;
 
@@ -117,7 +117,7 @@ class CheapestProductPercentageOffDiscount extends BaseDiscount implements Disco
         return $total;
     }
 
-    public function discountAmount(Cart $cart, EligibleForDiscount $eligibleForDiscount): Money
+    public function discountAmount(Cart $cart, Discountable $eligibleForDiscount): Money
     {
         // Cheapest discount is based on one item for one quantity
         $discountBasePrice = $eligibleForDiscount->discountBasePriceAsMoney($this->conditions)->divide($eligibleForDiscount->quantity());

@@ -5,7 +5,7 @@ namespace Optiphar\Discounts\Conditions;
 use Money\Money;
 use Thinktomorrow\Trader\Purchase\Cart\Cart;
 use Optiphar\Discounts\Condition;
-use Optiphar\Discounts\EligibleForDiscount;
+use Optiphar\Discounts\Discountable;
 use Optiphar\Promos\Common\Domain\Rules\Rule;
 
 class MinimumAmount implements Condition
@@ -18,7 +18,7 @@ class MinimumAmount implements Condition
         $this->minimumAmount = $minimumAmount;
     }
 
-    public function check(Cart $cart, EligibleForDiscount $eligibleForDiscount): bool
+    public function check(Cart $cart, Discountable $eligibleForDiscount): bool
     {
         // We need the subtotal but without the added item discounts.
         $subTotalWithoutItemDiscounts = $cart->items()->reduce(function($carry, $item){

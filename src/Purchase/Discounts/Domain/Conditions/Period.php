@@ -5,7 +5,7 @@ namespace Optiphar\Discounts\Conditions;
 use DateTimeImmutable;
 use Thinktomorrow\Trader\Purchase\Cart\Cart;
 use Optiphar\Discounts\Condition;
-use Optiphar\Discounts\EligibleForDiscount;
+use Optiphar\Discounts\Discountable;
 use Optiphar\Promos\Common\Domain\Rules\Rule;
 
 class Period implements Condition
@@ -22,7 +22,7 @@ class Period implements Condition
         $this->endAt = $endAt;
     }
 
-    public function check(Cart $cart, EligibleForDiscount $eligibleForDiscount): bool
+    public function check(Cart $cart, Discountable $eligibleForDiscount): bool
     {
         $valid_start_at = $this->comesAfter( new DateTimeImmutable(), $this->startAt );
         $valid_end_at = $this->goesBefore( new DateTimeImmutable(), $this->endAt );

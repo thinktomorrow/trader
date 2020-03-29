@@ -13,7 +13,7 @@ use Optiphar\Cashier\TaxRate;
 use Optiphar\Discounts\Discount;
 use Optiphar\Discounts\DiscountId;
 use Optiphar\Promos\Common\Domain\Promo;
-use Optiphar\Discounts\EligibleForDiscount;
+use Optiphar\Discounts\Discountable;
 
 class ProductPercentageOffDiscount extends BaseDiscount implements Discount
 {
@@ -102,7 +102,7 @@ class ProductPercentageOffDiscount extends BaseDiscount implements Discount
         return $total;
     }
 
-    public function discountAmount(Cart $cart, EligibleForDiscount $eligibleForDiscount): Money
+    public function discountAmount(Cart $cart, Discountable $eligibleForDiscount): Money
     {
         $discountBasePrice = $eligibleForDiscount->discountBasePriceAsMoney($this->conditions);
         $discountBasePriceMinusDiscounts = $discountBasePrice->subtract($eligibleForDiscount->discountTotalAsMoney());

@@ -6,6 +6,7 @@ namespace Thinktomorrow\Trader\Purchase\Cart\Ports;
 
 use Illuminate\Support\Collection;
 use Thinktomorrow\Trader\Purchase\Cart\Domain\Cart;
+use Thinktomorrow\Trader\Purchase\Cart\Domain\CartFactory;
 use Thinktomorrow\Trader\Purchase\Cart\Domain\CartReference;
 use Thinktomorrow\Trader\Purchase\Cart\Domain\CartRepository;
 use Thinktomorrow\Trader\Common\Domain\References\ReferenceValue;
@@ -138,5 +139,10 @@ class DbCartRepository implements CartRepository
             CartState::ABANDONED,
             CartState::REVIVED,
         ]);
+    }
+
+    public function emptyCart(CartReference $cartReference): Cart
+    {
+        return $this->cartFactory->createEmpty($cartReference);
     }
 }

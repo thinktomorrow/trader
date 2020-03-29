@@ -5,7 +5,7 @@ namespace Optiphar\Discounts\Conditions;
 use Optiphar\Cart\Cart;
 use Optiphar\Cart\CartItem;
 use Optiphar\Discounts\Condition;
-use Optiphar\Discounts\EligibleForDiscount;
+use Optiphar\Discounts\Discountable;
 use Optiphar\Promos\Common\Domain\Rules\Rule;
 
 class CategoryWhitelist implements Condition
@@ -18,7 +18,7 @@ class CategoryWhitelist implements Condition
         $this->categoryIds = $categoryIds;
     }
 
-    public function check(Cart $cart, EligibleForDiscount $eligibleForDiscount): bool
+    public function check(Cart $cart, Discountable $eligibleForDiscount): bool
     {
         if (empty($this->categoryIds)) {
             return true;

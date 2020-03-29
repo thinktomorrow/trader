@@ -1,10 +1,10 @@
-<?php
+<?php declare(strict_types=1);
 
-namespace Optiphar\Discounts;
+namespace Thinktomorrow\Trader\Purchase\Discounts\Domain;
 
-use Optiphar\Core\Common\AggregateId;
+use Thinktomorrow\Trader\Common\Domain\AggregateId;
 
-final class DiscountId
+class DiscountId extends AggregateId
 {
-    use AggregateId;
+
 }
