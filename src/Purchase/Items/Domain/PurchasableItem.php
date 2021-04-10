@@ -25,12 +25,4 @@ interface PurchasableItem
      * @return TaxRate
      */
     public function taxRate(): TaxRate;
-
-    /**
-     * All the information required for the purchase of this item.
-     * This allows to refer to historical accurate item data.
-     *
-     * @return array
-     */
-    public function cartItemData(): array;
 }

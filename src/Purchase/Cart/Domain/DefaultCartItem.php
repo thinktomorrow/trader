@@ -6,10 +6,10 @@ use Money\Money;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 use Thinktomorrow\Trader\Common\Cash\RendersMoney;
-use Thinktomorrow\Trader\Purchase\Notes\Domain\Note;
+use Thinktomorrow\Trader\Common\Notes\Note;
 use Thinktomorrow\MagicAttributes\HasMagicAttributes;
 use Thinktomorrow\Trader\Common\Domain\Taxes\TaxRate;
-use Thinktomorrow\Trader\Purchase\Notes\Domain\NoteCollection;
+use Thinktomorrow\Trader\Common\Notes\NoteCollection;
 
 use Thinktomorrow\Trader\Purchase\Items\Domain\PurchasableItemId;
 use Thinktomorrow\Trader\Purchase\Discounts\Domain\AppliedDiscount;

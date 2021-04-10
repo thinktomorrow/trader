@@ -7,7 +7,7 @@ interface Couponable
 {
     public function enteredCoupon(): ?string;
 
-    public function enterCoupon(string $coupon);
+    public function enterCoupon(string $coupon): void;
 
     public function removeCoupon();
 }

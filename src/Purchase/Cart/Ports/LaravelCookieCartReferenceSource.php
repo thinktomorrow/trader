@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Thinktomorrow\Trader\Purchase\Cart\Ports;
 
 use Optiphar\Utils\CookieValue;
-use Thinktomorrow\Trader\Common\Ports\Laravel\CookieSource;
+use Thinktomorrow\Trader\Infrastructure\Laravel\Common\CookieSource;
 use Thinktomorrow\Trader\Purchase\Cart\Domain\CartReference;
 use Thinktomorrow\Trader\Purchase\Cart\Domain\CartReferenceSource;
 

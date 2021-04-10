@@ -1,9 +1,9 @@
 <?php
 declare(strict_types=1);
 
-namespace Thinktomorrow\Trader\Purchase\Notes\Domain;
+namespace Thinktomorrow\Trader\Common\Notes;
 
-interface ContainsNotes
+interface CarriesNotes
 {
     public function notes(): NoteCollection;
 

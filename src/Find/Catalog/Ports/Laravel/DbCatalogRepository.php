@@ -9,11 +9,11 @@ use Thinktomorrow\Trader\Find\Channels\ChannelId;
 use Thinktomorrow\Trader\Common\Domain\Taxes\TaxRate;
 use Thinktomorrow\Trader\Find\Catalog\Domain\ProductId;
 use Thinktomorrow\Trader\Common\Domain\Locales\LocaleId;
-use Thinktomorrow\Trader\Find\Catalog\Reads\ProductRead;
+use Thinktomorrow\Trader\Infrastructure\Basic\Find\Catalog\Reads\ProductRead;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
-use Thinktomorrow\Trader\Find\Catalog\Reads\CatalogRepository;
-use Thinktomorrow\Trader\Find\Catalog\Reads\ProductReadFactory;
-use Thinktomorrow\Trader\Find\Catalog\Reads\ProductReadCollection;
+use Thinktomorrow\Trader\Infrastructure\Basic\Find\Catalog\Reads\CatalogRepository;
+use Thinktomorrow\Trader\Infrastructure\Basic\Find\Catalog\Reads\ProductReadFactory;
+use Thinktomorrow\Trader\Infrastructure\Basic\Find\Catalog\Reads\ProductReadCollection;
 
 class DbCatalogRepository extends AbstractDbProductRepository implements CatalogRepository
 {

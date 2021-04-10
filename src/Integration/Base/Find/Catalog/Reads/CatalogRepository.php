@@ -1,6 +1,6 @@
 <?php
 
-namespace Thinktomorrow\Trader\Find\Catalog\Reads;
+namespace Thinktomorrow\Trader\Integration\Base\Find\Catalog\Reads;
 
 use Thinktomorrow\Trader\Find\Channels\ChannelId;
 use Thinktomorrow\Trader\Common\Domain\Locales\LocaleId;

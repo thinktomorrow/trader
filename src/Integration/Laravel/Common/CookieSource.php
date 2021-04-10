@@ -1,6 +1,6 @@
 <?php
 
-namespace Thinktomorrow\Trader\Common\Ports\Laravel;
+namespace Thinktomorrow\Trader\Integration\Laravel\Common;
 
 use Illuminate\Cookie\CookieJar;
 use Illuminate\Http\Request;
@@ -18,6 +18,7 @@ abstract class CookieSource
 
     public function __construct(Request $request, CookieJar $cookieJar)
     {
+        // TODO: replace with getCookieKey protected abstract as well as getLifetime
         if(!isset($this->cookieKey) || !$this->cookieKey)
         {
             throw new \DomainException('A CookieValue class requires a cookieKey property value. Did you perhaps forget to set it?');

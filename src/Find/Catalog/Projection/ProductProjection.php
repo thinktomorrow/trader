@@ -1,6 +1,6 @@
 <?php declare(strict_types=1);
 
-namespace Thinktomorrow\Trader\Find\Catalog\Reads;
+namespace Thinktomorrow\Trader\Infrastructure\Basic\Find\Catalog\Reads;
 
 use Illuminate\Contracts\Container\Container;
 

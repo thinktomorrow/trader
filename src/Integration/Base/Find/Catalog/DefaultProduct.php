@@ -1,12 +1,14 @@
 <?php
 
-namespace Thinktomorrow\Trader\Find\Catalog\Domain;
+namespace Thinktomorrow\Trader\Integration\Base\Find;
 
 use Money\Money;
 use Money\Currency;
 use Thinktomorrow\Trader\Common\Cash\Cash;
 use Thinktomorrow\Trader\Purchase\PurchasableItem;
 use Thinktomorrow\Trader\Common\Domain\Taxes\TaxRate;
+use Thinktomorrow\Trader\Find\Catalog\Domain\Product;
+use Thinktomorrow\Trader\Find\Catalog\Domain\ProductId;
 use Thinktomorrow\Trader\Purchase\Items\Domain\PurchasableItemId;
 
 class DefaultProduct implements Product

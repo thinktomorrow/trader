@@ -1,6 +1,6 @@
 <?php declare(strict_types=1);
 
-namespace Thinktomorrow\Trader\Find\Catalog\Reads;
+namespace Thinktomorrow\Trader\Integration\Base\Find\Catalog\Reads;
 
 use Assert\Assertion;
 use Thinktomorrow\Trader\Common\Domain\Adjusters\AdjusterStrategy;

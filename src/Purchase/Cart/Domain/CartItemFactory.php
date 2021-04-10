@@ -6,7 +6,7 @@ use Money\Money;
 use Assert\Assertion;
 use Illuminate\Contracts\Container\Container;
 use Thinktomorrow\Trader\Common\Domain\Taxes\TaxRate;
-use Thinktomorrow\Trader\Purchase\Notes\Domain\NoteCollection;
+use Thinktomorrow\Trader\Common\Notes\NoteCollection;
 use Thinktomorrow\Trader\Purchase\Items\Domain\PurchasableItem;
 use Thinktomorrow\Trader\Purchase\Items\Domain\PurchasableItemId;
 use Thinktomorrow\Trader\Common\Domain\Adjusters\AdjusterStrategy;

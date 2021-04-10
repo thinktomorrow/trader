@@ -33,7 +33,8 @@
     },
     "autoload": {
         "psr-4": {
-            "Thinktomorrow\\Trader\\": "src/"
+            "Thinktomorrow\\Trader\\": "src/",
+            "Thinktomorrow\\Trader\\Infrastructure": "Infrastructure/"
         },
       "classmap":[]
     },

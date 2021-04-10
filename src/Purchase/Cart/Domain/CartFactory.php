@@ -10,7 +10,7 @@ use Optiphar\Cart\Adjusters\PaymentMethodAdjuster;
 use Optiphar\Cart\Adjusters\ShippingMethodAdjuster;
 use Thinktomorrow\Trader\Common\Domain\Locales\LocaleId;
 use Optiphar\Cart\Adjusters\ItemGuards\AddedAsFreeItemGuard;
-use Thinktomorrow\Trader\Purchase\Notes\Domain\NoteCollection;
+use Thinktomorrow\Trader\Common\Notes\NoteCollection;
 use Thinktomorrow\Trader\Purchase\Items\Domain\PurchasableItem;
 use Thinktomorrow\Trader\Common\Domain\Adjusters\AdjusterStrategy;
 use Thinktomorrow\Trader\Purchase\Discounts\Domain\AppliedDiscount;

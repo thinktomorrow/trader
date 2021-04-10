@@ -1,6 +1,6 @@
 <?php
 
-namespace Thinktomorrow\Trader\Find\Catalog\Reads;
+namespace Thinktomorrow\Trader\Integration\Base\Find\Catalog\Reads;
 
 use Money\Money;
 use Money\Currency;

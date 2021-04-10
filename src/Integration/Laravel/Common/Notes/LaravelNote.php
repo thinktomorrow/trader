@@ -1,14 +1,14 @@
 <?php declare(strict_types=1);
 
-namespace Thinktomorrow\Trader\Purchase\Notes\Ports;
+namespace Thinktomorrow\Trader\Integration\Base\Common\Notes;
 
-class DefaultNote
+class LaravelNote
 {
-    /** @var array */
-    private $translations;
+    /** @var string */
+    private $message;
 
     /** @var array */
-    private $tags;
+    private $tags = [];
 
     /** @var string */
     private $htmlTag;
@@ -20,15 +20,13 @@ class DefaultNote
     /** @var string */
     private $class;
 
-    private function __construct(array $translations)
+    private function __construct(string $message)
     {
-        $this->translations = $translations;
-        $this->tags = [];
-
+        $this->message = $message;
         $this->element('span','');
     }
 
-    public static function fromTransKey(string $transkey, array $replace = [])
+    public static function fromMessage(string $transkey, array $replace = [])
     {
         $translations = array_fill_keys(config('translatable.locales'), null);
 

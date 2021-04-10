@@ -5,7 +5,7 @@ namespace Tests\Integration;
 use Tests\TestCase;
 use Illuminate\Http\Request;
 use Illuminate\Cookie\CookieJar;
-use Thinktomorrow\Trader\Common\Ports\Laravel\CookieSource;
+use Thinktomorrow\Trader\Infrastructure\Laravel\Common\CookieSource;
 
 class CookieSourceTest extends TestCase
 {

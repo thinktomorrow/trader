@@ -7,11 +7,11 @@ use Thinktomorrow\Trader\Find\Channels\ChannelId;
 use Thinktomorrow\Trader\Fulfil\Domain\FulfillableItem;
 use Thinktomorrow\Trader\Common\Domain\Locales\LocaleId;
 use Thinktomorrow\Trader\Common\Domain\Taxes\TaxRateTotals;
-use Thinktomorrow\Trader\Purchase\Notes\Domain\ContainsNotes;
+use Thinktomorrow\Trader\Common\Notes\CarriesNotes;
 use Thinktomorrow\Trader\Purchase\Discounts\Domain\Couponable;
 use Thinktomorrow\Trader\Purchase\Discounts\Domain\Discountable;
 
-interface Cart extends Discountable, Couponable, ContainsNotes, FulfillableItem
+interface Cart extends Discountable, Couponable, CarriesNotes, FulfillableItem
 {
     public function reference(): CartReference;
 

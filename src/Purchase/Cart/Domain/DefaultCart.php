@@ -8,10 +8,10 @@ use Thinktomorrow\Trader\Find\Channels\ChannelId;
 use Thinktomorrow\Trader\Common\Cash\RendersMoney;
 use Thinktomorrow\Trader\Common\Domain\Locales\LocaleId;
 use Thinktomorrow\Trader\Fulfil\Domain\FulfillableItemId;
-use Thinktomorrow\Trader\Purchase\Notes\Domain\Note;
+use Thinktomorrow\Trader\Common\Notes\Note;
 use Thinktomorrow\MagicAttributes\HasMagicAttributes;
 use Thinktomorrow\Trader\Common\Domain\Taxes\TaxRateTotals;
-use Thinktomorrow\Trader\Purchase\Notes\Domain\NoteCollection;
+use Thinktomorrow\Trader\Common\Notes\NoteCollection;
 use Thinktomorrow\Trader\Purchase\Discounts\Domain\AppliedDiscount;
 use Thinktomorrow\Trader\Purchase\Discounts\Domain\AppliedDiscountCollection;
 

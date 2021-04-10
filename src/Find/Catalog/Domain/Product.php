@@ -2,15 +2,16 @@
 
 namespace Thinktomorrow\Trader\Find\Catalog\Domain;
 
-use Money\Money;
-use Thinktomorrow\Trader\Common\Domain\Taxes\TaxRate;
-use Thinktomorrow\Trader\Purchase\Items\Domain\PurchasableItem;
-
-interface Product extends PurchasableItem
+interface Product
 {
-    public function id();
+    public function id(): ProductId;
 
-    public function price(): Money;
+    // Description
+    // images
+    // product type
+    // channel
+    // seo
 
-    public function taxRate(): TaxRate;
+    // collections
+    // tags
 }
