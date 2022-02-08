@@ -3,10 +3,10 @@
 namespace Thinktomorrow\Trader\TestsOld\Price;
 
 use Money\Money;
-use Thinktomorrow\Trader\Common\Config;
+use Common\Config;
 use Thinktomorrow\Trader\Common\Price\Cash;
-use Thinktomorrow\Trader\Common\Price\Percentage;
 use Thinktomorrow\Trader\TestsOld\TestCase;
+use Thinktomorrow\Trader\Common\Price\Percentage;
 
 class CashTest extends TestCase
 {

@@ -1,6 +1,6 @@
 <?php
 
-use Thinktomorrow\Trader\Common\Config;
+use Common\Config;
 use Thinktomorrow\Trader\TestsOld\TestCase;
 
 class ConfigTest extends TestCase
