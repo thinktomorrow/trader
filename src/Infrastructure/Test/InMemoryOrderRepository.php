@@ -3,38 +3,38 @@ declare(strict_types=1);
 
 namespace Thinktomorrow\Trader\Infrastructure\Test;
 
-use Thinktomorrow\Trader\Domain\Model\Order\Order;
 use Thinktomorrow\Trader\Domain\Model\Order\OrderId;
-use Thinktomorrow\Trader\Domain\Model\Order\OrderRepository;
+use Thinktomorrow\Trader\Domain\Model\Order\Entity\Order;
+use Thinktomorrow\Trader\Domain\Model\Order\Entity\OrderRepository;
 use Thinktomorrow\Trader\Domain\Model\Order\Exceptions\CouldNotFindOrder;
 
-final class ArrayOrderRepository implements OrderRepository
+final class InMemoryOrderRepository implements OrderRepository
 {
-    private array $orders = [];
+    private static array $orders = [];
 
     private string $nextReference = 'xxx-123';
 
     public function save(Order $order): void
     {
-        $this->orders[$order->orderId->get()] = $order;
+        static::$orders[$order->orderId->get()] = $order;
     }
 
     public function find(OrderId $orderId): Order
     {
-        if(!isset($this->orders[$orderId->get()])) {
+        if(!isset(static::$orders[$orderId->get()])) {
             throw new CouldNotFindOrder('No order found by id ' . $orderId);
         }
 
-        return $this->orders[$orderId->get()];
+        return static::$orders[$orderId->get()];
     }
 
     public function delete(OrderId $orderId): void
     {
-        if(!isset($this->orders[$orderId->get()])) {
+        if(!isset(static::$orders[$orderId->get()])) {
             throw new CouldNotFindOrder('No order found by id ' . $orderId);
         }
 
-        unset($this->orders[$orderId->get()]);
+        unset(static::$orders[$orderId->get()]);
     }
 
     public function nextReference(): OrderId
@@ -46,5 +46,10 @@ final class ArrayOrderRepository implements OrderRepository
     public function setNextReference(string $nextReference): void
     {
         $this->nextReference = $nextReference;
+    }
+
+    public function clear()
+    {
+        static::$orders = [];
     }
 }

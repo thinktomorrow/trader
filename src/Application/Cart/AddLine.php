@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 
-namespace Thinktomorrow\Trader\Application\Order;
+namespace Thinktomorrow\Trader\Application\Cart;
 
 
 use Thinktomorrow\Trader\Domain\Model\Order\OrderId;

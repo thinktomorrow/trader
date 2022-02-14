@@ -3,9 +3,9 @@ declare(strict_types=1);
 
 namespace Thinktomorrow\Trader\Application\Order;
 
-use Thinktomorrow\Trader\Domain\Model\Order\Order;
-use Thinktomorrow\Trader\Domain\Model\Order\OrderRepository;
+use Thinktomorrow\Trader\Domain\Model\Order\Entity\Order;
 use Thinktomorrow\Trader\Domain\Common\Event\EventDispatcher;
+use Thinktomorrow\Trader\Domain\Model\Order\Entity\OrderRepository;
 
 final class OrderApplication
 {

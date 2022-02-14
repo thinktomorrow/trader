@@ -35,11 +35,11 @@ class Cash
      * Convenience method to allow maintaining dynamic currency.
      * Keep in mind that this remains consistent across your application.
      *
-     * @param int $amount
+     * @param string|int $amount
      * @param string|null $currencyCode
      * @return Money
      */
-    public static function make(int $amount, string $currencyCode = null): Money
+    public static function make(string|int $amount, string $currencyCode = null): Money
     {
         $currencyCode = $currencyCode ?: static::getDefaultCurrencyCode();
 

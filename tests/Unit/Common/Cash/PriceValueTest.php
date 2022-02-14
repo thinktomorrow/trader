@@ -12,8 +12,8 @@ class PriceValueTest extends TestCase
     /** @test */
     public function it_can_make_price_including_vat()
     {
-        $object = PriceValueStub::fromMoneyIncludingVat(
-            Money::EUR(120), TaxRate::fromString('20')
+        $object = PriceValueStub::fromMoney(
+            Money::EUR(120), TaxRate::fromString('20'), true
         );
 
         $this->assertEquals(Money::EUR(120), $object->getIncludingVat());
@@ -23,8 +23,8 @@ class PriceValueTest extends TestCase
     /** @test */
     public function it_can_make_price_excluding_vat()
     {
-        $object = PriceValueStub::fromMoneyExcludingVat(
-            Money::EUR(100), TaxRate::fromString('20')
+        $object = PriceValueStub::fromMoney(
+            Money::EUR(100), TaxRate::fromString('20'), false
         );
 
         $this->assertEquals(Money::EUR(100), $object->getExcludingVat());

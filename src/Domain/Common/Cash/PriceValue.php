@@ -17,17 +17,27 @@ trait PriceValue
         //
     }
 
-    public static function fromMoneyIncludingVat(Money $money, TaxRate $taxRate): static
+    public static function fromScalars(string|int $amount, string $currency, string $taxRate, bool $includesTax): static
     {
-        return static::fromMoney($money, $taxRate, true);
+        return static::fromMoney(
+            Cash::make($amount, $currency),
+            TaxRate::fromString($taxRate),
+            $includesTax
+        );
     }
 
-    public static function fromMoneyExcludingVat(Money $money, TaxRate $taxRate): static
+    public static function fromPrice(Price $otherPrice): static
     {
-        return static::fromMoney($money, $taxRate, false);
+        $price = new static();
+
+        $price->money = $otherPrice->getMoney();
+        $price->taxRate = $otherPrice->getTaxRate();
+        $price->includesTax = $otherPrice->includesTax();
+
+        return $price;
     }
 
-    private static function fromMoney(Money $money, TaxRate $taxRate, bool $includesTax): static
+    public static function fromMoney(Money $money, TaxRate $taxRate, bool $includesTax): static
     {
         $valueObject = new static();
 
@@ -60,6 +70,11 @@ trait PriceValue
         );
     }
 
+    public function getMoney(): Money
+    {
+        return $this->money;
+    }
+
     public function getTaxRate(): TaxRate
     {
         return $this->taxRate;
@@ -68,5 +83,28 @@ trait PriceValue
     public function includesTax(): bool
     {
         return $this->includesTax;
+    }
+
+    public function multiply(int $quantity): static
+    {
+        return static::fromMoney($this->money->multiply($quantity), $this->taxRate, $this->includesTax);
+    }
+
+    public function add(Price $otherPrice): static
+    {
+        $otherMoney = $this->includesTax()
+            ? $otherPrice->getIncludingVat()
+            : $otherPrice->getExcludingVat();
+
+        return static::fromMoney($this->money->add($otherMoney), $this->taxRate, $this->includesTax);
+    }
+
+    public function subtract(Price $otherPrice): static
+    {
+        $otherMoney = $this->includesTax()
+            ? $otherPrice->getIncludingVat()
+            : $otherPrice->getExcludingVat();
+
+        return static::fromMoney($this->money->subtract($otherMoney), $this->taxRate, $this->includesTax);
     }
 }

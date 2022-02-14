@@ -21,8 +21,8 @@ class ProductTest extends TestCase
         $product = Product::create(
             $productId = ProductId::fromString('yyy'),
             $productGroupId = ProductGroupId::fromString('xxx'),
-            $productUnitPrice = ProductUnitPrice::fromMoneyExcludingVat(
-                Money::EUR(10), TaxRate::fromString('20')
+            $productUnitPrice = ProductUnitPrice::fromMoney(
+                Money::EUR(10), TaxRate::fromString('20'), false
             ),
         );
 
@@ -47,8 +47,7 @@ class ProductTest extends TestCase
 
         $product->update(
             ProductGroupId::fromString('zzz'),
-            ProductUnitPrice::fromMoneyExcludingVat(Money::EUR(10),
-            TaxRate::fromString('20')),
+            ProductUnitPrice::fromMoney(Money::EUR(10), TaxRate::fromString('20'), false),
             ['foo' => 'bar']
         );
 
@@ -68,15 +67,13 @@ class ProductTest extends TestCase
 
         $product->update(
             ProductGroupId::fromString('zzz'),
-            ProductUnitPrice::fromMoneyExcludingVat(Money::EUR(10),
-                TaxRate::fromString('20')),
+            ProductUnitPrice::fromMoney(Money::EUR(10), TaxRate::fromString('20'), false),
             ['bar' => 'baz']
         );
 
         $product->update(
             ProductGroupId::fromString('zzz'),
-            ProductUnitPrice::fromMoneyExcludingVat(Money::EUR(10),
-                TaxRate::fromString('20')),
+            ProductUnitPrice::fromMoney(Money::EUR(10), TaxRate::fromString('20'), false),
             ['foo' => 'bar']
         );
 
@@ -108,8 +105,8 @@ class ProductTest extends TestCase
         return Product::create(
             ProductId::fromString('yyy'),
             ProductGroupId::fromString('xxx'),
-            ProductUnitPrice::fromMoneyExcludingVat(
-                Money::EUR(10), TaxRate::fromString('20')
+            ProductUnitPrice::fromMoney(
+                Money::EUR(10), TaxRate::fromString('20'), false
             )
         );
     }

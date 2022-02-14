@@ -1,8 +1,11 @@
 <?php
 declare(strict_types=1);
 
-namespace Thinktomorrow\Trader\Domain\Model\Order;
+namespace Thinktomorrow\Trader\Domain\Model\Order\Entity;
 
+use Thinktomorrow\Trader\Domain\Model\Order\OrderId;
+use Thinktomorrow\Trader\Domain\Model\Order\Quantity;
+use Thinktomorrow\Trader\Domain\Model\Order\LineNumber;
 use Thinktomorrow\Trader\Domain\Model\Product\ProductId;
 
 final class Line

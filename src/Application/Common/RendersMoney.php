@@ -3,7 +3,7 @@
 namespace Thinktomorrow\Trader\Application\Common;
 
 use Money\Money;
-use Thinktomorrow\Trader\Common\Domain\Locale;
+use Thinktomorrow\Trader\Domain\Common\Locale;
 use Thinktomorrow\Trader\Domain\Common\Cash\Cash;
 use Thinktomorrow\Trader\Domain\Common\Cash\Percentage;
 
@@ -16,7 +16,7 @@ trait RendersMoney
 
     protected function renderPercentage(Percentage $percentage): string
     {
-        return (string) $percentage->toInteger();
+        return $percentage->get();
     }
 
     protected function renderMoneyAsNett(Money $money, Percentage $taxRate, Locale $localeId): string

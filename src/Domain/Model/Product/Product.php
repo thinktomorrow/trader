@@ -71,9 +71,7 @@ final class Product implements Aggregate
 
         $product->productId = ProductId::fromString($state['product_id']);
         $product->productGroupId = ProductGroupId::fromString($state['product_group_id']);
-        $product->productUnitPrice = $state['includes_vat']
-            ? ProductUnitPrice::fromMoneyIncludingVat(Cash::make($state['product_unit_price']), TaxRate::fromString($state['tax_rate']))
-            : ProductUnitPrice::fromMoneyExcludingVat(Cash::make($state['product_unit_price']), TaxRate::fromString($state['tax_rate']));
+        $product->productUnitPrice = ProductUnitPrice::fromMoney(Cash::make($state['product_unit_price']), TaxRate::fromString($state['tax_rate']), $state['includes_vat']);
 
         $product->data = $state['data'];
 

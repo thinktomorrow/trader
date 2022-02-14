@@ -4,10 +4,10 @@ declare(strict_types=1);
 namespace Tests\Infrastructure;
 
 use PHPUnit\Framework\TestCase;
-use Thinktomorrow\Trader\Domain\Model\Order\Order;
 use Thinktomorrow\Trader\Domain\Model\Order\OrderId;
+use Thinktomorrow\Trader\Domain\Model\Order\Entity\Order;
 use Thinktomorrow\Trader\Domain\Model\Customer\CustomerId;
-use Thinktomorrow\Trader\Infrastructure\Test\ArrayOrderRepository;
+use Thinktomorrow\Trader\Infrastructure\Test\InMemoryOrderRepository;
 
 final class OrderRepositoryTest extends TestCase
 {
@@ -26,7 +26,7 @@ final class OrderRepositoryTest extends TestCase
 
     private function orderRepositories(): \Generator
     {
-        yield new ArrayOrderRepository();
+        yield new InMemoryOrderRepository();
     }
 
     public function orders(): \Generator
