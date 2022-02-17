@@ -4,9 +4,9 @@ declare(strict_types=1);
 namespace Thinktomorrow\Trader\Infrastructure\Laravel;
 
 use Illuminate\Database\Connection;
+use Thinktomorrow\Trader\Domain\Model\Order\Order;
 use Thinktomorrow\Trader\Domain\Model\Order\OrderId;
-use Thinktomorrow\Trader\Domain\Model\Order\Entity\Order;
-use Thinktomorrow\Trader\Domain\Model\Order\Entity\OrderRepository;
+use Thinktomorrow\Trader\Domain\Model\Order\OrderRepository;
 
 final class MysqlOrderRepository implements OrderRepository
 {

@@ -14,6 +14,8 @@ interface Price
 
     public static function fromMoney(Money $money, TaxRate $taxRate, bool $includesTax): static;
 
+    public static function zero(): static;
+
     public function getIncludingVat(): Money;
 
     public function getExcludingVat(): Money;

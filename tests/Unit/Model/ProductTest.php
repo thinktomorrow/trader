@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 
-namespace Tests\Unit;
+namespace Tests\Unit\Model;
 
 use Money\Money;
 use PHPUnit\Framework\TestCase;
@@ -9,6 +9,7 @@ use Thinktomorrow\Trader\Domain\Common\Taxes\TaxRate;
 use Thinktomorrow\Trader\Domain\Model\Product\Product;
 use Thinktomorrow\Trader\Domain\Model\Product\ProductId;
 use Thinktomorrow\Trader\Domain\Model\Product\ProductUnitPrice;
+use Thinktomorrow\Trader\Domain\Model\Product\ProductSalePrice;
 use Thinktomorrow\Trader\Domain\Model\ProductGroup\ProductGroupId;
 use Thinktomorrow\Trader\Domain\Model\Product\Event\ProductCreated;
 use Thinktomorrow\Trader\Domain\Model\Product\Event\ProductUpdated;
@@ -24,12 +25,14 @@ class ProductTest extends TestCase
             $productUnitPrice = ProductUnitPrice::fromMoney(
                 Money::EUR(10), TaxRate::fromString('20'), false
             ),
+            $productSalePrice = ProductSalePrice::fromMoney(Money::EUR(8), TaxRate::fromString('20'), false),
         );
 
         $this->assertEquals([
             'product_id' => $productId->get(),
             'product_group_id' => $productGroupId->get(),
             'product_unit_price' => $productUnitPrice->getExcludingVat()->getAmount(),
+            'product_sale_price' => $productSalePrice->getExcludingVat()->getAmount(),
             'tax_rate' => $productUnitPrice->getTaxRate()->toPercentage()->get(),
             'includes_vat' => false,
             'data' => [],
@@ -48,6 +51,7 @@ class ProductTest extends TestCase
         $product->update(
             ProductGroupId::fromString('zzz'),
             ProductUnitPrice::fromMoney(Money::EUR(10), TaxRate::fromString('20'), false),
+            ProductSalePrice::fromMoney(Money::EUR(8), TaxRate::fromString('20'), false),
             ['foo' => 'bar']
         );
 
@@ -68,12 +72,14 @@ class ProductTest extends TestCase
         $product->update(
             ProductGroupId::fromString('zzz'),
             ProductUnitPrice::fromMoney(Money::EUR(10), TaxRate::fromString('20'), false),
+            ProductSalePrice::fromMoney(Money::EUR(8), TaxRate::fromString('20'), false),
             ['bar' => 'baz']
         );
 
         $product->update(
             ProductGroupId::fromString('zzz'),
             ProductUnitPrice::fromMoney(Money::EUR(10), TaxRate::fromString('20'), false),
+            ProductSalePrice::fromMoney(Money::EUR(8), TaxRate::fromString('20'), false),
             ['foo' => 'bar']
         );
 
@@ -87,6 +93,7 @@ class ProductTest extends TestCase
             'product_id' => 'xxx',
             'product_group_id' => 'yyy',
             'product_unit_price' => 100,
+            'product_sale_price' => 80,
             'tax_rate' => '20',
             'includes_vat' => false,
             'data' => ['foo' => 'bar']
@@ -95,6 +102,7 @@ class ProductTest extends TestCase
         $this->assertEquals(ProductId::fromString('xxx'), $product->productId);
         $this->assertEquals(ProductGroupId::fromString('yyy'), $product->getMappedData()['product_group_id']);
         $this->assertEquals(100, $product->getMappedData()['product_unit_price']);
+        $this->assertEquals(80, $product->getMappedData()['product_sale_price']);
         $this->assertEquals('20', $product->getMappedData()['tax_rate']);
         $this->assertEquals(false, $product->getMappedData()['includes_vat']);
         $this->assertEquals(['foo' => 'bar'], $product->getMappedData()['data']);
@@ -107,7 +115,8 @@ class ProductTest extends TestCase
             ProductGroupId::fromString('xxx'),
             ProductUnitPrice::fromMoney(
                 Money::EUR(10), TaxRate::fromString('20'), false
-            )
+            ),
+            ProductSalePrice::fromMoney(Money::EUR(8), TaxRate::fromString('20'), false),
         );
     }
 }

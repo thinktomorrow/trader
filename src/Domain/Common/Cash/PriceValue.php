@@ -26,6 +26,12 @@ trait PriceValue
         );
     }
 
+    public static function zero(): static
+    {
+        // TODO: how to get default settings for this here?
+        return static::fromScalars('0','EUR','0',true);
+    }
+
     public static function fromPrice(Price $otherPrice): static
     {
         $price = new static();
@@ -39,13 +45,13 @@ trait PriceValue
 
     public static function fromMoney(Money $money, TaxRate $taxRate, bool $includesTax): static
     {
-        $valueObject = new static();
+        $price = new static();
 
-        $valueObject->money = $money;
-        $valueObject->taxRate = $taxRate;
-        $valueObject->includesTax = $includesTax;
+        $price->money = $money;
+        $price->taxRate = $taxRate;
+        $price->includesTax = $includesTax;
 
-        return $valueObject;
+        return $price;
     }
 
     public function getIncludingVat(): Money

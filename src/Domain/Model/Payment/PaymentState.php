@@ -7,6 +7,7 @@ use Thinktomorrow\Trader\Domain\Common\State\StateValue;
 
 enum PaymentState: string
 {
+    case none = "none"; // The order is still in customer hands (incomplete) and a payment is not initialized yet.
     case initialized = "initialized"; // a payment link has been generated, but the customer hasn't yet completed payment.
     case paid = "paid"; // the customer has completed payment and settlement is guaranteed. proceed with shipment.
     case canceled = "canceled"; // the merchant or the customer has canceled the transaction.

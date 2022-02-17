@@ -21,4 +21,10 @@ trait Country
     {
         return $this->country;
     }
+
+    public function equals($other): bool
+    {
+        return get_class($other) === get_class($this)
+            && $this->get() === $other->get();
+    }
 }

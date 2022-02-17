@@ -7,6 +7,7 @@ use Thinktomorrow\Trader\Domain\Common\State\StateValue;
 
 enum ShippingState: string
 {
+    case none = "none"; // The order is still in customer hands (incomplete) and a shipment is not initialized yet.
     case initialized = "initialized"; // The label is created but before the package is dropped off or picked up by the carrier.
     case transit = "transit"; // The package has been scanned by the carrier and is in transit.
     case delivered = "delivered"; // The package has been successfully delivered.

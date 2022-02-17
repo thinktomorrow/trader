@@ -37,6 +37,9 @@
       "psr-4": {
           "Tests\\": "tests/"
       },
+      "files": [
+          "src/helpers.php"
+      ],
       "classmap":[]
   },
     "scripts": {
