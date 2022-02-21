@@ -5,12 +5,11 @@ namespace Tests\Unit\Model;
 
 use Tests\Unit\TestCase;
 use Thinktomorrow\Trader\Domain\Model\Order\Price\Total;
-use Thinktomorrow\Trader\Domain\Model\Payment\PaymentCost;
 use Thinktomorrow\Trader\Domain\Model\Order\Price\SubTotal;
-use Thinktomorrow\Trader\Domain\Model\Payment\PaymentTotal;
-use Thinktomorrow\Trader\Domain\Model\Shipping\ShippingCost;
-use Thinktomorrow\Trader\Domain\Model\Discount\DiscountTotal;
-use Thinktomorrow\Trader\Domain\Model\Shipping\ShippingState;
+use Thinktomorrow\Trader\Domain\Model\Order\Payment\PaymentCost;
+use Thinktomorrow\Trader\Domain\Model\Order\Shipping\ShippingCost;
+use Thinktomorrow\Trader\Domain\Model\Order\Shipping\ShippingState;
+use Thinktomorrow\Trader\Domain\Model\Order\Discount\DiscountTotal;
 
 class OrderDetailsTest extends TestCase
 {

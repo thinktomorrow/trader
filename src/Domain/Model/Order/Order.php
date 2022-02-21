@@ -5,31 +5,34 @@ namespace Thinktomorrow\Trader\Domain\Model\Order;
 
 use Thinktomorrow\Trader\Domain\Common\Cash\Price;
 use Thinktomorrow\Trader\Domain\Common\Entity\HasData;
-use Thinktomorrow\Trader\Domain\Model\Payment\Payment;
-use Thinktomorrow\Trader\Domain\Model\Product\ProductId;
+use Thinktomorrow\Trader\Domain\Model\Order\Line\Line;
 use Thinktomorrow\Trader\Domain\Common\Entity\Aggregate;
-use Thinktomorrow\Trader\Domain\Model\Shipping\Shipping;
 use Thinktomorrow\Trader\Domain\Model\Order\Price\Total;
-use Thinktomorrow\Trader\Domain\Model\Discount\Discount;
-use Thinktomorrow\Trader\Domain\Model\Payment\PaymentCost;
-use Thinktomorrow\Trader\Domain\Model\Shipping\ShippingId;
-use Thinktomorrow\Trader\Domain\Model\Discount\DiscountId;
+use Thinktomorrow\Trader\Domain\Model\Order\Line\Quantity;
 use Thinktomorrow\Trader\Domain\Common\Event\RecordsEvents;
 use Thinktomorrow\Trader\Domain\Model\Order\Price\SubTotal;
-use Thinktomorrow\Trader\Domain\Model\Shipping\ShippingCost;
+use Thinktomorrow\Trader\Domain\Model\Order\Line\LinePrice;
+use Thinktomorrow\Trader\Domain\Model\Order\Payment\Payment;
+use Thinktomorrow\Trader\Domain\Model\Order\Line\LineId;
 use Thinktomorrow\Trader\Domain\Model\Order\Events\LineAdded;
-use Thinktomorrow\Trader\Domain\Model\Payment\BillingAddress;
-use Thinktomorrow\Trader\Domain\Model\Discount\DiscountTotal;
+use Thinktomorrow\Trader\Domain\Model\Order\Shipping\Shipping;
+use Thinktomorrow\Trader\Domain\Model\Order\Discount\Discount;
 use Thinktomorrow\Trader\Domain\Model\Order\Events\LineUpdated;
 use Thinktomorrow\Trader\Domain\Model\Order\Events\LineDeleted;
-use Thinktomorrow\Trader\Domain\Model\Shipping\ShippingAddress;
 use Thinktomorrow\Trader\Domain\Common\Entity\RecordsChangelog;
+use Thinktomorrow\Trader\Domain\Model\Product\Variant\VariantId;
+use Thinktomorrow\Trader\Domain\Model\Order\Shipping\ShippingId;
+use Thinktomorrow\Trader\Domain\Model\Order\Payment\PaymentCost;
+use Thinktomorrow\Trader\Domain\Model\Order\Discount\DiscountId;
 use Thinktomorrow\Trader\Domain\Model\Order\Events\OrderUpdated;
 use Thinktomorrow\Trader\Domain\Model\Order\Events\OrderCreated;
 use Thinktomorrow\Trader\Domain\Model\Order\Events\ShippingAdded;
+use Thinktomorrow\Trader\Domain\Model\Order\Shipping\ShippingCost;
+use Thinktomorrow\Trader\Domain\Model\Order\Payment\BillingAddress;
+use Thinktomorrow\Trader\Domain\Model\Order\Discount\DiscountTotal;
 use Thinktomorrow\Trader\Domain\Model\Order\Events\ShippingDeleted;
 use Thinktomorrow\Trader\Domain\Model\Order\Events\ShippingUpdated;
-use Thinktomorrow\Trader\Domain\Model\ShippingProfile\ShippingProfileId;
+use Thinktomorrow\Trader\Domain\Model\Order\Shipping\ShippingAddress;
 use Thinktomorrow\Trader\Domain\Model\Order\Exceptions\ShippingAlreadyOnOrder;
 use Thinktomorrow\Trader\Domain\Model\Order\Exceptions\CouldNotFindShippingOnOrder;
 
@@ -101,7 +104,7 @@ final class Order implements Aggregate
 
     public function getShippingCost(): ShippingCost
     {
-        if (count($this->discounts) < 1) {
+        if (count($this->shippings) < 1) {
             return ShippingCost::zero();
         }
 
@@ -137,9 +140,9 @@ final class Order implements Aggregate
         return $this->billingAddress ?? BillingAddress::empty();
     }
 
-    public function getShopper(): Shopper
+    public function getShopper(): ?Shopper
     {
-        return $this->shopper ?? Shopper::empty();
+        return $this->shopper;
     }
 
     public function updateShopper(Shopper $shopper): void
@@ -172,48 +175,67 @@ final class Order implements Aggregate
         $this->recordEvent(new OrderUpdated($this->orderId));
     }
 
-    public function addOrUpdateLine(LineNumber $lineNumber, ProductId $productId, LinePrice $linePrice, Quantity $quantity): void
+    public function addOrUpdateLine(LineId $lineId, VariantId $productId, LinePrice $linePrice, Quantity $quantity): void
     {
-        if (null !== $this->findLineIndex($lineNumber)) {
-            $this->updateLine($lineNumber, $productId, $linePrice, $quantity);
+        if (null !== $this->findLineIndex($lineId)) {
+            $this->updateLine($lineId, $linePrice, $quantity);
 
             return;
         }
 
-        $this->addLine($lineNumber, $productId, $linePrice, $quantity);
+        $this->addLine($lineId, $productId, $linePrice, $quantity);
     }
 
-    private function addLine(LineNumber $lineNumber, ProductId $productId, LinePrice $linePrice, Quantity $quantity): void
+    private function addLine(LineId $lineId, VariantId $productId, LinePrice $linePrice, Quantity $quantity): void
     {
-        $this->lines[] = Line::create($this->orderId, $lineNumber, $productId, $linePrice, $quantity);
+        $this->lines[] = Line::create($this->orderId, $lineId, $productId, $linePrice, $quantity);
 
-        $this->recordEvent(new LineAdded($this->orderId, $lineNumber, $productId));
+        $this->recordEvent(new LineAdded($this->orderId, $lineId, $productId));
     }
 
-    private function updateLine(LineNumber $lineNumber, ProductId $productId, LinePrice $linePrice, Quantity $quantity): void
+    private function updateLine(LineId $lineId, LinePrice $linePrice, Quantity $quantity): void
     {
-        if (null !== $lineIndexToBeUpdated = $this->findLineIndex($lineNumber)) {
-            $this->lines[$lineIndexToBeUpdated]->update($productId, $linePrice, $quantity);
+        if (null !== $lineIndexToBeUpdated = $this->findLineIndex($lineId)) {
+            $this->lines[$lineIndexToBeUpdated]->updatePrice($linePrice);
+            $this->lines[$lineIndexToBeUpdated]->updateQuantity($quantity);
+
+            $this->recordEvent(new LineUpdated($this->orderId, $lineId));
         }
-
-        $this->recordEvent(new LineUpdated($this->orderId, $lineNumber, $productId));
     }
 
-    public function deleteLine(LineNumber $lineNumber): void
+    public function updateLinePrice(LineId $lineId, LinePrice $linePrice): void
     {
-        if (null !== $lineIndexToBeDeleted = $this->findLineIndex($lineNumber)) {
+        if (null !== $lineIndexToBeUpdated = $this->findLineIndex($lineId)) {
+            $this->lines[$lineIndexToBeUpdated]->updatePrice($linePrice);
+
+            $this->recordEvent(new LineUpdated($this->orderId, $lineId));
+        }
+    }
+
+    public function updateLineQuantity(LineId $lineId, Quantity $quantity): void
+    {
+        if (null !== $lineIndexToBeUpdated = $this->findLineIndex($lineId)) {
+            $this->lines[$lineIndexToBeUpdated]->updateQuantity($quantity);
+
+            $this->recordEvent(new LineUpdated($this->orderId, $lineId));
+        }
+    }
+
+    public function deleteLine(LineId $lineId): void
+    {
+        if (null !== $lineIndexToBeDeleted = $this->findLineIndex($lineId)) {
             $lineToBeDeleted = $this->lines[$lineIndexToBeDeleted];
 
             unset($this->lines[$lineIndexToBeDeleted]);
 
-            $this->recordEvent(new LineDeleted($this->orderId, $lineToBeDeleted->lineNumber, $lineToBeDeleted->getProductId()));
+            $this->recordEvent(new LineDeleted($this->orderId, $lineToBeDeleted->lineId, $lineToBeDeleted->getVariantId()));
         }
     }
 
-    private function findLineIndex(LineNumber $lineNumber): ?int
+    private function findLineIndex(LineId $lineId): ?int
     {
         foreach ($this->lines as $index => $line) {
-            if ($lineNumber->asInt() === $line->lineNumber->asInt()) {
+            if ($lineId->asInt() === $line->lineId->asInt()) {
                 return $index;
             }
         }

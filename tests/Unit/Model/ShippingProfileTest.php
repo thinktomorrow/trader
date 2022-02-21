@@ -6,8 +6,8 @@ namespace Tests\Unit\Model;
 use Money\Money;
 use PHPUnit\Framework\TestCase;
 use Thinktomorrow\Trader\Domain\Model\ShippingProfile\Tariff;
-use Thinktomorrow\Trader\Domain\Model\Shipping\ShippingCountry;
 use Thinktomorrow\Trader\Domain\Model\ShippingProfile\TariffNumber;
+use Thinktomorrow\Trader\Domain\Model\Order\Shipping\ShippingCountry;
 use Thinktomorrow\Trader\Domain\Model\ShippingProfile\ShippingProfile;
 use Thinktomorrow\Trader\Domain\Model\ShippingProfile\ShippingProfileId;
 

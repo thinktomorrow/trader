@@ -7,33 +7,35 @@ use Money\Money;
 use PHPUnit\Framework\Assert;
 use PHPUnit\Framework\TestCase;
 use Thinktomorrow\Trader\Domain\Common\Cash\Cash;
-use Thinktomorrow\Trader\Domain\Model\Order\Line;
-use Thinktomorrow\Trader\Application\Cart\AddLine;
 use Thinktomorrow\Trader\Domain\Model\Order\Order;
 use Thinktomorrow\Trader\Domain\Model\Order\OrderId;
-use Thinktomorrow\Trader\Domain\Model\Order\Quantity;
 use Thinktomorrow\Trader\Domain\Common\Taxes\TaxRate;
+use Thinktomorrow\Trader\Domain\Model\Order\Line\Line;
 use Thinktomorrow\Trader\Domain\Model\Product\Product;
-use Thinktomorrow\Trader\Domain\Model\Order\LineNumber;
+use Thinktomorrow\Trader\Application\Cart\Line\AddLine;
 use Thinktomorrow\Trader\Domain\Model\Product\ProductId;
-use Thinktomorrow\Trader\Infrastructure\Test\TestTraderConfig;
-use Thinktomorrow\Trader\Domain\Model\Shipping\ShippingCountry;
-use Thinktomorrow\Trader\Domain\Model\Product\ProductSalePrice;
-use Thinktomorrow\Trader\Application\Cart\ChooseShippingProfile;
+use Thinktomorrow\Trader\Domain\Model\Order\Line\LineId;
+use Thinktomorrow\Trader\Domain\Model\Order\Line\Quantity;
 use Thinktomorrow\Trader\Domain\Model\Customer\CustomerId;
 use Thinktomorrow\Trader\Application\Cart\CartApplication;
+use Thinktomorrow\Trader\Application\Cart\Line\RemoveLine;
 use Thinktomorrow\Trader\Infrastructure\Test\TestContainer;
-use Thinktomorrow\Trader\Domain\Model\Product\ProductUnitPrice;
+use Thinktomorrow\Trader\Domain\Model\Product\Variant\Variant;
+use Thinktomorrow\Trader\Infrastructure\Test\TestTraderConfig;
+use Thinktomorrow\Trader\Domain\Model\Product\Variant\VariantId;
+use Thinktomorrow\Trader\Application\Cart\ChooseShippingProfile;
 use Thinktomorrow\Trader\Infrastructure\Test\EventDispatcherSpy;
 use Thinktomorrow\Trader\Application\Cart\ChooseShippingCountry;
-use Thinktomorrow\Trader\Domain\Model\ProductGroup\ProductGroupId;
+use Thinktomorrow\Trader\Application\Cart\Line\ChangeLineQuantity;
 use Thinktomorrow\Trader\Domain\Model\ShippingProfile\TariffNumber;
-use Thinktomorrow\Trader\Domain\Model\ShippingProfile\ShippingProfile;
-use Thinktomorrow\Trader\Infrastructure\Test\InMemoryProductRepository;
+use Thinktomorrow\Trader\Domain\Model\Order\Shipping\ShippingCountry;
 use Thinktomorrow\Trader\Infrastructure\Test\InMemoryOrderRepository;
-use Thinktomorrow\Trader\Infrastructure\Test\InMemoryShippingRepository;
+use Thinktomorrow\Trader\Domain\Model\ShippingProfile\ShippingProfile;
+use Thinktomorrow\Trader\Domain\Model\Product\Variant\VariantSalePrice;
+use Thinktomorrow\Trader\Domain\Model\Product\Variant\VariantUnitPrice;
+use Thinktomorrow\Trader\Infrastructure\Test\InMemoryProductRepository;
 use Thinktomorrow\Trader\Domain\Model\ShippingProfile\ShippingProfileId;
-use Thinktomorrow\Trader\Infrastructure\Test\ArrayOrderDetailsRepository;
+use Thinktomorrow\Trader\Infrastructure\Test\InMemoryCustomerRepository;
 use Thinktomorrow\Trader\Domain\Model\Order\Exceptions\CouldNotFindOrder;
 use Thinktomorrow\Trader\Application\RefreshCart\Adjusters\AdjustShipping;
 use Thinktomorrow\Trader\Infrastructure\Test\InMemoryPaymentMethodRepository;
@@ -44,28 +46,17 @@ abstract class CartContext extends TestCase
     protected CartApplication $cartApplication;
     protected InMemoryProductRepository $productRepository;
     protected InMemoryOrderRepository $orderRepository;
-    protected ArrayOrderDetailsRepository $orderDetailsRepository;
     protected InMemoryShippingProfileRepository $shippingProfileRepository;
-    private InMemoryShippingRepository $shippingRepository;
 
     public function setUp(): void
     {
-        $container = new TestContainer();
-
-        // ProductRepository $productRepository,
-        //        OrderRepository $orderRepository,
-        //        OrderDetailsRepository $orderDetailsRepository,
-        //        ShippingRepository $shippingRepository,
-        //        ShippingProfileRepository $shippingProfileRepository,
-        //        EventDispatcher $eventDispatcher
-
         $this->cartApplication = new CartApplication(
             new TestTraderConfig(),
             $this->productRepository = new InMemoryProductRepository(),
             $this->orderRepository = new InMemoryOrderRepository(),
-            $this->shippingRepository = new InMemoryShippingRepository(),
             $this->shippingProfileRepository = new InMemoryShippingProfileRepository(),
             new InMemoryPaymentMethodRepository(),
+            new InMemoryCustomerRepository(),
             new EventDispatcherSpy(),
         );
 
@@ -79,21 +70,23 @@ abstract class CartContext extends TestCase
     {
         $this->productRepository->clear();
         $this->orderRepository->clear();
-        $this->shippingRepository->clear();
         $this->shippingProfileRepository->clear();
     }
 
     protected function givenThereIsAProductWhichCostsEur($productTitle, $price)
     {
         // Create a product
-        $this->productRepository->save(Product::create(
+        $product = Product::create(ProductId::fromString($productTitle));
+        $product->addVariant(Variant::create(
             ProductId::fromString($productTitle),
-            ProductGroupId::fromString('xxx'),
-            ProductUnitPrice::fromMoney(
+            VariantId::fromString($productTitle . '-123'),
+            VariantUnitPrice::fromMoney(
                 Cash::make(1000), TaxRate::fromString('20'), true
             ),
-            ProductSalePrice::fromMoney(Money::EUR($price * 100), TaxRate::fromString('20'), true),
+            VariantSalePrice::fromMoney(Money::EUR($price * 100), TaxRate::fromString('20'), true),
         ));
+
+        $this->productRepository->save($product);
 
         Assert::assertNotNull($this->productRepository->find(ProductId::fromString($productTitle)));
     }
@@ -128,7 +121,7 @@ abstract class CartContext extends TestCase
         $this->cartApplication->chooseShippingProfile(new ChooseShippingProfile($order->orderId->get(), $shippingProfile->shippingProfileId->get()));
     }
 
-    protected function whenIAddTheProductToTheCart($productTitle, $quantity)
+    protected function whenIAddTheVariantToTheCart($productVariantId, $quantity)
     {
         $order = $this->getOrder();
 
@@ -137,13 +130,52 @@ abstract class CartContext extends TestCase
         // Add product to order
         $this->cartApplication->addLine(new AddLine(
             $order->orderId->get(),
-            LineNumber::fromInt($count + 1)->asInt(),
-            ProductId::fromString($productTitle)->get(),
+            LineId::fromInt($count + 1)->asInt(),
+            VariantId::fromString($productVariantId)->get(),
             Quantity::fromInt((int)$quantity)->asInt(),
         ));
 
         $lines = $this->orderRepository->find($order->orderId)->getChildEntities()[Line::class];
-        Assert::assertEquals(ProductId::fromString($productTitle)->get(), $lines[$count]['product_id']);
+        Assert::assertEquals(VariantId::fromString($productVariantId)->get(), $lines[$count]['variant_id']);
+    }
+
+    protected function whenIChangeTheProductQuantity($productTitle, $quantity)
+    {
+        $order = $this->getOrder();
+        $lines = $order->getChildEntities()[Line::class];
+
+        // Find matching line by productId
+        $lineId = null;
+        foreach($lines as $line) {
+            if($line['variant_id'] == $productTitle) {
+                $lineId = LineId::fromInt($line['line_id']);
+            }
+        }
+
+        $this->cartApplication->changeLineQuantity(new ChangeLineQuantity(
+            $order->orderId->get(),
+            $lineId->asInt(),
+            Quantity::fromInt((int)$quantity)->asInt(),
+        ));
+    }
+
+    protected function whenIRemoveTheLine($productVariantId)
+    {
+        $order = $this->getOrder();
+        $lines = $order->getChildEntities()[Line::class];
+
+        // Find matching line by productId
+        $lineId = null;
+        foreach($lines as $line) {
+            if($line['variant_id'] == $productVariantId) {
+                $lineId = LineId::fromInt($line['line_id']);
+            }
+        }
+
+        $this->cartApplication->removeLine(new RemoveLine(
+            $order->orderId->get(),
+            $lineId->asInt(),
+        ));
     }
 
     protected function thenIShouldHaveProductInTheCart($times, $quantity)
@@ -152,7 +184,9 @@ abstract class CartContext extends TestCase
         $lines = $this->orderRepository->find($order->orderId)->getChildEntities()[Line::class];
 
         Assert::assertCount((int) $times, $lines);
-        Assert::assertEquals((int) $quantity, $lines[0]['quantity']);
+        if(count($lines) > 0) {
+            Assert::assertEquals((int) $quantity, $lines[0]['quantity']);
+        }
     }
 
     protected function thenTheOverallCartPriceShouldBeEur($total)
@@ -168,7 +202,6 @@ abstract class CartContext extends TestCase
         } catch (CouldNotFindOrder $e) {
             $this->orderRepository->save($order = Order::create(
                 OrderId::fromString('xxx'),
-                CustomerId::fromString('yyy'),
             ));
 
             return $order;

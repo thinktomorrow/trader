@@ -6,7 +6,7 @@ namespace Thinktomorrow\Trader\Application\RefreshCart\Adjusters;
 use Thinktomorrow\Trader\Domain\Common\Context;
 use Thinktomorrow\Trader\Domain\Model\Order\Order;
 use Thinktomorrow\Trader\Application\RefreshCart\Adjuster;
-use Thinktomorrow\Trader\Domain\Model\Shipping\ShippingCountry;
+use Thinktomorrow\Trader\Domain\Model\Order\Shipping\ShippingCountry;
 
 final class AdjustShipping implements Adjuster
 {

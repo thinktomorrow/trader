@@ -4,72 +4,98 @@ declare(strict_types=1);
 namespace Thinktomorrow\Trader\Application\Cart;
 
 use Thinktomorrow\Trader\TraderConfig;
+use Thinktomorrow\Trader\Domain\Model\Order\Shopper;
 use Thinktomorrow\Trader\Domain\Common\Taxes\TaxRate;
-use Thinktomorrow\Trader\Domain\Model\Order\LinePrice;
-use Thinktomorrow\Trader\Domain\Model\Payment\Payment;
-use Thinktomorrow\Trader\Domain\Model\Shipping\Shipping;
-use Thinktomorrow\Trader\Domain\Model\Payment\PaymentCost;
-use Thinktomorrow\Trader\Domain\Model\Shipping\ShippingCost;
+use Thinktomorrow\Trader\Application\Cart\Line\AddLine;
+use Thinktomorrow\Trader\Application\Cart\Line\RemoveLine;
+use Thinktomorrow\Trader\Domain\Model\Order\Line\LinePrice;
+use Thinktomorrow\Trader\Domain\Model\Order\Payment\Payment;
 use Thinktomorrow\Trader\Domain\Model\Order\OrderRepository;
 use Thinktomorrow\Trader\Domain\Common\Event\EventDispatcher;
-use Thinktomorrow\Trader\Domain\Model\Shipping\ShippingCountry;
+use Thinktomorrow\Trader\Domain\Model\Order\Shipping\Shipping;
+use Thinktomorrow\Trader\Domain\Model\Order\Payment\PaymentCost;
 use Thinktomorrow\Trader\Domain\Model\Product\ProductRepository;
-use Thinktomorrow\Trader\Domain\Model\Shipping\ShippingRepository;
+use Thinktomorrow\Trader\Domain\Model\Order\Shipping\ShippingCost;
+use Thinktomorrow\Trader\Domain\Model\Customer\CustomerRepository;
+use Thinktomorrow\Trader\Application\Cart\Line\ChangeLineQuantity;
+use Thinktomorrow\Trader\Domain\Model\Order\Shipping\ShippingCountry;
 use Thinktomorrow\Trader\Domain\Model\PaymentMethod\PaymentMethodRepository;
 use Thinktomorrow\Trader\Domain\Model\ShippingProfile\ShippingProfileRepository;
+use Thinktomorrow\Trader\Application\Cart\VariantDetailsForCart\FindVariantDetailsForCart;
 use Thinktomorrow\Trader\Domain\Model\ShippingProfile\Exceptions\ShippingProfileNotSelectableForCountry;
 use Thinktomorrow\Trader\Domain\Model\ShippingProfile\Exceptions\CouldNotSelectShippingCountryDueToMissingShippingCountry;
 
 final class CartApplication
 {
-    private ProductRepository $productRepository;
+    private FindVariantDetailsForCart $findVariantDetailsForCart;
     private OrderRepository $orderRepository;
-    private ShippingRepository $shippingRepository;
     private ShippingProfileRepository $shippingProfileRepository;
     private EventDispatcher $eventDispatcher;
     private PaymentMethodRepository $paymentMethodRepository;
+    private CustomerRepository $customerRepository;
     private TraderConfig $config;
 
     public function __construct(
-        TraderConfig $config,
-        ProductRepository $productRepository,
-        OrderRepository $orderRepository,
-        ShippingRepository $shippingRepository,
+        TraderConfig              $config,
+        FindVariantDetailsForCart $findVariantDetailsForCart,
+        OrderRepository           $orderRepository,
         ShippingProfileRepository $shippingProfileRepository,
-        PaymentMethodRepository $paymentMethodRepository,
-        EventDispatcher $eventDispatcher
+        PaymentMethodRepository   $paymentMethodRepository,
+        CustomerRepository        $customerRepository,
+        EventDispatcher           $eventDispatcher
     )
     {
-        $this->productRepository = $productRepository;
+        $this->findVariantDetailsForCart = $findVariantDetailsForCart;
         $this->orderRepository = $orderRepository;
-        $this->shippingRepository = $shippingRepository;
         $this->shippingProfileRepository = $shippingProfileRepository;
         $this->eventDispatcher = $eventDispatcher;
         $this->paymentMethodRepository = $paymentMethodRepository;
+        $this->customerRepository = $customerRepository;
         $this->config = $config;
     }
 
     public function addLine(AddLine $addLine): void
     {
         $order = $this->orderRepository->find($addLine->getOrderId());
-        $product = $this->productRepository->find($addLine->getProductId());
+        $variant = $this->findVariantDetailsForCart->findVariantDetailsForCart($addLine->getVariantId());
 
         $order->addOrUpdateLine(
-            $addLine->getLineNumber(),
-            $product->productId,
-            LinePrice::fromPrice($product->getSalePrice()),
+            $addLine->getlineId(),
+            $addLine->getVariantId(),
+            LinePrice::fromPrice($variant->getSalePrice()),
             $addLine->getQuantity()
         );
 
         $this->orderRepository->save($order);
 
         $this->eventDispatcher->dispatch($order->releaseEvents());
+    }
 
-//        // Trigger refresh (should be after event)
-//        $this->refreshCart(new RefreshCart($order->orderId->get(), [
-//            AdjustShipping::class,
-//        ], new Context(), // TODO: create testcontext?
-//        ));
+    public function changeLineQuantity(ChangeLineQuantity $changeLineQuantity): void
+    {
+        $order = $this->orderRepository->find($changeLineQuantity->getOrderId());
+
+        $order->updateLineQuantity(
+            $changeLineQuantity->getlineId(),
+            $changeLineQuantity->getQuantity()
+        );
+
+        $this->orderRepository->save($order);
+
+        $this->eventDispatcher->dispatch($order->releaseEvents());
+    }
+
+    public function removeLine(RemoveLine $removeLine): void
+    {
+        $order = $this->orderRepository->find($removeLine->getOrderId());
+
+        $order->deleteLine(
+            $removeLine->getlineId(),
+        );
+
+        $this->orderRepository->save($order);
+
+        $this->eventDispatcher->dispatch($order->releaseEvents());
     }
 
     public function chooseShippingCountry(ChooseShippingCountry $chooseShippingCountry): void
@@ -131,23 +157,30 @@ final class CartApplication
             );
         }
 
-        $shippingId = $this->shippingRepository->nextReference();
-
-        // find matching tariff - validate if shipping profile is valid for this order?? ()
+        // Find matching shipping tariff
         $tariff = $shippingProfile->findTariffByPrice($order->getSubtotal(), $this->config->doesPriceInputIncludesTax());
 
-        $shipping = Shipping::create(
-            $order->orderId,
-            $shippingId,
-            $shippingProfile->shippingProfileId,
-            ShippingCost::fromMoney(
-                $tariff->getRate(),
-                TaxRate::fromString($this->config->getDefaultTaxRate()),
-                $this->config->doesPriceInputIncludesTax()
-            )
+        $shippingCost = ShippingCost::fromMoney(
+            $tariff->getRate(),
+            TaxRate::fromString($this->config->getDefaultTaxRate()),
+            $this->config->doesPriceInputIncludesTax()
         );
 
-        $order->updateShipping($shipping);
+        if(count($order->getShippings()) > 0) {
+            /** @var Shipping $existingShipping */
+            $existingShipping = $order->getShippings()[0];
+            $existingShipping->updateShippingProfile($shippingProfile->shippingProfileId);
+            $existingShipping->updateCost($shippingCost);
+
+            $order->updateShipping($existingShipping);
+        } else {
+            $order->addShipping(Shipping::create(
+                $order->orderId,
+                $this->orderRepository->nextShippingReference(),
+                $shippingProfile->shippingProfileId,
+                $shippingCost
+            ));
+        }
 
         // TODO: Maybe do the refresh-cart here? before the save.
 
@@ -182,6 +215,22 @@ final class CartApplication
         $order->updatePayment($payment);
 
         // TODO: Maybe do the refresh-cart here? before the save.
+
+        $this->orderRepository->save($order);
+
+        $this->eventDispatcher->dispatch($order->releaseEvents());
+    }
+
+    public function chooseCustomer(ChooseCustomer $chooseCustomer): void
+    {
+        $order = $this->orderRepository->find($chooseCustomer->getOrderId());
+        $customer = $this->customerRepository->find($chooseCustomer->getCustomerId());
+
+        $shopper = Shopper::create();
+
+        $order->updateShopper($shopper);
+
+        // TODO: do the refresh-cart here? before the save.
 
         $this->orderRepository->save($order);
 

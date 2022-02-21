@@ -4,7 +4,7 @@ declare(strict_types=1);
 namespace Thinktomorrow\Trader\Application\Cart;
 
 use Thinktomorrow\Trader\Domain\Model\Order\OrderId;
-use Thinktomorrow\Trader\Domain\Model\Shipping\ShippingAddress;
+use Thinktomorrow\Trader\Domain\Model\Order\Shipping\ShippingAddress;
 
 class ChooseShippingAddress
 {

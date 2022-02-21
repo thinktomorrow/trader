@@ -7,6 +7,7 @@ use Illuminate\Database\Connection;
 use Thinktomorrow\Trader\Domain\Model\Order\Order;
 use Thinktomorrow\Trader\Domain\Model\Order\OrderId;
 use Thinktomorrow\Trader\Domain\Model\Order\OrderRepository;
+use Thinktomorrow\Trader\Domain\Model\Order\Shipping\ShippingId;
 
 final class MysqlOrderRepository implements OrderRepository
 {
@@ -41,5 +42,10 @@ final class MysqlOrderRepository implements OrderRepository
     public function nextReference(): OrderId
     {
         // TODO: Implement nextReference() method.
+    }
+
+    public function nextShippingReference(): ShippingId
+    {
+        // TODO: Implement nextShippingReference() method.
     }
 }

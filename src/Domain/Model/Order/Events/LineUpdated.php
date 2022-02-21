@@ -4,19 +4,16 @@ declare(strict_types=1);
 namespace Thinktomorrow\Trader\Domain\Model\Order\Events;
 
 use Thinktomorrow\Trader\Domain\Model\Order\OrderId;
-use Thinktomorrow\Trader\Domain\Model\Order\LineNumber;
-use Thinktomorrow\Trader\Domain\Model\Product\ProductId;
+use Thinktomorrow\Trader\Domain\Model\Order\Line\LineId;
 
 final class LineUpdated
 {
     public readonly OrderId $orderId;
-    public readonly LineNumber $lineNumber;
-    public readonly ProductId $productId;
+    public readonly LineId $lineId;
 
-    public function __construct(OrderId $orderId, LineNumber $lineNumber, ProductId $productId)
+    public function __construct(OrderId $orderId, LineId $lineId)
     {
         $this->orderId = $orderId;
-        $this->lineNumber = $lineNumber;
-        $this->productId = $productId;
+        $this->lineId = $lineId;
     }
 }

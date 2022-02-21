@@ -3,7 +3,7 @@ declare(strict_types=1);
 
 namespace Thinktomorrow\Trader\Domain\Common;
 
-use Thinktomorrow\Trader\Domain\Model\Shipping\ShippingId;
+use Thinktomorrow\Trader\Domain\Model\Order\Shipping\ShippingId;
 
 final class Context
 {

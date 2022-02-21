@@ -3,11 +3,11 @@ declare(strict_types=1);
 
 namespace Thinktomorrow\Trader\Infrastructure\Test;
 
-use Thinktomorrow\Trader\Domain\Model\Shipping\ShippingId;
 use Thinktomorrow\Trader\Domain\Model\Order\Price\SubTotal;
+use Thinktomorrow\Trader\Domain\Model\Order\Shipping\ShippingId;
+use Thinktomorrow\Trader\Domain\Model\Order\Shipping\ShippingCountry;
 use Thinktomorrow\Trader\Domain\Model\ShippingProfile\ShippingProfile;
 use Thinktomorrow\Trader\Domain\Model\ShippingProfile\ShippingProfileId;
-use Thinktomorrow\Trader\Domain\Model\Shipping\ShippingCountry;
 use Thinktomorrow\Trader\Domain\Model\ShippingProfile\ShippingProfileRepository;
 use Thinktomorrow\Trader\Application\RefreshCart\Adjusters\FindSuitableShippingProfile;
 use Thinktomorrow\Trader\Domain\Model\ShippingProfile\Exceptions\CouldNotFindShippingProfile;
@@ -32,28 +32,7 @@ final class InMemoryShippingProfileRepository implements ShippingProfileReposito
         return static::$shippingProfiles[$shippingProfileId->get()];
     }
 
-//    public function findMatch(ShippingId $shippingProfileId, SubTotal $subTotal, ShippingCountry $country, \DateTimeImmutable $date): ShippingRead
-//    {
-//        if(isset(static::$shippingProfiles[$shippingProfileId->get()])) {
-//            $shipping = static::$shippingProfiles[$shippingProfileId->get()];
-//
-//            // FOr testing we just return the first rule as a match
-//            /** @var Rule $rule */
-//            foreach($shipping->getChildEntities()[Rule::class] as $rule) {
-//                return ShippingRead::fromMappedData([
-//                    'id' => $shippingProfileId->get(),
-//                    'state' => ShippingState::initialized->value,
-//                    'cost' => $rule->getCost()->getMoney()->getAmount(),
-//                    'tax_rate' => $rule->getCost()->getTaxRate()->toPercentage()->get(),
-//                    'includes_vat' => $rule->getCost()->includesTax(),
-//                ], []);
-//            }
-//        }
-//
-//        throw new CouldNotFindShippingProfile();
-//    }
-
-    public function delete(ShippingId $shippingProfileId): void
+    public function delete(ShippingProfileId $shippingProfileId): void
     {
         if(!isset(static::$shippingProfiles[$shippingProfileId->get()])) {
             throw new CouldNotFindShippingProfile('No available shipping found by id ' . $shippingProfileId);

@@ -7,7 +7,7 @@ use Money\Money;
 use Thinktomorrow\Trader\Domain\Common\Cash\Price;
 use Thinktomorrow\Trader\Domain\Common\Entity\Aggregate;
 use Thinktomorrow\Trader\Domain\Common\Event\RecordsEvents;
-use Thinktomorrow\Trader\Domain\Model\Shipping\ShippingCountry;
+use Thinktomorrow\Trader\Domain\Model\Order\Shipping\ShippingCountry;
 
 final class ShippingProfile implements Aggregate
 {
@@ -67,7 +67,7 @@ final class ShippingProfile implements Aggregate
 
     public function deleteCountry(ShippingCountry $country): void
     {
-        /** @var ShippingCountry $existingCountry */
+        /** @var \Thinktomorrow\Trader\Domain\Model\Order\Shipping\ShippingCountry $existingCountry */
         foreach($this->countries as $index => $existingCountry)
         {
             if($country->equals($existingCountry)) {
@@ -94,7 +94,7 @@ final class ShippingProfile implements Aggregate
 
     public function hasCountry(ShippingCountry $country): bool
     {
-        /** @var ShippingCountry $existingCountry */
+        /** @var \Thinktomorrow\Trader\Domain\Model\Order\Shipping\ShippingCountry $existingCountry */
         foreach($this->countries as $existingCountry) {
             if($existingCountry->equals($country)) {
                 return true;
