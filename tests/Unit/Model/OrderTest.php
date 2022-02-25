@@ -8,6 +8,7 @@ use Thinktomorrow\Trader\Domain\Common\Email;
 use Thinktomorrow\Trader\Domain\Model\Order\Order;
 use Thinktomorrow\Trader\Domain\Model\Order\OrderId;
 use Thinktomorrow\Trader\Domain\Model\Order\Line\Line;
+use Thinktomorrow\Trader\Domain\Model\Order\OrderState;
 use Thinktomorrow\Trader\Domain\Model\Order\Line\Quantity;
 use Thinktomorrow\Trader\Domain\Model\Customer\CustomerId;
 use Thinktomorrow\Trader\Domain\Model\Order\Line\LinePrice;
@@ -16,6 +17,7 @@ use Thinktomorrow\Trader\Domain\Model\Order\Line\LineId;
 use Thinktomorrow\Trader\Domain\Model\Order\Events\LineAdded;
 use Thinktomorrow\Trader\Domain\Model\Order\Shipping\Shipping;
 use Thinktomorrow\Trader\Domain\Model\Order\Discount\Discount;
+use Thinktomorrow\Trader\Domain\Model\Order\Payment\PaymentId;
 use Thinktomorrow\Trader\Domain\Model\Order\Events\LineUpdated;
 use Thinktomorrow\Trader\Domain\Model\Order\Events\LineDeleted;
 use Thinktomorrow\Trader\Domain\Model\Product\Variant\VariantId;
@@ -43,7 +45,11 @@ class OrderTest extends TestCase
 
         $this->assertEquals([
             'order_id' => $orderId->get(),
-            'data' => [],
+            'order_state' => OrderState::cart_pending->value,
+            'total' => '0',
+            'tax_total' => '0',
+            'includes_vat' => true,
+            'data' => "[]",
         ], $order->getMappedData());
 
         $this->assertEquals([
@@ -117,10 +123,12 @@ class OrderTest extends TestCase
 
         $order->updatePayment(Payment::create(
             $order->orderId,
+            $paymentId = PaymentId::fromString('ppp'),
             $paymentMethodId = PaymentMethodId::fromString('uuu'),
             PaymentCost::zero()
         ));
 
+        $this->assertEquals($paymentId, $order->getPayment()->paymentId);
         $this->assertEquals($paymentMethodId, $order->getPayment()->getPaymentMethodId());
 
         $this->assertEquals([
@@ -172,7 +180,7 @@ class OrderTest extends TestCase
         $order = $this->createdOrder();
 
         $order->addOrUpdateLine(
-            LineId::fromInt(2),
+            LineId::fromString('abcdef'),
             VariantId::fromString('xxx'),
             $linePrice = LinePrice::fromScalars('250', 'EUR', '9', true),
             Quantity::fromInt(2),
@@ -183,7 +191,7 @@ class OrderTest extends TestCase
         $this->assertEquals([
             new LineAdded(
                 $order->orderId,
-                LineId::fromInt(2),
+                LineId::fromString('abcdef'),
                 VariantId::fromString('xxx')
             ),
         ], $order->releaseEvents());
@@ -195,7 +203,7 @@ class OrderTest extends TestCase
         $order = $this->createdOrder();
 
         $order->addOrUpdateLine(
-            LineId::fromInt(1),
+            LineId::fromString('abc'),
             VariantId::fromString('yyy'),
             $linePrice = LinePrice::fromScalars('200','EUR','10', true),
             Quantity::fromInt(3),
@@ -211,7 +219,7 @@ class OrderTest extends TestCase
         $this->assertEquals([
             new LineUpdated(
                 $order->orderId,
-                LineId::fromInt(1),
+                LineId::fromString('abc'),
                 VariantId::fromString('yyy'),
             ),
         ], $order->releaseEvents());
@@ -225,7 +233,7 @@ class OrderTest extends TestCase
         $this->assertCount(1, $order->getChildEntities()[Line::class]);
 
         $order->deleteLine(
-            LineId::fromInt(1),
+            LineId::fromString('abc'),
         );
 
         $this->assertCount(0, $order->getChildEntities()[Line::class]);
@@ -233,7 +241,7 @@ class OrderTest extends TestCase
         $this->assertEquals([
             new LineDeleted(
                 $order->orderId,
-                LineId::fromInt(1),
+                LineId::fromString('abc'),
                 VariantId::fromString('xxx'),
             ),
         ], $order->releaseEvents());
@@ -280,7 +288,7 @@ class OrderTest extends TestCase
         $order->addData(['bar' => 'baz']);
         $order->addData(['foo' => 'bar', 'bar' => 'boo']);
 
-        $this->assertEquals(['bar' => 'boo', 'foo' => 'bar'], $order->getMappedData()['data']);
+        $this->assertEquals(json_encode(['bar' => 'boo', 'foo' => 'bar']), $order->getMappedData()['data']);
     }
 
     /** @test */
@@ -291,6 +299,6 @@ class OrderTest extends TestCase
         $order->addData(['foo' => 'bar', 'bar' => 'boo']);
         $order->deleteData('bar');
 
-        $this->assertEquals(['foo' => 'bar'], $order->getMappedData()['data']);
+        $this->assertEquals(json_encode(['foo' => 'bar']), $order->getMappedData()['data']);
     }
 }

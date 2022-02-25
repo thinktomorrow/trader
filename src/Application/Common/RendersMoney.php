@@ -18,11 +18,4 @@ trait RendersMoney
     {
         return $percentage->get();
     }
-
-    protected function renderMoneyAsNett(Money $money, Percentage $taxRate, Locale $localeId): string
-    {
-        $nett = Cash::from($money)->subtractTaxPercentage($taxRate);
-
-        return $this->renderMoney($nett, $localeId);
-    }
 }

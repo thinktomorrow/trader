@@ -12,11 +12,11 @@ use Thinktomorrow\Trader\Domain\Model\Product\Variant\VariantId;
 final class AddLine
 {
     private string $orderId;
-    private int $lineId;
+    private string $lineId;
     private string $variantId;
     private int $quantity;
 
-    public function __construct(string $orderId, int $lineId, string $variantId, int $quantity)
+    public function __construct(string $orderId, string $lineId, string $variantId, int $quantity)
     {
         $this->orderId = $orderId;
         $this->lineId = $lineId;
@@ -32,7 +32,7 @@ final class AddLine
     public function getlineId(): LineId
     {
         // TODO: get read model of order in order to get info on lines count so we can get the next lineId
-        return LineId::fromInt($this->lineId);
+        return LineId::fromString($this->lineId);
     }
 
     public function getVariantId(): VariantId

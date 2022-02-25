@@ -12,6 +12,7 @@ class Payment
     use HasData;
 
     public readonly OrderId $orderId;
+    public readonly PaymentId $paymentId;
     private PaymentMethodId $paymentMethodId;
     private PaymentState $paymentState;
     private PaymentCost $paymentCost;
@@ -20,11 +21,12 @@ class Payment
     {
     }
 
-    public static function create(OrderId $orderId, PaymentMethodId $paymentMethodId, PaymentCost $paymentCost): static
+    public static function create(OrderId $orderId, PaymentId $paymentId, PaymentMethodId $paymentMethodId, PaymentCost $paymentCost): static
     {
         $payment = new static();
 
         $payment->orderId = $orderId;
+        $payment->paymentId = $paymentId;
         $payment->paymentMethodId = $paymentMethodId;
         $payment->paymentState = PaymentState::none;
         $payment->paymentCost = $paymentCost;
@@ -61,39 +63,41 @@ class Payment
     {
         return [
             'order_id'          => $this->orderId->get(),
+            'payment_id'        => $this->paymentId->get(),
             'payment_method_id' => $this->paymentMethodId->get(),
             'payment_state'     => $this->paymentState->value,
-            'payment_cost'      => $this->paymentCost->getMoney()->getAmount(),
+            'cost'              => $this->paymentCost->getMoney()->getAmount(),
             'tax_rate'          => $this->paymentCost->getTaxRate()->toPercentage()->get(),
             'includes_vat'      => $this->paymentCost->includesTax(),
-            'data'              => $this->data,
+            'data'              => json_encode($this->data),
         ];
     }
 
-    public static function make(OrderId $orderId, PaymentMethodId $paymentMethodId, PaymentState $paymentState, PaymentCost $paymentTotal, array $data): static
-    {
-        $payment = new static();
-
-        $payment->orderId = $orderId;
-        $payment->paymentMethodId = $paymentMethodId;
-        $payment->paymentState = $paymentState;
-        $payment->paymentCost = $paymentTotal;
-        $payment->data = $data;
-
-        return $payment;
-    }
+//    public static function make(OrderId $orderId, PaymentMethodId $paymentMethodId, PaymentState $paymentState, PaymentCost $paymentTotal, array $data): static
+//    {
+//        $payment = new static();
+//
+//        $payment->orderId = $orderId;
+//        $payment->paymentMethodId = $paymentMethodId;
+//        $payment->paymentState = $paymentState;
+//        $payment->paymentCost = $paymentTotal;
+//        $payment->data = $data;
+//
+//        return $payment;
+//    }
 
     public static function fromMappedData(array $state, array $aggregateState): static
     {
         $payment = new static();
 
         $payment->orderId = OrderId::fromString($aggregateState['order_id']);
+        $payment->paymentId = PaymentId::fromString($state['payment_id']);
         $payment->paymentMethodId = PaymentMethodId::fromString($state['payment_method_id']);
         $payment->paymentState = PaymentState::from($state['payment_state']);
         $payment->paymentCost = PaymentCost::fromScalars(
-            $state['payment_cost'], 'EUR', $state['tax_rate'], $state['includes_vat']
+            $state['cost'], 'EUR', $state['tax_rate'], $state['includes_vat']
         );
-        $payment->data = $state['data'];
+        $payment->data = json_decode($state['data']);
 
         return $payment;
     }

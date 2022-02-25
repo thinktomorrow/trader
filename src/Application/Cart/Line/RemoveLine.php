@@ -9,9 +9,9 @@ use Thinktomorrow\Trader\Domain\Model\Order\Line\LineId;
 final class RemoveLine
 {
     private string $orderId;
-    private int $lineId;
+    private string $lineId;
 
-    public function __construct(string $orderId, int $lineId)
+    public function __construct(string $orderId, string $lineId)
     {
         $this->orderId = $orderId;
         $this->lineId = $lineId;
@@ -25,6 +25,6 @@ final class RemoveLine
     public function getlineId(): LineId
     {
         // TODO: get read model of order in order to get info on lines count so we can get the next lineId
-        return LineId::fromInt($this->lineId);
+        return LineId::fromString($this->lineId);
     }
 }

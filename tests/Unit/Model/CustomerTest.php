@@ -3,7 +3,6 @@ declare(strict_types=1);
 
 namespace Tests\Unit\Model;
 
-use Money\Money;
 use PHPUnit\Framework\TestCase;
 use Thinktomorrow\Trader\Domain\Common\Email;
 use Thinktomorrow\Trader\Domain\Model\Customer\Customer;

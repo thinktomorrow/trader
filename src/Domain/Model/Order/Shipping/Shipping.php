@@ -72,10 +72,10 @@ final class Shipping implements ChildEntity
             'shipping_id'         => $this->shippingId->get(),
             'shipping_profile_id' => $this->shippingProfileId->get(),
             'shipping_state'      => $this->shippingState->value,
-            'shipping_cost'       => $this->shippingCost->getMoney()->getAmount(),
+            'cost'                  => $this->shippingCost->getMoney()->getAmount(),
             'tax_rate'            => $this->shippingCost->getTaxRate()->toPercentage()->get(),
             'includes_vat'        => $this->shippingCost->includesTax(),
-            'data'                => $this->data,
+            'data'                => json_encode($this->data),
         ];
     }
 
@@ -88,9 +88,9 @@ final class Shipping implements ChildEntity
         $shipping->shippingProfileId = ShippingProfileId::fromString($state['shipping_profile_id']);
         $shipping->shippingState = ShippingState::from($state['shipping_state']);
         $shipping->shippingCost = ShippingCost::fromScalars(
-            $state['shipping_cost'], 'EUR', $state['tax_rate'], $state['includes_vat']
+            $state['cost'], 'EUR', $state['tax_rate'], $state['includes_vat']
         );
-        $shipping->data = $state['data'];
+        $shipping->data = json_decode($state['data']);
 
         return $shipping;
     }

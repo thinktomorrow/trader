@@ -59,7 +59,7 @@ final class Line implements ChildEntity
     {
         return [
             'order_id' => $this->orderId->get(),
-            'line_id' => $this->lineId->asInt(),
+            'line_id' => $this->lineId->get(),
             'variant_id' => $this->variantId->get(),
             'line_price' => $this->linePrice->getMoney()->getAmount(),
             'tax_rate' => $this->linePrice->getTaxRate()->toPercentage()->get(),
@@ -73,7 +73,7 @@ final class Line implements ChildEntity
         $line = new static();
 
         $line->orderId = OrderId::fromString($aggregateState['order_id']);
-        $line->lineId = LineId::fromInt($state['line_id']);
+        $line->lineId = LineId::fromString($state['line_id']);
         $line->variantId = VariantId::fromString($state['variant_id']);
         $line->linePrice = LinePrice::fromScalars($state['line_price'], 'EUR', $state['tax_rate'], $state['includes_vat']);
         $line->quantity = Quantity::fromInt($state['quantity']);

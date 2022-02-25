@@ -9,6 +9,7 @@ use Thinktomorrow\Trader\Domain\Model\Customer\CustomerId;
 
 class Shopper implements ChildEntity
 {
+    public readonly ShopperId $shopperId;
     private Email $email;
     private string $firstname;
     private string $lastname;
@@ -25,10 +26,11 @@ class Shopper implements ChildEntity
 
     }
 
-    public static function create(Email $email, string $firstname, string $lastname): static
+    public static function create(ShopperId $shopperId, Email $email, string $firstname, string $lastname): static
     {
         // locale, preferences, customer -> fixed discounts, email, firstname, lastname
         $shopper = new static();
+        $shopper->shopperId = $shopperId;
         $shopper->email = $email;
         $shopper->firstname = $firstname;
         $shopper->lastname = $lastname;
@@ -79,6 +81,7 @@ class Shopper implements ChildEntity
     public function getMappedData(): array
     {
         return [
+            'shopper_id'                   => $this->shopperId->get(),
             'email'                   => $this->email->get(),
             'firstname'               => $this->firstname,
             'lastname'                => $this->lastname,
@@ -90,6 +93,7 @@ class Shopper implements ChildEntity
     public static function fromMappedData(array $state, array $aggregateState): static
     {
         $shopper = new static();
+        $shopper->shopperId = ShopperId::fromString($state['shopper_id']);
         $shopper->email = Email::fromString($state['email']);
         $shopper->firstname = $state['firstname'];
         $shopper->lastname = $state['lastname'];

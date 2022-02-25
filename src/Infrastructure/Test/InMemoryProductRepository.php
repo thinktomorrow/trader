@@ -8,10 +8,10 @@ use Thinktomorrow\Trader\Domain\Model\Product\ProductId;
 use Thinktomorrow\Trader\Domain\Model\Product\ProductRepository;
 use Thinktomorrow\Trader\Domain\Model\Product\Variant\VariantId;
 use Thinktomorrow\Trader\Domain\Model\Product\Exceptions\CouldNotFindVariant;
-use Thinktomorrow\Trader\Application\Cart\VariantDetailsForCart\VariantDetailsForCart;
-use Thinktomorrow\Trader\Application\Cart\VariantDetailsForCart\FindVariantDetailsForCart;
+use Thinktomorrow\Trader\Application\Cart\VariantForCart\VariantForCart;
+use Thinktomorrow\Trader\Application\Cart\VariantForCart\FindVariantForCart;
 
-final class InMemoryProductRepository implements ProductRepository, FindVariantDetailsForCart
+final class InMemoryProductRepository implements ProductRepository, FindVariantForCart
 {
     private static array $products = [];
 
@@ -56,12 +56,12 @@ final class InMemoryProductRepository implements ProductRepository, FindVariantD
         static::$products = [];
     }
 
-    public function findVariantDetailsForCart(VariantId $variantId): VariantDetailsForCart
+    public function findVariantForCart(VariantId $variantId): VariantForCart
     {
         foreach(static::$products as $product) {
             foreach($product->getVariants() as $variant) {
                 if($variant->variantId->equals($variantId)) {
-                    return new VariantDetailsForCart(
+                    return new VariantForCart(
                         $variant->getSalePrice()
                     );
                 }

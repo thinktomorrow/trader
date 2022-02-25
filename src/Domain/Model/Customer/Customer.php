@@ -5,9 +5,12 @@ namespace Thinktomorrow\Trader\Domain\Model\Customer;
 
 use Thinktomorrow\Trader\Domain\Common\Email;
 use Thinktomorrow\Trader\Domain\Common\Entity\Aggregate;
+use Thinktomorrow\Trader\Domain\Common\Event\RecordsEvents;
 
 class Customer implements Aggregate
 {
+    use RecordsEvents;
+
     public readonly CustomerId $customerId;
     private Email $email;
     private string $firstname;

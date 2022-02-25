@@ -26,6 +26,6 @@ final class OrderApplication
 
         $this->orderRepository->save($order);
 
-        $this->eventDispatcher->dispatch($order->releaseEvents());
+        $this->eventDispatcher->dispatchAll($order->releaseEvents());
     }
 }

@@ -130,7 +130,7 @@ abstract class CartContext extends TestCase
         // Add product to order
         $this->cartApplication->addLine(new AddLine(
             $order->orderId->get(),
-            LineId::fromInt($count + 1)->asInt(),
+            LineId::fromString((string)($count + 1))->get(),
             VariantId::fromString($productVariantId)->get(),
             Quantity::fromInt((int)$quantity)->asInt(),
         ));
@@ -148,13 +148,13 @@ abstract class CartContext extends TestCase
         $lineId = null;
         foreach($lines as $line) {
             if($line['variant_id'] == $productTitle) {
-                $lineId = LineId::fromInt($line['line_id']);
+                $lineId = LineId::fromString($line['line_id']);
             }
         }
 
         $this->cartApplication->changeLineQuantity(new ChangeLineQuantity(
             $order->orderId->get(),
-            $lineId->asInt(),
+            $lineId->get(),
             Quantity::fromInt((int)$quantity)->asInt(),
         ));
     }
@@ -168,13 +168,13 @@ abstract class CartContext extends TestCase
         $lineId = null;
         foreach($lines as $line) {
             if($line['variant_id'] == $productVariantId) {
-                $lineId = LineId::fromInt($line['line_id']);
+                $lineId = LineId::fromString($line['line_id']);
             }
         }
 
         $this->cartApplication->removeLine(new RemoveLine(
             $order->orderId->get(),
-            $lineId->asInt(),
+            $lineId->get(),
         ));
     }
 

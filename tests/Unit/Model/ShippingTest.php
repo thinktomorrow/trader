@@ -28,10 +28,10 @@ class ShippingTest extends TestCase
             'shipping_id' => $shippingId->get(),
             'shipping_profile_id' => $shippingProfileId->get(),
             'shipping_state' => ShippingState::none->value,
-            'shipping_cost' => $cost->getMoney()->getAmount(),
+            'cost' => $cost->getMoney()->getAmount(),
             'tax_rate' => $cost->getTaxRate()->toPercentage()->get(),
             'includes_vat' => $cost->includesTax(),
-            'data' => [],
+            'data' => json_encode([]),
         ], $shipping->getMappedData());
     }
 
@@ -46,10 +46,10 @@ class ShippingTest extends TestCase
             'shipping_id'    => 'yyy',
             'shipping_profile_id'    => 'zzz',
             'shipping_state' => ShippingState::transit->value,
-            'shipping_cost' => '200',
+            'cost' => '200',
             'tax_rate' => '9',
             'includes_vat' => true,
-            'data' => [],
+            'data' => json_encode([]),
         ], $shipping->getMappedData());
     }
 
@@ -59,10 +59,10 @@ class ShippingTest extends TestCase
             'shipping_id' => 'yyy',
             'shipping_profile_id' => 'zzz',
             'shipping_state' => ShippingState::transit->value,
-            'shipping_cost' => '200',
+            'cost' => '200',
             'tax_rate' => '9',
             'includes_vat' => true,
-            'data' => [],
+            'data' => json_encode([]),
         ], [
             'order_id' => 'aaa',
         ]);

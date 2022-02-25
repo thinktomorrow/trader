@@ -9,7 +9,7 @@ final class EventDispatcherSpy implements EventDispatcher
 {
     private $dispatchedEvents = [];
 
-    public function dispatch(array $events): void
+    public function dispatchAll(array $events): void
     {
         $this->dispatchedEvents = array_merge($this->dispatchedEvents, $events);
     }

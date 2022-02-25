@@ -21,13 +21,13 @@ use Thinktomorrow\Trader\Application\Cart\Line\ChangeLineQuantity;
 use Thinktomorrow\Trader\Domain\Model\Order\Shipping\ShippingCountry;
 use Thinktomorrow\Trader\Domain\Model\PaymentMethod\PaymentMethodRepository;
 use Thinktomorrow\Trader\Domain\Model\ShippingProfile\ShippingProfileRepository;
-use Thinktomorrow\Trader\Application\Cart\VariantDetailsForCart\FindVariantDetailsForCart;
+use Thinktomorrow\Trader\Application\Cart\VariantForCart\FindVariantForCart;
 use Thinktomorrow\Trader\Domain\Model\ShippingProfile\Exceptions\ShippingProfileNotSelectableForCountry;
 use Thinktomorrow\Trader\Domain\Model\ShippingProfile\Exceptions\CouldNotSelectShippingCountryDueToMissingShippingCountry;
 
 final class CartApplication
 {
-    private FindVariantDetailsForCart $findVariantDetailsForCart;
+    private FindVariantForCart $findVariantDetailsForCart;
     private OrderRepository $orderRepository;
     private ShippingProfileRepository $shippingProfileRepository;
     private EventDispatcher $eventDispatcher;
@@ -37,7 +37,7 @@ final class CartApplication
 
     public function __construct(
         TraderConfig              $config,
-        FindVariantDetailsForCart $findVariantDetailsForCart,
+        FindVariantForCart        $findVariantDetailsForCart,
         OrderRepository           $orderRepository,
         ShippingProfileRepository $shippingProfileRepository,
         PaymentMethodRepository   $paymentMethodRepository,
@@ -57,7 +57,7 @@ final class CartApplication
     public function addLine(AddLine $addLine): void
     {
         $order = $this->orderRepository->find($addLine->getOrderId());
-        $variant = $this->findVariantDetailsForCart->findVariantDetailsForCart($addLine->getVariantId());
+        $variant = $this->findVariantDetailsForCart->findVariantForCart($addLine->getVariantId());
 
         $order->addOrUpdateLine(
             $addLine->getlineId(),
@@ -68,7 +68,7 @@ final class CartApplication
 
         $this->orderRepository->save($order);
 
-        $this->eventDispatcher->dispatch($order->releaseEvents());
+        $this->eventDispatcher->dispatchAll($order->releaseEvents());
     }
 
     public function changeLineQuantity(ChangeLineQuantity $changeLineQuantity): void
@@ -82,7 +82,7 @@ final class CartApplication
 
         $this->orderRepository->save($order);
 
-        $this->eventDispatcher->dispatch($order->releaseEvents());
+        $this->eventDispatcher->dispatchAll($order->releaseEvents());
     }
 
     public function removeLine(RemoveLine $removeLine): void
@@ -95,7 +95,7 @@ final class CartApplication
 
         $this->orderRepository->save($order);
 
-        $this->eventDispatcher->dispatch($order->releaseEvents());
+        $this->eventDispatcher->dispatchAll($order->releaseEvents());
     }
 
     public function chooseShippingCountry(ChooseShippingCountry $chooseShippingCountry): void
@@ -110,7 +110,7 @@ final class CartApplication
 
         $this->orderRepository->save($order);
 
-        $this->eventDispatcher->dispatch($order->releaseEvents());
+        $this->eventDispatcher->dispatchAll($order->releaseEvents());
     }
 
     public function chooseShippingAddress(ChooseShippingAddress $chooseShippingAddress): void
@@ -123,7 +123,7 @@ final class CartApplication
 
         $this->orderRepository->save($order);
 
-        $this->eventDispatcher->dispatch($order->releaseEvents());
+        $this->eventDispatcher->dispatchAll($order->releaseEvents());
     }
 
     public function chooseBillingAddress(ChooseBillingAddress $chooseBillingAddress): void
@@ -136,7 +136,7 @@ final class CartApplication
 
         $this->orderRepository->save($order);
 
-        $this->eventDispatcher->dispatch($order->releaseEvents());
+        $this->eventDispatcher->dispatchAll($order->releaseEvents());
     }
 
     public function chooseShippingProfile(ChooseShippingProfile $chooseShippingProfile): void
@@ -186,7 +186,7 @@ final class CartApplication
 
         $this->orderRepository->save($order);
 
-        $this->eventDispatcher->dispatch($order->releaseEvents());
+        $this->eventDispatcher->dispatchAll($order->releaseEvents());
 
         // Trigger refresh (should be after event)
 //        $this->refreshCart(new RefreshCart($order->orderId->get(), [
@@ -218,7 +218,7 @@ final class CartApplication
 
         $this->orderRepository->save($order);
 
-        $this->eventDispatcher->dispatch($order->releaseEvents());
+        $this->eventDispatcher->dispatchAll($order->releaseEvents());
     }
 
     public function chooseCustomer(ChooseCustomer $chooseCustomer): void
@@ -234,7 +234,7 @@ final class CartApplication
 
         $this->orderRepository->save($order);
 
-        $this->eventDispatcher->dispatch($order->releaseEvents());
+        $this->eventDispatcher->dispatchAll($order->releaseEvents());
     }
 
 

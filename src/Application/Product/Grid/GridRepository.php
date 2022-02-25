@@ -1,8 +1,9 @@
 <?php
 declare(strict_types=1);
 
-namespace Thinktomorrow\Trader\Application\Product\ListGridProducts;
+namespace Thinktomorrow\Trader\Application\Product\Grid;
 
+use Thinktomorrow\Trader\Domain\Common\Locale;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 
 interface GridRepository
@@ -26,6 +27,8 @@ interface GridRepository
     public function paginate(int $perPage): self;
 
     public function limit(int $limit): self;
+
+    public function setLocale(Locale $locale): self;
 
     public function getResults(): LengthAwarePaginator;
 }
