@@ -4,10 +4,13 @@ declare(strict_types=1);
 namespace Tests\Infrastructure;
 
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 use Thinktomorrow\Trader\Infrastructure\Shop\CustomerAuth\CustomerModel;
 
 class CustomerAuthTest extends TestCase
 {
+    use RefreshDatabase;
+
     /** @test */
     public function non_authenticated_are_kept_out()
     {

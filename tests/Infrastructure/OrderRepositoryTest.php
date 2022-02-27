@@ -3,8 +3,8 @@ declare(strict_types=1);
 
 namespace Tests\Infrastructure;
 
-use Tests\TestHelpers;
 use Thinktomorrow\Trader\Domain\Model\Order\Order;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 use Thinktomorrow\Trader\Domain\Model\Order\OrderId;
 use Thinktomorrow\Trader\Domain\Model\Order\Shipping\ShippingId;
 use Thinktomorrow\Trader\Infrastructure\Test\InMemoryOrderRepository;
@@ -13,7 +13,8 @@ use Thinktomorrow\Trader\Infrastructure\Laravel\Repositories\MysqlOrderRepositor
 
 final class OrderRepositoryTest extends TestCase
 {
-    use TestHelpers;
+    use RefreshDatabase;
+
 
     /**
      * @test

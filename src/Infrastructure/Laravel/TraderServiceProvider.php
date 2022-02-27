@@ -3,8 +3,11 @@ declare(strict_types=1);
 
 namespace Thinktomorrow\Trader\Infrastructure\Laravel;
 
+use Illuminate\Support\Arr;
 use Thinktomorrow\Trader\TraderConfig;
 use Illuminate\Support\ServiceProvider;
+use Thinktomorrow\Trader\Domain\Common\Locale;
+use Thinktomorrow\Trader\Application\Common\DataRenderer;
 use Thinktomorrow\Trader\Domain\Model\Order\OrderRepository;
 use Thinktomorrow\Trader\Domain\Common\Event\EventDispatcher;
 use Thinktomorrow\Trader\Application\Product\Grid\GridRepository;
@@ -46,6 +49,26 @@ class TraderServiceProvider extends ServiceProvider
 
     public function boot()
     {
+        /**
+         * This closure deals with rendering string and localized content on our view and read models.
+         *
+         * Dotted syntax for nested arrays is supported, e.g. customer.firstname. This function
+         * expects that localized content is always formatted as <key>.<language>. We always
+         * first try to find localized content before fetching the defaults.
+         */
+        DataRenderer::setResolver(function(array $data, string $key, string $language = null, string $default = null)
+        {
+            if(!$language) {
+                $language = $this->app->make(TraderConfig::class)
+                    ->getDefaultLocale()
+                    ->getLanguage();
+            }
+
+            return Arr::get(
+                $data, $key . '.' . $language, Arr::get($data, $key, $default)
+            );
+        });
+
         // Config
         $this->publishes([__DIR__.'/config/config.php' => config_path('trader.php')]);
         $this->mergeConfigFrom(__DIR__.'/config/config.php', 'trader');

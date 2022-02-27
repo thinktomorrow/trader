@@ -3,8 +3,8 @@ declare(strict_types=1);
 
 namespace Tests\Infrastructure;
 
-use Tests\TestHelpers;
 use Thinktomorrow\Trader\Domain\Common\Email;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 use Thinktomorrow\Trader\Domain\Model\Customer\Customer;
 use Thinktomorrow\Trader\Domain\Model\Customer\CustomerId;
 use Thinktomorrow\Trader\Infrastructure\Test\InMemoryCustomerRepository;
@@ -13,7 +13,8 @@ use Thinktomorrow\Trader\Infrastructure\Laravel\Repositories\MysqlCustomerReposi
 
 final class CustomerRepositoryTest extends TestCase
 {
-    use TestHelpers;
+    use RefreshDatabase;
+
 
     /**
      * @test
