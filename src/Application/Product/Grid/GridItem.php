@@ -63,6 +63,7 @@ class GridItem
         $item->salePrice = VariantSalePrice::fromScalars($state['sale_price'], 'EUR', $state['tax_rate'], $state['includes_tax']);
         $item->unitPrice = VariantUnitPrice::fromScalars($state['unit_price'], 'EUR', $state['tax_rate'], $state['includes_tax']);
 
+        // TODO: title
         $item->title = 'ddkdkdk';
 
         if(is_array($state['data'])) {

@@ -53,19 +53,20 @@ class CreateBasicTraderTables extends Migration
 
         Schema::create(static::PREFIX.'taxa', function (Blueprint $table)
         {
-            $table->id();
-            $table->unsignedBigInteger('parent_id')->nullable()->index();
+            $table->char('taxon_id', 36)->primary();
+            $table->char('parent_id', 36)->nullable()->index();
             $table->string('key')->unique();
+            $table->string('state')->default(\Thinktomorrow\Trader\Domain\Model\Taxon\TaxonState::online->value);
             $table->json('data')->nullable();
-            $table->unsignedInteger('order_column')->default(0);
+            $table->unsignedInteger('order')->default(0);
             $table->timestamps();
         });
 
         Schema::create(static::PREFIX.'taxa_products', function (Blueprint $table) {
-            $table->unsignedBigInteger('taxon_id');
-            $table->char('product_id');
+            $table->char('taxon_id', 36);
+            $table->char('product_id', 36);
 
-            $table->foreign('taxon_id')->references('id')->on(static::PREFIX.'taxa')->onDelete('cascade');
+            $table->foreign('taxon_id')->references('taxon_id')->on(static::PREFIX.'taxa')->onDelete('cascade');
             $table->foreign('product_id')->references('product_id')->on(static::PREFIX.'products')->onDelete('cascade');
 
             $table->unique(['taxon_id','product_id']);

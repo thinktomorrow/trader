@@ -3,26 +3,61 @@ declare(strict_types=1);
 
 namespace Thinktomorrow\Trader\Application\Taxon\Filter;
 
-use Thinktomorrow\Vine\DefaultNode;
+use Thinktomorrow\Vine\NodeSource;
+use Thinktomorrow\Trader\Domain\Common\Locale;
+use Thinktomorrow\Trader\Domain\Model\Taxon\TaxonState;
+use Thinktomorrow\Trader\Application\Common\RendersData;
 
-class TaxonFilter extends DefaultNode
+class TaxonFilter implements NodeSource
 {
-    private string $id;
-    private string $key;
-    private string $label;
-    private bool $showOnline;
-    private array $data;
+    use RendersData;
 
-    public function __construct(string $id, string $key, string $label, bool $showOnline, array $data)
+    public readonly string $id;
+    public readonly int $order; // Make publicly available for sorting via vine
+    private string $key;
+    private TaxonState $taxonState;
+    private array $data;
+    private array $productIds;
+    private ?string $parentId = null;
+    private array $children = [];
+
+    private function __construct(string $id, string $key, TaxonState $taxonState, int $order, array $data, array $productIds, ?string $parentId = null)
     {
         $this->id = $id;
         $this->key = $key;
-        $this->label = $label;
-        $this->showOnline = $showOnline;
+        $this->taxonState = $taxonState;
+        $this->order = $order;
         $this->data = $data;
+        $this->productIds = $productIds;
+        $this->parentId = $parentId;
+    }
 
-        // Add the data[order_column] to the node entry so we can use it for sorting.
-        parent::__construct($data);
+    public static function fromMappedData(array $state): static
+    {
+        return new static(
+            $state['taxon_id'],
+            $state['key'],
+            TaxonState::from($state['state']),
+            $state['order'],
+            $state['data'] ? json_decode($state['data'], true) : [],
+            $state['product_ids'] ? explode(',',$state['product_ids']) : [],
+            $state['parent_id'],
+        );
+    }
+
+    public function setChildren(array $children): void
+    {
+        $this->children = $children;
+    }
+
+    public function children(): array
+    {
+        return $this->children;
+    }
+
+    public function hasChildren(): bool
+    {
+        return count($this->children) > 0;
     }
 
     public function getKey(): string
@@ -30,38 +65,33 @@ class TaxonFilter extends DefaultNode
         return $this->key;
     }
 
-    public function getLabel(): string
+    public function getLabel(string $language = null): string
     {
-        return $this->label;
+        return $this->data('label', $language);
     }
 
     public function showOnline(): bool
     {
-        return $this->showOnline;
+        return in_array($this->taxonState, TaxonState::onlineStates());
     }
 
-    public function getNodeId($key = null, $default = null): string
+    public function getNodeId(): string
     {
         return $this->id;
     }
 
     public function getParentNodeId(): ?string
     {
-        return $this->data('parent_id');
+        return $this->parentId;
     }
 
-    private function data(string $key, $default = null)
+    public function getProductIds(): array
     {
-        // TODO: remove container here, put it in repository and pass context to this object instead.
-        $language = '';
+        return $this->productIds;
+    }
 
-        // TODO: allow for dotted content... ... how to use Laravel here?
-
-        // First we search for localized content
-//        return Arr::get(
-//            $this->data,
-//            $key . '.' . $language,
-//            Arr::get($this->data, $key, $default)
-//        );
+    public function getChildren(): array
+    {
+        return $this->children;
     }
 }

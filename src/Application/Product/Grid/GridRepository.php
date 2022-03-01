@@ -28,7 +28,7 @@ interface GridRepository
 
     public function limit(int $limit): self;
 
-    public function setLocale(Locale $locale): self;
+    public function setLocale(Locale $locale): static;
 
     public function getResults(): LengthAwarePaginator;
 }

@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 
-namespace Thinktomorrow\Trader\Application\Taxon\Filter;
+namespace Thinktomorrow\Trader\Infrastructure\Vine;
 
 use Thinktomorrow\Vine\Node;
 use Thinktomorrow\Vine\Source;
@@ -11,7 +11,7 @@ class TaxonSource implements Source
     private iterable $records;
     private \Closure $createEntry;
 
-    public string $sortChildrenBy = 'order_column';
+    public string $sortChildrenBy = 'order';
 
     public function __construct(iterable $records, \Closure $createEntry)
     {

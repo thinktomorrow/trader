@@ -42,20 +42,10 @@ final class InMemoryCustomerRepository implements CustomerRepository
         return CustomerId::fromString($this->nextReference);
     }
 
-    public function nextShippingReference(): ShippingId
-    {
-        return ShippingId::fromString($this->nextShippingReference);
-    }
-
     // For testing purposes only
     public function setNextReference(string $nextReference): void
     {
         $this->nextReference = $nextReference;
-    }
-
-    public function setNextShippingReference(string $nextShippingReference): void
-    {
-        $this->nextShippingReference = $nextShippingReference;
     }
 
     public function clear()

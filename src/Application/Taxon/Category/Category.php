@@ -5,8 +5,7 @@ namespace Thinktomorrow\Trader\Application\Taxon\Category;
 
 class Category
 {
-
-    public function __construct()
+    public function getKey(): string
     {
 
     }

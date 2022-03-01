@@ -21,7 +21,7 @@
         "ext-intl": "*",
         "psr/container": "^2.0",
         "laravel/ui": "^3.4",
-        "thinktomorrow/vine": "^0.4.0"
+        "thinktomorrow/vine": "^0.4.1"
     },
     "require-dev": {
         "phpunit/phpunit" : "~9.5",
