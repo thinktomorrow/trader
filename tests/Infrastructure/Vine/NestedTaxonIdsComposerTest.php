@@ -7,8 +7,8 @@ use Tests\Infrastructure\TestCase;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Thinktomorrow\Trader\Domain\Model\Taxon\Taxon;
 use Thinktomorrow\Trader\Domain\Model\Taxon\TaxonId;
-use Thinktomorrow\Trader\Infrastructure\Test\InMemoryTaxonRepository;
 use Thinktomorrow\Trader\Infrastructure\Vine\VineNestedTaxonIdsComposer;
+use Thinktomorrow\Trader\Infrastructure\Test\Repositories\InMemoryTaxonRepository;
 use Thinktomorrow\Trader\Infrastructure\Laravel\Repositories\MysqlTaxonRepository;
 
 final class NestedTaxonIdsComposerTest extends TestCase

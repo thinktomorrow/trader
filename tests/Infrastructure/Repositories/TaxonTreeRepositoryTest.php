@@ -1,14 +1,14 @@
 <?php
 declare(strict_types=1);
 
-namespace Tests\Infrastructure;
+namespace Tests\Infrastructure\Repositories;
 
+use Tests\Infrastructure\TestCase;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Thinktomorrow\Trader\Domain\Model\Taxon\Taxon;
 use Thinktomorrow\Trader\Domain\Model\Taxon\TaxonId;
 use Thinktomorrow\Trader\Application\Taxon\Filter\TaxonFilter;
-use Thinktomorrow\Trader\Infrastructure\Test\TestTraderConfig;
-use Thinktomorrow\Trader\Infrastructure\Test\InMemoryTaxonRepository;
+use Thinktomorrow\Trader\Infrastructure\Test\Repositories\InMemoryTaxonRepository;
 use Thinktomorrow\Trader\Infrastructure\Laravel\Repositories\MysqlTaxonRepository;
 
 final class TaxonTreeRepositoryTest extends TestCase

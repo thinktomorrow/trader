@@ -16,7 +16,6 @@ use Thinktomorrow\Trader\Application\Cart\Line\AddLine;
 use Thinktomorrow\Trader\Domain\Model\Product\ProductId;
 use Thinktomorrow\Trader\Domain\Model\Order\Line\LineId;
 use Thinktomorrow\Trader\Domain\Model\Order\Line\Quantity;
-use Thinktomorrow\Trader\Domain\Model\Customer\CustomerId;
 use Thinktomorrow\Trader\Application\Cart\CartApplication;
 use Thinktomorrow\Trader\Application\Cart\Line\RemoveLine;
 use Thinktomorrow\Trader\Infrastructure\Test\TestContainer;
@@ -29,17 +28,17 @@ use Thinktomorrow\Trader\Application\Cart\ChooseShippingCountry;
 use Thinktomorrow\Trader\Application\Cart\Line\ChangeLineQuantity;
 use Thinktomorrow\Trader\Domain\Model\ShippingProfile\TariffNumber;
 use Thinktomorrow\Trader\Domain\Model\Order\Shipping\ShippingCountry;
-use Thinktomorrow\Trader\Infrastructure\Test\InMemoryOrderRepository;
 use Thinktomorrow\Trader\Domain\Model\ShippingProfile\ShippingProfile;
 use Thinktomorrow\Trader\Domain\Model\Product\Variant\VariantSalePrice;
 use Thinktomorrow\Trader\Domain\Model\Product\Variant\VariantUnitPrice;
-use Thinktomorrow\Trader\Infrastructure\Test\InMemoryProductRepository;
 use Thinktomorrow\Trader\Domain\Model\ShippingProfile\ShippingProfileId;
-use Thinktomorrow\Trader\Infrastructure\Test\InMemoryCustomerRepository;
 use Thinktomorrow\Trader\Domain\Model\Order\Exceptions\CouldNotFindOrder;
 use Thinktomorrow\Trader\Application\RefreshCart\Adjusters\AdjustShipping;
-use Thinktomorrow\Trader\Infrastructure\Test\InMemoryPaymentMethodRepository;
-use Thinktomorrow\Trader\Infrastructure\Test\InMemoryShippingProfileRepository;
+use Thinktomorrow\Trader\Infrastructure\Test\Repositories\InMemoryOrderRepository;
+use Thinktomorrow\Trader\Infrastructure\Test\Repositories\InMemoryProductRepository;
+use Thinktomorrow\Trader\Infrastructure\Test\Repositories\InMemoryCustomerRepository;
+use Thinktomorrow\Trader\Infrastructure\Test\Repositories\InMemoryPaymentMethodRepository;
+use Thinktomorrow\Trader\Infrastructure\Test\Repositories\InMemoryShippingProfileRepository;
 
 abstract class CartContext extends TestCase
 {

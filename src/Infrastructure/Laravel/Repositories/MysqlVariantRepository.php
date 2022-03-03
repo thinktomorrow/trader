@@ -4,11 +4,14 @@ declare(strict_types=1);
 namespace Thinktomorrow\Trader\Infrastructure\Laravel\Repositories;
 
 use Illuminate\Support\Facades\DB;
+use Thinktomorrow\Trader\Domain\Model\Product\ProductId;
 use Thinktomorrow\Trader\Domain\Model\Product\Variant\VariantId;
+use Thinktomorrow\Trader\Application\Product\ProductOptions\Variants;
 use Thinktomorrow\Trader\Application\Cart\VariantForCart\VariantForCart;
-use Thinktomorrow\Trader\Application\Cart\VariantForCart\FindVariantForCart;
+use Thinktomorrow\Trader\Application\Product\ProductOptions\VariantForProductOptionRepository;
+use Thinktomorrow\Trader\Application\Cart\VariantForCart\VariantForCartRepository;
 
-class MysqlFindVariantForCart implements FindVariantForCart
+class MysqlVariantRepository implements VariantForCartRepository, VariantForProductOptionRepository
 {
     private static string $variantTable = 'trader_product_variants';
 
@@ -35,6 +38,26 @@ class MysqlFindVariantForCart implements FindVariantForCart
         }
 
         $state = (array) $state;
+
+        return VariantForCart::fromMappedData(array_merge($state, [
+            'includes_tax' => (bool) $state['includes_tax'],
+        ]));
+    }
+
+    public function getVariantsForProductOption(ProductId $productId): Variants
+    {
+        // Basic builder query
+        $rows = DB::table(static::$variantTable)
+            ->where(static::$variantTable . '.product_id', $productId->get())
+            ->select([
+                'variant_id',
+                'options',
+                'data',
+            ])
+            ->orderBy('order_column','ASC')
+            ->get();
+
+        dd($rows);
 
         return VariantForCart::fromMappedData(array_merge($state, [
             'includes_tax' => (bool) $state['includes_tax'],

@@ -21,13 +21,13 @@ use Thinktomorrow\Trader\Application\Cart\Line\ChangeLineQuantity;
 use Thinktomorrow\Trader\Domain\Model\Order\Shipping\ShippingCountry;
 use Thinktomorrow\Trader\Domain\Model\PaymentMethod\PaymentMethodRepository;
 use Thinktomorrow\Trader\Domain\Model\ShippingProfile\ShippingProfileRepository;
-use Thinktomorrow\Trader\Application\Cart\VariantForCart\FindVariantForCart;
+use Thinktomorrow\Trader\Application\Cart\VariantForCart\VariantForCartRepository;
 use Thinktomorrow\Trader\Domain\Model\ShippingProfile\Exceptions\ShippingProfileNotSelectableForCountry;
 use Thinktomorrow\Trader\Domain\Model\ShippingProfile\Exceptions\CouldNotSelectShippingCountryDueToMissingShippingCountry;
 
 final class CartApplication
 {
-    private FindVariantForCart $findVariantDetailsForCart;
+    private VariantForCartRepository $findVariantDetailsForCart;
     private OrderRepository $orderRepository;
     private ShippingProfileRepository $shippingProfileRepository;
     private EventDispatcher $eventDispatcher;
@@ -37,7 +37,7 @@ final class CartApplication
 
     public function __construct(
         TraderConfig              $config,
-        FindVariantForCart        $findVariantDetailsForCart,
+        VariantForCartRepository  $findVariantDetailsForCart,
         OrderRepository           $orderRepository,
         ShippingProfileRepository $shippingProfileRepository,
         PaymentMethodRepository   $paymentMethodRepository,

@@ -3,23 +3,31 @@
 namespace Tests;
 
 use Throwable;
+use Money\Money;
 use Thinktomorrow\Trader\Domain\Common\Email;
 use Illuminate\Contracts\Debug\ExceptionHandler;
 use Thinktomorrow\Trader\Domain\Model\Order\Order;
 use Thinktomorrow\Trader\Domain\Model\Order\Shopper;
+use Thinktomorrow\Trader\Domain\Common\Taxes\TaxRate;
 use Thinktomorrow\Trader\Domain\Model\Order\Line\Line;
+use Thinktomorrow\Trader\Domain\Model\Product\Product;
 use Thinktomorrow\Trader\Domain\Model\Order\OrderState;
 use Thinktomorrow\Trader\Domain\Model\Customer\Customer;
+use Thinktomorrow\Trader\Domain\Model\Product\ProductId;
 use Thinktomorrow\Trader\Domain\Model\Customer\CustomerId;
 use Thinktomorrow\Trader\Domain\Model\Order\Payment\Payment;
 use Thinktomorrow\Trader\Domain\Model\Order\Discount\Discount;
 use Thinktomorrow\Trader\Domain\Model\Order\Shipping\Shipping;
+use Thinktomorrow\Trader\Domain\Model\Product\Variant\Variant;
+use Thinktomorrow\Trader\Domain\Model\Product\Variant\VariantId;
 use Thinktomorrow\Trader\Domain\Model\Order\Payment\PaymentState;
 use Thinktomorrow\Trader\Domain\Model\CustomerLogin\CustomerLogin;
 use Thinktomorrow\Trader\Domain\Model\Customer\CustomerRepository;
 use Thinktomorrow\Trader\Domain\Model\Order\Payment\BillingAddress;
 use Thinktomorrow\Trader\Domain\Model\Order\Shipping\ShippingState;
 use Thinktomorrow\Trader\Domain\Model\Order\Shipping\ShippingAddress;
+use Thinktomorrow\Trader\Domain\Model\Product\Variant\VariantUnitPrice;
+use Thinktomorrow\Trader\Domain\Model\Product\Variant\VariantSalePrice;
 use Thinktomorrow\Trader\Domain\Model\CustomerLogin\CustomerLoginRepository;
 
 trait TestHelpers
@@ -161,5 +169,26 @@ trait TestHelpers
         app(CustomerLoginRepository::class)->save($customerLogin);
 
         return $customer;
+    }
+
+    protected function createdProduct(): Product
+    {
+        return Product::create(ProductId::fromString('xxx'));
+    }
+
+    protected function createdProductWithVariant(): Product
+    {
+        $product = $this->createdProduct();
+
+        $product->addVariant(Variant::create(
+            ProductId::fromString('xxx'),
+            VariantId::fromString('yyy'),
+            VariantUnitPrice::fromMoney(
+                Money::EUR(10), TaxRate::fromString('20'), false
+            ),
+            VariantSalePrice::fromMoney(Money::EUR(8), TaxRate::fromString('20'), false),
+        ));
+
+        return $product;
     }
 }

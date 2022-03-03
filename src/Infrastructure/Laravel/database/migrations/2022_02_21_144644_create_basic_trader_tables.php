@@ -41,7 +41,7 @@ class CreateBasicTraderTables extends Migration
             $table->integer('sale_price')->unsigned();
             $table->integer('unit_price')->unsigned();
             $table->char('tax_rate', 3);
-            $table->boolean('includes_tax');
+            $table->boolean('includes_vat');
             $table->json('options')->nullable(); // variant options
             $table->json('data')->nullable();
             $table->unsignedInteger('order_column')->default(0);

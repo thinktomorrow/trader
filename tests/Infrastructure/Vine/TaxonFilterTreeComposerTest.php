@@ -3,14 +3,13 @@ declare(strict_types=1);
 
 namespace Tests\Infrastructure\Vine;
 
-use Illuminate\Support\Facades\DB;
 use Tests\Infrastructure\TestCase;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Thinktomorrow\Trader\Domain\Model\Taxon\Taxon;
 use Thinktomorrow\Trader\Domain\Model\Taxon\TaxonId;
 use Thinktomorrow\Trader\Domain\Model\Taxon\TaxonState;
-use Thinktomorrow\Trader\Infrastructure\Test\InMemoryTaxonRepository;
 use Thinktomorrow\Trader\Infrastructure\Vine\VineTaxonFilterTreeComposer;
+use Thinktomorrow\Trader\Infrastructure\Test\Repositories\InMemoryTaxonRepository;
 use Thinktomorrow\Trader\Infrastructure\Laravel\Repositories\MysqlTaxonRepository;
 
 final class TaxonFilterTreeComposerTest extends TestCase

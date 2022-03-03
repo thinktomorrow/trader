@@ -4,7 +4,7 @@ namespace Tests\Infrastructure\Vine;
 
 use Illuminate\Support\Facades\DB;
 use Thinktomorrow\Trader\Domain\Model\Taxon\Taxon;
-use Thinktomorrow\Trader\Infrastructure\Test\InMemoryTaxonRepository;
+use Thinktomorrow\Trader\Infrastructure\Test\Repositories\InMemoryTaxonRepository;
 
 trait CreatesTaxon
 {

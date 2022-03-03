@@ -1,8 +1,9 @@
 <?php
 declare(strict_types=1);
 
-namespace Tests\Infrastructure;
+namespace Tests\Infrastructure\Repositories;
 
+use Tests\Infrastructure\TestCase;
 use Thinktomorrow\Trader\Domain\Common\Email;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Thinktomorrow\Trader\Domain\Model\Customer\CustomerId;

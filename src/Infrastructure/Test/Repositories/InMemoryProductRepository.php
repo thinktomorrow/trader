@@ -1,17 +1,17 @@
 <?php
 declare(strict_types=1);
 
-namespace Thinktomorrow\Trader\Infrastructure\Test;
+namespace Thinktomorrow\Trader\Infrastructure\Test\Repositories;
 
 use Thinktomorrow\Trader\Domain\Model\Product\Product;
 use Thinktomorrow\Trader\Domain\Model\Product\ProductId;
 use Thinktomorrow\Trader\Domain\Model\Product\ProductRepository;
 use Thinktomorrow\Trader\Domain\Model\Product\Variant\VariantId;
-use Thinktomorrow\Trader\Domain\Model\Product\Exceptions\CouldNotFindVariant;
 use Thinktomorrow\Trader\Application\Cart\VariantForCart\VariantForCart;
-use Thinktomorrow\Trader\Application\Cart\VariantForCart\FindVariantForCart;
+use Thinktomorrow\Trader\Domain\Model\Product\Exceptions\CouldNotFindProduct;
+use Thinktomorrow\Trader\Application\Cart\VariantForCart\VariantForCartRepository;
 
-final class InMemoryProductRepository implements ProductRepository, FindVariantForCart
+final class InMemoryProductRepository implements ProductRepository, VariantForCartRepository
 {
     private static array $products = [];
 
@@ -25,7 +25,7 @@ final class InMemoryProductRepository implements ProductRepository, FindVariantF
     public function find(ProductId $productId): Product
     {
         if(!isset(static::$products[$productId->get()])) {
-            throw new CouldNotFindVariant('No product found by id ' . $productId);
+            throw new CouldNotFindProduct('No product found by id ' . $productId);
         }
 
         return static::$products[$productId->get()];
@@ -34,7 +34,7 @@ final class InMemoryProductRepository implements ProductRepository, FindVariantF
     public function delete(ProductId $productId): void
     {
         if(!isset(static::$products[$productId->get()])) {
-            throw new CouldNotFindVariant('No product found by id ' . $productId);
+            throw new CouldNotFindProduct('No product found by id ' . $productId);
         }
 
         unset(static::$products[$productId->get()]);

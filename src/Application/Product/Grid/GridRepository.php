@@ -10,7 +10,7 @@ interface GridRepository
 {
     public function filterByTerm(string $term): self;
 
-    public function filterByTaxa(array $taxa): self;
+    public function filterByTaxonKeys(array $taxonKeys): self;
 
     public function filterByProductIds(array $productIds): self;
 

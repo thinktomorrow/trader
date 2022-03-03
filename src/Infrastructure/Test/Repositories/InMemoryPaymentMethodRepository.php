@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 
-namespace Thinktomorrow\Trader\Infrastructure\Test;
+namespace Thinktomorrow\Trader\Infrastructure\Test\Repositories;
 
 use Thinktomorrow\Trader\Domain\Model\PaymentMethod\PaymentMethod;
 use Thinktomorrow\Trader\Domain\Model\PaymentMethod\PaymentMethodId;

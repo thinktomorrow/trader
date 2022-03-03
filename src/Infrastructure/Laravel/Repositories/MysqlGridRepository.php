@@ -13,10 +13,12 @@ use Thinktomorrow\Trader\Domain\Model\Product\ProductState;
 use Thinktomorrow\Trader\Domain\Model\Product\Variant\VariantState;
 use Thinktomorrow\Trader\Application\Product\Grid\GridItem;
 use Thinktomorrow\Trader\Application\Product\Grid\GridRepository;
+use Thinktomorrow\Trader\Application\Product\Grid\NestedTaxonIdsComposer;
 
 class MysqlGridRepository implements GridRepository
 {
     protected Builder $builder;
+    private NestedTaxonIdsComposer $nestedTaxonIdsComposer;
 
     private int $perPage = 20;
     private Locale $locale;
@@ -26,7 +28,7 @@ class MysqlGridRepository implements GridRepository
     private static string $taxonTable = 'trader_taxa';
     private static string $taxonPivotTable = 'trader_taxa_products';
 
-    public function __construct(TraderConfig $traderConfig)
+    public function __construct(TraderConfig $traderConfig, NestedTaxonIdsComposer $nestedTaxonIdsComposer)
     {
         $this->locale = $traderConfig->getDefaultLocale();
 
@@ -41,6 +43,8 @@ class MysqlGridRepository implements GridRepository
                 static::$productTable . '.data AS product_data',
                 static::$productTable . '.order_column AS product_order_column',
             ]);
+        $this->traderConfig = $traderConfig;
+        $this->nestedTaxonIdsComposer = $nestedTaxonIdsComposer;
     }
 
     public function filterByTerm(string $term): GridRepository
@@ -48,9 +52,21 @@ class MysqlGridRepository implements GridRepository
         // TODO: Implement filterByTerm() method.
     }
 
-    public function filterByTaxa(array $taxa): GridRepository
+    public function filterByTaxonKeys(array $taxonKeys): GridRepository
     {
-        // TODO: Implement filterByTaxa() method.
+        /**
+         * All taxa are grouped by their root. Taxa within the same root have an OR relation
+         * in the search. Taxa of different roots will be searched as an AND operation
+         */
+        $taxonIds = $this->nestedTaxonIdsComposer->getGroupedByRootByKeys($taxonKeys);
+
+        foreach ($taxonIds as $rootId => $ids) {
+            $joinTable = 'join' . $rootId;
+            $this->builder->join(static::$taxonPivotTable . ' AS ' . $joinTable, static::$productTable.'.id', '=', $joinTable.'.product_id')
+                ->whereIn($joinTable.'.taxon_id', array_unique($ids));
+        }
+
+        return $this;
     }
 
     public function filterByProductIds(array $productIds): GridRepository

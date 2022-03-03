@@ -63,7 +63,7 @@ class CategoryController
         return view('shop.catalog.taxon', [
             'category' => $category,
 //            'taxonModel' => TaxonModel::findByKey($category->getKey()),
-            'products' => $this->gridRepository->filterByTaxa($activeTaxons->pluck('key'))->paginate(12)->getResults(),
+            'products' => $this->gridRepository->filterByTaxonKeys($activeTaxons->pluck('key'))->paginate(12)->getResults(),
             'filterTaxons' => $filterTaxons,
             'activeTaxons' => collect($activeTaxons->removeNode($category)->all()),
         ]);

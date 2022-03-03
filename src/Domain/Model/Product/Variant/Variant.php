@@ -70,14 +70,14 @@ final class Variant implements ChildEntity
             'tax_rate' => $this->unitPrice->getTaxRate()->toPercentage()->get(),
             'includes_vat' => $this->unitPrice->includesTax(),
 
-            'options' => array_values(array_map(function(array $option){
+            'options' => json_encode(array_values(array_map(function(array $option){
                 return [
                     'option_id' => $option['option_id']->get(),
                     'option_value_id' => $option['option_value_id']->get(),
                 ];
-            }, $this->options)),
+            }, $this->options))),
 
-            'data' => $this->data,
+            'data' => json_encode($this->data),
         ];
     }
 
@@ -94,10 +94,8 @@ final class Variant implements ChildEntity
         $variant->variantId = VariantId::fromString($state['variant_id']);
         $variant->unitPrice = VariantUnitPrice::fromScalars($state['unit_price'], 'EUR', $state['tax_rate'], $state['includes_vat']);
         $variant->salePrice = VariantSalePrice::fromScalars($state['sale_price'], 'EUR', $state['tax_rate'], $state['includes_vat']);
-        $variant->setOptions($state['options']);
-
-
-        $variant->data = $state['data'];
+        $variant->setOptions(json_decode($state['options']));
+        $variant->data = json_decode($state['data']);
 
         return $variant;
     }

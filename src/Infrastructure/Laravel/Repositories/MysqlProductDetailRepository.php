@@ -15,11 +15,6 @@ class MysqlProductDetailRepository implements ProductDetailRepository
     private static string $productTable = 'trader_products';
     private static string $variantTable = 'trader_product_variants';
 
-    public function __construct(TraderConfig $traderConfig)
-    {
-        $this->locale = $traderConfig->getDefaultLocale();
-    }
-
     public function findProductDetail(VariantId $variantId): ProductDetail
     {
         // Basic builder query
@@ -42,6 +37,6 @@ class MysqlProductDetailRepository implements ProductDetailRepository
 
         return ProductDetail::fromMappedData(array_merge($state, [
             'includes_tax' => (bool) $state['includes_tax'],
-        ]), $this->locale);
+        ]));
     }
 }

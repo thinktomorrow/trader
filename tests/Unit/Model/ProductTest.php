@@ -183,27 +183,4 @@ class ProductTest extends TestCase
             new VariantDeleted(ProductId::fromString('xxx'), VariantId::fromString('yyy')),
         ], $product->releaseEvents());
     }
-
-    private function createdProduct(): Product
-    {
-        $product = Product::create(ProductId::fromString('xxx'));
-
-        return $product;
-    }
-
-    private function createdProductWithVariant(): Product
-    {
-        $product = $this->createdProduct();
-
-        $product->addVariant(Variant::create(
-            ProductId::fromString('xxx'),
-            VariantId::fromString('yyy'),
-            VariantUnitPrice::fromMoney(
-                Money::EUR(10), TaxRate::fromString('20'), false
-            ),
-            VariantSalePrice::fromMoney(Money::EUR(8), TaxRate::fromString('20'), false),
-        ));
-
-        return $product;
-    }
 }

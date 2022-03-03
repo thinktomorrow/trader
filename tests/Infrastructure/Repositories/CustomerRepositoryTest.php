@@ -1,14 +1,15 @@
 <?php
 declare(strict_types=1);
 
-namespace Tests\Infrastructure;
+namespace Tests\Infrastructure\Repositories;
 
+use Tests\Infrastructure\TestCase;
 use Thinktomorrow\Trader\Domain\Common\Email;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Thinktomorrow\Trader\Domain\Model\Customer\Customer;
 use Thinktomorrow\Trader\Domain\Model\Customer\CustomerId;
-use Thinktomorrow\Trader\Infrastructure\Test\InMemoryCustomerRepository;
 use Thinktomorrow\Trader\Domain\Model\Customer\Exceptions\CouldNotFindCustomer;
+use Thinktomorrow\Trader\Infrastructure\Test\Repositories\InMemoryCustomerRepository;
 use Thinktomorrow\Trader\Infrastructure\Laravel\Repositories\MysqlCustomerRepository;
 
 final class CustomerRepositoryTest extends TestCase
@@ -21,11 +22,11 @@ final class CustomerRepositoryTest extends TestCase
      */
     public function it_can_save_an_customer(Customer $customer)
     {
-        foreach($this->customerRepositories() as $customerRepository) {
-            $customerRepository->save($customer);
+        foreach($this->repositories() as $repository) {
+            $repository->save($customer);
             $customer->releaseEvents();
 
-            $this->assertEquals($customer, $customerRepository->find($customer->customerId));
+            $this->assertEquals($customer, $repository->find($customer->customerId));
         }
     }
 
@@ -35,11 +36,11 @@ final class CustomerRepositoryTest extends TestCase
      */
     public function it_can_find_an_customer(Customer $customer)
     {
-        foreach($this->customerRepositories() as $customerRepository) {
-            $customerRepository->save($customer);
+        foreach($this->repositories() as $repository) {
+            $repository->save($customer);
             $customer->releaseEvents();
 
-            $this->assertEquals($customer, $customerRepository->find($customer->customerId));
+            $this->assertEquals($customer, $repository->find($customer->customerId));
         }
     }
 
@@ -51,29 +52,29 @@ final class CustomerRepositoryTest extends TestCase
     {
         $customersNotFound = 0;
 
-        foreach($this->customerRepositories() as $customerRepository) {
-            $customerRepository->save($customer);
-            $customerRepository->delete($customer->customerId);
+        foreach($this->repositories() as $repository) {
+            $repository->save($customer);
+            $repository->delete($customer->customerId);
 
             try{
-                $customerRepository->find($customer->customerId);
+                $repository->find($customer->customerId);
             } catch (CouldNotFindCustomer $e) {
                 $customersNotFound++;
             }
         }
 
-        $this->assertEquals(count(iterator_to_array($this->customerRepositories())), $customersNotFound);
+        $this->assertEquals(count(iterator_to_array($this->repositories())), $customersNotFound);
     }
 
     /** @test */
     public function it_can_generate_a_next_reference()
     {
-        foreach($this->customerRepositories() as $customerRepository) {
-            $this->assertInstanceOf(CustomerId::class, $customerRepository->nextReference());
+        foreach($this->repositories() as $repository) {
+            $this->assertInstanceOf(CustomerId::class, $repository->nextReference());
         }
     }
 
-    private function customerRepositories(): \Generator
+    private function repositories(): \Generator
     {
         yield new InMemoryCustomerRepository();
         yield new MysqlCustomerRepository();

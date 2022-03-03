@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace Thinktomorrow\Trader\Application\Product\ProductDetail;
 
 use Thinktomorrow\Trader\Domain\Common\Locale;
+use Thinktomorrow\Trader\Application\Common\RendersData;
 use Thinktomorrow\Trader\Application\Product\RendersPrices;
 use Thinktomorrow\Trader\Domain\Model\Product\Variant\VariantId;
 use Thinktomorrow\Trader\Domain\Model\Product\Variant\VariantSalePrice;
@@ -12,11 +13,11 @@ use Thinktomorrow\Trader\Domain\Model\Product\Variant\VariantUnitPrice;
 class ProductDetail
 {
     use RendersPrices;
+    use RendersData;
 
     private VariantId $variantId;
-    private string $title;
+    private array $data;
 
-    // Set default on construct...
     private Locale $locale;
 
     private function __construct()
@@ -24,23 +25,14 @@ class ProductDetail
 
     }
 
-    public static function fromMappedData(array $state, Locale $locale): static
+    public static function fromMappedData(array $state): static
     {
         $item = new static();
-        $item->locale = $locale;
+
         $item->variantId = VariantId::fromString($state['variant_id']);
         $item->salePrice = VariantSalePrice::fromScalars($state['sale_price'], 'EUR', $state['tax_rate'], $state['includes_tax']);
         $item->unitPrice = VariantUnitPrice::fromScalars($state['unit_price'], 'EUR', $state['tax_rate'], $state['includes_tax']);
-
-        $item->title = 'ddkdkdk';
-
-        if(is_array($state['data'])) {
-            // Maybe do this in repository?
-//            $item->title = isset($state['data']['title'])
-
-        }
-
-        // TODO: how te set dafult cuurnenen!!!
+        $item->data = $state['data'];
 
         return $item;
     }
@@ -52,10 +44,20 @@ class ProductDetail
 
     public function getTitle(): string
     {
-        return $this->title;
+        return $this->data('title');
     }
 
     public function getThumbUrl(): string
+    {
+
+    }
+
+//    public function getOtherProducts(): array
+//    {
+//
+//    }
+
+    public function getImages(): array
     {
 
     }

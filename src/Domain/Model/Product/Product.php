@@ -59,6 +59,8 @@ class Product implements Aggregate
         $product = new static();
         $product->productId = ProductId::fromString($state['product_id']);
 
+        $product->variants = array_map(fn($variantState) => Variant::fromMappedData($variantState, $state), $childEntities[Variant::class]);
+
         return $product;
     }
 }

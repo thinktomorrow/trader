@@ -5,7 +5,7 @@ namespace Thinktomorrow\Trader\Application\Cart\VariantForCart;
 
 use Thinktomorrow\Trader\Domain\Model\Product\Variant\VariantId;
 
-interface FindVariantForCart
+interface VariantForCartRepository
 {
     public function findVariantForCart(VariantId $variantId): VariantForCart;
 }

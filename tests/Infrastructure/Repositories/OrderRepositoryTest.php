@@ -1,14 +1,15 @@
 <?php
 declare(strict_types=1);
 
-namespace Tests\Infrastructure;
+namespace Tests\Infrastructure\Repositories;
 
+use Tests\Infrastructure\TestCase;
 use Thinktomorrow\Trader\Domain\Model\Order\Order;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Thinktomorrow\Trader\Domain\Model\Order\OrderId;
 use Thinktomorrow\Trader\Domain\Model\Order\Shipping\ShippingId;
-use Thinktomorrow\Trader\Infrastructure\Test\InMemoryOrderRepository;
 use Thinktomorrow\Trader\Domain\Model\Order\Exceptions\CouldNotFindOrder;
+use Thinktomorrow\Trader\Infrastructure\Test\Repositories\InMemoryOrderRepository;
 use Thinktomorrow\Trader\Infrastructure\Laravel\Repositories\MysqlOrderRepository;
 
 final class OrderRepositoryTest extends TestCase

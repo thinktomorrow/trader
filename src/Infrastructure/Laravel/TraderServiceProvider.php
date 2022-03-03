@@ -18,10 +18,10 @@ use Thinktomorrow\Trader\Domain\Model\ShippingProfile\ShippingProfileRepository;
 use Thinktomorrow\Trader\Infrastructure\Laravel\Repositories\MysqlGridRepository;
 use Thinktomorrow\Trader\Infrastructure\Laravel\Repositories\MysqlOrderRepository;
 use Thinktomorrow\Trader\Application\Product\ProductDetail\ProductDetailRepository;
-use Thinktomorrow\Trader\Infrastructure\Laravel\Repositories\MysqlFindVariantForCart;
+use Thinktomorrow\Trader\Infrastructure\Laravel\Repositories\MysqlVariantRepository;
 use Thinktomorrow\Trader\Infrastructure\Laravel\Repositories\MysqlCustomerRepository;
 use Thinktomorrow\Trader\Infrastructure\Laravel\Repositories\MysqlProductDetailRepository;
-use Thinktomorrow\Trader\Application\Cart\VariantForCart\FindVariantForCart;
+use Thinktomorrow\Trader\Application\Cart\VariantForCart\VariantForCartRepository;
 use Thinktomorrow\Trader\Infrastructure\Laravel\Repositories\MysqlPaymentMethodRepository;
 use Thinktomorrow\Trader\Infrastructure\Laravel\Repositories\MysqlCustomerLoginRepository;
 use Thinktomorrow\Trader\Infrastructure\Laravel\Repositories\MysqlShippingProfileRepository;
@@ -37,7 +37,7 @@ class TraderServiceProvider extends ServiceProvider
         // Product
         $this->app->bind(GridRepository::class, MysqlGridRepository::class);
         $this->app->bind(ProductDetailRepository::class, MysqlProductDetailRepository::class);
-        $this->app->bind(FindVariantForCart::class, MysqlFindVariantForCart::class);
+        $this->app->bind(VariantForCartRepository::class, MysqlVariantRepository::class);
 
         // Order
         $this->app->bind(OrderRepository::class, MysqlOrderRepository::class);
