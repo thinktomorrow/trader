@@ -11,7 +11,7 @@ class VariantForProductOption
     public readonly VariantId $variantId;
     private VariantOptions $options;
 
-    public function __construct(VariantId $variantId, VariantOptions $options)
+    private function __construct(VariantId $variantId, VariantOptions $options)
     {
         $this->variantId = $variantId;
         $this->options = $options;
@@ -35,5 +35,20 @@ class VariantForProductOption
     public function getUrl(): string
     {
 
+    }
+
+    public static function fromMappedData(array $state, array $optionValueStates): static
+    {
+        return new static(
+            VariantId::fromString($state['variant_id']),
+            static::createOptions($optionValueStates)
+        );
+    }
+
+    private static function createOptions(array $optionValueStates)
+    {
+        return VariantOptions::fromType(array_map(function($optionValueState){
+            return ProductOption::fromMappedData($optionValueState);
+        }, $optionValueStates));
     }
 }

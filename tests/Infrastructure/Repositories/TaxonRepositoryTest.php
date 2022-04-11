@@ -20,7 +20,7 @@ final class TaxonRepositoryTest extends TestCase
      * @test
      * @dataProvider taxons
      */
-    public function it_can_save_an_taxon(Taxon $taxon)
+    public function it_can_save_and_find_a_taxon(Taxon $taxon)
     {
         foreach($this->taxonRepositories() as $taxonRepository) {
             $taxonRepository->save($taxon);
@@ -34,21 +34,7 @@ final class TaxonRepositoryTest extends TestCase
      * @test
      * @dataProvider taxons
      */
-    public function it_can_find_an_taxon(Taxon $taxon)
-    {
-        foreach($this->taxonRepositories() as $taxonRepository) {
-            $taxonRepository->save($taxon);
-            $taxon->releaseEvents();
-
-            $this->assertEquals($taxon, $taxonRepository->find($taxon->taxonId));
-        }
-    }
-
-    /**
-     * @test
-     * @dataProvider taxons
-     */
-    public function it_can_delete_an_taxon(Taxon $taxon)
+    public function it_can_delete_a_taxon(Taxon $taxon)
     {
         $taxonsNotFound = 0;
 

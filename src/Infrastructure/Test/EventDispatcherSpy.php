@@ -14,9 +14,12 @@ final class EventDispatcherSpy implements EventDispatcher
         $this->dispatchedEvents = array_merge($this->dispatchedEvents, $events);
     }
 
-    public function getDispatchedEvents(): array
+    public function releaseDispatchedEvents(): array
     {
-        return $this->dispatchedEvents;
+        $events = $this->dispatchedEvents;
+        $this->clear();
+
+        return $events;
     }
 
     public function clear(): void

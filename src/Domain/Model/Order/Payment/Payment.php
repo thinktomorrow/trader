@@ -97,7 +97,7 @@ class Payment
         $payment->paymentCost = PaymentCost::fromScalars(
             $state['cost'], 'EUR', $state['tax_rate'], $state['includes_vat']
         );
-        $payment->data = json_decode($state['data']);
+        $payment->data = json_decode($state['data'], true);
 
         return $payment;
     }

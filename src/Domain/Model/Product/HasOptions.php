@@ -3,68 +3,75 @@ declare(strict_types=1);
 
 namespace Thinktomorrow\Trader\Domain\Model\Product;
 
+use Assert\Assertion;
 use Thinktomorrow\Trader\Domain\Model\Product\Option\Option;
 use Thinktomorrow\Trader\Domain\Model\Product\Option\OptionId;
-use Thinktomorrow\Trader\Domain\Model\Product\Event\OptionAdded;
-use Thinktomorrow\Trader\Domain\Model\Product\Event\OptionUpdated;
-use Thinktomorrow\Trader\Domain\Model\Product\Event\OptionDeleted;
+use Thinktomorrow\Trader\Domain\Model\Product\Variant\VariantId;
+use Thinktomorrow\Trader\Domain\Model\Product\Event\OptionsUpdated;
+use Thinktomorrow\Trader\Domain\Model\Product\Option\OptionValueId;
+use Thinktomorrow\Trader\Domain\Model\Product\Event\OptionValuesUpdated;
 use Thinktomorrow\Trader\Domain\Model\Product\Exceptions\CouldNotFindOptionOnProduct;
-use Thinktomorrow\Trader\Domain\Model\Product\Exceptions\OptionAlreadyExistsOnProduct;
 
 trait HasOptions
 {
     private array $options = [];
 
-    public function addOption(Option $option): void
+    public function getNextOptionId(): OptionId
     {
-        // TODO CHeck if this option is one of the product ones
-        if (null !== $this->findOptionIndex($option->optionId)) {
-            throw new OptionAlreadyExistsOnProduct(
-                'Cannot add option ['.$option->optionId->get().'] because product ['.$this->productId->get().'] already has a variant with option combination.'
-            );
+        $i = mt_rand(1,999);
+        $nextOptionId = OptionId::fromString($this->productId->get() . '_' . $i);
+
+        while($this->hasOption($nextOptionId)) {
+            $nextOptionId = OptionId::fromString($this->productId->get() . '_' . ++$i);
         }
 
-        $this->options[] = $option;
-
-        $this->recordEvent(new OptionAdded($this->productId, $option->optionId));
+        return $nextOptionId;
     }
 
-    public function updateOptionValueIds(OptionId $optionId, array $optionValueIds): void
+    public function updateOptions(array $options): void
     {
-        // TODO: check uniqueness of options
+        Assertion::allIsInstanceOf($options, Option::class);
 
-        if (null === $optionIndex = $this->findOptionIndex($optionId)) {
+        foreach($options as $option) {
+            $this->options[$option->optionId->get()] = $option;
+        }
+
+        $this->recordEvent(new OptionsUpdated($this->productId));
+    }
+
+    public function assignOptionValueToVariant(OptionValueId $optionValueId, VariantId $variantId): void
+    {
+        /** @var Option $option */
+        foreach($this->options as $option) {
+            if($option->hasOptionValue($optionValueId)) {
+                $optionValue = $option->findOptionValue($optionValueId)->addToVariant($variantId);
+                $option->updateOptionValue($optionValue);
+            }
+        }
+    }
+
+    private function hasOption(OptionId $optionId): bool
+    {
+        /** @var Option $option */
+        foreach($this->options as $option) {
+            if($option->optionId->equals($optionId)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    public function updateOptionValues(OptionId $optionId, array $optionValues): void
+    {
+        if (!$this->hasOption($optionId)) {
             throw new CouldNotFindOptionOnProduct(
                 'Cannot update option because product ['.$this->productId->get().'] has no option by id ['.$optionId->get().']'
             );
         }
 
-        $this->options[$optionIndex]->updateOptionValueIds($optionValueIds);
+        $this->options[$optionId->get()]->updateOptionValues($optionValues);
 
-        $this->recordEvent(new OptionUpdated($this->productId, $optionId));
-    }
-
-    public function deleteOption(OptionId $optionId): void
-    {
-        if (null === $optionIndex = $this->findOptionIndex($optionId)) {
-            throw new CouldNotFindOptionOnProduct(
-                'Cannot delete option because product ['.$this->productId->get().'] has no option by id ['.$optionId->get().']'
-            );
-        }
-
-        unset($this->options[$optionIndex]);
-
-        $this->recordEvent(new OptionDeleted($this->productId, $optionId));
-    }
-
-    private function findOptionIndex(OptionId $optionId): ?int
-    {
-        foreach ($this->options as $index => $option) {
-            if ($optionId->equals($option->optionId)) {
-                return $index;
-            }
-        }
-
-        return null;
+        $this->recordEvent(new OptionValuesUpdated($this->productId, $optionId));
     }
 }

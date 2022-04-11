@@ -16,28 +16,13 @@ final class OrderRepositoryTest extends TestCase
 {
     use RefreshDatabase;
 
-
     /**
      * @test
      * @dataProvider orders
      */
-    public function it_can_save_an_order(Order $order)
+    public function it_can_save_and_find_an_order(Order $order)
     {
-        foreach($this->orderRepositories() as $orderRepository) {
-            $orderRepository->save($order);
-            $order->releaseEvents();
-
-            $this->assertEquals($order, $orderRepository->find($order->orderId));
-        }
-    }
-
-    /**
-     * @test
-     * @dataProvider orders
-     */
-    public function it_can_find_an_order(Order $order)
-    {
-        foreach($this->orderRepositories() as $orderRepository) {
+        foreach ($this->orderRepositories() as $orderRepository) {
             $orderRepository->save($order);
             $order->releaseEvents();
 
@@ -53,11 +38,11 @@ final class OrderRepositoryTest extends TestCase
     {
         $ordersNotFound = 0;
 
-        foreach($this->orderRepositories() as $orderRepository) {
+        foreach ($this->orderRepositories() as $orderRepository) {
             $orderRepository->save($order);
             $orderRepository->delete($order->orderId);
 
-            try{
+            try {
                 $orderRepository->find($order->orderId);
             } catch (CouldNotFindOrder $e) {
                 $ordersNotFound++;
@@ -70,7 +55,7 @@ final class OrderRepositoryTest extends TestCase
     /** @test */
     public function it_can_generate_a_next_reference()
     {
-        foreach($this->orderRepositories() as $orderRepository) {
+        foreach ($this->orderRepositories() as $orderRepository) {
             $this->assertInstanceOf(OrderId::class, $orderRepository->nextReference());
         }
     }
@@ -78,7 +63,7 @@ final class OrderRepositoryTest extends TestCase
     /** @test */
     public function it_can_generate_a_next_shipping_reference()
     {
-        foreach($this->orderRepositories() as $orderRepository) {
+        foreach ($this->orderRepositories() as $orderRepository) {
             $this->assertInstanceOf(ShippingId::class, $orderRepository->nextShippingReference());
         }
     }
@@ -93,8 +78,10 @@ final class OrderRepositoryTest extends TestCase
     {
         yield [$this->createdOrder()];
 
-        yield [Order::create(
-            OrderId::fromString('xxx'),
-        )];
+        yield [
+            Order::create(
+                OrderId::fromString('xxx'),
+            ),
+        ];
     }
 }

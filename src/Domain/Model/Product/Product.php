@@ -3,27 +3,27 @@ declare(strict_types=1);
 
 namespace Thinktomorrow\Trader\Domain\Model\Product;
 
+use Thinktomorrow\Trader\Domain\Model\Taxon\TaxonId;
 use Thinktomorrow\Trader\Domain\Common\Entity\HasData;
 use Thinktomorrow\Trader\Domain\Common\Entity\Aggregate;
 use Thinktomorrow\Trader\Domain\Common\Event\RecordsEvents;
+use Thinktomorrow\Trader\Domain\Model\Product\Option\Option;
 use Thinktomorrow\Trader\Domain\Model\Product\Variant\Variant;
-use Thinktomorrow\Trader\Domain\Model\Product\Event\ProductAdded;
+use Thinktomorrow\Trader\Domain\Model\Product\Event\ProductCreated;
+use Thinktomorrow\Trader\Domain\Model\Product\Option\OptionValue;
+use Thinktomorrow\Trader\Domain\Model\Product\Event\ProductDataUpdated;
 
 class Product implements Aggregate
 {
     use RecordsEvents;
     use HasOptions;
     use HasVariants;
-    use HasData;
+    use BelongsToTaxa;
+    use HasData{
+        addData as defaultAddData;
+    }
 
     public readonly ProductId $productId;
-    private array $taxa;
-
-    // TODO
-    private array $options = [
-        // Option (optionId,
-        // view: list all options with their variant link
-    ];
 
     private function __construct()
     {
@@ -35,15 +35,24 @@ class Product implements Aggregate
         $product = new static();
         $product->productId = $productId;
 
-        $product->recordEvent(new ProductAdded($product->productId));
+        $product->recordEvent(new ProductCreated($product->productId));
 
         return $product;
+    }
+
+    public function addData(array $data): void
+    {
+        $this->defaultAddData($data);
+
+        $this->recordEvent(new ProductDataUpdated($this->productId));
     }
 
     public function getMappedData(): array
     {
         return [
             'product_id' => $this->productId->get(),
+            'taxon_ids' => array_map(fn($taxonId) => $taxonId->get(), $this->taxonIds),
+            'data' => json_encode($this->data),
         ];
     }
 
@@ -51,6 +60,10 @@ class Product implements Aggregate
     {
         return [
             Variant::class => array_map(fn(Variant $variant) => $variant->getMappedData(), $this->variants),
+            Option::class => array_map(fn(Option $option) =>
+                array_merge($option->getMappedData(), ['values' => $option->getChildEntities()[OptionValue::class]]),
+                array_values($this->options)
+            ),
         ];
     }
 
@@ -59,7 +72,18 @@ class Product implements Aggregate
         $product = new static();
         $product->productId = ProductId::fromString($state['product_id']);
 
-        $product->variants = array_map(fn($variantState) => Variant::fromMappedData($variantState, $state), $childEntities[Variant::class]);
+        if(array_key_exists(Variant::class, $childEntities)) {
+            $product->variants = array_map(fn($variantState) => Variant::fromMappedData($variantState, $state), $childEntities[Variant::class]);
+        }
+
+        if(array_key_exists(Option::class, $childEntities)) {
+            foreach($childEntities[Option::class] as $optionState) {
+                $product->options[$optionState['option_id']] = Option::fromMappedData($optionState, $state, [OptionValue::class => $optionState['values']]);
+            }
+        }
+
+        $product->data = json_decode($state['data'], true);
+        $product->taxonIds = array_map(fn($taxonId) => TaxonId::fromString($taxonId), $state['taxon_ids']);
 
         return $product;
     }

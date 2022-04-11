@@ -12,6 +12,7 @@ class VariantOptions extends ArrayCollection
     {
         Assertion::allIsInstanceOf($items, ProductOption::class);
 
+        // TODO: this should also be constrainted in the domain variant model
         static::assertOneValuePerOption($items);
 
         return new static($items);
@@ -19,8 +20,8 @@ class VariantOptions extends ArrayCollection
 
     /**
      * Merges a new option value into this set of variant options. Specifically for variant options it is
-     * important that each option is only represented once. So this new option value will replace
-     * an option value that shares the same option.
+     * important that each option is only represented once. So a new option value will always replace
+     * an option value with the same option reference.
      */
     public function merge(ProductOption $option): static
     {
@@ -41,6 +42,7 @@ class VariantOptions extends ArrayCollection
 //        return array_map(fn($item) => $item->optionValueId->get(), $this->items);
 //    }
 
+    // TODO: this should be in domain
     private static function assertOneValuePerOption(array $items)
     {
         $optionIds = [];

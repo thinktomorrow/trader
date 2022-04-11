@@ -155,7 +155,7 @@ final class Order implements Aggregate
         $order->payment = $childEntities[Payment::class] ? Payment::fromMappedData($childEntities[Payment::class], $state) : null;
         $order->shopper = $childEntities[Shopper::class] ? Shopper::fromMappedData($childEntities[Shopper::class], $state) : null;
 
-        $order->data = json_decode($state['data']);
+        $order->data = json_decode($state['data'], true);
 
         return $order;
     }

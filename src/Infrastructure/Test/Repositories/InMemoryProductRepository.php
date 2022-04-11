@@ -5,13 +5,12 @@ namespace Thinktomorrow\Trader\Infrastructure\Test\Repositories;
 
 use Thinktomorrow\Trader\Domain\Model\Product\Product;
 use Thinktomorrow\Trader\Domain\Model\Product\ProductId;
-use Thinktomorrow\Trader\Domain\Model\Product\ProductRepository;
 use Thinktomorrow\Trader\Domain\Model\Product\Variant\VariantId;
+use Thinktomorrow\Trader\Domain\Model\Product\ProductRepository;
 use Thinktomorrow\Trader\Application\Cart\VariantForCart\VariantForCart;
 use Thinktomorrow\Trader\Domain\Model\Product\Exceptions\CouldNotFindProduct;
-use Thinktomorrow\Trader\Application\Cart\VariantForCart\VariantForCartRepository;
 
-final class InMemoryProductRepository implements ProductRepository, VariantForCartRepository
+final class InMemoryProductRepository implements ProductRepository
 {
     private static array $products = [];
 

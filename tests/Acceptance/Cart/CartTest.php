@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 
-namespace Tests\Acceptance;
+namespace Tests\Acceptance\Cart;
 
 use Thinktomorrow\Trader\Application\Cart\ChooseBillingAddress;
 use Thinktomorrow\Trader\Application\Cart\ChooseShippingAddress;

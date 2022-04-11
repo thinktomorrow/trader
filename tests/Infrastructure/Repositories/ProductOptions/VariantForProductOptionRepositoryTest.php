@@ -10,6 +10,9 @@ use Thinktomorrow\Trader\Domain\Model\Customer\Customer;
 use Thinktomorrow\Trader\Domain\Model\Product\ProductId;
 use Thinktomorrow\Trader\Domain\Model\Customer\CustomerId;
 use Thinktomorrow\Trader\Infrastructure\Laravel\Repositories\MysqlVariantRepository;
+use Thinktomorrow\Trader\Infrastructure\Test\Repositories\InMemoryProductRepository;
+use Thinktomorrow\Trader\Infrastructure\Laravel\Repositories\MysqlProductRepository;
+use Thinktomorrow\Trader\Infrastructure\Test\Repositories\InMemoryVariantRepository;
 use Thinktomorrow\Trader\Application\Product\ProductOptions\VariantForProductOptionRepository;
 
 final class VariantForProductOptionRepositoryTest extends TestCase
@@ -19,31 +22,31 @@ final class VariantForProductOptionRepositoryTest extends TestCase
     /** @test */
     public function it_can_get_all_variants()
     {
-        $product = $this->createdProductWithVariant();
-
-        // TODO: Save the product first...
+        $product = $this->createdProductWithOptions();
 
         /** @var VariantForProductOptionRepository $repository */
-        foreach($this->repositories() as $repository) {
-            $variants = $repository->getVariantsForProductOption(ProductId::fromString('xxx'));
-            dd($variants);
+        foreach($this->repositories() as $repositories) {
+            $productRepository = $repositories[0];
+            $variantRepository = $repositories[1];
+
+            $productRepository->save($product);
+
+            $variants = $variantRepository->getVariantsForProductOption($product->productId);
+            $this->assertCount(1, $variants);
+            $this->assertCount(2, $variants[0]->getOptions());
         }
     }
 
     private function repositories(): \Generator
     {
-//        yield new InMemoryCustomerRepository();
-        yield new MysqlVariantRepository();
-    }
+        yield [
+            new InMemoryProductRepository(),
+            new InMemoryVariantRepository(new InMemoryProductRepository()),
+        ];
 
-    public function customers(): \Generator
-    {
-        yield [$this->createdCustomer()];
-
-        yield [Customer::create(
-            CustomerId::fromString('xxx'),
-            Email::fromString('ben@thinktomorrow.be'),
-            'Ben', 'Cavens'
-        )];
+        yield [
+            new MysqlProductRepository(),
+            new MysqlVariantRepository(),
+        ];
     }
 }

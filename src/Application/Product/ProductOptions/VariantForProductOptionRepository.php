@@ -7,5 +7,5 @@ use Thinktomorrow\Trader\Domain\Model\Product\ProductId;
 
 interface VariantForProductOptionRepository
 {
-    public function getVariantsForProductOption(ProductId $productId): Variants;
+    public function getVariantsForProductOption(ProductId $productId): VariantForProductOptionCollection;
 }

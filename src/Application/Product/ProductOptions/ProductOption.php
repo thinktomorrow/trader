@@ -55,4 +55,17 @@ class ProductOption
     {
         $this->isActive = $isActive;
     }
+
+    public static function fromMappedData(array $state): static
+    {
+        if(!isset($state['option_id'])) {
+            trap($state);
+        }
+
+        return new static(
+            OptionId::fromString($state['option_id']),
+            OptionValueId::fromString($state['option_value_id']),
+            json_decode($state['data'], true)
+        );
+    }
 }

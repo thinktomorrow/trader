@@ -6,7 +6,7 @@ namespace Thinktomorrow\Trader\Domain\Model\Product\Event;
 use Thinktomorrow\Trader\Domain\Model\Product\ProductId;
 use Thinktomorrow\Trader\Domain\Model\Product\Option\OptionId;
 
-final class OptionDeleted
+final class OptionValuesUpdated
 {
     public readonly ProductId $productId;
     public readonly OptionId $optionId;

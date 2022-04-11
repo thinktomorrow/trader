@@ -16,15 +16,19 @@ use Thinktomorrow\Trader\Domain\Model\Customer\Customer;
 use Thinktomorrow\Trader\Domain\Model\Product\ProductId;
 use Thinktomorrow\Trader\Domain\Model\Customer\CustomerId;
 use Thinktomorrow\Trader\Domain\Model\Order\Payment\Payment;
+use Thinktomorrow\Trader\Domain\Model\Product\Option\Option;
+use Thinktomorrow\Trader\Domain\Model\Product\Variant\Variant;
 use Thinktomorrow\Trader\Domain\Model\Order\Discount\Discount;
 use Thinktomorrow\Trader\Domain\Model\Order\Shipping\Shipping;
-use Thinktomorrow\Trader\Domain\Model\Product\Variant\Variant;
+use Thinktomorrow\Trader\Domain\Model\Product\Option\OptionId;
 use Thinktomorrow\Trader\Domain\Model\Product\Variant\VariantId;
 use Thinktomorrow\Trader\Domain\Model\Order\Payment\PaymentState;
+use Thinktomorrow\Trader\Domain\Model\Product\Option\OptionValue;
 use Thinktomorrow\Trader\Domain\Model\CustomerLogin\CustomerLogin;
 use Thinktomorrow\Trader\Domain\Model\Customer\CustomerRepository;
 use Thinktomorrow\Trader\Domain\Model\Order\Payment\BillingAddress;
 use Thinktomorrow\Trader\Domain\Model\Order\Shipping\ShippingState;
+use Thinktomorrow\Trader\Domain\Model\Product\Option\OptionValueId;
 use Thinktomorrow\Trader\Domain\Model\Order\Shipping\ShippingAddress;
 use Thinktomorrow\Trader\Domain\Model\Product\Variant\VariantUnitPrice;
 use Thinktomorrow\Trader\Domain\Model\Product\Variant\VariantSalePrice;
@@ -176,19 +180,148 @@ trait TestHelpers
         return Product::create(ProductId::fromString('xxx'));
     }
 
-    protected function createdProductWithVariant(): Product
+    protected function createdProductWithOption(): Product
     {
         $product = $this->createdProduct();
 
-        $product->addVariant(Variant::create(
+        $product->updateOptions([
+            $option = Option::create($product->productId, OptionId::fromString('ooo')),
+        ]);
+
+        $option->updateOptionValues([OptionValue::create($option->optionId, OptionValueId::fromString('xxx'), [
+            'label' => [
+                'nl' => 'option label nl',
+                'en' => 'option label en',
+            ],
+            'value' => [
+                'nl' => 'option value nl',
+                'en' => 'option value en',
+            ],
+        ])]);
+
+        $variant = $this->createdVariantWithOption();
+        $product->createVariant($variant);
+
+        return $product;
+    }
+
+    protected function createdProductWithOptions(): Product
+    {
+        $product = $this->createdProduct();
+
+        $product->updateOptions([
+            $option = Option::create($product->productId, OptionId::fromString('ooo')),
+            $option2 = Option::create($product->productId, OptionId::fromString('ppp')),
+        ]);
+
+        $option->updateOptionValues([
+            OptionValue::create($option->optionId, OptionValueId::fromString('xxx'), [
+                'label' => [
+                    'nl' => 'option label nl 1',
+                    'en' => 'option label en 1',
+                ],
+                'value' => [
+                    'nl' => 'option value nl 1',
+                    'en' => 'option value en 1',
+                ],
+            ]),
+            OptionValue::create($option->optionId, OptionValueId::fromString('yyy'), [
+                'label' => [
+                    'nl' => 'option label nl 2',
+                    'en' => 'option label en 2',
+                ],
+                'value' => [
+                    'nl' => 'option value nl 2',
+                    'en' => 'option value en 2',
+                ],
+            ]),
+            OptionValue::create($option2->optionId, OptionValueId::fromString('zzz'), [
+                'label' => [
+                    'nl' => 'option label nl 3',
+                    'en' => 'option label en 3',
+                ],
+                'value' => [
+                    'nl' => 'option value nl 3',
+                    'en' => 'option value en 3',
+                ],
+            ])
+        ]);
+
+        $variant = $this->createdVariantWithOption();
+
+        // TODO: how/where to protect from duplicates (multiple values from same option). In create/updateVariant of product
+        $variant->updateOptionValueIds([
+            OptionValueId::fromString('xxx'),
+//            OptionValueId::fromString('yyy'),
+            OptionValueId::fromString('zzz'),
+        ]);
+        $product->createVariant($variant);
+
+        return $product;
+    }
+
+    protected function createdProductWithVariant(): Product
+    {
+        $product = $this->createdProduct();
+        $variant = $this->createdVariantWithOption();
+
+        $product->createVariant($variant);
+
+        return $product;
+    }
+
+    protected function createdVariant(): Variant
+    {
+        $variant = Variant::create(
             ProductId::fromString('xxx'),
             VariantId::fromString('yyy'),
             VariantUnitPrice::fromMoney(
                 Money::EUR(10), TaxRate::fromString('20'), false
             ),
             VariantSalePrice::fromMoney(Money::EUR(8), TaxRate::fromString('20'), false),
-        ));
+        );
 
-        return $product;
+        return $variant;
+    }
+
+    protected function createdVariantWithOption(): Variant
+    {
+        $variant = Variant::create(
+            ProductId::fromString('xxx'),
+            VariantId::fromString('yyy'),
+            VariantUnitPrice::fromMoney(
+                Money::EUR(10), TaxRate::fromString('20'), false
+            ),
+            VariantSalePrice::fromMoney(Money::EUR(8), TaxRate::fromString('20'), false),
+        );
+
+        $variant->updateOptionValueIds([
+            OptionValueId::fromString('option-value-id'),
+        ]);
+
+        return $variant;
+    }
+
+    protected function assertArrayEqualsWithWildcard(array $expected, array $actual, $message = null): void
+    {
+        $message = $message ?: 'actual array: ' . print_r($actual, true) . ' does not match expected: ' . print_r($expected, true);
+
+        $this->assertEquals(count($expected), count($actual), 'Count doesn\'t match: ' . $message);
+        $this->assertEquals(array_keys($expected), array_keys($actual), 'Keys do not match: ' . $message);
+
+        foreach($expected as $expectedKey => $expectedValue) {
+
+            if(is_array($expectedValue)) {
+                $this->assertArrayEqualsWithWildcard($expectedValue, $actual[$expectedKey], $message);
+                continue;
+            }
+
+            if($expectedValue == '*') {
+                $this->assertNotNull($actual[$expectedKey]);
+                continue;
+            }
+
+            $this->assertEquals($expectedValue, $actual[$expectedKey], $message);
+        }
     }
 }

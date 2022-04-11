@@ -5,6 +5,7 @@ namespace Thinktomorrow\Trader\Domain\Model\Taxon;
 
 use Thinktomorrow\Trader\Domain\Common\Entity\Aggregate;
 use Thinktomorrow\Trader\Domain\Common\Event\RecordsEvents;
+use Thinktomorrow\Trader\Domain\Model\Taxon\Exceptions\InvalidParentTaxonId;
 
 class Taxon implements Aggregate
 {

@@ -9,8 +9,6 @@ use Thinktomorrow\Trader\Domain\Common\Taxes\TaxRate;
 use Thinktomorrow\Trader\Domain\Model\Product\ProductId;
 use Thinktomorrow\Trader\Domain\Model\Product\Variant\Variant;
 use Thinktomorrow\Trader\Domain\Model\Product\Variant\VariantId;
-use Thinktomorrow\Trader\Domain\Model\Product\Event\VariantAdded;
-use Thinktomorrow\Trader\Domain\Model\Product\Event\VariantUpdated;
 use Thinktomorrow\Trader\Domain\Model\Product\Variant\VariantUnitPrice;
 use Thinktomorrow\Trader\Domain\Model\Product\Variant\VariantSalePrice;
 
@@ -34,9 +32,9 @@ class VariantTest extends TestCase
             'unit_price' => $productUnitPrice->getExcludingVat()->getAmount(),
             'sale_price' => $productSalePrice->getExcludingVat()->getAmount(),
             'tax_rate' => $productUnitPrice->getTaxRate()->toPercentage()->get(),
+            'option_value_ids' => [],
             'includes_vat' => false,
-            'options' => [],
-            'data' => [],
+            'data' => json_encode([]),
         ], $variant->getMappedData());
     }
 
@@ -66,7 +64,7 @@ class VariantTest extends TestCase
             ['foo' => 'bar']
         );
 
-        $this->assertEquals(['foo' => 'bar'], $variant->getMappedData()['data']);
+        $this->assertEquals(json_encode(['foo' => 'bar']), $variant->getMappedData()['data']);
     }
 
     /** @test */
@@ -82,23 +80,22 @@ class VariantTest extends TestCase
             ['foo' => 'bar']
         );
 
-        $this->assertEquals(['bar' => 'baz', 'foo' => 'bar'], $variant->getMappedData()['data']);
+        $this->assertEquals(json_encode(['bar' => 'baz', 'foo' => 'bar']), $variant->getMappedData()['data']);
     }
 
     /** @test */
     public function it_can_be_build_from_raw_data()
     {
         $variant = Variant::fromMappedData([
-            'product_id' => 'xxx',
             'variant_id' => 'yyy',
             'unit_price' => 100,
             'sale_price' => 80,
             'tax_rate' => '20',
+            'option_value_ids' => ['option-value-id'],
             'includes_vat' => false,
-            'options' => [
-                ['option_id' => 'eee', 'option_value_id' => 'aaa']
-            ],
-            'data' => ['foo' => 'bar']
+            'data' => json_encode(['foo' => 'bar'])
+        ], [
+            'product_id' => 'xxx',
         ]);
 
         $this->assertEquals(ProductId::fromString('xxx'), $variant->getMappedData()['product_id']);
@@ -107,7 +104,8 @@ class VariantTest extends TestCase
         $this->assertEquals(80, $variant->getMappedData()['sale_price']);
         $this->assertEquals('20', $variant->getMappedData()['tax_rate']);
         $this->assertEquals(false, $variant->getMappedData()['includes_vat']);
-        $this->assertEquals(['foo' => 'bar'], $variant->getMappedData()['data']);
+        $this->assertEquals(['option-value-id'], $variant->getMappedData()['option_value_ids']);
+        $this->assertEquals(json_encode(['foo' => 'bar']), $variant->getMappedData()['data']);
     }
 
     private function createdVariant(): Variant

@@ -3,27 +3,25 @@ declare(strict_types=1);
 
 namespace Tests\Unit\Model;
 
-use Money\Money;
-use PHPUnit\Framework\TestCase;
-use Thinktomorrow\Trader\Domain\Common\Taxes\TaxRate;
+use Tests\Unit\TestCase;
+use Thinktomorrow\Trader\Domain\Model\Taxon\TaxonId;
 use Thinktomorrow\Trader\Domain\Model\Product\Product;
 use Thinktomorrow\Trader\Domain\Model\Product\ProductId;
 use Thinktomorrow\Trader\Domain\Model\Product\Option\Option;
 use Thinktomorrow\Trader\Domain\Model\Product\Variant\Variant;
 use Thinktomorrow\Trader\Domain\Model\Product\Option\OptionId;
 use Thinktomorrow\Trader\Domain\Model\Product\Variant\VariantId;
-use Thinktomorrow\Trader\Domain\Model\Product\Event\OptionAdded;
-use Thinktomorrow\Trader\Domain\Model\Product\Event\VariantAdded;
-use Thinktomorrow\Trader\Domain\Model\Product\Event\ProductAdded;
-use Thinktomorrow\Trader\Domain\Model\Product\Event\OptionUpdated;
-use Thinktomorrow\Trader\Domain\Model\Product\Event\OptionDeleted;
-use Thinktomorrow\Trader\Domain\Model\Product\Event\VariantUpdated;
+use Thinktomorrow\Trader\Domain\Model\Product\Event\ProductCreated;
+use Thinktomorrow\Trader\Domain\Model\Product\Option\OptionValue;
+use Thinktomorrow\Trader\Domain\Model\Product\Event\OptionsUpdated;
 use Thinktomorrow\Trader\Domain\Model\Product\Option\OptionValueId;
+use Thinktomorrow\Trader\Domain\Model\Product\Event\VariantCreated;
 use Thinktomorrow\Trader\Domain\Model\Product\Event\VariantDeleted;
 use Thinktomorrow\Trader\Domain\Model\Product\Variant\VariantUnitPrice;
 use Thinktomorrow\Trader\Domain\Model\Product\Variant\VariantSalePrice;
+use Thinktomorrow\Trader\Domain\Model\Product\Event\ProductTaxaUpdated;
+use Thinktomorrow\Trader\Domain\Model\Product\Event\OptionValuesUpdated;
 use Thinktomorrow\Trader\Domain\Model\Product\Exceptions\CouldNotFindOptionOnProduct;
-use Thinktomorrow\Trader\Domain\Model\Product\Exceptions\OptionAlreadyExistsOnProduct;
 
 class ProductTest extends TestCase
 {
@@ -34,21 +32,54 @@ class ProductTest extends TestCase
 
         $this->assertEquals([
             'product_id' => 'xxx',
+            'taxon_ids' => [],
+            'data' => '[]',
         ], $product->getMappedData());
 
         $this->assertEquals([
-            new ProductAdded(ProductId::fromString('xxx')),
+            new ProductCreated(ProductId::fromString('xxx')),
         ], $product->releaseEvents());
     }
 
     /** @test */
     public function it_can_be_build_from_raw_data()
     {
+        $data = json_encode([
+            'title' => [
+                'nl' => 'title nl',
+                'en' => 'title en',
+            ],
+            'custom' => 'custom-value',
+        ]);
+
         $product = Product::fromMappedData([
             'product_id' => 'xxx',
+            'data' => $data,
+            'taxon_ids' => ['1','2'],
         ]);
 
         $this->assertEquals(ProductId::fromString('xxx'), $product->getMappedData()['product_id']);
+        $this->assertEquals(['1','2'], $product->getMappedData()['taxon_ids']);
+        $this->assertEquals([
+            'nl' => 'title nl',
+            'en' => 'title en',
+        ], $product->getData('title'));
+        $this->assertEquals($data, $product->getMappedData()['data']);
+    }
+
+    /** @test */
+    public function it_can_add_taxon()
+    {
+        $product = $this->createdProduct();
+
+        $product->updateTaxonIds([TaxonId::fromString('zzz')]);
+
+        $this->assertEquals([
+            new ProductCreated(ProductId::fromString('xxx')),
+            new ProductTaxaUpdated(ProductId::fromString('xxx')),
+        ], $product->releaseEvents());
+
+        $this->assertEquals(['zzz'], $product->getMappedData()['taxon_ids']);
     }
 
     /** @test */
@@ -56,71 +87,73 @@ class ProductTest extends TestCase
     {
         $product = $this->createdProduct();
 
-        $product->addOption(Option::create($product->productId, OptionId::fromString('ooo')));
+        $product->updateOptions([Option::create($product->productId, OptionId::fromString('ooo'))]);
 
         $this->assertEquals([
-            new ProductAdded(ProductId::fromString('xxx')),
-            new OptionAdded(ProductId::fromString('xxx'), OptionId::fromString('ooo')),
+            new ProductCreated(ProductId::fromString('xxx')),
+            new OptionsUpdated(ProductId::fromString('xxx')),
         ], $product->releaseEvents());
+
+        $this->assertEquals([
+            [
+                'product_id' => $product->productId->get(),
+                'option_id' => 'ooo',
+                'values' => [],
+            ]
+        ], $product->getChildEntities()[Option::class]);
     }
 
     /** @test */
     public function it_cannot_add_same_option_twice()
     {
-        $this->expectException(OptionAlreadyExistsOnProduct::class);
-
         $product = $this->createdProduct();
 
-        $product->addOption(Option::create($product->productId, OptionId::fromString('ooo')));
-        $product->addOption(Option::create($product->productId, OptionId::fromString('ooo')));
+        $product->updateOptions([Option::create($product->productId, OptionId::fromString('ooo'))]);
+        $product->updateOptions([Option::create($product->productId, OptionId::fromString('ooo'))]);
+
+        $this->assertCount(1, $product->getChildEntities()[Option::class]);
     }
 
     /** @test */
-    public function it_can_update_option()
+    public function it_can_update_option_values()
     {
         $product = $this->createdProduct();
 
-        $product->addOption($option = Option::create($product->productId, OptionId::fromString('ooo')));
-        $product->updateOptionValueIds($option->optionId, [OptionValueId::fromString('ppp')]);
+        $product->updateOptions([$option = Option::create($product->productId, OptionId::fromString('ooo'))]);
+        $option->updateOptionValues([OptionValue::create($option->optionId, OptionValueId::fromString('xxx'), [
+            'label' => [
+                'nl' => 'option value label nl',
+                'en' => 'option value label en',
+            ],
+        ])]);
 
         $this->assertEquals([
-            new ProductAdded(ProductId::fromString('xxx')),
-            new OptionAdded(ProductId::fromString('xxx'), OptionId::fromString('ooo')),
-            new OptionUpdated(ProductId::fromString('xxx'), OptionId::fromString('ooo')),
+            new ProductCreated(ProductId::fromString('xxx')),
+            new OptionsUpdated(ProductId::fromString('xxx')),
         ], $product->releaseEvents());
-    }
-
-    /** @test */
-    public function it_cannot_update_option_that_is_not_present_on_product()
-    {
-        $this->expectException(CouldNotFindOptionOnProduct::class);
-
-        $product = $this->createdProduct();
-        $product->updateOptionValueIds(OptionId::fromString('ooo'), [OptionValueId::fromString('ppp')]);
-    }
-
-    /** @test */
-    public function it_can_delete_option()
-    {
-        $product = $this->createdProduct();
-
-        $product->addOption($option = Option::create($product->productId, OptionId::fromString('ooo')));
-        $product->deleteOption($option->optionId);
 
         $this->assertEquals([
-            new ProductAdded(ProductId::fromString('xxx')),
-            new OptionAdded(ProductId::fromString('xxx'), OptionId::fromString('ooo')),
-            new OptionDeleted(ProductId::fromString('xxx'), OptionId::fromString('ooo')),
-        ], $product->releaseEvents());
-    }
+            new OptionValuesUpdated(ProductId::fromString('xxx'), OptionId::fromString('ooo')),
+        ], $option->releaseEvents());
 
-    /** @test */
-    public function it_cannot_delete_option_that_is_not_present()
-    {
-        $this->expectException(CouldNotFindOptionOnProduct::class);
-
-        $product = $this->createdProduct();
-        $product->deleteOption(OptionId::fromString('ooo'));
+        $this->assertEquals([
+            [
+                'product_id' => $product->productId->get(),
+                'option_id' => 'ooo',
+                'values' => [
+                    [
+                        'option_id' => 'ooo',
+                        'option_value_id' => 'xxx',
+                        'data' => json_encode([
+                            'label' => [
+                                'nl' => 'option value label nl',
+                                'en' => 'option value label en',
+                            ],
+                        ])
+                    ]
+                ],
+            ]
+        ], $product->getChildEntities()[Option::class]);
     }
 
     /** @test */
@@ -129,8 +162,8 @@ class ProductTest extends TestCase
         $product = $this->createdProductWithVariant();
 
         $this->assertEquals([
-            new ProductAdded(ProductId::fromString('xxx')),
-            new VariantAdded(ProductId::fromString('xxx'), VariantId::fromString('yyy')),
+            new ProductCreated(ProductId::fromString('xxx')),
+            new VariantCreated(ProductId::fromString('xxx'), VariantId::fromString('yyy')),
         ], $product->releaseEvents());
     }
 
@@ -141,7 +174,7 @@ class ProductTest extends TestCase
 
         $product = $this->createdProduct();
 
-        $product->addVariant(Variant::create(
+        $product->createVariant(Variant::create(
             ProductId::fromString('false-product-id'),
             VariantId::fromString('yyy'),
             VariantUnitPrice::zero(),
@@ -155,19 +188,16 @@ class ProductTest extends TestCase
     {
         $product = $this->createdProductWithVariant();
 
-        $product->addVariantOptionValue(
-            VariantId::fromString('yyy'), OptionId::fromString('eee'), OptionValueId::fromString('aaa')
-        );
+        $variant = $product->getVariants()[0];
+        $variant->updatePrice(VariantUnitPrice::zero(), VariantSalePrice::zero());
 
-        $product->updateVariantPrice(
-            VariantId::fromString('yyy'), VariantUnitPrice::zero(), VariantSalePrice::zero()
-        );
+        $product->updateVariant($variant);
 
         $this->assertEquals('0', $product->getChildEntities()[Variant::class][0]['unit_price']);
         $this->assertEquals('0', $product->getChildEntities()[Variant::class][0]['sale_price']);
         $this->assertEquals([
-            ['option_id' => 'eee', 'option_value_id' => 'aaa'],
-        ], $product->getChildEntities()[Variant::class][0]['options']);
+            'option-value-id'
+        ], $product->getVariants()[0]->getMappedData()['option_value_ids']);
     }
 
     /** @test */
@@ -178,8 +208,8 @@ class ProductTest extends TestCase
         $product->deleteVariant(VariantId::fromString('yyy'));
 
         $this->assertEquals([
-            new ProductAdded(ProductId::fromString('xxx')),
-            new VariantAdded(ProductId::fromString('xxx'), VariantId::fromString('yyy')),
+            new ProductCreated(ProductId::fromString('xxx')),
+            new VariantCreated(ProductId::fromString('xxx'), VariantId::fromString('yyy')),
             new VariantDeleted(ProductId::fromString('xxx'), VariantId::fromString('yyy')),
         ], $product->releaseEvents());
     }

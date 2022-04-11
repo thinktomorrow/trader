@@ -20,7 +20,7 @@ final class CustomerRepositoryTest extends TestCase
      * @test
      * @dataProvider customers
      */
-    public function it_can_save_an_customer(Customer $customer)
+    public function it_can_save_and_find_a_customer(Customer $customer)
     {
         foreach($this->repositories() as $repository) {
             $repository->save($customer);
@@ -34,21 +34,7 @@ final class CustomerRepositoryTest extends TestCase
      * @test
      * @dataProvider customers
      */
-    public function it_can_find_an_customer(Customer $customer)
-    {
-        foreach($this->repositories() as $repository) {
-            $repository->save($customer);
-            $customer->releaseEvents();
-
-            $this->assertEquals($customer, $repository->find($customer->customerId));
-        }
-    }
-
-    /**
-     * @test
-     * @dataProvider customers
-     */
-    public function it_can_delete_an_customer(Customer $customer)
+    public function it_can_delete_a_customer(Customer $customer)
     {
         $customersNotFound = 0;
 

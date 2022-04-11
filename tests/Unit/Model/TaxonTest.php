@@ -7,7 +7,7 @@ use PHPUnit\Framework\TestCase;
 use Thinktomorrow\Trader\Domain\Model\Taxon\Taxon;
 use Thinktomorrow\Trader\Domain\Model\Taxon\TaxonId;
 use Thinktomorrow\Trader\Domain\Model\Taxon\TaxonState;
-use Thinktomorrow\Trader\Domain\Model\Taxon\InvalidParentTaxonId;
+use Thinktomorrow\Trader\Domain\Model\Taxon\Exceptions\InvalidParentTaxonId;
 
 class TaxonTest extends TestCase
 {

@@ -12,7 +12,7 @@ abstract class ArrayCollection implements Countable, IteratorAggregate, ArrayAcc
 {
     protected array $items;
 
-    private function __construct(array $items)
+    protected function __construct(array $items)
     {
         $this->items = $items;
     }

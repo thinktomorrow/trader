@@ -10,9 +10,9 @@ use Illuminate\Database\Query\Expression;
 use Thinktomorrow\Trader\Domain\Common\Locale;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Thinktomorrow\Trader\Domain\Model\Product\ProductState;
-use Thinktomorrow\Trader\Domain\Model\Product\Variant\VariantState;
 use Thinktomorrow\Trader\Application\Product\Grid\GridItem;
 use Thinktomorrow\Trader\Application\Product\Grid\GridRepository;
+use Thinktomorrow\Trader\Domain\Model\Product\Variant\VariantState;
 use Thinktomorrow\Trader\Application\Product\Grid\NestedTaxonIdsComposer;
 
 class MysqlGridRepository implements GridRepository

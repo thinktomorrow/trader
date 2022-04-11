@@ -90,7 +90,7 @@ final class Shipping implements ChildEntity
         $shipping->shippingCost = ShippingCost::fromScalars(
             $state['cost'], 'EUR', $state['tax_rate'], $state['includes_vat']
         );
-        $shipping->data = json_decode($state['data']);
+        $shipping->data = json_decode($state['data'], true);
 
         return $shipping;
     }

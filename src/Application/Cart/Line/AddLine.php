@@ -29,7 +29,7 @@ final class AddLine
         return OrderId::fromString($this->orderId);
     }
 
-    public function getlineId(): LineId
+    public function getLineId(): LineId
     {
         // TODO: get read model of order in order to get info on lines count so we can get the next lineId
         return LineId::fromString($this->lineId);

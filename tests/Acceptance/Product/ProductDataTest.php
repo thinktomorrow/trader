@@ -1,54 +1,19 @@
 <?php
 declare(strict_types=1);
 
-namespace Tests\Acceptance;
+namespace Tests\Acceptance\Product;
 
-use PHPUnit\Framework\TestCase;
 use Thinktomorrow\Trader\Domain\Common\Locale;
-use Thinktomorrow\Trader\Application\Common\DataRenderer;
 use Thinktomorrow\Trader\Domain\Model\Product\Option\OptionId;
 use Thinktomorrow\Trader\Domain\Model\Product\Option\OptionValueId;
 use Thinktomorrow\Trader\Application\Product\ProductOptions\ProductOption;
 use Thinktomorrow\Trader\Application\Product\ProductOptions\ProductOptions;
 use Thinktomorrow\Trader\Application\Product\ProductOptions\ProductOptionsComposer;
+use function dd;
 
-class ProductOptionsTest extends TestCase
+class ProductDataTest extends ProductContext
 {
-    protected function setUp(): void
-    {
-        parent::setUp();
 
-        DataRenderer::setResolver(function(array $data, string $key, string $language = null, string $default = null)
-        {
-            if(!isset($data[$key])) {
-                return $default;
-            }
-
-            if(!$language) {
-                $language = 'nl';
-            }
-
-            if(isset($data[$key][$language])) {
-                return $data[$key][$language];
-            }
-
-            return $data[$key];
-        });
-    }
-
-    /** @test */
-    public function it_can_render_data()
-    {
-        $productOption = new ProductOption(OptionId::fromString('aaa'), OptionValueId::fromString('aaa-value'), [
-            'label' => 'color',
-            'value' => 'aaa value',
-        ]);
-
-        $this->assertEquals(OptionId::fromString('aaa'), $productOption->optionId);
-        $this->assertEquals(OptionValueId::fromString('aaa-value'), $productOption->optionValueId);
-        $this->assertEquals('color', $productOption->getLabel());
-        $this->assertEquals('aaa value', $productOption->getValue());
-    }
 
     /** @test */
     public function it_can_render_localized_data()
@@ -71,7 +36,7 @@ class ProductOptionsTest extends TestCase
     public function it_can_compose_options()
     {
         $composer = new ProductOptionsComposer(
-            // ProductOptionsRepo
+        // ProductOptionsRepo
         // VariantRepo
         );
 

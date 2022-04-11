@@ -20,8 +20,8 @@ class ProductOptionsComposer
     }
 
     /**
-     * Find the product that has the same options as the referred current product but for a specific option alteration.
-     * This is the action used to determine the links behind each option on the product page.
+     * Compose all possible option combinations relative to the passed product variant. This is the action
+     * used to determine the links behind each option on the product page, so we include an url as well.
      */
     public function get(ProductId $productId, VariantId $variantId): ProductOptions
     {
@@ -29,17 +29,18 @@ class ProductOptionsComposer
         $productOptions = $this->productOptionsRepository->getProductOptions($productId);
 
         // Get all product variants
-        $variants = $this->variantRepository->getVariantsForProductOption($productId);
+        $variants = $this->variantRepository->getVariantsForProductOption($productId, $productOptions);
 
         // Current set of productOptions
         $variant = $variants->find($variantId);
 
-        // Loop over each productOptions as a alternation of this current set
+        // Loop over each productOptions as an alternation of this current set
         // and attach their url if they match with exactly a set of productOptions.
         /** @var ProductOption $productOption */
         foreach($productOptions as $productOption) {
 
-            // merge this option with the variantOptions
+            // merge this option with the variantOptions. The merge will make
+            // sure we don't have more than one option value per option.
             $variantOptions = $variant->getOptions()->merge($productOption);
 
             // Find a variant for this combination?
@@ -52,8 +53,6 @@ class ProductOptionsComposer
                 $productOption->markActive();
             }
         }
-
-
 
         // All product options
             // For each one:

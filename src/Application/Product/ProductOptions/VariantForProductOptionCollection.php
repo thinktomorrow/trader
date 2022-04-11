@@ -7,7 +7,7 @@ use Assert\Assertion;
 use Thinktomorrow\Trader\Application\Common\ArrayCollection;
 use Thinktomorrow\Trader\Domain\Model\Product\Variant\VariantId;
 
-class Variants extends ArrayCollection
+class VariantForProductOptionCollection extends ArrayCollection
 {
     public static function fromType(array $items): static
     {

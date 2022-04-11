@@ -19,7 +19,7 @@ final class ProductRepositoryTest extends TestCase
      * @test
      * @dataProvider products
      */
-    public function it_can_save_and_find_an_product(Product $product)
+    public function it_can_save_and_find_a_product(Product $product)
     {
         foreach($this->repositories() as $repository) {
             $repository->save($product);
@@ -33,7 +33,7 @@ final class ProductRepositoryTest extends TestCase
      * @test
      * @dataProvider products
      */
-    public function it_can_delete_an_product(Product $product)
+    public function it_can_delete_a_product(Product $product)
     {
         $productsNotFound = 0;
 
@@ -69,5 +69,6 @@ final class ProductRepositoryTest extends TestCase
     {
         yield [$this->createdProduct()];
         yield [$this->createdProductWithVariant()];
+        yield [$this->createdProductWithOption()];
     }
 }

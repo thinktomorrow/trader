@@ -7,8 +7,8 @@ use Thinktomorrow\Trader\Domain\Model\Order\Line\LineId;
 use Thinktomorrow\Trader\Domain\Model\Order\Line\Quantity;
 use Thinktomorrow\Trader\Domain\Model\Order\Line\LinePrice;
 use Thinktomorrow\Trader\Domain\Model\Order\Events\LineAdded;
-use Thinktomorrow\Trader\Domain\Model\Order\Events\LineUpdated;
 use Thinktomorrow\Trader\Domain\Model\Order\Events\LineDeleted;
+use Thinktomorrow\Trader\Domain\Model\Order\Events\LineUpdated;
 use Thinktomorrow\Trader\Domain\Model\Product\Variant\VariantId;
 
 trait HasLines

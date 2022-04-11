@@ -60,7 +60,7 @@ final class CartApplication
         $variant = $this->findVariantDetailsForCart->findVariantForCart($addLine->getVariantId());
 
         $order->addOrUpdateLine(
-            $addLine->getlineId(),
+            $addLine->getLineId(),
             $addLine->getVariantId(),
             LinePrice::fromPrice($variant->getSalePrice()),
             $addLine->getQuantity()
@@ -76,7 +76,7 @@ final class CartApplication
         $order = $this->orderRepository->find($changeLineQuantity->getOrderId());
 
         $order->updateLineQuantity(
-            $changeLineQuantity->getlineId(),
+            $changeLineQuantity->getLineId(),
             $changeLineQuantity->getQuantity()
         );
 
@@ -90,7 +90,7 @@ final class CartApplication
         $order = $this->orderRepository->find($removeLine->getOrderId());
 
         $order->deleteLine(
-            $removeLine->getlineId(),
+            $removeLine->getLineId(),
         );
 
         $this->orderRepository->save($order);

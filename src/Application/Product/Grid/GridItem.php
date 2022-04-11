@@ -11,7 +11,7 @@ use Thinktomorrow\Trader\Domain\Model\Product\Variant\VariantUnitPrice;
 
 /**
  * A grid item is constructed of a product variant. If a variant is set to be show_in_grid
- * and it is available for purchase, it will be fetched as a griditem.
+ * and it is available for purchase, it will be fetched as a grid item.
  */
 class GridItem
 {

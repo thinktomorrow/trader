@@ -15,7 +15,6 @@ final class CustomerLoginRepositoryTest extends TestCase
 {
     use RefreshDatabase;
 
-
     /**
      * @test
      * @dataProvider entities

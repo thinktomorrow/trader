@@ -5,7 +5,7 @@ namespace Thinktomorrow\Trader\Domain\Model\Product\Event;
 
 use Thinktomorrow\Trader\Domain\Model\Product\ProductId;
 
-final class ProductAdded
+final class ProductTaxaUpdated
 {
     public readonly ProductId $productId;
 

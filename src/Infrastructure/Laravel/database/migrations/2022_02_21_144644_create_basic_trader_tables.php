@@ -1,8 +1,8 @@
 <?php
 
-use Illuminate\Database\Migrations\Migration;
-use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Database\Migrations\Migration;
 
 class CreateBasicTraderTables extends Migration
 {
@@ -42,13 +42,40 @@ class CreateBasicTraderTables extends Migration
             $table->integer('unit_price')->unsigned();
             $table->char('tax_rate', 3);
             $table->boolean('includes_vat');
-            $table->json('options')->nullable(); // variant options
+//            $table->json('options')->nullable(); // variant options
             $table->json('data')->nullable();
             $table->unsignedInteger('order_column')->default(0);
             $table->timestamps();
 
             $table->index('product_id');
             $table->foreign('product_id')->references('product_id')->on(static::PREFIX.'products')->onDelete('cascade');
+        });
+
+        Schema::create(static::PREFIX.'product_options', function (Blueprint $table) {
+            $table->char('option_id', 36);
+            $table->char('product_id', 36);
+            $table->json('data')->nullable();
+            $table->unsignedInteger('order_column')->default(0);
+
+            $table->foreign('product_id')->references('product_id')->on('trader_products')->onDelete('cascade');
+        });
+
+        Schema::create(static::PREFIX.'product_option_values', function (Blueprint $table) {
+            $table->char('option_id', 36);
+            $table->char('option_value_id', 36);
+            $table->json('data')->nullable();
+            $table->unsignedInteger('order_column')->default(0);
+
+            $table->foreign('option_id')->references('option_id')->on('trader_product_options')->onDelete('cascade');
+        });
+
+        Schema::create(static::PREFIX.'variant_option_values', function (Blueprint $table) {
+            $table->char('variant_id', 36);
+            $table->char('option_value_id', 36);
+            $table->unsignedInteger('order_column')->default(0);
+
+            $table->foreign('variant_id')->references('variant_id')->on('trader_product_variants')->onDelete('cascade');
+            $table->foreign('option_value_id')->references('option_value_id')->on('trader_product_option_values')->onDelete('cascade');
         });
 
         Schema::create(static::PREFIX.'taxa', function (Blueprint $table)

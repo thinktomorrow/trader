@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 
-namespace Tests\Acceptance;
+namespace Tests\Acceptance\Cart;
 
 use Money\Money;
 use PHPUnit\Framework\Assert;
@@ -36,9 +36,11 @@ use Thinktomorrow\Trader\Domain\Model\Order\Exceptions\CouldNotFindOrder;
 use Thinktomorrow\Trader\Application\RefreshCart\Adjusters\AdjustShipping;
 use Thinktomorrow\Trader\Infrastructure\Test\Repositories\InMemoryOrderRepository;
 use Thinktomorrow\Trader\Infrastructure\Test\Repositories\InMemoryProductRepository;
+use Thinktomorrow\Trader\Infrastructure\Test\Repositories\InMemoryVariantRepository;
 use Thinktomorrow\Trader\Infrastructure\Test\Repositories\InMemoryCustomerRepository;
 use Thinktomorrow\Trader\Infrastructure\Test\Repositories\InMemoryPaymentMethodRepository;
 use Thinktomorrow\Trader\Infrastructure\Test\Repositories\InMemoryShippingProfileRepository;
+use function Tests\Acceptance\count;
 
 abstract class CartContext extends TestCase
 {
@@ -51,13 +53,15 @@ abstract class CartContext extends TestCase
     {
         $this->cartApplication = new CartApplication(
             new TestTraderConfig(),
-            $this->productRepository = new InMemoryProductRepository(),
+            new InMemoryVariantRepository(),
             $this->orderRepository = new InMemoryOrderRepository(),
             $this->shippingProfileRepository = new InMemoryShippingProfileRepository(),
             new InMemoryPaymentMethodRepository(),
             new InMemoryCustomerRepository(),
             new EventDispatcherSpy(),
         );
+
+        $this->productRepository = new InMemoryProductRepository();
 
         // Container bindings
         (new TestContainer())->add(AdjustShipping::class, new AdjustShipping(
@@ -76,7 +80,7 @@ abstract class CartContext extends TestCase
     {
         // Create a product
         $product = Product::create(ProductId::fromString($productTitle));
-        $product->addVariant(Variant::create(
+        $product->createVariant(Variant::create(
             ProductId::fromString($productTitle),
             VariantId::fromString($productTitle . '-123'),
             VariantUnitPrice::fromMoney(
