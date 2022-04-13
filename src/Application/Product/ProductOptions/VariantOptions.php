@@ -5,6 +5,7 @@ namespace Thinktomorrow\Trader\Application\Product\ProductOptions;
 
 use Assert\Assertion;
 use Thinktomorrow\Trader\Application\Common\ArrayCollection;
+use Thinktomorrow\Trader\Domain\Model\Product\Option\OptionValueId;
 
 class VariantOptions extends ArrayCollection
 {
@@ -35,6 +36,35 @@ class VariantOptions extends ArrayCollection
         }
 
         return static::fromType($items);
+    }
+
+    public function equals(self $other): bool
+    {
+        $currentItemsAsArray = static::convertToDiffableItems($this->items);
+        $otherItemsAsArray = static::convertToDiffableItems($other->items);
+
+        return count(array_diff_assoc($currentItemsAsArray, $otherItemsAsArray)) == 0;
+    }
+
+    public function hasOptionValueId(OptionValueId $optionValueId): bool
+    {
+        /** @var ProductOption $item */
+        foreach($this->items as $item) {
+            if($item->optionValueId->equals($optionValueId)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    private static function convertToDiffableItems(array $items): array
+    {
+        $result = [];
+        foreach($items as $item) {
+            $result[$item->optionId->get()] = $item->optionValueId->get();
+        }
+        return $result;
     }
 
 //    public function getOptionValueIds(): array

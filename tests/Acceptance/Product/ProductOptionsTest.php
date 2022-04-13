@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace Tests\Acceptance\Product;
 
+use Tests\TestHelpers;
 use Thinktomorrow\Trader\Domain\Common\Locale;
 use Thinktomorrow\Trader\Domain\Model\Product\Option\OptionId;
 use Thinktomorrow\Trader\Domain\Model\Product\Option\OptionValueId;
@@ -13,6 +14,8 @@ use function dd;
 
 class ProductOptionsTest extends ProductContext
 {
+    use TestHelpers;
+
     /** @test */
     public function it_can_create_a_product_option()
     {
@@ -54,7 +57,16 @@ class ProductOptionsTest extends ProductContext
     /** @test */
     public function it_can_compose_options()
     {
-        $composer = $this->productOptionsComposer->get();
+        $product = $this->createdProductWithOptions();
+        $this->productRepository->save($product);
+
+        $composer = $this->productOptionsComposer->get(
+            $product->productId,
+            $product->getVariants()[0]->variantId,
+            Locale::fromString('nl','be')
+        );
+
+
 
         $productOptions = $this->createOptions();
 

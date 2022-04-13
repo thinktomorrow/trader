@@ -16,6 +16,11 @@ trait HasOptions
 {
     private array $options = [];
 
+    public function getOptions(): array
+    {
+        return $this->options;
+    }
+
     public function getNextOptionId(): OptionId
     {
         $i = mt_rand(1,999);

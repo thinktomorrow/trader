@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace Thinktomorrow\Trader\Application\Product\ProductOptions;
 
+use Thinktomorrow\Trader\Domain\Common\Locale;
 use Thinktomorrow\Trader\Domain\Model\Product\Variant\VariantId;
 use Thinktomorrow\Trader\Domain\Model\Product\Option\OptionValueId;
 
@@ -24,7 +25,7 @@ class VariantForProductOption
 
     public function hasOptionValueId(OptionValueId $optionValueId): bool
     {
-
+        return $this->options->hasOptionValueId($optionValueId);
     }
 
     public function getOptions(): VariantOptions
@@ -32,9 +33,10 @@ class VariantForProductOption
         return $this->options;
     }
 
-    public function getUrl(): string
+    public function getUrl(Locale $locale): string
     {
-
+        // TODO: how to determine this? A route resolver like data renderer ?
+        return 'NOT DONE YET';
     }
 
     public static function fromMappedData(array $state, array $optionValueStates): static

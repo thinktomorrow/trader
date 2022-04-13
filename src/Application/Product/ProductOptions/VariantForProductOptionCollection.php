@@ -18,7 +18,14 @@ class VariantForProductOptionCollection extends ArrayCollection
 
     public function find(VariantId $variantId): VariantForProductOption
     {
+        /** @var VariantForProductOption $item */
+        foreach($this->items as $item) {
+            if($item->variantId->equals($variantId)) {
+                return $item;
+            }
+        }
 
+        throw new \InvalidArgumentException(static::class . ' does not contain variant by variant id [' . $variantId->get() . '].');
     }
 
     public function findByOptionValues(VariantOptions $variantOptions): ?VariantForProductOption

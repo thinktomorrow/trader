@@ -41,6 +41,11 @@ class Option implements ChildAggregate
         return $nextOptionValueId;
     }
 
+    public function getOptionValues(): array
+    {
+        return $this->optionValues;
+    }
+
     public function hasOptionValue(OptionValueId $optionValueId): bool
     {
         /** @var OptionValue $optionValue */

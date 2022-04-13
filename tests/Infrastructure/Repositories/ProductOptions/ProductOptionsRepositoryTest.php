@@ -40,11 +40,10 @@ final class ProductOptionsRepositoryTest extends TestCase
 
     private function repositories(): \Generator
     {
-//        yield [
-//            new InMemoryProductRepository(),
-        // TODO: make productDetail repo work
-//            new InMemoryProductDetailRepository(),
-//        ];
+        yield [
+            new InMemoryProductRepository(),
+            new InMemoryProductDetailRepository(new InMemoryProductRepository()),
+        ];
 
         yield [
             new MysqlProductRepository(),

@@ -81,6 +81,8 @@ final class InMemoryVariantRepository implements VariantRepository, VariantForCa
 
     public function getVariantsForProductOption(ProductId $productId): VariantForProductOptionCollection
     {
+        // TODO: get url... locale,
+
         $product = $this->productRepository->find($productId);
         $variants = $product->getVariants();
         $options = $product->getChildEntities()[Option::class];

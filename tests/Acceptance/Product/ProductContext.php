@@ -56,7 +56,7 @@ abstract class ProductContext extends TestCase
         );
 
         $this->productOptionsComposer = new ProductOptionsComposer(
-            new InMemoryProductDetailRepository(),
+            new InMemoryProductDetailRepository($this->productRepository),
             new InMemoryVariantRepository($this->productRepository),
         );
     }
