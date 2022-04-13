@@ -5,7 +5,7 @@ namespace Thinktomorrow\Trader\Application\Product\ProductOptions;
 
 use Thinktomorrow\Trader\Domain\Model\Product\ProductId;
 
-interface VariantForProductOptionRepository
+interface VariantProductOptionsRepository
 {
-    public function getVariantsForProductOption(ProductId $productId): VariantForProductOptionCollection;
+    public function getVariantProductOptions(ProductId $productId): VariantProductOptionsCollection;
 }

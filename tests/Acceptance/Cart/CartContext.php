@@ -40,7 +40,6 @@ use Thinktomorrow\Trader\Infrastructure\Test\Repositories\InMemoryVariantReposit
 use Thinktomorrow\Trader\Infrastructure\Test\Repositories\InMemoryCustomerRepository;
 use Thinktomorrow\Trader\Infrastructure\Test\Repositories\InMemoryPaymentMethodRepository;
 use Thinktomorrow\Trader\Infrastructure\Test\Repositories\InMemoryShippingProfileRepository;
-use function Tests\Acceptance\count;
 
 abstract class CartContext extends TestCase
 {
@@ -53,7 +52,7 @@ abstract class CartContext extends TestCase
     {
         $this->cartApplication = new CartApplication(
             new TestTraderConfig(),
-            new InMemoryVariantRepository(),
+            new InMemoryVariantRepository(new InMemoryProductRepository()),
             $this->orderRepository = new InMemoryOrderRepository(),
             $this->shippingProfileRepository = new InMemoryShippingProfileRepository(),
             new InMemoryPaymentMethodRepository(),

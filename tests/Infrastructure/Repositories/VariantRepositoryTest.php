@@ -10,6 +10,7 @@ use Thinktomorrow\Trader\Domain\Model\Product\Variant\VariantId;
 use Thinktomorrow\Trader\Domain\Model\Product\Exceptions\CouldNotFindVariant;
 use Thinktomorrow\Trader\Infrastructure\Test\Repositories\InMemoryVariantRepository;
 use Thinktomorrow\Trader\Infrastructure\Laravel\Repositories\MysqlVariantRepository;
+use Thinktomorrow\Trader\Infrastructure\Test\Repositories\InMemoryProductRepository;
 
 final class VariantRepositoryTest extends TestCase
 {
@@ -23,9 +24,9 @@ final class VariantRepositoryTest extends TestCase
     {
         foreach($this->repositories() as $repository) {
             $repository->save($variant);
-            $variant->releaseEvents();
 
-            $this->assertEquals($variant, $repository->find($variant->variantId));
+            $variantStates = $repository->getStatesByProduct($variant->productId);
+            $this->assertEquals([$variant], array_map(fn($variantState) => Variant::fromMappedData($variantState, ['product_id' => 'xxx']), $variantStates));
         }
     }
 
@@ -35,20 +36,12 @@ final class VariantRepositoryTest extends TestCase
      */
     public function it_can_delete_an_variant(Variant $variant)
     {
-        $variantsNotFound = 0;
-
         foreach($this->repositories() as $repository) {
             $repository->save($variant);
             $repository->delete($variant->variantId);
 
-            try{
-                $repository->find($variant->variantId);
-            } catch (CouldNotFindVariant $e) {
-                $variantsNotFound++;
-            }
+            $this->assertCount(0, $repository->getStatesByProduct($variant->productId));
         }
-
-        $this->assertEquals(count(iterator_to_array($this->repositories())), $variantsNotFound);
     }
 
     /** @test */
@@ -61,7 +54,7 @@ final class VariantRepositoryTest extends TestCase
 
     private function repositories(): \Generator
     {
-        yield new InMemoryVariantRepository();
+        yield new InMemoryVariantRepository(new InMemoryProductRepository());
         yield new MysqlVariantRepository();
     }
 

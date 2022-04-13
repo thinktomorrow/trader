@@ -11,14 +11,14 @@ use Thinktomorrow\Trader\Domain\Model\Product\Variant\VariantId;
 use Thinktomorrow\Trader\Domain\Model\Product\VariantRepository;
 use Thinktomorrow\Trader\Domain\Model\Product\Option\OptionValue;
 use Thinktomorrow\Trader\Domain\Model\Product\Variant\VariantState;
-use Thinktomorrow\Trader\Application\Product\ProductOptions\VariantForProductOptionCollection;
+use Thinktomorrow\Trader\Application\Product\ProductOptions\VariantProductOptionsCollection;
 use Thinktomorrow\Trader\Application\Cart\VariantForCart\VariantForCart;
 use Thinktomorrow\Trader\Domain\Model\Product\Exceptions\CouldNotFindVariant;
 use Thinktomorrow\Trader\Application\Cart\VariantForCart\VariantForCartRepository;
-use Thinktomorrow\Trader\Application\Product\ProductOptions\VariantForProductOption;
-use Thinktomorrow\Trader\Application\Product\ProductOptions\VariantForProductOptionRepository;
+use Thinktomorrow\Trader\Application\Product\ProductOptions\VariantProductOptions;
+use Thinktomorrow\Trader\Application\Product\ProductOptions\VariantProductOptionsRepository;
 
-class MysqlVariantRepository implements VariantRepository, VariantForCartRepository, VariantForProductOptionRepository
+class MysqlVariantRepository implements VariantRepository, VariantForCartRepository, VariantProductOptionsRepository
 {
     private static string $variantTable = 'trader_product_variants';
     private static string $optionTable = 'trader_product_options';
@@ -29,13 +29,15 @@ class MysqlVariantRepository implements VariantRepository, VariantForCartReposit
     {
         $state = $variant->getMappedData();
 
+        $option_value_ids = array_remove($state, 'option_value_ids');
+
         if (!$this->exists($variant->variantId)) {
             DB::table(static::$variantTable)->insert($state);
         } else {
             DB::table(static::$variantTable)->where('variant_id', $variant->variantId)->update($state);
         }
 
-        $this->upsertOptionValues($variant);
+        $this->syncVariantOptionValueIds($variant->variantId, $option_value_ids);
     }
 
     private function exists(VariantId $variantId): bool
@@ -43,50 +45,101 @@ class MysqlVariantRepository implements VariantRepository, VariantForCartReposit
         return DB::table(static::$variantTable)->where('variant_id', $variantId->get())->exists();
     }
 
-    private function upsertOptionValues(Variant $variant): void
+    private function syncVariantOptionValueIds(VariantId $variantId, array $option_value_ids): void
     {
-        $optionValueIds = array_map(fn($optionValueState) => $optionValueState['option_id'], $variant->getChildEntities()[OptionValue::class]);
+        $changedOptionValueIds = collect($option_value_ids);
 
-        DB::table(static::$optionValueTable)
-            ->where('variant_id', $variant->variantId)
-            ->whereNotIn('option_value_id', $optionValueIds)
-            ->delete();
+        // Get all existing option_value ids
+        $existingOptionValueIds = DB::table(static::$variantOptionValueLookupTable)
+            ->where('variant_id', $variantId)
+            ->select('option_value_id')
+            ->get();
 
-        foreach ($variant->getChildEntities()[OptionValue::class] as $optionValueState) {
-
-            DB::table(static::$optionValueTable)
-                ->updateOrInsert([
-                    'option_id' => $optionValueState['option_id'],
-                    'option_value_id'  => $optionValueState['option_value_id'],
-                ], $optionValueState);
+        // Remove the ones that are not in the new list
+        $detachOptionValueIds = $existingOptionValueIds->diff($changedOptionValueIds);
+        if($detachOptionValueIds->count() > 0) {
+            DB::table(static::$variantOptionValueLookupTable)
+                ->where('variant_id', $variantId)
+                ->whereIn('option_value_id', $detachOptionValueIds->all())
+                ->delete();
         }
+
+        // Insert the new option_value ids
+        $attachOptionValueIds = $changedOptionValueIds->diff($existingOptionValueIds);
+
+        $insertData = $attachOptionValueIds->map(function($option_value_id) use($variantId) {
+            return ['variant_id' => $variantId->get(), 'option_value_id' => $option_value_id];
+        })->all();
+
+        DB::table(static::$variantOptionValueLookupTable)->insert($insertData);
     }
 
-    public function find(VariantId $variantId): Variant
+//    private function upsertOptionValues(Variant $variant): void
+//    {
+//        $optionValueIds = array_map(fn($optionValueState) => $optionValueState['option_id'], $variant->getChildEntities()[OptionValue::class]);
+//
+//        DB::table(static::$optionValueTable)
+//            ->where('variant_id', $variant->variantId)
+//            ->whereNotIn('option_value_id', $optionValueIds)
+//            ->delete();
+//
+//        foreach ($variant->getChildEntities()[OptionValue::class] as $optionValueState) {
+//
+//            DB::table(static::$optionValueTable)
+//                ->updateOrInsert([
+//                    'option_id' => $optionValueState['option_id'],
+//                    'option_value_id'  => $optionValueState['option_value_id'],
+//                ], $optionValueState);
+//        }
+//    }
+
+    public function getStatesByProduct(ProductId $productId): array
     {
-        $state = DB::table(static::$variantTable)
-            ->where(static::$variantTable . '.variant_id', $variantId->get())
-            ->first();
-
-        if (!$state) {
-            throw new CouldNotFindVariant('No variant found by id [' . $variantId->get() . ']');
-        }
-
-        $optionValueStates = DB::table(static::$optionValueTable)
-            ->where(static::$optionValueTable . '.variant_id', $variantId->get())
+        $variantStates = DB::table(static::$variantTable)
+            ->select([static::$variantTable . '.*', DB::raw('GROUP_CONCAT(`option_value_id`) AS option_value_ids')])
+            ->where(static::$variantTable . '.product_id', $productId->get())
+            ->leftJoin(static::$variantOptionValueLookupTable, static::$variantTable . '.variant_id','=',static::$variantOptionValueLookupTable.'.variant_id')
             ->get()
             ->map(fn($item) => (array) $item)
+            ->map(fn($item) => array_merge($item, [
+                'includes_vat' => (bool) $item['includes_vat'],
+                'option_value_ids' => $item['option_value_ids'] ? explode(',', $item['option_value_ids']) : []
+            ]))
             ->toArray();
 
-        $state = (array) $state;
-        $state['includes_vat'] = (bool) $state['includes_vat'];
+        // Handle a bug in laravel where raw group concat statement would return a record with falsy null values
+        if(count($variantStates) == 1 && null === $variantStates[0]['variant_id']) {
+            $variantStates = [];
+        }
 
-        return Variant::fromMappedData($state, [
-            'product_id' => $state['product_id'],
-        ], [
-            OptionValue::class => $optionValueStates,
-        ]);
+        return $variantStates;
     }
+
+//    public function find(VariantId $variantId): Variant
+//    {
+//        $state = DB::table(static::$variantTable)
+//            ->where(static::$variantTable . '.variant_id', $variantId->get())
+//            ->first();
+//
+//        if (!$state) {
+//            throw new CouldNotFindVariant('No variant found by id [' . $variantId->get() . ']');
+//        }
+//
+//        $optionValueStates = DB::table(static::$optionValueTable)
+//            ->where(static::$optionValueTable . '.variant_id', $variantId->get())
+//            ->get()
+//            ->map(fn($item) => (array) $item)
+//            ->toArray();
+//
+//        $state = (array) $state;
+//        $state['includes_vat'] = (bool) $state['includes_vat'];
+//
+//        return Variant::fromMappedData($state, [
+//            'product_id' => $state['product_id'],
+//        ], [
+//            OptionValue::class => $optionValueStates,
+//        ]);
+//    }
 
     public function delete(VariantId $variantId): void
     {
@@ -123,7 +176,7 @@ class MysqlVariantRepository implements VariantRepository, VariantForCartReposit
         ]));
     }
 
-    public function getVariantsForProductOption(ProductId $productId): VariantForProductOptionCollection
+    public function getVariantProductOptions(ProductId $productId): VariantProductOptionsCollection
     {
         $rows = DB::table(static::$variantTable)
             ->join(static::$variantOptionValueLookupTable, static::$variantTable.'.variant_id', '=', static::$variantOptionValueLookupTable.'.variant_id')
@@ -141,8 +194,8 @@ class MysqlVariantRepository implements VariantRepository, VariantForCartReposit
             ->map(fn($item) => (array) $item)
             ->groupBy('variant_id');
 
-        return VariantForProductOptionCollection::fromType($rows->map(function($optionValueStates) {
-            return VariantForProductOption::fromMappedData([
+        return VariantProductOptionsCollection::fromType($rows->map(function($optionValueStates) {
+            return VariantProductOptions::fromMappedData([
                 'variant_id' => $optionValueStates->first()['variant_id']
             ], $optionValueStates->all());
         })->values()->all());

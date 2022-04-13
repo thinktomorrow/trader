@@ -13,8 +13,6 @@ use function dd;
 
 class ProductDataTest extends ProductContext
 {
-
-
     /** @test */
     public function it_can_render_localized_data()
     {
@@ -30,35 +28,5 @@ class ProductDataTest extends ProductContext
         $productOption->setLocale(Locale::fromString('en', 'BE'));
         $this->assertEquals('color', $productOption->getLabel());
         $this->assertEquals('aaa value', $productOption->getValue());
-    }
-
-    /** @test */
-    public function it_can_compose_options()
-    {
-        $composer = new ProductOptionsComposer(
-        // ProductOptionsRepo
-        // VariantRepo
-        );
-
-        $productOptions = $this->createOptions();
-
-        dd($productOptions);
-    }
-
-    private function createOptions()
-    {
-        $productOption = new ProductOption(OptionId::fromString('aaa'), OptionValueId::fromString('aaa-value'), [
-            'label' => 'color',
-            'value' => 'aaa value',
-        ]);
-
-        $productOption2 = new ProductOption(OptionId::fromString('bbb'), OptionValueId::fromString('bbb-value'), [
-            'label' => 'size',
-            'value' => 'bbb value',
-        ]);
-
-        return ProductOptions::fromType([
-            $productOption, $productOption2,
-        ]);
     }
 }

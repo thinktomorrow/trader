@@ -10,6 +10,7 @@ use Thinktomorrow\Trader\Domain\Model\Product\ProductId;
 use Thinktomorrow\Trader\Domain\Model\Product\Exceptions\CouldNotFindProduct;
 use Thinktomorrow\Trader\Infrastructure\Test\Repositories\InMemoryProductRepository;
 use Thinktomorrow\Trader\Infrastructure\Laravel\Repositories\MysqlProductRepository;
+use Thinktomorrow\Trader\Infrastructure\Laravel\Repositories\MysqlVariantRepository;
 
 final class ProductRepositoryTest extends TestCase
 {
@@ -62,7 +63,7 @@ final class ProductRepositoryTest extends TestCase
     private function repositories(): \Generator
     {
         yield new InMemoryProductRepository();
-        yield new MysqlProductRepository();
+        yield new MysqlProductRepository(new MysqlVariantRepository());
     }
 
     public function products(): \Generator

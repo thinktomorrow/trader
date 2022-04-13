@@ -133,10 +133,6 @@ class ProductTest extends TestCase
         ], $product->releaseEvents());
 
         $this->assertEquals([
-            new OptionValuesUpdated(ProductId::fromString('xxx'), OptionId::fromString('ooo')),
-        ], $option->releaseEvents());
-
-        $this->assertEquals([
             [
                 'product_id' => $product->productId->get(),
                 'option_id' => 'ooo',

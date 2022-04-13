@@ -64,7 +64,7 @@ class MysqlTaxonRepository implements TaxonRepository, TaxonTreeRepository
             ->groupBy(static::$taxonTable.'.taxon_id')
             ->get();
 
-        return new TaxonFilters(
+        return TaxonFilters:: fromType(
             $results
                 ->map(fn($row) => TaxonFilter::fromMappedData((array) $row))
                 ->toArray()

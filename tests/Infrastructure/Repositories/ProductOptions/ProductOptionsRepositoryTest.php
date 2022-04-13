@@ -15,7 +15,7 @@ use Thinktomorrow\Trader\Infrastructure\Laravel\Repositories\MysqlProductReposit
 use Thinktomorrow\Trader\Application\Product\ProductOptions\ProductOptionsRepository;
 use Thinktomorrow\Trader\Infrastructure\Laravel\Repositories\MysqlProductDetailRepository;
 use Thinktomorrow\Trader\Infrastructure\Test\Repositories\InMemoryProductDetailRepository;
-use Thinktomorrow\Trader\Application\Product\ProductOptions\VariantForProductOptionRepository;
+use Thinktomorrow\Trader\Application\Product\ProductOptions\VariantProductOptionsRepository;
 
 final class ProductOptionsRepositoryTest extends TestCase
 {
@@ -46,7 +46,7 @@ final class ProductOptionsRepositoryTest extends TestCase
         ];
 
         yield [
-            new MysqlProductRepository(),
+            new MysqlProductRepository(new MysqlVariantRepository()),
             new MysqlProductDetailRepository(),
         ];
     }

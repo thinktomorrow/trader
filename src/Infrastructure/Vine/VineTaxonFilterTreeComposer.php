@@ -26,7 +26,7 @@ class VineTaxonFilterTreeComposer implements TaxonFilterTreeComposer
         $mainTaxonNode = $this->getTree()->find(fn($node) => $node->getNodeEntry()->getKey() == $mainTaxonFilterKey);
 
         if(!$mainTaxonNode) {
-            return new TaxonFilters([]);
+            return TaxonFilters::fromType([]);
         }
 
         $productIds = $this->getProductIds($mainTaxonNode);
@@ -47,7 +47,7 @@ class VineTaxonFilterTreeComposer implements TaxonFilterTreeComposer
                 ->prune(fn ($node) => ! in_array($node->getNodeId(), [$mainTaxonNode->getNodeId(), ...$ancestorIds]));
         }
 
-        return new TaxonFilters($this->convertNodeCollectionToArray($filterTaxons));
+        return TaxonFilters::fromType($this->convertNodeCollectionToArray($filterTaxons));
     }
 
     public function getActiveFilters(string $mainTaxonFilterKey, array $activeKeys): TaxonFilters
@@ -55,7 +55,7 @@ class VineTaxonFilterTreeComposer implements TaxonFilterTreeComposer
         $mainTaxonNode = $this->getTree()->find(fn($node) => $node->getNodeEntry()->getKey() == $mainTaxonFilterKey);
 
         if(!$mainTaxonNode) {
-            return new TaxonFilters([]);
+            return TaxonFilters::fromType([]);
         }
 
         // The main category is always considered 'active' as a grid filter, with or without any other filtering active
@@ -80,7 +80,7 @@ class VineTaxonFilterTreeComposer implements TaxonFilterTreeComposer
             $collection = $collection->merge($selectedTaxons);
         }
 
-        return new TaxonFilters(
+        return TaxonFilters::fromType(
             $this->convertNodeCollectionToArray($collection)
         );
     }

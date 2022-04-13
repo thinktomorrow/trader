@@ -7,7 +7,7 @@ use Thinktomorrow\Trader\Domain\Common\Locale;
 use Thinktomorrow\Trader\Domain\Model\Product\Variant\VariantId;
 use Thinktomorrow\Trader\Domain\Model\Product\Option\OptionValueId;
 
-class VariantForProductOption
+class VariantProductOptions
 {
     public readonly VariantId $variantId;
     private VariantOptions $options;

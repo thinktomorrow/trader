@@ -12,9 +12,9 @@ use Thinktomorrow\Trader\Domain\Model\Product\Variant\VariantId;
 class ProductOptionsComposer
 {
     private ProductOptionsRepository $productOptionsRepository;
-    private VariantForProductOptionRepository $variantRepository;
+    private VariantProductOptionsRepository $variantRepository;
 
-    public function __construct(ProductOptionsRepository $productOptionsRepository, VariantForProductOptionRepository $variantRepository)
+    public function __construct(ProductOptionsRepository $productOptionsRepository, VariantProductOptionsRepository $variantRepository)
     {
         $this->productOptionsRepository = $productOptionsRepository;
         $this->variantRepository = $variantRepository;
@@ -30,7 +30,7 @@ class ProductOptionsComposer
         $productOptions = $this->productOptionsRepository->getProductOptions($productId);
 
         // Get all product variants
-        $variants = $this->variantRepository->getVariantsForProductOption($productId); // Idea: perhaps pass the productOptions
+        $variants = $this->variantRepository->getVariantProductOptions($productId); // Idea: perhaps pass the productOptions
 
         // Current set of productOptions
         $variant = $variants->find($variantId);

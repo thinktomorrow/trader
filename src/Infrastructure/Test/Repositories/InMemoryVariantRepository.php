@@ -11,11 +11,11 @@ use Thinktomorrow\Trader\Domain\Model\Product\VariantRepository;
 use Thinktomorrow\Trader\Application\Cart\VariantForCart\VariantForCart;
 use Thinktomorrow\Trader\Domain\Model\Product\Exceptions\CouldNotFindVariant;
 use Thinktomorrow\Trader\Application\Cart\VariantForCart\VariantForCartRepository;
-use Thinktomorrow\Trader\Application\Product\ProductOptions\VariantForProductOption;
-use Thinktomorrow\Trader\Application\Product\ProductOptions\VariantForProductOptionRepository;
-use Thinktomorrow\Trader\Application\Product\ProductOptions\VariantForProductOptionCollection;
+use Thinktomorrow\Trader\Application\Product\ProductOptions\VariantProductOptions;
+use Thinktomorrow\Trader\Application\Product\ProductOptions\VariantProductOptionsRepository;
+use Thinktomorrow\Trader\Application\Product\ProductOptions\VariantProductOptionsCollection;
 
-final class InMemoryVariantRepository implements VariantRepository, VariantForCartRepository, VariantForProductOptionRepository
+final class InMemoryVariantRepository implements VariantRepository, VariantForCartRepository, VariantProductOptionsRepository
 {
     private InMemoryProductRepository $productRepository;
 
@@ -32,13 +32,18 @@ final class InMemoryVariantRepository implements VariantRepository, VariantForCa
         static::$variants[$variant->variantId->get()] = $variant;
     }
 
-    public function find(VariantId $variantId): Variant
+    public function getStatesByProduct(ProductId $productId): array
     {
-        if(!isset(static::$variants[$variantId->get()])) {
-            throw new CouldNotFindVariant('No variant found by id ' . $variantId);
+        $result = [];
+
+        /** @var Variant $variant */
+        foreach(static::$variants as $variant) {
+            if($variant->productId->equals($productId)) {
+                $result[] = $variant->getMappedData();
+            }
         }
 
-        return static::$variants[$variantId->get()];
+        return $result;
     }
 
     public function delete(VariantId $variantId): void
@@ -79,7 +84,7 @@ final class InMemoryVariantRepository implements VariantRepository, VariantForCa
         throw new CouldNotFindVariant('No variant found by id ' . $variantId->get());
     }
 
-    public function getVariantsForProductOption(ProductId $productId): VariantForProductOptionCollection
+    public function getVariantProductOptions(ProductId $productId): VariantProductOptionsCollection
     {
         // TODO: get url... locale,
 
@@ -101,12 +106,12 @@ final class InMemoryVariantRepository implements VariantRepository, VariantForCa
                 }
             }
 
-            $variantForProductOptions[] = VariantForProductOption::fromMappedData([
+            $variantForProductOptions[] = VariantProductOptions::fromMappedData([
                 'variant_id' => $variant->variantId->get(),
             ], $variantOptionValues);
 
         }
 
-        return VariantForProductOptionCollection::fromType($variantForProductOptions);
+        return VariantProductOptionsCollection::fromType($variantForProductOptions);
     }
 }

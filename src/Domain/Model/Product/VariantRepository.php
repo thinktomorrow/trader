@@ -10,7 +10,7 @@ interface VariantRepository
 {
     public function save(Variant $variant): void;
 
-    public function find(VariantId $variantId): Variant;
+    public function getStatesByProduct(ProductId $productId): array;
 
     public function delete(VariantId $variantId): void;
 

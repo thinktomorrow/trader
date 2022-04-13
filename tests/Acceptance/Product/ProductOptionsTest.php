@@ -60,33 +60,32 @@ class ProductOptionsTest extends ProductContext
         $product = $this->createdProductWithOptions();
         $this->productRepository->save($product);
 
-        $composer = $this->productOptionsComposer->get(
+        $productOptions = $this->productOptionsComposer->get(
             $product->productId,
             $product->getVariants()[0]->variantId,
             Locale::fromString('nl','be')
         );
 
-
-
-        $productOptions = $this->createOptions();
-
-        dd($productOptions);
+        $this->assertCount(3, $productOptions);
+        $this->assertNotNull($productOptions[0]->getUrl());
+        $this->assertNotNull($productOptions[2]->getUrl());
+        $this->assertNull($productOptions[1]->getUrl()); // Second one has no variant to point at so no url
     }
 
-    private function createOptions()
-    {
-        $productOption = new ProductOption(OptionId::fromString('aaa'), OptionValueId::fromString('aaa-value'), [
-            'label' => 'color',
-            'value' => 'aaa value',
-        ]);
-
-        $productOption2 = new ProductOption(OptionId::fromString('bbb'), OptionValueId::fromString('bbb-value'), [
-            'label' => 'size',
-            'value' => 'bbb value',
-        ]);
-
-        return ProductOptions::fromType([
-            $productOption, $productOption2,
-        ]);
-    }
+//    private function createOptions()
+//    {
+//        $productOption = new ProductOption(OptionId::fromString('aaa'), OptionValueId::fromString('aaa-value'), [
+//            'label' => 'color',
+//            'value' => 'aaa value',
+//        ]);
+//
+//        $productOption2 = new ProductOption(OptionId::fromString('bbb'), OptionValueId::fromString('bbb-value'), [
+//            'label' => 'size',
+//            'value' => 'bbb value',
+//        ]);
+//
+//        return ProductOptions::fromType([
+//            $productOption, $productOption2,
+//        ]);
+//    }
 }

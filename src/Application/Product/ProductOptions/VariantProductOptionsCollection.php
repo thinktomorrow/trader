@@ -7,18 +7,18 @@ use Assert\Assertion;
 use Thinktomorrow\Trader\Application\Common\ArrayCollection;
 use Thinktomorrow\Trader\Domain\Model\Product\Variant\VariantId;
 
-class VariantForProductOptionCollection extends ArrayCollection
+class VariantProductOptionsCollection extends ArrayCollection
 {
     public static function fromType(array $items): static
     {
-        Assertion::allIsInstanceOf($items, VariantForProductOption::class);
+        Assertion::allIsInstanceOf($items, VariantProductOptions::class);
 
         return new static($items);
     }
 
-    public function find(VariantId $variantId): VariantForProductOption
+    public function find(VariantId $variantId): VariantProductOptions
     {
-        /** @var VariantForProductOption $item */
+        /** @var VariantProductOptions $item */
         foreach($this->items as $item) {
             if($item->variantId->equals($variantId)) {
                 return $item;
@@ -28,9 +28,9 @@ class VariantForProductOptionCollection extends ArrayCollection
         throw new \InvalidArgumentException(static::class . ' does not contain variant by variant id [' . $variantId->get() . '].');
     }
 
-    public function findByOptionValues(VariantOptions $variantOptions): ?VariantForProductOption
+    public function findByOptionValues(VariantOptions $variantOptions): ?VariantProductOptions
     {
-        /** @var VariantForProductOption $item */
+        /** @var VariantProductOptions $item */
         foreach($this->items as $item) {
             if($item->hasExactOptionsMatch($variantOptions)) {
                 return $item;
