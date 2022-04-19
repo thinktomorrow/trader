@@ -5,16 +5,15 @@ namespace Tests\Infrastructure\Vine;
 
 use Tests\Infrastructure\TestCase;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Thinktomorrow\Trader\Domain\Model\Taxon\Taxon;
-use Thinktomorrow\Trader\Domain\Model\Taxon\TaxonId;
-use Thinktomorrow\Trader\Infrastructure\Vine\VineNestedTaxonIdsComposer;
+use Thinktomorrow\Trader\Infrastructure\Vine\VineTaxonIdOptionsComposer;
+use Thinktomorrow\Trader\Infrastructure\Vine\VineFlattenedTaxonIdsComposer;
 use Thinktomorrow\Trader\Infrastructure\Test\Repositories\InMemoryTaxonRepository;
 use Thinktomorrow\Trader\Infrastructure\Laravel\Repositories\MysqlTaxonRepository;
 
-final class NestedTaxonIdsComposerTest extends TestCase
+final class TaxonIdOptionsComposerTest extends TestCase
 {
     use RefreshDatabase;
-    use CreatesTaxon;
+    use TaxonHelpers;
 
     public function tearDown(): void
     {
@@ -24,16 +23,28 @@ final class NestedTaxonIdsComposerTest extends TestCase
     }
 
     /** @test */
-    public function it_can_retrieve_all_ids_grouped_by_root()
+    public function it_can_retrieve_options()
     {
         $this->createDefaultTaxons();
 
         foreach($this->repositories() as $repository) {
-            $result = (new VineNestedTaxonIdsComposer($repository))->getGroupedByRootByKeys(['taxon-first', 'taxon-sixth']);
+            $result = (new VineTaxonIdOptionsComposer($repository))->getOptions();
 
             $this->assertEquals([
-                'first' => ['first','second','third','fourth'],
-                'fifth' => ['sixth'],
+                [
+                    'group' => 'Taxon first',
+                    'values' => [
+                        'second' => 'Taxon second',
+                        'third' => 'Taxon third',
+                        'fourth' => 'Taxon third > Taxon fourth'
+                    ],
+                ],
+                [
+                    'group' => 'Taxon fifth',
+                    'values' => [
+                        'sixth' => 'Taxon sixth',
+                    ],
+                ],
             ], $result);
         }
     }
@@ -44,7 +55,7 @@ final class NestedTaxonIdsComposerTest extends TestCase
         $this->createDefaultTaxons();
 
         foreach($this->repositories() as $repository) {
-            $result = (new VineNestedTaxonIdsComposer($repository))->getGroupedByRootByIds(['first', 'sixth']);
+            $result = (new VineFlattenedTaxonIdsComposer($repository))->getGroupedByRootByIds(['first', 'sixth']);
 
             $this->assertEquals([
                 'first' => ['first','second','third','fourth'],
@@ -59,7 +70,7 @@ final class NestedTaxonIdsComposerTest extends TestCase
         $this->createDefaultTaxons();
 
         foreach($this->repositories() as $repository) {
-            $result = (new VineNestedTaxonIdsComposer($repository))->getGroupedByRootByKeys(['taxon-first', 'taxon-second']);
+            $result = (new VineFlattenedTaxonIdsComposer($repository))->getGroupedByRootByKeys(['taxon-first', 'taxon-second']);
 
             $this->assertEquals([
                 'first' => ['first','second','third','fourth'],
@@ -73,7 +84,7 @@ final class NestedTaxonIdsComposerTest extends TestCase
         $this->createDefaultTaxons();
 
         foreach($this->repositories() as $repository) {
-            $result = (new VineNestedTaxonIdsComposer($repository))->getGroupedByRootByKeys(['xxxx']);
+            $result = (new VineFlattenedTaxonIdsComposer($repository))->getGroupedByRootByKeys(['xxxx']);
 
             $this->assertEquals([], $result);
         }
@@ -83,15 +94,5 @@ final class NestedTaxonIdsComposerTest extends TestCase
     {
         yield new InMemoryTaxonRepository();
         yield new MysqlTaxonRepository();
-    }
-
-    private function createDefaultTaxons()
-    {
-        $this->createTaxon(Taxon::create(TaxonId::fromString('first'), 'taxon-first'));
-            $this->createTaxon(Taxon::create(TaxonId::fromString('second'), 'taxon-second', TaxonId::fromString('first')));
-            $this->createTaxon(Taxon::create(TaxonId::fromString('third'), 'taxon-third', TaxonId::fromString('first')));
-                $this->createTaxon(Taxon::create(TaxonId::fromString('fourth'), 'taxon-fourth', TaxonId::fromString('third')));
-        $this->createTaxon(Taxon::create(TaxonId::fromString('fifth'), 'taxon-fifth'));
-            $this->createTaxon(Taxon::create(TaxonId::fromString('sixth'), 'taxon-sixth', TaxonId::fromString('fifth')));
     }
 }

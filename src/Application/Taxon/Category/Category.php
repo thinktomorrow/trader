@@ -3,10 +3,9 @@ declare(strict_types=1);
 
 namespace Thinktomorrow\Trader\Application\Taxon\Category;
 
-class Category
-{
-    public function getKey(): string
-    {
+use Thinktomorrow\Trader\Application\Taxon\Tree\TaxonNode;
 
-    }
+class Category extends TaxonNode
+{
+
 }

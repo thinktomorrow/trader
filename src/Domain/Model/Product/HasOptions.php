@@ -14,8 +14,10 @@ use Thinktomorrow\Trader\Domain\Model\Product\Exceptions\CouldNotFindOptionOnPro
 
 trait HasOptions
 {
+    /** @var Option[] */
     private array $options = [];
 
+    /** @return Option[] */
     public function getOptions(): array
     {
         return $this->options;
@@ -24,10 +26,10 @@ trait HasOptions
     public function getNextOptionId(): OptionId
     {
         $i = mt_rand(1,999);
-        $nextOptionId = OptionId::fromString($this->productId->get() . '_' . $i);
+        $nextOptionId = OptionId::fromString( substr($i .'_' . $this->productId->get(), 0, 36));
 
         while($this->hasOption($nextOptionId)) {
-            $nextOptionId = OptionId::fromString($this->productId->get() . '_' . ++$i);
+            $nextOptionId = OptionId::fromString( substr(++$i .'_' . $this->productId->get(), 0, 36));
         }
 
         return $nextOptionId;
@@ -37,6 +39,13 @@ trait HasOptions
     {
         Assertion::allIsInstanceOf($options, Option::class);
 
+        // Remove current options that are not present in the update payload.
+        foreach($this->options as $currentOption) {
+            if(!in_array($currentOption->optionId->get(), array_map(fn($option) => $option->optionId->get(), $options))) {
+                unset($this->options[$currentOption->optionId->get()]);
+            }
+        }
+
         foreach($options as $option) {
             $this->options[$option->optionId->get()] = $option;
         }
@@ -44,16 +53,16 @@ trait HasOptions
         $this->recordEvent(new OptionsUpdated($this->productId));
     }
 
-    public function assignOptionValueToVariant(OptionValueId $optionValueId, VariantId $variantId): void
-    {
-        /** @var Option $option */
-        foreach($this->options as $option) {
-            if($option->hasOptionValue($optionValueId)) {
-                $optionValue = $option->findOptionValue($optionValueId)->addToVariant($variantId);
-                $option->updateOptionValue($optionValue);
-            }
-        }
-    }
+//    public function assignOptionValueToVariant(OptionValueId $optionValueId, VariantId $variantId): void
+//    {
+//        /** @var Option $option */
+//        foreach($this->options as $option) {
+//            if($option->hasOptionValue($optionValueId)) {
+//                $optionValue = $option->findOptionValue($optionValueId)->addToVariant($variantId);
+//                $option->updateOptionValue($optionValue);
+//            }
+//        }
+//    }
 
     private function hasOption(OptionId $optionId): bool
     {

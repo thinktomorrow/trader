@@ -6,6 +6,7 @@ namespace Thinktomorrow\Trader\Infrastructure\Laravel\Repositories;
 use Ramsey\Uuid\Uuid;
 use Illuminate\Support\Facades\DB;
 use Thinktomorrow\Trader\Domain\Model\Product\ProductId;
+use Thinktomorrow\Trader\Application\Common\TraderHelpers;
 use Thinktomorrow\Trader\Domain\Model\Product\Variant\Variant;
 use Thinktomorrow\Trader\Domain\Model\Product\Variant\VariantId;
 use Thinktomorrow\Trader\Domain\Model\Product\VariantRepository;
@@ -29,7 +30,7 @@ class MysqlVariantRepository implements VariantRepository, VariantForCartReposit
     {
         $state = $variant->getMappedData();
 
-        $option_value_ids = array_remove($state, 'option_value_ids');
+        $option_value_ids = TraderHelpers::array_remove($state, 'option_value_ids');
 
         if (!$this->exists($variant->variantId)) {
             DB::table(static::$variantTable)->insert($state);
@@ -99,6 +100,7 @@ class MysqlVariantRepository implements VariantRepository, VariantForCartReposit
             ->select([static::$variantTable . '.*', DB::raw('GROUP_CONCAT(`option_value_id`) AS option_value_ids')])
             ->where(static::$variantTable . '.product_id', $productId->get())
             ->leftJoin(static::$variantOptionValueLookupTable, static::$variantTable . '.variant_id','=',static::$variantOptionValueLookupTable.'.variant_id')
+            ->groupBy(static::$variantTable . '.variant_id')
             ->get()
             ->map(fn($item) => (array) $item)
             ->map(fn($item) => array_merge($item, [

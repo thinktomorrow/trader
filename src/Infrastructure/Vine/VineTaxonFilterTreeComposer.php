@@ -3,16 +3,15 @@ declare(strict_types=1);
 
 namespace Thinktomorrow\Trader\Infrastructure\Vine;
 
-use Thinktomorrow\Vine\Node;
 use Thinktomorrow\Vine\NodeCollection;
-use Thinktomorrow\Trader\Application\Taxon\Filter\TaxonFilter;
-use Thinktomorrow\Trader\Application\Taxon\Filter\TaxonFilters;
-use Thinktomorrow\Trader\Application\Taxon\Filter\TaxonTreeRepository;
+use Thinktomorrow\Trader\Application\Taxon\Tree\TaxonTree;
+use Thinktomorrow\Trader\Application\Taxon\Tree\TaxonNode;
+use Thinktomorrow\Trader\Application\Taxon\Tree\TaxonTreeRepository;
 use Thinktomorrow\Trader\Application\Taxon\Filter\TaxonFilterTreeComposer;
 
 class VineTaxonFilterTreeComposer implements TaxonFilterTreeComposer
 {
-    use UsesTaxonFilterTree;
+    use UsesTaxonTree;
 
     private TaxonTreeRepository $taxonTreeRepository;
 
@@ -21,19 +20,25 @@ class VineTaxonFilterTreeComposer implements TaxonFilterTreeComposer
         $this->taxonTreeRepository = $taxonTreeRepository;
     }
 
-    public function getAvailableFilters(string $mainTaxonFilterKey): TaxonFilters
+    public function getAvailableFilters(string $mainTaxonFilterKey): TaxonTree
     {
-        $mainTaxonNode = $this->getTree()->find(fn($node) => $node->getNodeEntry()->getKey() == $mainTaxonFilterKey);
+        /** @var TaxonNode $mainTaxonNode */
+        $mainTaxonNode = $this->getTree()->find(fn(TaxonNode $node) => $node->getKey() == $mainTaxonFilterKey);
 
         if(!$mainTaxonNode) {
-            return TaxonFilters::fromType([]);
+            return new TaxonTree();
         }
 
         $productIds = $this->getProductIds($mainTaxonNode);
 
-        $filterTaxons = $this->getTree()
-            ->shake(fn ($node) => array_intersect($node->getNodeEntry()->getProductIds(), $productIds))
-            ->prune(fn ($node) => $node->getNodeEntry()->showOnline());
+        /**
+         * The products belonging to the main taxon determine which taxons will
+         * be returned as filters. Here we shake out the taxon tree so there
+         * are only taxa left that match one or more of the same products
+         */
+        $taxonTree = $this->getTree()
+            ->shake(fn (TaxonNode $node) => array_intersect($node->getProductIds(), $productIds))
+            ->prune(fn (TaxonNode $node) => $node->showOnline());
 
         // For a better filter representation, we want to start from the given taxon as the root - and not the 'real' root.
         // Therefor we exclude all ancestors from the given taxon which allows to only show the
@@ -43,28 +48,29 @@ class VineTaxonFilterTreeComposer implements TaxonFilterTreeComposer
             // Keep the root node in the filter in order to keep our structure intact
             array_pop($ancestorIds);
 
-            $filterTaxons = $filterTaxons
+            $taxonTree = $taxonTree
                 ->prune(fn ($node) => ! in_array($node->getNodeId(), [$mainTaxonNode->getNodeId(), ...$ancestorIds]));
         }
 
-        return TaxonFilters::fromType($this->convertNodeCollectionToArray($filterTaxons));
+        return $taxonTree;
+//        return new TaxonFilters($this->convertNodeCollectionToArray($filterTaxons));
     }
 
-    public function getActiveFilters(string $mainTaxonFilterKey, array $activeKeys): TaxonFilters
+    public function getActiveFilters(string $mainTaxonFilterKey, array $activeKeys): TaxonTree
     {
-        $mainTaxonNode = $this->getTree()->find(fn($node) => $node->getNodeEntry()->getKey() == $mainTaxonFilterKey);
+        $mainTaxonNode = $this->getTree()->find(fn($node) => $node->getKey() == $mainTaxonFilterKey);
 
         if(!$mainTaxonNode) {
-            return TaxonFilters::fromType([]);
+            return new TaxonTree();
         }
 
         // The main category is always considered 'active' as a grid filter, with or without any other filtering active
-        $collection = new NodeCollection([$mainTaxonNode]);
+        $taxonTree = new TaxonTree([$mainTaxonNode]);
 
         /** Used filters from current request */
         if (count($activeKeys) > 0) {
 
-            $selectedTaxons = $this->getTree()->findMany(fn($node) => in_array($node->getNodeEntry()->getKey(), $activeKeys));
+            $selectedTaxons = $this->getTree()->findMany(fn($node) => in_array($node->getKey(), $activeKeys));
 
             /**
              * Subfiltering
@@ -73,50 +79,52 @@ class VineTaxonFilterTreeComposer implements TaxonFilterTreeComposer
              */
             foreach ($selectedTaxons as $selectedTaxon) {
                 if ($selectedTaxon->getRootNode()->getNodeId() === $mainTaxonNode->getRootNode()->getNodeId()) {
-                    $collection = new NodeCollection();
+                    $taxonTree = new TaxonTree();
                 }
             }
 
-            $collection = $collection->merge($selectedTaxons);
+            $taxonTree = $taxonTree->merge($selectedTaxons);
         }
 
-        return TaxonFilters::fromType(
-            $this->convertNodeCollectionToArray($collection)
-        );
+        return $taxonTree;
+
+//        return TaxonFilters::fromType(
+//            $this->convertNodeCollectionToArray($collection)
+//        );
     }
 
-    private function convertNodeCollectionToArray(NodeCollection $collection): array
-    {
-        $filters = [];
-
-        $collection->each(function(Node $node) use(&$filters) {
-
-            /** @var TaxonFilter $taxonFilter */
-            $taxonFilter = $node->getNodeEntry();
-
-            if($node->hasChildNodes()) {
-                $taxonFilter->setChildren(
-                    $this->convertNodeCollectionToArray($node->getChildNodes())
-                );
-            }
-
-            $filters[] = $taxonFilter;
-        });
-
-        return $filters;
-    }
+//    private function convertNodeCollectionToArray(NodeCollection $collection): array
+//    {
+//        $filters = [];
+//
+//        $collection->each(function(Node $node) use(&$filters) {
+//
+//            /** @var TaxonFilter $taxonFilter */
+//            $taxonFilter = $node->getNodeEntry();
+//
+//            if($node->hasChildNodes()) {
+//                $taxonFilter->setChildren(
+//                    $this->convertNodeCollectionToArray($node->getChildNodes())
+//                );
+//            }
+//
+//            $filters[] = $taxonFilter;
+//        });
+//
+//        return $filters;
+//    }
 
     /**
      * Get all product ids belonging to this taxon filter and all its children
      *
      * @return array
      */
-    private function getProductIds(Node $node): array
+    private function getProductIds(TaxonNode $node): array
     {
-        $productIds = $node->getNodeEntry()->getProductIds();
+        $productIds = $node->getProductIds();
 
         $node->getChildNodes()->flatten()->each(function ($childNode) use (&$productIds) {
-            $productIds = array_merge($productIds, $childNode->getNodeEntry()->getProductIds());
+            $productIds = array_merge($productIds, $childNode->getProductIds());
         });
 
         return array_values(array_unique($productIds));

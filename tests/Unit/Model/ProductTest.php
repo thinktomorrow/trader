@@ -55,7 +55,7 @@ class ProductTest extends TestCase
         $product = Product::fromMappedData([
             'product_id' => 'xxx',
             'data' => $data,
-            'taxon_ids' => ['1','2'],
+            'taxon_ids' => '1,2',
         ]);
 
         $this->assertEquals(ProductId::fromString('xxx'), $product->getMappedData()['product_id']);
@@ -87,7 +87,7 @@ class ProductTest extends TestCase
     {
         $product = $this->createdProduct();
 
-        $product->updateOptions([Option::create($product->productId, OptionId::fromString('ooo'))]);
+        $product->updateOptions([Option::create($product->productId, OptionId::fromString('ooo'), ['foo' => 'bar'])]);
 
         $this->assertEquals([
             new ProductCreated(ProductId::fromString('xxx')),
@@ -99,6 +99,7 @@ class ProductTest extends TestCase
                 'product_id' => $product->productId->get(),
                 'option_id' => 'ooo',
                 'values' => [],
+                'data' => json_encode(['foo' => 'bar']),
             ]
         ], $product->getChildEntities()[Option::class]);
     }
@@ -108,8 +109,8 @@ class ProductTest extends TestCase
     {
         $product = $this->createdProduct();
 
-        $product->updateOptions([Option::create($product->productId, OptionId::fromString('ooo'))]);
-        $product->updateOptions([Option::create($product->productId, OptionId::fromString('ooo'))]);
+        $product->updateOptions([Option::create($product->productId, OptionId::fromString('ooo'), [])]);
+        $product->updateOptions([Option::create($product->productId, OptionId::fromString('ooo'), [])]);
 
         $this->assertCount(1, $product->getChildEntities()[Option::class]);
     }
@@ -119,7 +120,7 @@ class ProductTest extends TestCase
     {
         $product = $this->createdProduct();
 
-        $product->updateOptions([$option = Option::create($product->productId, OptionId::fromString('ooo'))]);
+        $product->updateOptions([$option = Option::create($product->productId, OptionId::fromString('ooo'),[])]);
         $option->updateOptionValues([OptionValue::create($option->optionId, OptionValueId::fromString('xxx'), [
             'label' => [
                 'nl' => 'option value label nl',
@@ -148,6 +149,7 @@ class ProductTest extends TestCase
                         ])
                     ]
                 ],
+                'data' => json_encode([]),
             ]
         ], $product->getChildEntities()[Option::class]);
     }
@@ -208,5 +210,22 @@ class ProductTest extends TestCase
             new VariantCreated(ProductId::fromString('xxx'), VariantId::fromString('yyy')),
             new VariantDeleted(ProductId::fromString('xxx'), VariantId::fromString('yyy')),
         ], $product->releaseEvents());
+    }
+
+    /** @test */
+    public function it_can_get_all_options()
+    {
+        $product = $this->createdProductWithOptions();
+
+        /** @var Option[] $options */
+        $options = $product->getOptions();
+
+        $this->assertCount(2, $options);
+        $this->assertCount(2, $options['ooo']->getOptionValues());
+        $this->assertCount(1, $options['ppp']->getOptionValues());
+
+        $this->assertEquals('xxx', $options['ooo']->getOptionValues()[0]->optionValueId);
+        $this->assertEquals('yyy', $options['ooo']->getOptionValues()[1]->optionValueId);
+        $this->assertEquals('zzz', $options['ppp']->getOptionValues()[0]->optionValueId);
     }
 }

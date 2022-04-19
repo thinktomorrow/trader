@@ -7,6 +7,7 @@ use Ramsey\Uuid\Uuid;
 use Illuminate\Support\Facades\DB;
 use Thinktomorrow\Trader\Domain\Model\Product\Product;
 use Thinktomorrow\Trader\Domain\Model\Product\ProductId;
+use Thinktomorrow\Trader\Application\Common\TraderHelpers;
 use Thinktomorrow\Trader\Domain\Model\Product\Option\Option;
 use Thinktomorrow\Trader\Domain\Model\Product\Variant\Variant;
 use Thinktomorrow\Trader\Domain\Model\Product\Option\OptionId;
@@ -40,7 +41,7 @@ class MysqlProductRepository implements ProductRepository
         // personalisations
 
         $state = $product->getMappedData();
-        $taxon_ids = array_remove($state, 'taxon_ids');
+        $taxon_ids = TraderHelpers::array_remove($state, 'taxon_ids');
 
         if (!$this->exists($product->productId)) {
             DB::table(static::$productTable)->insert($state);
@@ -66,7 +67,7 @@ class MysqlProductRepository implements ProductRepository
 
         foreach ($product->getChildEntities()[Option::class] as $optionState) {
 
-            $option_values = array_remove($optionState, 'values');
+            $option_values = TraderHelpers::array_remove($optionState, 'values');
 
             DB::table(static::$optionTable)
                 ->updateOrInsert([
@@ -107,7 +108,8 @@ class MysqlProductRepository implements ProductRepository
         $existingTaxonIds = DB::table(static::$productTaxonLookupTable)
             ->where('product_id', $productId)
             ->select('taxon_id')
-            ->get();
+            ->get()
+            ->pluck('taxon_id');
 
         // Remove the ones that are not in the new list
         $detachTaxonIds = $existingTaxonIds->diff($changedTaxonIds);
@@ -139,10 +141,11 @@ class MysqlProductRepository implements ProductRepository
             ->select([static::$productTable . '.*', DB::raw('GROUP_CONCAT(`taxon_id`) AS taxon_ids')])
             ->where(static::$productTable . '.product_id', $productId->get())
             ->leftJoin(static::$productTaxonLookupTable, static::$productTable . '.product_id','=',static::$productTaxonLookupTable.'.product_id')
+            ->groupBy(static::$productTable . '.product_id')
             ->first();
 
         // Handle a bug in laravel where raw group concat statement would return a record with falsy null values
-        if(null === $productState->product_id) {
+        if($productState && null === $productState->product_id) {
             $productState = null;
         }
 
@@ -150,7 +153,7 @@ class MysqlProductRepository implements ProductRepository
             throw new CouldNotFindProduct('No product found by id [' . $productId->get() . ']');
         }
 
-        $productState = array_merge((array)$productState, ['taxon_ids' => $productState->taxon_ids ?: []]);
+        $productState = array_merge((array)$productState, ['taxon_ids' => ($productState->taxon_ids ? explode(',', $productState->taxon_ids) : [])]);
 
         $variantStates = $this->variantRepository->getStatesByProduct($productId);
 

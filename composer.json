@@ -19,9 +19,9 @@
         "beberlei/assert": "^3.3",
         "ext-bcmath": "*",
         "ext-intl": "*",
-        "psr/container": "^2.0",
+        "psr/container": "^1.1.2|^2.0",
         "laravel/ui": "^3.4",
-        "thinktomorrow/vine": "^0.4.1"
+        "thinktomorrow/vine": "^0.4.4"
     },
     "require-dev": {
         "phpunit/phpunit" : "~9.5",

@@ -23,10 +23,10 @@ class UpdateProductOptionsTest extends ProductContext
         ];
 
         $this->productApplication->updateProductOptions(new UpdateProductOptions($productId->get(), [[
-            'id' => null,
+            'option_id' => null,
             'values' => [
                 [
-                    'id' => null,
+                    'option_value_id' => null,
                     'data' => $dataPayload
                 ]
 
@@ -65,10 +65,10 @@ class UpdateProductOptionsTest extends ProductContext
         ];
 
         $this->productApplication->updateProductOptions(new UpdateProductOptions($productId->get(), [[
-            'id' => null,
+            'option_id' => null,
             'values' => [
                 [
-                    'id' => null,
+                    'option_value_id' => null,
                     'data' => $dataPayload
                 ]
 
@@ -86,14 +86,14 @@ class UpdateProductOptionsTest extends ProductContext
 
         // Update (+ add a second value)
         $this->productApplication->updateProductOptions(new UpdateProductOptions($productId->get(), [[
-            'id' => $option_id,
+            'option_id' => $option_id,
             'values' => [
                 [
-                    'id' => $option_value_id,
+                    'option_value_id' => $option_value_id,
                     'data' => $dataPayload
                 ],
                 [
-                    'id' => null,
+                    'option_value_id' => null,
                     'data' => array_merge($dataPayload, ['foo' => 'bar'])
                 ]
 
@@ -127,6 +127,19 @@ class UpdateProductOptionsTest extends ProductContext
     /** @test */
     public function it_can_remove_existing_options()
     {
+        $product = $this->createdProductWithOptions();
+        $this->productRepository->save($product);
+
+        $this->productApplication->updateProductOptions(new UpdateProductOptions($product->productId->get(), []));
+
+        $product = $this->productRepository->find($product->productId);
+
+        $this->assertEquals([], $product->getChildEntities()[Option::class]);
+    }
+
+    /** @test */
+    public function it_can_remove_existing_option_values()
+    {
         $productId = $this->createAProduct('50', ['1','2'], ['title' => ['nl' => 'foobar nl']]);
 
         $dataPayload = [
@@ -135,10 +148,10 @@ class UpdateProductOptionsTest extends ProductContext
         ];
 
         $this->productApplication->updateProductOptions(new UpdateProductOptions($productId->get(), [[
-            'id' => null,
+            'option_id' => null,
             'values' => [
                 [
-                    'id' => null,
+                    'option_value_id' => null,
                     'data' => $dataPayload
                 ]
 
@@ -150,9 +163,11 @@ class UpdateProductOptionsTest extends ProductContext
         $option_id = $product->getChildEntities()[Option::class][0]['option_id'];
 
         $this->productApplication->updateProductOptions(new UpdateProductOptions($productId->get(), [[
-            'id' => $option_id,
+            'option_id' => $option_id,
             'values' => [],
         ]]));
+
+        $product = $this->productRepository->find($productId);
 
         $this->assertArrayEqualsWithWildcard([
             [

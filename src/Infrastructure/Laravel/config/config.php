@@ -33,7 +33,14 @@ return [
      * which is used as a default for all the global taxes
      * such as shipping and payment costs.
      */
-    'tax_rate' => '21',
+    'default_tax_rate' => '21',
+
+    /**
+     * All available tax_rates to select from by the webmaster. This is
+     */
+    'tax_rates' => [
+        '21', '6', '12',
+    ],
 
     /**
      * When this value is true, all entered prices as given by the merchant are considered to have

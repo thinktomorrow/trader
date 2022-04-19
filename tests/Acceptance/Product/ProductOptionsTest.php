@@ -8,9 +8,6 @@ use Thinktomorrow\Trader\Domain\Common\Locale;
 use Thinktomorrow\Trader\Domain\Model\Product\Option\OptionId;
 use Thinktomorrow\Trader\Domain\Model\Product\Option\OptionValueId;
 use Thinktomorrow\Trader\Application\Product\ProductOptions\ProductOption;
-use Thinktomorrow\Trader\Application\Product\ProductOptions\ProductOptions;
-use Thinktomorrow\Trader\Application\Product\ProductOptions\ProductOptionsComposer;
-use function dd;
 
 class ProductOptionsTest extends ProductContext
 {
@@ -71,21 +68,4 @@ class ProductOptionsTest extends ProductContext
         $this->assertNotNull($productOptions[2]->getUrl());
         $this->assertNull($productOptions[1]->getUrl()); // Second one has no variant to point at so no url
     }
-
-//    private function createOptions()
-//    {
-//        $productOption = new ProductOption(OptionId::fromString('aaa'), OptionValueId::fromString('aaa-value'), [
-//            'label' => 'color',
-//            'value' => 'aaa value',
-//        ]);
-//
-//        $productOption2 = new ProductOption(OptionId::fromString('bbb'), OptionValueId::fromString('bbb-value'), [
-//            'label' => 'size',
-//            'value' => 'bbb value',
-//        ]);
-//
-//        return ProductOptions::fromType([
-//            $productOption, $productOption2,
-//        ]);
-//    }
 }

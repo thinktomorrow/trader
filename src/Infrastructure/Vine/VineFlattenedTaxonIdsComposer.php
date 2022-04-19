@@ -3,12 +3,13 @@ declare(strict_types=1);
 
 namespace Thinktomorrow\Trader\Infrastructure\Vine;
 
-use Thinktomorrow\Trader\Application\Taxon\Filter\TaxonTreeRepository;
-use Thinktomorrow\Trader\Application\Product\Grid\NestedTaxonIdsComposer;
+use Thinktomorrow\Trader\Application\Taxon\Tree\TaxonNode;
+use Thinktomorrow\Trader\Application\Taxon\Tree\TaxonTreeRepository;
+use Thinktomorrow\Trader\Application\Product\Grid\FlattenedTaxonIdsComposer;
 
-class VineNestedTaxonIdsComposer implements NestedTaxonIdsComposer
+class VineFlattenedTaxonIdsComposer implements FlattenedTaxonIdsComposer
 {
-    use UsesTaxonFilterTree;
+    use UsesTaxonTree;
 
     private TaxonTreeRepository $taxonTreeRepository;
 
@@ -36,8 +37,8 @@ class VineNestedTaxonIdsComposer implements NestedTaxonIdsComposer
         foreach ($taxonKeys as $key) {
 
             $node = ($passedAsKeys)
-                ? $this->getTree()->find(fn($node) => $node->getNodeEntry()->getKey() == $key)
-                : $this->getTree()->find(fn($node) => $node->getNodeId() == $key);
+                ? $this->getTree()->find(fn(TaxonNode $node) => $node->getKey() == $key)
+                : $this->getTree()->find(fn(TaxonNode $node) => $node->getNodeId() == $key);
 
             if(!$node) continue;
 

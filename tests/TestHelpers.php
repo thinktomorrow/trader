@@ -185,7 +185,7 @@ trait TestHelpers
         $product = $this->createdProduct();
 
         $product->updateOptions([
-            $option = Option::create($product->productId, OptionId::fromString('ooo')),
+            $option = Option::create($product->productId, OptionId::fromString('ooo'), ['foo' => 'bar']),
         ]);
 
         $option->updateOptionValues([OptionValue::create($option->optionId, OptionValueId::fromString('xxx'), [
@@ -210,8 +210,8 @@ trait TestHelpers
         $product = $this->createdProduct();
 
         $product->updateOptions([
-            $option = Option::create($product->productId, OptionId::fromString('ooo')),
-            $option2 = Option::create($product->productId, OptionId::fromString('ppp')),
+            $option = Option::create($product->productId, OptionId::fromString('ooo'), ['foo' => 'bar']),
+            $option2 = Option::create($product->productId, OptionId::fromString('ppp'), []),
         ]);
 
         $option->updateOptionValues([
@@ -234,7 +234,10 @@ trait TestHelpers
                     'nl' => 'option value nl 2',
                     'en' => 'option value en 2',
                 ],
-            ]),
+            ])
+        ]);
+
+        $option2->updateOptionValues([
             OptionValue::create($option2->optionId, OptionValueId::fromString('zzz'), [
                 'label' => [
                     'nl' => 'option label nl 3',

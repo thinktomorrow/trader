@@ -22,7 +22,12 @@ class TraderConfig implements \Thinktomorrow\Trader\TraderConfig
 
     public function getDefaultTaxRate(): string
     {
-        return config('trader.tax_rate');
+        return config('trader.default_tax_rate');
+    }
+
+    public function getAvailableTaxRates(): array
+    {
+        return config('trader.tax_rates');
     }
 
     public function doesPriceInputIncludesTax(): bool

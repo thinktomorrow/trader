@@ -52,7 +52,7 @@ class CreateBasicTraderTables extends Migration
         });
 
         Schema::create(static::PREFIX.'product_options', function (Blueprint $table) {
-            $table->char('option_id', 36);
+            $table->char('option_id', 36)->primary();
             $table->char('product_id', 36);
             $table->json('data')->nullable();
             $table->unsignedInteger('order_column')->default(0);
@@ -61,11 +61,13 @@ class CreateBasicTraderTables extends Migration
         });
 
         Schema::create(static::PREFIX.'product_option_values', function (Blueprint $table) {
+            $table->char('option_value_id', 36)->primary();
             $table->char('option_id', 36);
-            $table->char('option_value_id', 36);
             $table->json('data')->nullable();
             $table->unsignedInteger('order_column')->default(0);
+        });
 
+        Schema::table(static::PREFIX.'product_option_values', function (Blueprint $table) {
             $table->foreign('option_id')->references('option_id')->on('trader_product_options')->onDelete('cascade');
         });
 
@@ -73,6 +75,8 @@ class CreateBasicTraderTables extends Migration
             $table->char('variant_id', 36);
             $table->char('option_value_id', 36);
             $table->unsignedInteger('order_column')->default(0);
+
+            $table->primary(['variant_id','option_value_id']);
 
             $table->foreign('variant_id')->references('variant_id')->on('trader_product_variants')->onDelete('cascade');
             $table->foreign('option_value_id')->references('option_value_id')->on('trader_product_option_values')->onDelete('cascade');
@@ -93,10 +97,10 @@ class CreateBasicTraderTables extends Migration
             $table->char('taxon_id', 36);
             $table->char('product_id', 36);
 
+            $table->primary(['taxon_id','product_id']);
+
             $table->foreign('taxon_id')->references('taxon_id')->on(static::PREFIX.'taxa')->onDelete('cascade');
             $table->foreign('product_id')->references('product_id')->on(static::PREFIX.'products')->onDelete('cascade');
-
-            $table->unique(['taxon_id','product_id']);
         });
 
         Schema::create(static::PREFIX.'redirects', function (Blueprint $table)
@@ -182,39 +186,38 @@ class CreateBasicTraderTables extends Migration
         Schema::create(static::PREFIX.'order_lines', function (Blueprint $table)
         {
             $table->char('line_id', 36)->primary();
-            $table->char('order_id', 36);
-            $table->char('variant_id', 36); // reference to original/current product
+            $table->char('order_id', 36)->index();
+            $table->char('variant_id', 36)->nullable()->index(); // reference to original/current product
             $table->smallInteger('quantity')->unsigned();
             $table->integer('line_price')->unsigned();
             $table->string('tax_rate');
             $table->boolean('includes_vat');
             $table->json('data')->nullable(); // Contains historic product data like name
 
-            $table->index('product_id');
-            $table->index('order_id');
             $table->foreign('order_id')->references('order_id')->on(static::PREFIX.'orders')->onDelete('cascade');
+            $table->foreign('variant_id')->references('variant_id')->on(static::PREFIX.'product_variants')->nullOnDelete();
         });
 
         Schema::create(static::PREFIX.'order_shoppers', function (Blueprint $table)
         {
             $table->char('shopper_id', 36)->primary();
-            $table->char('order_id', 36);
-            $table->unsignedBigInteger('customer_id')->nullable();
+            $table->char('order_id', 36)->index();
+            $table->char('customer_id', 36)->nullable()->index();
             $table->string('email');
             $table->string('firstname');
             $table->string('lastname');
             $table->boolean('register_after_checkout');
             $table->json('data')->nullable();
 
-            $table->index('order_id');
             $table->foreign('order_id')->references('order_id')->on(static::PREFIX.'orders')->onDelete('cascade');
+            $table->foreign('customer_id')->references('customer_id')->on(static::PREFIX.'customers')->nullOnDelete();
         });
 
         Schema::create(static::PREFIX.'order_shipping', function (Blueprint $table)
         {
             $table->char('shipping_id', 36)->primary();
-            $table->char('order_id', 36);
-            $table->char('shipping_profile_id', 36);
+            $table->char('order_id', 36)->index();
+            $table->char('shipping_profile_id', 36)->nullable()->index();
             $table->string('shipping_state', 32);
 
             $table->integer('cost')->unsigned();
@@ -222,15 +225,15 @@ class CreateBasicTraderTables extends Migration
             $table->boolean('includes_vat');
             $table->json('data')->nullable();
 
-            $table->index('order_id');
             $table->foreign('order_id')->references('order_id')->on(static::PREFIX.'orders')->onDelete('cascade');
+            $table->foreign('shipping_profile_id')->references('shipping_profile_id')->on(static::PREFIX.'shipping_profiles')->nullOnDelete();
         });
 
         Schema::create(static::PREFIX.'order_payment', function (Blueprint $table)
         {
             $table->char('payment_id', 36)->primary();
-            $table->char('order_id', 36);
-            $table->char('payment_method_id', 36);
+            $table->char('order_id', 36)->index();
+            $table->char('payment_method_id', 36)->nullable()->index();
             $table->string('payment_state', 32);
 
             $table->integer('cost')->unsigned();
@@ -238,33 +241,31 @@ class CreateBasicTraderTables extends Migration
             $table->boolean('includes_vat');
             $table->json('data')->nullable();
 
-            $table->index('order_id');
             $table->foreign('order_id')->references('order_id')->on(static::PREFIX.'orders')->onDelete('cascade');
+            $table->foreign('payment_method_id')->references('payment_method_id')->on(static::PREFIX.'payment_methods')->nullOnDelete();
         });
 
         Schema::create(static::PREFIX.'order_events', function (Blueprint $table)
         {
             $table->id();
-            $table->char('order_id', 36);
+            $table->char('order_id', 36)->index();
             $table->string('event'); // transition.confirmed, transition.paid, notification.delay
             $table->dateTime('at');
             $table->json('data')->nullable();
 
-            $table->index('order_id');
             $table->foreign('order_id')->references('order_id')->on(static::PREFIX.'orders')->onDelete('cascade');
         });
 
         Schema::create(static::PREFIX.'order_discounts', function (Blueprint $table)
         {
             $table->char('discount_id', 36)->primary();
-            $table->char('order_id', 36);
-            $table->char('promo_id', 36)->nullable(); // Refers to original promo
+            $table->char('order_id', 36)->index();
+            $table->char('promo_id', 36)->nullable()->index(); // Refers to original promo
             $table->integer('total')->unsigned();
             $table->string('tax_rate');
             $table->boolean('includes_vat');
             $table->json('data')->nullable();
 
-            $table->index('order_id');
             $table->foreign('order_id')->references('order_id')->on(static::PREFIX.'orders')->onDelete('cascade');
         });
     }

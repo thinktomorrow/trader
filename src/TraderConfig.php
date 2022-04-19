@@ -13,5 +13,7 @@ interface TraderConfig
 
     public function getDefaultTaxRate(): string;
 
+    public function getAvailableTaxRates(): array;
+
     public function doesPriceInputIncludesTax(): bool;
 }

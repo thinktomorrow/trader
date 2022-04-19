@@ -16,10 +16,10 @@ class UpdateProductOptionItem
      * Payload format looks like this:
      *
      * [
-     *    'id' => '123', // null
+     *    'option_id' => '123', // null
      *    'values' => [
      *        [
-     *            'id' => '123', // or null
+     *            'option_value_id' => '123', // or null
      *            'data' => [
      *                'label' => ['nl' => 'label nl'],
      *                'custom' => 'foobar',

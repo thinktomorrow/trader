@@ -10,15 +10,26 @@ use Thinktomorrow\Trader\Domain\Common\Locale;
 use Thinktomorrow\Trader\Application\Common\DataRenderer;
 use Thinktomorrow\Trader\Domain\Model\Order\OrderRepository;
 use Thinktomorrow\Trader\Domain\Common\Event\EventDispatcher;
+use Thinktomorrow\Trader\Domain\Model\Product\ProductRepository;
+use Thinktomorrow\Trader\Domain\Model\Product\VariantRepository;
 use Thinktomorrow\Trader\Application\Product\Grid\GridRepository;
 use Thinktomorrow\Trader\Domain\Model\Customer\CustomerRepository;
+use Thinktomorrow\Trader\Application\Taxon\Tree\TaxonTreeRepository;
+use Thinktomorrow\Trader\Infrastructure\Vine\VineTaxonIdOptionsComposer;
+use Thinktomorrow\Trader\Infrastructure\Vine\VineTaxonFilterTreeComposer;
+use Thinktomorrow\Trader\Application\Taxon\Filter\TaxonFilterTreeComposer;
+use Thinktomorrow\Trader\Infrastructure\Vine\VineFlattenedTaxonIdsComposer;
 use Thinktomorrow\Trader\Domain\Model\PaymentMethod\PaymentMethodRepository;
 use Thinktomorrow\Trader\Domain\Model\CustomerLogin\CustomerLoginRepository;
+use Thinktomorrow\Trader\Application\Product\Grid\FlattenedTaxonIdsComposer;
+use Thinktomorrow\Trader\Application\Taxon\TaxonSelect\TaxonIdOptionsComposer;
 use Thinktomorrow\Trader\Domain\Model\ShippingProfile\ShippingProfileRepository;
 use Thinktomorrow\Trader\Infrastructure\Laravel\Repositories\MysqlGridRepository;
 use Thinktomorrow\Trader\Infrastructure\Laravel\Repositories\MysqlOrderRepository;
+use Thinktomorrow\Trader\Infrastructure\Laravel\Repositories\MysqlTaxonRepository;
 use Thinktomorrow\Trader\Application\Product\ProductDetail\ProductDetailRepository;
 use Thinktomorrow\Trader\Infrastructure\Laravel\Repositories\MysqlVariantRepository;
+use Thinktomorrow\Trader\Infrastructure\Laravel\Repositories\MysqlProductRepository;
 use Thinktomorrow\Trader\Infrastructure\Laravel\Repositories\MysqlCustomerRepository;
 use Thinktomorrow\Trader\Infrastructure\Laravel\Repositories\MysqlProductDetailRepository;
 use Thinktomorrow\Trader\Application\Cart\VariantForCart\VariantForCartRepository;
@@ -36,8 +47,15 @@ class TraderServiceProvider extends ServiceProvider
 
         // Product
         $this->app->bind(GridRepository::class, MysqlGridRepository::class);
+        $this->app->bind(ProductRepository::class, MysqlProductRepository::class);
         $this->app->bind(ProductDetailRepository::class, MysqlProductDetailRepository::class);
+        $this->app->bind(VariantRepository::class, MysqlVariantRepository::class);
         $this->app->bind(VariantForCartRepository::class, MysqlVariantRepository::class);
+
+        $this->app->bind(TaxonTreeRepository::class, MysqlTaxonRepository::class);
+        $this->app->bind(TaxonIdOptionsComposer::class, VineTaxonIdOptionsComposer::class);
+        $this->app->bind(TaxonFilterTreeComposer::class, VineTaxonFilterTreeComposer::class);
+        $this->app->bind(FlattenedTaxonIdsComposer::class, VineFlattenedTaxonIdsComposer::class);
 
         // Order
         $this->app->bind(OrderRepository::class, MysqlOrderRepository::class);
@@ -56,7 +74,7 @@ class TraderServiceProvider extends ServiceProvider
          * expects that localized content is always formatted as <key>.<language>. We always
          * first try to find localized content before fetching the defaults.
          */
-        DataRenderer::setResolver(function(array $data, string $key, string $language = null, string $default = null)
+        DataRenderer::setResolver(function(array $data, string $key, string $language = null, $default = null)
         {
             if(!$language) {
                 $language = $this->app->make(TraderConfig::class)

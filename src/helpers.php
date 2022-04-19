@@ -1,15 +1,5 @@
 <?php
 
-if(!function_exists('array_remove')) {
-    function array_remove(array &$array, $key)
-    {
-        $value = $array[$key] ?? null;
-        unset($array[$key]);
-
-        return $value;
-    }
-}
-
 if(!function_exists('dd')) {
     function dd() {
         var_dump(...func_get_args());

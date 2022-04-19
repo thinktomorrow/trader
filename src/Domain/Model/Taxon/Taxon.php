@@ -3,12 +3,14 @@ declare(strict_types=1);
 
 namespace Thinktomorrow\Trader\Domain\Model\Taxon;
 
+use Thinktomorrow\Trader\Domain\Common\Entity\HasData;
 use Thinktomorrow\Trader\Domain\Common\Entity\Aggregate;
 use Thinktomorrow\Trader\Domain\Common\Event\RecordsEvents;
 use Thinktomorrow\Trader\Domain\Model\Taxon\Exceptions\InvalidParentTaxonId;
 
 class Taxon implements Aggregate
 {
+    use HasData;
     use RecordsEvents;
 
     public readonly TaxonId $taxonId;
@@ -17,13 +19,14 @@ class Taxon implements Aggregate
     private int $order;
     private ?TaxonId $parentTaxonId = null;
 
-    public static function create(TaxonId $taxonId, string $taxonKey, ?TaxonId $parentTaxonId = null): static
+    public static function create(TaxonId $taxonId, string $taxonKey, array $data, ?TaxonId $parentTaxonId = null): static
     {
         $taxon = new static();
         $taxon->taxonId = $taxonId;
         $taxon->taxonKey = $taxonKey;
         $taxon->taxonState = TaxonState::online;
         $taxon->order = 0;
+        $taxon->data = $data;
 
         $parentTaxonId
             ? $taxon->changeParent($parentTaxonId)
@@ -64,6 +67,7 @@ class Taxon implements Aggregate
             'state' => $this->taxonState->value,
             'order' => $this->order,
             'parent_id' => $this->parentTaxonId?->get(),
+            'data' => json_encode($this->data),
         ];
     }
 
@@ -79,6 +83,7 @@ class Taxon implements Aggregate
         $taxon->taxonKey = $state['key'];
         $taxon->taxonState = TaxonState::from($state['state']);
         $taxon->order = (int) $state['order'];
+        $taxon->data = json_decode($state['data'], true);
         $taxon->parentTaxonId = $state['parent_id'] ? TaxonId::fromString($state['parent_id']) : null;
 
         return $taxon;

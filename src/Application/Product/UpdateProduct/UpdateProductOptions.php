@@ -27,8 +27,11 @@ class UpdateProductOptions
     public function getOptions(): array
     {
         return array_map(function($option){
-            $values = array_map(fn($optionValue) => new UpdateProductOptionValueItem($optionValue['id'], $optionValue['data']), $option['values']);
-            return new UpdateProductOptionItem($option['id'], $values);
+            $values = array_map(function($optionValue) {
+                return new UpdateProductOptionValueItem($optionValue['option_value_id'], $optionValue['data'] );
+            }, $option['values'] ?? []);
+
+            return new UpdateProductOptionItem($option['option_id'], $values);
         }, $this->options);
     }
 }

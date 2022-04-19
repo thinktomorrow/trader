@@ -7,7 +7,7 @@ use Tests\Infrastructure\TestCase;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Thinktomorrow\Trader\Domain\Model\Taxon\Taxon;
 use Thinktomorrow\Trader\Domain\Model\Taxon\TaxonId;
-use Thinktomorrow\Trader\Application\Taxon\Filter\TaxonFilter;
+use Thinktomorrow\Trader\Application\Taxon\Tree\TaxonNode;
 use Thinktomorrow\Trader\Infrastructure\Test\Repositories\InMemoryTaxonRepository;
 use Thinktomorrow\Trader\Infrastructure\Laravel\Repositories\MysqlTaxonRepository;
 
@@ -21,8 +21,8 @@ final class TaxonTreeRepositoryTest extends TestCase
         $this->createTaxons();
 
         foreach($this->repositories() as $repository) {
-            $this->assertContainsOnlyInstancesOf(TaxonFilter::class, $repository->getAllTaxonFilters());
-            $this->assertCount(5, $repository->getAllTaxonFilters());
+            $this->assertContainsOnlyInstancesOf(TaxonNode::class, $repository->getAllTaxonNodes());
+            $this->assertCount(5, $repository->getAllTaxonNodes());
         }
     }
 

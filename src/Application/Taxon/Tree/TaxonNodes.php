@@ -1,16 +1,16 @@
 <?php
 declare(strict_types=1);
 
-namespace Thinktomorrow\Trader\Application\Taxon\Filter;
+namespace Thinktomorrow\Trader\Application\Taxon\Tree;
 
 use Assert\Assertion;
 use Thinktomorrow\Trader\Application\Common\ArrayCollection;
 
-class TaxonFilters extends ArrayCollection
+class TaxonNodes extends ArrayCollection
 {
     public static function fromType(array $items): static
     {
-        Assertion::allIsInstanceOf($items, TaxonFilter::class);
+        Assertion::allIsInstanceOf($items, TaxonNode::class);
 
         return new static($items);
     }

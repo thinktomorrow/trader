@@ -13,12 +13,12 @@ use Thinktomorrow\Trader\Domain\Model\Product\ProductState;
 use Thinktomorrow\Trader\Application\Product\Grid\GridItem;
 use Thinktomorrow\Trader\Application\Product\Grid\GridRepository;
 use Thinktomorrow\Trader\Domain\Model\Product\Variant\VariantState;
-use Thinktomorrow\Trader\Application\Product\Grid\NestedTaxonIdsComposer;
+use Thinktomorrow\Trader\Application\Product\Grid\FlattenedTaxonIdsComposer;
 
 class MysqlGridRepository implements GridRepository
 {
     protected Builder $builder;
-    private NestedTaxonIdsComposer $nestedTaxonIdsComposer;
+    private FlattenedTaxonIdsComposer $flattenedTaxonIds;
 
     private int $perPage = 20;
     private Locale $locale;
@@ -28,8 +28,10 @@ class MysqlGridRepository implements GridRepository
     private static string $taxonTable = 'trader_taxa';
     private static string $taxonPivotTable = 'trader_taxa_products';
 
-    public function __construct(TraderConfig $traderConfig, NestedTaxonIdsComposer $nestedTaxonIdsComposer)
+    public function __construct(TraderConfig $traderConfig, FlattenedTaxonIdsComposer $flattenedTaxonIds)
     {
+        $this->traderConfig = $traderConfig;
+        $this->flattenedTaxonIds = $flattenedTaxonIds;
         $this->locale = $traderConfig->getDefaultLocale();
 
         // Basic builder query
@@ -43,8 +45,6 @@ class MysqlGridRepository implements GridRepository
                 static::$productTable . '.data AS product_data',
                 static::$productTable . '.order_column AS product_order_column',
             ]);
-        $this->traderConfig = $traderConfig;
-        $this->nestedTaxonIdsComposer = $nestedTaxonIdsComposer;
     }
 
     public function filterByTerm(string $term): GridRepository
@@ -58,7 +58,7 @@ class MysqlGridRepository implements GridRepository
          * All taxa are grouped by their root. Taxa within the same root have an OR relation
          * in the search. Taxa of different roots will be searched as an AND operation
          */
-        $taxonIds = $this->nestedTaxonIdsComposer->getGroupedByRootByKeys($taxonKeys);
+        $taxonIds = $this->flattenedTaxonIds->getGroupedByRootByKeys($taxonKeys);
 
         foreach ($taxonIds as $rootId => $ids) {
             $joinTable = 'join' . $rootId;

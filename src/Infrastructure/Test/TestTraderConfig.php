@@ -23,6 +23,11 @@ class TestTraderConfig implements TraderConfig
         return '10';
     }
 
+    public function getAvailableTaxRates(): array
+    {
+        return ['21', '12', '6', '10'];
+    }
+
     public function doesPriceInputIncludesTax(): bool
     {
         return true;
