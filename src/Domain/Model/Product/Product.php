@@ -78,7 +78,7 @@ class Product implements Aggregate
 
         if(array_key_exists(Option::class, $childEntities)) {
             foreach($childEntities[Option::class] as $optionState) {
-                $product->options[$optionState['option_id']] = Option::fromMappedData($optionState, $state, [OptionValue::class => $optionState['values']]);
+                $product->options[] = Option::fromMappedData($optionState, $state, [OptionValue::class => $optionState['values']]);
             }
         }
 

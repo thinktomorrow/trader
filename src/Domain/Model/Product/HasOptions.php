@@ -6,9 +6,7 @@ namespace Thinktomorrow\Trader\Domain\Model\Product;
 use Assert\Assertion;
 use Thinktomorrow\Trader\Domain\Model\Product\Option\Option;
 use Thinktomorrow\Trader\Domain\Model\Product\Option\OptionId;
-use Thinktomorrow\Trader\Domain\Model\Product\Variant\VariantId;
 use Thinktomorrow\Trader\Domain\Model\Product\Event\OptionsUpdated;
-use Thinktomorrow\Trader\Domain\Model\Product\Option\OptionValueId;
 use Thinktomorrow\Trader\Domain\Model\Product\Event\OptionValuesUpdated;
 use Thinktomorrow\Trader\Domain\Model\Product\Exceptions\CouldNotFindOptionOnProduct;
 
@@ -39,30 +37,30 @@ trait HasOptions
     {
         Assertion::allIsInstanceOf($options, Option::class);
 
-        // Remove current options that are not present in the update payload.
-        foreach($this->options as $currentOption) {
-            if(!in_array($currentOption->optionId->get(), array_map(fn($option) => $option->optionId->get(), $options))) {
-                unset($this->options[$currentOption->optionId->get()]);
-            }
-        }
+        // Remove current options.
+        $this->options = [];
 
-        foreach($options as $option) {
-            $this->options[$option->optionId->get()] = $option;
-        }
+        $this->options = $options;
 
         $this->recordEvent(new OptionsUpdated($this->productId));
     }
 
-//    public function assignOptionValueToVariant(OptionValueId $optionValueId, VariantId $variantId): void
-//    {
-//        /** @var Option $option */
-//        foreach($this->options as $option) {
-//            if($option->hasOptionValue($optionValueId)) {
-//                $optionValue = $option->findOptionValue($optionValueId)->addToVariant($variantId);
-//                $option->updateOptionValue($optionValue);
-//            }
-//        }
-//    }
+    public function updateOptionValues(OptionId $optionId, array $optionValues): void
+    {
+        if(!$this->hasOption($optionId)) {
+            throw new CouldNotFindOptionOnProduct(
+                'Cannot update option because product ['.$this->productId->get().'] has no option by id ['.$optionId->get().']'
+            );
+        }
+
+        foreach($this->options as $i => $existingOption) {
+            if($existingOption->optionId->equals($optionId)) {
+                $this->options[$i]->updateOptionValues($optionValues);
+                $this->recordEvent(new OptionValuesUpdated($this->productId, $optionId));
+                return;
+            }
+        }
+    }
 
     private function hasOption(OptionId $optionId): bool
     {
@@ -74,18 +72,5 @@ trait HasOptions
         }
 
         return false;
-    }
-
-    public function updateOptionValues(OptionId $optionId, array $optionValues): void
-    {
-        if (!$this->hasOption($optionId)) {
-            throw new CouldNotFindOptionOnProduct(
-                'Cannot update option because product ['.$this->productId->get().'] has no option by id ['.$optionId->get().']'
-            );
-        }
-
-        $this->options[$optionId->get()]->updateOptionValues($optionValues);
-
-        $this->recordEvent(new OptionValuesUpdated($this->productId, $optionId));
     }
 }

@@ -185,4 +185,10 @@ class UpdateProductOptionsTest extends ProductContext
             ]
         ], $product->getChildEntities()[Option::class]);
     }
+
+    /** @test */
+    public function it_can_reorder_options()
+    {
+
+    }
 }

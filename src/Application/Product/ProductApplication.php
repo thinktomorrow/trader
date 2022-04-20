@@ -81,9 +81,6 @@ class ProductApplication
         $product = $this->productRepository->find($updateProductOptions->getProductId());
         $options = [];
 
-        // Remove options not present in command
-
-
         foreach ($updateProductOptions->getOptions() as $optionItem) {
             $option = Option::create($product->productId, $optionItem->getOptionId() ?: $product->getNextOptionId(), $optionItem->getData());
 

@@ -65,7 +65,7 @@ class MysqlProductRepository implements ProductRepository
             ->whereNotIn('option_id', $option_ids)
             ->delete();
 
-        foreach ($product->getChildEntities()[Option::class] as $optionState) {
+        foreach ($product->getChildEntities()[Option::class] as $i => $optionState) {
 
             $option_values = TraderHelpers::array_remove($optionState, 'values');
 
@@ -73,15 +73,16 @@ class MysqlProductRepository implements ProductRepository
                 ->updateOrInsert([
                     'product_id' => $product->productId->get(),
                     'option_id'  => $optionState['option_id'],
-                ], $optionState);
+                ], array_merge($optionState,['order_column' => $i]));
 
             // TODO: do this in one query...
-            foreach($option_values as $option_value) {
+//            trap($option_values);
+            foreach($option_values as $j => $option_value) {
                 DB::table(static::$optionValueTable)
                     ->updateOrInsert([
                         'option_id'  => $option_value['option_id'],
                         'option_value_id'  => $option_value['option_value_id'],
-                    ], $option_value);
+                    ], array_merge($option_value, ['order_column' => $j]));
             }
         }
     }
