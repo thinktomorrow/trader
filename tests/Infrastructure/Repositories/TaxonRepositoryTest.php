@@ -71,12 +71,14 @@ final class TaxonRepositoryTest extends TestCase
         yield [Taxon::create(
             TaxonId::fromString('xxx'),
             'taxon-key',
+            ['foo' => 'bar'],
             TaxonId::fromString('parent'),
         )];
 
         $taxon = Taxon::create(
             TaxonId::fromString('xxx'),
             'taxon-key',
+            ['foo' => 'bar'],
             TaxonId::fromString('parent'),
         );
 
@@ -89,6 +91,7 @@ final class TaxonRepositoryTest extends TestCase
         yield [Taxon::create(
             TaxonId::fromString('xxx'),
             'taxon-key',
+            ['foo' => 'bar'],
         )];
     }
 }

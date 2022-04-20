@@ -55,7 +55,7 @@ class ProductTest extends TestCase
         $product = Product::fromMappedData([
             'product_id' => 'xxx',
             'data' => $data,
-            'taxon_ids' => '1,2',
+            'taxon_ids' => ['1','2'],
         ]);
 
         $this->assertEquals(ProductId::fromString('xxx'), $product->getMappedData()['product_id']);

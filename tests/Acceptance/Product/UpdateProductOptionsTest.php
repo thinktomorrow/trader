@@ -24,6 +24,7 @@ class UpdateProductOptionsTest extends ProductContext
 
         $this->productApplication->updateProductOptions(new UpdateProductOptions($productId->get(), [[
             'option_id' => null,
+            'data' => $dataPayload,
             'values' => [
                 [
                     'option_value_id' => null,
@@ -39,6 +40,7 @@ class UpdateProductOptionsTest extends ProductContext
            [
                'product_id' => '*',
                'option_id' => '*',
+               'data' => json_encode($dataPayload),
                'values' => [
                     [
                         'option_id' => '*',
@@ -66,6 +68,7 @@ class UpdateProductOptionsTest extends ProductContext
 
         $this->productApplication->updateProductOptions(new UpdateProductOptions($productId->get(), [[
             'option_id' => null,
+            'data' => $dataPayload,
             'values' => [
                 [
                     'option_value_id' => null,
@@ -87,6 +90,7 @@ class UpdateProductOptionsTest extends ProductContext
         // Update (+ add a second value)
         $this->productApplication->updateProductOptions(new UpdateProductOptions($productId->get(), [[
             'option_id' => $option_id,
+            'data' => $dataPayload,
             'values' => [
                 [
                     'option_value_id' => $option_value_id,
@@ -104,6 +108,7 @@ class UpdateProductOptionsTest extends ProductContext
             [
                 'product_id' => '*',
                 'option_id' => $option_id,
+                'data' => json_encode($dataPayload),
                 'values' => [
                     [
                         'option_id' => $option_id,
@@ -149,6 +154,7 @@ class UpdateProductOptionsTest extends ProductContext
 
         $this->productApplication->updateProductOptions(new UpdateProductOptions($productId->get(), [[
             'option_id' => null,
+            'data' => $dataPayload,
             'values' => [
                 [
                     'option_value_id' => null,
@@ -164,6 +170,7 @@ class UpdateProductOptionsTest extends ProductContext
 
         $this->productApplication->updateProductOptions(new UpdateProductOptions($productId->get(), [[
             'option_id' => $option_id,
+            'data' => [],
             'values' => [],
         ]]));
 
@@ -173,6 +180,7 @@ class UpdateProductOptionsTest extends ProductContext
             [
                 'product_id' => '*',
                 'option_id' => $option_id,
+                'data' => json_encode([]),
                 'values' => [],
             ]
         ], $product->getChildEntities()[Option::class]);

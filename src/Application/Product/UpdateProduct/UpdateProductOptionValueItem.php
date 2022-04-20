@@ -12,8 +12,6 @@ class UpdateProductOptionValueItem
 
     public function __construct(?string $optionValueId, array $data)
     {
-        $this->assertValuesFormat($data);
-
         $this->optionValueId = $optionValueId;
         $this->data = $data;
     }
@@ -27,10 +25,4 @@ class UpdateProductOptionValueItem
     {
         return $this->data;
     }
-
-    private function assertValuesFormat(array $values): void
-    {
-
-    }
-
 }

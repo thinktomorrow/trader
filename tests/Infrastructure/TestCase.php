@@ -6,6 +6,8 @@ namespace Tests\Infrastructure;
 use Tests\TestHelpers;
 use Thinktomorrow\Trader\Infrastructure\Shop\ShopServiceProvider;
 use Thinktomorrow\Trader\Infrastructure\Laravel\TraderServiceProvider;
+use Thinktomorrow\Trader\Infrastructure\Test\Repositories\InMemoryVariantRepository;
+use Thinktomorrow\Trader\Infrastructure\Test\Repositories\InMemoryProductRepository;
 
 abstract class TestCase extends \Orchestra\Testbench\TestCase
 {
@@ -17,5 +19,13 @@ abstract class TestCase extends \Orchestra\Testbench\TestCase
             TraderServiceProvider::class,
             ShopServiceProvider::class,
         ];
+    }
+
+    protected function tearDown(): void
+    {
+        (new InMemoryProductRepository())->clear();
+        (new InMemoryVariantRepository(new InMemoryProductRepository()))->clear();
+
+        parent::tearDown();
     }
 }

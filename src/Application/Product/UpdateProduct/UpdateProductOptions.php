@@ -31,7 +31,7 @@ class UpdateProductOptions
                 return new UpdateProductOptionValueItem($optionValue['option_value_id'], $optionValue['data'] );
             }, $option['values'] ?? []);
 
-            return new UpdateProductOptionItem($option['option_id'], $values);
+            return new UpdateProductOptionItem($option['option_id'], $option['data'], $values);
         }, $this->options);
     }
 }

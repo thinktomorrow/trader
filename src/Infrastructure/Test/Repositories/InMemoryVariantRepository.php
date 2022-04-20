@@ -19,7 +19,7 @@ final class InMemoryVariantRepository implements VariantRepository, VariantForCa
 {
     private InMemoryProductRepository $productRepository;
 
-    private static array $variants = [];
+    public static array $variants = [];
     private string $nextReference = 'xxx-123';
 
     public function __construct(InMemoryProductRepository $productRepository)

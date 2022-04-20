@@ -64,6 +64,7 @@ abstract class ProductContext extends TestCase
     public function tearDown(): void
     {
         $this->productRepository->clear();
+        $this->variantRepository->clear();
     }
 
     protected function createAProduct(string $unitPrice, array $taxonIds, array $data = []): ProductId

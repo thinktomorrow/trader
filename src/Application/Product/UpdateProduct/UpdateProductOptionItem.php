@@ -9,6 +9,9 @@ use Thinktomorrow\Trader\Domain\Model\Product\Option\OptionId;
 class UpdateProductOptionItem
 {
     private ?string $optionId;
+    private array $data;
+
+    /** @var UpdateProductOptionValueItem[] */
     private array $values;
 
     /**
@@ -17,11 +20,12 @@ class UpdateProductOptionItem
      *
      * [
      *    'option_id' => '123', // null
+     *    'data' => ['label' => 'nl' => ['kleur']],
      *    'values' => [
      *        [
      *            'option_value_id' => '123', // or null
      *            'data' => [
-     *                'label' => ['nl' => 'label nl'],
+     *                'label' => ['nl' => 'groen'],
      *                'custom' => 'foobar',
      *            ],
      *        ],
@@ -29,11 +33,12 @@ class UpdateProductOptionItem
      * ]
      */
 
-    public function __construct(?string $optionId, array $values)
+    public function __construct(?string $optionId, array $data, array $values)
     {
         Assertion::allIsInstanceOf($values, UpdateProductOptionValueItem::class);
 
         $this->optionId = $optionId;
+        $this->data = $data;
         $this->values = $values;
     }
 
@@ -42,9 +47,11 @@ class UpdateProductOptionItem
         return $this->optionId ? OptionId::fromString($this->optionId) : null;
     }
 
-    /**
-     * @return UpdateProductOptionValueItem[]
-     */
+    public function getData(): array
+    {
+        return $this->data;
+    }
+
     public function getValues(): array
     {
         return $this->values;

@@ -47,12 +47,13 @@ abstract class CartContext extends TestCase
     protected InMemoryProductRepository $productRepository;
     protected InMemoryOrderRepository $orderRepository;
     protected InMemoryShippingProfileRepository $shippingProfileRepository;
+    protected InMemoryVariantRepository $variantRepository;
 
     public function setUp(): void
     {
         $this->cartApplication = new CartApplication(
             new TestTraderConfig(),
-            new InMemoryVariantRepository(new InMemoryProductRepository()),
+            $this->variantRepository = new InMemoryVariantRepository(new InMemoryProductRepository()),
             $this->orderRepository = new InMemoryOrderRepository(),
             $this->shippingProfileRepository = new InMemoryShippingProfileRepository(),
             new InMemoryPaymentMethodRepository(),
@@ -71,6 +72,7 @@ abstract class CartContext extends TestCase
     public function tearDown(): void
     {
         $this->productRepository->clear();
+        $this->variantRepository->clear();
         $this->orderRepository->clear();
         $this->shippingProfileRepository->clear();
     }
@@ -91,6 +93,7 @@ abstract class CartContext extends TestCase
         $this->productRepository->save($product);
 
         Assert::assertNotNull($this->productRepository->find(ProductId::fromString($productTitle)));
+        Assert::assertNotNull($this->variantRepository->findVariantForCart(VariantId::fromString($productTitle . '-123')));
     }
 
     public function givenOrderHasAShippingCountry(string $country)

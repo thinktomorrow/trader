@@ -314,6 +314,10 @@ trait TestHelpers
 
         foreach($expected as $expectedKey => $expectedValue) {
 
+            if(is_array($expectedValue) && !is_array($actual[$expectedKey])) {
+                $this->assertEquals($expectedValue, $actual[$expectedKey], $message);
+            }
+
             if(is_array($expectedValue)) {
                 $this->assertArrayEqualsWithWildcard($expectedValue, $actual[$expectedKey], $message);
                 continue;

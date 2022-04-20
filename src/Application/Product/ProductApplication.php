@@ -85,7 +85,7 @@ class ProductApplication
 
 
         foreach ($updateProductOptions->getOptions() as $optionItem) {
-            $option = Option::create($product->productId, $optionItem->getOptionId() ?: $product->getNextOptionId());
+            $option = Option::create($product->productId, $optionItem->getOptionId() ?: $product->getNextOptionId(), $optionItem->getData());
 
             $option->updateOptionValues(array_map(function ($value) use ($option) {
                 return OptionValue::create(

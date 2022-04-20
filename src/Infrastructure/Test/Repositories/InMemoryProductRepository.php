@@ -19,6 +19,8 @@ final class InMemoryProductRepository implements ProductRepository
     public function save(Product $product): void
     {
         static::$products[$product->productId->get()] = $product;
+
+        InMemoryVariantRepository::$variants = array_merge(InMemoryVariantRepository::$variants, $product->getVariants());
     }
 
     public function find(ProductId $productId): Product
@@ -55,16 +57,16 @@ final class InMemoryProductRepository implements ProductRepository
         static::$products = [];
     }
 
-    public function findVariantForCart(VariantId $variantId): VariantForCart
-    {
-        foreach(static::$products as $product) {
-            foreach($product->getVariants() as $variant) {
-                if($variant->variantId->equals($variantId)) {
-                    return new VariantForCart(
-                        $variant->getSalePrice()
-                    );
-                }
-            }
-        }
-    }
+//    public function findVariantForCart(VariantId $variantId): VariantForCart
+//    {
+//        foreach(static::$products as $product) {
+//            foreach($product->getVariants() as $variant) {
+//                if($variant->variantId->equals($variantId)) {
+//                    return new VariantForCart(
+//                        $variant->getSalePrice()
+//                    );
+//                }
+//            }
+//        }
+//    }
 }

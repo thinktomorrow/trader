@@ -35,11 +35,11 @@ final class TaxonTreeRepositoryTest extends TestCase
     private function createTaxons()
     {
         $taxons = [
-            Taxon::create(TaxonId::fromString('first'), 'taxon-first'),
-            Taxon::create(TaxonId::fromString('second'), 'taxon-second', TaxonId::fromString('first')),
-            Taxon::create(TaxonId::fromString('third'), 'taxon-third', TaxonId::fromString('first')),
-            Taxon::create(TaxonId::fromString('fourth'), 'taxon-fourth', TaxonId::fromString('third')),
-            Taxon::create(TaxonId::fromString('fifth'), 'taxon-fifth'),
+            Taxon::create(TaxonId::fromString('first'), 'taxon-first', ['label' => 'taxon first']),
+            Taxon::create(TaxonId::fromString('second'), 'taxon-second',  ['label' => 'taxon second'], TaxonId::fromString('first')),
+            Taxon::create(TaxonId::fromString('third'), 'taxon-third', ['label' => 'taxon third'], TaxonId::fromString('first')),
+            Taxon::create(TaxonId::fromString('fourth'), 'taxon-fourth', ['label' => 'taxon fourth'], TaxonId::fromString('third')),
+            Taxon::create(TaxonId::fromString('fifth'), 'taxon-fifth', ['label' => 'taxon fifth']),
         ];
 
         foreach($this->repositories() as $repository) {

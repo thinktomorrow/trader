@@ -17,6 +17,7 @@ class TaxonTest extends TestCase
         $taxon = Taxon::create(
             TaxonId::fromString('aaa'),
             'taxon-key',
+            ['foo' => 'bar'],
             TaxonId::fromString('parent-aaa'),
         );
 
@@ -26,6 +27,7 @@ class TaxonTest extends TestCase
             'state' => TaxonState::online->value,
             'order' => 0,
             'parent_id' => 'parent-aaa',
+            'data' => json_encode(['foo' => 'bar']),
         ], $taxon->getMappedData());
     }
 
@@ -35,6 +37,7 @@ class TaxonTest extends TestCase
         $taxon = Taxon::create(
             TaxonId::fromString('aaa'),
             'taxon-key',
+            [],
         );
 
         $this->assertNull($taxon->getMappedData()['parent_id']);
@@ -46,6 +49,7 @@ class TaxonTest extends TestCase
         $taxon = Taxon::create(
             TaxonId::fromString('aaa'),
             'taxon-key',
+            [],
         );
 
         $taxon->changeParent(TaxonId::fromString('bbb'),);
@@ -59,6 +63,7 @@ class TaxonTest extends TestCase
         $taxon = Taxon::create(
             TaxonId::fromString('aaa'),
             'taxon-key',
+            [],
             TaxonId::fromString('bbb')
         );
 
@@ -75,6 +80,7 @@ class TaxonTest extends TestCase
         Taxon::create(
             TaxonId::fromString('aaa'),
             'taxon-key',
+            [],
             TaxonId::fromString('aaa'),
         );
     }
@@ -85,6 +91,7 @@ class TaxonTest extends TestCase
         $taxon = Taxon::create(
             TaxonId::fromString('aaa'),
             'taxon-key',
+            [],
             TaxonId::fromString('bbb')
         );
 
@@ -106,6 +113,7 @@ class TaxonTest extends TestCase
             'state' => TaxonState::offline->value,
             'order' => 5,
             'parent_id' => 'parent-yyy',
+            'data' => json_encode(['foo' => 'bar']),
         ], $taxon->getMappedData());
     }
 
@@ -116,7 +124,8 @@ class TaxonTest extends TestCase
             'key' => 'taxon-key',
             'state' => TaxonState::offline->value,
             'order' => 5,
-            'parent_id' => 'parent-yyy'
+            'parent_id' => 'parent-yyy',
+            'data' => json_encode(['foo' => 'bar']),
         ], []);
     }
 }
