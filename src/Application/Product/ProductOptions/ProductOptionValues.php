@@ -29,10 +29,11 @@ class ProductOptionValues
         foreach($options as $option) {
             $output[] = [
                 'option_id' => $option->optionId->get(),
+                'data' => $option->getData(),
                 'values' => array_map(function($optionValue){
                     return [
                         'option_value_id' => $optionValue->optionValueId->get(),
-                        ...$optionValue->getData()
+                        'data' => $optionValue->getData(),
                     ];
                 }, $option->getOptionValues()),
             ];

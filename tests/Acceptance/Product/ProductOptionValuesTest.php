@@ -25,44 +25,54 @@ class ProductOptionValuesTest extends ProductContext
         $this->assertEquals([
             [
                 'option_id' => 'ooo',
+                'data' => ['foo' => 'bar'],
                 'values' => [
                     [
                         'option_value_id' => 'xxx',
-                        'label' => [
-                            'nl' => 'option label nl 1',
-                            'en' => 'option label en 1',
-                        ],
-                        'value' => [
-                            'nl' => 'option value nl 1',
-                            'en' => 'option value en 1',
+                        'data' => [
+                            'label' => [
+                                'nl' => 'option label nl 1',
+                                'en' => 'option label en 1',
+                            ],
+                            'value' => [
+                                'nl' => 'option value nl 1',
+                                'en' => 'option value en 1',
+                            ],
                         ],
                     ],
                     [
                         'option_value_id' => 'yyy',
-                        'label' => [
-                            'nl' => 'option label nl 2',
-                            'en' => 'option label en 2',
+                        'data' => [
+                            'label' => [
+                                'nl' => 'option label nl 2',
+                                'en' => 'option label en 2',
+                            ],
+                            'value' => [
+                                'nl' => 'option value nl 2',
+                                'en' => 'option value en 2',
+                            ],
                         ],
-                        'value' => [
-                            'nl' => 'option value nl 2',
-                            'en' => 'option value en 2',
-                        ],
+
                     ],
                 ],
             ],
             [
                 'option_id' => 'ppp',
+                'data' => [],
                 'values' => [
                     [
                         'option_value_id' => 'zzz',
-                        'label' => [
-                            'nl' => 'option label nl 3',
-                            'en' => 'option label en 3',
+                        'data' => [
+                            'label' => [
+                                'nl' => 'option label nl 3',
+                                'en' => 'option label en 3',
+                            ],
+                            'value' => [
+                                'nl' => 'option value nl 3',
+                                'en' => 'option value en 3',
+                            ],
                         ],
-                        'value' => [
-                            'nl' => 'option value nl 3',
-                            'en' => 'option value en 3',
-                        ],
+
                     ],
                 ],
             ]

@@ -121,7 +121,7 @@ class Option implements ChildAggregate
         $option->productId = ProductId::fromString($aggregateState['product_id']);
         $option->optionId = OptionId::fromString($state['option_id']);
         $option->optionValues = array_map(fn($optionValueState) => OptionValue::fromMappedData($optionValueState, $state), $childEntities[OptionValue::class] ?? []);
-        $option->data = json_decode($state['data'], true);
+        $option->data = $state['data'] ? json_decode($state['data'], true) : [];
 
         return $option;
     }
