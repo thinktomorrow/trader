@@ -8,25 +8,25 @@ use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 
 interface GridRepository
 {
-    public function filterByTerm(string $term): self;
+    public function filterByTerm(string $term): static;
 
-    public function filterByTaxonKeys(array $taxonKeys): self;
+    public function filterByTaxonKeys(array $taxonKeys): static;
 
-    public function filterByProductIds(array $productIds): self;
+    public function filterByProductIds(array $productIds): static;
 
-    public function filterByPrice(string $minimumPriceAmount = null, string $maximumPriceAmount = null): self;
+    public function filterByPrice(string $minimumPriceAmount = null, string $maximumPriceAmount = null): static;
 
-    public function sortByLabel(): self;
+    public function sortByLabel(): static;
 
-    public function sortByLabelDesc(): self;
+    public function sortByLabelDesc(): static;
 
-    public function sortByPrice(): self;
+    public function sortByPrice(): static;
 
-    public function sortByPriceDesc(): self;
+    public function sortByPriceDesc(): static;
 
-    public function paginate(int $perPage): self;
+    public function paginate(int $perPage): static;
 
-    public function limit(int $limit): self;
+    public function limit(int $limit): static;
 
     public function setLocale(Locale $locale): static;
 

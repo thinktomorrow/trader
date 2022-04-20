@@ -135,7 +135,6 @@ abstract class CartContext extends TestCase
         // Add product to order
         $this->cartApplication->addLine(new AddLine(
             $order->orderId->get(),
-            LineId::fromString((string)($count + 1))->get(),
             VariantId::fromString($productVariantId)->get(),
             Quantity::fromInt((int)$quantity)->asInt(),
         ));

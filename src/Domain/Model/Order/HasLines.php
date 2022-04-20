@@ -82,4 +82,16 @@ trait HasLines
 
         return null;
     }
+
+    public function getNextLineId(): LineId
+    {
+        $i = mt_rand(1,999);
+        $nextLineId = LineId::fromString(substr($i .'_' . $this->orderId->get(), 0, 36));
+
+        while(null !== $this->findLineIndex($nextLineId)) {
+            $nextLineId = LineId::fromString(substr(++$i .'_' . $this->orderId->get(), 0, 36));
+        }
+
+        return $nextLineId;
+    }
 }

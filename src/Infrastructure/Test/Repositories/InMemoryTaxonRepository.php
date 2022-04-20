@@ -64,6 +64,7 @@ final class InMemoryTaxonRepository implements TaxonRepository, TaxonTreeReposit
     public function clear()
     {
         static::$taxons = [];
+        static::$productIds = [];
     }
 
     public function getTaxonTree(): TaxonTree

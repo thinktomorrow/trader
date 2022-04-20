@@ -47,12 +47,12 @@ class MysqlGridRepository implements GridRepository
             ]);
     }
 
-    public function filterByTerm(string $term): GridRepository
+    public function filterByTerm(string $term): static
     {
         // TODO: Implement filterByTerm() method.
     }
 
-    public function filterByTaxonKeys(array $taxonKeys): GridRepository
+    public function filterByTaxonKeys(array $taxonKeys): static
     {
         /**
          * All taxa are grouped by their root. Taxa within the same root have an OR relation
@@ -69,47 +69,47 @@ class MysqlGridRepository implements GridRepository
         return $this;
     }
 
-    public function filterByProductIds(array $productIds): GridRepository
+    public function filterByProductIds(array $productIds): static
     {
         // TODO: Implement filterByProductIds() method.
     }
 
-    public function filterByPrice(string $minimumPriceAmount = null, string $maximumPriceAmount = null): GridRepository
+    public function filterByPrice(string $minimumPriceAmount = null, string $maximumPriceAmount = null): static
     {
         // TODO: Implement filterByPrice() method.
     }
 
-    public function sortByLabel(): GridRepository
+    public function sortByLabel(): static
     {
         // TODO: Implement sortByLabel() method.
     }
 
-    public function sortByLabelDesc(): GridRepository
+    public function sortByLabelDesc(): static
     {
         // TODO: Implement sortByLabelDesc() method.
     }
 
-    public function sortByPrice(): GridRepository
+    public function sortByPrice(): static
     {
         // TODO: Implement sortByPrice() method.
     }
 
-    public function sortByPriceDesc(): GridRepository
+    public function sortByPriceDesc(): static
     {
         // TODO: Implement sortByPriceDesc() method.
     }
 
-    public function paginate(int $perPage): GridRepository
+    public function paginate(int $perPage): static
     {
         // TODO: Implement paginate() method.
     }
 
-    public function limit(int $limit): GridRepository
+    public function limit(int $limit): static
     {
         // TODO: Implement limit() method.
     }
 
-    public function setLocale(Locale $locale): GridRepository
+    public function setLocale(Locale $locale): static
     {
         $this->locale = $locale;
 
@@ -196,7 +196,7 @@ class MysqlGridRepository implements GridRepository
     //        return $this->builder->get()->map(fn ($model) => $this->productGroupRepository->composeProductGroup($model));
     //    }
     //
-    //    public function filterByTerm(string $term): GridRepository
+    //    public function filterByTerm(string $term): static
     //    {
     //        $this->builder->where(function ($query) use ($term) {
     //            $query->whereRaw('LOWER(json_extract('.static::$productTable.'.data, "$.title.'.$this->context->getLocale()->getLanguage().'")) LIKE ?', '%'. trim(strtolower($term)) . '%');
@@ -206,12 +206,12 @@ class MysqlGridRepository implements GridRepository
     //        return $this;
     //    }
     //
-    //    public function filterByTaxa(array $taxa): GridRepository
+    //    public function filterByTaxa(array $taxa): static
     //    {
     //        return $this->filterByTaxonomy($taxa);
     //    }
     //
-    //    public function filterByTaxonIds(array $taxa): GridRepository
+    //    public function filterByTaxonIds(array $taxa): static
     //    {
     //        return $this->filterByTaxonomy($taxa, false);
     //    }
@@ -223,7 +223,7 @@ class MysqlGridRepository implements GridRepository
     //     * @param array $taxa
     //     * @return GridRepository
     //     */
-    //    private function filterByTaxonomy(array $taxa, bool $passedAsKeys = true): GridRepository
+    //    private function filterByTaxonomy(array $taxa, bool $passedAsKeys = true): static
     //    {
     //        // Get all taxa including their grandchildren - remember that each taxon key
     //        // is unique across all the taxonomy entries so we can safely retrieve by key.
@@ -251,7 +251,7 @@ class MysqlGridRepository implements GridRepository
     //        return $this;
     //    }
     //
-    //    public function filterByPrice(Money $minimumPrice = null, Money $maximumPrice = null): GridRepository
+    //    public function filterByPrice(Money $minimumPrice = null, Money $maximumPrice = null): static
     //    {
     //        if ($minimumPrice) {
     //            $this->builder->where(static::$productTable . '.sale_price', '>=', $minimumPrice->getAmount());
@@ -264,24 +264,24 @@ class MysqlGridRepository implements GridRepository
     //        return $this;
     //    }
     //
-    //    public function filterByProductGroupIds(array $productGroupIds): GridRepository
+    //    public function filterByProductGroupIds(array $productGroupIds): static
     //    {
     //        $this->builder->whereIn(static::$productGroupTable.'.id', $productGroupIds);
     //
     //        return $this;
     //    }
     //
-    //    public function sortByLabel(): GridRepository
+    //    public function sortByLabel(): static
     //    {
     //        return $this->addSortByLabel();
     //    }
     //
-    //    public function sortByLabelDesc(): GridRepository
+    //    public function sortByLabelDesc(): static
     //    {
     //        return $this->addSortByLabel('DESC');
     //    }
     //
-    //    protected function addSortByLabel($order = 'ASC'): GridRepository
+    //    protected function addSortByLabel($order = 'ASC'): static
     //    {
     //        $labelField = 'LOWER(json_unquote(json_extract('.static::$productTable.'.data, "$.title.'.$this->context->getLocale()->getLanguage().'")))';
     //
@@ -294,17 +294,17 @@ class MysqlGridRepository implements GridRepository
     //        return $this;
     //    }
     //
-    //    public function sortByPrice(): GridRepository
+    //    public function sortByPrice(): static
     //    {
     //        return $this->addSortByPrice();
     //    }
     //
-    //    public function sortByPriceDesc(): GridRepository
+    //    public function sortByPriceDesc(): static
     //    {
     //        return $this->addSortByPrice('DESC');
     //    }
     //
-    //    private function addSortByPrice($order = 'ASC'): GridRepository
+    //    private function addSortByPrice($order = 'ASC'): static
     //    {
     //        $this->builder->addSelect(
     //            $order == 'DESC'
@@ -317,14 +317,14 @@ class MysqlGridRepository implements GridRepository
     //        return $this;
     //    }
     //
-    //    public function paginate(int $perPage): GridRepository
+    //    public function paginate(int $perPage): static
     //    {
     //        $this->perPage = $perPage;
     //
     //        return $this;
     //    }
     //
-    //    public function limit(int $limit): GridRepository
+    //    public function limit(int $limit): static
     //    {
     //        $this->builder->limit($limit);
     //

@@ -7,9 +7,6 @@ use Thinktomorrow\Trader\Domain\Common\Locale;
 use Thinktomorrow\Trader\Domain\Model\Product\Option\OptionId;
 use Thinktomorrow\Trader\Domain\Model\Product\Option\OptionValueId;
 use Thinktomorrow\Trader\Application\Product\ProductOptions\ProductOption;
-use Thinktomorrow\Trader\Application\Product\ProductOptions\ProductOptions;
-use Thinktomorrow\Trader\Application\Product\ProductOptions\ProductOptionsComposer;
-use function dd;
 
 class ProductDataTest extends ProductContext
 {

@@ -59,8 +59,10 @@ final class CartApplication
         $order = $this->orderRepository->find($addLine->getOrderId());
         $variant = $this->findVariantDetailsForCart->findVariantForCart($addLine->getVariantId());
 
+        $lineId = $order->getNextLineId();
+
         $order->addOrUpdateLine(
-            $addLine->getLineId(),
+            $lineId,
             $addLine->getVariantId(),
             LinePrice::fromPrice($variant->getSalePrice()),
             $addLine->getQuantity()
