@@ -53,7 +53,8 @@
     "extra": {
         "laravel": {
             "providers": [
-                "Thinktomorrow\\Trader\\Infrastructure\\Laravel\\TraderServiceProvider"
+                "Thinktomorrow\\Trader\\Infrastructure\\Laravel\\TraderServiceProvider",
+                "Thinktomorrow\\Trader\\Infrastructure\\Shop\\ShopServiceProvider"
             ]
         }
     },

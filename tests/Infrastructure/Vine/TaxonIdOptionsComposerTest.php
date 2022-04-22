@@ -8,7 +8,8 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 use Thinktomorrow\Trader\Infrastructure\Vine\VineTaxonIdOptionsComposer;
 use Thinktomorrow\Trader\Infrastructure\Vine\VineFlattenedTaxonIdsComposer;
 use Thinktomorrow\Trader\Infrastructure\Test\Repositories\InMemoryTaxonRepository;
-use Thinktomorrow\Trader\Infrastructure\Laravel\Repositories\MysqlTaxonRepository;
+use Thinktomorrow\Trader\Infrastructure\Test\Repositories\InMemoryTaxonTreeRepository;
+use Thinktomorrow\Trader\Infrastructure\Laravel\Repositories\MysqlTaxonTreeRepository;
 
 final class TaxonIdOptionsComposerTest extends TestCase
 {
@@ -92,7 +93,7 @@ final class TaxonIdOptionsComposerTest extends TestCase
 
     private function repositories(): \Generator
     {
-        yield new InMemoryTaxonRepository();
-        yield new MysqlTaxonRepository();
+        yield new InMemoryTaxonTreeRepository();
+        yield new MysqlTaxonTreeRepository();
     }
 }

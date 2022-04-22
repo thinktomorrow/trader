@@ -5,21 +5,16 @@ namespace Thinktomorrow\Trader\Infrastructure\Test\Repositories;
 
 use Thinktomorrow\Trader\Domain\Model\Taxon\Taxon;
 use Thinktomorrow\Trader\Domain\Model\Taxon\TaxonId;
-use Thinktomorrow\Trader\Domain\Model\Taxon\TaxonState;
-use Thinktomorrow\Trader\Application\Taxon\Tree\TaxonTree;
-use Thinktomorrow\Trader\Application\Taxon\Tree\TaxonNode;
-use Thinktomorrow\Trader\Application\Taxon\Tree\TaxonNodes;
 use Thinktomorrow\Trader\Domain\Model\Taxon\TaxonRepository;
-use Thinktomorrow\Trader\Application\Taxon\Tree\TaxonTreeRepository;
 use Thinktomorrow\Trader\Domain\Model\Taxon\Exceptions\CouldNotFindTaxon;
 
-final class InMemoryTaxonRepository implements TaxonRepository, TaxonTreeRepository
+final class InMemoryTaxonRepository implements TaxonRepository
 {
     /** @var Taxon[] */
-    private static array $taxons = [];
+    public static array $taxons = [];
 
     // Lookup of 'connected' product-taxon ids
-    private static array $productIds = [];
+    public static array $productIds = [];
 
     private string $nextReference = 'ccc-123';
 
@@ -65,38 +60,5 @@ final class InMemoryTaxonRepository implements TaxonRepository, TaxonTreeReposit
     {
         static::$taxons = [];
         static::$productIds = [];
-    }
-
-    public function getTaxonTree(): TaxonTree
-    {
-        return TaxonTree::fromArray(static::$taxons);
-    }
-
-    public function getAllTaxonNodes(): TaxonNodes
-    {
-        $nodes = [];
-
-        foreach(static::$taxons as $taxon) {
-            $nodes[] = TaxonNode::fromMappedData([
-                'taxon_id'    => $taxon->taxonId->get(),
-                'parent_id'   => $taxon->getMappedData()['parent_id'],
-                'key'         => $taxon->getMappedData()['key'],
-                'data' => json_encode($taxon->getData()),
-                'state'       => $taxon->getMappedData()['state'],
-                'order'       => $taxon->getMappedData()['order'],
-                'product_ids' => $this->getCommaSeparatedProductIds($taxon->taxonId),
-            ]);
-        }
-
-        return TaxonNodes::fromType($nodes);
-    }
-
-    private function getCommaSeparatedProductIds(TaxonId $taxonId): string
-    {
-        if (!isset(static::$productIds[$taxonId->get()])) {
-            return '';
-        }
-
-        return implode(',', static::$productIds[$taxonId->get()]);
     }
 }

@@ -7,7 +7,8 @@ use Tests\Infrastructure\TestCase;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Thinktomorrow\Trader\Infrastructure\Vine\VineFlattenedTaxonIdsComposer;
 use Thinktomorrow\Trader\Infrastructure\Test\Repositories\InMemoryTaxonRepository;
-use Thinktomorrow\Trader\Infrastructure\Laravel\Repositories\MysqlTaxonRepository;
+use Thinktomorrow\Trader\Infrastructure\Test\Repositories\InMemoryTaxonTreeRepository;
+use Thinktomorrow\Trader\Infrastructure\Laravel\Repositories\MysqlTaxonTreeRepository;
 
 final class FlattenedTaxonIdsComposerTest extends TestCase
 {
@@ -79,17 +80,8 @@ final class FlattenedTaxonIdsComposerTest extends TestCase
 
     private function repositories(): \Generator
     {
-        yield new InMemoryTaxonRepository();
-        yield new MysqlTaxonRepository();
+        yield new InMemoryTaxonTreeRepository();
+        yield new MysqlTaxonTreeRepository();
     }
 
-//    private function createDefaultTaxons()
-//    {
-//        $this->createTaxon(Taxon::create(TaxonId::fromString('first'), 'taxon-first', ['foo' => 'bar']));
-//            $this->createTaxon(Taxon::create(TaxonId::fromString('second'), 'taxon-second', [], TaxonId::fromString('first')));
-//            $this->createTaxon(Taxon::create(TaxonId::fromString('third'), 'taxon-third', [], TaxonId::fromString('first')));
-//                $this->createTaxon(Taxon::create(TaxonId::fromString('fourth'), 'taxon-fourth', [], TaxonId::fromString('third')));
-//        $this->createTaxon(Taxon::create(TaxonId::fromString('fifth'), 'taxon-fifth', []));
-//            $this->createTaxon(Taxon::create(TaxonId::fromString('sixth'), 'taxon-sixth', [], TaxonId::fromString('fifth')));
-//    }
 }

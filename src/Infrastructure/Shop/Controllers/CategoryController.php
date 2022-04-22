@@ -4,42 +4,70 @@ declare(strict_types=1);
 namespace Thinktomorrow\Trader\Infrastructure\Shop\Controllers;
 
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Redirect;
+use Illuminate\Contracts\Pagination\LengthAwarePaginator;
+use Thinktomorrow\Trader\Application\Taxon\Tree\TaxonNode;
+use Thinktomorrow\Trader\Application\Taxon\Tree\TaxonTree;
 use Thinktomorrow\Trader\Domain\Common\Cash\IntegerConverter;
 use Thinktomorrow\Trader\Application\Product\Grid\GridRepository;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
-use Thinktomorrow\Trader\Infrastructure\Vine\ExtractActiveTaxonFilters;
-use Thinktomorrow\Trader\Infrastructure\Vine\GetAvailableTaxonFilters;
 use Thinktomorrow\Trader\Application\Taxon\Category\CategoryRepository;
+use Thinktomorrow\Trader\Application\Taxon\Filter\TaxonFilterTreeComposer;
+use Thinktomorrow\Trader\Infrastructure\Shop\RuntimeExceptions\FoundRouteAsRedirect;
 
 class CategoryController
 {
-    private GridRepository $gridRepository;
-    private CategoryRepository $categoryRepository;
-    private GetAvailableTaxonFilters $getAvailableTaxonFilters;
-    private ExtractActiveTaxonFilters $getActiveTaxonFilters;
+    protected GridRepository $gridRepository;
+    protected CategoryRepository $categoryRepository;
+    protected TaxonFilterTreeComposer $taxonFilterTreeComposer;
+    protected ?TaxonTree $activeTaxons = null;
 
-    public function __construct(GridRepository $gridRepository, CategoryRepository $categoryRepository, GetAvailableTaxonFilters $getAvailableTaxonFilters, ExtractActiveTaxonFilters $getActiveTaxonFilters)
+    public function __construct(GridRepository $gridRepository, CategoryRepository $categoryRepository, TaxonFilterTreeComposer $taxonFilterTreeComposer)
     {
         $this->gridRepository = $gridRepository;
         $this->categoryRepository = $categoryRepository;
-        $this->getAvailableTaxonFilters = $getAvailableTaxonFilters;
-        $this->getActiveTaxonFilters = $getActiveTaxonFilters;
+        $this->taxonFilterTreeComposer = $taxonFilterTreeComposer;
     }
 
     public function show(string $taxonKeys, Request $request)
     {
+        try{
+            $taxon = $this->extractTaxonFromSlug($taxonKeys, $request);
+        } catch(FoundRouteAsRedirect $e) {
+            return redirect()->to($e->getRedirect());
+        }
+
+        $products = $this->getProducts($taxon, $request);
+        $filterTaxons = $this->taxonFilterTreeComposer->getAvailableFilters($taxon->getKey());
+
+        return view('shop.catalog.taxon', [
+            'taxon' => $taxon,
+            'products' => $products,
+            'filterTaxons' => $filterTaxons,
+            'activeTaxons' => collect($this->getActiveTaxons($taxon, $request)->removeNode($taxon)->all()),
+        ]);
+    }
+
+    protected function extractTaxonFromSlug(string $taxonKeys, Request $request): TaxonNode
+    {
         // The main taxon for the page content and filtering
         $taxonKeys = explode('/', $taxonKeys);
-        $category = $this->categoryRepository->findByKey(urldecode($taxonKeys[count($taxonKeys) - 1]));
+        $taxon = $this->categoryRepository->findTaxonByKey(urldecode($taxonKeys[count($taxonKeys) - 1]));
 
-        if (! $category) {
+        if (! $taxon) {
+
             if ($redirect = Redirect::from($request->path())) {
-                return redirect()->to($redirect->to);
+                throw (new FoundRouteAsRedirect($request->path()))->setRedirect($redirect->to);
             }
 
             throw new NotFoundHttpException('No Taxon category found by slug ' . implode('/', $taxonKeys));
         }
 
+        return $taxon;
+    }
+
+    protected function getProducts(TaxonNode $taxon, Request $request): LengthAwarePaginator
+    {
         if ($request->anyFilled('price-from', 'price-to')) {
             $priceRanges = [
                 IntegerConverter::convertDecimalToInteger($request->input('price-from', $request->input('price-to'))),
@@ -57,77 +85,18 @@ class CategoryController
                 : $this->gridRepository->sortByPrice();
         }
 
-        $activeTaxons = $this->getActiveTaxonFilters->get($category->getKey(), $request->all());
-        $filterTaxons = $this->getAvailableTaxonFilters->get($category->getKey());
-
-        return view('shop.catalog.taxon', [
-            'category' => $category,
-//            'taxonModel' => TaxonModel::findByKey($category->getKey()),
-            'products' => $this->gridRepository->filterByTaxonKeys($activeTaxons->pluck('key'))->paginate(12)->getResults(),
-            'filterTaxons' => $filterTaxons,
-            'activeTaxons' => collect($activeTaxons->removeNode($category)->all()),
-        ]);
+        return $this->gridRepository
+            ->filterByTaxonKeys($this->getActiveTaxons($taxon, $request)->pluck('key'))
+            ->paginate(12)
+            ->getResults();
     }
 
-    /**
-     * @param Taxon|null $taxon
-     * @param Request $request
-     * @return Collection
-     */
-    private function activeTaxons(Taxon $taxon, Request $request): NodeCollection
+    protected function getActiveTaxons(TaxonNode $taxon, Request $request)
     {
-        // Without any filtering active, the current taxon page is used for the product filtering
-        $activeTaxons = new NodeCollection([$taxon]);
-
-        // With filtering in effect, only products belonging to these filtered taxa, will be fetched
-        if ($request->filled('taxon')) {
-            $selectedTaxons = $this->taxonRepository->findManyByKeys((array)$request->input('taxon', []));
-
-            /**
-             * If any of the selected taxa belong to the same root as the main taxon, we filter down into the main taxon
-             * and therefore omit the main taxon as filter and use the selected taxa as the only active filters instead.
-             */
-            foreach ($selectedTaxons as $selectedTaxon) {
-                if ($selectedTaxon->getRootNode()->getNodeId() === $taxon->getRootNode()->getNodeId()) {
-                    $activeTaxons = new NodeCollection([]);
-                }
-            }
-
-            $activeTaxons = $activeTaxons->merge(
-                $this->taxonRepository->findManyByKeys((array)$request->input('taxon', []))
-            );
+        if($this->activeTaxons) {
+            return $this->activeTaxons;
         }
 
-        return $activeTaxons;
-    }
-
-    private function filterTaxons(Taxon $taxon): NodeCollection
-    {
-        $tree = $this->taxonRepository->getRootNodes();
-
-        // Get all productgroup ids for this taxon
-        $productGroupIds = $taxon->getProductGroupIds();
-
-        $taxon->getChildNodes()->flatten()->each(function ($taxonChild) use (&$productGroupIds) {
-            $productGroupIds = array_merge($productGroupIds, $taxonChild->getProductGroupIds());
-        });
-
-        $productGroupIds = array_values(array_unique($productGroupIds));
-
-        $filterTaxons = $tree->shake(fn ($node) => array_intersect($node->getProductGroupIds(), $productGroupIds));
-
-        // For categories, we want to start from the given taxon as the root - and not the 'real' root.
-        // Therefore we exclude all ancestors from the given taxon which allows to only show the
-        // nested taxa. This is purely a visual improvement for the filter.
-        if (! $taxon->isRootNode() && ($ancestorIds = $taxon->pluckAncestorNodes('id'))) {
-
-            // Keep the root node in the filter in order to keep our structure intact
-            array_pop($ancestorIds);
-
-            $filterTaxons = $filterTaxons
-                ->prune(fn ($node) => ! in_array($node->getNodeId(), [$taxon->getNodeId(), ...$ancestorIds]));
-        }
-
-        return $filterTaxons;
+        return $this->activeTaxons = $this->taxonFilterTreeComposer->getActiveFilters($taxon->getKey(), $request->all());
     }
 }

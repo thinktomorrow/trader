@@ -69,44 +69,84 @@ class MysqlGridRepository implements GridRepository
         return $this;
     }
 
-    public function filterByProductIds(array $productIds): static
+    public function filterByProductIds(array $product_ids): static
     {
-        // TODO: Implement filterByProductIds() method.
+        $this->builder->whereIn(static::$productTable.'.id', $product_ids);
+
+        return $this;
     }
 
-    public function filterByPrice(string $minimumPriceAmount = null, string $maximumPriceAmount = null): static
+    public function filterByPrice(?string $minimumPriceAmount = null, ?string $maximumPriceAmount = null): static
     {
-        // TODO: Implement filterByPrice() method.
+        if (!is_null($minimumPriceAmount)) {
+            $this->builder->where(static::$variantTable . '.sale_price', '>=', $minimumPriceAmount);
+        }
+
+        if (!is_null($maximumPriceAmount)) {
+            $this->builder->where(static::$variantTable . '.sale_price', '<=', $maximumPriceAmount);
+        }
+
+        return $this;
     }
 
     public function sortByLabel(): static
     {
-        // TODO: Implement sortByLabel() method.
+        return $this->addSortByLabel();
     }
 
     public function sortByLabelDesc(): static
     {
-        // TODO: Implement sortByLabelDesc() method.
+        return $this->addSortByLabel('DESC');
+    }
+
+    protected function addSortByLabel($order = 'ASC'): static
+    {
+        $labelField = 'LOWER(json_unquote(json_extract('.static::$variantTable.'.data, "$.title.'.$this->locale->getLanguage().'")))';
+
+        $this->builder->addSelect(
+            DB::raw($this->grammarGroupConcat($labelField . ' ORDER BY ' . $labelField . ' ' . $order) . ' AS labels'),
+        );
+
+        $this->builder->orderBy('labels', $order);
+
+        return $this;
     }
 
     public function sortByPrice(): static
     {
-        // TODO: Implement sortByPrice() method.
+        return $this->addSortByPrice();
     }
 
     public function sortByPriceDesc(): static
     {
-        // TODO: Implement sortByPriceDesc() method.
+        return $this->addSortByPrice('DESC');
+    }
+
+    private function addSortByPrice($order = 'ASC'): static
+    {
+        $this->builder->addSelect(
+            $order == 'DESC'
+                ? DB::raw('MAX('.static::$variantTable.'.sale_price) AS sale_price_aggregate')
+                : DB::raw('MIN('.static::$variantTable.'.sale_price) AS sale_price_aggregate')
+        );
+
+        $this->builder->orderBy('sale_price_aggregate', $order);
+
+        return $this;
     }
 
     public function paginate(int $perPage): static
     {
-        // TODO: Implement paginate() method.
+        $this->perPage = $perPage;
+
+        return $this;
     }
 
     public function limit(int $limit): static
     {
-        // TODO: Implement limit() method.
+        $this->builder->limit($limit);
+
+        return $this;
     }
 
     public function setLocale(Locale $locale): static
@@ -119,9 +159,9 @@ class MysqlGridRepository implements GridRepository
     public function getResults(): LengthAwarePaginator
     {
         // Default ordering if no ordering has been applied yet.
-//        if (!$this->builder->orders || count($this->builder->orders) < 1) {
-//            $this->builder->orderBy(static::$productTable . '.order_column', 'ASC');
-//        }
+        if (!$this->builder->orders || count($this->builder->orders) < 1) {
+            $this->builder->orderBy(static::$productTable . '.order_column', 'ASC');
+        }
 
         // TODO: concat all gridProduct ids that match the filters
         $results = $this->builder->paginate($this->perPage)->withQueryString();
@@ -146,205 +186,4 @@ class MysqlGridRepository implements GridRepository
     {
         return DB::raw('GROUP_CONCAT(' . $column . ' SEPARATOR "' . $separator . '")');
     }
-
-    // private int $perPage = 20;
-    //
-    //    protected Builder $builder;
-    //    protected Context $context;
-    //    private ProductGroupRepository $productGroupRepository;
-    //    private TaxonRepository $taxonRepository;
-    //
-    //    private static string $productGroupTable;
-    //    protected static string $productTable;
-    //    private static string $taxaTable;
-    //    private static string $taxaPivotTable;
-    //
-    //    public function __construct(ProductGroupRepository $productGroupRepository, TaxonRepository $taxonRepository, Context $context)
-    //    {
-    //        $this->productGroupRepository = $productGroupRepository;
-    //        $this->taxonRepository = $taxonRepository;
-    //        $this->context = $context;
-    //
-    //        static::$productTable = (new ProductModel)->getTable();
-    //        static::$productGroupTable = (new ProductGroupModel())->getTable();
-    //        static::$taxaTable = (new TaxonModel())->getTable();
-    //        static::$taxaPivotTable = 'trader_taxa_products';
-    //
-    //        $this->builder = ProductGroupModel::query()->online()
-    //            ->join(static::$productTable, static::$productGroupTable.'.id', '=', static::$productTable.'.productgroup_id')
-    //            ->where(static::$productTable.'.is_grid_product', true)
-    //            ->whereIn(static::$productTable.'.state', \Thinktomorrow\Trader\Catalog\Products\Ports\DefaultProductStateMachine::getAvailableStates()) // TODO: use statemachine contract instead
-    //            ->groupBy(static::$productGroupTable.'.id')
-    //            ->with(['products']); // Is this better???
-    //
-    //        $this->builder->select([
-    //            static::$productGroupTable.'.*',
-    //
-    //            // TODO: add order by for the group_concat so the grid products are also sorted according to the expected order.
-    //            // e.g. static::$productTable.'.id ORDER BY sale_price DESC'
-    //            DB::raw($this->grammarGroupConcat(static::$productTable.'.id') . ' AS grid_product_ids'),
-    //        ]);
-    //    }
-    //
-    //    public function all(): Collection
-    //    {
-    //        // Default ordering if non applied
-    //        if (! $this->builder->getQuery()->orders || count($this->builder->getQuery()->orders) < 1) {
-    //            $this->builder->orderBy(static::$productGroupTable.'.order_column', 'ASC');
-    //        }
-    //
-    //        return $this->builder->get()->map(fn ($model) => $this->productGroupRepository->composeProductGroup($model));
-    //    }
-    //
-    //    public function filterByTerm(string $term): static
-    //    {
-    //        $this->builder->where(function ($query) use ($term) {
-    //            $query->whereRaw('LOWER(json_extract('.static::$productTable.'.data, "$.title.'.$this->context->getLocale()->getLanguage().'")) LIKE ?', '%'. trim(strtolower($term)) . '%');
-    //            $query->orWhereRaw('LOWER(json_extract('.static::$productGroupTable.'.data, "$.title.'.$this->context->getLocale()->getLanguage().'")) LIKE ?', '%'. trim(strtolower($term)) . '%');
-    //        });
-    //
-    //        return $this;
-    //    }
-    //
-    //    public function filterByTaxa(array $taxa): static
-    //    {
-    //        return $this->filterByTaxonomy($taxa);
-    //    }
-    //
-    //    public function filterByTaxonIds(array $taxa): static
-    //    {
-    //        return $this->filterByTaxonomy($taxa, false);
-    //    }
-    //
-    //    /**
-    //     * All taxa are grouped by their root. Taxa within the same root have an OR relation
-    //     * in the search. Taxa of different roots will be searched as an AND operation
-    //     *
-    //     * @param array $taxa
-    //     * @return GridRepository
-    //     */
-    //    private function filterByTaxonomy(array $taxa, bool $passedAsKeys = true): static
-    //    {
-    //        // Get all taxa including their grandchildren - remember that each taxon key
-    //        // is unique across all the taxonomy entries so we can safely retrieve by key.
-    //        $taxonIds = [];
-    //
-    //        foreach ($taxa as $key) {
-    //            if ($taxon = ($passedAsKeys ? $this->taxonRepository->findByKey($key) : $this->taxonRepository->findById($key))) {
-    //                $rootId = ($taxon->getAncestorNodes()->isEmpty()) ? $taxon->getNodeId() : $taxon->getAncestorNodes()->first()->getNodeId();
-    //
-    //                if (! isset($taxonIds[$rootId])) {
-    //                    $taxonIds[$rootId] = [];
-    //                }
-    //
-    //                $taxonIds[$rootId] = array_merge($taxonIds[$rootId], $taxon->pluckChildNodes('id'));
-    //            }
-    //        }
-    //
-    //        // inner join for each taxon root group so a AND relation can be setup for search within one query
-    //        foreach ($taxonIds as $rootId => $ids) {
-    //            $joinTable = 'join' . $rootId;
-    //            $this->builder->join(static::$taxaPivotTable . ' AS ' . $joinTable, static::$productGroupTable.'.id', '=', $joinTable.'.productgroup_id')
-    //                 ->whereIn($joinTable.'.taxon_id', array_unique($ids));
-    //        }
-    //
-    //        return $this;
-    //    }
-    //
-    //    public function filterByPrice(Money $minimumPrice = null, Money $maximumPrice = null): static
-    //    {
-    //        if ($minimumPrice) {
-    //            $this->builder->where(static::$productTable . '.sale_price', '>=', $minimumPrice->getAmount());
-    //        }
-    //
-    //        if ($maximumPrice) {
-    //            $this->builder->where(static::$productTable . '.sale_price', '<=', $maximumPrice->getAmount());
-    //        }
-    //
-    //        return $this;
-    //    }
-    //
-    //    public function filterByProductGroupIds(array $productGroupIds): static
-    //    {
-    //        $this->builder->whereIn(static::$productGroupTable.'.id', $productGroupIds);
-    //
-    //        return $this;
-    //    }
-    //
-    //    public function sortByLabel(): static
-    //    {
-    //        return $this->addSortByLabel();
-    //    }
-    //
-    //    public function sortByLabelDesc(): static
-    //    {
-    //        return $this->addSortByLabel('DESC');
-    //    }
-    //
-    //    protected function addSortByLabel($order = 'ASC'): static
-    //    {
-    //        $labelField = 'LOWER(json_unquote(json_extract('.static::$productTable.'.data, "$.title.'.$this->context->getLocale()->getLanguage().'")))';
-    //
-    //        $this->builder->addSelect(
-    //            DB::raw($this->grammarGroupConcat($labelField . ' ORDER BY ' . $labelField . ' ' . $order) . ' AS labels'),
-    //        );
-    //
-    //        $this->builder->orderBy('labels', $order);
-    //
-    //        return $this;
-    //    }
-    //
-    //    public function sortByPrice(): static
-    //    {
-    //        return $this->addSortByPrice();
-    //    }
-    //
-    //    public function sortByPriceDesc(): static
-    //    {
-    //        return $this->addSortByPrice('DESC');
-    //    }
-    //
-    //    private function addSortByPrice($order = 'ASC'): static
-    //    {
-    //        $this->builder->addSelect(
-    //            $order == 'DESC'
-    //                ? DB::raw('MAX('.static::$productTable.'.sale_price) AS sale_price_aggregate')
-    //                : DB::raw('MIN('.static::$productTable.'.sale_price) AS sale_price_aggregate')
-    //        );
-    //
-    //        $this->builder->orderBy('sale_price_aggregate', $order);
-    //
-    //        return $this;
-    //    }
-    //
-    //    public function paginate(int $perPage): static
-    //    {
-    //        $this->perPage = $perPage;
-    //
-    //        return $this;
-    //    }
-    //
-    //    public function limit(int $limit): static
-    //    {
-    //        $this->builder->limit($limit);
-    //
-    //        return $this;
-    //    }
-    //
-    //    public function getResults(): LengthAwarePaginator
-    //    {
-    //        // Default ordering if non applied
-    //        if (! $this->builder->getQuery()->orders || count($this->builder->getQuery()->orders) < 1) {
-    //            $this->builder->orderBy(static::$productGroupTable.'.order_column', 'ASC');
-    //        }
-    //
-    //        // TODO: concat all gridProduct ids that match the filters
-    //        $results = $this->builder->paginate($this->perPage)->withQueryString();
-    //
-    //        return $results->setCollection(
-    //            $results->getCollection()->map(fn ($model) => $this->productGroupRepository->composeProductGroup($model))
-    //        );
-    //    }
-    //
-    //
 }

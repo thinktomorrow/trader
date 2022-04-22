@@ -77,6 +77,11 @@ class TaxonNode extends DefaultNode
         return $this->data('label', null, $this->getKey());
     }
 
+    public function getContent(): ?string
+    {
+        return $this->data('content');
+    }
+
     public function showOnline(): bool
     {
         return in_array($this->taxonState, TaxonState::onlineStates());

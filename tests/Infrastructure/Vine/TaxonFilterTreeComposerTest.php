@@ -10,7 +10,8 @@ use Thinktomorrow\Trader\Domain\Model\Taxon\TaxonId;
 use Thinktomorrow\Trader\Domain\Model\Taxon\TaxonState;
 use Thinktomorrow\Trader\Infrastructure\Vine\VineTaxonFilterTreeComposer;
 use Thinktomorrow\Trader\Infrastructure\Test\Repositories\InMemoryTaxonRepository;
-use Thinktomorrow\Trader\Infrastructure\Laravel\Repositories\MysqlTaxonRepository;
+use Thinktomorrow\Trader\Infrastructure\Test\Repositories\InMemoryTaxonTreeRepository;
+use Thinktomorrow\Trader\Infrastructure\Laravel\Repositories\MysqlTaxonTreeRepository;
 
 final class TaxonFilterTreeComposerTest extends TestCase
 {
@@ -143,15 +144,7 @@ final class TaxonFilterTreeComposerTest extends TestCase
 
     private function repositories(): \Generator
     {
-        yield new InMemoryTaxonRepository();
-        yield new MysqlTaxonRepository();
+        yield new InMemoryTaxonTreeRepository();
+        yield new MysqlTaxonTreeRepository();
     }
-
-//    private function createDefaultTaxons()
-//    {
-//        $this->createTaxon(Taxon::create(TaxonId::fromString('first'), 'taxon-first', []), ['aaa']);
-//        $this->createTaxon(Taxon::create(TaxonId::fromString('second'), 'taxon-second', [], TaxonId::fromString('first')), ['bbb']);
-//        $this->createTaxon(Taxon::create(TaxonId::fromString('third'), 'taxon-third', [], TaxonId::fromString('first')), ['ccc']);
-//        $this->createTaxon(Taxon::create(TaxonId::fromString('fourth'), 'taxon-fourth', [], TaxonId::fromString('third')), ['ddd']);
-//    }
 }

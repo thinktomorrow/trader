@@ -4,48 +4,42 @@ declare(strict_types=1);
 namespace Tests\Infrastructure\Repositories;
 
 use Tests\Infrastructure\TestCase;
+use Tests\Infrastructure\Vine\TaxonHelpers;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Thinktomorrow\Trader\Domain\Model\Taxon\Taxon;
-use Thinktomorrow\Trader\Domain\Model\Taxon\TaxonId;
 use Thinktomorrow\Trader\Application\Taxon\Tree\TaxonNode;
-use Thinktomorrow\Trader\Infrastructure\Test\Repositories\InMemoryTaxonRepository;
-use Thinktomorrow\Trader\Infrastructure\Laravel\Repositories\MysqlTaxonRepository;
+use Thinktomorrow\Trader\Infrastructure\Test\Repositories\InMemoryTaxonTreeRepository;
+use Thinktomorrow\Trader\Infrastructure\Laravel\Repositories\MysqlTaxonTreeRepository;
 
 final class TaxonTreeRepositoryTest extends TestCase
 {
     use RefreshDatabase;
+    use TaxonHelpers;
 
     /** @test */
-    public function it_can_get_all_records()
+    public function it_can_get_the_entire_tree()
     {
-        $this->createTaxons();
+        $this->createDefaultTaxons();
 
         foreach($this->repositories() as $repository) {
-            $this->assertContainsOnlyInstancesOf(TaxonNode::class, $repository->getAllTaxonNodes());
-            $this->assertCount(5, $repository->getAllTaxonNodes());
+            $this->assertContainsOnlyInstancesOf(TaxonNode::class, $repository->getTree());
+            $this->assertEquals(2, $repository->getTree()->count());
+            $this->assertEquals(6, $repository->getTree()->total());
+        }
+    }
+
+    /** @test */
+    public function it_can_find_taxon_by_key()
+    {
+        $this->createDefaultTaxons();
+
+        foreach($this->repositories() as $repository) {
+            $this->assertNotNull($repository->findTaxonByKey('taxon-fifth'));
         }
     }
 
     private function repositories(): \Generator
     {
-        yield new InMemoryTaxonRepository();
-        yield new MysqlTaxonRepository();
-    }
-
-    private function createTaxons()
-    {
-        $taxons = [
-            Taxon::create(TaxonId::fromString('first'), 'taxon-first', ['label' => 'taxon first']),
-            Taxon::create(TaxonId::fromString('second'), 'taxon-second',  ['label' => 'taxon second'], TaxonId::fromString('first')),
-            Taxon::create(TaxonId::fromString('third'), 'taxon-third', ['label' => 'taxon third'], TaxonId::fromString('first')),
-            Taxon::create(TaxonId::fromString('fourth'), 'taxon-fourth', ['label' => 'taxon fourth'], TaxonId::fromString('third')),
-            Taxon::create(TaxonId::fromString('fifth'), 'taxon-fifth', ['label' => 'taxon fifth']),
-        ];
-
-        foreach($this->repositories() as $repository) {
-            foreach($taxons as $taxon) {
-                $repository->save($taxon);
-            }
-        }
+        yield new InMemoryTaxonTreeRepository();
+        yield new MysqlTaxonTreeRepository();
     }
 }

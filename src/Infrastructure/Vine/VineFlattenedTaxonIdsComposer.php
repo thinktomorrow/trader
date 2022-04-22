@@ -9,8 +9,6 @@ use Thinktomorrow\Trader\Application\Product\Grid\FlattenedTaxonIdsComposer;
 
 class VineFlattenedTaxonIdsComposer implements FlattenedTaxonIdsComposer
 {
-    use UsesTaxonTree;
-
     private TaxonTreeRepository $taxonTreeRepository;
 
     public function __construct(TaxonTreeRepository $taxonTreeRepository)
@@ -37,8 +35,8 @@ class VineFlattenedTaxonIdsComposer implements FlattenedTaxonIdsComposer
         foreach ($taxonKeys as $key) {
 
             $node = ($passedAsKeys)
-                ? $this->getTree()->find(fn(TaxonNode $node) => $node->getKey() == $key)
-                : $this->getTree()->find(fn(TaxonNode $node) => $node->getNodeId() == $key);
+                ? $this->taxonTreeRepository->getTree()->find(fn(TaxonNode $node) => $node->getKey() == $key)
+                : $this->taxonTreeRepository->getTree()->find(fn(TaxonNode $node) => $node->getNodeId() == $key);
 
             if(!$node) continue;
 

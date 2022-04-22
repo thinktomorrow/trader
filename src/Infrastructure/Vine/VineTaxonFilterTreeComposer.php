@@ -3,7 +3,6 @@ declare(strict_types=1);
 
 namespace Thinktomorrow\Trader\Infrastructure\Vine;
 
-use Thinktomorrow\Vine\NodeCollection;
 use Thinktomorrow\Trader\Application\Taxon\Tree\TaxonTree;
 use Thinktomorrow\Trader\Application\Taxon\Tree\TaxonNode;
 use Thinktomorrow\Trader\Application\Taxon\Tree\TaxonTreeRepository;
@@ -11,8 +10,6 @@ use Thinktomorrow\Trader\Application\Taxon\Filter\TaxonFilterTreeComposer;
 
 class VineTaxonFilterTreeComposer implements TaxonFilterTreeComposer
 {
-    use UsesTaxonTree;
-
     private TaxonTreeRepository $taxonTreeRepository;
 
     public function __construct(TaxonTreeRepository $taxonTreeRepository)
@@ -23,7 +20,7 @@ class VineTaxonFilterTreeComposer implements TaxonFilterTreeComposer
     public function getAvailableFilters(string $mainTaxonFilterKey): TaxonTree
     {
         /** @var TaxonNode $mainTaxonNode */
-        $mainTaxonNode = $this->getTree()->find(fn(TaxonNode $node) => $node->getKey() == $mainTaxonFilterKey);
+        $mainTaxonNode = $this->taxonTreeRepository->getTree()->find(fn(TaxonNode $node) => $node->getKey() == $mainTaxonFilterKey);
 
         if(!$mainTaxonNode) {
             return new TaxonTree();
@@ -36,7 +33,7 @@ class VineTaxonFilterTreeComposer implements TaxonFilterTreeComposer
          * be returned as filters. Here we shake out the taxon tree so there
          * are only taxa left that match one or more of the same products
          */
-        $taxonTree = $this->getTree()
+        $taxonTree = $this->taxonTreeRepository->getTree()
             ->shake(fn (TaxonNode $node) => array_intersect($node->getProductIds(), $productIds))
             ->prune(fn (TaxonNode $node) => $node->showOnline());
 
@@ -58,7 +55,7 @@ class VineTaxonFilterTreeComposer implements TaxonFilterTreeComposer
 
     public function getActiveFilters(string $mainTaxonFilterKey, array $activeKeys): TaxonTree
     {
-        $mainTaxonNode = $this->getTree()->find(fn($node) => $node->getKey() == $mainTaxonFilterKey);
+        $mainTaxonNode = $this->taxonTreeRepository->getTree()->find(fn($node) => $node->getKey() == $mainTaxonFilterKey);
 
         if(!$mainTaxonNode) {
             return new TaxonTree();
@@ -70,7 +67,7 @@ class VineTaxonFilterTreeComposer implements TaxonFilterTreeComposer
         /** Used filters from current request */
         if (count($activeKeys) > 0) {
 
-            $selectedTaxons = $this->getTree()->findMany(fn($node) => in_array($node->getKey(), $activeKeys));
+            $selectedTaxons = $this->taxonTreeRepository->getTree()->findMany(fn($node) => in_array($node->getKey(), $activeKeys));
 
             /**
              * Subfiltering

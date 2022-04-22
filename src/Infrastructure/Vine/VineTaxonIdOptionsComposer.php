@@ -10,8 +10,6 @@ use Thinktomorrow\Trader\Application\Taxon\TaxonSelect\TaxonIdOptionsComposer;
 
 class VineTaxonIdOptionsComposer implements TaxonIdOptionsComposer
 {
-    use UsesTaxonTree;
-
     private TaxonTreeRepository $taxonTreeRepository;
 
     private array $excludeTaxonIds = [];
@@ -86,7 +84,7 @@ class VineTaxonIdOptionsComposer implements TaxonIdOptionsComposer
 
     private function getFilteredTree(): TaxonTree
     {
-        return $this->getTree()
+        return $this->taxonTreeRepository->getTree()
             ->remove(function (TaxonNode $node) {
                 if ($node->isRootNode() && ! empty($this->includeTaxonRootIds)) {
                     return ! in_array($node->getId(), $this->includeTaxonRootIds);

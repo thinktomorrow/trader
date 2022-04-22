@@ -6,6 +6,7 @@ use Illuminate\Support\Facades\DB;
 use Thinktomorrow\Trader\Domain\Model\Taxon\Taxon;
 use Thinktomorrow\Trader\Domain\Model\Taxon\TaxonId;
 use Thinktomorrow\Trader\Infrastructure\Test\Repositories\InMemoryTaxonRepository;
+use Thinktomorrow\Trader\Infrastructure\Laravel\Repositories\MysqlTaxonRepository;
 
 trait TaxonHelpers
 {
@@ -38,7 +39,7 @@ trait TaxonHelpers
 
     private function createTaxon(Taxon $taxon, array $productIds = [])
     {
-        foreach($this->repositories() as $taxonRepository) {
+        foreach($this->entityRepositories() as $taxonRepository) {
 
             // In memory
             if($taxonRepository instanceof InMemoryTaxonRepository) {
@@ -55,5 +56,11 @@ trait TaxonHelpers
 
             $taxonRepository->save($taxon);
         }
+    }
+
+    private function entityRepositories(): \Generator
+    {
+        yield new InMemoryTaxonRepository();
+        yield new MysqlTaxonRepository();
     }
 }

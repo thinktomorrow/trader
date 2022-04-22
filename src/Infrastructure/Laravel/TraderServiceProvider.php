@@ -15,6 +15,7 @@ use Thinktomorrow\Trader\Domain\Model\Product\VariantRepository;
 use Thinktomorrow\Trader\Application\Product\Grid\GridRepository;
 use Thinktomorrow\Trader\Domain\Model\Customer\CustomerRepository;
 use Thinktomorrow\Trader\Application\Taxon\Tree\TaxonTreeRepository;
+use Thinktomorrow\Trader\Application\Taxon\Category\CategoryRepository;
 use Thinktomorrow\Trader\Infrastructure\Vine\VineTaxonIdOptionsComposer;
 use Thinktomorrow\Trader\Infrastructure\Vine\VineTaxonFilterTreeComposer;
 use Thinktomorrow\Trader\Application\Taxon\Filter\TaxonFilterTreeComposer;
@@ -31,6 +32,7 @@ use Thinktomorrow\Trader\Application\Product\ProductDetail\ProductDetailReposito
 use Thinktomorrow\Trader\Infrastructure\Laravel\Repositories\MysqlVariantRepository;
 use Thinktomorrow\Trader\Infrastructure\Laravel\Repositories\MysqlProductRepository;
 use Thinktomorrow\Trader\Infrastructure\Laravel\Repositories\MysqlCustomerRepository;
+use Thinktomorrow\Trader\Infrastructure\Laravel\Repositories\MysqlTaxonTreeRepository;
 use Thinktomorrow\Trader\Infrastructure\Laravel\Repositories\MysqlProductDetailRepository;
 use Thinktomorrow\Trader\Application\Cart\VariantForCart\VariantForCartRepository;
 use Thinktomorrow\Trader\Infrastructure\Laravel\Repositories\MysqlPaymentMethodRepository;
@@ -52,7 +54,9 @@ class TraderServiceProvider extends ServiceProvider
         $this->app->bind(VariantRepository::class, MysqlVariantRepository::class);
         $this->app->bind(VariantForCartRepository::class, MysqlVariantRepository::class);
 
-        $this->app->bind(TaxonTreeRepository::class, MysqlTaxonRepository::class);
+        // Taxon
+        $this->app->bind(TaxonTreeRepository::class, MysqlTaxonTreeRepository::class);
+        $this->app->bind(CategoryRepository::class, MysqlTaxonTreeRepository::class);
         $this->app->bind(TaxonIdOptionsComposer::class, VineTaxonIdOptionsComposer::class);
         $this->app->bind(TaxonFilterTreeComposer::class, VineTaxonFilterTreeComposer::class);
         $this->app->bind(FlattenedTaxonIdsComposer::class, VineFlattenedTaxonIdsComposer::class);

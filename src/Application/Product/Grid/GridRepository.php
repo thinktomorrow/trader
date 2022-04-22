@@ -12,7 +12,7 @@ interface GridRepository
 
     public function filterByTaxonKeys(array $taxonKeys): static;
 
-    public function filterByProductIds(array $productIds): static;
+    public function filterByProductIds(array $product_ids): static;
 
     public function filterByPrice(string $minimumPriceAmount = null, string $maximumPriceAmount = null): static;
 
