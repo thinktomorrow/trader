@@ -160,12 +160,12 @@ final class CartApplication
         }
 
         // Find matching shipping tariff
-        $tariff = $shippingProfile->findTariffByPrice($order->getSubtotal(), $this->config->doesPriceInputIncludesTax());
+        $tariff = $shippingProfile->findTariffByPrice($order->getSubtotal(), $this->config->doesPriceInputIncludesVat());
 
         $shippingCost = ShippingCost::fromMoney(
             $tariff->getRate(),
             TaxRate::fromString($this->config->getDefaultTaxRate()),
-            $this->config->doesPriceInputIncludesTax()
+            $this->config->doesPriceInputIncludesVat()
         );
 
         if(count($order->getShippings()) > 0) {
@@ -210,7 +210,7 @@ final class CartApplication
             PaymentCost::fromMoney(
                 $paymentMethod->getRate(),
                 TaxRate::fromString($this->config->getDefaultTaxRate()),
-                $this->config->doesPriceInputIncludesTax()
+                $this->config->doesPriceInputIncludesVat()
             )
         );
 

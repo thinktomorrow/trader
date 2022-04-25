@@ -31,7 +31,7 @@ final class Discount implements ChildEntity
             'discount_id' => $this->discountId->get(),
             'total' => $this->discountTotal->getMoney()->getAmount(),
             'tax_rate' => $this->discountTotal->getTaxRate()->toPercentage()->get(),
-            'includes_vat' => $this->discountTotal->includesTax(),
+            'includes_vat' => $this->discountTotal->includesVat(),
         ];
     }
 

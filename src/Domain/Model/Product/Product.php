@@ -23,6 +23,8 @@ class Product implements Aggregate
         addData as defaultAddData;
     }
 
+    private ProductState $state;
+
     public readonly ProductId $productId;
 
     private function __construct()
@@ -34,10 +36,16 @@ class Product implements Aggregate
     {
         $product = new static();
         $product->productId = $productId;
+        $product->state = ProductState::draft;
 
         $product->recordEvent(new ProductCreated($product->productId));
 
         return $product;
+    }
+
+    public function updateState(ProductState $state): void
+    {
+        $this->state = $state;
     }
 
     public function addData(array $data): void
@@ -51,6 +59,7 @@ class Product implements Aggregate
     {
         return [
             'product_id' => $this->productId->get(),
+            'state' => $this->state->value,
             'taxon_ids' => array_map(fn($taxonId) => $taxonId->get(), $this->taxonIds),
             'data' => json_encode($this->data),
         ];
@@ -71,6 +80,7 @@ class Product implements Aggregate
     {
         $product = new static();
         $product->productId = ProductId::fromString($state['product_id']);
+        $product->state = ProductState::from($state['state']);
 
         if(array_key_exists(Variant::class, $childEntities)) {
             $product->variants = array_map(fn($variantState) => Variant::fromMappedData($variantState, $state), $childEntities[Variant::class]);

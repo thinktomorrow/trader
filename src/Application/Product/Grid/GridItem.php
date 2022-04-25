@@ -4,7 +4,7 @@ declare(strict_types=1);
 namespace Thinktomorrow\Trader\Application\Product\Grid;
 
 use Thinktomorrow\Trader\Domain\Common\Locale;
-use Thinktomorrow\Trader\Application\Product\RendersPrices;
+use Thinktomorrow\Trader\Application\Common\RendersPrices;
 use Thinktomorrow\Trader\Domain\Model\Product\Variant\VariantId;
 use Thinktomorrow\Trader\Domain\Model\Product\Variant\VariantSalePrice;
 use Thinktomorrow\Trader\Domain\Model\Product\Variant\VariantUnitPrice;
@@ -60,8 +60,8 @@ class GridItem
         $item = new static();
         $item->locale = $locale;
         $item->variantId = VariantId::fromString($state['variant_id']);
-        $item->salePrice = VariantSalePrice::fromScalars($state['sale_price'], 'EUR', $state['tax_rate'], $state['includes_tax']);
-        $item->unitPrice = VariantUnitPrice::fromScalars($state['unit_price'], 'EUR', $state['tax_rate'], $state['includes_tax']);
+        $item->salePrice = VariantSalePrice::fromScalars($state['sale_price'], 'EUR', $state['tax_rate'], $state['includes_vat']);
+        $item->unitPrice = VariantUnitPrice::fromScalars($state['unit_price'], 'EUR', $state['tax_rate'], $state['includes_vat']);
 
         // TODO: title
         $item->title = 'ddkdkdk';

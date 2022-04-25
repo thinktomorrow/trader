@@ -6,8 +6,11 @@ namespace Tests\Acceptance\Product;
 use Money\Money;
 use PHPUnit\Framework\Assert;
 use PHPUnit\Framework\TestCase;
+use Thinktomorrow\Trader\TraderConfig;
+use Thinktomorrow\Trader\Domain\Common\Locale;
 use Thinktomorrow\Trader\Domain\Model\Product\ProductId;
 use Thinktomorrow\Trader\Application\Common\DataRenderer;
+use Thinktomorrow\Trader\Application\Common\DefaultLocale;
 use Thinktomorrow\Trader\Application\Product\CreateProduct;
 use Thinktomorrow\Trader\Infrastructure\Test\TestTraderConfig;
 use Thinktomorrow\Trader\Infrastructure\Test\EventDispatcherSpy;
@@ -28,10 +31,13 @@ abstract class ProductContext extends TestCase
     protected InMemoryVariantRepository $variantRepository;
     protected EventDispatcherSpy $eventDispatcher;
     protected ProductOptionsComposer $productOptionsComposer;
+    protected InMemoryProductDetailRepository $productDetailRepository;
 
     protected function setUp(): void
     {
-        DataRenderer::setResolver(function(array $data, string $key, string $language = null, string $default = null)
+        DefaultLocale::set(Locale::fromString('nl', 'BE'));
+
+        DataRenderer::setDataResolver(function(array $data, string $key, string $language = null, string $default = null)
         {
             if(!isset($data[$key])) {
                 return $default;
@@ -56,7 +62,7 @@ abstract class ProductContext extends TestCase
         );
 
         $this->productOptionsComposer = new ProductOptionsComposer(
-            new InMemoryProductDetailRepository($this->productRepository),
+            $this->productDetailRepository = new InMemoryProductDetailRepository($this->productRepository),
             new InMemoryVariantRepository($this->productRepository),
         );
     }

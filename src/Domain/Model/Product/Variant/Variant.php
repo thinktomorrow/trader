@@ -15,6 +15,7 @@ final class Variant implements ChildEntity
 
     public readonly ProductId $productId;
     public readonly VariantId $variantId;
+    private VariantState $state;
     private VariantUnitPrice $unitPrice;
     private VariantSalePrice $salePrice;
     private array $optionValueIds = [];
@@ -31,12 +32,18 @@ final class Variant implements ChildEntity
     public static function create(ProductId $productId, VariantId $variantId, VariantUnitPrice $unitPrice, VariantSalePrice $salePrice): static
     {
         $variant = new static();
+        $variant->state = VariantState::available;
         $variant->productId = $productId;
         $variant->variantId = $variantId;
         $variant->unitPrice = $unitPrice;
         $variant->salePrice = $salePrice;
 
         return $variant;
+    }
+
+    public function updateState(VariantState $state): void
+    {
+        $this->state = $state;
     }
 
     public function updatePrice(VariantUnitPrice $unitPrice, VariantSalePrice $salePrice): void
@@ -57,10 +64,11 @@ final class Variant implements ChildEntity
         return [
             'product_id' => $this->productId->get(),
             'variant_id' => $this->variantId->get(),
+            'state' => $this->state->value,
             'unit_price' => $this->unitPrice->getMoney()->getAmount(),
             'sale_price' => $this->salePrice->getMoney()->getAmount(),
             'tax_rate' => $this->unitPrice->getTaxRate()->toPercentage()->get(),
-            'includes_vat' => $this->unitPrice->includesTax(),
+            'includes_vat' => $this->unitPrice->includesVat(),
             'option_value_ids' => array_map(fn($optionValueId) => $optionValueId->get(), $this->optionValueIds),
             'data' => json_encode($this->data),
         ];
@@ -72,6 +80,7 @@ final class Variant implements ChildEntity
 
         $variant->productId = ProductId::fromString($aggregateState['product_id']);
         $variant->variantId = VariantId::fromString($state['variant_id']);
+        $variant->state = VariantState::from($state['state']);
         $variant->unitPrice = VariantUnitPrice::fromScalars($state['unit_price'], 'EUR', $state['tax_rate'], $state['includes_vat']);
         $variant->salePrice = VariantSalePrice::fromScalars($state['sale_price'], 'EUR', $state['tax_rate'], $state['includes_vat']);
         $variant->data = json_decode($state['data'], true);

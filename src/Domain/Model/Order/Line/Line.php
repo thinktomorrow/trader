@@ -63,7 +63,7 @@ final class Line implements ChildEntity
             'variant_id' => $this->variantId->get(),
             'line_price' => $this->linePrice->getMoney()->getAmount(),
             'tax_rate' => $this->linePrice->getTaxRate()->toPercentage()->get(),
-            'includes_vat' => $this->linePrice->includesTax(),
+            'includes_vat' => $this->linePrice->includesVat(),
             'quantity' => $this->quantity->asInt(),
         ];
     }

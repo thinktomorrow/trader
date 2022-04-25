@@ -14,8 +14,10 @@ use Thinktomorrow\Trader\Domain\Model\Product\Exceptions\VariantAlreadyExistsOnP
 
 trait HasVariants
 {
+    /** @var Variant[] */
     private array $variants = [];
 
+    /** @return Variant[] */
     public function getVariants(): array
     {
         return $this->variants;

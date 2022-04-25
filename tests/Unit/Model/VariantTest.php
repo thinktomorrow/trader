@@ -9,6 +9,7 @@ use Thinktomorrow\Trader\Domain\Common\Taxes\TaxRate;
 use Thinktomorrow\Trader\Domain\Model\Product\ProductId;
 use Thinktomorrow\Trader\Domain\Model\Product\Variant\Variant;
 use Thinktomorrow\Trader\Domain\Model\Product\Variant\VariantId;
+use Thinktomorrow\Trader\Domain\Model\Product\Variant\VariantState;
 use Thinktomorrow\Trader\Domain\Model\Product\Variant\VariantUnitPrice;
 use Thinktomorrow\Trader\Domain\Model\Product\Variant\VariantSalePrice;
 
@@ -29,6 +30,7 @@ class VariantTest extends TestCase
         $this->assertEquals([
             'product_id' => $productId->get(),
             'variant_id' => $variantId->get(),
+            'state' => VariantState::available->value,
             'unit_price' => $productUnitPrice->getExcludingVat()->getAmount(),
             'sale_price' => $productSalePrice->getExcludingVat()->getAmount(),
             'tax_rate' => $productUnitPrice->getTaxRate()->toPercentage()->get(),
@@ -51,7 +53,7 @@ class VariantTest extends TestCase
         $this->assertEquals($unitPrice->getMoney()->getAmount(), $variant->getMappedData()['unit_price']);
         $this->assertEquals($salePrice->getMoney()->getAmount(), $variant->getMappedData()['sale_price']);
         $this->assertEquals($salePrice->getTaxRate()->toPercentage()->get(), $variant->getMappedData()['tax_rate']);
-        $this->assertEquals($salePrice->includesTax(), $variant->getMappedData()['includes_vat']);
+        $this->assertEquals($salePrice->includesVat(), $variant->getMappedData()['includes_vat']);
         $this->assertEquals($salePrice, $variant->getSalePrice());
     }
 
@@ -88,6 +90,7 @@ class VariantTest extends TestCase
     {
         $variant = Variant::fromMappedData([
             'variant_id' => 'yyy',
+            'state' => VariantState::deleted->value,
             'unit_price' => 100,
             'sale_price' => 80,
             'tax_rate' => '20',
@@ -100,6 +103,7 @@ class VariantTest extends TestCase
 
         $this->assertEquals(ProductId::fromString('xxx'), $variant->getMappedData()['product_id']);
         $this->assertEquals(VariantId::fromString('yyy'), $variant->variantId);
+        $this->assertEquals(VariantState::deleted->value, $variant->getMappedData()['state']);
         $this->assertEquals(100, $variant->getMappedData()['unit_price']);
         $this->assertEquals(80, $variant->getMappedData()['sale_price']);
         $this->assertEquals('20', $variant->getMappedData()['tax_rate']);

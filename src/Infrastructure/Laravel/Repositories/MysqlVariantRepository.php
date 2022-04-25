@@ -163,7 +163,7 @@ class MysqlVariantRepository implements VariantRepository, VariantForCartReposit
                 'variant_id',
                 'sale_price',
                 'tax_rate',
-                'includes_tax'
+                'includes_vat'
             ])
             ->first();
 
@@ -174,7 +174,7 @@ class MysqlVariantRepository implements VariantRepository, VariantForCartReposit
         $state = (array) $state;
 
         return VariantForCart::fromMappedData(array_merge($state, [
-            'includes_tax' => (bool) $state['includes_tax'],
+            'includes_vat' => (bool) $state['includes_vat'],
         ]));
     }
 

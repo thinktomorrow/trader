@@ -30,7 +30,7 @@ class ShippingTest extends TestCase
             'shipping_state' => ShippingState::none->value,
             'cost' => $cost->getMoney()->getAmount(),
             'tax_rate' => $cost->getTaxRate()->toPercentage()->get(),
-            'includes_vat' => $cost->includesTax(),
+            'includes_vat' => $cost->includesVat(),
             'data' => json_encode([]),
         ], $shipping->getMappedData());
     }

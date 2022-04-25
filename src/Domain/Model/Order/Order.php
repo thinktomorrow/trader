@@ -122,7 +122,7 @@ final class Order implements Aggregate
             'order_state'  => $this->orderState->value,
             'total'        => $this->getTotal()->getMoney()->getAmount(),
             'tax_total'    => $this->getTaxTotal()->getAmount(),
-            'includes_vat' => $this->getTotal()->includesTax(),
+            'includes_vat' => $this->getTotal()->includesVat(),
             'data'         => json_encode($this->data),
         ];
     }

@@ -47,5 +47,12 @@ return [
      * tax already included. Set this value to false if all entered prices are always without
      * tax included. Keep in mind that this does not alter already entered price values.
      */
-    'does_price_input_includes_tax' => true,
+    'does_price_input_includes_vat' => true,
+
+    /**
+     * Which taxon subtree represents the main category of the catalog. The main category taxon
+     * determines which of the products taxa to use for the breadcrumb tree and structure.
+     * If left blank, by default the first taxon subtree found will be used.
+     */
+    'category_root_id' => null,
 ];

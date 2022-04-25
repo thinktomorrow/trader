@@ -28,7 +28,7 @@ return [
      * we use this default country as a fallback for e.g. tax logic
      * Format used is the 2-chars ISO string.
      */
-    'country_id' => 'BE',
+    'country' => 'BE',
 
     /*
      * Default tax percentage. This is the percentage as integer

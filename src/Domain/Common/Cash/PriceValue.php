@@ -10,19 +10,19 @@ trait PriceValue
 {
     private Money $money;
     private TaxRate $taxRate;
-    private bool $includesTax;
+    private bool $includesVat;
 
     private function __construct()
     {
         //
     }
 
-    public static function fromScalars(string|int $amount, string $currency, string $taxRate, bool $includesTax): static
+    public static function fromScalars(string|int $amount, string $currency, string $taxRate, bool $includesVat): static
     {
         return static::fromMoney(
             Cash::make($amount, $currency),
             TaxRate::fromString($taxRate),
-            $includesTax
+            $includesVat
         );
     }
 
@@ -38,25 +38,25 @@ trait PriceValue
 
         $price->money = $otherPrice->getMoney();
         $price->taxRate = $otherPrice->getTaxRate();
-        $price->includesTax = $otherPrice->includesTax();
+        $price->includesVat = $otherPrice->includesVat();
 
         return $price;
     }
 
-    public static function fromMoney(Money $money, TaxRate $taxRate, bool $includesTax): static
+    public static function fromMoney(Money $money, TaxRate $taxRate, bool $includesVat): static
     {
         $price = new static();
 
         $price->money = $money;
         $price->taxRate = $taxRate;
-        $price->includesTax = $includesTax;
+        $price->includesVat = $includesVat;
 
         return $price;
     }
 
     public function getIncludingVat(): Money
     {
-        if($this->includesTax) {
+        if($this->includesVat) {
             return $this->money;
         }
 
@@ -67,7 +67,7 @@ trait PriceValue
 
     public function getExcludingVat(): Money
     {
-        if(! $this->includesTax) {
+        if(! $this->includesVat) {
             return $this->money;
         }
 
@@ -86,31 +86,31 @@ trait PriceValue
         return $this->taxRate;
     }
 
-    public function includesTax(): bool
+    public function includesVat(): bool
     {
-        return $this->includesTax;
+        return $this->includesVat;
     }
 
     public function multiply(int $quantity): static
     {
-        return static::fromMoney($this->money->multiply($quantity), $this->taxRate, $this->includesTax);
+        return static::fromMoney($this->money->multiply($quantity), $this->taxRate, $this->includesVat);
     }
 
     public function add(Price $otherPrice): static
     {
-        $otherMoney = $this->includesTax()
+        $otherMoney = $this->includesVat()
             ? $otherPrice->getIncludingVat()
             : $otherPrice->getExcludingVat();
 
-        return static::fromMoney($this->money->add($otherMoney), $this->taxRate, $this->includesTax);
+        return static::fromMoney($this->money->add($otherMoney), $this->taxRate, $this->includesVat);
     }
 
     public function subtract(Price $otherPrice): static
     {
-        $otherMoney = $this->includesTax()
+        $otherMoney = $this->includesVat()
             ? $otherPrice->getIncludingVat()
             : $otherPrice->getExcludingVat();
 
-        return static::fromMoney($this->money->subtract($otherMoney), $this->taxRate, $this->includesTax);
+        return static::fromMoney($this->money->subtract($otherMoney), $this->taxRate, $this->includesVat);
     }
 }

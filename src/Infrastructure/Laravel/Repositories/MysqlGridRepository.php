@@ -60,10 +60,17 @@ class MysqlGridRepository implements GridRepository
          */
         $taxonIds = $this->flattenedTaxonIds->getGroupedByRootByKeys($taxonKeys);
 
+        return $this->filterByTaxonIds($taxonIds, true);
+    }
+
+    public function filterByTaxonIds(array $taxon_ids, bool $already_grouped = false): static
+    {
+        $taxonIds = $already_grouped ? $taxon_ids : $this->flattenedTaxonIds->getGroupedByRootByIds($taxon_ids);
+
         foreach ($taxonIds as $rootId => $ids) {
             $joinTable = 'join' . $rootId;
-            $this->builder->join(static::$taxonPivotTable . ' AS ' . $joinTable, static::$productTable.'.id', '=', $joinTable.'.product_id')
-                ->whereIn($joinTable.'.taxon_id', array_unique($ids));
+            $this->builder->join(static::$taxonPivotTable . ' AS ' . $joinTable, static::$productTable . '.product_id', '=', $joinTable . '.product_id')
+                ->whereIn($joinTable . '.taxon_id', array_unique($ids));
         }
 
         return $this;
@@ -170,7 +177,7 @@ class MysqlGridRepository implements GridRepository
             $results->getCollection()
                 ->map(fn ($state) => get_object_vars($state))
                 ->map(fn ($state) => GridItem::fromMappedData(array_merge($state, [
-                    'includes_tax' => (bool) $state['includes_tax'],
+                    'includes_vat' => (bool) $state['includes_vat'],
                 ]), $this->locale))
         );
     }

@@ -68,7 +68,7 @@ class Payment
             'payment_state'     => $this->paymentState->value,
             'cost'              => $this->paymentCost->getMoney()->getAmount(),
             'tax_rate'          => $this->paymentCost->getTaxRate()->toPercentage()->get(),
-            'includes_vat'      => $this->paymentCost->includesTax(),
+            'includes_vat'      => $this->paymentCost->includesVat(),
             'data'              => json_encode($this->data),
         ];
     }

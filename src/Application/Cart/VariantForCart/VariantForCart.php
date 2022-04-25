@@ -22,7 +22,7 @@ class VariantForCart
     public static function fromMappedData(array $state): static
     {
         return new static(
-            VariantSalePrice::fromScalars($state['sale_price'], 'EUR', $state['tax_rate'], $state['includes_tax'])
+            VariantSalePrice::fromScalars($state['sale_price'], 'EUR', $state['tax_rate'], $state['includes_vat'])
         );
     }
 }

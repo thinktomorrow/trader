@@ -8,6 +8,13 @@ use Thinktomorrow\Trader\Domain\Common\Locale;
 
 class TestTraderConfig implements TraderConfig
 {
+    private array $overwrites;
+
+    public function __construct(array $overwrites = [])
+    {
+        $this->overwrites = $overwrites;
+    }
+
     public function getDefaultLocale(): Locale
     {
         return Locale::fromString('nl', 'BE');
@@ -28,8 +35,18 @@ class TestTraderConfig implements TraderConfig
         return ['21', '12', '6', '10'];
     }
 
-    public function doesPriceInputIncludesTax(): bool
+    public function doesPriceInputIncludesVat(): bool
     {
         return true;
+    }
+
+    public function getCategoryRootId(): ?string
+    {
+        return $this->overwrites['category_root_id'] ?? null;
+    }
+
+    public function getClassMap(): array
+    {
+        return [];
     }
 }

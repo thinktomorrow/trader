@@ -17,15 +17,9 @@ use Thinktomorrow\Trader\Application\Product\ProductOptions\VariantProductOption
 
 final class InMemoryVariantRepository implements VariantRepository, VariantForCartRepository, VariantProductOptionsRepository
 {
-    private InMemoryProductRepository $productRepository;
-
+    /** @var Variant[] */
     public static array $variants = [];
     private string $nextReference = 'xxx-123';
-
-    public function __construct(InMemoryProductRepository $productRepository)
-    {
-        $this->productRepository = $productRepository;
-    }
 
     public function save(Variant $variant): void
     {
@@ -88,7 +82,7 @@ final class InMemoryVariantRepository implements VariantRepository, VariantForCa
     {
         // TODO: get url... locale,
 
-        $product = $this->productRepository->find($productId);
+        $product = InMemoryProductRepository::$products[$productId->get()];
         $variants = $product->getVariants();
         $options = $product->getChildEntities()[Option::class];
 

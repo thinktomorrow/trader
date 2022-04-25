@@ -30,8 +30,18 @@ class TraderConfig implements \Thinktomorrow\Trader\TraderConfig
         return config('trader.tax_rates');
     }
 
-    public function doesPriceInputIncludesTax(): bool
+    public function doesPriceInputIncludesVat(): bool
     {
-        return config('trader.does_price_input_includes_tax');
+        return config('trader.does_price_input_includes_vat');
+    }
+
+    public function getCategoryRootId(): ?string
+    {
+        return config('trader.category_root_id');
+    }
+
+    public function getClassMap(): array
+    {
+        return config('trader.classmap', []);
     }
 }

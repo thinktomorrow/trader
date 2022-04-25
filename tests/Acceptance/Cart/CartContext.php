@@ -53,7 +53,7 @@ abstract class CartContext extends TestCase
     {
         $this->cartApplication = new CartApplication(
             new TestTraderConfig(),
-            $this->variantRepository = new InMemoryVariantRepository(new InMemoryProductRepository()),
+            $this->variantRepository = new InMemoryVariantRepository(),
             $this->orderRepository = new InMemoryOrderRepository(),
             $this->shippingProfileRepository = new InMemoryShippingProfileRepository(),
             new InMemoryPaymentMethodRepository(),

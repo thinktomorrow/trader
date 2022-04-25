@@ -12,7 +12,7 @@ use Thinktomorrow\Trader\Domain\Model\Product\Exceptions\CouldNotFindProduct;
 
 final class InMemoryProductRepository implements ProductRepository
 {
-    private static array $products = [];
+    public static array $products = [];
 
     private string $nextReference = 'xxx-123';
 
@@ -20,7 +20,12 @@ final class InMemoryProductRepository implements ProductRepository
     {
         static::$products[$product->productId->get()] = $product;
 
-        InMemoryVariantRepository::$variants = array_merge(InMemoryVariantRepository::$variants, $product->getVariants());
+        foreach($product->getVariants() as $variant) {
+            InMemoryVariantRepository::$variants = array_merge(InMemoryVariantRepository::$variants, [
+                $variant->variantId->get() => $variant,
+            ]);
+        }
+
     }
 
     public function find(ProductId $productId): Product

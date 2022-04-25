@@ -15,5 +15,9 @@ interface TraderConfig
 
     public function getAvailableTaxRates(): array;
 
-    public function doesPriceInputIncludesTax(): bool;
+    public function doesPriceInputIncludesVat(): bool;
+
+    public function getCategoryRootId(): ?string;
+
+    public function getClassMap(): array;
 }

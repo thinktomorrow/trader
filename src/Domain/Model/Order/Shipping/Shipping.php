@@ -74,7 +74,7 @@ final class Shipping implements ChildEntity
             'shipping_state'      => $this->shippingState->value,
             'cost'                  => $this->shippingCost->getMoney()->getAmount(),
             'tax_rate'            => $this->shippingCost->getTaxRate()->toPercentage()->get(),
-            'includes_vat'        => $this->shippingCost->includesTax(),
+            'includes_vat'        => $this->shippingCost->includesVat(),
             'data'                => json_encode($this->data),
         ];
     }

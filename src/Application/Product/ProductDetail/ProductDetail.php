@@ -1,64 +1,29 @@
 <?php
-declare(strict_types=1);
 
 namespace Thinktomorrow\Trader\Application\Product\ProductDetail;
 
-use Thinktomorrow\Trader\Domain\Common\Locale;
-use Thinktomorrow\Trader\Application\Common\RendersData;
-use Thinktomorrow\Trader\Application\Product\RendersPrices;
-use Thinktomorrow\Trader\Domain\Model\Product\Variant\VariantId;
-use Thinktomorrow\Trader\Domain\Model\Product\Variant\VariantSalePrice;
-use Thinktomorrow\Trader\Domain\Model\Product\Variant\VariantUnitPrice;
+use Money\Money;
 
-class ProductDetail
+interface ProductDetail
 {
-    use RendersPrices;
-    use RendersData;
+    public static function fromMappedData(array $state): static;
 
-    private VariantId $variantId;
-    private array $data;
+    public function getVariantId(): string;
+    public function getProductId(): string;
+    public function getTaxonIds(): array;
+    public function isAvailable(): bool;
 
-    private Locale $locale;
+    public function getUnitPrice(): string;
+    public function getSalePrice(): string;
+    public function getUnitPriceAsMoney(): Money;
+    public function getSalePriceAsMoney(): Money;
 
-    private function __construct()
-    {
+    public function getTitle(): string;
+    public function getIntro(): string;
+    public function getContent(): string;
+    public function getSku(): string;
+    public function getUrl(): string;
 
-    }
-
-    public static function fromMappedData(array $state): static
-    {
-        $item = new static();
-
-        $item->variantId = VariantId::fromString($state['variant_id']);
-        $item->salePrice = VariantSalePrice::fromScalars($state['sale_price'], 'EUR', $state['tax_rate'], $state['includes_tax']);
-        $item->unitPrice = VariantUnitPrice::fromScalars($state['unit_price'], 'EUR', $state['tax_rate'], $state['includes_tax']);
-        $item->data = $state['data'];
-
-        return $item;
-    }
-
-    public function getId(): string
-    {
-        return $this->variantId->get();
-    }
-
-    public function getTitle(): string
-    {
-        return $this->data('title');
-    }
-
-    public function getThumbUrl(): string
-    {
-
-    }
-
-//    public function getOtherProducts(): array
-//    {
-//
-//    }
-
-    public function getImages(): array
-    {
-
-    }
+    public function setImages(iterable $images): void;
+    public function getImages(): iterable;
 }

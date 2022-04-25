@@ -5,16 +5,16 @@ namespace Thinktomorrow\Trader\Application\Common;
 
 class DataRenderer
 {
-    private static \Closure $resolver;
+    private static \Closure $dataResolver;
 
-    public static function setResolver(\Closure $resolver)
+    public static function setDataResolver(\Closure $dataResolver)
     {
-        static::$resolver = $resolver;
+        static::$dataResolver = $dataResolver;
     }
 
     public static function get(array $data, string $key, string $language = null, $default = null)
     {
-        return call_user_func_array(static::$resolver, [
+        return call_user_func_array(static::$dataResolver, [
             $data,
             $key,
             $language,

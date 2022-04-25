@@ -4,12 +4,15 @@ declare(strict_types=1);
 namespace Thinktomorrow\Trader\Infrastructure\Laravel\Repositories;
 
 use Illuminate\Support\Facades\DB;
+use Psr\Container\ContainerInterface;
 use Thinktomorrow\Trader\Domain\Model\Product\ProductId;
 use Thinktomorrow\Trader\Domain\Model\Product\ProductState;
 use Thinktomorrow\Trader\Domain\Model\Product\Variant\VariantId;
 use Thinktomorrow\Trader\Application\Product\ProductDetail\ProductDetail;
 use Thinktomorrow\Trader\Application\Product\ProductOptions\ProductOption;
 use Thinktomorrow\Trader\Application\Product\ProductOptions\ProductOptions;
+use Thinktomorrow\Trader\Infrastructure\Laravel\Models\DefaultProductDetail;
+use Thinktomorrow\Trader\Domain\Model\Product\Exceptions\CouldNotFindVariant;
 use Thinktomorrow\Trader\Application\Product\ProductDetail\ProductDetailRepository;
 use Thinktomorrow\Trader\Application\Product\ProductOptions\ProductOptionsRepository;
 
@@ -21,29 +24,44 @@ class MysqlProductDetailRepository implements ProductDetailRepository, ProductOp
     private static string $optionTable = 'trader_product_options';
     private static string $optionValueTable = 'trader_product_option_values';
     private static string $variantOptionValueLookupTable = 'trader_variant_option_values';
+    private static string $taxonLookupTable = 'trader_taxa_products';
 
-    public function findProductDetail(VariantId $variantId): ProductDetail
+    private ContainerInterface $container;
+
+    public function __construct(ContainerInterface $container)
     {
+        $this->container = $container;
+    }
+
+    public function findProductDetail(VariantId $variantId): DefaultProductDetail
+    {
+        // $results = DB::table(static::$taxonTable)
+
+        //
+
         // Basic builder query
         $state = DB::table(static::$variantTable)
             ->join(static::$productTable, static::$variantTable . '.product_id', '=', static::$productTable . '.product_id')
+            ->leftJoin(static::$taxonLookupTable, static::$productTable.'.product_id', static::$taxonLookupTable.'.product_id')
             ->whereIn(static::$productTable . '.state', ProductState::onlineStates())
             ->where(static::$variantTable . '.variant_id', $variantId->get())
+            ->groupBy(static::$variantTable.'.variant_id')
             ->select([
                 static::$variantTable . '.*',
                 static::$productTable . '.data AS product_data',
-                static::$productTable . '.order_column AS product_order_column',
+                DB::raw('GROUP_CONCAT(taxon_id) AS taxon_ids')
             ])
         ->first();
 
         if(!$state) {
-            throw new \RuntimeException('No online variant found by id [' . $variantId->get(). ']');
+            throw new CouldNotFindVariant('No online variant found by id [' . $variantId->get(). ']');
         }
 
         $state = (array) $state;
 
-        return ProductDetail::fromMappedData(array_merge($state, [
-            'includes_tax' => (bool) $state['includes_tax'],
+        return $this->container->get(ProductDetail::class)::fromMappedData(array_merge($state, [
+            'includes_vat' => (bool) $state['includes_vat'],
+            'taxon_ids' => explode(',',$state['taxon_ids']),
         ]));
     }
 

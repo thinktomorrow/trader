@@ -7,21 +7,15 @@ use Tests\Unit\TestCase;
 use Thinktomorrow\Trader\Domain\Model\Taxon\TaxonId;
 use Thinktomorrow\Trader\Domain\Model\Product\Product;
 use Thinktomorrow\Trader\Domain\Model\Product\ProductId;
-use Thinktomorrow\Trader\Domain\Model\Product\Option\Option;
+use Thinktomorrow\Trader\Domain\Model\Product\ProductState;
 use Thinktomorrow\Trader\Domain\Model\Product\Variant\Variant;
-use Thinktomorrow\Trader\Domain\Model\Product\Option\OptionId;
 use Thinktomorrow\Trader\Domain\Model\Product\Variant\VariantId;
 use Thinktomorrow\Trader\Domain\Model\Product\Event\ProductCreated;
-use Thinktomorrow\Trader\Domain\Model\Product\Option\OptionValue;
-use Thinktomorrow\Trader\Domain\Model\Product\Event\OptionsUpdated;
-use Thinktomorrow\Trader\Domain\Model\Product\Option\OptionValueId;
 use Thinktomorrow\Trader\Domain\Model\Product\Event\VariantCreated;
 use Thinktomorrow\Trader\Domain\Model\Product\Event\VariantDeleted;
 use Thinktomorrow\Trader\Domain\Model\Product\Variant\VariantUnitPrice;
 use Thinktomorrow\Trader\Domain\Model\Product\Variant\VariantSalePrice;
 use Thinktomorrow\Trader\Domain\Model\Product\Event\ProductTaxaUpdated;
-use Thinktomorrow\Trader\Domain\Model\Product\Event\OptionValuesUpdated;
-use Thinktomorrow\Trader\Domain\Model\Product\Exceptions\CouldNotFindOptionOnProduct;
 
 class ProductTest extends TestCase
 {
@@ -32,6 +26,7 @@ class ProductTest extends TestCase
 
         $this->assertEquals([
             'product_id' => 'xxx',
+            'state' => ProductState::draft->value,
             'taxon_ids' => [],
             'data' => '[]',
         ], $product->getMappedData());
@@ -54,6 +49,7 @@ class ProductTest extends TestCase
 
         $product = Product::fromMappedData([
             'product_id' => 'xxx',
+            'state' => ProductState::online->value,
             'data' => $data,
             'taxon_ids' => ['1','2'],
         ]);
@@ -108,6 +104,15 @@ class ProductTest extends TestCase
         ));
     }
 
+    /** @test */
+    public function it_can_update_state()
+    {
+        $product = $this->createdProduct();
+
+        $product->updateState(ProductState::archived);
+
+        $this->assertEquals(ProductState::archived->value, $product->getMappedData()['state']);
+    }
 
     /** @test */
     public function it_can_update_variant()
