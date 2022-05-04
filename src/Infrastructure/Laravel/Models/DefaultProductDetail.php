@@ -74,13 +74,13 @@ class DefaultProductDetail implements ProductDetail
     public function getUnitPrice(): string
     {
         // Remove any 00 decimals
-        return str_replace(',00', '', $this->renderMoney($this->getUnitPriceAsMoney(), $this->locale));
+        return str_replace(',00', '', $this->renderMoney($this->getUnitPriceAsMoney(), $this->getLocale()));
     }
 
     public function getSalePrice(): string
     {
         // Remove any 00 decimals
-        return str_replace(',00', '', $this->renderMoney($this->getSalePriceAsMoney(), $this->locale));
+        return str_replace(',00', '', $this->renderMoney($this->getSalePriceAsMoney(), $this->getLocale()));
     }
 
     public function getUnitPriceAsMoney(): Money
@@ -124,11 +124,6 @@ class DefaultProductDetail implements ProductDetail
     {
 
     }
-
-//    public function getOtherProducts(): array
-//    {
-//
-//    }
 
     public function setImages(iterable $images): void
     {

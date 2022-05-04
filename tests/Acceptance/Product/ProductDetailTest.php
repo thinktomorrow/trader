@@ -40,8 +40,8 @@ class ProductDetailTest extends ProductContext
         $this->assertEquals($product->getVariants()[0]->variantId->get(), $productDetail->getVariantId());
         $this->assertEquals($product->getVariants()[0]->productId->get(), $productDetail->getProductId());
         $this->assertTrue($productDetail->isAvailable());
-        $this->assertEquals('€ 0,12', $productDetail->getUnitPrice());
-        $this->assertEquals('€ 0,10', $productDetail->getSalePrice());
+        $this->assertEquals('€ 0,10', $productDetail->getUnitPrice());
+        $this->assertEquals('€ 0,08', $productDetail->getSalePrice());
         $this->assertEquals('variant title nl', $productDetail->getTitle());
         $this->assertEquals(['1','2'], $productDetail->getTaxonIds());
 

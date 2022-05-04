@@ -9,6 +9,7 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 use Thinktomorrow\Trader\Domain\Model\Customer\Customer;
 use Thinktomorrow\Trader\Domain\Model\Product\ProductId;
 use Thinktomorrow\Trader\Domain\Model\Customer\CustomerId;
+use Thinktomorrow\Trader\Infrastructure\Test\TestContainer;
 use Thinktomorrow\Trader\Infrastructure\Laravel\Repositories\MysqlVariantRepository;
 use Thinktomorrow\Trader\Infrastructure\Test\Repositories\InMemoryProductRepository;
 use Thinktomorrow\Trader\Infrastructure\Laravel\Repositories\MysqlProductRepository;
@@ -42,12 +43,12 @@ final class ProductOptionsRepositoryTest extends TestCase
     {
         yield [
             new InMemoryProductRepository(),
-            new InMemoryProductDetailRepository(new InMemoryProductRepository()),
+            new InMemoryProductDetailRepository(),
         ];
 
         yield [
             new MysqlProductRepository(new MysqlVariantRepository()),
-            new MysqlProductDetailRepository(),
+            new MysqlProductDetailRepository(new TestContainer()),
         ];
     }
 }
