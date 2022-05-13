@@ -11,6 +11,7 @@ use Thinktomorrow\Trader\Domain\Common\Event\EventDispatcher;
 use Thinktomorrow\Trader\Domain\Model\Product\Variant\Variant;
 use Thinktomorrow\Trader\Domain\Model\Product\ProductRepository;
 use Thinktomorrow\Trader\Domain\Model\Product\VariantRepository;
+use Thinktomorrow\Trader\Domain\Model\Product\Variant\VariantId;
 use Thinktomorrow\Trader\Domain\Model\Product\Option\OptionValue;
 use Thinktomorrow\Trader\Application\Product\UpdateProduct\UpdateProductTaxa;
 use Thinktomorrow\Trader\Application\Product\UpdateProduct\UpdateProductData;
@@ -52,6 +53,26 @@ class ProductApplication
         $this->eventDispatcher->dispatchAll($product->releaseEvents());
 
         return $productId;
+    }
+
+    public function createVariant(CreateVariant $createVariant): VariantId
+    {
+        $product = $this->productRepository->find($createVariant->getProductId());
+
+        $product->createVariant($variant = Variant::create(
+            $product->productId,
+            $this->variantRepository->nextReference(),
+            $createVariant->getUnitPrice($this->traderConfig->getDefaultTaxRate()),
+            $createVariant->getSalePrice($this->traderConfig->getDefaultTaxRate()),
+        ));
+
+        $variant->addData($createVariant->getData());
+
+        $this->productRepository->save($product);
+
+        $this->eventDispatcher->dispatchAll($product->releaseEvents());
+
+        return $variant->variantId;
     }
 
     public function updateProductTaxa(UpdateProductTaxa $updateProductTaxa): void

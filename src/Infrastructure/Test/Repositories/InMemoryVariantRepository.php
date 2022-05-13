@@ -19,7 +19,7 @@ final class InMemoryVariantRepository implements VariantRepository, VariantForCa
 {
     /** @var Variant[] */
     public static array $variants = [];
-    private string $nextReference = 'xxx-123';
+    private static string $nextReference = 'xxx-123';
 
     public function save(Variant $variant): void
     {
@@ -51,13 +51,13 @@ final class InMemoryVariantRepository implements VariantRepository, VariantForCa
 
     public function nextReference(): VariantId
     {
-        return VariantId::fromString($this->nextReference);
+        return VariantId::fromString(static::$nextReference);
     }
 
     // For testing purposes only
-    public function setNextReference(string $nextReference): void
+    public static function setNextReference(string $nextReference): void
     {
-        $this->nextReference = $nextReference;
+        static::$nextReference = $nextReference;
     }
 
     public function clear()

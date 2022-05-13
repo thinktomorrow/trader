@@ -12,9 +12,11 @@ use Thinktomorrow\Trader\Domain\Model\Product\ProductId;
 use Thinktomorrow\Trader\Application\Common\DataRenderer;
 use Thinktomorrow\Trader\Application\Common\DefaultLocale;
 use Thinktomorrow\Trader\Application\Product\CreateProduct;
+use Thinktomorrow\Trader\Application\Product\CreateVariant;
 use Thinktomorrow\Trader\Infrastructure\Test\TestTraderConfig;
 use Thinktomorrow\Trader\Infrastructure\Test\EventDispatcherSpy;
 use Thinktomorrow\Trader\Application\Product\ProductApplication;
+use Thinktomorrow\Trader\Domain\Model\Product\Variant\VariantId;
 use Thinktomorrow\Trader\Domain\Model\Product\Event\ProductCreated;
 use Thinktomorrow\Trader\Domain\Model\Product\Event\VariantCreated;
 use Thinktomorrow\Trader\Domain\Model\Product\Event\ProductTaxaUpdated;
@@ -89,6 +91,21 @@ abstract class ProductContext extends TestCase
         ], $this->eventDispatcher->releaseDispatchedEvents());
 
         return $productId;
+    }
+
+    protected function createAVariant(string $productId, string $unitPrice, array $data = [], string $variantId = 'xxx-123'): VariantId
+    {
+        InMemoryVariantRepository::setNextReference($variantId);
+
+        $variantId = $this->productApplication->createVariant(new CreateVariant(
+            $productId, $unitPrice, $data
+        ));
+
+        $this->assertEquals([
+            new VariantCreated(ProductId::fromString($productId), $variantId),
+        ], $this->eventDispatcher->releaseDispatchedEvents());
+
+        return $variantId;
     }
 
     protected function editProductOptions(string $unitPrice, array $taxonIds, array $data = []): ProductId
