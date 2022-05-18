@@ -5,9 +5,10 @@ namespace Thinktomorrow\Trader\Domain\Model\Product;
 
 enum ProductState: string
 {
-    case draft = 'draft'; // productgroup is offline and in concept
+    case offline = 'offline'; // product is offline
     case online = 'online'; // online
-    case archived = 'archived'; // archived and optionally replaced by new product
+    case archived = 'archived'; // archived and no longer in use
+    case queued_for_deletion = 'queued_for_deletion'; // pending for permanent deletion
 
     public static function onlineStates(): array
     {

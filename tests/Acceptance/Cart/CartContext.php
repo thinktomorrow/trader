@@ -67,9 +67,17 @@ abstract class CartContext extends TestCase
         (new TestContainer())->add(AdjustShipping::class, new AdjustShipping(
             $this->shippingProfileRepository,
         ));
+
+        // Make sure we start with a clean slate
+        $this->clearRepositories();
     }
 
     public function tearDown(): void
+    {
+        $this->clearRepositories();
+    }
+
+    private function clearRepositories()
     {
         $this->productRepository->clear();
         $this->variantRepository->clear();

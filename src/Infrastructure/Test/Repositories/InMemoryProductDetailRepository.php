@@ -7,11 +7,11 @@ use Thinktomorrow\Trader\Domain\Model\Product\ProductId;
 use Thinktomorrow\Trader\Domain\Model\Product\Option\Option;
 use Thinktomorrow\Trader\Domain\Model\Product\Variant\VariantId;
 use Thinktomorrow\Trader\Domain\Model\Product\Option\OptionValue;
-use Thinktomorrow\Trader\Application\Product\ProductOptions\ProductOption;
-use Thinktomorrow\Trader\Application\Product\ProductOptions\ProductOptions;
+use Thinktomorrow\Trader\Application\Product\GetProductOptions\ProductOption;
+use Thinktomorrow\Trader\Application\Product\GetProductOptions\ProductOptions;
 use Thinktomorrow\Trader\Infrastructure\Laravel\Models\DefaultProductDetail;
 use Thinktomorrow\Trader\Application\Product\ProductDetail\ProductDetailRepository;
-use Thinktomorrow\Trader\Application\Product\ProductOptions\ProductOptionsRepository;
+use Thinktomorrow\Trader\Application\Product\GetProductOptions\ProductOptionsRepository;
 
 final class InMemoryProductDetailRepository implements ProductDetailRepository, ProductOptionsRepository
 {

@@ -11,12 +11,14 @@ class CreateProduct
 {
     private array $taxonIds;
     private string $unitPrice;
+    private string $taxRate;
     private array $data;
 
-    public function __construct(array $taxonIds, string $unitPrice, array $data)
+    public function __construct(array $taxonIds, string $unitPrice, string $taxRate, array $data)
     {
         $this->taxonIds = $taxonIds;
         $this->unitPrice = $unitPrice;
+        $this->taxRate = $taxRate;
         $this->data = $data;
     }
 
@@ -25,14 +27,14 @@ class CreateProduct
         return array_map(fn($taxonId) => TaxonId::fromString($taxonId), $this->taxonIds);
     }
 
-    public function getUnitPrice(string $taxRate): VariantUnitPrice
+    public function getUnitPrice(bool $doesPriceInputIncludesVat, string $currency): VariantUnitPrice
     {
-        return VariantUnitPrice::fromScalars($this->unitPrice, 'EUR', $taxRate, true);
+        return VariantUnitPrice::fromScalars($this->unitPrice, $currency, $this->taxRate, $doesPriceInputIncludesVat);
     }
 
-    public function getSalePrice(string $taxRate): VariantSalePrice
+    public function getSalePrice(bool $doesPriceInputIncludesVat, string $currency): VariantSalePrice
     {
-        return VariantSalePrice::fromScalars($this->unitPrice, 'EUR', $taxRate, true);
+        return VariantSalePrice::fromScalars($this->unitPrice, $currency, $this->taxRate, $doesPriceInputIncludesVat);
     }
 
     public function getData(): array

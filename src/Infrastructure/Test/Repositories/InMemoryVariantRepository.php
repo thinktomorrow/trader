@@ -11,9 +11,9 @@ use Thinktomorrow\Trader\Domain\Model\Product\VariantRepository;
 use Thinktomorrow\Trader\Application\Cart\VariantForCart\VariantForCart;
 use Thinktomorrow\Trader\Domain\Model\Product\Exceptions\CouldNotFindVariant;
 use Thinktomorrow\Trader\Application\Cart\VariantForCart\VariantForCartRepository;
-use Thinktomorrow\Trader\Application\Product\ProductOptions\VariantProductOptions;
-use Thinktomorrow\Trader\Application\Product\ProductOptions\VariantProductOptionsRepository;
-use Thinktomorrow\Trader\Application\Product\ProductOptions\VariantProductOptionsCollection;
+use Thinktomorrow\Trader\Application\Product\GetProductOptions\VariantProductOptions;
+use Thinktomorrow\Trader\Application\Product\GetProductOptions\VariantProductOptionsRepository;
+use Thinktomorrow\Trader\Application\Product\GetProductOptions\VariantProductOptionsCollection;
 
 final class InMemoryVariantRepository implements VariantRepository, VariantForCartRepository, VariantProductOptionsRepository
 {

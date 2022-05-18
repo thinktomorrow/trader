@@ -211,7 +211,7 @@ trait TestHelpers
 
         $product->updateOptions([
             $option = Option::create($product->productId, OptionId::fromString('ooo'), ['foo' => 'bar']),
-            $option2 = Option::create($product->productId, OptionId::fromString('ppp'), []),
+            $option2 = Option::create($product->productId, OptionId::fromString('ppp'), ['foo' => 'baz']),
         ]);
 
         $option->updateOptionValues([

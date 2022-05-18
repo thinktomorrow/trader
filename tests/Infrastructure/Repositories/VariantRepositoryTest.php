@@ -34,6 +34,22 @@ final class VariantRepositoryTest extends TestCase
      * @test
      * @dataProvider variants
      */
+    public function it_can_sync_option_values(Variant $variant)
+    {
+        foreach($this->repositories() as $repository) {
+            $repository->save($variant);
+
+            // Resave so that the sync check occurs
+            $repository->save($variant);
+
+            $this->assertEquals($variant->getMappedData()['option_value_ids'], $repository->getStatesByProduct($variant->productId)[0]['option_value_ids']);
+        }
+    }
+
+    /**
+     * @test
+     * @dataProvider variants
+     */
     public function it_can_delete_an_variant(Variant $variant)
     {
         foreach($this->repositories() as $repository) {

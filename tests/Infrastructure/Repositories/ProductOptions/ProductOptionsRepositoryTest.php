@@ -13,10 +13,10 @@ use Thinktomorrow\Trader\Infrastructure\Test\TestContainer;
 use Thinktomorrow\Trader\Infrastructure\Laravel\Repositories\MysqlVariantRepository;
 use Thinktomorrow\Trader\Infrastructure\Test\Repositories\InMemoryProductRepository;
 use Thinktomorrow\Trader\Infrastructure\Laravel\Repositories\MysqlProductRepository;
-use Thinktomorrow\Trader\Application\Product\ProductOptions\ProductOptionsRepository;
+use Thinktomorrow\Trader\Application\Product\GetProductOptions\ProductOptionsRepository;
 use Thinktomorrow\Trader\Infrastructure\Laravel\Repositories\MysqlProductDetailRepository;
 use Thinktomorrow\Trader\Infrastructure\Test\Repositories\InMemoryProductDetailRepository;
-use Thinktomorrow\Trader\Application\Product\ProductOptions\VariantProductOptionsRepository;
+use Thinktomorrow\Trader\Application\Product\GetProductOptions\VariantProductOptionsRepository;
 
 final class ProductOptionsRepositoryTest extends TestCase
 {

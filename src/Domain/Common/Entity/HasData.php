@@ -21,8 +21,8 @@ trait HasData
 
     public function getData(string $key = null)
     {
-        if(!is_null($key) && isset($this->data[$key])) {
-            return $this->data[$key];
+        if(!is_null($key)) {
+            return data_get($this->data, $key);
         }
 
         return $this->data;

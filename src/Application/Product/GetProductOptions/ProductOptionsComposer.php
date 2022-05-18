@@ -1,12 +1,11 @@
 <?php
 declare(strict_types=1);
 
-namespace Thinktomorrow\Trader\Application\Product\ProductOptions;
+namespace Thinktomorrow\Trader\Application\Product\GetProductOptions;
 
 use Assert\Assertion;
 use Thinktomorrow\Trader\Domain\Common\Locale;
 use Thinktomorrow\Trader\Domain\Model\Product\ProductId;
-use Thinktomorrow\Trader\Domain\Model\Product\Option\Option;
 use Thinktomorrow\Trader\Domain\Model\Product\Variant\VariantId;
 
 class ProductOptionsComposer

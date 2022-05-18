@@ -21,10 +21,12 @@ use Thinktomorrow\Trader\Domain\Model\Product\Event\ProductCreated;
 use Thinktomorrow\Trader\Domain\Model\Product\Event\VariantCreated;
 use Thinktomorrow\Trader\Domain\Model\Product\Event\ProductTaxaUpdated;
 use Thinktomorrow\Trader\Domain\Model\Product\Event\ProductDataUpdated;
-use Thinktomorrow\Trader\Application\Product\ProductOptions\ProductOptionsComposer;
+use Thinktomorrow\Trader\Application\Product\GetProductOptions\ProductOptionValues;
+use Thinktomorrow\Trader\Application\Product\GetProductOptions\ProductOptionsComposer;
 use Thinktomorrow\Trader\Infrastructure\Test\Repositories\InMemoryProductRepository;
 use Thinktomorrow\Trader\Infrastructure\Test\Repositories\InMemoryVariantRepository;
 use Thinktomorrow\Trader\Infrastructure\Test\Repositories\InMemoryProductDetailRepository;
+use Thinktomorrow\Trader\Application\Product\CheckProductOptions\MissingOptionCombinations;
 
 abstract class ProductContext extends TestCase
 {
@@ -67,6 +69,10 @@ abstract class ProductContext extends TestCase
             $this->productDetailRepository = new InMemoryProductDetailRepository($this->productRepository),
             new InMemoryVariantRepository($this->productRepository),
         );
+
+        $this->missingOptionCombinations = new MissingOptionCombinations(
+            new ProductOptionValues(new InMemoryProductRepository())
+        );
     }
 
     public function tearDown(): void
@@ -78,7 +84,7 @@ abstract class ProductContext extends TestCase
     protected function createAProduct(string $unitPrice, array $taxonIds, array $data = []): ProductId
     {
         $productId = $this->productApplication->createProduct(new CreateProduct(
-            $taxonIds, $unitPrice, $data
+            $taxonIds, $unitPrice, '12', $data
         ));
 
         Assert::assertNotNull($product = $this->productRepository->find($productId));

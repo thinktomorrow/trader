@@ -71,28 +71,6 @@ class DefaultProductDetail implements ProductDetail
         return in_array($this->state, VariantState::availableStates());
     }
 
-    public function getUnitPrice(): string
-    {
-        // Remove any 00 decimals
-        return str_replace(',00', '', $this->renderMoney($this->getUnitPriceAsMoney(), $this->getLocale()));
-    }
-
-    public function getSalePrice(): string
-    {
-        // Remove any 00 decimals
-        return str_replace(',00', '', $this->renderMoney($this->getSalePriceAsMoney(), $this->getLocale()));
-    }
-
-    public function getUnitPriceAsMoney(): Money
-    {
-        return $this->unitPrice->getMoney();
-    }
-
-    public function getSalePriceAsMoney(): Money
-    {
-        return $this->salePrice->getMoney();
-    }
-
     public function getTitle(): string
     {
         return $this->data('title', null,
@@ -115,7 +93,7 @@ class DefaultProductDetail implements ProductDetail
         return $this->getVariantId();
     }
 
-    public function getUrl(): string
+    public function getUrl(string $locale = null): string
     {
         return '/'.$this->getVariantId();
     }

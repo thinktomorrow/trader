@@ -2,7 +2,7 @@
 
 namespace Thinktomorrow\Trader\Application\Common;
 
-use Thinktomorrow\Trader\Application\Common\RendersMoney;
+use Money\Money;
 use Thinktomorrow\Trader\Domain\Model\Product\Variant\VariantSalePrice;
 use Thinktomorrow\Trader\Domain\Model\Product\Variant\VariantUnitPrice;
 
@@ -17,7 +17,7 @@ trait RendersPrices
     public function getSalePrice(bool $includeTax = true): string
     {
         return $this->renderMoney(
-            $includeTax ? $this->salePrice->getIncludingVat() : $this->salePrice->getExcludingVat(),
+            $this->getSalePriceAsMoney($includeTax),
             $this->getLocale()
         );
     }
@@ -25,13 +25,31 @@ trait RendersPrices
     public function getUnitPrice(bool $includeTax = true): string
     {
         return $this->renderMoney(
-            $includeTax ? $this->unitPrice->getIncludingVat() : $this->unitPrice->getExcludingVat(),
+            $this->getUnitPriceAsMoney($includeTax),
             $this->getLocale()
         );
     }
 
-    public function isOnSale(): bool
+    public function onSale(): bool
     {
         return $this->salePrice->getMoney()->lessThan($this->unitPrice->getMoney());
+    }
+
+    public function getSaleDiscount(): string
+    {
+        return $this->renderMoney(
+            $this->getUnitPriceAsMoney()->subtract($this->getSalePriceAsMoney()),
+            $this->getLocale()
+        );
+    }
+
+    public function getUnitPriceAsMoney(bool $includeTax = true): Money
+    {
+        return $includeTax ? $this->unitPrice->getIncludingVat() : $this->unitPrice->getExcludingVat();
+    }
+
+    public function getSalePriceAsMoney(bool $includeTax = true): Money
+    {
+        return $includeTax ? $this->salePrice->getIncludingVat() : $this->salePrice->getExcludingVat();
     }
 }

@@ -26,7 +26,7 @@ class ProductTest extends TestCase
 
         $this->assertEquals([
             'product_id' => 'xxx',
-            'state' => ProductState::draft->value,
+            'state' => ProductState::offline->value,
             'taxon_ids' => [],
             'data' => '[]',
         ], $product->getMappedData());

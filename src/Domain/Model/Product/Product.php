@@ -36,7 +36,7 @@ class Product implements Aggregate
     {
         $product = new static();
         $product->productId = $productId;
-        $product->state = ProductState::draft;
+        $product->state = ProductState::offline;
 
         $product->recordEvent(new ProductCreated($product->productId));
 

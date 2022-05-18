@@ -34,13 +34,15 @@ use Thinktomorrow\Trader\Application\Product\ProductDetail\ProductDetailReposito
 use Thinktomorrow\Trader\Infrastructure\Laravel\Repositories\MysqlVariantRepository;
 use Thinktomorrow\Trader\Infrastructure\Laravel\Repositories\MysqlProductRepository;
 use Thinktomorrow\Trader\Infrastructure\Laravel\Repositories\MysqlCustomerRepository;
-use Thinktomorrow\Trader\Application\Product\ProductOptions\ProductOptionsRepository;
+use Thinktomorrow\Trader\Application\Product\GetProductOptions\ProductOptionsRepository;
 use Thinktomorrow\Trader\Infrastructure\Laravel\Repositories\MysqlTaxonTreeRepository;
 use Thinktomorrow\Trader\Infrastructure\Laravel\Repositories\MysqlProductDetailRepository;
 use Thinktomorrow\Trader\Infrastructure\Laravel\Repositories\MysqlPaymentMethodRepository;
 use Thinktomorrow\Trader\Infrastructure\Laravel\Repositories\MysqlCustomerLoginRepository;
 use Thinktomorrow\Trader\Infrastructure\Laravel\Repositories\MysqlShippingProfileRepository;
-use Thinktomorrow\Trader\Application\Product\ProductOptions\VariantProductOptionsRepository;
+use Thinktomorrow\Trader\Application\Product\GetProductOptions\VariantProductOptionsRepository;
+use Thinktomorrow\Trader\Application\Product\CheckProductOptions\CheckProductOptionsRepository;
+use Thinktomorrow\Trader\Infrastructure\Laravel\Repositories\MysqlCheckProductOptionsRepository;
 
 class TraderServiceProvider extends ServiceProvider
 {
@@ -58,6 +60,7 @@ class TraderServiceProvider extends ServiceProvider
         $this->app->bind(VariantRepository::class, MysqlVariantRepository::class);
         $this->app->bind(VariantForCartRepository::class, MysqlVariantRepository::class);
         $this->app->bind(VariantProductOptionsRepository::class, MysqlVariantRepository::class);
+        $this->app->bind(CheckProductOptionsRepository::class, MysqlCheckProductOptionsRepository::class);
         $this->app->bind(ProductDetail::class, function(){
             return DefaultProductDetail::class;
         });

@@ -11,7 +11,8 @@ trait RendersMoney
 {
     protected function renderMoney(Money $money, Locale $locale): string
     {
-        return Cash::from($money)->toLocalizedFormat($locale);
+        // Remove any 00 decimals
+        return str_replace(',00', '', Cash::from($money)->toLocalizedFormat($locale));
     }
 
     protected function renderPercentage(Percentage $percentage): string

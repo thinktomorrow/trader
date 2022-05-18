@@ -6,7 +6,7 @@ namespace Tests\Acceptance\Product;
 use Thinktomorrow\Trader\Domain\Common\Locale;
 use Thinktomorrow\Trader\Domain\Model\Product\Option\OptionId;
 use Thinktomorrow\Trader\Domain\Model\Product\Option\OptionValueId;
-use Thinktomorrow\Trader\Application\Product\ProductOptions\ProductOption;
+use Thinktomorrow\Trader\Application\Product\GetProductOptions\ProductOption;
 
 class ProductDataTest extends ProductContext
 {

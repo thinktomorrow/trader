@@ -9,12 +9,12 @@ use Thinktomorrow\Trader\Domain\Model\Product\ProductId;
 use Thinktomorrow\Trader\Domain\Model\Product\ProductState;
 use Thinktomorrow\Trader\Domain\Model\Product\Variant\VariantId;
 use Thinktomorrow\Trader\Application\Product\ProductDetail\ProductDetail;
-use Thinktomorrow\Trader\Application\Product\ProductOptions\ProductOption;
-use Thinktomorrow\Trader\Application\Product\ProductOptions\ProductOptions;
+use Thinktomorrow\Trader\Application\Product\GetProductOptions\ProductOption;
+use Thinktomorrow\Trader\Application\Product\GetProductOptions\ProductOptions;
 use Thinktomorrow\Trader\Infrastructure\Laravel\Models\DefaultProductDetail;
 use Thinktomorrow\Trader\Domain\Model\Product\Exceptions\CouldNotFindVariant;
 use Thinktomorrow\Trader\Application\Product\ProductDetail\ProductDetailRepository;
-use Thinktomorrow\Trader\Application\Product\ProductOptions\ProductOptionsRepository;
+use Thinktomorrow\Trader\Application\Product\GetProductOptions\ProductOptionsRepository;
 
 class MysqlProductDetailRepository implements ProductDetailRepository, ProductOptionsRepository
 {
@@ -61,7 +61,7 @@ class MysqlProductDetailRepository implements ProductDetailRepository, ProductOp
 
         return $this->container->get(ProductDetail::class)::fromMappedData(array_merge($state, [
             'includes_vat' => (bool) $state['includes_vat'],
-            'taxon_ids' => explode(',',$state['taxon_ids']),
+            'taxon_ids' => $state['taxon_ids'] ? explode(',',$state['taxon_ids']) : []
         ]));
     }
 

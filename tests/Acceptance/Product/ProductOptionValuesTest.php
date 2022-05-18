@@ -4,7 +4,7 @@ declare(strict_types=1);
 namespace Tests\Acceptance\Product;
 
 use Tests\TestHelpers;
-use Thinktomorrow\Trader\Application\Product\ProductOptions\ProductOptionValues;
+use Thinktomorrow\Trader\Application\Product\GetProductOptions\ProductOptionValues;
 use Thinktomorrow\Trader\Infrastructure\Test\Repositories\InMemoryProductRepository;
 
 class ProductOptionValuesTest extends ProductContext
@@ -58,7 +58,7 @@ class ProductOptionValuesTest extends ProductContext
             ],
             [
                 'option_id' => 'ppp',
-                'data' => [],
+                'data' => ['foo' => 'baz'],
                 'values' => [
                     [
                         'option_value_id' => 'zzz',

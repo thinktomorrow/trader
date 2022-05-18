@@ -26,7 +26,7 @@ class CreateBasicTraderTables extends Migration
         Schema::create(static::PREFIX.'products', function (Blueprint $table)
         {
             $table->char('product_id', 36)->primary();
-            $table->string('state')->default(\Thinktomorrow\Trader\Domain\Model\Product\ProductState::draft->value);
+            $table->string('state')->default(\Thinktomorrow\Trader\Domain\Model\Product\ProductState::offline->value);
             $table->json('data')->nullable(); // Contains generic product data like label, description
             $table->unsignedInteger('order_column')->default(0);
             $table->timestamps();

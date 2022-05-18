@@ -38,6 +38,19 @@ trait HasVariants
         $this->variants[] = $variant;
     }
 
+    public function findVariant(VariantId $variantId): Variant
+    {
+        $index = $this->findVariantIndex($variantId);
+
+        if (null === $index) {
+            throw new CouldNotFindVariantOnProduct(
+                'Cannot find variant ['.$variantId->get().'] on product ['.$this->productId->get().']'
+            );
+        }
+
+        return $this->variants[$index];
+    }
+
     public function updateVariant(Variant $variant): void
     {
         Assertion::true($variant->productId->equals($this->productId), 'Variant has a different product id ['.$variant->productId->get().'] that the product it is being added to ['.$this->productId->get().'].');

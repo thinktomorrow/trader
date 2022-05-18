@@ -17,12 +17,14 @@ interface ProductDetail
     public function getSalePrice(): string;
     public function getUnitPriceAsMoney(): Money;
     public function getSalePriceAsMoney(): Money;
+    public function onSale(): bool;
+    public function getSaleDiscount(): string;
 
     public function getTitle(): string;
     public function getIntro(): string;
     public function getContent(): string;
     public function getSku(): string;
-    public function getUrl(): string;
+    public function getUrl(string $locale = null): string;
 
     public function setImages(iterable $images): void;
     public function getImages(): iterable;

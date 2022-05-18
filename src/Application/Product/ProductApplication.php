@@ -16,6 +16,7 @@ use Thinktomorrow\Trader\Domain\Model\Product\Option\OptionValue;
 use Thinktomorrow\Trader\Application\Product\UpdateProduct\UpdateProductTaxa;
 use Thinktomorrow\Trader\Application\Product\UpdateProduct\UpdateProductData;
 use Thinktomorrow\Trader\Application\Product\UpdateProduct\UpdateProductOptions;
+use Thinktomorrow\Trader\Application\Product\UpdateVariant\UpdateVariantOptionValues;
 
 class ProductApplication
 {
@@ -44,8 +45,8 @@ class ProductApplication
         $product->createVariant(Variant::create(
             $productId,
             $this->variantRepository->nextReference(),
-            $createProduct->getUnitPrice($this->traderConfig->getDefaultTaxRate()),
-            $createProduct->getSalePrice($this->traderConfig->getDefaultTaxRate()),
+            $createProduct->getUnitPrice($this->traderConfig->doesPriceInputIncludesVat(), $this->traderConfig->getDefaultCurrency()),
+            $createProduct->getSalePrice($this->traderConfig->doesPriceInputIncludesVat(), $this->traderConfig->getDefaultCurrency()),
         ));
 
         $this->productRepository->save($product);
@@ -117,6 +118,19 @@ class ProductApplication
         }
 
         $product->updateOptions($options);
+
+        $this->productRepository->save($product);
+
+        $this->eventDispatcher->dispatchAll($product->releaseEvents());
+    }
+
+    public function updateVariantOptionValues(UpdateVariantOptionValues $updateVariantOptionValues): void
+    {
+        $product = $this->productRepository->find($updateVariantOptionValues->getProductId());
+
+        $variant = $product->findVariant($updateVariantOptionValues->getVariantId());
+        $variant->updateOptionValueIds($updateVariantOptionValues->getOptionValueIds());
+        $product->updateVariant($variant);
 
         $this->productRepository->save($product);
 

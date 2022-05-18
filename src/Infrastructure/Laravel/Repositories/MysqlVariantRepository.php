@@ -12,12 +12,12 @@ use Thinktomorrow\Trader\Domain\Model\Product\Variant\VariantId;
 use Thinktomorrow\Trader\Domain\Model\Product\VariantRepository;
 use Thinktomorrow\Trader\Domain\Model\Product\Option\OptionValue;
 use Thinktomorrow\Trader\Domain\Model\Product\Variant\VariantState;
-use Thinktomorrow\Trader\Application\Product\ProductOptions\VariantProductOptionsCollection;
+use Thinktomorrow\Trader\Application\Product\GetProductOptions\VariantProductOptionsCollection;
 use Thinktomorrow\Trader\Application\Cart\VariantForCart\VariantForCart;
 use Thinktomorrow\Trader\Domain\Model\Product\Exceptions\CouldNotFindVariant;
 use Thinktomorrow\Trader\Application\Cart\VariantForCart\VariantForCartRepository;
-use Thinktomorrow\Trader\Application\Product\ProductOptions\VariantProductOptions;
-use Thinktomorrow\Trader\Application\Product\ProductOptions\VariantProductOptionsRepository;
+use Thinktomorrow\Trader\Application\Product\GetProductOptions\VariantProductOptions;
+use Thinktomorrow\Trader\Application\Product\GetProductOptions\VariantProductOptionsRepository;
 
 class MysqlVariantRepository implements VariantRepository, VariantForCartRepository, VariantProductOptionsRepository
 {
@@ -54,7 +54,8 @@ class MysqlVariantRepository implements VariantRepository, VariantForCartReposit
         $existingOptionValueIds = DB::table(static::$variantOptionValueLookupTable)
             ->where('variant_id', $variantId)
             ->select('option_value_id')
-            ->get();
+            ->get()
+            ->pluck('option_value_id');
 
         // Remove the ones that are not in the new list
         $detachOptionValueIds = $existingOptionValueIds->diff($changedOptionValueIds);

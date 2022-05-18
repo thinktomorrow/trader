@@ -9,7 +9,7 @@ use Thinktomorrow\Trader\Infrastructure\Laravel\Repositories\MysqlVariantReposit
 use Thinktomorrow\Trader\Infrastructure\Test\Repositories\InMemoryProductRepository;
 use Thinktomorrow\Trader\Infrastructure\Laravel\Repositories\MysqlProductRepository;
 use Thinktomorrow\Trader\Infrastructure\Test\Repositories\InMemoryVariantRepository;
-use Thinktomorrow\Trader\Application\Product\ProductOptions\VariantProductOptionsRepository;
+use Thinktomorrow\Trader\Application\Product\GetProductOptions\VariantProductOptionsRepository;
 
 final class VariantProductOptionsRepositoryTest extends TestCase
 {
