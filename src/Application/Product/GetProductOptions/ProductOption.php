@@ -18,12 +18,14 @@ class ProductOption
     private array $data;
     private ?string $url = null;
     private bool $isActive = false;
+    private array $optionData;
 
-    public function __construct(OptionId $optionId, OptionValueId $optionValueId, array $data)
+    public function __construct(OptionId $optionId, OptionValueId $optionValueId, array $data, array $optionData)
     {
         $this->optionId = $optionId;
         $this->optionValueId = $optionValueId;
         $this->data = $data;
+        $this->optionData = $optionData;
     }
 
     public function getLabel(): string
@@ -61,7 +63,8 @@ class ProductOption
         return new static(
             OptionId::fromString($state['option_id']),
             OptionValueId::fromString($state['option_value_id']),
-            json_decode($state['data'], true)
+            json_decode($state['data'], true),
+            json_decode($state['option_data'], true),
         );
     }
 }

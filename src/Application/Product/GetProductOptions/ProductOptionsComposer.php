@@ -28,8 +28,12 @@ class ProductOptionsComposer
         // Get all options of the product
         $productOptions = $this->productOptionsRepository->getProductOptions($productId);
 
+        if($productOptions->isEmpty()) return $productOptions;
+
         // Get all product variants
         $variants = $this->variantRepository->getVariantProductOptions($productId); // Idea: perhaps pass the productOptions
+
+        if($variants->isEmpty()) return ProductOptions::fromType([]);
 
         // Current set of productOptions
         $variant = $variants->find($variantId);

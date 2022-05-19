@@ -68,7 +68,7 @@ class MysqlProductDetailRepository implements ProductDetailRepository, ProductOp
     public function getProductOptions(ProductId $productId): ProductOptions
     {
         $optionValues = DB::table(static::$optionValueTable)
-            ->select(static::$optionValueTable.'.*')
+            ->select(static::$optionValueTable.'.*', static::$optionTable.'.data AS option_data')
             ->join(static::$optionTable, static::$optionValueTable . '.option_id', '=', static::$optionTable.'.option_id')
             ->orderBy(static::$optionTable . '.order_column')
             ->orderBy(static::$optionValueTable . '.order_column')
