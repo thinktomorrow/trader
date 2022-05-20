@@ -13,16 +13,20 @@ use Thinktomorrow\Trader\Application\Common\DataRenderer;
 use Thinktomorrow\Trader\Application\Common\DefaultLocale;
 use Thinktomorrow\Trader\Application\Product\CreateProduct;
 use Thinktomorrow\Trader\Application\Product\CreateVariant;
+use Thinktomorrow\Trader\Infrastructure\Test\TestContainer;
 use Thinktomorrow\Trader\Infrastructure\Test\TestTraderConfig;
 use Thinktomorrow\Trader\Infrastructure\Test\EventDispatcherSpy;
 use Thinktomorrow\Trader\Application\Product\ProductApplication;
 use Thinktomorrow\Trader\Domain\Model\Product\Variant\VariantId;
 use Thinktomorrow\Trader\Domain\Model\Product\Event\ProductCreated;
 use Thinktomorrow\Trader\Domain\Model\Product\Event\VariantCreated;
+use Thinktomorrow\Trader\Application\Product\OptionLinks\OptionLink;
 use Thinktomorrow\Trader\Domain\Model\Product\Event\ProductTaxaUpdated;
 use Thinktomorrow\Trader\Domain\Model\Product\Event\ProductDataUpdated;
-use Thinktomorrow\Trader\Application\Product\GetProductOptions\ProductOptionValues;
-use Thinktomorrow\Trader\Application\Product\GetProductOptions\ProductOptionsComposer;
+use Thinktomorrow\Trader\Application\RefreshCart\Adjusters\AdjustShipping;
+use Thinktomorrow\Trader\Application\Product\OptionLinks\DefaultOptionLink;
+use Thinktomorrow\Trader\Application\Product\OptionLinks\ProductOptionValues;
+use Thinktomorrow\Trader\Application\Product\OptionLinks\OptionLinksComposer;
 use Thinktomorrow\Trader\Infrastructure\Test\Repositories\InMemoryProductRepository;
 use Thinktomorrow\Trader\Infrastructure\Test\Repositories\InMemoryVariantRepository;
 use Thinktomorrow\Trader\Infrastructure\Test\Repositories\InMemoryProductDetailRepository;
@@ -34,7 +38,7 @@ abstract class ProductContext extends TestCase
     protected InMemoryProductRepository $productRepository;
     protected InMemoryVariantRepository $variantRepository;
     protected EventDispatcherSpy $eventDispatcher;
-    protected ProductOptionsComposer $productOptionsComposer;
+    protected OptionLinksComposer $productOptionsComposer;
     protected InMemoryProductDetailRepository $productDetailRepository;
 
     protected function setUp(): void
@@ -65,10 +69,14 @@ abstract class ProductContext extends TestCase
             $this->variantRepository = new InMemoryVariantRepository($this->productRepository),
         );
 
-        $this->productOptionsComposer = new ProductOptionsComposer(
-            $this->productDetailRepository = new InMemoryProductDetailRepository($this->productRepository),
-            new InMemoryVariantRepository($this->productRepository),
+        (new TestContainer())->add(OptionLink::class, DefaultOptionLink::class);
+
+        $this->productOptionsComposer = new OptionLinksComposer(
+            $this->productRepository,
+            new TestContainer(),
         );
+
+        $this->productDetailRepository = new InMemoryProductDetailRepository();
 
         $this->missingOptionCombinations = new MissingOptionCombinations(
             new ProductOptionValues(new InMemoryProductRepository())

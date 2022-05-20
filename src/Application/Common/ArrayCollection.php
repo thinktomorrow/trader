@@ -19,6 +19,16 @@ abstract class ArrayCollection implements Countable, IteratorAggregate, ArrayAcc
 
     abstract public static function fromType(array $items): static;
 
+    public static function empty(): static
+    {
+        return new static([]);
+    }
+
+    public function isEmpty(): bool
+    {
+        return count($this->items) < 1;
+    }
+
     public function count(): int
     {
         return count($this->items);

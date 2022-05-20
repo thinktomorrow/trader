@@ -23,7 +23,9 @@ class FindCategoryTaxon
         $tree = $this->taxonTreeRepository->getTree();
 
         if(!$categoryRootId = $this->traderConfig->getCategoryRootId()) {
-            $categoryRootId = $tree->first()->getId();
+            if(!$categoryRootId = $tree->first()?->getId()) {
+                return null;
+            }
         }
 
         foreach($taxon_ids as $taxon_id) {

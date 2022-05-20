@@ -20,6 +20,7 @@ use Thinktomorrow\Trader\Infrastructure\Vine\VineTaxonIdOptionsComposer;
 use Thinktomorrow\Trader\Infrastructure\Vine\VineTaxonFilterTreeComposer;
 use Thinktomorrow\Trader\Application\Product\ProductDetail\ProductDetail;
 use Thinktomorrow\Trader\Application\Taxon\Filter\TaxonFilterTreeComposer;
+use Thinktomorrow\Trader\Application\Product\OptionLinks\OptionLink;
 use Thinktomorrow\Trader\Infrastructure\Vine\VineFlattenedTaxonIdsComposer;
 use Thinktomorrow\Trader\Domain\Model\PaymentMethod\PaymentMethodRepository;
 use Thinktomorrow\Trader\Domain\Model\CustomerLogin\CustomerLoginRepository;
@@ -28,19 +29,18 @@ use Thinktomorrow\Trader\Infrastructure\Laravel\Models\DefaultProductDetail;
 use Thinktomorrow\Trader\Application\Taxon\TaxonSelect\TaxonIdOptionsComposer;
 use Thinktomorrow\Trader\Domain\Model\ShippingProfile\ShippingProfileRepository;
 use Thinktomorrow\Trader\Infrastructure\Laravel\Repositories\MysqlGridRepository;
+use Thinktomorrow\Trader\Application\Product\OptionLinks\DefaultOptionLink;
 use Thinktomorrow\Trader\Infrastructure\Laravel\Repositories\MysqlOrderRepository;
 use Thinktomorrow\Trader\Application\Cart\VariantForCart\VariantForCartRepository;
 use Thinktomorrow\Trader\Application\Product\ProductDetail\ProductDetailRepository;
 use Thinktomorrow\Trader\Infrastructure\Laravel\Repositories\MysqlVariantRepository;
 use Thinktomorrow\Trader\Infrastructure\Laravel\Repositories\MysqlProductRepository;
 use Thinktomorrow\Trader\Infrastructure\Laravel\Repositories\MysqlCustomerRepository;
-use Thinktomorrow\Trader\Application\Product\GetProductOptions\ProductOptionsRepository;
 use Thinktomorrow\Trader\Infrastructure\Laravel\Repositories\MysqlTaxonTreeRepository;
 use Thinktomorrow\Trader\Infrastructure\Laravel\Repositories\MysqlProductDetailRepository;
 use Thinktomorrow\Trader\Infrastructure\Laravel\Repositories\MysqlPaymentMethodRepository;
 use Thinktomorrow\Trader\Infrastructure\Laravel\Repositories\MysqlCustomerLoginRepository;
 use Thinktomorrow\Trader\Infrastructure\Laravel\Repositories\MysqlShippingProfileRepository;
-use Thinktomorrow\Trader\Application\Product\GetProductOptions\VariantProductOptionsRepository;
 use Thinktomorrow\Trader\Application\Product\CheckProductOptions\CheckProductOptionsRepository;
 use Thinktomorrow\Trader\Infrastructure\Laravel\Repositories\MysqlCheckProductOptionsRepository;
 
@@ -56,13 +56,14 @@ class TraderServiceProvider extends ServiceProvider
         $this->app->bind(GridRepository::class, MysqlGridRepository::class);
         $this->app->bind(ProductRepository::class, MysqlProductRepository::class);
         $this->app->bind(ProductDetailRepository::class, MysqlProductDetailRepository::class);
-        $this->app->bind(ProductOptionsRepository::class, MysqlProductDetailRepository::class);
         $this->app->bind(VariantRepository::class, MysqlVariantRepository::class);
         $this->app->bind(VariantForCartRepository::class, MysqlVariantRepository::class);
-        $this->app->bind(VariantProductOptionsRepository::class, MysqlVariantRepository::class);
         $this->app->bind(CheckProductOptionsRepository::class, MysqlCheckProductOptionsRepository::class);
         $this->app->bind(ProductDetail::class, function(){
             return DefaultProductDetail::class;
+        });
+        $this->app->bind(OptionLink::class, function(){
+            return DefaultOptionLink::class;
         });
 
         // Taxon

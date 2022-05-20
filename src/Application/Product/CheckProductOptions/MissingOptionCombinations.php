@@ -6,7 +6,7 @@ namespace Thinktomorrow\Trader\Application\Product\CheckProductOptions;
 use Thinktomorrow\Trader\Domain\Model\Product\Product;
 use Thinktomorrow\Trader\Domain\Model\Product\ProductId;
 use Thinktomorrow\Trader\Domain\Model\Product\Variant\Variant;
-use Thinktomorrow\Trader\Application\Product\GetProductOptions\ProductOptionValues;
+use Thinktomorrow\Trader\Application\Product\OptionLinks\ProductOptionValues;
 
 class MissingOptionCombinations
 {

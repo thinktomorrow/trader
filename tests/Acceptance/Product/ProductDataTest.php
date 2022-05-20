@@ -3,27 +3,37 @@ declare(strict_types=1);
 
 namespace Tests\Acceptance\Product;
 
+use Tests\TestHelpers;
 use Thinktomorrow\Trader\Domain\Common\Locale;
 use Thinktomorrow\Trader\Domain\Model\Product\Option\OptionId;
+use Thinktomorrow\Trader\Domain\Model\Product\Option\OptionValue;
 use Thinktomorrow\Trader\Domain\Model\Product\Option\OptionValueId;
-use Thinktomorrow\Trader\Application\Product\GetProductOptions\ProductOption;
+use Thinktomorrow\Trader\Application\Product\OptionLinks\DefaultOptionLink;
 
 class ProductDataTest extends ProductContext
 {
+    use TestHelpers;
+
     /** @test */
     public function it_can_render_localized_data()
     {
-        $productOption = new ProductOption(OptionId::fromString('aaa'), OptionValueId::fromString('aaa-value'), [
-            'label' => ['nl' => 'kleur', 'en' => 'color'],
-            'value' => ['nl' => 'aaa waarde', 'en' => 'aaa value'],
+        $product = $this->createdProductWithOptions();
+        $product->addData([
+            'content' => ['nl' => 'content nl', 'en' => 'content en'],
         ]);
+        $product->getVariants()[0]->addData([
+            'title' => ['nl' => 'title nl', 'en' => 'title en'],
+        ]);
+        $this->productRepository->save($product);
+
+        $productDetail = $this->productDetailRepository->findProductDetail($product->getVariants()[0]->variantId);
 
         // Default test locale is nl
-        $this->assertEquals('kleur', $productOption->getLabel());
-        $this->assertEquals('aaa waarde', $productOption->getValue());
+        $this->assertEquals('title nl', $productDetail->getTitle());
+        $this->assertEquals('content nl', $productDetail->getIntro());
 
-        $productOption->setLocale(Locale::fromString('en', 'BE'));
-        $this->assertEquals('color', $productOption->getLabel());
-        $this->assertEquals('aaa value', $productOption->getValue());
+        $productDetail->setLocale(Locale::fromString('en', 'BE'));
+        $this->assertEquals('title en', $productDetail->getTitle());
+        $this->assertEquals('content en', $productDetail->getIntro());
     }
 }

@@ -12,14 +12,12 @@ use Thinktomorrow\Trader\Domain\Model\Product\Variant\VariantId;
 use Thinktomorrow\Trader\Domain\Model\Product\VariantRepository;
 use Thinktomorrow\Trader\Domain\Model\Product\Option\OptionValue;
 use Thinktomorrow\Trader\Domain\Model\Product\Variant\VariantState;
-use Thinktomorrow\Trader\Application\Product\GetProductOptions\VariantProductOptionsCollection;
+use Thinktomorrow\Trader\Application\Product\OptionLinks\Variants;
 use Thinktomorrow\Trader\Application\Cart\VariantForCart\VariantForCart;
 use Thinktomorrow\Trader\Domain\Model\Product\Exceptions\CouldNotFindVariant;
 use Thinktomorrow\Trader\Application\Cart\VariantForCart\VariantForCartRepository;
-use Thinktomorrow\Trader\Application\Product\GetProductOptions\VariantProductOptions;
-use Thinktomorrow\Trader\Application\Product\GetProductOptions\VariantProductOptionsRepository;
 
-class MysqlVariantRepository implements VariantRepository, VariantForCartRepository, VariantProductOptionsRepository
+class MysqlVariantRepository implements VariantRepository, VariantForCartRepository
 {
     private static string $variantTable = 'trader_product_variants';
     private static string $optionTable = 'trader_product_options';
@@ -177,30 +175,5 @@ class MysqlVariantRepository implements VariantRepository, VariantForCartReposit
         return VariantForCart::fromMappedData(array_merge($state, [
             'includes_vat' => (bool) $state['includes_vat'],
         ]));
-    }
-
-    public function getVariantProductOptions(ProductId $productId): VariantProductOptionsCollection
-    {
-        $rows = DB::table(static::$variantTable)
-            ->join(static::$variantOptionValueLookupTable, static::$variantTable.'.variant_id', '=', static::$variantOptionValueLookupTable.'.variant_id')
-            ->join(static::$optionValueTable, static::$variantOptionValueLookupTable.'.option_value_id','=',static::$optionValueTable.'.option_value_id')
-            ->where(static::$variantTable . '.product_id', $productId->get())
-            ->whereIn(static::$variantTable . '.state', VariantState::availableStates())
-            ->select([
-                static::$variantOptionValueLookupTable.'.variant_id',
-                static::$optionValueTable.'.option_value_id',
-                static::$optionValueTable.'.option_id',
-                static::$optionValueTable.'.data',
-            ])
-            ->orderBy(static::$variantTable.'.order_column','ASC')
-            ->get()
-            ->map(fn($item) => (array) $item)
-            ->groupBy('variant_id');
-
-        return VariantProductOptionsCollection::fromType($rows->map(function($optionValueStates) {
-            return VariantProductOptions::fromMappedData([
-                'variant_id' => $optionValueStates->first()['variant_id']
-            ], $optionValueStates->all());
-        })->values()->all());
     }
 }

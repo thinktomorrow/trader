@@ -8,6 +8,7 @@ use Thinktomorrow\Trader\Domain\Common\Entity\HasData;
 use Thinktomorrow\Trader\Domain\Model\Product\ProductId;
 use Thinktomorrow\Trader\Domain\Common\Entity\ChildEntity;
 use Thinktomorrow\Trader\Domain\Model\Product\Option\OptionValueId;
+use Thinktomorrow\Trader\Application\Product\OptionLinks\DefaultOptionLink;
 
 final class Variant implements ChildEntity
 {
@@ -18,6 +19,8 @@ final class Variant implements ChildEntity
     private VariantState $state;
     private VariantUnitPrice $unitPrice;
     private VariantSalePrice $salePrice;
+
+    /** @var DefaultOptionLink[] */
     private array $optionValueIds = [];
     private array $personalisations = [];
     private array $data = [];
@@ -57,6 +60,11 @@ final class Variant implements ChildEntity
         Assertion::allIsInstanceOf($optionValueIds, OptionValueId::class);
 
         $this->optionValueIds = $optionValueIds;
+    }
+
+    public function getOptionValueIds(): array
+    {
+        return $this->optionValueIds;
     }
 
     public function getMappedData(): array

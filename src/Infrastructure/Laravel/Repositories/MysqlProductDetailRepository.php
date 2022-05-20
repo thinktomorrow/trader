@@ -9,14 +9,13 @@ use Thinktomorrow\Trader\Domain\Model\Product\ProductId;
 use Thinktomorrow\Trader\Domain\Model\Product\ProductState;
 use Thinktomorrow\Trader\Domain\Model\Product\Variant\VariantId;
 use Thinktomorrow\Trader\Application\Product\ProductDetail\ProductDetail;
-use Thinktomorrow\Trader\Application\Product\GetProductOptions\ProductOption;
-use Thinktomorrow\Trader\Application\Product\GetProductOptions\ProductOptions;
+use Thinktomorrow\Trader\Application\Product\OptionLinks\DefaultOptionLink;
+use Thinktomorrow\Trader\Application\Product\OptionLinks\OptionLinks;
 use Thinktomorrow\Trader\Infrastructure\Laravel\Models\DefaultProductDetail;
 use Thinktomorrow\Trader\Domain\Model\Product\Exceptions\CouldNotFindVariant;
 use Thinktomorrow\Trader\Application\Product\ProductDetail\ProductDetailRepository;
-use Thinktomorrow\Trader\Application\Product\GetProductOptions\ProductOptionsRepository;
 
-class MysqlProductDetailRepository implements ProductDetailRepository, ProductOptionsRepository
+class MysqlProductDetailRepository implements ProductDetailRepository
 {
     private static string $productTable = 'trader_products';
     private static string $variantTable = 'trader_product_variants';
@@ -63,24 +62,5 @@ class MysqlProductDetailRepository implements ProductDetailRepository, ProductOp
             'includes_vat' => (bool) $state['includes_vat'],
             'taxon_ids' => $state['taxon_ids'] ? explode(',',$state['taxon_ids']) : []
         ]));
-    }
-
-    public function getProductOptions(ProductId $productId): ProductOptions
-    {
-        $optionValues = DB::table(static::$optionValueTable)
-            ->select(static::$optionValueTable.'.*')
-            ->join(static::$optionTable, static::$optionValueTable . '.option_id', '=', static::$optionTable.'.option_id')
-            ->orderBy(static::$optionTable . '.order_column')
-            ->orderBy(static::$optionValueTable . '.order_column')
-            ->get()
-            ->map(fn($item) => (array) $item)
-            ->toArray();
-
-        $productOptions = [];
-        foreach($optionValues as $optionValue) {
-            $productOptions[] = ProductOption::fromMappedData($optionValue);
-        }
-
-        return ProductOptions::fromType($productOptions);
     }
 }
