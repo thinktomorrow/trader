@@ -8,8 +8,8 @@ use Thinktomorrow\Trader\Domain\Model\Product\Option\Option;
 use Thinktomorrow\Trader\Domain\Model\Product\ProductRepository;
 
 /**
- * DTO for composing the simple option array, ready for usage in an
- * admin form select or when constructing option values on a pdp
+ * DTO for composing the simple option array,
+ * ready for usage in an admin form select
  */
 class ProductOptionValues
 {
@@ -20,18 +20,11 @@ class ProductOptionValues
         $this->productRepository = $productRepository;
     }
 
-    public function get(string $product_id, bool $valuesAsProductOptions = false): array
+    public function get(string $product_id): array
     {
         $product = $this->productRepository->find(ProductId::fromString($product_id));
-        $options = $product->getOptions();
 
-        $output = [];
-
-        foreach($options as $option) {
-            $output[] = $this->convertToArrayItem($option);
-        }
-
-        return $output;
+        return array_map(fn($option) => $this->convertToArrayItem($option), $product->getOptions());
     }
 
     private function convertToArrayItem(Option $option): array
