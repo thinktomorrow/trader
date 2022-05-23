@@ -23,7 +23,6 @@ use Thinktomorrow\Trader\Domain\Model\Product\Event\VariantCreated;
 use Thinktomorrow\Trader\Application\Product\OptionLinks\OptionLink;
 use Thinktomorrow\Trader\Domain\Model\Product\Event\ProductTaxaUpdated;
 use Thinktomorrow\Trader\Domain\Model\Product\Event\ProductDataUpdated;
-use Thinktomorrow\Trader\Application\RefreshCart\Adjusters\AdjustShipping;
 use Thinktomorrow\Trader\Application\Product\OptionLinks\DefaultOptionLink;
 use Thinktomorrow\Trader\Application\Product\OptionLinks\ProductOptionValues;
 use Thinktomorrow\Trader\Application\Product\OptionLinks\OptionLinksComposer;
@@ -107,12 +106,12 @@ abstract class ProductContext extends TestCase
         return $productId;
     }
 
-    protected function createAVariant(string $productId, string $unitPrice, array $data = [], string $variantId = 'xxx-123'): VariantId
+    protected function createAVariant(string $productId, string $unitPrice, string $taxRate, array $data = [], string $variantId = 'xxx-123'): VariantId
     {
         InMemoryVariantRepository::setNextReference($variantId);
 
         $variantId = $this->productApplication->createVariant(new CreateVariant(
-            $productId, $unitPrice, $data
+            $productId, $unitPrice, $taxRate, $data
         ));
 
         $this->assertEquals([
@@ -120,16 +119,5 @@ abstract class ProductContext extends TestCase
         ], $this->eventDispatcher->releaseDispatchedEvents());
 
         return $variantId;
-    }
-
-    protected function editProductOptions(string $unitPrice, array $taxonIds, array $data = []): ProductId
-    {
-        $productId = $this->productApplication->createProduct(new CreateProduct(
-            $taxonIds, $unitPrice, $data
-        ));
-
-        Assert::assertNotNull($this->productRepository->find($productId));
-
-        return $productId;
     }
 }

@@ -9,7 +9,7 @@ class CreateVariantTest extends ProductContext
     public function it_can_create_a_variant()
     {
         $productId = $this->createAProduct('50', ['1','2'], ['title' => ['nl' => 'foobar nl']]);
-        $variantId = $this->createAVariant($productId->get(), "1234", ['title' => ['nl' => 'foobar nl']], 'xxx-124');
+        $variantId = $this->createAVariant($productId->get(), "1234", "12", ['title' => ['nl' => 'foobar nl']], 'xxx-124');
 
         $product = $this->productRepository->find($productId);
 

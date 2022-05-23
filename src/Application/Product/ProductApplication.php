@@ -13,6 +13,7 @@ use Thinktomorrow\Trader\Domain\Model\Product\ProductRepository;
 use Thinktomorrow\Trader\Domain\Model\Product\VariantRepository;
 use Thinktomorrow\Trader\Domain\Model\Product\Variant\VariantId;
 use Thinktomorrow\Trader\Domain\Model\Product\Option\OptionValue;
+use Thinktomorrow\Trader\Domain\Model\Product\Event\ProductDeleted;
 use Thinktomorrow\Trader\Application\Product\UpdateProduct\UpdateProductTaxa;
 use Thinktomorrow\Trader\Application\Product\UpdateProduct\UpdateProductData;
 use Thinktomorrow\Trader\Application\Product\UpdateProduct\UpdateProductOptions;
@@ -63,8 +64,8 @@ class ProductApplication
         $product->createVariant($variant = Variant::create(
             $product->productId,
             $this->variantRepository->nextReference(),
-            $createVariant->getUnitPrice($this->traderConfig->getDefaultTaxRate()),
-            $createVariant->getSalePrice($this->traderConfig->getDefaultTaxRate()),
+            $createVariant->getUnitPrice($this->traderConfig->doesPriceInputIncludesVat(), $this->traderConfig->getDefaultCurrency()),
+            $createVariant->getSalePrice($this->traderConfig->doesPriceInputIncludesVat(), $this->traderConfig->getDefaultCurrency()),
         ));
 
         $variant->addData($createVariant->getData());
@@ -131,6 +132,26 @@ class ProductApplication
         $variant = $product->findVariant($updateVariantOptionValues->getVariantId());
         $variant->updateOptionValueIds($updateVariantOptionValues->getOptionValueIds());
         $product->updateVariant($variant);
+
+        $this->productRepository->save($product);
+
+        $this->eventDispatcher->dispatchAll($product->releaseEvents());
+    }
+
+    public function deleteProduct(DeleteProduct $deleteProduct): void
+    {
+        $this->productRepository->delete($deleteProduct->getProductId());
+
+        $this->eventDispatcher->dispatchAll([
+            new ProductDeleted($deleteProduct->getProductId())
+        ]);
+    }
+
+    public function deleteVariant(DeleteVariant $deleteVariant): void
+    {
+        $product = $this->productRepository->find($deleteVariant->getProductId());
+
+        $product->deleteVariant($deleteVariant->getVariantId());
 
         $this->productRepository->save($product);
 
