@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace Thinktomorrow\Trader\Application\Taxon;
 
 use Thinktomorrow\Trader\Domain\Model\Taxon\TaxonId;
+use Thinktomorrow\Trader\Domain\Model\Taxon\TaxonKey;
 
 final class CreateTaxon
 {
@@ -18,9 +19,9 @@ final class CreateTaxon
         $this->parent_taxon_id = $parent_taxon_id;
     }
 
-    public function getTaxonKey(): string
+    public function getTaxonKey(): TaxonKey
     {
-        return $this->taxon_key;
+        return TaxonKey::fromString($this->taxon_key);
     }
 
     public function getData(): array

@@ -33,6 +33,19 @@ final class InMemoryTaxonRepository implements TaxonRepository
         return static::$taxons[$taxonId->get()];
     }
 
+    public function getByParentId(TaxonId $taxonId): array
+    {
+        $output = [];
+
+        foreach(static::$taxons as $taxon) {
+            if($taxon->getParentId()?->equals($taxonId)) {
+                $output[] = $taxon;
+            }
+        }
+
+        return $output;
+    }
+
     public function delete(TaxonId $taxonId): void
     {
         if (!isset(static::$taxons[$taxonId->get()])) {
@@ -72,7 +85,7 @@ final class InMemoryTaxonRepository implements TaxonRepository
     private function existsByKey(TaxonKey $taxonKey, TaxonId $allowedTaxonId): bool
     {
         foreach(static::$taxons as $taxon) {
-            if(!$taxon->taxonId->equals($allowedTaxonId) && $taxon->getKey()->equals($taxonKey)) {
+            if(!$taxon->taxonId->equals($allowedTaxonId) && $taxon->taxonKey->equals($taxonKey)) {
                 return true;
             }
         }

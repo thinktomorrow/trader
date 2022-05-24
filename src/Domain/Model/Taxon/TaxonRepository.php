@@ -9,6 +9,9 @@ interface TaxonRepository
 
     public function find(TaxonId $taxonId): Taxon;
 
+    /** @return Taxon[] */
+    public function getByParentId(TaxonId $taxonId): array;
+
     public function delete(TaxonId $taxonId): void;
 
     public function nextReference(): TaxonId;

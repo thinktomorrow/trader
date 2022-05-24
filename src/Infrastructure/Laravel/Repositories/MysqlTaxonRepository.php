@@ -45,6 +45,17 @@ class MysqlTaxonRepository implements TaxonRepository
         return Taxon::fromMappedData((array) $taxonState, []);
     }
 
+    public function getByParentId(TaxonId $taxonId): array
+    {
+        $taxonStates = DB::table(static::$taxonTable)
+            ->where(static::$taxonTable . '.parent_id', $taxonId->get())
+            ->get();
+
+        return $taxonStates
+            ->map(fn($record) => Taxon::fromMappedData((array) $record, []))
+            ->toArray();
+    }
+
     public function delete(TaxonId $taxonId): void
     {
         DB::table(static::$taxonTable)->where('taxon_id', $taxonId->get())->delete();

@@ -14,7 +14,7 @@ class Taxon implements Aggregate
     use RecordsEvents;
 
     public readonly TaxonId $taxonId;
-    private TaxonKey $taxonKey;
+    public readonly TaxonKey $taxonKey;
     private TaxonState $taxonState;
     private int $order;
     private ?TaxonId $parentTaxonId = null;
@@ -32,6 +32,11 @@ class Taxon implements Aggregate
             : $taxon->moveToRoot();
 
         return $taxon;
+    }
+
+    public function getParentId(): ?TaxonId
+    {
+        return $this->parentTaxonId;
     }
 
     public function changeParent(TaxonId $parentTaxonId): void

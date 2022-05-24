@@ -21,6 +21,11 @@ final class MoveTaxon
         return TaxonId::fromString($this->taxon_id);
     }
 
+    public function hasParentTaxonId(): bool
+    {
+        return !is_null($this->parent_taxon_id);
+    }
+
     public function getParentTaxonId(): ?TaxonId
     {
         return $this->parent_taxon_id ? TaxonId::fromString($this->parent_taxon_id) : null;

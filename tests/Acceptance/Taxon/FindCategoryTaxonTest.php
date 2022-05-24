@@ -7,7 +7,6 @@ use Tests\Infrastructure\Vine\TaxonHelpers;
 use Thinktomorrow\Trader\Infrastructure\Test\TestTraderConfig;
 use Thinktomorrow\Trader\Application\Taxon\Category\FindCategoryTaxon;
 use Thinktomorrow\Trader\Infrastructure\Test\Repositories\InMemoryTaxonRepository;
-use Thinktomorrow\Trader\Infrastructure\Laravel\Repositories\MysqlTaxonRepository;
 use Thinktomorrow\Trader\Infrastructure\Test\Repositories\InMemoryTaxonTreeRepository;
 
 class FindCategoryTaxonTest extends TaxonContext
