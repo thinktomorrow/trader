@@ -12,4 +12,6 @@ interface TaxonRepository
     public function delete(TaxonId $taxonId): void;
 
     public function nextReference(): TaxonId;
+
+    public function uniqueKeyReference(TaxonKey $taxonKey, TaxonId $allowedTaxonId): TaxonKey;
 }

@@ -6,6 +6,7 @@ namespace Tests\Unit\Model;
 use PHPUnit\Framework\TestCase;
 use Thinktomorrow\Trader\Domain\Model\Taxon\Taxon;
 use Thinktomorrow\Trader\Domain\Model\Taxon\TaxonId;
+use Thinktomorrow\Trader\Domain\Model\Taxon\TaxonKey;
 use Thinktomorrow\Trader\Domain\Model\Taxon\TaxonState;
 use Thinktomorrow\Trader\Domain\Model\Taxon\Exceptions\InvalidParentTaxonId;
 
@@ -16,10 +17,11 @@ class TaxonTest extends TestCase
     {
         $taxon = Taxon::create(
             TaxonId::fromString('aaa'),
-            'taxon-key',
-            ['foo' => 'bar'],
+            TaxonKey::fromString('taxon-key'),
             TaxonId::fromString('parent-aaa'),
         );
+
+        $taxon->addData(['foo' => 'bar']);
 
         $this->assertEquals([
             'taxon_id' => 'aaa',
@@ -36,8 +38,7 @@ class TaxonTest extends TestCase
     {
         $taxon = Taxon::create(
             TaxonId::fromString('aaa'),
-            'taxon-key',
-            [],
+            TaxonKey::fromString('taxon-key'),
         );
 
         $this->assertNull($taxon->getMappedData()['parent_id']);
@@ -48,8 +49,7 @@ class TaxonTest extends TestCase
     {
         $taxon = Taxon::create(
             TaxonId::fromString('aaa'),
-            'taxon-key',
-            [],
+            TaxonKey::fromString('taxon-key'),
         );
 
         $taxon->changeParent(TaxonId::fromString('bbb'),);
@@ -62,8 +62,7 @@ class TaxonTest extends TestCase
     {
         $taxon = Taxon::create(
             TaxonId::fromString('aaa'),
-            'taxon-key',
-            [],
+            TaxonKey::fromString('taxon-key'),
             TaxonId::fromString('bbb')
         );
 
@@ -79,8 +78,7 @@ class TaxonTest extends TestCase
 
         Taxon::create(
             TaxonId::fromString('aaa'),
-            'taxon-key',
-            [],
+            TaxonKey::fromString('taxon-key'),
             TaxonId::fromString('aaa'),
         );
     }
@@ -90,8 +88,7 @@ class TaxonTest extends TestCase
     {
         $taxon = Taxon::create(
             TaxonId::fromString('aaa'),
-            'taxon-key',
-            [],
+            TaxonKey::fromString('taxon-key'),
             TaxonId::fromString('bbb')
         );
 

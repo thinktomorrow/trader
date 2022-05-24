@@ -14,19 +14,18 @@ class Taxon implements Aggregate
     use RecordsEvents;
 
     public readonly TaxonId $taxonId;
-    private string $taxonKey;
+    private TaxonKey $taxonKey;
     private TaxonState $taxonState;
     private int $order;
     private ?TaxonId $parentTaxonId = null;
 
-    public static function create(TaxonId $taxonId, string $taxonKey, array $data, ?TaxonId $parentTaxonId = null): static
+    public static function create(TaxonId $taxonId, TaxonKey $taxonKey, ?TaxonId $parentTaxonId = null): static
     {
         $taxon = new static();
         $taxon->taxonId = $taxonId;
         $taxon->taxonKey = $taxonKey;
         $taxon->taxonState = TaxonState::online;
         $taxon->order = 0;
-        $taxon->data = $data;
 
         $parentTaxonId
             ? $taxon->changeParent($parentTaxonId)
@@ -63,7 +62,7 @@ class Taxon implements Aggregate
     {
         return [
             'taxon_id' => $this->taxonId->get(),
-            'key' => $this->taxonKey,
+            'key' => $this->taxonKey->get(),
             'state' => $this->taxonState->value,
             'order' => $this->order,
             'parent_id' => $this->parentTaxonId?->get(),
@@ -80,7 +79,7 @@ class Taxon implements Aggregate
     {
         $taxon = new static();
         $taxon->taxonId = TaxonId::fromString($state['taxon_id']);
-        $taxon->taxonKey = $state['key'];
+        $taxon->taxonKey = TaxonKey::fromString($state['key']);
         $taxon->taxonState = TaxonState::from($state['state']);
         $taxon->order = (int) $state['order'];
         $taxon->data = json_decode($state['data'], true);

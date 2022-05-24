@@ -7,6 +7,7 @@ use Tests\Infrastructure\TestCase;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Thinktomorrow\Trader\Domain\Model\Taxon\Taxon;
 use Thinktomorrow\Trader\Domain\Model\Taxon\TaxonId;
+use Thinktomorrow\Trader\Domain\Model\Taxon\TaxonKey;
 use Thinktomorrow\Trader\Domain\Model\Taxon\TaxonState;
 use Thinktomorrow\Trader\Infrastructure\Vine\VineTaxonFilterTreeComposer;
 use Thinktomorrow\Trader\Infrastructure\Test\Repositories\InMemoryTaxonRepository;
@@ -51,10 +52,10 @@ final class TaxonFilterTreeComposerTest extends TestCase
     /** @test */
     public function taxon_without_product_is_not_added_to_filter_tree()
     {
-        $this->createTaxon(Taxon::create(TaxonId::fromString('first'), 'taxon-first', []), ['aaa']);
+        $this->createTaxon(Taxon::create(TaxonId::fromString('first'), TaxonKey::fromString('taxon-first')), ['aaa']);
 
-        $this->createTaxon(Taxon::create(TaxonId::fromString('second'), 'taxon-second', [], TaxonId::fromString('first')), ['bbb']);
-        $this->createTaxon(Taxon::create(TaxonId::fromString('third'), 'taxon-third', [], TaxonId::fromString('first')), []);
+        $this->createTaxon(Taxon::create(TaxonId::fromString('second'), TaxonKey::fromString('taxon-second'), TaxonId::fromString('first')), ['bbb']);
+        $this->createTaxon(Taxon::create(TaxonId::fromString('third'), TaxonKey::fromString('taxon-third'), TaxonId::fromString('first')), []);
 
         foreach($this->repositories() as $repository) {
             $composer = new VineTaxonFilterTreeComposer($repository);
@@ -68,12 +69,12 @@ final class TaxonFilterTreeComposerTest extends TestCase
     /** @test */
     public function it_can_order_filters()
     {
-        $this->createTaxon(Taxon::create(TaxonId::fromString('main'), 'taxon-main', []), ['aaa']);
+        $this->createTaxon(Taxon::create(TaxonId::fromString('main'), TaxonKey::fromString('taxon-main')), ['aaa']);
 
-        $first = Taxon::create(TaxonId::fromString('first'), 'taxon-first', [], TaxonId::fromString('main'));
+        $first = Taxon::create(TaxonId::fromString('first'), TaxonKey::fromString('taxon-first'), TaxonId::fromString('main'));
         $first->changeOrder(3);
 
-        $second = Taxon::create(TaxonId::fromString('second'), 'taxon-second', [], TaxonId::fromString('main'));
+        $second = Taxon::create(TaxonId::fromString('second'), TaxonKey::fromString('taxon-second'), TaxonId::fromString('main'));
         $second->changeOrder(1);
 
         $this->createTaxon($first, ['aaa']);
@@ -93,9 +94,9 @@ final class TaxonFilterTreeComposerTest extends TestCase
     /** @test */
     public function it_excludes_filters_that_are_offline()
     {
-        $this->createTaxon(Taxon::create(TaxonId::fromString('first'), 'taxon-first', []), ['aaa']);
+        $this->createTaxon(Taxon::create(TaxonId::fromString('first'), TaxonKey::fromString('taxon-first')), ['aaa']);
 
-        $taxon = Taxon::create(TaxonId::fromString('second'), 'taxon-second', [], TaxonId::fromString('first'));
+        $taxon = Taxon::create(TaxonId::fromString('second'), TaxonKey::fromString('taxon-second'), TaxonId::fromString('first'));
         $taxon->changeState(TaxonState::offline);
 
         $this->createTaxon($taxon, ['bbb']);

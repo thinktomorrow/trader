@@ -7,6 +7,7 @@ use Tests\Infrastructure\TestCase;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Thinktomorrow\Trader\Domain\Model\Taxon\Taxon;
 use Thinktomorrow\Trader\Domain\Model\Taxon\TaxonId;
+use Thinktomorrow\Trader\Domain\Model\Taxon\TaxonKey;
 use Thinktomorrow\Trader\Domain\Model\Taxon\TaxonState;
 use Thinktomorrow\Trader\Domain\Model\Taxon\Exceptions\CouldNotFindTaxon;
 use Thinktomorrow\Trader\Infrastructure\Test\Repositories\InMemoryTaxonRepository;
@@ -68,19 +69,22 @@ final class TaxonRepositoryTest extends TestCase
 
     public function taxons(): \Generator
     {
-        yield [Taxon::create(
+        $taxon = Taxon::create(
             TaxonId::fromString('xxx'),
-            'taxon-key',
-            ['foo' => 'bar'],
+            TaxonKey::fromString('taxon-key'),
             TaxonId::fromString('parent'),
-        )];
+        );
+        $taxon->addData(['foo' => 'bar']);
+
+        yield [$taxon];
 
         $taxon = Taxon::create(
             TaxonId::fromString('xxx'),
-            'taxon-key',
-            ['foo' => 'bar'],
+            TaxonKey::fromString('taxon-key'),
             TaxonId::fromString('parent'),
         );
+
+        $taxon->addData(['foo' => 'bar']);
 
         $taxon->changeState(TaxonState::queued_for_deletion);
         $taxon->changeOrder(555);
@@ -90,8 +94,7 @@ final class TaxonRepositoryTest extends TestCase
         // As Root
         yield [Taxon::create(
             TaxonId::fromString('xxx'),
-            'taxon-key',
-            ['foo' => 'bar'],
+            TaxonKey::fromString('taxon-key'),
         )];
     }
 }
