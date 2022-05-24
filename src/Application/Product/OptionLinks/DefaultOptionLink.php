@@ -38,12 +38,12 @@ class DefaultOptionLink implements OptionLink
 
     public function getOptionLabel(): string
     {
-        return $this->data('label', null, null, $this->option->getData());
+        return $this->data('label', null, '', $this->option->getData());
     }
 
     public function getValueLabel(): string
     {
-        return $this->data('value', null, null, $this->optionValue->getData());
+        return $this->data('value', null, '', $this->optionValue->getData());
     }
 
     public function getUrl(): ?string

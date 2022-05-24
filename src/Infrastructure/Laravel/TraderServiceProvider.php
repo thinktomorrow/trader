@@ -108,9 +108,11 @@ class TraderServiceProvider extends ServiceProvider
                     ->getLanguage();
             }
 
-            return Arr::get(
+            $value = Arr::get(
                 $data, $key . '.' . $language, Arr::get($data, $key, $default)
             );
+
+            return $value === null ? $default :$value;
         });
     }
 }

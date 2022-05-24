@@ -24,7 +24,7 @@ class OptionLinksComposer
      * Compose all possible option combinations relative to the passed product variant. This is the action
      * used to determine the links behind each option on the product page, so we include an url as well.
      */
-    public function get(ProductId $productId, VariantId $variantId): OptionLinks
+    public function get(ProductId $productId, VariantId $variantId, Locale $locale): OptionLinks
     {
         $product = $this->productRepository->find($productId);
         $variant = $product->findVariant($variantId);
@@ -52,6 +52,8 @@ class OptionLinksComposer
                     $optionValue,
                     $this->findVariantByOptionValues($product, $mergedVariantOptions)
                 );
+
+                $optionLink->setLocale($locale);
 
                 // If this option value also belongs to this current variant, we'll mark it as active
                 if(in_array($optionValue->optionValueId, $variant->getOptionValueIds())) {
