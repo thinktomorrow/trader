@@ -18,10 +18,10 @@ return [
      * Default locale following. The default locale is
      * mostly used for rendering the localized Money values
      */
-    'locale' => 'nl',
+    'language' => 'nl',
 
     /*
-     * Default country
+     * Default country/region
      * In case the country of the customer or order is not set yet,
      * we use this default country as a fallback for e.g. tax logic
      * Format used is the 2-chars ISO string.

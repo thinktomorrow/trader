@@ -14,7 +14,7 @@ trait HasLocale
         $this->locale = $locale;
     }
 
-    private function getLocale(): Locale
+    protected function getLocale(): Locale
     {
         if(!$this->locale) {
             return DefaultLocale::get();

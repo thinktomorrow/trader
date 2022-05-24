@@ -5,6 +5,7 @@ namespace Thinktomorrow\Trader\Infrastructure\Laravel\Repositories;
 
 use Ramsey\Uuid\Uuid;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Collection;
 use Thinktomorrow\Trader\Domain\Model\Product\Product;
 use Thinktomorrow\Trader\Domain\Model\Product\ProductId;
 use Thinktomorrow\Trader\Application\Common\TraderHelpers;
@@ -159,21 +160,33 @@ class MysqlProductRepository implements ProductRepository
         $variantStates = $this->variantRepository->getStatesByProduct($productId);
 
         $optionStates = DB::table(static::$optionTable)
+            ->join(static::$optionValueTable, static::$optionTable.'.option_id' ,'=',static::$optionValueTable.'.option_id')
             ->where(static::$optionTable . '.product_id', $productId->get())
             ->orderBy(static::$optionTable . '.order_column')
+            ->orderBy('option_value_order_column')
+            ->select([
+                static::$optionTable . '.*',
+                static::$optionValueTable . '.option_value_id',
+                static::$optionValueTable . '.data AS option_value_data',
+                static::$optionValueTable . '.order_column AS option_value_order_column',
+            ])
             ->get()
-            ->map(fn($item) => (array) $item)
-            ->map(function($item) {
+            ->groupBy('option_id')
+            ->map(function(Collection $item) {
 
-                // TODO: avoid nested query calls...
-                $item['values'] = DB::table(static::$optionValueTable)
-                    ->where(static::$optionValueTable . '.option_id', $item['option_id'])
-                    ->orderBy(static::$optionValueTable . '.order_column')
-                    ->get()
-                    ->map(fn($item) => (array) $item)
-                    ->toArray();
+                $first = $item->first();
 
-                return $item;
+                return [
+                    'option_id' => $first->option_id,
+                    'product_id' => $first->product_id,
+                    'data' => $first->data,
+                    'values' => array_map(fn($value) => [
+                        'option_id' => $value->option_id,
+                        'option_value_id' => $value->option_value_id,
+                        'data' => $value->option_value_data,
+                        'order_column' => $value->option_value_order_column,
+                    ], $item->all())
+                ];
             })
             ->toArray();
 

@@ -9,6 +9,7 @@ use Thinktomorrow\Trader\Domain\Model\Product\Variant\VariantId;
 use Thinktomorrow\Trader\Domain\Model\Product\Event\VariantCreated;
 use Thinktomorrow\Trader\Domain\Model\Product\Event\VariantUpdated;
 use Thinktomorrow\Trader\Domain\Model\Product\Event\VariantDeleted;
+use Thinktomorrow\Trader\Domain\Model\Product\Exceptions\CouldNotDeleteVariant;
 use Thinktomorrow\Trader\Domain\Model\Product\Exceptions\CouldNotFindVariantOnProduct;
 use Thinktomorrow\Trader\Domain\Model\Product\Exceptions\VariantAlreadyExistsOnProduct;
 
@@ -64,81 +65,19 @@ trait HasVariants
         $this->recordEvent(new VariantUpdated($this->productId, $variant->variantId));
     }
 
-    // TODO: move to variant... and rename this to updateVariant()
-//    public function updateVariantPrice(VariantId $variantId, VariantUnitPrice $unitPrice, VariantSalePrice $salePrice): void
-//    {
-//        if (null === $variantIndex = $this->findVariantIndex($variantId)) {
-//            throw new CouldNotFindVariantOnProduct(
-//                'Cannot update variant because product ['.$this->productId->get().'] has no variant by id ['.$variantId->get().']'
-//            );
-//        }
-//
-//        $this->variants[$variantIndex]->updatePrice($unitPrice, $salePrice);
-//
-//        $this->recordEvent(new VariantUpdated($this->productId, $variantId));
-//    }
-
     public function deleteVariant(VariantId $variantId): void
     {
         if (null !== $variantIndex = $this->findVariantIndex($variantId)) {
+
+            if(count($this->variants) === 1) {
+                throw new CouldNotDeleteVariant('At least one variant is required on a product.');
+            }
+
             unset($this->variants[$variantIndex]);
 
             $this->recordEvent(new VariantDeleted($this->productId, $variantId));
         }
     }
-
-//    public function addVariantOptionValue(VariantId $variantId, OptionId $optionId, OptionValueId $optionValueId): void
-//    {
-//        if (null === $variantIndex = $this->findVariantIndex($variantId)) {
-//            throw new CouldNotFindVariantOnProduct(
-//                'Cannot add option selection to variant because product ['.$this->productId->get().'] has no variant by id ['.$variantId->get().']'
-//            );
-//        }
-//
-//        if (null !== $this->findOptionIndex($optionId)) {
-//            throw new CouldNotFindOptionOnProduct(
-//                'Cannot add option ['.$optionId->get().'] to variant because product ['.$this->productId->get().'] does not have this option.'
-//            );
-//        }
-//
-//        $this->variants[$variantIndex]->addOrUpdateOption($optionId, $optionValueId);
-//    }
-//
-//    public function updateVariantOptionValue(VariantId $variantId, OptionId $optionId, OptionValueId $optionValueId): void
-//    {
-//        if (null === $variantIndex = $this->findVariantIndex($variantId)) {
-//            throw new CouldNotFindVariantOnProduct(
-//                'Cannot add option selection to variant because product ['.$this->productId->get().'] has no variant by id ['.$variantId->get().']'
-//            );
-//        }
-//
-//        // TODO CHeck if this option is one of the product ones
-////        if (null !== $this->findOptionIndex($option->optionId)) {
-////            throw new OptionDoesNotExistOnProduct(
-////                'Cannot add option ['.$option->optionId->get().'] because product ['.$this->productId->get().'] already has a variant with option combination.'
-////            );
-////        }
-////
-////        // TODO: check uniqueness of option combo
-////        if (null !== $this->findOptionIndex($option->optionId)) {
-////            throw new OptionCombinationAlreadyExists(
-////                'Cannot add option ['.$option->optionId->get().'] because product ['.$this->productId->get().'] already has a variant with option combination.'
-////            );
-////        }
-//
-//        $this->variants[$variantIndex]->addOrUpdateOption($optionId, $optionValueId);
-//    }
-//
-//    public function deleteVariantOption(VariantId $variantId, OptionId $optionId): void
-//    {
-//        if (null === $variantIndex = $this->findVariantIndex($variantId)) {
-//            throw new CouldNotFindVariantOnProduct(
-//                'Cannot add option selection to variant because product ['.$this->productId->get().'] has no variant by id ['.$variantId->get().']'
-//            );
-//        }
-//
-//        $this->variants[$variantIndex]->deleteOption($optionId);
-//    }
 
     private function findVariantIndex(VariantId $variantId): ?int
     {

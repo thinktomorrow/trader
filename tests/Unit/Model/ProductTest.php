@@ -3,8 +3,10 @@ declare(strict_types=1);
 
 namespace Tests\Unit\Model;
 
+use Money\Money;
 use Tests\Unit\TestCase;
 use Thinktomorrow\Trader\Domain\Model\Taxon\TaxonId;
+use Thinktomorrow\Trader\Domain\Common\Taxes\TaxRate;
 use Thinktomorrow\Trader\Domain\Model\Product\Product;
 use Thinktomorrow\Trader\Domain\Model\Product\ProductId;
 use Thinktomorrow\Trader\Domain\Model\Product\ProductState;
@@ -16,6 +18,7 @@ use Thinktomorrow\Trader\Domain\Model\Product\Event\VariantDeleted;
 use Thinktomorrow\Trader\Domain\Model\Product\Variant\VariantUnitPrice;
 use Thinktomorrow\Trader\Domain\Model\Product\Variant\VariantSalePrice;
 use Thinktomorrow\Trader\Domain\Model\Product\Event\ProductTaxaUpdated;
+use Thinktomorrow\Trader\Domain\Model\Product\Exceptions\CouldNotDeleteVariant;
 
 class ProductTest extends TestCase
 {
@@ -135,13 +138,32 @@ class ProductTest extends TestCase
     public function it_can_delete_variant()
     {
         $product = $this->createdProductWithVariant();
+        $product->createVariant(Variant::create(
+            ProductId::fromString('xxx'),
+            VariantId::fromString('zzz'),
+            VariantUnitPrice::fromMoney(Money::EUR(10), TaxRate::fromString('20'), false),
+            VariantSalePrice::fromMoney(Money::EUR(8), TaxRate::fromString('20'), false),
+        ));
 
-        $product->deleteVariant(VariantId::fromString('yyy'));
+        $product->deleteVariant(VariantId::fromString('zzz'));
 
         $this->assertEquals([
             new ProductCreated(ProductId::fromString('xxx')),
             new VariantCreated(ProductId::fromString('xxx'), VariantId::fromString('yyy')),
-            new VariantDeleted(ProductId::fromString('xxx'), VariantId::fromString('yyy')),
+            new VariantCreated(ProductId::fromString('xxx'), VariantId::fromString('zzz')),
+            new VariantDeleted(ProductId::fromString('xxx'), VariantId::fromString('zzz')),
         ], $product->releaseEvents());
+    }
+
+    /** @test */
+    public function it_cannot_delete_last_variant()
+    {
+        $this->expectException(CouldNotDeleteVariant::class);
+
+        $product = $this->createdProductWithVariant();
+
+        $product->deleteVariant(VariantId::fromString('yyy'));
+
+        $this->assertCount(1, $product->getVariants());
     }
 }

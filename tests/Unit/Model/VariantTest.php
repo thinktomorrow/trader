@@ -90,7 +90,7 @@ class VariantTest extends TestCase
     {
         $variant = Variant::fromMappedData([
             'variant_id' => 'yyy',
-            'state' => VariantState::deleted->value,
+            'state' => VariantState::queued_for_deletion->value,
             'unit_price' => 100,
             'sale_price' => 80,
             'tax_rate' => '20',
@@ -103,7 +103,7 @@ class VariantTest extends TestCase
 
         $this->assertEquals(ProductId::fromString('xxx'), $variant->getMappedData()['product_id']);
         $this->assertEquals(VariantId::fromString('yyy'), $variant->variantId);
-        $this->assertEquals(VariantState::deleted->value, $variant->getMappedData()['state']);
+        $this->assertEquals(VariantState::queued_for_deletion->value, $variant->getMappedData()['state']);
         $this->assertEquals(100, $variant->getMappedData()['unit_price']);
         $this->assertEquals(80, $variant->getMappedData()['sale_price']);
         $this->assertEquals('20', $variant->getMappedData()['tax_rate']);

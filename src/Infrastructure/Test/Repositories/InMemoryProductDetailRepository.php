@@ -7,13 +7,12 @@ use Thinktomorrow\Trader\Domain\Model\Product\ProductId;
 use Thinktomorrow\Trader\Domain\Model\Product\Option\Option;
 use Thinktomorrow\Trader\Domain\Model\Product\Variant\VariantId;
 use Thinktomorrow\Trader\Domain\Model\Product\Option\OptionValue;
-use Thinktomorrow\Trader\Application\Product\GetProductOptions\ProductOption;
-use Thinktomorrow\Trader\Application\Product\GetProductOptions\ProductOptions;
+use Thinktomorrow\Trader\Application\Product\OptionLinks\DefaultOptionLink;
+use Thinktomorrow\Trader\Application\Product\OptionLinks\OptionLinks;
 use Thinktomorrow\Trader\Infrastructure\Laravel\Models\DefaultProductDetail;
 use Thinktomorrow\Trader\Application\Product\ProductDetail\ProductDetailRepository;
-use Thinktomorrow\Trader\Application\Product\GetProductOptions\ProductOptionsRepository;
 
-final class InMemoryProductDetailRepository implements ProductDetailRepository, ProductOptionsRepository
+final class InMemoryProductDetailRepository implements ProductDetailRepository
 {
     public function findProductDetail(VariantId $variantId): DefaultProductDetail
     {
@@ -24,27 +23,5 @@ final class InMemoryProductDetailRepository implements ProductDetailRepository, 
             'product_data' => json_encode($product->getData()),
             'taxon_ids' => array_map(fn($taxonId) => $taxonId->get(), $product->getTaxonIds()),
         ]));
-    }
-
-    public function getProductOptions(ProductId $productId): ProductOptions
-    {
-        $product = InMemoryProductRepository::$products[$productId->get()];
-
-        $optionValues = [];
-
-        /** @var Option $option */
-        foreach($product->getOptions() as $option) {
-            /** @var OptionValue $optionValue */
-            foreach($option->getOptionValues() as $optionValue) {
-                $optionValues[] = $optionValue->getMappedData();
-            }
-        }
-
-        $productOptions = [];
-        foreach($optionValues as $optionValue) {
-            $productOptions[] = ProductOption::fromMappedData($optionValue);
-        }
-
-        return ProductOptions::fromType($productOptions);
     }
 }

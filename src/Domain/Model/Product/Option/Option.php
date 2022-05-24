@@ -15,6 +15,8 @@ class Option implements ChildAggregate
 
     public readonly ProductId $productId;
     public readonly OptionId $optionId;
+
+    /** @var OptionValue[] */
     private array $optionValues = [];
 
     private function __construct()
@@ -45,7 +47,6 @@ class Option implements ChildAggregate
         return $nextOptionValueId;
     }
 
-    /** @return OptionValue[] */
     public function getOptionValues(): array
     {
         return $this->optionValues;

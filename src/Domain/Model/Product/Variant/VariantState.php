@@ -7,7 +7,7 @@ enum VariantState: string
 {
     case available = 'available'; // product is available for purchase
     case unavailable = 'unavailable'; // product is not available for purchase
-    case deleted = 'deleted'; // Product is / will be deleted
+    case queued_for_deletion = 'queued_for_deletion'; // Product is / will be deleted
 
     public static function availableStates(): array
     {

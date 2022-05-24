@@ -93,7 +93,7 @@ class DefaultProductDetail implements ProductDetail
         return $this->getVariantId();
     }
 
-    public function getUrl(string $locale = null): string
+    public function getUrl(): string
     {
         return '/'.$this->getVariantId();
     }

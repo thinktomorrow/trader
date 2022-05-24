@@ -11,11 +11,8 @@ use Thinktomorrow\Trader\Domain\Model\Product\VariantRepository;
 use Thinktomorrow\Trader\Application\Cart\VariantForCart\VariantForCart;
 use Thinktomorrow\Trader\Domain\Model\Product\Exceptions\CouldNotFindVariant;
 use Thinktomorrow\Trader\Application\Cart\VariantForCart\VariantForCartRepository;
-use Thinktomorrow\Trader\Application\Product\GetProductOptions\VariantProductOptions;
-use Thinktomorrow\Trader\Application\Product\GetProductOptions\VariantProductOptionsRepository;
-use Thinktomorrow\Trader\Application\Product\GetProductOptions\VariantProductOptionsCollection;
 
-final class InMemoryVariantRepository implements VariantRepository, VariantForCartRepository, VariantProductOptionsRepository
+final class InMemoryVariantRepository implements VariantRepository, VariantForCartRepository
 {
     /** @var Variant[] */
     public static array $variants = [];
@@ -76,36 +73,5 @@ final class InMemoryVariantRepository implements VariantRepository, VariantForCa
         }
 
         throw new CouldNotFindVariant('No variant found by id ' . $variantId->get());
-    }
-
-    public function getVariantProductOptions(ProductId $productId): VariantProductOptionsCollection
-    {
-        // TODO: get url... locale,
-
-        $product = InMemoryProductRepository::$products[$productId->get()];
-        $variants = $product->getVariants();
-        $options = $product->getChildEntities()[Option::class];
-
-        $variantForProductOptions = [];
-
-        foreach($variants as $variant) {
-            $variantOptionValueIds = $variant->getMappedData()['option_value_ids'];
-
-            $variantOptionValues = [];
-            foreach($options as $option) {
-                foreach($option['values'] as $value) {
-                    if(in_array($value['option_value_id'], $variantOptionValueIds)) {
-                        $variantOptionValues[] = $value;
-                    }
-                }
-            }
-
-            $variantForProductOptions[] = VariantProductOptions::fromMappedData([
-                'variant_id' => $variant->variantId->get(),
-            ], $variantOptionValues);
-
-        }
-
-        return VariantProductOptionsCollection::fromType($variantForProductOptions);
     }
 }
