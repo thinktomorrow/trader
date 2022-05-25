@@ -74,7 +74,7 @@ class TaxonNode extends DefaultNode
 
     public function getLabel(): string
     {
-        return $this->data('label', null, $this->getKey());
+        return $this->data('title', null, $this->getKey());
     }
 
     public function getContent(): ?string

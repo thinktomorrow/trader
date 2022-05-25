@@ -17,6 +17,10 @@ trait AggregateId
      */
     public static function fromString(string $id): static
     {
+        if($id === '') {
+            throw new \DomainException('Aggregate id string cannot be empty.');
+        }
+
         $aggregateId = new static();
         $aggregateId->id = $id;
 

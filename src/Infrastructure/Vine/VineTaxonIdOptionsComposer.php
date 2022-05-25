@@ -33,6 +33,23 @@ class VineTaxonIdOptionsComposer implements TaxonIdOptionsComposer
         return array_values($grouped);
     }
 
+    public function getOptionsForMultiselect(): array
+    {
+        $options = $this->getOptions();
+
+        return array_map(function($group){
+
+            $values = [];
+            foreach($group['values'] as $id => $value) {
+                $values[] = ['label' => $value, 'id' => $id];
+            }
+
+            $group['values'] = $values;
+
+            return $group;
+        }, $options);
+    }
+
     public function exclude(array|string $excludeTaxonIds): static
     {
         $this->excludeTaxonIds = (array) $excludeTaxonIds;

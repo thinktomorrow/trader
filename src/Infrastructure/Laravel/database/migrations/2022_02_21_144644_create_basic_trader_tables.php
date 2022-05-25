@@ -108,6 +108,7 @@ class CreateBasicTraderTables extends Migration
             $table->id();
             $table->string('from');
             $table->string('to');
+            $table->timestamp('created_at');
         });
     }
 

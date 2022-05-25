@@ -7,6 +7,8 @@ interface TaxonIdOptionsComposer
 {
     public function getOptions(): array;
 
+    public function getOptionsForMultiselect(): array;
+
     public function exclude(array|string $excludeTaxonIds): static;
 
     public function include(array|string $includeTaxonRootIds): static;

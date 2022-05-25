@@ -9,6 +9,7 @@ use Illuminate\Support\ServiceProvider;
 use Thinktomorrow\Trader\Application\Common\DataRenderer;
 use Thinktomorrow\Trader\Application\Common\DefaultLocale;
 use Thinktomorrow\Trader\Domain\Model\Order\OrderRepository;
+use Thinktomorrow\Trader\Domain\Model\Taxon\TaxonRepository;
 use Thinktomorrow\Trader\Domain\Common\Event\EventDispatcher;
 use Thinktomorrow\Trader\Domain\Model\Product\ProductRepository;
 use Thinktomorrow\Trader\Domain\Model\Product\VariantRepository;
@@ -32,6 +33,7 @@ use Thinktomorrow\Trader\Infrastructure\Laravel\Repositories\MysqlGridRepository
 use Thinktomorrow\Trader\Application\Product\OptionLinks\DefaultOptionLink;
 use Thinktomorrow\Trader\Infrastructure\Laravel\Repositories\MysqlOrderRepository;
 use Thinktomorrow\Trader\Application\Cart\VariantForCart\VariantForCartRepository;
+use Thinktomorrow\Trader\Infrastructure\Laravel\Repositories\MysqlTaxonRepository;
 use Thinktomorrow\Trader\Application\Product\ProductDetail\ProductDetailRepository;
 use Thinktomorrow\Trader\Infrastructure\Laravel\Repositories\MysqlVariantRepository;
 use Thinktomorrow\Trader\Infrastructure\Laravel\Repositories\MysqlProductRepository;
@@ -67,6 +69,7 @@ class TraderServiceProvider extends ServiceProvider
         });
 
         // Taxon
+        $this->app->bind(TaxonRepository::class, MysqlTaxonRepository::class);
         $this->app->bind(TaxonTreeRepository::class, MysqlTaxonTreeRepository::class);
         $this->app->bind(CategoryRepository::class, MysqlTaxonTreeRepository::class);
         $this->app->bind(TaxonIdOptionsComposer::class, VineTaxonIdOptionsComposer::class);
