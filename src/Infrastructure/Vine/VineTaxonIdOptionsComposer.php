@@ -26,15 +26,7 @@ class VineTaxonIdOptionsComposer implements TaxonIdOptionsComposer
         $grouped = [];
 
         collect($this->getFlattened())->each(function ($item) use (&$grouped) {
-
-
             $grouped[$item['root']->getKey()] = ['group' => $item['root']->getLabel(), 'values' => $item['values']];
-
-//            $values = array_values(array_map(fn ($value) => [ // reset keys with array_values for proper array for multiselect
-//                'id' => array_search($value, $item['values']), // Get key (id)
-//                'label' => $value,
-//            ], $item['values']));
-//            $grouped[$item['root']->getKey()] = ['group' => $item['root']->getLabel(), 'values' => $values];
         });
 
         // We remove the group key as we need to have non-assoc array for the multiselect options.
