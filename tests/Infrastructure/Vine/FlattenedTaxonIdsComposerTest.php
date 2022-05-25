@@ -5,6 +5,9 @@ namespace Tests\Infrastructure\Vine;
 
 use Tests\Infrastructure\TestCase;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Thinktomorrow\Trader\Application\Taxon\Tree\TaxonNode;
+use Thinktomorrow\Trader\Infrastructure\Test\TestContainer;
+use Thinktomorrow\Trader\Infrastructure\Laravel\Models\DefaultTaxonNode;
 use Thinktomorrow\Trader\Infrastructure\Vine\VineFlattenedTaxonIdsComposer;
 use Thinktomorrow\Trader\Infrastructure\Test\Repositories\InMemoryTaxonRepository;
 use Thinktomorrow\Trader\Infrastructure\Test\Repositories\InMemoryTaxonTreeRepository;
@@ -14,6 +17,13 @@ final class FlattenedTaxonIdsComposerTest extends TestCase
 {
     use RefreshDatabase;
     use TaxonHelpers;
+
+    protected function setUp(): void
+    {
+        parent::setUp();
+
+        (new TestContainer())->add(TaxonNode::class, DefaultTaxonNode::class);
+    }
 
     public function tearDown(): void
     {
@@ -80,8 +90,8 @@ final class FlattenedTaxonIdsComposerTest extends TestCase
 
     private function repositories(): \Generator
     {
-        yield new InMemoryTaxonTreeRepository();
-        yield new MysqlTaxonTreeRepository();
+        yield new InMemoryTaxonTreeRepository(new TestContainer());
+        yield new MysqlTaxonTreeRepository(new TestContainer());
     }
 
 }

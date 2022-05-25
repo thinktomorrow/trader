@@ -3,8 +3,8 @@ declare(strict_types=1);
 
 namespace Thinktomorrow\Trader\Infrastructure\Test\Repositories;
 
+use Psr\Container\ContainerInterface;
 use Thinktomorrow\Vine\NodeCollectionFactory;
-use Thinktomorrow\Trader\Domain\Model\Taxon\Taxon;
 use Thinktomorrow\Trader\Domain\Model\Taxon\TaxonId;
 use Thinktomorrow\Trader\Infrastructure\Vine\TaxonSource;
 use Thinktomorrow\Trader\Application\Taxon\Tree\TaxonTree;
@@ -15,6 +15,13 @@ use Thinktomorrow\Trader\Application\Taxon\Category\CategoryRepository;
 
 final class InMemoryTaxonTreeRepository implements TaxonTreeRepository, CategoryRepository
 {
+    private ContainerInterface $container;
+
+    public function __construct(ContainerInterface $container)
+    {
+        $this->container = $container;
+    }
+
     public function getTree(): TaxonTree
     {
         return new TaxonTree((new NodeCollectionFactory)->strict()->fromSource(
@@ -31,8 +38,10 @@ final class InMemoryTaxonTreeRepository implements TaxonTreeRepository, Category
     {
         $nodes = [];
 
+        $taxonNodeClass = $this->container->get(TaxonNode::class);
+
         foreach(InMemoryTaxonRepository::$taxons as $taxon) {
-            $nodes[] = TaxonNode::fromMappedData([
+            $nodes[] = $taxonNodeClass::fromMappedData([
                 'taxon_id'    => $taxon->taxonId->get(),
                 'parent_id'   => $taxon->getMappedData()['parent_id'],
                 'key'         => $taxon->getMappedData()['key'],

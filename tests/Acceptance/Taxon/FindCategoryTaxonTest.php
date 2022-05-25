@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace Tests\Acceptance\Taxon;
 
 use Tests\Infrastructure\Vine\TaxonHelpers;
+use Thinktomorrow\Trader\Infrastructure\Test\TestContainer;
 use Thinktomorrow\Trader\Infrastructure\Test\TestTraderConfig;
 use Thinktomorrow\Trader\Application\Taxon\Category\FindCategoryTaxon;
 use Thinktomorrow\Trader\Infrastructure\Test\Repositories\InMemoryTaxonRepository;
@@ -30,7 +31,7 @@ class FindCategoryTaxonTest extends TaxonContext
     {
         $finder = new FindCategoryTaxon(
             new TestTraderConfig(['category_root_id' => 'fifth']),
-            new InMemoryTaxonTreeRepository()
+            new InMemoryTaxonTreeRepository(new TestContainer())
         );
 
         $this->assertEquals('sixth', $finder->byTaxonIds(['first','second','sixth'])->getId());
@@ -41,7 +42,7 @@ class FindCategoryTaxonTest extends TaxonContext
     {
         $finder = new FindCategoryTaxon(
             new TestTraderConfig(['category_root_id' => null]),
-            new InMemoryTaxonTreeRepository()
+            new InMemoryTaxonTreeRepository(new TestContainer())
         );
 
         $this->assertEquals('second', $finder->byTaxonIds(['second','sixth'])->getId());
@@ -52,7 +53,7 @@ class FindCategoryTaxonTest extends TaxonContext
     {
         $finder = new FindCategoryTaxon(
             new TestTraderConfig(['category_root_id' => null]),
-            new InMemoryTaxonTreeRepository()
+            new InMemoryTaxonTreeRepository(new TestContainer())
         );
 
         $this->assertEquals('first', $finder->byTaxonIds(['first','sixth'])->getId());

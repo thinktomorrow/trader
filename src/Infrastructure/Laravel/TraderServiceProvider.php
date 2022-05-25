@@ -17,6 +17,7 @@ use Thinktomorrow\Trader\Application\Product\Grid\GridRepository;
 use Thinktomorrow\Trader\Domain\Model\Customer\CustomerRepository;
 use Thinktomorrow\Trader\Application\Taxon\Tree\TaxonTreeRepository;
 use Thinktomorrow\Trader\Application\Taxon\Category\CategoryRepository;
+use Thinktomorrow\Trader\Application\Taxon\Redirect\RedirectRepository;
 use Thinktomorrow\Trader\Infrastructure\Vine\VineTaxonIdOptionsComposer;
 use Thinktomorrow\Trader\Infrastructure\Vine\VineTaxonFilterTreeComposer;
 use Thinktomorrow\Trader\Application\Product\ProductDetail\ProductDetail;
@@ -38,6 +39,7 @@ use Thinktomorrow\Trader\Application\Product\ProductDetail\ProductDetailReposito
 use Thinktomorrow\Trader\Infrastructure\Laravel\Repositories\MysqlVariantRepository;
 use Thinktomorrow\Trader\Infrastructure\Laravel\Repositories\MysqlProductRepository;
 use Thinktomorrow\Trader\Infrastructure\Laravel\Repositories\MysqlCustomerRepository;
+use Thinktomorrow\Trader\Infrastructure\Laravel\Repositories\MysqlRedirectRepository;
 use Thinktomorrow\Trader\Infrastructure\Laravel\Repositories\MysqlTaxonTreeRepository;
 use Thinktomorrow\Trader\Infrastructure\Laravel\Repositories\MysqlProductDetailRepository;
 use Thinktomorrow\Trader\Infrastructure\Laravel\Repositories\MysqlPaymentMethodRepository;
@@ -61,12 +63,10 @@ class TraderServiceProvider extends ServiceProvider
         $this->app->bind(VariantRepository::class, MysqlVariantRepository::class);
         $this->app->bind(VariantForCartRepository::class, MysqlVariantRepository::class);
         $this->app->bind(CheckProductOptionsRepository::class, MysqlCheckProductOptionsRepository::class);
-        $this->app->bind(ProductDetail::class, function(){
-            return DefaultProductDetail::class;
-        });
-        $this->app->bind(OptionLink::class, function(){
-            return DefaultOptionLink::class;
-        });
+
+        // Default models
+        $this->app->bind(ProductDetail::class, function(){ return DefaultProductDetail::class; });
+        $this->app->bind(OptionLink::class, function(){ return DefaultOptionLink::class; });
 
         // Taxon
         $this->app->bind(TaxonRepository::class, MysqlTaxonRepository::class);
@@ -75,6 +75,7 @@ class TraderServiceProvider extends ServiceProvider
         $this->app->bind(TaxonIdOptionsComposer::class, VineTaxonIdOptionsComposer::class);
         $this->app->bind(TaxonFilterTreeComposer::class, VineTaxonFilterTreeComposer::class);
         $this->app->bind(FlattenedTaxonIdsComposer::class, VineFlattenedTaxonIdsComposer::class);
+        $this->app->bind(RedirectRepository::class, MysqlRedirectRepository::class);
 
         // Order
         $this->app->bind(OrderRepository::class, MysqlOrderRepository::class);

@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace Thinktomorrow\Trader\Infrastructure\Laravel\Repositories;
 
 use Illuminate\Support\Facades\DB;
+use Psr\Container\ContainerInterface;
 use Thinktomorrow\Vine\NodeCollectionFactory;
 use Thinktomorrow\Trader\Infrastructure\Vine\TaxonSource;
 use Thinktomorrow\Trader\Application\Taxon\Tree\TaxonNode;
@@ -11,12 +12,20 @@ use Thinktomorrow\Trader\Application\Taxon\Tree\TaxonTree;
 use Thinktomorrow\Trader\Application\Taxon\Tree\TaxonNodes;
 use Thinktomorrow\Trader\Application\Taxon\Tree\TaxonTreeRepository;
 use Thinktomorrow\Trader\Application\Taxon\Category\CategoryRepository;
+use Thinktomorrow\Trader\Application\Product\ProductDetail\ProductDetail;
 
 class MysqlTaxonTreeRepository implements TaxonTreeRepository, CategoryRepository
 {
     private ?TaxonTree $tree = null;
 
     private static $taxonTable = 'trader_taxa';
+
+    private ContainerInterface $container;
+
+    public function __construct(ContainerInterface $container)
+    {
+        $this->container = $container;
+    }
 
     public function findTaxonByKey(string $key): TaxonNode
     {
@@ -52,8 +61,10 @@ class MysqlTaxonTreeRepository implements TaxonTreeRepository, CategoryRepositor
             ->orderBy(static::$taxonTable.'.order')
             ->get();
 
+        $taxonNodeClass = $this->container->get(TaxonNode::class);
+
         return TaxonNodes::fromType(
-            $results->map(fn($row) => TaxonNode::fromMappedData((array) $row))->all()
+            $results->map(fn($row) => $taxonNodeClass::fromMappedData((array) $row))->all()
         );
     }
 }

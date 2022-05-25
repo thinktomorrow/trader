@@ -34,10 +34,6 @@ class MysqlProductDetailRepository implements ProductDetailRepository
 
     public function findProductDetail(VariantId $variantId): DefaultProductDetail
     {
-        // $results = DB::table(static::$taxonTable)
-
-        //
-
         // Basic builder query
         $state = DB::table(static::$variantTable)
             ->join(static::$productTable, static::$variantTable . '.product_id', '=', static::$productTable . '.product_id')
