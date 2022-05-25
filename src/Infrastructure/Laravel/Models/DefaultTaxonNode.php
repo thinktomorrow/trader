@@ -95,14 +95,7 @@ class DefaultTaxonNode extends DefaultNode implements TaxonNode
 
     public function getUrl(): string
     {
-        $slug = array_reduce($this->getBreadCrumbs(), function ($carry, $node) {
-            return $carry .'/'. $node->getKey();
-        }, '');
-
-        $slug .= '/' . $this->getKey();
-
-        // TODO: route should be in project... as chief route resolver of pages.
-        return route('taxons.show', trim($slug, '/'));
+        return $this->getKey();
     }
 
     public function getBreadCrumbs(): array
@@ -119,14 +112,14 @@ class DefaultTaxonNode extends DefaultNode implements TaxonNode
     {
         $label = $this->getLabel();
 
-        if ($this->isLeafNode()) {
-            $label = array_reduce($this->getBreadCrumbs(), function ($carry, $taxon) use ($withoutRoot) {
+        if (!$this->isRootNode()) {
+            $label = array_reduce(array_reverse($this->getBreadCrumbs()), function ($carry, $taxon) use ($withoutRoot) {
                 if ($taxon->isRootNode()) {
                     return $withoutRoot ? $carry : $taxon->getLabel() . ': ' . $carry;
                 }
 
                 return $taxon->getLabel() . ' > ' . $carry;
-            }, $label);
+            }, $this->getLabel());
         }
 
         return $label;

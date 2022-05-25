@@ -8,6 +8,7 @@ use Thinktomorrow\Trader\TraderConfig;
 use Illuminate\Support\ServiceProvider;
 use Thinktomorrow\Trader\Application\Common\DataRenderer;
 use Thinktomorrow\Trader\Application\Common\DefaultLocale;
+use Thinktomorrow\Trader\Application\Taxon\Tree\TaxonNode;
 use Thinktomorrow\Trader\Domain\Model\Order\OrderRepository;
 use Thinktomorrow\Trader\Domain\Model\Taxon\TaxonRepository;
 use Thinktomorrow\Trader\Domain\Common\Event\EventDispatcher;
@@ -16,13 +17,15 @@ use Thinktomorrow\Trader\Domain\Model\Product\VariantRepository;
 use Thinktomorrow\Trader\Application\Product\Grid\GridRepository;
 use Thinktomorrow\Trader\Domain\Model\Customer\CustomerRepository;
 use Thinktomorrow\Trader\Application\Taxon\Tree\TaxonTreeRepository;
+use Thinktomorrow\Trader\Application\Product\OptionLinks\OptionLink;
 use Thinktomorrow\Trader\Application\Taxon\Category\CategoryRepository;
 use Thinktomorrow\Trader\Application\Taxon\Redirect\RedirectRepository;
 use Thinktomorrow\Trader\Infrastructure\Vine\VineTaxonIdOptionsComposer;
+use Thinktomorrow\Trader\Infrastructure\Laravel\Models\DefaultTaxonNode;
 use Thinktomorrow\Trader\Infrastructure\Vine\VineTaxonFilterTreeComposer;
 use Thinktomorrow\Trader\Application\Product\ProductDetail\ProductDetail;
+use Thinktomorrow\Trader\Infrastructure\Laravel\Models\DefaultOptionLink;
 use Thinktomorrow\Trader\Application\Taxon\Filter\TaxonFilterTreeComposer;
-use Thinktomorrow\Trader\Application\Product\OptionLinks\OptionLink;
 use Thinktomorrow\Trader\Infrastructure\Vine\VineFlattenedTaxonIdsComposer;
 use Thinktomorrow\Trader\Domain\Model\PaymentMethod\PaymentMethodRepository;
 use Thinktomorrow\Trader\Domain\Model\CustomerLogin\CustomerLoginRepository;
@@ -31,7 +34,6 @@ use Thinktomorrow\Trader\Infrastructure\Laravel\Models\DefaultProductDetail;
 use Thinktomorrow\Trader\Application\Taxon\TaxonSelect\TaxonIdOptionsComposer;
 use Thinktomorrow\Trader\Domain\Model\ShippingProfile\ShippingProfileRepository;
 use Thinktomorrow\Trader\Infrastructure\Laravel\Repositories\MysqlGridRepository;
-use Thinktomorrow\Trader\Application\Product\OptionLinks\DefaultOptionLink;
 use Thinktomorrow\Trader\Infrastructure\Laravel\Repositories\MysqlOrderRepository;
 use Thinktomorrow\Trader\Application\Cart\VariantForCart\VariantForCartRepository;
 use Thinktomorrow\Trader\Infrastructure\Laravel\Repositories\MysqlTaxonRepository;
@@ -67,6 +69,7 @@ class TraderServiceProvider extends ServiceProvider
         // Default models
         $this->app->bind(ProductDetail::class, function(){ return DefaultProductDetail::class; });
         $this->app->bind(OptionLink::class, function(){ return DefaultOptionLink::class; });
+        $this->app->bind(TaxonNode::class, function(){ return DefaultTaxonNode::class; });
 
         // Taxon
         $this->app->bind(TaxonRepository::class, MysqlTaxonRepository::class);

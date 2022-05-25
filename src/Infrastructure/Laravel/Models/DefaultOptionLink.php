@@ -1,13 +1,14 @@
 <?php
 declare(strict_types=1);
 
-namespace Thinktomorrow\Trader\Application\Product\OptionLinks;
+namespace Thinktomorrow\Trader\Infrastructure\Laravel\Models;
 
 use Thinktomorrow\Trader\Application\Common\HasLocale;
 use Thinktomorrow\Trader\Application\Common\RendersData;
 use Thinktomorrow\Trader\Domain\Model\Product\Option\Option;
 use Thinktomorrow\Trader\Domain\Model\Product\Variant\Variant;
 use Thinktomorrow\Trader\Domain\Model\Product\Option\OptionValue;
+use Thinktomorrow\Trader\Application\Product\OptionLinks\OptionLink;
 
 class DefaultOptionLink implements OptionLink
 {

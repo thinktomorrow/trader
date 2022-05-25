@@ -5,10 +5,6 @@ namespace Tests\Acceptance\Product;
 
 use Tests\TestHelpers;
 use Thinktomorrow\Trader\Domain\Common\Locale;
-use Thinktomorrow\Trader\Domain\Model\Product\Option\OptionId;
-use Thinktomorrow\Trader\Domain\Model\Product\Option\OptionValue;
-use Thinktomorrow\Trader\Domain\Model\Product\Option\OptionValueId;
-use Thinktomorrow\Trader\Application\Product\OptionLinks\DefaultOptionLink;
 
 class ProductDataTest extends ProductContext
 {

@@ -13,6 +13,7 @@ use Thinktomorrow\Trader\Application\Taxon\Tree\TaxonNodes;
 use Thinktomorrow\Trader\Application\Taxon\Tree\TaxonTreeRepository;
 use Thinktomorrow\Trader\Application\Taxon\Category\CategoryRepository;
 use Thinktomorrow\Trader\Application\Product\ProductDetail\ProductDetail;
+use Thinktomorrow\Trader\Domain\Model\Taxon\Exceptions\CouldNotFindTaxon;
 
 class MysqlTaxonTreeRepository implements TaxonTreeRepository, CategoryRepository
 {
@@ -33,7 +34,7 @@ class MysqlTaxonTreeRepository implements TaxonTreeRepository, CategoryRepositor
         $taxonNode = $this->getTree()->find(fn (TaxonNode $taxonNode) => $taxonNode->getKey() == $key);
 
         if(!$taxonNode) {
-            throw new \InvalidArgumentException('No taxon record found by key ' . $key);
+            throw new CouldNotFindTaxon('No taxon record found by key ' . $key);
         }
 
         return $taxonNode;

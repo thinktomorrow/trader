@@ -3,12 +3,7 @@ declare(strict_types=1);
 
 namespace Thinktomorrow\Trader\Infrastructure\Test\Repositories;
 
-use Thinktomorrow\Trader\Domain\Model\Product\ProductId;
-use Thinktomorrow\Trader\Domain\Model\Product\Option\Option;
 use Thinktomorrow\Trader\Domain\Model\Product\Variant\VariantId;
-use Thinktomorrow\Trader\Domain\Model\Product\Option\OptionValue;
-use Thinktomorrow\Trader\Application\Product\OptionLinks\DefaultOptionLink;
-use Thinktomorrow\Trader\Application\Product\OptionLinks\OptionLinks;
 use Thinktomorrow\Trader\Infrastructure\Laravel\Models\DefaultProductDetail;
 use Thinktomorrow\Trader\Application\Product\ProductDetail\ProductDetailRepository;
 

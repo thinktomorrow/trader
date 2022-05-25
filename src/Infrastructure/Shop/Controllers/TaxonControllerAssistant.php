@@ -4,66 +4,36 @@ declare(strict_types=1);
 namespace Thinktomorrow\Trader\Infrastructure\Shop\Controllers;
 
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Redirect;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Thinktomorrow\Trader\Application\Taxon\Tree\TaxonNode;
-use Thinktomorrow\Trader\Application\Taxon\Tree\TaxonTree;
 use Thinktomorrow\Trader\Domain\Common\Cash\IntegerConverter;
-use Thinktomorrow\Trader\Application\Product\Grid\GridRepository;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
-use Thinktomorrow\Trader\Application\Taxon\Category\CategoryRepository;
-use Thinktomorrow\Trader\Application\Taxon\Filter\TaxonFilterTreeComposer;
+use Thinktomorrow\Trader\Domain\Model\Taxon\Exceptions\CouldNotFindTaxon;
 use Thinktomorrow\Trader\Infrastructure\Shop\RuntimeExceptions\FoundRouteAsRedirect;
 
-class CategoryController
+trait TaxonControllerAssistant
 {
-    protected GridRepository $gridRepository;
-    protected CategoryRepository $categoryRepository;
-    protected TaxonFilterTreeComposer $taxonFilterTreeComposer;
-    protected ?TaxonTree $activeTaxons = null;
-
-    public function __construct(GridRepository $gridRepository, CategoryRepository $categoryRepository, TaxonFilterTreeComposer $taxonFilterTreeComposer)
-    {
-        $this->gridRepository = $gridRepository;
-        $this->categoryRepository = $categoryRepository;
-        $this->taxonFilterTreeComposer = $taxonFilterTreeComposer;
-    }
-
-    public function show(string $taxonKeys, Request $request)
-    {
-        try{
-            $taxon = $this->extractTaxonFromSlug($taxonKeys, $request);
-        } catch(FoundRouteAsRedirect $e) {
-            return redirect()->to($e->getRedirect());
-        }
-
-        $products = $this->getProducts($taxon, $request);
-        $filterTaxons = $this->taxonFilterTreeComposer->getAvailableFilters($taxon->getKey());
-
-        return view('shop.catalog.taxon', [
-            'taxon' => $taxon,
-            'products' => $products,
-            'filterTaxons' => $filterTaxons,
-            'activeTaxons' => collect($this->getActiveTaxons($taxon, $request)->removeNode($taxon)->all()),
-        ]);
-    }
-
-    protected function extractTaxonFromSlug(string $taxonKeys, Request $request): TaxonNode
+    protected function extractTaxonFromSlug(string $taxonKeys): TaxonNode
     {
         // The main taxon for the page content and filtering
         $taxonKeys = explode('/', $taxonKeys);
-        $taxon = $this->categoryRepository->findTaxonByKey(urldecode($taxonKeys[count($taxonKeys) - 1]));
+        $taxonKey = urldecode($taxonKeys[count($taxonKeys) - 1]);
 
-        if (! $taxon) {
-
-            if ($redirect = Redirect::from($request->path())) {
-                throw (new FoundRouteAsRedirect($request->path()))->setRedirect($redirect->to);
+        try{
+            return $this->categoryRepository->findTaxonByKey($taxonKey);
+        }
+        catch(CouldNotFindTaxon $e) {
+            if ($redirect = $this->redirectRepository->find($taxonKey)) {
+                throw (new FoundRouteAsRedirect($this->getTaxonUrl($redirect->getFrom())))->setRedirect($this->getTaxonUrl($redirect->getTo()));
             }
 
             throw new NotFoundHttpException('No Taxon category found by slug ' . implode('/', $taxonKeys));
         }
+    }
 
-        return $taxon;
+    protected function getTaxonUrl(string $taxon_key): string
+    {
+        return $taxon_key;
     }
 
     protected function getProducts(TaxonNode $taxon, Request $request): LengthAwarePaginator

@@ -3,10 +3,8 @@ declare(strict_types=1);
 
 namespace Tests\Acceptance\Product;
 
-use Money\Money;
 use PHPUnit\Framework\Assert;
 use PHPUnit\Framework\TestCase;
-use Thinktomorrow\Trader\TraderConfig;
 use Thinktomorrow\Trader\Domain\Common\Locale;
 use Thinktomorrow\Trader\Domain\Model\Product\ProductId;
 use Thinktomorrow\Trader\Application\Common\DataRenderer;
@@ -23,7 +21,7 @@ use Thinktomorrow\Trader\Domain\Model\Product\Event\VariantCreated;
 use Thinktomorrow\Trader\Application\Product\OptionLinks\OptionLink;
 use Thinktomorrow\Trader\Domain\Model\Product\Event\ProductTaxaUpdated;
 use Thinktomorrow\Trader\Domain\Model\Product\Event\ProductDataUpdated;
-use Thinktomorrow\Trader\Application\Product\OptionLinks\DefaultOptionLink;
+use Thinktomorrow\Trader\Infrastructure\Laravel\Models\DefaultOptionLink;
 use Thinktomorrow\Trader\Application\Product\OptionLinks\ProductOptionValues;
 use Thinktomorrow\Trader\Application\Product\OptionLinks\OptionLinksComposer;
 use Thinktomorrow\Trader\Infrastructure\Test\Repositories\InMemoryProductRepository;

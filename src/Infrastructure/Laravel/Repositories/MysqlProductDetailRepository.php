@@ -5,12 +5,9 @@ namespace Thinktomorrow\Trader\Infrastructure\Laravel\Repositories;
 
 use Illuminate\Support\Facades\DB;
 use Psr\Container\ContainerInterface;
-use Thinktomorrow\Trader\Domain\Model\Product\ProductId;
 use Thinktomorrow\Trader\Domain\Model\Product\ProductState;
 use Thinktomorrow\Trader\Domain\Model\Product\Variant\VariantId;
 use Thinktomorrow\Trader\Application\Product\ProductDetail\ProductDetail;
-use Thinktomorrow\Trader\Application\Product\OptionLinks\DefaultOptionLink;
-use Thinktomorrow\Trader\Application\Product\OptionLinks\OptionLinks;
 use Thinktomorrow\Trader\Infrastructure\Laravel\Models\DefaultProductDetail;
 use Thinktomorrow\Trader\Domain\Model\Product\Exceptions\CouldNotFindVariant;
 use Thinktomorrow\Trader\Application\Product\ProductDetail\ProductDetailRepository;

@@ -5,6 +5,7 @@ namespace Thinktomorrow\Trader\Application\Product\OptionLinks;
 
 use Assert\Assertion;
 use Thinktomorrow\Trader\Application\Common\ArrayCollection;
+use Thinktomorrow\Trader\Infrastructure\Laravel\Models\DefaultOptionLink;
 
 class OptionLinks extends ArrayCollection
 {

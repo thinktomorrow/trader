@@ -8,7 +8,7 @@ use Thinktomorrow\Trader\Domain\Common\Entity\HasData;
 use Thinktomorrow\Trader\Domain\Model\Product\ProductId;
 use Thinktomorrow\Trader\Domain\Common\Entity\ChildEntity;
 use Thinktomorrow\Trader\Domain\Model\Product\Option\OptionValueId;
-use Thinktomorrow\Trader\Application\Product\OptionLinks\DefaultOptionLink;
+use Thinktomorrow\Trader\Infrastructure\Laravel\Models\DefaultOptionLink;
 
 final class Variant implements ChildEntity
 {
