@@ -43,12 +43,16 @@ class ProductApplication
         $product->updateTaxonIds($createProduct->getTaxonIds());
         $product->addData($createProduct->getData());
 
-        $product->createVariant(Variant::create(
+        $variant = Variant::create(
             $productId,
             $this->variantRepository->nextReference(),
             $createProduct->getUnitPrice($this->traderConfig->doesPriceInputIncludesVat(), $this->traderConfig->getDefaultCurrency()),
             $createProduct->getSalePrice($this->traderConfig->doesPriceInputIncludesVat(), $this->traderConfig->getDefaultCurrency()),
-        ));
+        );
+
+        $variant->showInGrid();
+
+        $product->createVariant($variant);
 
         $this->productRepository->save($product);
 

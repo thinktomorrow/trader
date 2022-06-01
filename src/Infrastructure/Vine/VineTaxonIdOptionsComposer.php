@@ -21,6 +21,17 @@ class VineTaxonIdOptionsComposer implements TaxonIdOptionsComposer
         $this->taxonTreeRepository = $taxonTreeRepository;
     }
 
+    public function getRoots(): array
+    {
+        $result = [];
+
+        foreach($this->getFlattened() as ['root' => $root]) {
+            $result[$root->getId()] = $root->getLabel();
+        }
+
+        return $result;
+    }
+
     public function getOptions(): array
     {
         $grouped = [];

@@ -3,104 +3,119 @@ declare(strict_types=1);
 
 namespace Tests\Infrastructure\Repositories;
 
-class GridRepositoryTest
+use Money\Money;
+use Tests\Infrastructure\TestCase;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Foundation\Testing\RefreshDatabase;
+use Thinktomorrow\Trader\Infrastructure\Test\TestContainer;
+use Thinktomorrow\Trader\Application\Product\Grid\GridItem;
+use Thinktomorrow\Trader\Application\Taxon\TaxonApplication;
+use Thinktomorrow\Trader\Infrastructure\Test\TestTraderConfig;
+use Thinktomorrow\Trader\Application\Product\ProductApplication;
+use Thinktomorrow\Trader\Infrastructure\Test\EventDispatcherSpy;
+use Thinktomorrow\Trader\Infrastructure\Laravel\Models\DefaultGridItem;
+use Thinktomorrow\Trader\Infrastructure\Vine\VineFlattenedTaxonIdsComposer;
+use Thinktomorrow\Trader\Infrastructure\Laravel\Repositories\MysqlGridRepository;
+use Thinktomorrow\Trader\Infrastructure\Test\Repositories\InMemoryTaxonRepository;
+use Thinktomorrow\Trader\Infrastructure\Laravel\Repositories\MysqlTaxonRepository;
+use Thinktomorrow\Trader\Infrastructure\Test\Repositories\InMemoryProductRepository;
+use Thinktomorrow\Trader\Infrastructure\Test\Repositories\InMemoryVariantRepository;
+use Thinktomorrow\Trader\Infrastructure\Laravel\Repositories\MysqlProductRepository;
+use Thinktomorrow\Trader\Infrastructure\Laravel\Repositories\MysqlVariantRepository;
+use Thinktomorrow\Trader\Infrastructure\Laravel\Repositories\MysqlTaxonTreeRepository;
+
+class GridRepositoryTest extends TestCase
 {
+    use RefreshDatabase;
+
+    protected function setUp(): void
+    {
+        parent::setUp();
+
+        $this->createMysqlCatalog();
+    }
+
     /** @test */
     public function it_only_fetches_grid_products()
     {
-        $this->createCatalog();
+        $gridItems = $this->getMysqlGridRepository()->getResults();
 
-        $productGroups = app()->make(GridRepository::class)->getResults();
-
-        $this->assertGridCounts($productGroups, 2, 3);
+        $this->assertCount(3, $gridItems);
     }
 
     /** @test */
     public function it_can_filter_by_minimum_sale_price()
     {
-        $this->createCatalog();
+        $gridItems = $this->getMysqlGridRepository()->filterByPrice('251')->getResults();
 
-        $productGroups = app()->make(GridRepository::class)->filterByPrice(Money::EUR(250))->getResults();
-
-        $this->assertGridCounts($productGroups, 1, 1);
-        $this->assertEquals(Money::EUR(300), $productGroups->first()->getGridProducts()->first()->getTotal());
+        $this->assertCount(1, $gridItems);
+        $this->assertTrue($gridItems->first()->getSalePriceAsMoney()->greaterThan(Money::EUR(251)));
     }
 
     /** @test */
     public function it_can_filter_by_maximum_sale_price()
     {
-        $this->createCatalog();
+        $gridItems = $this->getMysqlGridRepository()->filterByPrice(null, '251')->getResults();
 
-        $productGroups = app()->make(GridRepository::class)->filterByPrice(null, Money::EUR(250))->getResults();
-
-        $this->assertGridCounts($productGroups, 1, 2);
-        $this->assertEquals(Money::EUR(80), $productGroups->first()->getGridProducts()->first()->getTotal());
+        $this->assertCount(2, $gridItems);
+        $this->assertTrue($gridItems[0]->getSalePriceAsMoney()->lessThan(Money::EUR(251)));
+        $this->assertTrue($gridItems[1]->getSalePriceAsMoney()->lessThan(Money::EUR(251)));
     }
 
     /** @test */
-    public function it_can_filter_by_sale_price_range()
+    public function it_can_filter_by_price_range()
     {
-        $this->createCatalog();
+        $gridItems = $this->getMysqlGridRepository()->filterByPrice('101', '251')->getResults();
 
-        $productGroups = app()->make(GridRepository::class)->filterByPrice(Money::EUR(80), Money::EUR(90))->getResults();
-
-        $this->assertGridCounts($productGroups, 1, 1);
-        $this->assertEquals(Money::EUR(80), $productGroups->first()->getGridProducts()->first()->getTotal());
+        $this->assertCount(1, $gridItems);
+        $this->assertTrue($gridItems[0]->getSalePriceAsMoney()->greaterThan(Money::EUR(101)));
+        $this->assertTrue($gridItems[0]->getSalePriceAsMoney()->lessThan(Money::EUR(251)));
     }
 
     /** @test */
     public function it_can_filter_by_exact_search_term()
     {
-        $this->createCatalog();
+        $gridItems = $this->getMysqlGridRepository()->filterByTerm('product one')->getResults();
 
-        $productGroups = app()->make(GridRepository::class)->filterByTerm('deluxe')->getResults();
-
-        $this->assertGridCounts($productGroups, 1, 1);
+        $this->assertCount(1, $gridItems);
+        $this->assertEquals('product one', $gridItems->first()->getTitle());
     }
 
     /** @test */
     public function it_can_filter_by_partial_search_term()
     {
-        $this->disableExceptionHandling();
-        $this->createCatalog();
+        $gridItems = $this->getMysqlGridRepository()->filterByTerm('one')->getResults();
 
-        $productGroups = app()->make(GridRepository::class)->filterByTerm('large')->getResults();
-
-        $this->assertGridCounts($productGroups, 2, 2);
+        $this->assertCount(1, $gridItems);
+        $this->assertEquals('product one', $gridItems->first()->getTitle());
     }
 
     /** @test */
     public function it_can_filter_by_taxonomy()
     {
-        $this->createCatalog();
+        $gridItems = $this->getMysqlGridRepository()->filterByTaxonKeys(['foobar-child'])->getResults();
 
-        $productGroups = app()->make(GridRepository::class)->filterByTaxa(['blue'])->getResults();
-
-        $this->assertGridCounts($productGroups, 1, 2);
+        $this->assertCount(1, $gridItems);
     }
 
     /** @test */
     public function when_filtering_taxon_all_child_taxonomy_is_included_in_the_search()
     {
-        $this->createCatalog();
+        $gridItems = $this->getMysqlGridRepository()->filterByTaxonKeys(['foobar'])->getResults();
 
-        $productGroups = app()->make(GridRepository::class)->filterByTaxa(['yellow'])->getResults();
-
-        $this->assertGridCounts($productGroups, 1, 2);
+        $this->assertCount(2, $gridItems);
     }
 
     /** @test */
     public function it_can_sort_by_sale_price()
     {
-        $this->createCatalog();
+        $gridItems = $this->getMysqlGridRepository()->sortByPrice()->getResults();
 
-        $productGroups = app()->make(GridRepository::class)->sortByPrice()->getResults();
-
-        $this->assertGridCounts($productGroups, 2, 3);
+        $this->assertCount(3, $gridItems);
 
         $previousSalePrice = null;
-        foreach ($productGroups as $productGroup) {
-            $salePrice = $productGroup->getGridProducts()->first()->getTotal();
+        foreach ($gridItems as $gridItem) {
+            $salePrice = $gridItem->getSalePriceAsMoney()->getAmount();
 
             if ($previousSalePrice) {
                 $this->assertGreaterThanOrEqual($previousSalePrice, $salePrice);
@@ -113,15 +128,13 @@ class GridRepositoryTest
     /** @test */
     public function it_can_sort_by_descending_sale_price()
     {
-        $this->createCatalog();
+        $gridItems = $this->getMysqlGridRepository()->sortByPriceDesc()->getResults();
 
-        $productGroups = app()->make(GridRepository::class)->sortByPriceDesc()->getResults();
-
-        $this->assertGridCounts($productGroups, 2, 3);
+        $this->assertCount(3, $gridItems);
 
         $previousSalePrice = null;
-        foreach ($productGroups as $productGroup) {
-            $salePrice = $productGroup->getGridProducts()->first()->getTotal();
+        foreach ($gridItems as $gridItem) {
+            $salePrice = $gridItem->getSalePriceAsMoney()->getAmount();
 
             if ($previousSalePrice) {
                 $this->assertLessThanOrEqual($previousSalePrice, $salePrice);
@@ -132,36 +145,59 @@ class GridRepositoryTest
     }
 
     /** @test */
-    public function it_can_sort_by_product_label()
+    public function it_can_sort_by_product_title()
     {
-        $this->createCatalog();
+        $gridItems = $this->getMysqlGridRepository()->sortByLabel()->getResults();
 
-        $productGroups = app()->make(GridRepository::class)->sortByLabel()->getResults();
+        $this->assertCount(3, $gridItems);
 
-        $this->assertGridCounts($productGroups, 2, 3);
+        $titles = $gridItems->map(fn ($gridItem) => $gridItem->getTitle());
 
-        $labels = $productGroups->map(fn ($group) => $group->getGridProducts()->first()->getTitle());
-
-        $expected = $labels->toArray();
+        $expected = $titles->toArray();
         natcasesort($expected);
 
-        $this->assertEquals($expected, $labels->toArray());
+        $this->assertEquals($expected, $titles->toArray());
     }
 
     /** @test */
     public function it_can_sort_by_descending_label()
     {
-        $this->createCatalog();
+        $gridItems = $this->getMysqlGridRepository()->sortByLabelDesc()->getResults();
 
-        $productGroups = app()->make(GridRepository::class)->sortByLabelDesc()->getResults();
+        $this->assertCount(3, $gridItems);
 
-        $this->assertGridCounts($productGroups, 2, 3);
+        $titles = $gridItems->map(fn ($gridItem) => $gridItem->getTitle());
 
-        $labels = $productGroups->map(fn ($group) => $group->getGridProducts()->first()->getTitle());
-
-        $expected = $labels->toArray();
+        $expected = $titles->toArray();
         natcasesort($expected);
 
-        $this->assertEquals(array_reverse($expected), $labels->toArray());
+        $this->assertEquals(array_reverse($expected), $titles->toArray());
+    }
+
+    protected function createMysqlCatalog()
+    {
+        $this->createCatalog(new TaxonApplication(
+            new TestTraderConfig(),
+            new EventDispatcherSpy(),
+            new MysqlTaxonRepository(),
+        ), new ProductApplication(
+            new TestTraderConfig(),
+            new EventDispatcherSpy(),
+            new MysqlProductRepository(new MysqlVariantRepository()),
+            new MysqlVariantRepository(),
+        ),
+            new MysqlProductRepository(new MysqlVariantRepository())
+        );
+    }
+
+    private function getMysqlGridRepository()
+    {
+        (new TestContainer())->add(GridItem::class, DefaultGridItem::class);
+
+        return new MysqlGridRepository(
+            new TestContainer(),
+            new TestTraderConfig(),
+            new VineFlattenedTaxonIdsComposer(new MysqlTaxonTreeRepository(new TestContainer()))
+        );
     }
 }

@@ -24,5 +24,6 @@ class CreateProductTest extends ProductContext
         $this->assertCount(1, $variants);
         $this->assertEquals('50', $variants[0]->getMappedData()['unit_price']);
         $this->assertEquals('50', $variants[0]->getMappedData()['sale_price']);
+        $this->assertEquals(true, $variants[0]->getMappedData()['show_in_grid']);
     }
 }

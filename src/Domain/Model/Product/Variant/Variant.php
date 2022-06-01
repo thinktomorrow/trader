@@ -23,6 +23,7 @@ final class Variant implements ChildEntity
     /** @var DefaultOptionLink[] */
     private array $optionValueIds = [];
     private array $personalisations = [];
+    private bool $show_in_grid = false;
     private array $data = [];
 
     private function __construct(){}
@@ -55,6 +56,11 @@ final class Variant implements ChildEntity
         $this->salePrice = $salePrice;
     }
 
+    public function showInGrid(bool $show_in_grid = true): void
+    {
+        $this->show_in_grid = $show_in_grid;
+    }
+
     public function updateOptionValueIds(array $optionValueIds): void
     {
         Assertion::allIsInstanceOf($optionValueIds, OptionValueId::class);
@@ -78,6 +84,7 @@ final class Variant implements ChildEntity
             'tax_rate' => $this->unitPrice->getTaxRate()->toPercentage()->get(),
             'includes_vat' => $this->unitPrice->includesVat(),
             'option_value_ids' => array_map(fn($optionValueId) => $optionValueId->get(), $this->optionValueIds),
+            'show_in_grid' => $this->show_in_grid,
             'data' => json_encode($this->data),
         ];
     }
@@ -91,6 +98,7 @@ final class Variant implements ChildEntity
         $variant->state = VariantState::from($state['state']);
         $variant->unitPrice = VariantUnitPrice::fromScalars($state['unit_price'], 'EUR', $state['tax_rate'], $state['includes_vat']);
         $variant->salePrice = VariantSalePrice::fromScalars($state['sale_price'], 'EUR', $state['tax_rate'], $state['includes_vat']);
+        $variant->show_in_grid = $state['show_in_grid'] ? (bool) $state['show_in_grid'] : false;
         $variant->data = json_decode($state['data'], true);
 
         $variant->optionValueIds = array_map(fn($optionValueState) => OptionValueId::fromString($optionValueState), $state['option_value_ids']);

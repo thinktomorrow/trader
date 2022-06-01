@@ -19,5 +19,8 @@ class CreateVariantTest extends ProductContext
         $this->assertEquals('50', $variants[0]->getMappedData()['unit_price']);
         $this->assertEquals('1234', $variants[1]->getMappedData()['unit_price']);
         $this->assertEquals(['nl' => 'foobar nl'], $variants[1]->getData('title'));
+
+        $this->assertEquals(true, $variants[0]->getMappedData()['show_in_grid']);
+        $this->assertEquals(false, $variants[1]->getMappedData()['show_in_grid']);
     }
 }

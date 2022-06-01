@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace Thinktomorrow\Trader\Infrastructure\Laravel\Repositories;
 
 use Illuminate\Support\Facades\DB;
+use Psr\Container\ContainerInterface;
 use Illuminate\Database\Query\Builder;
 use Thinktomorrow\Trader\TraderConfig;
 use Illuminate\Database\Query\Expression;
@@ -17,19 +18,21 @@ use Thinktomorrow\Trader\Application\Product\Grid\FlattenedTaxonIdsComposer;
 
 class MysqlGridRepository implements GridRepository
 {
-    protected Builder $builder;
+    private ContainerInterface $container;
     private FlattenedTaxonIdsComposer $flattenedTaxonIds;
 
     private int $perPage = 20;
     private Locale $locale;
+    protected Builder $builder;
 
     private static string $productTable = 'trader_products';
     private static string $variantTable = 'trader_product_variants';
     private static string $taxonTable = 'trader_taxa';
     private static string $taxonPivotTable = 'trader_taxa_products';
 
-    public function __construct(TraderConfig $traderConfig, FlattenedTaxonIdsComposer $flattenedTaxonIds)
+    public function __construct(ContainerInterface $container, TraderConfig $traderConfig, FlattenedTaxonIdsComposer $flattenedTaxonIds)
     {
+        $this->container = $container;
         $this->traderConfig = $traderConfig;
         $this->flattenedTaxonIds = $flattenedTaxonIds;
         $this->locale = $traderConfig->getDefaultLocale();
@@ -49,7 +52,9 @@ class MysqlGridRepository implements GridRepository
 
     public function filterByTerm(string $term): static
     {
-        // TODO: Implement filterByTerm() method.
+        $this->whereJsonLike($term);
+
+        return $this;
     }
 
     public function filterByTaxonKeys(array $taxonKeys): static
@@ -108,13 +113,13 @@ class MysqlGridRepository implements GridRepository
 
     protected function addSortByLabel($order = 'ASC'): static
     {
-        $labelField = 'LOWER(json_unquote(json_extract('.static::$variantTable.'.data, "$.title.'.$this->locale->getLanguage().'")))';
-
         $this->builder->addSelect(
-            DB::raw($this->grammarGroupConcat($labelField . ' ORDER BY ' . $labelField . ' ' . $order) . ' AS labels'),
+            DB::raw('LOWER(json_extract('.static::$productTable.'.data, "$.title.'.$this->locale->getLanguage().'")) AS product_title'),
+            DB::raw('LOWER(json_extract('.static::$variantTable.'.data, "$.title.'.$this->locale->getLanguage().'")) AS variant_title')
         );
 
-        $this->builder->orderBy('labels', $order);
+        $this->builder->orderBy('variant_title', $order);
+        $this->builder->orderBy('product_title', $order);
 
         return $this;
     }
@@ -131,13 +136,7 @@ class MysqlGridRepository implements GridRepository
 
     private function addSortByPrice($order = 'ASC'): static
     {
-        $this->builder->addSelect(
-            $order == 'DESC'
-                ? DB::raw('MAX('.static::$variantTable.'.sale_price) AS sale_price_aggregate')
-                : DB::raw('MIN('.static::$variantTable.'.sale_price) AS sale_price_aggregate')
-        );
-
-        $this->builder->orderBy('sale_price_aggregate', $order);
+        $this->builder->orderBy('sale_price', $order);
 
         return $this;
     }
@@ -163,6 +162,9 @@ class MysqlGridRepository implements GridRepository
         return $this;
     }
 
+    /**
+     * @return GridItem[]
+     */
     public function getResults(): LengthAwarePaginator
     {
         // Default ordering if no ordering has been applied yet.
@@ -176,7 +178,7 @@ class MysqlGridRepository implements GridRepository
         return $results->setCollection(
             $results->getCollection()
                 ->map(fn ($state) => get_object_vars($state))
-                ->map(fn ($state) => GridItem::fromMappedData(array_merge($state, [
+                ->map(fn ($state) => $this->container->get(GridItem::class)::fromMappedData(array_merge($state, [
                     'includes_vat' => (bool) $state['includes_vat'],
                 ]), $this->locale))
         );
@@ -192,5 +194,23 @@ class MysqlGridRepository implements GridRepository
     protected function grammarGroupConcat(string $column, string $separator = ','): Expression
     {
         return DB::raw('GROUP_CONCAT(' . $column . ' SEPARATOR "' . $separator . '")');
+    }
+
+    protected function whereJsonLike($value)
+    {
+        $value = trim(strtolower($value));
+
+        $keys = [
+            static::$productTable => ['title', 'content'],
+            static::$variantTable => ['title'],
+        ];
+
+        $this->builder->where(function($builder) use($value, $keys){
+            foreach([static::$productTable, static::$variantTable] as $table) {
+                foreach($keys[$table] as $key) {
+                    $builder->orWhereRaw('LOWER(json_extract(`'.$table.'`.`data`, "$.'.$key.'")) LIKE ?', '%'. $value . '%');
+                }
+            }
+        });
     }
 }

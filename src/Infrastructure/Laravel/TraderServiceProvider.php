@@ -9,6 +9,7 @@ use Illuminate\Support\ServiceProvider;
 use Thinktomorrow\Trader\Application\Common\DataRenderer;
 use Thinktomorrow\Trader\Application\Common\DefaultLocale;
 use Thinktomorrow\Trader\Application\Taxon\Tree\TaxonNode;
+use Thinktomorrow\Trader\Application\Product\Grid\GridItem;
 use Thinktomorrow\Trader\Domain\Model\Order\OrderRepository;
 use Thinktomorrow\Trader\Domain\Model\Taxon\TaxonRepository;
 use Thinktomorrow\Trader\Domain\Common\Event\EventDispatcher;
@@ -20,6 +21,7 @@ use Thinktomorrow\Trader\Application\Taxon\Tree\TaxonTreeRepository;
 use Thinktomorrow\Trader\Application\Product\OptionLinks\OptionLink;
 use Thinktomorrow\Trader\Application\Taxon\Category\CategoryRepository;
 use Thinktomorrow\Trader\Application\Taxon\Redirect\RedirectRepository;
+use Thinktomorrow\Trader\Infrastructure\Laravel\Models\DefaultGridItem;
 use Thinktomorrow\Trader\Infrastructure\Vine\VineTaxonIdOptionsComposer;
 use Thinktomorrow\Trader\Infrastructure\Laravel\Models\DefaultTaxonNode;
 use Thinktomorrow\Trader\Infrastructure\Vine\VineTaxonFilterTreeComposer;
@@ -67,6 +69,7 @@ class TraderServiceProvider extends ServiceProvider
         $this->app->bind(CheckProductOptionsRepository::class, MysqlCheckProductOptionsRepository::class);
 
         // Default models
+        $this->app->bind(GridItem::class, function(){ return DefaultGridItem::class; });
         $this->app->bind(ProductDetail::class, function(){ return DefaultProductDetail::class; });
         $this->app->bind(OptionLink::class, function(){ return DefaultOptionLink::class; });
         $this->app->bind(TaxonNode::class, function(){ return DefaultTaxonNode::class; });

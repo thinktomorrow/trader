@@ -7,21 +7,30 @@ use Money\Money;
 use Thinktomorrow\Trader\Domain\Common\Email;
 use Illuminate\Contracts\Debug\ExceptionHandler;
 use Thinktomorrow\Trader\Domain\Model\Order\Order;
+use Thinktomorrow\Trader\Domain\Model\Taxon\Taxon;
 use Thinktomorrow\Trader\Domain\Model\Order\Shopper;
 use Thinktomorrow\Trader\Domain\Common\Taxes\TaxRate;
 use Thinktomorrow\Trader\Domain\Model\Order\Line\Line;
 use Thinktomorrow\Trader\Domain\Model\Product\Product;
 use Thinktomorrow\Trader\Domain\Model\Order\OrderState;
+use Thinktomorrow\Trader\Application\Taxon\CreateTaxon;
 use Thinktomorrow\Trader\Domain\Model\Customer\Customer;
 use Thinktomorrow\Trader\Domain\Model\Product\ProductId;
 use Thinktomorrow\Trader\Domain\Model\Customer\CustomerId;
+use Thinktomorrow\Trader\Application\Product\CreateProduct;
+use Thinktomorrow\Trader\Application\Product\CreateVariant;
+use Thinktomorrow\Trader\Domain\Model\Product\ProductState;
 use Thinktomorrow\Trader\Domain\Model\Order\Payment\Payment;
 use Thinktomorrow\Trader\Domain\Model\Product\Option\Option;
+use Thinktomorrow\Trader\Domain\Model\Taxon\TaxonRepository;
+use Thinktomorrow\Trader\Application\Taxon\TaxonApplication;
 use Thinktomorrow\Trader\Domain\Model\Product\Variant\Variant;
 use Thinktomorrow\Trader\Domain\Model\Order\Discount\Discount;
 use Thinktomorrow\Trader\Domain\Model\Order\Shipping\Shipping;
 use Thinktomorrow\Trader\Domain\Model\Product\Option\OptionId;
 use Thinktomorrow\Trader\Domain\Model\Product\Variant\VariantId;
+use Thinktomorrow\Trader\Domain\Model\Product\ProductRepository;
+use Thinktomorrow\Trader\Application\Product\ProductApplication;
 use Thinktomorrow\Trader\Domain\Model\Order\Payment\PaymentState;
 use Thinktomorrow\Trader\Domain\Model\Product\Option\OptionValue;
 use Thinktomorrow\Trader\Domain\Model\CustomerLogin\CustomerLogin;
@@ -303,6 +312,26 @@ trait TestHelpers
         ]);
 
         return $variant;
+    }
+
+    protected function createCatalog(TaxonApplication $taxonApplication, ProductApplication $productApplication, ProductRepository $productRepository)
+    {
+        $taxonId = $taxonApplication->createTaxon(new CreateTaxon('foobar', ['title' => ['nl' => 'foobar nl']]));
+        $taxonChildId = $taxonApplication->createTaxon(new CreateTaxon('foobar-child', ['title' => ['nl' => 'foobar child nl']], $taxonId->get()));
+
+        $productId = $productApplication->createProduct(new CreateProduct([$taxonId->get()], "100", "6", ['title' => ['nl' => 'product one']]));
+        $product2Id = $productApplication->createProduct(new CreateProduct([$taxonChildId->get()], "250", "12", ['title' => ['nl' => 'product two']]));
+        $product3Id = $productApplication->createProduct(new CreateProduct([], "500", "21", ['title' => ['nl' => 'product three']]));
+
+        // Set every product online
+        foreach([$productId, $product2Id, $product3Id] as $prodId) {
+            $product = $productRepository->find($prodId);
+            $product->updateState(ProductState::online);
+
+            $productRepository->save($product);
+        }
+
+        $productApplication->createVariant(new CreateVariant($productId->get(), "120", "6", ['title' => ['nl' => 'product one - variant two']]));
     }
 
     protected function assertArrayEqualsWithWildcard(array $expected, array $actual, $message = null): void

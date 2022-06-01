@@ -52,43 +52,15 @@ final class TaxonIdOptionsComposerTest extends TestCase
     }
 
     /** @test */
-    public function it_can_find_taxon_ids_by_ids()
+    public function it_can_retrieve_only_roots()
     {
         $this->createDefaultTaxons();
 
         foreach($this->repositories() as $repository) {
-            $result = (new VineFlattenedTaxonIdsComposer($repository))->getGroupedByRootByIds(['first', 'sixth']);
-
             $this->assertEquals([
-                'first' => ['first','second','third','fourth'],
-                'fifth' => ['sixth'],
-            ], $result);
-        }
-    }
-
-    /** @test */
-    public function it_returns_unique_values()
-    {
-        $this->createDefaultTaxons();
-
-        foreach($this->repositories() as $repository) {
-            $result = (new VineFlattenedTaxonIdsComposer($repository))->getGroupedByRootByKeys(['taxon-first', 'taxon-second']);
-
-            $this->assertEquals([
-                'first' => ['first','second','third','fourth'],
-            ], $result);
-        }
-    }
-
-    /** @test */
-    public function it_returns_empty_list_for_non_found_taxons()
-    {
-        $this->createDefaultTaxons();
-
-        foreach($this->repositories() as $repository) {
-            $result = (new VineFlattenedTaxonIdsComposer($repository))->getGroupedByRootByKeys(['xxxx']);
-
-            $this->assertEquals([], $result);
+                'first' => 'Taxon first',
+                'fifth' => 'Taxon fifth',
+            ], (new VineTaxonIdOptionsComposer($repository))->getRoots());
         }
     }
 

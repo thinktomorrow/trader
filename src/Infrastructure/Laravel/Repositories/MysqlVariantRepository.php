@@ -10,11 +10,7 @@ use Thinktomorrow\Trader\Application\Common\TraderHelpers;
 use Thinktomorrow\Trader\Domain\Model\Product\Variant\Variant;
 use Thinktomorrow\Trader\Domain\Model\Product\Variant\VariantId;
 use Thinktomorrow\Trader\Domain\Model\Product\VariantRepository;
-use Thinktomorrow\Trader\Domain\Model\Product\Option\OptionValue;
-use Thinktomorrow\Trader\Domain\Model\Product\Variant\VariantState;
-use Thinktomorrow\Trader\Application\Product\OptionLinks\Variants;
 use Thinktomorrow\Trader\Application\Cart\VariantForCart\VariantForCart;
-use Thinktomorrow\Trader\Domain\Model\Product\Exceptions\CouldNotFindVariant;
 use Thinktomorrow\Trader\Application\Cart\VariantForCart\VariantForCartRepository;
 
 class MysqlVariantRepository implements VariantRepository, VariantForCartRepository
