@@ -6,6 +6,7 @@ namespace Thinktomorrow\Trader\Infrastructure\Shop\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Thinktomorrow\Trader\Application\Taxon\Tree\TaxonNode;
+use Thinktomorrow\Trader\Application\Taxon\Tree\TaxonTree;
 use Thinktomorrow\Trader\Domain\Common\Cash\IntegerConverter;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Thinktomorrow\Trader\Domain\Model\Taxon\Exceptions\CouldNotFindTaxon;
@@ -13,6 +14,8 @@ use Thinktomorrow\Trader\Infrastructure\Shop\RuntimeExceptions\FoundRouteAsRedir
 
 trait TaxonControllerAssistant
 {
+    protected ?TaxonTree $activeTaxons = null;
+
     protected function extractTaxonFromSlug(string $taxonKeys): TaxonNode
     {
         // The main taxon for the page content and filtering

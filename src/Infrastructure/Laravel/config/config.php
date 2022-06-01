@@ -15,18 +15,13 @@ return [
     'currency' => 'EUR',
 
     /*
-     * Default locale following. The default locale is
-     * mostly used for rendering the localized Money values
-     */
-    'language' => 'nl',
-
-    /*
-     * Default country/region
+     * Default locale following the ISO 639-1 standard. The default locale is
+     * mostly used for rendering the localized Money values.
+     *
      * In case the country of the customer or order is not set yet,
      * we use this default country as a fallback for e.g. tax logic
-     * Format used is the 2-chars ISO string.
      */
-    'country' => 'BE',
+    'locale' => 'nl-be',
 
     /*
      * Default tax percentage. This is the percentage as integer

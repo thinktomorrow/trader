@@ -11,7 +11,7 @@ final class Locale
     private function __construct(string $language, string $region)
     {
         $this->language = $language;
-        $this->region = strtoupper($region);
+        $this->region = strtolower($region);
     }
 
     public static function fromString(string $language, string $region): self
@@ -19,10 +19,20 @@ final class Locale
         return new static($language, $region);
     }
 
-//    public static function default(): self
-//    {
-//        return static::fromString((new TraderConfig())->defaultLanguage(), (new TraderConfig())->defaultRegion());
-//    }
+    /**
+     * From ISO 639-1 standard
+     *
+     * @param string $isoCode
+     * @return $this
+     */
+    public static function fromIsoCode(string $isoCode): self
+    {
+        if(!strpos($isoCode, '-')) {
+            throw new \InvalidArgumentException('Invalid isocode format: ' . $isoCode);
+        }
+
+        return static::fromString(...explode('-', $isoCode));
+    }
 
     public function getLanguage(): string
     {
@@ -34,9 +44,13 @@ final class Locale
         return $this->region;
     }
 
+    /**
+     * ISO 639-1 standard
+     * @return string
+     */
     public function toIsoCode(): string
     {
-        return $this->language . '_' . $this->region;
+        return $this->language . '-' . $this->region;
     }
 
     public function __toString(): string

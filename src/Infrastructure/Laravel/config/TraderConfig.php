@@ -9,15 +9,9 @@ class TraderConfig implements \Thinktomorrow\Trader\TraderConfig
 {
     public function getDefaultLocale(): Locale
     {
-        return Locale::fromString(
-            config('trader.language'),
-            config('trader.country')
+        return Locale::fromIsoCode(
+            config('trader.locale')
         );
-    }
-
-    public function getDefaultRegion(): string
-    {
-        return config('trader.country');
     }
 
     public function getDefaultCurrency(): string
