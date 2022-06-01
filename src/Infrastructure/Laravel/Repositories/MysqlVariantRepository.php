@@ -70,25 +70,6 @@ class MysqlVariantRepository implements VariantRepository, VariantForCartReposit
         DB::table(static::$variantOptionValueLookupTable)->insert($insertData);
     }
 
-//    private function upsertOptionValues(Variant $variant): void
-//    {
-//        $optionValueIds = array_map(fn($optionValueState) => $optionValueState['option_id'], $variant->getChildEntities()[OptionValue::class]);
-//
-//        DB::table(static::$optionValueTable)
-//            ->where('variant_id', $variant->variantId)
-//            ->whereNotIn('option_value_id', $optionValueIds)
-//            ->delete();
-//
-//        foreach ($variant->getChildEntities()[OptionValue::class] as $optionValueState) {
-//
-//            DB::table(static::$optionValueTable)
-//                ->updateOrInsert([
-//                    'option_id' => $optionValueState['option_id'],
-//                    'option_value_id'  => $optionValueState['option_value_id'],
-//                ], $optionValueState);
-//        }
-//    }
-
     public function getStatesByProduct(ProductId $productId): array
     {
         $variantStates = DB::table(static::$variantTable)
@@ -96,6 +77,7 @@ class MysqlVariantRepository implements VariantRepository, VariantForCartReposit
             ->where(static::$variantTable . '.product_id', $productId->get())
             ->leftJoin(static::$variantOptionValueLookupTable, static::$variantTable . '.variant_id','=',static::$variantOptionValueLookupTable.'.variant_id')
             ->groupBy(static::$variantTable . '.variant_id')
+            ->orderBy(static::$variantTable.'.order_column')
             ->get()
             ->map(fn($item) => (array) $item)
             ->map(fn($item) => array_merge($item, [

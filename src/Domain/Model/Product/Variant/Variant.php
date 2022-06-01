@@ -50,6 +50,11 @@ final class Variant implements ChildEntity
         $this->state = $state;
     }
 
+    public function getState(): VariantState
+    {
+        return $this->state;
+    }
+
     public function updatePrice(VariantUnitPrice $unitPrice, VariantSalePrice $salePrice): void
     {
         $this->unitPrice = $unitPrice;

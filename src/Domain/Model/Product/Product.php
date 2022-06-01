@@ -48,6 +48,11 @@ class Product implements Aggregate
         $this->state = $state;
     }
 
+    public function getState(): ProductState
+    {
+        return $this->state;
+    }
+
     public function addData(array $data): void
     {
         $this->defaultAddData($data);

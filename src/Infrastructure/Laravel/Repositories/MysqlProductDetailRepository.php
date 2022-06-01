@@ -16,10 +16,6 @@ class MysqlProductDetailRepository implements ProductDetailRepository
 {
     private static string $productTable = 'trader_products';
     private static string $variantTable = 'trader_product_variants';
-
-    private static string $optionTable = 'trader_product_options';
-    private static string $optionValueTable = 'trader_product_option_values';
-    private static string $variantOptionValueLookupTable = 'trader_variant_option_values';
     private static string $taxonLookupTable = 'trader_taxa_products';
 
     private ContainerInterface $container;
