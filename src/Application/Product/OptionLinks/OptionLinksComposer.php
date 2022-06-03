@@ -100,6 +100,9 @@ class OptionLinksComposer
 
     private function hasExactOptionsMatch(array $firstOptionValueIds, array $secondOptionValueIds): bool
     {
-        return count(array_diff_assoc($firstOptionValueIds, $secondOptionValueIds)) == 0;
+        // array_diff with empty array returns unexpected results
+        if(count($firstOptionValueIds) < 1 || count($secondOptionValueIds) < 1) return false;
+
+        return count(array_diff($firstOptionValueIds, $secondOptionValueIds)) == 0;
     }
 }

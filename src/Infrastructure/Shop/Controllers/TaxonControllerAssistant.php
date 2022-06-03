@@ -43,13 +43,16 @@ trait TaxonControllerAssistant
     {
         if ($request->anyFilled('price-from', 'price-to')) {
             $priceRanges = [
-                IntegerConverter::convertDecimalToInteger($request->input('price-from', $request->input('price-to'))),
-                IntegerConverter::convertDecimalToInteger($request->input('price-to', $request->input('price-from'))),
+                $request->input('price-from') ? (string) IntegerConverter::convertDecimalToInteger($request->input('price-from')) : null,
+                $request->input('price-to') ? (string) IntegerConverter::convertDecimalToInteger($request->input('price-to')) : null,
             ];
 
-            sort($priceRanges);
+            // Sort in ascending order when both prices are filled in.
+            if(isset($priceRanges[0], $priceRanges[1])) {
+                sort($priceRanges);
+            }
 
-            $this->gridRepository->filterByPrice((string) $priceRanges[0], (string) $priceRanges[1]);
+            $this->gridRepository->filterByPrice($priceRanges[0], $priceRanges[1]);
         }
 
         if ($request->filled('sortPrice')) {
@@ -59,17 +62,17 @@ trait TaxonControllerAssistant
         }
 
         return $this->gridRepository
-            ->filterByTaxonKeys($this->getActiveTaxons($taxon, $request)->pluck('key'))
+            ->filterByTaxonIds($this->getActiveTaxons($taxon, $request->input('taxon', []))->pluck('id'))
             ->paginate(12)
             ->getResults();
     }
 
-    protected function getActiveTaxons(TaxonNode $taxon, Request $request)
+    protected function getActiveTaxons(TaxonNode $taxon, array $taxonKeys)
     {
         if($this->activeTaxons) {
             return $this->activeTaxons;
         }
 
-        return $this->activeTaxons = $this->taxonFilterTreeComposer->getActiveFilters($taxon->getKey(), $request->all());
+        return $this->activeTaxons = $this->taxonFilterTreeComposer->getActiveFilters($taxon->getKey(), $taxonKeys);
     }
 }

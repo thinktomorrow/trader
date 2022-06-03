@@ -84,32 +84,7 @@ class VineTaxonFilterTreeComposer implements TaxonFilterTreeComposer
         }
 
         return $taxonTree;
-
-//        return TaxonFilters::fromType(
-//            $this->convertNodeCollectionToArray($collection)
-//        );
     }
-
-//    private function convertNodeCollectionToArray(NodeCollection $collection): array
-//    {
-//        $filters = [];
-//
-//        $collection->each(function(Node $node) use(&$filters) {
-//
-//            /** @var TaxonFilter $taxonFilter */
-//            $taxonFilter = $node->getNodeEntry();
-//
-//            if($node->hasChildNodes()) {
-//                $taxonFilter->setChildren(
-//                    $this->convertNodeCollectionToArray($node->getChildNodes())
-//                );
-//            }
-//
-//            $filters[] = $taxonFilter;
-//        });
-//
-//        return $filters;
-//    }
 
     /**
      * Get all product ids belonging to this taxon filter and all its children
