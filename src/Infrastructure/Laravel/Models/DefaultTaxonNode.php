@@ -21,6 +21,7 @@ class DefaultTaxonNode extends DefaultNode implements TaxonNode
     private array $data;
     private array $product_ids;
     private ?string $parentId;
+    private iterable $images;
 
     private function __construct(string $id, string $key, TaxonState $taxonState, int $order, array $data, array $product_ids, ?string $parentId = null)
     {
@@ -125,8 +126,13 @@ class DefaultTaxonNode extends DefaultNode implements TaxonNode
         return $label;
     }
 
-    public function getImages(): array
+    public function setImages(iterable $images): void
     {
-        return $this->data('images', null, []);
+        $this->images = $images;
+    }
+
+    public function getImages(): iterable
+    {
+        return $this->images;
     }
 }

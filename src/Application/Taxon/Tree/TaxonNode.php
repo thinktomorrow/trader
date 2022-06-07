@@ -25,5 +25,5 @@ interface TaxonNode extends Node
     public function getBreadCrumbs(): array;
     public function getBreadCrumbLabelWithoutRoot(): string;
     public function getBreadCrumbLabel(bool $withoutRoot = false): string;
-    public function getImages(): array;
+    public function getImages(): iterable;
 }
