@@ -55,10 +55,16 @@ trait TaxonControllerAssistant
             $this->gridRepository->filterByPrice($priceRanges[0], $priceRanges[1]);
         }
 
-        if ($request->filled('sortPrice')) {
-            $request->input('sortPrice') === 'priceDesc'
-                ? $this->gridRepository->sortByPriceDesc()
-                : $this->gridRepository->sortByPrice();
+        if ($request->filled('sort')) {
+            if($request->input('sort') === 'priceDesc') {
+                $this->gridRepository->sortByPriceDesc();
+            } elseif($request->input('sort') === 'priceAsc') {
+                $this->gridRepository->sortByPrice();
+            } elseif($request->input('sort') === 'labelDesc') {
+                $this->gridRepository->sortByLabelDesc();
+            } elseif($request->input('sort') === 'labelAsc') {
+                $this->gridRepository->sortByLabel();
+            }
         }
 
         return $this->gridRepository
