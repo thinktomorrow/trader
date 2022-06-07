@@ -86,6 +86,7 @@ trait TestHelpers
                     'tax_rate' => '10',
                     'includes_vat' => true,
                     'quantity' => 2,
+                    'data' => json_encode(['foo' => 'bar']),
                 ],
             ],
             ShippingAddress::class => [

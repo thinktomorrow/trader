@@ -18,6 +18,16 @@ class CartTest extends CartContext
     }
 
     /** @test */
+    public function in_order_to_buy_products_in_quantity_as_a_visitor_I_need_to_be_able_to_put_same_product_in_my_cart_multiple_times()
+    {
+        $this->givenThereIsAProductWhichCostsEur('lightsaber', 5);
+        $this->whenIAddTheVariantToTheCart('lightsaber-123', 1, ['foo' => 'bar']);
+        $this->whenIAddTheVariantToTheCart('lightsaber-123', 1, ['fez' => 'bes']);
+
+        $this->thenIShouldHaveProductInTheCart(1, 1);
+    }
+
+    /** @test */
     public function in_order_to_choose_my_quantity_as_a_visitor_I_need_to_be_able_to_change_quantity_of_a_product()
     {
         $this->givenThereIsAProductWhichCostsEur('lightsaber', 5);

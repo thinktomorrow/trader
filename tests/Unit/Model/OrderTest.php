@@ -184,6 +184,7 @@ class OrderTest extends TestCase
             VariantId::fromString('xxx'),
             $linePrice = LinePrice::fromScalars('250', 'EUR', '9', true),
             Quantity::fromInt(2),
+            ['foo' => 'bar']
         );
 
         $this->assertCount(2, $order->getChildEntities()[Line::class]);
@@ -207,6 +208,7 @@ class OrderTest extends TestCase
             VariantId::fromString('yyy'),
             $linePrice = LinePrice::fromScalars('200','EUR','10', true),
             Quantity::fromInt(3),
+            ['foo' => 'bar']
         );
 
         $firstLine = $order->getChildEntities()[Line::class][0];
@@ -215,12 +217,12 @@ class OrderTest extends TestCase
         $this->assertEquals('xxx', $firstLine['variant_id']);
         $this->assertEquals($linePrice->getMoney()->getAmount(), $firstLine['line_price']);
         $this->assertEquals(3, $firstLine['quantity']);
+        $this->assertEquals(json_encode(['foo' => 'bar']), $firstLine['data']);
 
         $this->assertEquals([
             new LineUpdated(
                 $order->orderId,
                 LineId::fromString('abc'),
-                VariantId::fromString('yyy'),
             ),
         ], $order->releaseEvents());
     }

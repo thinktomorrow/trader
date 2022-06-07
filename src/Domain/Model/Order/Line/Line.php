@@ -5,11 +5,14 @@ namespace Thinktomorrow\Trader\Domain\Model\Order\Line;
 
 use Thinktomorrow\Trader\Domain\Common\Cash\Price;
 use Thinktomorrow\Trader\Domain\Model\Order\OrderId;
+use Thinktomorrow\Trader\Domain\Common\Entity\HasData;
 use Thinktomorrow\Trader\Domain\Common\Entity\ChildEntity;
 use Thinktomorrow\Trader\Domain\Model\Product\Variant\VariantId;
 
 final class Line implements ChildEntity
 {
+    use HasData;
+
     public readonly OrderId $orderId;
     public readonly LineId $lineId;
     private VariantId $variantId;
@@ -21,7 +24,7 @@ final class Line implements ChildEntity
 
     }
 
-    public static function create(OrderId $orderId, LineId $lineId, VariantId $productId, LinePrice $linePrice, Quantity $quantity): static
+    public static function create(OrderId $orderId, LineId $lineId, VariantId $productId, LinePrice $linePrice, Quantity $quantity, array $data): static
     {
         $line = new static();
 
@@ -30,6 +33,7 @@ final class Line implements ChildEntity
         $line->variantId = $productId;
         $line->linePrice = $linePrice;
         $line->quantity = $quantity;
+        $line->data = $data;
 
         return $line;
     }
@@ -58,13 +62,14 @@ final class Line implements ChildEntity
     public function getMappedData(): array
     {
         return [
-            'order_id' => $this->orderId->get(),
-            'line_id' => $this->lineId->get(),
-            'variant_id' => $this->variantId->get(),
-            'line_price' => $this->linePrice->getMoney()->getAmount(),
-            'tax_rate' => $this->linePrice->getTaxRate()->toPercentage()->get(),
+            'order_id'     => $this->orderId->get(),
+            'line_id'      => $this->lineId->get(),
+            'variant_id'   => $this->variantId->get(),
+            'line_price'   => $this->linePrice->getMoney()->getAmount(),
+            'tax_rate'     => $this->linePrice->getTaxRate()->toPercentage()->get(),
             'includes_vat' => $this->linePrice->includesVat(),
-            'quantity' => $this->quantity->asInt(),
+            'quantity'     => $this->quantity->asInt(),
+            'data'         => json_encode($this->data),
         ];
     }
 
@@ -77,6 +82,7 @@ final class Line implements ChildEntity
         $line->variantId = VariantId::fromString($state['variant_id']);
         $line->linePrice = LinePrice::fromScalars($state['line_price'], 'EUR', $state['tax_rate'], $state['includes_vat']);
         $line->quantity = Quantity::fromInt($state['quantity']);
+        $line->data = json_decode($state['data'], true);
 
         return $line;
     }

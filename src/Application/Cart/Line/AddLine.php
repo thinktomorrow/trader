@@ -13,12 +13,14 @@ final class AddLine
     private string $orderId;
     private string $variantId;
     private int $quantity;
+    private array $data;
 
-    public function __construct(string $orderId, string $variantId, int $quantity)
+    public function __construct(string $orderId, string $variantId, int $quantity, array $data)
     {
         $this->orderId = $orderId;
         $this->variantId = $variantId;
         $this->quantity = $quantity;
+        $this->data = $data;
     }
 
     public function getOrderId(): OrderId
@@ -34,5 +36,10 @@ final class AddLine
     public function getQuantity(): Quantity
     {
         return Quantity::fromInt($this->quantity);
+    }
+
+    public function getData(): array
+    {
+        return $this->data;
     }
 }

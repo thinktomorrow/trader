@@ -134,7 +134,7 @@ abstract class CartContext extends TestCase
         $this->cartApplication->chooseShippingProfile(new ChooseShippingProfile($order->orderId->get(), $shippingProfile->shippingProfileId->get()));
     }
 
-    protected function whenIAddTheVariantToTheCart($productVariantId, $quantity)
+    protected function whenIAddTheVariantToTheCart($productVariantId, $quantity = 1, array $data = [])
     {
         $order = $this->getOrder();
 
@@ -145,10 +145,20 @@ abstract class CartContext extends TestCase
             $order->orderId->get(),
             VariantId::fromString($productVariantId)->get(),
             Quantity::fromInt((int)$quantity)->asInt(),
+            $data
         ));
 
+        $checkFlag = false;
         $lines = $this->orderRepository->find($order->orderId)->getChildEntities()[Line::class];
-        Assert::assertEquals(VariantId::fromString($productVariantId)->get(), $lines[$count]['variant_id']);
+        foreach($lines as $line) {
+            if($line['variant_id'] == $productVariantId) {
+                $checkFlag = true;
+            }
+        }
+
+        if(!$checkFlag){
+            throw new \Exception('Cartitem presence check failed. No line found by ' . $productVariantId);
+        }
     }
 
     protected function whenIChangeTheProductQuantity($productTitle, $quantity)
@@ -204,6 +214,27 @@ abstract class CartContext extends TestCase
     protected function thenTheOverallCartPriceShouldBeEur($total)
     {
         Assert::assertEquals($total * 100, $this->getOrder()->getTotal()->getIncludingVat()->getAmount());
+    }
+
+    protected function thenTheCartItemShouldContainData($productVariantId, $dataKey, $dataValue)
+    {
+        $order = $this->orderRepository->find(OrderId::fromString('xxx'));
+        $lines = $order->getLines();
+
+        // Find matching line by variantId
+        $line = null;
+        foreach($lines as $_line) {
+            if($_line->getVariantId()->get() == $productVariantId) {
+                $line = $_line;
+            }
+        }
+
+        if(!$line) {
+            throw new \Exception('No line found by ' . $productVariantId);
+        }
+
+        $this->assertArrayHasKey($dataKey, $line->getData());
+        $this->assertEquals($dataValue, $line->getData($dataKey));
     }
 
     protected function getOrder(): Order

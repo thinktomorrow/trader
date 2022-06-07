@@ -7,6 +7,7 @@ use Thinktomorrow\Trader\TraderConfig;
 use Thinktomorrow\Trader\Domain\Model\Order\Shopper;
 use Thinktomorrow\Trader\Domain\Common\Taxes\TaxRate;
 use Thinktomorrow\Trader\Application\Cart\Line\AddLine;
+use Thinktomorrow\Trader\Domain\Model\Order\Line\LineId;
 use Thinktomorrow\Trader\Application\Cart\Line\RemoveLine;
 use Thinktomorrow\Trader\Domain\Model\Order\Line\LinePrice;
 use Thinktomorrow\Trader\Domain\Model\Order\Payment\Payment;
@@ -14,7 +15,6 @@ use Thinktomorrow\Trader\Domain\Model\Order\OrderRepository;
 use Thinktomorrow\Trader\Domain\Common\Event\EventDispatcher;
 use Thinktomorrow\Trader\Domain\Model\Order\Shipping\Shipping;
 use Thinktomorrow\Trader\Domain\Model\Order\Payment\PaymentCost;
-use Thinktomorrow\Trader\Domain\Model\Product\ProductRepository;
 use Thinktomorrow\Trader\Domain\Model\Order\Shipping\ShippingCost;
 use Thinktomorrow\Trader\Domain\Model\Customer\CustomerRepository;
 use Thinktomorrow\Trader\Application\Cart\Line\ChangeLineQuantity;
@@ -59,13 +59,15 @@ final class CartApplication
         $order = $this->orderRepository->find($addLine->getOrderId());
         $variant = $this->findVariantDetailsForCart->findVariantForCart($addLine->getVariantId());
 
-        $lineId = $order->getNextLineId();
+        // Lines are unique per variant.
+        $lineId = LineId::fromString($addLine->getVariantId()->get());
 
         $order->addOrUpdateLine(
             $lineId,
             $addLine->getVariantId(),
             LinePrice::fromPrice($variant->getSalePrice()),
-            $addLine->getQuantity()
+            $addLine->getQuantity(),
+            $addLine->getData()
         );
 
         $this->orderRepository->save($order);

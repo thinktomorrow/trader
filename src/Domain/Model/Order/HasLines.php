@@ -15,29 +15,36 @@ trait HasLines
 {
     private array $lines = [];
 
-    public function addOrUpdateLine(LineId $lineId, VariantId $productId, LinePrice $linePrice, Quantity $quantity): void
+    /** @return Line[] */
+    public function getLines(): array
+    {
+        return $this->lines;
+    }
+
+    public function addOrUpdateLine(LineId $lineId, VariantId $productId, LinePrice $linePrice, Quantity $quantity, array $data): void
     {
         if (null !== $this->findLineIndex($lineId)) {
-            $this->updateLine($lineId, $linePrice, $quantity);
+            $this->updateLine($lineId, $linePrice, $quantity, $data);
 
             return;
         }
 
-        $this->addLine($lineId, $productId, $linePrice, $quantity);
+        $this->addLine($lineId, $productId, $linePrice, $quantity, $data);
     }
 
-    private function addLine(LineId $lineId, VariantId $productId, LinePrice $linePrice, Quantity $quantity): void
+    private function addLine(LineId $lineId, VariantId $productId, LinePrice $linePrice, Quantity $quantity, array $data): void
     {
-        $this->lines[] = Line::create($this->orderId, $lineId, $productId, $linePrice, $quantity);
+        $this->lines[] = Line::create($this->orderId, $lineId, $productId, $linePrice, $quantity, $data);
 
         $this->recordEvent(new LineAdded($this->orderId, $lineId, $productId));
     }
 
-    private function updateLine(LineId $lineId, LinePrice $linePrice, Quantity $quantity): void
+    private function updateLine(LineId $lineId, LinePrice $linePrice, Quantity $quantity, $data): void
     {
         if (null !== $lineIndexToBeUpdated = $this->findLineIndex($lineId)) {
             $this->lines[$lineIndexToBeUpdated]->updatePrice($linePrice);
             $this->lines[$lineIndexToBeUpdated]->updateQuantity($quantity);
+            $this->lines[$lineIndexToBeUpdated]->addData($data);
 
             $this->recordEvent(new LineUpdated($this->orderId, $lineId));
         }
@@ -81,17 +88,5 @@ trait HasLines
         }
 
         return null;
-    }
-
-    public function getNextLineId(): LineId
-    {
-        $i = mt_rand(1,999);
-        $nextLineId = LineId::fromString(substr($i .'_' . $this->orderId->get(), 0, 36));
-
-        while(null !== $this->findLineIndex($nextLineId)) {
-            $nextLineId = LineId::fromString(substr(++$i .'_' . $this->orderId->get(), 0, 36));
-        }
-
-        return $nextLineId;
     }
 }
