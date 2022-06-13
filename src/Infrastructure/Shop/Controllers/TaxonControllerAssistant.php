@@ -3,12 +3,12 @@ declare(strict_types=1);
 
 namespace Thinktomorrow\Trader\Infrastructure\Shop\Controllers;
 
-use Illuminate\Http\Request;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
+use Illuminate\Http\Request;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Thinktomorrow\Trader\Application\Taxon\Tree\TaxonNode;
 use Thinktomorrow\Trader\Application\Taxon\Tree\TaxonTree;
 use Thinktomorrow\Trader\Domain\Common\Cash\IntegerConverter;
-use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Thinktomorrow\Trader\Domain\Model\Taxon\Exceptions\CouldNotFindTaxon;
 use Thinktomorrow\Trader\Infrastructure\Shop\RuntimeExceptions\FoundRouteAsRedirect;
 
@@ -22,10 +22,9 @@ trait TaxonControllerAssistant
         $taxonKeys = explode('/', $taxonKeys);
         $taxonKey = urldecode($taxonKeys[count($taxonKeys) - 1]);
 
-        try{
+        try {
             return $this->categoryRepository->findTaxonByKey($taxonKey);
-        }
-        catch(CouldNotFindTaxon $e) {
+        } catch (CouldNotFindTaxon $e) {
             if ($redirect = $this->redirectRepository->find($taxonKey)) {
                 throw (new FoundRouteAsRedirect($this->getTaxonUrl($redirect->getFrom())))->setRedirect($this->getTaxonUrl($redirect->getTo()));
             }
@@ -48,7 +47,7 @@ trait TaxonControllerAssistant
             ];
 
             // Sort in ascending order when both prices are filled in.
-            if(isset($priceRanges[0], $priceRanges[1])) {
+            if (isset($priceRanges[0], $priceRanges[1])) {
                 sort($priceRanges);
             }
 
@@ -56,13 +55,13 @@ trait TaxonControllerAssistant
         }
 
         if ($request->filled('sort')) {
-            if($request->input('sort') === 'priceDesc') {
+            if ($request->input('sort') === 'priceDesc') {
                 $this->gridRepository->sortByPriceDesc();
-            } elseif($request->input('sort') === 'priceAsc') {
+            } elseif ($request->input('sort') === 'priceAsc') {
                 $this->gridRepository->sortByPrice();
-            } elseif($request->input('sort') === 'labelDesc') {
+            } elseif ($request->input('sort') === 'labelDesc') {
                 $this->gridRepository->sortByLabelDesc();
-            } elseif($request->input('sort') === 'labelAsc') {
+            } elseif ($request->input('sort') === 'labelAsc') {
                 $this->gridRepository->sortByLabel();
             }
         }
@@ -75,7 +74,7 @@ trait TaxonControllerAssistant
 
     protected function getActiveTaxons(TaxonNode $taxon, array $taxonKeys)
     {
-        if($this->activeTaxons) {
+        if ($this->activeTaxons) {
             return $this->activeTaxons;
         }
 

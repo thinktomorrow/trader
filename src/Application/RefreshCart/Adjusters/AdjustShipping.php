@@ -3,10 +3,10 @@ declare(strict_types=1);
 
 namespace Thinktomorrow\Trader\Application\RefreshCart\Adjusters;
 
-use Thinktomorrow\Trader\Domain\Common\Context;
-use Thinktomorrow\Trader\Domain\Model\Order\Order;
 use Thinktomorrow\Trader\Application\RefreshCart\Adjuster;
+use Thinktomorrow\Trader\Domain\Common\Context;
 use Thinktomorrow\Trader\Domain\Model\Order\Address\ShippingCountry;
+use Thinktomorrow\Trader\Domain\Model\Order\Order;
 
 final class AdjustShipping implements Adjuster
 {
@@ -30,7 +30,9 @@ final class AdjustShipping implements Adjuster
 
         // If shippingId is no longer the same, update order as well
 
-        if(!$order->getShippingId()) return;
+        if (! $order->getShippingId()) {
+            return;
+        }
 
         $shippingCountry = ShippingCountry::fromString(
             $orderDetails->getShippingAddress()->getCountry() ?? $context->getDefaultShippingCountry()

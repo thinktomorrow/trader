@@ -8,7 +8,7 @@ trait RendersData
 
     protected function data(string $key, string $language = null, $default = null, array $data = null)
     {
-        if(! $language) {
+        if (! $language) {
             $language = $this->getLocale()->getLanguage();
         }
 

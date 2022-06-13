@@ -16,7 +16,7 @@ final class TestContainer implements ContainerInterface
 
     public function get(string $id)
     {
-        if(!$this->has($id)) {
+        if (! $this->has($id)) {
             return new $id;
         }
 

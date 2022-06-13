@@ -3,9 +3,9 @@ declare(strict_types=1);
 
 namespace Thinktomorrow\Trader\Application\Product\UpdateVariant;
 
+use Thinktomorrow\Trader\Domain\Model\Product\Option\OptionValueId;
 use Thinktomorrow\Trader\Domain\Model\Product\ProductId;
 use Thinktomorrow\Trader\Domain\Model\Product\Variant\VariantId;
-use Thinktomorrow\Trader\Domain\Model\Product\Option\OptionValueId;
 
 class UpdateVariantOptionValues
 {
@@ -35,6 +35,6 @@ class UpdateVariantOptionValues
      */
     public function getOptionValueIds(): array
     {
-        return array_map(fn($value_id) => OptionValueId::fromString($value_id) , $this->optionValueIds);
+        return array_map(fn ($value_id) => OptionValueId::fromString($value_id), $this->optionValueIds);
     }
 }

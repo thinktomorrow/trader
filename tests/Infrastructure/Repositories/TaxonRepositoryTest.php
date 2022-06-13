@@ -3,15 +3,15 @@ declare(strict_types=1);
 
 namespace Tests\Infrastructure\Repositories;
 
-use Tests\Infrastructure\TestCase;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Tests\Infrastructure\TestCase;
+use Thinktomorrow\Trader\Domain\Model\Taxon\Exceptions\CouldNotFindTaxon;
 use Thinktomorrow\Trader\Domain\Model\Taxon\Taxon;
 use Thinktomorrow\Trader\Domain\Model\Taxon\TaxonId;
 use Thinktomorrow\Trader\Domain\Model\Taxon\TaxonKey;
 use Thinktomorrow\Trader\Domain\Model\Taxon\TaxonState;
-use Thinktomorrow\Trader\Domain\Model\Taxon\Exceptions\CouldNotFindTaxon;
-use Thinktomorrow\Trader\Infrastructure\Test\Repositories\InMemoryTaxonRepository;
 use Thinktomorrow\Trader\Infrastructure\Laravel\Repositories\MysqlTaxonRepository;
+use Thinktomorrow\Trader\Infrastructure\Test\Repositories\InMemoryTaxonRepository;
 
 final class TaxonRepositoryTest extends TestCase
 {
@@ -23,7 +23,7 @@ final class TaxonRepositoryTest extends TestCase
      */
     public function it_can_save_and_find_a_taxon(Taxon $taxon)
     {
-        foreach($this->taxonRepositories() as $taxonRepository) {
+        foreach ($this->taxonRepositories() as $taxonRepository) {
             $taxonRepository->save($taxon);
             $taxon->releaseEvents();
 
@@ -39,11 +39,11 @@ final class TaxonRepositoryTest extends TestCase
     {
         $taxonsNotFound = 0;
 
-        foreach($this->taxonRepositories() as $taxonRepository) {
+        foreach ($this->taxonRepositories() as $taxonRepository) {
             $taxonRepository->save($taxon);
             $taxonRepository->delete($taxon->taxonId);
 
-            try{
+            try {
                 $taxonRepository->find($taxon->taxonId);
             } catch (CouldNotFindTaxon $e) {
                 $taxonsNotFound++;
@@ -56,7 +56,7 @@ final class TaxonRepositoryTest extends TestCase
     /** @test */
     public function it_can_generate_a_next_reference()
     {
-        foreach($this->taxonRepositories() as $taxonRepository) {
+        foreach ($this->taxonRepositories() as $taxonRepository) {
             $this->assertInstanceOf(TaxonId::class, $taxonRepository->nextReference());
         }
     }

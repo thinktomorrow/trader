@@ -8,7 +8,7 @@ use Thinktomorrow\Trader\Application\Cart\UpdateBillingAddress;
 class CartTest extends CartContext
 {
     /** @test */
-    public function in_order_to_buy_products_as_a_visitor_I_need_to_be_able_to_put_products_in_my_cart()
+    public function in_order_to_buy_products_as_a_visitor__i_need_to_be_able_to_put_products_in_my_cart()
     {
         $this->givenThereIsAProductWhichCostsEur('lightsaber', 5);
         $this->whenIAddTheVariantToTheCart('lightsaber-123', 2);
@@ -17,7 +17,7 @@ class CartTest extends CartContext
     }
 
     /** @test */
-    public function in_order_to_buy_a_product_as_a_visitor_the_order_is_created_when_I_add_a_first_item_in_my_cart()
+    public function in_order_to_buy_a_product_as_a_visitor_the_order_is_created_when__i_add_a_first_item_in_my_cart()
     {
         $this->givenThereIsAProductWhichCostsEur('lightsaber', 5);
         $this->whenIAddTheFirstVariantToTheCart('lightsaber-123', 1);
@@ -25,7 +25,7 @@ class CartTest extends CartContext
     }
 
     /** @test */
-    public function in_order_to_buy_products_in_quantity_as_a_visitor_I_need_to_be_able_to_put_same_product_in_my_cart_multiple_times()
+    public function in_order_to_buy_products_in_quantity_as_a_visitor__i_need_to_be_able_to_put_same_product_in_my_cart_multiple_times()
     {
         $this->givenThereIsAProductWhichCostsEur('lightsaber', 5);
         $this->whenIAddTheVariantToTheCart('lightsaber-123', 1, ['foo' => 'bar']);
@@ -35,7 +35,7 @@ class CartTest extends CartContext
     }
 
     /** @test */
-    public function in_order_to_choose_my_quantity_as_a_visitor_I_need_to_be_able_to_change_quantity_of_a_product()
+    public function in_order_to_choose_my_quantity_as_a_visitor__i_need_to_be_able_to_change_quantity_of_a_product()
     {
         $this->givenThereIsAProductWhichCostsEur('lightsaber', 5);
         $this->whenIAddTheVariantToTheCart('lightsaber-123', 2);
@@ -47,7 +47,7 @@ class CartTest extends CartContext
     }
 
     /** @test */
-    public function in_order_to_be_in_control_as_a_visitor_I_need_to_be_able_to_remove_a_product()
+    public function in_order_to_be_in_control_as_a_visitor__i_need_to_be_able_to_remove_a_product()
     {
         $this->givenThereIsAProductWhichCostsEur('lightsaber', 5);
         $this->whenIAddTheVariantToTheCart('lightsaber-123', 2);
@@ -59,7 +59,7 @@ class CartTest extends CartContext
     }
 
     /** @test */
-    public function in_order_to_buy_multiple_products_as_a_visitor_I_need_to_be_able_to_put_multiple_products_in_my_cart()
+    public function in_order_to_buy_multiple_products_as_a_visitor__i_need_to_be_able_to_put_multiple_products_in_my_cart()
     {
         $this->givenThereIsAProductWhichCostsEur('lightsaber', 5);
         $this->givenThereIsAProductWhichCostsEur('kenobi scarf', 7);
@@ -102,7 +102,8 @@ class CartTest extends CartContext
         $address = ['NL', 'example 12', 'bus 2', '1000', 'Amsterdam'];
 
         $this->cartApplication->updateBillingAddress(new UpdateBillingAddress(
-            $this->getOrder()->orderId->get(), ...$address
+            $this->getOrder()->orderId->get(),
+            ...$address
         ));
 
         $this->assertEquals($address, array_values($this->getOrder()->getBillingAddress()->getAddress()->toArray()));

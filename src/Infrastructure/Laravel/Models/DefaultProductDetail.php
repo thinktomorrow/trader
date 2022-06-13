@@ -3,17 +3,16 @@ declare(strict_types=1);
 
 namespace Thinktomorrow\Trader\Infrastructure\Laravel\Models;
 
-use Money\Money;
 use Illuminate\Support\Str;
 use Thinktomorrow\Trader\Application\Common\HasLocale;
 use Thinktomorrow\Trader\Application\Common\RendersData;
-use Thinktomorrow\Trader\Domain\Model\Product\ProductId;
 use Thinktomorrow\Trader\Application\Common\RendersVariantPrices;
-use Thinktomorrow\Trader\Domain\Model\Product\Variant\VariantId;
-use Thinktomorrow\Trader\Domain\Model\Product\Variant\VariantState;
-use Thinktomorrow\Trader\Domain\Model\Product\Variant\VariantSalePrice;
-use Thinktomorrow\Trader\Domain\Model\Product\Variant\VariantUnitPrice;
 use Thinktomorrow\Trader\Application\Product\ProductDetail\ProductDetail;
+use Thinktomorrow\Trader\Domain\Model\Product\ProductId;
+use Thinktomorrow\Trader\Domain\Model\Product\Variant\VariantId;
+use Thinktomorrow\Trader\Domain\Model\Product\Variant\VariantSalePrice;
+use Thinktomorrow\Trader\Domain\Model\Product\Variant\VariantState;
+use Thinktomorrow\Trader\Domain\Model\Product\Variant\VariantUnitPrice;
 
 class DefaultProductDetail implements ProductDetail
 {
@@ -30,7 +29,6 @@ class DefaultProductDetail implements ProductDetail
 
     private function __construct()
     {
-
     }
 
     public static function fromMappedData(array $state): static
@@ -73,7 +71,9 @@ class DefaultProductDetail implements ProductDetail
 
     public function getTitle(): string
     {
-        return $this->data('title', null,
+        return $this->data(
+            'title',
+            null,
             $this->data('product_title', null, '')
         );
     }
@@ -100,7 +100,6 @@ class DefaultProductDetail implements ProductDetail
 
     public function getThumbUrl(): string
     {
-
     }
 
     public function setImages(iterable $images): void

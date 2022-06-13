@@ -4,14 +4,14 @@ declare(strict_types=1);
 namespace Thinktomorrow\Trader\Domain\Model\Product;
 
 use Assert\Assertion;
-use Thinktomorrow\Trader\Domain\Model\Product\Variant\Variant;
-use Thinktomorrow\Trader\Domain\Model\Product\Variant\VariantId;
 use Thinktomorrow\Trader\Domain\Model\Product\Event\VariantCreated;
-use Thinktomorrow\Trader\Domain\Model\Product\Event\VariantUpdated;
 use Thinktomorrow\Trader\Domain\Model\Product\Event\VariantDeleted;
+use Thinktomorrow\Trader\Domain\Model\Product\Event\VariantUpdated;
 use Thinktomorrow\Trader\Domain\Model\Product\Exceptions\CouldNotDeleteVariant;
 use Thinktomorrow\Trader\Domain\Model\Product\Exceptions\CouldNotFindVariantOnProduct;
 use Thinktomorrow\Trader\Domain\Model\Product\Exceptions\VariantAlreadyExistsOnProduct;
+use Thinktomorrow\Trader\Domain\Model\Product\Variant\Variant;
+use Thinktomorrow\Trader\Domain\Model\Product\Variant\VariantId;
 
 trait HasVariants
 {
@@ -68,8 +68,7 @@ trait HasVariants
     public function deleteVariant(VariantId $variantId): void
     {
         if (null !== $variantIndex = $this->findVariantIndex($variantId)) {
-
-            if(count($this->variants) === 1) {
+            if (count($this->variants) === 1) {
                 throw new CouldNotDeleteVariant('At least one variant is required on a product.');
             }
 

@@ -5,9 +5,9 @@ namespace Thinktomorrow\Trader\Infrastructure\Laravel\Repositories;
 
 use Illuminate\Support\Facades\DB;
 use Thinktomorrow\Trader\Domain\Model\Customer\CustomerId;
+use Thinktomorrow\Trader\Domain\Model\Customer\Exceptions\CouldNotFindCustomer;
 use Thinktomorrow\Trader\Domain\Model\CustomerLogin\CustomerLogin;
 use Thinktomorrow\Trader\Domain\Model\CustomerLogin\CustomerLoginRepository;
-use Thinktomorrow\Trader\Domain\Model\Customer\Exceptions\CouldNotFindCustomer;
 
 class MysqlCustomerLoginRepository implements CustomerLoginRepository
 {
@@ -26,7 +26,7 @@ class MysqlCustomerLoginRepository implements CustomerLoginRepository
             ->where(static::$customerTable . '.customer_id', $customerId->get())
             ->first();
 
-        if (!$customerState) {
+        if (! $customerState) {
             throw new CouldNotFindCustomer('No customer found by id [' . $customerId->get() . ']');
         }
 

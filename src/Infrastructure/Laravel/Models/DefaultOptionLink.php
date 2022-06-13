@@ -5,10 +5,10 @@ namespace Thinktomorrow\Trader\Infrastructure\Laravel\Models;
 
 use Thinktomorrow\Trader\Application\Common\HasLocale;
 use Thinktomorrow\Trader\Application\Common\RendersData;
-use Thinktomorrow\Trader\Domain\Model\Product\Option\Option;
-use Thinktomorrow\Trader\Domain\Model\Product\Variant\Variant;
-use Thinktomorrow\Trader\Domain\Model\Product\Option\OptionValue;
 use Thinktomorrow\Trader\Application\Product\OptionLinks\OptionLink;
+use Thinktomorrow\Trader\Domain\Model\Product\Option\Option;
+use Thinktomorrow\Trader\Domain\Model\Product\Option\OptionValue;
+use Thinktomorrow\Trader\Domain\Model\Product\Variant\Variant;
 
 class DefaultOptionLink implements OptionLink
 {
@@ -49,7 +49,7 @@ class DefaultOptionLink implements OptionLink
 
     public function getUrl(): ?string
     {
-        if(!$this->variant) {
+        if (! $this->variant) {
             return null;
         }
 

@@ -2,8 +2,6 @@
 
 namespace Thinktomorrow\Trader\Application\Cart\Read;
 
-use Money\Money;
-
 interface Cart
 {
     public static function fromMappedData(array $state, array $childObjects, iterable $discounts): static;

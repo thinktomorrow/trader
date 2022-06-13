@@ -4,11 +4,11 @@ declare(strict_types=1);
 namespace Tests\Acceptance\Taxon;
 
 use Tests\Infrastructure\Vine\TaxonHelpers;
-use Thinktomorrow\Trader\Infrastructure\Test\TestContainer;
-use Thinktomorrow\Trader\Infrastructure\Test\TestTraderConfig;
 use Thinktomorrow\Trader\Application\Taxon\Category\FindCategoryTaxon;
 use Thinktomorrow\Trader\Infrastructure\Test\Repositories\InMemoryTaxonRepository;
 use Thinktomorrow\Trader\Infrastructure\Test\Repositories\InMemoryTaxonTreeRepository;
+use Thinktomorrow\Trader\Infrastructure\Test\TestContainer;
+use Thinktomorrow\Trader\Infrastructure\Test\TestTraderConfig;
 
 class FindCategoryTaxonTest extends TaxonContext
 {

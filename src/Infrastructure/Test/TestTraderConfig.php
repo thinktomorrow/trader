@@ -3,8 +3,8 @@ declare(strict_types=1);
 
 namespace Thinktomorrow\Trader\Infrastructure\Test;
 
-use Thinktomorrow\Trader\TraderConfig;
 use Thinktomorrow\Trader\Domain\Common\Locale;
+use Thinktomorrow\Trader\TraderConfig;
 
 class TestTraderConfig implements TraderConfig
 {

@@ -4,8 +4,8 @@ declare(strict_types=1);
 namespace Tests\Acceptance\Product;
 
 use Tests\TestHelpers;
-use Thinktomorrow\Trader\Domain\Model\Product\Event\ProductDataUpdated;
 use Thinktomorrow\Trader\Application\Product\UpdateProduct\UpdateProductData;
+use Thinktomorrow\Trader\Domain\Model\Product\Event\ProductDataUpdated;
 
 class UpdateProductDataTest extends ProductContext
 {

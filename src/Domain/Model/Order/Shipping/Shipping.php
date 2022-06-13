@@ -3,9 +3,9 @@ declare(strict_types=1);
 
 namespace Thinktomorrow\Trader\Domain\Model\Order\Shipping;
 
-use Thinktomorrow\Trader\Domain\Model\Order\OrderId;
-use Thinktomorrow\Trader\Domain\Common\Entity\HasData;
 use Thinktomorrow\Trader\Domain\Common\Entity\ChildEntity;
+use Thinktomorrow\Trader\Domain\Common\Entity\HasData;
+use Thinktomorrow\Trader\Domain\Model\Order\OrderId;
 use Thinktomorrow\Trader\Domain\Model\ShippingProfile\ShippingProfileId;
 
 final class Shipping implements ChildEntity
@@ -68,14 +68,14 @@ final class Shipping implements ChildEntity
     public function getMappedData(): array
     {
         return [
-            'order_id'            => $this->orderId->get(),
-            'shipping_id'         => $this->shippingId->get(),
+            'order_id' => $this->orderId->get(),
+            'shipping_id' => $this->shippingId->get(),
             'shipping_profile_id' => $this->shippingProfileId->get(),
-            'shipping_state'      => $this->shippingState->value,
-            'cost'                  => $this->shippingCost->getMoney()->getAmount(),
-            'tax_rate'            => $this->shippingCost->getTaxRate()->toPercentage()->get(),
-            'includes_vat'        => $this->shippingCost->includesVat(),
-            'data'                => json_encode($this->data),
+            'shipping_state' => $this->shippingState->value,
+            'cost' => $this->shippingCost->getMoney()->getAmount(),
+            'tax_rate' => $this->shippingCost->getTaxRate()->toPercentage()->get(),
+            'includes_vat' => $this->shippingCost->includesVat(),
+            'data' => json_encode($this->data),
         ];
     }
 
@@ -88,7 +88,10 @@ final class Shipping implements ChildEntity
         $shipping->shippingProfileId = ShippingProfileId::fromString($state['shipping_profile_id']);
         $shipping->shippingState = ShippingState::from($state['shipping_state']);
         $shipping->shippingCost = ShippingCost::fromScalars(
-            $state['cost'], 'EUR', $state['tax_rate'], $state['includes_vat']
+            $state['cost'],
+            'EUR',
+            $state['tax_rate'],
+            $state['includes_vat']
         );
         $shipping->data = json_decode($state['data'], true);
 

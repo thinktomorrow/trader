@@ -14,14 +14,14 @@ trait HasData
 
     public function deleteData(string $key): void
     {
-        if(isset($this->data[$key])) {
+        if (isset($this->data[$key])) {
             unset($this->data[$key]);
         }
     }
 
     public function getData(string $key = null)
     {
-        if(!is_null($key)) {
+        if (! is_null($key)) {
             return data_get($this->data, $key);
         }
 

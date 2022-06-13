@@ -4,8 +4,8 @@ declare(strict_types=1);
 namespace Thinktomorrow\Trader\Application\Product;
 
 use Thinktomorrow\Trader\Domain\Model\Product\ProductId;
-use Thinktomorrow\Trader\Domain\Model\Product\Variant\VariantUnitPrice;
 use Thinktomorrow\Trader\Domain\Model\Product\Variant\VariantSalePrice;
+use Thinktomorrow\Trader\Domain\Model\Product\Variant\VariantUnitPrice;
 
 class CreateVariant
 {

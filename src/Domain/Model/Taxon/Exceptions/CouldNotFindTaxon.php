@@ -5,5 +5,4 @@ namespace Thinktomorrow\Trader\Domain\Model\Taxon\Exceptions;
 
 class CouldNotFindTaxon extends \RuntimeException
 {
-
 }

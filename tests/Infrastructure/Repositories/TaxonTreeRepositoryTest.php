@@ -3,13 +3,13 @@ declare(strict_types=1);
 
 namespace Tests\Infrastructure\Repositories;
 
+use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\Infrastructure\TestCase;
 use Tests\Infrastructure\Vine\TaxonHelpers;
-use Illuminate\Foundation\Testing\RefreshDatabase;
 use Thinktomorrow\Trader\Application\Taxon\Tree\TaxonNode;
-use Thinktomorrow\Trader\Infrastructure\Test\TestContainer;
-use Thinktomorrow\Trader\Infrastructure\Test\Repositories\InMemoryTaxonTreeRepository;
 use Thinktomorrow\Trader\Infrastructure\Laravel\Repositories\MysqlTaxonTreeRepository;
+use Thinktomorrow\Trader\Infrastructure\Test\Repositories\InMemoryTaxonTreeRepository;
+use Thinktomorrow\Trader\Infrastructure\Test\TestContainer;
 
 final class TaxonTreeRepositoryTest extends TestCase
 {
@@ -21,7 +21,7 @@ final class TaxonTreeRepositoryTest extends TestCase
     {
         $this->createDefaultTaxons();
 
-        foreach($this->repositories() as $repository) {
+        foreach ($this->repositories() as $repository) {
             $this->assertContainsOnlyInstancesOf(TaxonNode::class, $repository->getTree());
             $this->assertEquals(2, $repository->getTree()->count());
             $this->assertEquals(6, $repository->getTree()->total());
@@ -33,7 +33,7 @@ final class TaxonTreeRepositoryTest extends TestCase
     {
         $this->createDefaultTaxons();
 
-        foreach($this->repositories() as $repository) {
+        foreach ($this->repositories() as $repository) {
             $this->assertNotNull($repository->findTaxonByKey('taxon-fifth'));
         }
     }

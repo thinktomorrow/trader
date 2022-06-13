@@ -5,5 +5,4 @@ namespace Thinktomorrow\Trader\Domain\Model\Product\Exceptions;
 
 class CouldNotFindOptionValue extends \RuntimeException
 {
-
 }

@@ -16,7 +16,7 @@ trait RecordsChangelog
 
     public function recordInChangelog(string $versionNote): void
     {
-        if(!isset($this->changelog[$this->changelogVersion])) {
+        if (! isset($this->changelog[$this->changelogVersion])) {
             $this->changelog[$this->changelogVersion] = [];
         }
 
@@ -25,7 +25,7 @@ trait RecordsChangelog
 
     public function getPreviousChangelog(): array
     {
-        if(!isset($this->changelog[$this->changelogVersion - 1])) {
+        if (! isset($this->changelog[$this->changelogVersion - 1])) {
             return [];
         }
 

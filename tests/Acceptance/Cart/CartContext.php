@@ -3,55 +3,54 @@ declare(strict_types=1);
 
 namespace Tests\Acceptance\Cart;
 
-use Money\Money;
 use Illuminate\Support\Str;
+use Money\Money;
 use PHPUnit\Framework\Assert;
 use Tests\Acceptance\TestCase;
-use Thinktomorrow\Trader\Domain\Common\Email;
-use Thinktomorrow\Trader\Domain\Common\Cash\Cash;
-use Thinktomorrow\Trader\Domain\Model\Order\Order;
-use Thinktomorrow\Trader\Domain\Model\Order\OrderId;
-use Thinktomorrow\Trader\Domain\Common\Taxes\TaxRate;
-use Thinktomorrow\Trader\Domain\Model\Order\Line\Line;
-use Thinktomorrow\Trader\Domain\Model\Product\Product;
-use Thinktomorrow\Trader\Application\Cart\Line\AddLine;
-use Thinktomorrow\Trader\Domain\Model\Product\ProductId;
-use Thinktomorrow\Trader\Domain\Model\Order\Line\LineId;
-use Thinktomorrow\Trader\Application\Cart\UpdateShopper;
-use Thinktomorrow\Trader\Domain\Model\Customer\Customer;
-use Thinktomorrow\Trader\Application\Cart\ChooseCustomer;
-use Thinktomorrow\Trader\Domain\Model\Order\Line\Quantity;
 use Thinktomorrow\Trader\Application\Cart\CartApplication;
-use Thinktomorrow\Trader\Application\Cart\Line\RemoveLine;
-use Thinktomorrow\Trader\Domain\Model\Customer\CustomerId;
-use Thinktomorrow\Trader\Infrastructure\Test\TestContainer;
-use Thinktomorrow\Trader\Domain\Model\Product\Variant\Variant;
-use Thinktomorrow\Trader\Infrastructure\Test\TestTraderConfig;
+use Thinktomorrow\Trader\Application\Cart\ChooseCustomer;
 use Thinktomorrow\Trader\Application\Cart\ChoosePaymentMethod;
-use Thinktomorrow\Trader\Application\Cart\UpdateBillingAddress;
-use Thinktomorrow\Trader\Domain\Model\Product\Variant\VariantId;
 use Thinktomorrow\Trader\Application\Cart\ChooseShippingProfile;
-use Thinktomorrow\Trader\Infrastructure\Test\EventDispatcherSpy;
-use Thinktomorrow\Trader\Application\Cart\UpdateShippingAddress;
+use Thinktomorrow\Trader\Application\Cart\Line\AddLine;
 use Thinktomorrow\Trader\Application\Cart\Line\AddLineToNewOrder;
 use Thinktomorrow\Trader\Application\Cart\Line\ChangeLineQuantity;
-use Thinktomorrow\Trader\Domain\Model\PaymentMethod\PaymentMethod;
-use Thinktomorrow\Trader\Domain\Model\ShippingProfile\TariffNumber;
+use Thinktomorrow\Trader\Application\Cart\Line\RemoveLine;
+use Thinktomorrow\Trader\Application\Cart\UpdateBillingAddress;
+use Thinktomorrow\Trader\Application\Cart\UpdateShippingAddress;
+use Thinktomorrow\Trader\Application\Cart\UpdateShopper;
+use Thinktomorrow\Trader\Application\RefreshCart\Adjusters\AdjustShipping;
+use Thinktomorrow\Trader\Domain\Common\Cash\Cash;
+use Thinktomorrow\Trader\Domain\Common\Email;
+use Thinktomorrow\Trader\Domain\Common\Taxes\TaxRate;
+use Thinktomorrow\Trader\Domain\Model\Customer\Customer;
 use Thinktomorrow\Trader\Domain\Model\Order\Address\ShippingCountry;
+use Thinktomorrow\Trader\Domain\Model\Order\Exceptions\CouldNotFindOrder;
+use Thinktomorrow\Trader\Domain\Model\Order\Line\Line;
+use Thinktomorrow\Trader\Domain\Model\Order\Line\LineId;
+use Thinktomorrow\Trader\Domain\Model\Order\Line\Quantity;
+use Thinktomorrow\Trader\Domain\Model\Order\Order;
+use Thinktomorrow\Trader\Domain\Model\Order\OrderId;
+use Thinktomorrow\Trader\Domain\Model\PaymentMethod\PaymentMethod;
 use Thinktomorrow\Trader\Domain\Model\PaymentMethod\PaymentMethodId;
-use Thinktomorrow\Trader\Domain\Model\ShippingProfile\ShippingProfile;
+use Thinktomorrow\Trader\Domain\Model\Product\Product;
+use Thinktomorrow\Trader\Domain\Model\Product\ProductId;
+use Thinktomorrow\Trader\Domain\Model\Product\Variant\Variant;
+use Thinktomorrow\Trader\Domain\Model\Product\Variant\VariantId;
 use Thinktomorrow\Trader\Domain\Model\Product\Variant\VariantSalePrice;
 use Thinktomorrow\Trader\Domain\Model\Product\Variant\VariantUnitPrice;
+use Thinktomorrow\Trader\Domain\Model\ShippingProfile\ShippingProfile;
 use Thinktomorrow\Trader\Domain\Model\ShippingProfile\ShippingProfileId;
-use Thinktomorrow\Trader\Domain\Model\Order\Exceptions\CouldNotFindOrder;
-use Thinktomorrow\Trader\Application\RefreshCart\Adjusters\AdjustShipping;
+use Thinktomorrow\Trader\Domain\Model\ShippingProfile\TariffNumber;
+use Thinktomorrow\Trader\Infrastructure\Test\EventDispatcherSpy;
 use Thinktomorrow\Trader\Infrastructure\Test\Repositories\InMemoryCartRepository;
-use Thinktomorrow\Trader\Infrastructure\Test\Repositories\InMemoryOrderRepository;
-use Thinktomorrow\Trader\Infrastructure\Test\Repositories\InMemoryProductRepository;
-use Thinktomorrow\Trader\Infrastructure\Test\Repositories\InMemoryVariantRepository;
 use Thinktomorrow\Trader\Infrastructure\Test\Repositories\InMemoryCustomerRepository;
+use Thinktomorrow\Trader\Infrastructure\Test\Repositories\InMemoryOrderRepository;
 use Thinktomorrow\Trader\Infrastructure\Test\Repositories\InMemoryPaymentMethodRepository;
+use Thinktomorrow\Trader\Infrastructure\Test\Repositories\InMemoryProductRepository;
 use Thinktomorrow\Trader\Infrastructure\Test\Repositories\InMemoryShippingProfileRepository;
+use Thinktomorrow\Trader\Infrastructure\Test\Repositories\InMemoryVariantRepository;
+use Thinktomorrow\Trader\Infrastructure\Test\TestContainer;
+use Thinktomorrow\Trader\Infrastructure\Test\TestTraderConfig;
 
 abstract class CartContext extends TestCase
 {
@@ -113,7 +112,9 @@ abstract class CartContext extends TestCase
             ProductId::fromString($productTitle),
             VariantId::fromString($productTitle . '-123'),
             VariantUnitPrice::fromMoney(
-                Cash::make(1000), TaxRate::fromString('20'), true
+                Cash::make(1000),
+                TaxRate::fromString('20'),
+                true
             ),
             VariantSalePrice::fromMoney(Money::EUR($price * 100), TaxRate::fromString('20'), true),
         );
@@ -139,7 +140,7 @@ abstract class CartContext extends TestCase
         $shippingProfile = ShippingProfile::create(ShippingProfileId::fromString($shippingProfileId));
         $shippingProfile->addData(['title' => ['nl' => Str::headline($shippingProfileId)]]);
 
-        foreach($countries as $country) {
+        foreach ($countries as $country) {
             $shippingProfile->addCountry(ShippingCountry::fromString($country));
         }
 
@@ -158,7 +159,7 @@ abstract class CartContext extends TestCase
         $paymentMethod = PaymentMethod::create(PaymentMethodId::fromString($paymentMethodId), Cash::make($paymentRate * 100));
         $paymentMethod->addData(['title' => ['nl' => Str::headline($paymentMethodId)]]);
 
-       $this->paymentMethodRepository->save($paymentMethod);
+        $this->paymentMethodRepository->save($paymentMethod);
     }
 
     public function givenACustomerExists(string $email, bool $is_business = false)
@@ -188,13 +189,13 @@ abstract class CartContext extends TestCase
 
         $checkFlag = false;
         $lines = $this->orderRepository->find($order->orderId)->getChildEntities()[Line::class];
-        foreach($lines as $line) {
-            if($line['variant_id'] == $productVariantId) {
+        foreach ($lines as $line) {
+            if ($line['variant_id'] == $productVariantId) {
                 $checkFlag = true;
             }
         }
 
-        if(!$checkFlag){
+        if (! $checkFlag) {
             throw new \Exception('Cartitem presence check failed. No line found by ' . $productVariantId);
         }
     }
@@ -210,13 +211,13 @@ abstract class CartContext extends TestCase
 
         $checkFlag = false;
         $lines = $this->orderRepository->find($orderId)->getChildEntities()[Line::class];
-        foreach($lines as $line) {
-            if($line['variant_id'] == $productVariantId) {
+        foreach ($lines as $line) {
+            if ($line['variant_id'] == $productVariantId) {
                 $checkFlag = true;
             }
         }
 
-        if(!$checkFlag){
+        if (! $checkFlag) {
             throw new \Exception('Cartitem presence check failed. No line found by ' . $productVariantId);
         }
     }
@@ -228,8 +229,8 @@ abstract class CartContext extends TestCase
 
         // Find matching line by productId
         $lineId = null;
-        foreach($lines as $line) {
-            if($line['variant_id'] == $productTitle) {
+        foreach ($lines as $line) {
+            if ($line['variant_id'] == $productTitle) {
                 $lineId = LineId::fromString($line['line_id']);
             }
         }
@@ -248,8 +249,8 @@ abstract class CartContext extends TestCase
 
         // Find matching line by productId
         $lineId = null;
-        foreach($lines as $line) {
-            if($line['variant_id'] == $productVariantId) {
+        foreach ($lines as $line) {
+            if ($line['variant_id'] == $productVariantId) {
                 $lineId = LineId::fromString($line['line_id']);
             }
         }
@@ -290,7 +291,7 @@ abstract class CartContext extends TestCase
         $lines = $this->orderRepository->find($order->orderId)->getChildEntities()[Line::class];
 
         Assert::assertCount((int) $times, $lines);
-        if(count($lines) > 0) {
+        if (count($lines) > 0) {
             Assert::assertEquals((int) $quantity, $lines[0]['quantity']);
         }
     }
@@ -303,7 +304,12 @@ abstract class CartContext extends TestCase
     protected function whenIAddShippingAddress(?string $country = null, ?string $line1 = null, ?string $line2 = null, ?string $postalCode = null, ?string $city = null)
     {
         $this->cartApplication->updateShippingAddress(new UpdateShippingAddress(
-            $this->getOrder()->orderId->get(), $country, $line1, $line2, $postalCode, $city
+            $this->getOrder()->orderId->get(),
+            $country,
+            $line1,
+            $line2,
+            $postalCode,
+            $city
         ));
 
         $this->assertEquals([$country, $line1, $line2, $postalCode, $city], array_values($this->getOrder()->getShippingAddress()->getAddress()->toArray()));
@@ -312,7 +318,12 @@ abstract class CartContext extends TestCase
     protected function whenIAddBillingAddress(?string $country = null, ?string $line1 = null, ?string $line2 = null, ?string $postalCode = null, ?string $city = null)
     {
         $this->cartApplication->updateBillingAddress(new UpdateBillingAddress(
-            $this->getOrder()->orderId->get(), $country, $line1, $line2, $postalCode, $city
+            $this->getOrder()->orderId->get(),
+            $country,
+            $line1,
+            $line2,
+            $postalCode,
+            $city
         ));
 
         $this->assertEquals([$country, $line1, $line2, $postalCode, $city], array_values($this->getOrder()->getBillingAddress()->getAddress()->toArray()));
@@ -321,7 +332,8 @@ abstract class CartContext extends TestCase
     protected function whenIChooseShipping(string $shippingProfileId)
     {
         $this->cartApplication->chooseShippingProfile(new ChooseShippingProfile(
-            $this->getOrder()->orderId->get(), $shippingProfileId
+            $this->getOrder()->orderId->get(),
+            $shippingProfileId
         ));
 
         $this->assertEquals($shippingProfileId, $this->getOrder()->getShippings()[0]->getShippingProfileId()->get());
@@ -330,7 +342,8 @@ abstract class CartContext extends TestCase
     protected function whenIChoosePayment(string $paymentMethodId)
     {
         $this->cartApplication->choosePaymentMethod(new ChoosePaymentMethod(
-            $this->getOrder()->orderId->get(), $paymentMethodId
+            $this->getOrder()->orderId->get(),
+            $paymentMethodId
         ));
 
         $this->assertEquals($paymentMethodId, $this->getOrder()->getPayment()->getPaymentMethodId()->get());
@@ -348,13 +361,13 @@ abstract class CartContext extends TestCase
 
         // Find matching line by variantId
         $line = null;
-        foreach($lines as $_line) {
-            if($_line->getVariantId()->get() == $productVariantId) {
+        foreach ($lines as $_line) {
+            if ($_line->getVariantId()->get() == $productVariantId) {
                 $line = $_line;
             }
         }
 
-        if(!$line) {
+        if (! $line) {
             throw new \Exception('No line found by ' . $productVariantId);
         }
 
@@ -365,7 +378,7 @@ abstract class CartContext extends TestCase
     protected function getOrder(): Order
     {
         // Create an order if not already
-        try{
+        try {
             return $this->orderRepository->find(OrderId::fromString('xxx'));
         } catch (CouldNotFindOrder $e) {
             $this->orderRepository->save($order = Order::create(

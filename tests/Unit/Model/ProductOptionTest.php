@@ -4,13 +4,13 @@ declare(strict_types=1);
 namespace Tests\Unit\Model;
 
 use Tests\Unit\TestCase;
-use Thinktomorrow\Trader\Domain\Model\Product\ProductId;
+use Thinktomorrow\Trader\Domain\Model\Product\Event\OptionsUpdated;
+use Thinktomorrow\Trader\Domain\Model\Product\Event\ProductCreated;
 use Thinktomorrow\Trader\Domain\Model\Product\Option\Option;
 use Thinktomorrow\Trader\Domain\Model\Product\Option\OptionId;
-use Thinktomorrow\Trader\Domain\Model\Product\Event\ProductCreated;
 use Thinktomorrow\Trader\Domain\Model\Product\Option\OptionValue;
-use Thinktomorrow\Trader\Domain\Model\Product\Event\OptionsUpdated;
 use Thinktomorrow\Trader\Domain\Model\Product\Option\OptionValueId;
+use Thinktomorrow\Trader\Domain\Model\Product\ProductId;
 
 class ProductOptionTest extends TestCase
 {
@@ -32,7 +32,7 @@ class ProductOptionTest extends TestCase
                 'option_id' => 'ooo',
                 'values' => [],
                 'data' => json_encode(['foo' => 'bar']),
-            ]
+            ],
         ], $product->getChildEntities()[Option::class]);
     }
 
@@ -52,7 +52,7 @@ class ProductOptionTest extends TestCase
     {
         $product = $this->createdProduct();
 
-        $product->updateOptions([$option = Option::create($product->productId, OptionId::fromString('ooo'),[])]);
+        $product->updateOptions([$option = Option::create($product->productId, OptionId::fromString('ooo'), [])]);
         $option->updateOptionValues([OptionValue::create($option->optionId, OptionValueId::fromString('xxx'), [
             'label' => [
                 'nl' => 'option value label nl',
@@ -78,11 +78,11 @@ class ProductOptionTest extends TestCase
                                 'nl' => 'option value label nl',
                                 'en' => 'option value label en',
                             ],
-                        ])
-                    ]
+                        ]),
+                    ],
                 ],
                 'data' => json_encode([]),
-            ]
+            ],
         ], $product->getChildEntities()[Option::class]);
     }
 
@@ -109,7 +109,7 @@ class ProductOptionTest extends TestCase
                 'option_id' => 'ooo',
                 'values' => [],
                 'data' => json_encode([]),
-            ]
+            ],
         ], $product->getChildEntities()[Option::class]);
     }
 
@@ -136,16 +136,16 @@ class ProductOptionTest extends TestCase
                     [
                         'option_id' => 'ooo',
                         'option_value_id' => 'yyy',
-                        'data' => json_encode([])
+                        'data' => json_encode([]),
                     ],
                     [
                         'option_id' => 'ooo',
                         'option_value_id' => 'xxx',
-                        'data' => json_encode([])
-                    ]
+                        'data' => json_encode([]),
+                    ],
                 ],
                 'data' => json_encode(['foo' => 'bar']),
-            ]
+            ],
         ], $product->getChildEntities()[Option::class]);
     }
 

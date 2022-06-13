@@ -3,12 +3,12 @@ declare(strict_types=1);
 
 namespace Thinktomorrow\Trader\Infrastructure\Shop\CustomerAuth\Controllers;
 
+use Illuminate\Foundation\Validation\ValidatesRequests;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Foundation\Validation\ValidatesRequests;
-use function route;
 use function redirect;
+use function route;
 
 class CustomerAuthController extends Controller
 {
@@ -16,7 +16,6 @@ class CustomerAuthController extends Controller
 
     public function __construct()
     {
-
     }
 
     public function showLoginForm()

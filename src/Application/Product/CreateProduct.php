@@ -3,9 +3,9 @@ declare(strict_types=1);
 
 namespace Thinktomorrow\Trader\Application\Product;
 
-use Thinktomorrow\Trader\Domain\Model\Taxon\TaxonId;
-use Thinktomorrow\Trader\Domain\Model\Product\Variant\VariantUnitPrice;
 use Thinktomorrow\Trader\Domain\Model\Product\Variant\VariantSalePrice;
+use Thinktomorrow\Trader\Domain\Model\Product\Variant\VariantUnitPrice;
+use Thinktomorrow\Trader\Domain\Model\Taxon\TaxonId;
 
 class CreateProduct
 {
@@ -24,7 +24,7 @@ class CreateProduct
 
     public function getTaxonIds(): array
     {
-        return array_map(fn($taxonId) => TaxonId::fromString($taxonId), $this->taxonIds);
+        return array_map(fn ($taxonId) => TaxonId::fromString($taxonId), $this->taxonIds);
     }
 
     public function getUnitPrice(bool $doesPriceInputIncludesVat, string $currency): VariantUnitPrice

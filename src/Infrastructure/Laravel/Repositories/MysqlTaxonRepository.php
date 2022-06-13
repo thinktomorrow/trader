@@ -3,14 +3,14 @@ declare(strict_types=1);
 
 namespace Thinktomorrow\Trader\Infrastructure\Laravel\Repositories;
 
-use Ramsey\Uuid\Uuid;
-use Illuminate\Support\Str;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Str;
+use Ramsey\Uuid\Uuid;
+use Thinktomorrow\Trader\Domain\Model\Taxon\Exceptions\CouldNotFindTaxon;
 use Thinktomorrow\Trader\Domain\Model\Taxon\Taxon;
 use Thinktomorrow\Trader\Domain\Model\Taxon\TaxonId;
 use Thinktomorrow\Trader\Domain\Model\Taxon\TaxonKey;
 use Thinktomorrow\Trader\Domain\Model\Taxon\TaxonRepository;
-use Thinktomorrow\Trader\Domain\Model\Taxon\Exceptions\CouldNotFindTaxon;
 
 class MysqlTaxonRepository implements TaxonRepository
 {
@@ -20,7 +20,7 @@ class MysqlTaxonRepository implements TaxonRepository
     {
         $state = $taxon->getMappedData();
 
-        if (!$this->exists($taxon->taxonId)) {
+        if (! $this->exists($taxon->taxonId)) {
             DB::table(static::$taxonTable)->insert($state);
         } else {
             DB::table(static::$taxonTable)->where('taxon_id', $taxon->taxonId)->update($state);
@@ -38,7 +38,7 @@ class MysqlTaxonRepository implements TaxonRepository
             ->where(static::$taxonTable . '.taxon_id', $taxonId->get())
             ->first();
 
-        if (!$taxonState) {
+        if (! $taxonState) {
             throw new CouldNotFindTaxon('No taxon found by id [' . $taxonId->get() . ']');
         }
 
@@ -52,7 +52,7 @@ class MysqlTaxonRepository implements TaxonRepository
             ->get();
 
         return $taxonStates
-            ->map(fn($record) => Taxon::fromMappedData((array) $record, []))
+            ->map(fn ($record) => Taxon::fromMappedData((array) $record, []))
             ->toArray();
     }
 
@@ -70,7 +70,7 @@ class MysqlTaxonRepository implements TaxonRepository
     {
         $key = $taxonKey;
 
-        while($this->existsByKey($key, $allowedTaxonId)) {
+        while ($this->existsByKey($key, $allowedTaxonId)) {
             $key = TaxonKey::fromString($taxonKey->get() . '_' . Str::random(3));
         }
 

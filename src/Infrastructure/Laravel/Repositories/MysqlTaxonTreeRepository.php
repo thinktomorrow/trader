@@ -5,14 +5,14 @@ namespace Thinktomorrow\Trader\Infrastructure\Laravel\Repositories;
 
 use Illuminate\Support\Facades\DB;
 use Psr\Container\ContainerInterface;
-use Thinktomorrow\Vine\NodeCollectionFactory;
-use Thinktomorrow\Trader\Infrastructure\Vine\TaxonSource;
-use Thinktomorrow\Trader\Application\Taxon\Tree\TaxonNode;
-use Thinktomorrow\Trader\Application\Taxon\Tree\TaxonTree;
-use Thinktomorrow\Trader\Application\Taxon\Tree\TaxonNodes;
-use Thinktomorrow\Trader\Application\Taxon\Tree\TaxonTreeRepository;
 use Thinktomorrow\Trader\Application\Taxon\Category\CategoryRepository;
+use Thinktomorrow\Trader\Application\Taxon\Tree\TaxonNode;
+use Thinktomorrow\Trader\Application\Taxon\Tree\TaxonNodes;
+use Thinktomorrow\Trader\Application\Taxon\Tree\TaxonTree;
+use Thinktomorrow\Trader\Application\Taxon\Tree\TaxonTreeRepository;
 use Thinktomorrow\Trader\Domain\Model\Taxon\Exceptions\CouldNotFindTaxon;
+use Thinktomorrow\Trader\Infrastructure\Vine\TaxonSource;
+use Thinktomorrow\Vine\NodeCollectionFactory;
 
 class MysqlTaxonTreeRepository implements TaxonTreeRepository, CategoryRepository
 {
@@ -32,7 +32,7 @@ class MysqlTaxonTreeRepository implements TaxonTreeRepository, CategoryRepositor
         /** @var TaxonNode $taxonNode */
         $taxonNode = $this->getTree()->find(fn (TaxonNode $taxonNode) => $taxonNode->getKey() == $key);
 
-        if(!$taxonNode) {
+        if (! $taxonNode) {
             throw new CouldNotFindTaxon('No taxon record found by key ' . $key);
         }
 
@@ -41,7 +41,7 @@ class MysqlTaxonTreeRepository implements TaxonTreeRepository, CategoryRepositor
 
     public function getTree(): TaxonTree
     {
-        if($this->tree) {
+        if ($this->tree) {
             return $this->tree;
         }
 
@@ -64,7 +64,7 @@ class MysqlTaxonTreeRepository implements TaxonTreeRepository, CategoryRepositor
         $taxonNodeClass = $this->container->get(TaxonNode::class);
 
         return TaxonNodes::fromType(
-            $results->map(fn($row) => $taxonNodeClass::fromMappedData((array) $row))->all()
+            $results->map(fn ($row) => $taxonNodeClass::fromMappedData((array) $row))->all()
         );
     }
 }

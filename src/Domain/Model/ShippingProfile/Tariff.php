@@ -16,7 +16,6 @@ final class Tariff implements ChildEntity
 
     private function __construct()
     {
-
     }
 
     public static function create(ShippingProfileId $shippingProfileId, TariffNumber $tariffNumber, Money $rate, Money $from, Money $to): static
@@ -53,10 +52,10 @@ final class Tariff implements ChildEntity
     {
         return [
             'shipping_profile_id' => $this->shippingProfileId->get(),
-            'tariff_number'    => $this->tariffNumber->asInt(),
-            'rate'             => $this->rate->getAmount(),
-            'from'             => $this->from->getAmount(),
-            'to'               => $this->to->getAmount(),
+            'tariff_number' => $this->tariffNumber->asInt(),
+            'rate' => $this->rate->getAmount(),
+            'from' => $this->from->getAmount(),
+            'to' => $this->to->getAmount(),
         ];
     }
 

@@ -6,14 +6,12 @@ namespace Tests\Unit\Model;
 use Money\Money;
 use PHPUnit\Framework\TestCase;
 use Thinktomorrow\Trader\Domain\Common\Taxes\TaxRate;
+use Thinktomorrow\Trader\Domain\Model\Product\Option\OptionValueId;
 use Thinktomorrow\Trader\Domain\Model\Product\ProductId;
 use Thinktomorrow\Trader\Domain\Model\Product\Variant\Variant;
-use Thinktomorrow\Trader\Domain\Model\Product\Option\OptionId;
 use Thinktomorrow\Trader\Domain\Model\Product\Variant\VariantId;
-use Thinktomorrow\Trader\Domain\Model\Product\Option\OptionValue;
-use Thinktomorrow\Trader\Domain\Model\Product\Option\OptionValueId;
-use Thinktomorrow\Trader\Domain\Model\Product\Variant\VariantUnitPrice;
 use Thinktomorrow\Trader\Domain\Model\Product\Variant\VariantSalePrice;
+use Thinktomorrow\Trader\Domain\Model\Product\Variant\VariantUnitPrice;
 
 class OptionTest extends TestCase
 {
@@ -24,7 +22,9 @@ class OptionTest extends TestCase
             $productId = ProductId::fromString('xxx'),
             $variantId = VariantId::fromString('yyy'),
             $productUnitPrice = VariantUnitPrice::fromMoney(
-                Money::EUR(10), TaxRate::fromString('20'), false
+                Money::EUR(10),
+                TaxRate::fromString('20'),
+                false
             ),
             $productSalePrice = VariantSalePrice::fromMoney(Money::EUR(8), TaxRate::fromString('20'), false),
         );
@@ -34,7 +34,7 @@ class OptionTest extends TestCase
         ]);
 
         $this->assertEquals([
-            'def'
+            'def',
         ], $variant->getMappedData()['option_value_ids']);
     }
 }

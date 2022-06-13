@@ -4,15 +4,9 @@ declare(strict_types=1);
 namespace Tests\Acceptance\Product;
 
 use Tests\TestHelpers;
-use Thinktomorrow\Trader\Application\Product\DeleteProduct;
 use Thinktomorrow\Trader\Application\Product\DeleteVariant;
-use Thinktomorrow\Trader\Domain\Model\Product\Option\Option;
-use Thinktomorrow\Trader\Domain\Model\Product\Event\OptionsUpdated;
-use Thinktomorrow\Trader\Domain\Model\Product\Event\ProductDeleted;
 use Thinktomorrow\Trader\Domain\Model\Product\Event\VariantDeleted;
-use Thinktomorrow\Trader\Domain\Model\Product\Exceptions\CouldNotFindProduct;
 use Thinktomorrow\Trader\Domain\Model\Product\Exceptions\CouldNotDeleteVariant;
-use Thinktomorrow\Trader\Application\Product\UpdateProduct\UpdateProductOptions;
 
 class DeleteVariantTest extends ProductContext
 {
@@ -22,7 +16,7 @@ class DeleteVariantTest extends ProductContext
     public function it_can_delete_a_variant()
     {
         $productId = $this->createAProduct('50', ['1','2'], ['title' => ['nl' => 'foobar nl']]);
-        $variantId = $this->createAVariant($productId->get(), '12','3', [], 'yyy-123');
+        $variantId = $this->createAVariant($productId->get(), '12', '3', [], 'yyy-123');
 
         $this->productApplication->deleteVariant(new DeleteVariant($productId->get(), $variantId->get()));
 

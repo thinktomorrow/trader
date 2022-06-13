@@ -9,6 +9,5 @@ class TaxonCreated
 {
     public function __construct(public readonly TaxonId $taxonId)
     {
-
     }
 }

@@ -3,8 +3,8 @@ declare(strict_types=1);
 
 namespace Thinktomorrow\Trader\Domain\Model\Product\Option;
 
-use Thinktomorrow\Trader\Domain\Common\Entity\HasData;
 use Thinktomorrow\Trader\Domain\Common\Entity\ChildEntity;
+use Thinktomorrow\Trader\Domain\Common\Entity\HasData;
 
 class OptionValue implements ChildEntity
 {
@@ -15,7 +15,6 @@ class OptionValue implements ChildEntity
 
     private function __construct()
     {
-
     }
 
     public static function create(OptionId $optionId, OptionValueId $optionValueId, array $data): static

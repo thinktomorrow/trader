@@ -3,16 +3,16 @@ declare(strict_types=1);
 
 namespace Tests\Infrastructure\Repositories;
 
+use function bcrypt;
 use Carbon\Carbon;
-use Illuminate\Support\Facades\DB;
-use Tests\Infrastructure\TestCase;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Notification;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Notification;
+use function route;
+use Tests\Infrastructure\TestCase;
 use Thinktomorrow\Trader\Infrastructure\Shop\CustomerAuth\CustomerModel;
 use Thinktomorrow\Trader\Infrastructure\Shop\CustomerAuth\Notifications\ResetCustomerPasswordNotification;
-use function route;
-use function bcrypt;
 
 class CustomerPasswordResetTest extends TestCase
 {
@@ -25,8 +25,8 @@ class CustomerPasswordResetTest extends TestCase
 
         $customer = $this->createACustomerLogin();
 
-        $response = $this->post(route('customer.password.email'),[
-            'email' => 'ben@thinktomorrow.be'
+        $response = $this->post(route('customer.password.email'), [
+            'email' => 'ben@thinktomorrow.be',
         ]);
 
         $response->assertSessionHasNoErrors();
@@ -48,8 +48,8 @@ class CustomerPasswordResetTest extends TestCase
 
         $this->createACustomerLogin();
 
-        $response = $this->post(route('customer.password.email'),[
-            'email' => 'fake@example.com'
+        $response = $this->post(route('customer.password.email'), [
+            'email' => 'fake@example.com',
         ]);
 
         $this->assertDatabaseCount('trader_customer_password_resets', 0);
@@ -70,13 +70,13 @@ class CustomerPasswordResetTest extends TestCase
         DB::insert('INSERT INTO trader_customer_password_resets (email, token, created_at) VALUES(?, ?, ?)', [
             "ben@thinktomorrow.be",
             bcrypt("71594f253f7543eca5d884b37c637b0611b6a40809250c2e5ba2fbc9db74916c"),
-            Carbon::now()
+            Carbon::now(),
         ]);
 
         $response = $this->post(route('customer.password.reset.store'), [
-            'token'                 => "71594f253f7543eca5d884b37c637b0611b6a40809250c2e5ba2fbc9db74916c",
-            'email'                 => "ben@thinktomorrow.be",
-            'password'              => "new-password",
+            'token' => "71594f253f7543eca5d884b37c637b0611b6a40809250c2e5ba2fbc9db74916c",
+            'email' => "ben@thinktomorrow.be",
+            'password' => "new-password",
             'password_confirmation' => "new-password",
         ]);
 
@@ -85,9 +85,9 @@ class CustomerPasswordResetTest extends TestCase
 
         Auth::guard('customer')->logout();
 
-        $response = $this->post(route('customer.login.store'),[
-            'email'     => 'ben@thinktomorrow.be',
-            'password'  => 'new-password',
+        $response = $this->post(route('customer.login.store'), [
+            'email' => 'ben@thinktomorrow.be',
+            'password' => 'new-password',
         ]);
 
         $response->assertSessionHasNoErrors();
@@ -95,6 +95,4 @@ class CustomerPasswordResetTest extends TestCase
 
         $this->assertTrue(Auth::guard('customer')->check());
     }
-
-
 }

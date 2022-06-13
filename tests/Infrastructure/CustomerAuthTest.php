@@ -3,8 +3,8 @@ declare(strict_types=1);
 
 namespace Tests\Infrastructure;
 
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Auth;
 use Thinktomorrow\Trader\Infrastructure\Shop\CustomerAuth\CustomerModel;
 
 class CustomerAuthTest extends TestCase
@@ -23,7 +23,7 @@ class CustomerAuthTest extends TestCase
     public function it_returns_a_json_error_if_unauthenticated_request_expects_json_response()
     {
         $response = $this->get(route('customer.home'), [
-            'Accept' => 'application/json'
+            'Accept' => 'application/json',
         ]);
 
         $response->assertStatus(401);
@@ -34,7 +34,7 @@ class CustomerAuthTest extends TestCase
     {
         $customer = $this->createACustomerLogin();
 
-        $response = $this->post(route('customer.login.store'),[
+        $response = $this->post(route('customer.login.store'), [
             'email' => 'ben@thinktomorrow.be',
             'password' => '123456',
         ]);
@@ -52,7 +52,7 @@ class CustomerAuthTest extends TestCase
         $this->createACustomerLogin();
 
         // Enter invalid credentials
-        $response = $this->post(route('customer.login.store'),[
+        $response = $this->post(route('customer.login.store'), [
             'email' => 'ben@thinktomorrow.be',
             'password' => 'xxx',
         ]);
@@ -67,7 +67,7 @@ class CustomerAuthTest extends TestCase
     {
         $customer = $this->createACustomerLogin();
 
-        $response = $this->actingAs(CustomerModel::first(),'customer')
+        $response = $this->actingAs(CustomerModel::first(), 'customer')
             ->get(route('customer.home'));
 
         $response->assertStatus(200);
@@ -82,7 +82,7 @@ class CustomerAuthTest extends TestCase
         $this->get(route('customer.orders'))
              ->assertRedirect(route('customer.login'));
 
-        $response = $this->post(route('customer.login.store'),[
+        $response = $this->post(route('customer.login.store'), [
             'email' => 'ben@thinktomorrow.be',
             'password' => '123456',
         ]);
@@ -91,7 +91,7 @@ class CustomerAuthTest extends TestCase
     }
 
     /** @test */
-    function customer_is_attached_to_current_cart_after_login()
+    public function customer_is_attached_to_current_cart_after_login()
     {
         $this->markTestSkipped();
     }
@@ -120,7 +120,7 @@ class CustomerAuthTest extends TestCase
 
         $this->assertEquals($customer->customerId->get(), Auth::guard('customer')->user()->customer_id);
 
-        $response = $this->post(route('customer.login.store'),[
+        $response = $this->post(route('customer.login.store'), [
             'email' => 'ben@thinktomorrow.be',
             'password' => '123456',
         ]);

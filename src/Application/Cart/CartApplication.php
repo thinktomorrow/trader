@@ -3,32 +3,32 @@ declare(strict_types=1);
 
 namespace Thinktomorrow\Trader\Application\Cart;
 
-use Thinktomorrow\Trader\TraderConfig;
-use Thinktomorrow\Trader\Domain\Model\Order\Order;
-use Thinktomorrow\Trader\Domain\Model\Order\Shopper;
-use Thinktomorrow\Trader\Domain\Model\Order\OrderId;
-use Thinktomorrow\Trader\Domain\Common\Taxes\TaxRate;
 use Thinktomorrow\Trader\Application\Cart\Line\AddLine;
-use Thinktomorrow\Trader\Domain\Model\Order\Line\LineId;
-use Thinktomorrow\Trader\Application\Cart\Line\RemoveLine;
-use Thinktomorrow\Trader\Domain\Model\Order\Line\LinePrice;
-use Thinktomorrow\Trader\Domain\Model\Order\Payment\Payment;
-use Thinktomorrow\Trader\Domain\Model\Order\OrderRepository;
-use Thinktomorrow\Trader\Domain\Common\Event\EventDispatcher;
-use Thinktomorrow\Trader\Domain\Model\Order\Shipping\Shipping;
-use Thinktomorrow\Trader\Domain\Model\Order\Payment\PaymentCost;
 use Thinktomorrow\Trader\Application\Cart\Line\AddLineToNewOrder;
-use Thinktomorrow\Trader\Domain\Model\Order\Shipping\ShippingCost;
-use Thinktomorrow\Trader\Domain\Model\Customer\CustomerRepository;
 use Thinktomorrow\Trader\Application\Cart\Line\ChangeLineQuantity;
-use Thinktomorrow\Trader\Domain\Model\Order\Address\BillingAddress;
-use Thinktomorrow\Trader\Domain\Model\Order\Address\ShippingCountry;
-use Thinktomorrow\Trader\Domain\Model\Order\Address\ShippingAddress;
-use Thinktomorrow\Trader\Domain\Model\PaymentMethod\PaymentMethodRepository;
-use Thinktomorrow\Trader\Domain\Model\ShippingProfile\ShippingProfileRepository;
+use Thinktomorrow\Trader\Application\Cart\Line\RemoveLine;
 use Thinktomorrow\Trader\Application\Cart\VariantForCart\VariantForCartRepository;
-use Thinktomorrow\Trader\Domain\Model\ShippingProfile\Exceptions\ShippingProfileNotSelectableForCountry;
+use Thinktomorrow\Trader\Domain\Common\Event\EventDispatcher;
+use Thinktomorrow\Trader\Domain\Common\Taxes\TaxRate;
+use Thinktomorrow\Trader\Domain\Model\Customer\CustomerRepository;
+use Thinktomorrow\Trader\Domain\Model\Order\Address\BillingAddress;
+use Thinktomorrow\Trader\Domain\Model\Order\Address\ShippingAddress;
+use Thinktomorrow\Trader\Domain\Model\Order\Address\ShippingCountry;
+use Thinktomorrow\Trader\Domain\Model\Order\Line\LineId;
+use Thinktomorrow\Trader\Domain\Model\Order\Line\LinePrice;
+use Thinktomorrow\Trader\Domain\Model\Order\Order;
+use Thinktomorrow\Trader\Domain\Model\Order\OrderId;
+use Thinktomorrow\Trader\Domain\Model\Order\OrderRepository;
+use Thinktomorrow\Trader\Domain\Model\Order\Payment\Payment;
+use Thinktomorrow\Trader\Domain\Model\Order\Payment\PaymentCost;
+use Thinktomorrow\Trader\Domain\Model\Order\Shipping\Shipping;
+use Thinktomorrow\Trader\Domain\Model\Order\Shipping\ShippingCost;
+use Thinktomorrow\Trader\Domain\Model\Order\Shopper;
+use Thinktomorrow\Trader\Domain\Model\PaymentMethod\PaymentMethodRepository;
 use Thinktomorrow\Trader\Domain\Model\ShippingProfile\Exceptions\CouldNotSelectShippingProfileDueToMissingShippingCountry;
+use Thinktomorrow\Trader\Domain\Model\ShippingProfile\Exceptions\ShippingProfileNotSelectableForCountry;
+use Thinktomorrow\Trader\Domain\Model\ShippingProfile\ShippingProfileRepository;
+use Thinktomorrow\Trader\TraderConfig;
 
 final class CartApplication
 {
@@ -48,8 +48,7 @@ final class CartApplication
         PaymentMethodRepository   $paymentMethodRepository,
         CustomerRepository        $customerRepository,
         EventDispatcher           $eventDispatcher
-    )
-    {
+    ) {
         $this->findVariantDetailsForCart = $findVariantDetailsForCart;
         $this->orderRepository = $orderRepository;
         $this->shippingProfileRepository = $shippingProfileRepository;
@@ -193,13 +192,13 @@ final class CartApplication
         $order = $this->orderRepository->find($chooseShippingProfile->getOrderId());
 
         // Country of shipment
-        if(!$shippingCountry = $order->getShippingAddress()?->getAddress()->country){
+        if (! $shippingCountry = $order->getShippingAddress()?->getAddress()->country) {
             throw new CouldNotSelectShippingProfileDueToMissingShippingCountry(
                 'Order ['.$order->orderId->get().'] missing a shipping country that is required when selecting a shipping profile ' . $shippingProfile->shippingProfileId->get()
             );
         }
 
-        if(!$shippingProfile->hasCountry(ShippingCountry::fromString($shippingCountry))) {
+        if (! $shippingProfile->hasCountry(ShippingCountry::fromString($shippingCountry))) {
             throw new ShippingProfileNotSelectableForCountry(
                 'Shipping profile ' . $shippingProfile->shippingProfileId->get() . ' is not allowed for country ' . $shippingCountry
             );
@@ -214,7 +213,7 @@ final class CartApplication
             $this->config->doesPriceInputIncludesVat()
         );
 
-        if(count($order->getShippings()) > 0) {
+        if (count($order->getShippings()) > 0) {
             /** @var Shipping $existingShipping */
             $existingShipping = $order->getShippings()[0];
             $existingShipping->updateShippingProfile($shippingProfile->shippingProfileId);
@@ -223,7 +222,6 @@ final class CartApplication
 
             $order->updateShipping($existingShipping);
         } else {
-
             $shipping = Shipping::create(
                 $order->orderId,
                 $this->orderRepository->nextShippingReference(),
@@ -262,7 +260,7 @@ final class CartApplication
 
         // Currently no restrictions on payment selection... if any, this should be checked here.
 
-        if($payment = $order->getPayment()) {
+        if ($payment = $order->getPayment()) {
             $payment->updatePaymentMethod($paymentMethod->paymentMethodId);
             $payment->updateCost($paymentCost);
         } else {
@@ -288,7 +286,7 @@ final class CartApplication
     {
         $order = $this->orderRepository->find($updateShopper->getOrderId());
 
-        if($shopper = $order->getShopper()) {
+        if ($shopper = $order->getShopper()) {
             $shopper->updateEmail($updateShopper->getEmail());
             $shopper->updateBusiness($updateShopper->isBusiness());
         } else {
@@ -312,7 +310,7 @@ final class CartApplication
         $order = $this->orderRepository->find($chooseCustomer->getOrderId());
         $customer = $this->customerRepository->find($chooseCustomer->getCustomerId());
 
-        if($shopper = $order->getShopper()) {
+        if ($shopper = $order->getShopper()) {
             $shopper->updateEmail($customer->getEmail());
             $shopper->updateBusiness($customer->isBusiness());
         } else {
@@ -331,6 +329,4 @@ final class CartApplication
 
         $this->eventDispatcher->dispatchAll($order->releaseEvents());
     }
-
-
 }

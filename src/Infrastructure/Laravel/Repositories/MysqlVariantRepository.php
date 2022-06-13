@@ -3,16 +3,16 @@ declare(strict_types=1);
 
 namespace Thinktomorrow\Trader\Infrastructure\Laravel\Repositories;
 
-use Ramsey\Uuid\Uuid;
 use Illuminate\Support\Facades\DB;
 use Psr\Container\ContainerInterface;
-use Thinktomorrow\Trader\Domain\Model\Product\ProductId;
+use Ramsey\Uuid\Uuid;
+use Thinktomorrow\Trader\Application\Cart\VariantForCart\VariantForCart;
+use Thinktomorrow\Trader\Application\Cart\VariantForCart\VariantForCartRepository;
 use Thinktomorrow\Trader\Application\Common\TraderHelpers;
+use Thinktomorrow\Trader\Domain\Model\Product\ProductId;
 use Thinktomorrow\Trader\Domain\Model\Product\Variant\Variant;
 use Thinktomorrow\Trader\Domain\Model\Product\Variant\VariantId;
 use Thinktomorrow\Trader\Domain\Model\Product\VariantRepository;
-use Thinktomorrow\Trader\Application\Cart\VariantForCart\VariantForCart;
-use Thinktomorrow\Trader\Application\Cart\VariantForCart\VariantForCartRepository;
 
 class MysqlVariantRepository implements VariantRepository, VariantForCartRepository
 {
@@ -34,7 +34,7 @@ class MysqlVariantRepository implements VariantRepository, VariantForCartReposit
 
         $option_value_ids = TraderHelpers::array_remove($state, 'option_value_ids');
 
-        if (!$this->exists($variant->variantId)) {
+        if (! $this->exists($variant->variantId)) {
             DB::table(static::$variantTable)->insert($state);
         } else {
             DB::table(static::$variantTable)->where('variant_id', $variant->variantId)->update($state);
@@ -61,7 +61,7 @@ class MysqlVariantRepository implements VariantRepository, VariantForCartReposit
 
         // Remove the ones that are not in the new list
         $detachOptionValueIds = $existingOptionValueIds->diff($changedOptionValueIds);
-        if($detachOptionValueIds->count() > 0) {
+        if ($detachOptionValueIds->count() > 0) {
             DB::table(static::$variantOptionValueLookupTable)
                 ->where('variant_id', $variantId)
                 ->whereIn('option_value_id', $detachOptionValueIds->all())
@@ -71,7 +71,7 @@ class MysqlVariantRepository implements VariantRepository, VariantForCartReposit
         // Insert the new option_value ids
         $attachOptionValueIds = $changedOptionValueIds->diff($existingOptionValueIds);
 
-        $insertData = $attachOptionValueIds->map(function($option_value_id) use($variantId) {
+        $insertData = $attachOptionValueIds->map(function ($option_value_id) use ($variantId) {
             return ['variant_id' => $variantId->get(), 'option_value_id' => $option_value_id];
         })->all();
 
@@ -83,19 +83,19 @@ class MysqlVariantRepository implements VariantRepository, VariantForCartReposit
         $variantStates = DB::table(static::$variantTable)
             ->select([static::$variantTable . '.*', DB::raw('GROUP_CONCAT(`option_value_id`) AS option_value_ids')])
             ->where(static::$variantTable . '.product_id', $productId->get())
-            ->leftJoin(static::$variantOptionValueLookupTable, static::$variantTable . '.variant_id','=',static::$variantOptionValueLookupTable.'.variant_id')
+            ->leftJoin(static::$variantOptionValueLookupTable, static::$variantTable . '.variant_id', '=', static::$variantOptionValueLookupTable.'.variant_id')
             ->groupBy(static::$variantTable . '.variant_id')
             ->orderBy(static::$variantTable.'.order_column')
             ->get()
-            ->map(fn($item) => (array) $item)
-            ->map(fn($item) => array_merge($item, [
+            ->map(fn ($item) => (array) $item)
+            ->map(fn ($item) => array_merge($item, [
                 'includes_vat' => (bool) $item['includes_vat'],
-                'option_value_ids' => $item['option_value_ids'] ? explode(',', $item['option_value_ids']) : []
+                'option_value_ids' => $item['option_value_ids'] ? explode(',', $item['option_value_ids']) : [],
             ]))
             ->toArray();
 
         // Handle a bug in laravel where raw group concat statement would return a record with falsy null values
-        if(count($variantStates) == 1 && null === $variantStates[0]['variant_id']) {
+        if (count($variantStates) == 1 && null === $variantStates[0]['variant_id']) {
             $variantStates = [];
         }
 
@@ -127,7 +127,7 @@ class MysqlVariantRepository implements VariantRepository, VariantForCartReposit
             ])
             ->first();
 
-        if(!$state) {
+        if (! $state) {
             throw new \RuntimeException('No online variant found by id [' . $variantId->get(). ']');
         }
 

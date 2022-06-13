@@ -7,7 +7,6 @@ class CheckExistingOptionCombination
 {
     public function __construct()
     {
-
     }
 
     public function exists(array $option_ids, $excludeProductId = null): bool

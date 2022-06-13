@@ -11,7 +11,6 @@ class MysqlShippingProfileRepository implements ShippingProfileRepository
 {
     public function __construct()
     {
-
     }
 
     public function save(ShippingProfile $shippingProfile): void

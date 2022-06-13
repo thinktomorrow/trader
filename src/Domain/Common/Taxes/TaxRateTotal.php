@@ -31,7 +31,7 @@ class TaxRateTotal
 
     public function subtract(Money $taxableTotal): static
     {
-        if($taxableTotal->greaterThanOrEqual($this->taxableTotal)) {
+        if ($taxableTotal->greaterThanOrEqual($this->taxableTotal)) {
             return new static($this->taxRate, new Money(0, $this->taxableTotal->getCurrency()));
         }
 

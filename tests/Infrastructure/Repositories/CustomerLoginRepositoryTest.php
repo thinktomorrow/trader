@@ -3,13 +3,13 @@ declare(strict_types=1);
 
 namespace Tests\Infrastructure\Repositories;
 
+use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\Infrastructure\TestCase;
 use Thinktomorrow\Trader\Domain\Common\Email;
-use Illuminate\Foundation\Testing\RefreshDatabase;
 use Thinktomorrow\Trader\Domain\Model\Customer\CustomerId;
 use Thinktomorrow\Trader\Domain\Model\CustomerLogin\CustomerLogin;
-use Thinktomorrow\Trader\Infrastructure\Laravel\Repositories\MysqlCustomerRepository;
 use Thinktomorrow\Trader\Infrastructure\Laravel\Repositories\MysqlCustomerLoginRepository;
+use Thinktomorrow\Trader\Infrastructure\Laravel\Repositories\MysqlCustomerRepository;
 
 final class CustomerLoginRepositoryTest extends TestCase
 {
@@ -23,7 +23,7 @@ final class CustomerLoginRepositoryTest extends TestCase
     {
         $this->createCustomer();
 
-        foreach($this->repositories() as $customerRepository) {
+        foreach ($this->repositories() as $customerRepository) {
             $customerRepository->save($customerLogin);
             $customerLogin->releaseEvents();
 
@@ -39,7 +39,7 @@ final class CustomerLoginRepositoryTest extends TestCase
     {
         $this->createCustomer();
 
-        foreach($this->repositories() as $customerRepository) {
+        foreach ($this->repositories() as $customerRepository) {
             $customerRepository->save($customerLogin);
             $customerLogin->releaseEvents();
 

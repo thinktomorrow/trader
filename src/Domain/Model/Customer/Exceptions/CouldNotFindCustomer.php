@@ -5,5 +5,4 @@ namespace Thinktomorrow\Trader\Domain\Model\Customer\Exceptions;
 
 final class CouldNotFindCustomer extends \RuntimeException
 {
-
 }

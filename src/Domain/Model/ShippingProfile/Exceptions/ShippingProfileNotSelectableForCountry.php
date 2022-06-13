@@ -5,5 +5,4 @@ namespace Thinktomorrow\Trader\Domain\Model\ShippingProfile\Exceptions;
 
 final class ShippingProfileNotSelectableForCountry extends \RuntimeException
 {
-
 }

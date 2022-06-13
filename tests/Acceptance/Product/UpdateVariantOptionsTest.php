@@ -4,9 +4,6 @@ declare(strict_types=1);
 namespace Tests\Acceptance\Product;
 
 use Tests\TestHelpers;
-use Thinktomorrow\Trader\Domain\Model\Product\Option\Option;
-use Thinktomorrow\Trader\Domain\Model\Product\Event\OptionsUpdated;
-use Thinktomorrow\Trader\Application\Product\UpdateProduct\UpdateProductOptions;
 use Thinktomorrow\Trader\Application\Product\UpdateVariant\UpdateVariantOptionValues;
 
 class UpdateVariantOptionsTest extends ProductContext
@@ -33,6 +30,5 @@ class UpdateVariantOptionsTest extends ProductContext
         $variant = $product->getVariants()[0];
 
         $this->assertEquals(['xxx'], $variant->getMappedData()['option_value_ids']);
-
     }
 }

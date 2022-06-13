@@ -5,12 +5,12 @@ namespace Thinktomorrow\Trader\Infrastructure\Laravel\Repositories;
 
 use Illuminate\Support\Facades\DB;
 use Psr\Container\ContainerInterface;
+use Thinktomorrow\Trader\Application\Product\ProductDetail\ProductDetail;
+use Thinktomorrow\Trader\Application\Product\ProductDetail\ProductDetailRepository;
+use Thinktomorrow\Trader\Domain\Model\Product\Exceptions\CouldNotFindVariant;
 use Thinktomorrow\Trader\Domain\Model\Product\ProductState;
 use Thinktomorrow\Trader\Domain\Model\Product\Variant\VariantId;
-use Thinktomorrow\Trader\Application\Product\ProductDetail\ProductDetail;
 use Thinktomorrow\Trader\Infrastructure\Laravel\Models\DefaultProductDetail;
-use Thinktomorrow\Trader\Domain\Model\Product\Exceptions\CouldNotFindVariant;
-use Thinktomorrow\Trader\Application\Product\ProductDetail\ProductDetailRepository;
 
 class MysqlProductDetailRepository implements ProductDetailRepository
 {
@@ -37,11 +37,11 @@ class MysqlProductDetailRepository implements ProductDetailRepository
             ->select([
                 static::$variantTable . '.*',
                 static::$productTable . '.data AS product_data',
-                DB::raw('GROUP_CONCAT(taxon_id) AS taxon_ids')
+                DB::raw('GROUP_CONCAT(taxon_id) AS taxon_ids'),
             ])
         ->first();
 
-        if(!$state) {
+        if (! $state) {
             throw new CouldNotFindVariant('No online variant found by id [' . $variantId->get(). ']');
         }
 
@@ -49,7 +49,7 @@ class MysqlProductDetailRepository implements ProductDetailRepository
 
         return $this->container->get(ProductDetail::class)::fromMappedData(array_merge($state, [
             'includes_vat' => (bool) $state['includes_vat'],
-            'taxon_ids' => $state['taxon_ids'] ? explode(',',$state['taxon_ids']) : []
+            'taxon_ids' => $state['taxon_ids'] ? explode(',', $state['taxon_ids']) : [],
         ]));
     }
 }

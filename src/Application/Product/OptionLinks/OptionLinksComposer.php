@@ -6,8 +6,8 @@ namespace Thinktomorrow\Trader\Application\Product\OptionLinks;
 use Psr\Container\ContainerInterface;
 use Thinktomorrow\Trader\Domain\Common\Locale;
 use Thinktomorrow\Trader\Domain\Model\Product\ProductId;
-use Thinktomorrow\Trader\Domain\Model\Product\Variant\VariantId;
 use Thinktomorrow\Trader\Domain\Model\Product\ProductRepository;
+use Thinktomorrow\Trader\Domain\Model\Product\Variant\VariantId;
 
 class OptionLinksComposer
 {
@@ -30,9 +30,9 @@ class OptionLinksComposer
         $variant = $product->findVariant($variantId);
 
         $variantOptions = [];
-        foreach($product->getOptions() as $option) {
-            foreach($option->getOptionValues() as $optionValue){
-                if(in_array($optionValue->optionValueId, $variant->getOptionValueIds())) {
+        foreach ($product->getOptions() as $option) {
+            foreach ($option->getOptionValues() as $optionValue) {
+                if (in_array($optionValue->optionValueId, $variant->getOptionValueIds())) {
                     $variantOptions[] = $optionValue;
                 }
             }
@@ -40,8 +40,8 @@ class OptionLinksComposer
 
         $results = OptionLinks::empty();
 
-        foreach($product->getOptions() as $option) {
-            foreach($option->getOptionValues() as $optionValue) {
+        foreach ($product->getOptions() as $option) {
+            foreach ($option->getOptionValues() as $optionValue) {
 
                 // Merge this one with the current variant options
                 $mergedVariantOptions = $this->addtoVariantOptions($variantOptions, $optionValue);
@@ -56,7 +56,7 @@ class OptionLinksComposer
                 $optionLink->setLocale($locale);
 
                 // If this option value also belongs to this current variant, we'll mark it as active
-                if(in_array($optionValue->optionValueId, $variant->getOptionValueIds())) {
+                if (in_array($optionValue->optionValueId, $variant->getOptionValueIds())) {
                     $optionLink->markActive();
                 }
 
@@ -76,7 +76,7 @@ class OptionLinksComposer
     {
         $result = [];
 
-        foreach($variantOptions as $variantOption) {
+        foreach ($variantOptions as $variantOption) {
             $result[] = ($variantOption->optionId->equals($optionValue->optionId))
                 ? $optionValue
                 : $variantOption;
@@ -87,10 +87,10 @@ class OptionLinksComposer
 
     private function findVariantByOptionValues(\Thinktomorrow\Trader\Domain\Model\Product\Product $product, array $mergedVariantOptions): ?\Thinktomorrow\Trader\Domain\Model\Product\Variant\Variant
     {
-        $mergedVariantOptionValueIds = array_map(fn(\Thinktomorrow\Trader\Domain\Model\Product\Option\OptionValue $optionValue) => $optionValue->optionValueId,$mergedVariantOptions);
+        $mergedVariantOptionValueIds = array_map(fn (\Thinktomorrow\Trader\Domain\Model\Product\Option\OptionValue $optionValue) => $optionValue->optionValueId, $mergedVariantOptions);
 
-        foreach($product->getVariants() as $variant) {
-            if($this->hasExactOptionsMatch($variant->getOptionValueIds(), $mergedVariantOptionValueIds)) {
+        foreach ($product->getVariants() as $variant) {
+            if ($this->hasExactOptionsMatch($variant->getOptionValueIds(), $mergedVariantOptionValueIds)) {
                 return $variant;
             }
         }
@@ -101,7 +101,9 @@ class OptionLinksComposer
     private function hasExactOptionsMatch(array $firstOptionValueIds, array $secondOptionValueIds): bool
     {
         // array_diff with empty array returns unexpected results
-        if(count($firstOptionValueIds) < 1 || count($secondOptionValueIds) < 1) return false;
+        if (count($firstOptionValueIds) < 1 || count($secondOptionValueIds) < 1) {
+            return false;
+        }
 
         return count(array_diff($firstOptionValueIds, $secondOptionValueIds)) == 0;
     }

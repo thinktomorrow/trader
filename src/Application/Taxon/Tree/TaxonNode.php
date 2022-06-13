@@ -3,8 +3,8 @@ declare(strict_types=1);
 
 namespace Thinktomorrow\Trader\Application\Taxon\Tree;
 
-use Thinktomorrow\Vine\Node;
 use Thinktomorrow\Trader\Domain\Common\Locale;
+use Thinktomorrow\Vine\Node;
 
 interface TaxonNode extends Node
 {

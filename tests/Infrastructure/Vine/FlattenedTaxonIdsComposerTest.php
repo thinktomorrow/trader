@@ -3,15 +3,15 @@ declare(strict_types=1);
 
 namespace Tests\Infrastructure\Vine;
 
-use Tests\Infrastructure\TestCase;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Tests\Infrastructure\TestCase;
 use Thinktomorrow\Trader\Application\Taxon\Tree\TaxonNode;
-use Thinktomorrow\Trader\Infrastructure\Test\TestContainer;
 use Thinktomorrow\Trader\Infrastructure\Laravel\Models\DefaultTaxonNode;
-use Thinktomorrow\Trader\Infrastructure\Vine\VineFlattenedTaxonIdsComposer;
+use Thinktomorrow\Trader\Infrastructure\Laravel\Repositories\MysqlTaxonTreeRepository;
 use Thinktomorrow\Trader\Infrastructure\Test\Repositories\InMemoryTaxonRepository;
 use Thinktomorrow\Trader\Infrastructure\Test\Repositories\InMemoryTaxonTreeRepository;
-use Thinktomorrow\Trader\Infrastructure\Laravel\Repositories\MysqlTaxonTreeRepository;
+use Thinktomorrow\Trader\Infrastructure\Test\TestContainer;
+use Thinktomorrow\Trader\Infrastructure\Vine\VineFlattenedTaxonIdsComposer;
 
 final class FlattenedTaxonIdsComposerTest extends TestCase
 {
@@ -37,7 +37,7 @@ final class FlattenedTaxonIdsComposerTest extends TestCase
     {
         $this->createDefaultTaxons();
 
-        foreach($this->repositories() as $repository) {
+        foreach ($this->repositories() as $repository) {
             $result = (new VineFlattenedTaxonIdsComposer($repository))->getGroupedByRootByKeys(['taxon-first', 'taxon-sixth']);
 
             $this->assertEquals([
@@ -52,7 +52,7 @@ final class FlattenedTaxonIdsComposerTest extends TestCase
     {
         $this->createDefaultTaxons();
 
-        foreach($this->repositories() as $repository) {
+        foreach ($this->repositories() as $repository) {
             $result = (new VineFlattenedTaxonIdsComposer($repository))->getGroupedByRootByIds(['first', 'sixth']);
 
             $this->assertEquals([
@@ -67,7 +67,7 @@ final class FlattenedTaxonIdsComposerTest extends TestCase
     {
         $this->createDefaultTaxons();
 
-        foreach($this->repositories() as $repository) {
+        foreach ($this->repositories() as $repository) {
             $result = (new VineFlattenedTaxonIdsComposer($repository))->getGroupedByRootByKeys(['taxon-first', 'taxon-second']);
 
             $this->assertEquals([
@@ -81,7 +81,7 @@ final class FlattenedTaxonIdsComposerTest extends TestCase
     {
         $this->createDefaultTaxons();
 
-        foreach($this->repositories() as $repository) {
+        foreach ($this->repositories() as $repository) {
             $result = (new VineFlattenedTaxonIdsComposer($repository))->getGroupedByRootByKeys(['xxxx']);
 
             $this->assertEquals([], $result);
@@ -93,5 +93,4 @@ final class FlattenedTaxonIdsComposerTest extends TestCase
         yield new InMemoryTaxonTreeRepository(new TestContainer());
         yield new MysqlTaxonTreeRepository(new TestContainer());
     }
-
 }

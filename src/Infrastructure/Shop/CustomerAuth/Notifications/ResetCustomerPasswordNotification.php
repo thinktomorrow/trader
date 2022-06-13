@@ -4,10 +4,10 @@ declare(strict_types=1);
 namespace Thinktomorrow\Trader\Infrastructure\Shop\CustomerAuth\Notifications;
 
 use Illuminate\Bus\Queueable;
-use Illuminate\Queue\SerializesModels;
-use Illuminate\Notifications\Notification;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
+use Illuminate\Notifications\Notification;
+use Illuminate\Queue\SerializesModels;
 
 class ResetCustomerPasswordNotification extends Notification implements ShouldQueue
 {
@@ -36,7 +36,7 @@ class ResetCustomerPasswordNotification extends Notification implements ShouldQu
     {
         return (new MailMessage())
             ->subject('Herstel jouw wachtwoord.')
-            ->from('webmaster-email','webmaster-name')
+            ->from('webmaster-email', 'webmaster-name')
             ->view('chief::mails.password-reset', [
                 'reset_url' => route('chief.back.password.reset', $this->token),
             ]);

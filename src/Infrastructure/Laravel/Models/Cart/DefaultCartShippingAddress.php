@@ -7,5 +7,4 @@ use Thinktomorrow\Trader\Application\Cart\Read\CartShippingAddress;
 
 class DefaultCartShippingAddress extends DefaultAddress implements CartShippingAddress
 {
-
 }

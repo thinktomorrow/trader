@@ -3,8 +3,8 @@ declare(strict_types=1);
 
 namespace Tests\Infrastructure\Repositories;
 
-use Tests\Infrastructure\TestCase;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Tests\Infrastructure\TestCase;
 use Thinktomorrow\Trader\Application\Taxon\Redirect\Redirect;
 use Thinktomorrow\Trader\Infrastructure\Laravel\Repositories\MysqlRedirectRepository;
 
@@ -15,7 +15,7 @@ final class RedirectRepositoryTest extends TestCase
     /** @test */
     public function it_can_create_redirect()
     {
-        foreach($this->repositories() as $repository) {
+        foreach ($this->repositories() as $repository) {
             $repository->save(new Redirect('from', 'to'));
 
             $redirect = $repository->find('from');
@@ -33,7 +33,7 @@ final class RedirectRepositoryTest extends TestCase
     /** @test */
     public function non_found_redirect_returns_null()
     {
-        foreach($this->repositories() as $repository) {
+        foreach ($this->repositories() as $repository) {
             $this->assertNull($repository->find('xxx'));
         }
     }
@@ -41,7 +41,7 @@ final class RedirectRepositoryTest extends TestCase
     /** @test */
     public function it_ignores_a_slash_when_finding_a_redirect()
     {
-        foreach($this->repositories() as $repository) {
+        foreach ($this->repositories() as $repository) {
             $repository->save(new Redirect('/from', '/to'));
             $this->assertNotNull($repository->find('from'));
         }
@@ -50,7 +50,7 @@ final class RedirectRepositoryTest extends TestCase
     /** @test */
     public function it_can_update_a_redirect()
     {
-        foreach($this->repositories() as $repository) {
+        foreach ($this->repositories() as $repository) {
             $repository->save(new Redirect('from', 'to'));
 
             $redirect = $repository->find('from');
@@ -68,7 +68,7 @@ final class RedirectRepositoryTest extends TestCase
     /** @test */
     public function existing_redirects_are_adjusted_to_the_new_target()
     {
-        foreach($this->repositories() as $repository) {
+        foreach ($this->repositories() as $repository) {
             $repository->save(new Redirect('/existing/from', '/existing/to'));
             $repository->save(new Redirect('/existing/to', '/existing/to/new'));
 
@@ -85,7 +85,7 @@ final class RedirectRepositoryTest extends TestCase
     /** @test */
     public function it_removed_redirects_pointing_from_and_to_the_new_target()
     {
-        foreach($this->repositories() as $repository) {
+        foreach ($this->repositories() as $repository) {
             $repository->save(new Redirect('/existing/from', '/existing/to'));
             $repository->save(new Redirect('/existing/to', '/existing/from'));
 

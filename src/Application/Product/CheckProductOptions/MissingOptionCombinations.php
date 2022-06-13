@@ -3,10 +3,9 @@ declare(strict_types=1);
 
 namespace Thinktomorrow\Trader\Application\Product\CheckProductOptions;
 
-use Thinktomorrow\Trader\Domain\Model\Product\Product;
-use Thinktomorrow\Trader\Domain\Model\Product\ProductId;
-use Thinktomorrow\Trader\Domain\Model\Product\Variant\Variant;
 use Thinktomorrow\Trader\Application\Product\OptionLinks\ProductOptionValues;
+use Thinktomorrow\Trader\Domain\Model\Product\Product;
+use Thinktomorrow\Trader\Domain\Model\Product\Variant\Variant;
 
 class MissingOptionCombinations
 {
@@ -23,8 +22,8 @@ class MissingOptionCombinations
 
         $missingCombinations = $this->get($product);
 
-        foreach($missingCombinations as $i => $missingCombination) {
-            foreach($missingCombination as $j => $option_value_id) {
+        foreach ($missingCombinations as $i => $missingCombination) {
+            foreach ($missingCombination as $j => $option_value_id) {
                 $missingCombinations[$i][$j] = $this->findOptionLabelByValue($product, $option_value_id, $optionLabelKey, $optionValueLabelKey);
             }
         }
@@ -34,15 +33,15 @@ class MissingOptionCombinations
 
     private function findOptionLabelByValue(Product $product, $option_value_id, string $optionLabelKey, string $optionValueLabelKey): ?string
     {
-        foreach($product->getOptions() as $option) {
-            foreach($option->getOptionValues() as $optionValue) {
-                if($option_value_id === $optionValue->optionValueId->get()) {
-
+        foreach ($product->getOptions() as $option) {
+            foreach ($option->getOptionValues() as $optionValue) {
+                if ($option_value_id === $optionValue->optionValueId->get()) {
                     $optionLabel = $option->getData($optionLabelKey);
                     $optionValueLabel = $optionValue->getData($optionValueLabelKey);
 
-                    if(!is_string($optionLabel) || !is_string($optionValueLabel)) {
+                    if (! is_string($optionLabel) || ! is_string($optionValueLabel)) {
                         trap($optionLabel, $optionValueLabel);
+
                         return null;
                     }
 
@@ -59,11 +58,11 @@ class MissingOptionCombinations
         $options = $this->productOptionValues->get($product->productId->get());
 
         $optionValuesGrouped = [];
-        foreach($options as $option) {
-            $optionValuesGrouped[] = array_map(fn($value) => $value['option_value_id'], $option['values']);
+        foreach ($options as $option) {
+            $optionValuesGrouped[] = array_map(fn ($value) => $value['option_value_id'], $option['values']);
         }
 
-        if(count($optionValuesGrouped) < 2) {
+        if (count($optionValuesGrouped) < 2) {
             return [];
         }
 
@@ -108,5 +107,4 @@ class MissingOptionCombinations
 
         return $matrix;
     }
-
 }

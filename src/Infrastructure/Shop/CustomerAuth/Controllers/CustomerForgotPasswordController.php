@@ -3,9 +3,9 @@ declare(strict_types=1);
 
 namespace Thinktomorrow\Trader\Infrastructure\Shop\CustomerAuth\Controllers;
 
+use Illuminate\Foundation\Auth\SendsPasswordResetEmails;
 use Illuminate\Routing\Controller;
 use Illuminate\Support\Facades\Password;
-use Illuminate\Foundation\Auth\SendsPasswordResetEmails;
 use function view;
 
 class CustomerForgotPasswordController extends Controller

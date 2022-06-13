@@ -3,9 +3,9 @@
 namespace Thinktomorrow\Trader\Application\Common;
 
 use Money\Money;
-use Thinktomorrow\Trader\Domain\Common\Locale;
 use Thinktomorrow\Trader\Domain\Common\Cash\Cash;
 use Thinktomorrow\Trader\Domain\Common\Cash\Percentage;
+use Thinktomorrow\Trader\Domain\Common\Locale;
 
 trait RendersMoney
 {

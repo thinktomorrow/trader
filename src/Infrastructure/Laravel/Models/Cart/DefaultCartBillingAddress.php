@@ -7,5 +7,4 @@ use Thinktomorrow\Trader\Application\Cart\Read\CartBillingAddress;
 
 class DefaultCartBillingAddress extends DefaultAddress implements CartBillingAddress
 {
-
 }

@@ -5,12 +5,12 @@ namespace Thinktomorrow\Trader\Infrastructure\Laravel\Models;
 
 use Thinktomorrow\Trader\Application\Common\HasLocale;
 use Thinktomorrow\Trader\Application\Common\RendersData;
-use Thinktomorrow\Trader\Domain\Model\Product\ProductId;
 use Thinktomorrow\Trader\Application\Common\RendersVariantPrices;
 use Thinktomorrow\Trader\Application\Product\Grid\GridItem;
+use Thinktomorrow\Trader\Domain\Model\Product\ProductId;
 use Thinktomorrow\Trader\Domain\Model\Product\Variant\VariantId;
-use Thinktomorrow\Trader\Domain\Model\Product\Variant\VariantState;
 use Thinktomorrow\Trader\Domain\Model\Product\Variant\VariantSalePrice;
+use Thinktomorrow\Trader\Domain\Model\Product\Variant\VariantState;
 use Thinktomorrow\Trader\Domain\Model\Product\Variant\VariantUnitPrice;
 
 class DefaultGridItem implements GridItem
@@ -27,7 +27,6 @@ class DefaultGridItem implements GridItem
 
     private function __construct()
     {
-
     }
 
     public static function fromMappedData(array $state): static
@@ -64,7 +63,9 @@ class DefaultGridItem implements GridItem
 
     public function getTitle(): string
     {
-        return $this->data('title', null,
+        return $this->data(
+            'title',
+            null,
             $this->data('product_title', null, '')
         );
     }

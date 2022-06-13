@@ -6,8 +6,8 @@ use Illuminate\Support\Facades\DB;
 use Thinktomorrow\Trader\Domain\Model\Taxon\Taxon;
 use Thinktomorrow\Trader\Domain\Model\Taxon\TaxonId;
 use Thinktomorrow\Trader\Domain\Model\Taxon\TaxonKey;
-use Thinktomorrow\Trader\Infrastructure\Test\Repositories\InMemoryTaxonRepository;
 use Thinktomorrow\Trader\Infrastructure\Laravel\Repositories\MysqlTaxonRepository;
+use Thinktomorrow\Trader\Infrastructure\Test\Repositories\InMemoryTaxonRepository;
 
 trait TaxonHelpers
 {
@@ -46,15 +46,15 @@ trait TaxonHelpers
 
     private function createTaxon(Taxon $taxon, array $productIds = [])
     {
-        foreach($this->entityRepositories() as $taxonRepository) {
+        foreach ($this->entityRepositories() as $taxonRepository) {
 
             // In memory
-            if($taxonRepository instanceof InMemoryTaxonRepository) {
+            if ($taxonRepository instanceof InMemoryTaxonRepository) {
                 $taxonRepository->setProductIds($taxon->taxonId, $productIds);
             }
             // Mysql
             else {
-                foreach($productIds as $productId) {
+                foreach ($productIds as $productId) {
                     DB::table('trader_taxa_products')->insert([
                         ['taxon_id' => $taxon->taxonId->get(), 'product_id' => $productId],
                     ]);

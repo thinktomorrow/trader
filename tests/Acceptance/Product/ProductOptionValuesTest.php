@@ -75,7 +75,7 @@ class ProductOptionValuesTest extends ProductContext
 
                     ],
                 ],
-            ]
+            ],
         ], $values);
     }
 }

@@ -3,8 +3,8 @@ declare(strict_types=1);
 
 namespace Thinktomorrow\Trader\Application\Cart;
 
-use Thinktomorrow\Trader\Domain\Model\Order\OrderId;
 use Thinktomorrow\Trader\Domain\Model\Order\Address\BillingAddress;
+use Thinktomorrow\Trader\Domain\Model\Order\OrderId;
 
 class ChooseCustomerBillingAddress
 {
@@ -33,11 +33,11 @@ class ChooseCustomerBillingAddress
     public function getBillingAddress(): BillingAddress
     {
         return BillingAddress::fromArray([
-            'country'    => $this->country,
-            'line1'      => $this->line1,
-            'line2'      => $this->line2,
+            'country' => $this->country,
+            'line1' => $this->line1,
+            'line2' => $this->line2,
             'postalCode' => $this->postalCode,
-            'city'       => $this->city,
+            'city' => $this->city,
         ]);
     }
 }

@@ -27,7 +27,7 @@ final class Locale
      */
     public static function fromIsoCode(string $isoCode): self
     {
-        if(!strpos($isoCode, '-')) {
+        if (! strpos($isoCode, '-')) {
             throw new \InvalidArgumentException('Invalid isocode format: ' . $isoCode);
         }
 
@@ -64,4 +64,3 @@ final class Locale
             && (string)$this === (string)$other;
     }
 }
-

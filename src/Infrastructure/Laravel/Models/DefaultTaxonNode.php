@@ -3,11 +3,11 @@ declare(strict_types=1);
 
 namespace Thinktomorrow\Trader\Infrastructure\Laravel\Models;
 
-use Thinktomorrow\Vine\DefaultNode;
 use Thinktomorrow\Trader\Application\Common\HasLocale;
-use Thinktomorrow\Trader\Domain\Model\Taxon\TaxonState;
 use Thinktomorrow\Trader\Application\Common\RendersData;
 use Thinktomorrow\Trader\Application\Taxon\Tree\TaxonNode;
+use Thinktomorrow\Trader\Domain\Model\Taxon\TaxonState;
+use Thinktomorrow\Vine\DefaultNode;
 
 class DefaultTaxonNode extends DefaultNode implements TaxonNode
 {
@@ -49,7 +49,7 @@ class DefaultTaxonNode extends DefaultNode implements TaxonNode
             TaxonState::from($state['state']),
             $state['order'],
             $state['data'] ? json_decode($state['data'], true) : [],
-            $state['product_ids'] ? explode(',',$state['product_ids']) : [],
+            $state['product_ids'] ? explode(',', $state['product_ids']) : [],
             $state['parent_id'],
         );
     }
@@ -113,7 +113,7 @@ class DefaultTaxonNode extends DefaultNode implements TaxonNode
     {
         $label = $this->getLabel();
 
-        if (!$this->isRootNode()) {
+        if (! $this->isRootNode()) {
             $label = array_reduce(array_reverse($this->getBreadCrumbs()), function ($carry, $taxon) use ($withoutRoot) {
                 if ($taxon->isRootNode()) {
                     return $withoutRoot ? $carry : $taxon->getLabel() . ': ' . $carry;

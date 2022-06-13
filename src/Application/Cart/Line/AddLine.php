@@ -3,9 +3,8 @@ declare(strict_types=1);
 
 namespace Thinktomorrow\Trader\Application\Cart\Line;
 
-
-use Thinktomorrow\Trader\Domain\Model\Order\OrderId;
 use Thinktomorrow\Trader\Domain\Model\Order\Line\Quantity;
+use Thinktomorrow\Trader\Domain\Model\Order\OrderId;
 use Thinktomorrow\Trader\Domain\Model\Product\Variant\VariantId;
 
 final class AddLine

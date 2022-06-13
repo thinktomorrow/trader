@@ -3,21 +3,21 @@ declare(strict_types=1);
 
 namespace Thinktomorrow\Trader\Application\Product;
 
-use Thinktomorrow\Trader\TraderConfig;
-use Thinktomorrow\Trader\Domain\Model\Product\Product;
-use Thinktomorrow\Trader\Domain\Model\Product\ProductId;
-use Thinktomorrow\Trader\Domain\Model\Product\Option\Option;
-use Thinktomorrow\Trader\Domain\Common\Event\EventDispatcher;
-use Thinktomorrow\Trader\Domain\Model\Product\Variant\Variant;
-use Thinktomorrow\Trader\Domain\Model\Product\ProductRepository;
-use Thinktomorrow\Trader\Domain\Model\Product\VariantRepository;
-use Thinktomorrow\Trader\Domain\Model\Product\Variant\VariantId;
-use Thinktomorrow\Trader\Domain\Model\Product\Option\OptionValue;
-use Thinktomorrow\Trader\Domain\Model\Product\Event\ProductDeleted;
-use Thinktomorrow\Trader\Application\Product\UpdateProduct\UpdateProductTaxa;
 use Thinktomorrow\Trader\Application\Product\UpdateProduct\UpdateProductData;
 use Thinktomorrow\Trader\Application\Product\UpdateProduct\UpdateProductOptions;
+use Thinktomorrow\Trader\Application\Product\UpdateProduct\UpdateProductTaxa;
 use Thinktomorrow\Trader\Application\Product\UpdateVariant\UpdateVariantOptionValues;
+use Thinktomorrow\Trader\Domain\Common\Event\EventDispatcher;
+use Thinktomorrow\Trader\Domain\Model\Product\Event\ProductDeleted;
+use Thinktomorrow\Trader\Domain\Model\Product\Option\Option;
+use Thinktomorrow\Trader\Domain\Model\Product\Option\OptionValue;
+use Thinktomorrow\Trader\Domain\Model\Product\Product;
+use Thinktomorrow\Trader\Domain\Model\Product\ProductId;
+use Thinktomorrow\Trader\Domain\Model\Product\ProductRepository;
+use Thinktomorrow\Trader\Domain\Model\Product\Variant\Variant;
+use Thinktomorrow\Trader\Domain\Model\Product\Variant\VariantId;
+use Thinktomorrow\Trader\Domain\Model\Product\VariantRepository;
+use Thinktomorrow\Trader\TraderConfig;
 
 class ProductApplication
 {
@@ -147,7 +147,7 @@ class ProductApplication
         $this->productRepository->delete($deleteProduct->getProductId());
 
         $this->eventDispatcher->dispatchAll([
-            new ProductDeleted($deleteProduct->getProductId())
+            new ProductDeleted($deleteProduct->getProductId()),
         ]);
     }
 

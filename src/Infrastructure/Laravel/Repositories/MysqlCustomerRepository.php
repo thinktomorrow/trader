@@ -3,8 +3,8 @@ declare(strict_types=1);
 
 namespace Thinktomorrow\Trader\Infrastructure\Laravel\Repositories;
 
-use Ramsey\Uuid\Uuid;
 use Illuminate\Support\Facades\DB;
+use Ramsey\Uuid\Uuid;
 use Thinktomorrow\Trader\Domain\Model\Customer\Customer;
 use Thinktomorrow\Trader\Domain\Model\Customer\CustomerId;
 use Thinktomorrow\Trader\Domain\Model\Customer\CustomerRepository;
@@ -18,7 +18,7 @@ class MysqlCustomerRepository implements CustomerRepository
     {
         $state = $customer->getMappedData();
 
-        if (!$this->exists($customer->customerId)) {
+        if (! $this->exists($customer->customerId)) {
             DB::table(static::$customerTable)->insert($state);
         } else {
             DB::table(static::$customerTable)->where('customer_id', $customer->customerId)->update($state);
@@ -36,7 +36,7 @@ class MysqlCustomerRepository implements CustomerRepository
             ->where(static::$customerTable . '.customer_id', $customerId->get())
             ->first();
 
-        if (!$customerState) {
+        if (! $customerState) {
             throw new CouldNotFindCustomer('No customer found by id [' . $customerId->get() . ']');
         }
 

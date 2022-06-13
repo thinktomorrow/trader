@@ -5,8 +5,8 @@ namespace Thinktomorrow\Trader\Domain\Model\PaymentMethod;
 
 use Money\Money;
 use Thinktomorrow\Trader\Domain\Common\Cash\Cash;
-use Thinktomorrow\Trader\Domain\Common\Entity\HasData;
 use Thinktomorrow\Trader\Domain\Common\Entity\Aggregate;
+use Thinktomorrow\Trader\Domain\Common\Entity\HasData;
 
 class PaymentMethod implements Aggregate
 {
@@ -43,8 +43,8 @@ class PaymentMethod implements Aggregate
     {
         return [
             'payment_method_id' => $this->paymentMethodId->get(),
-            'rate'              => $this->rate->getAmount(),
-            'data'              => json_encode($this->data),
+            'rate' => $this->rate->getAmount(),
+            'data' => json_encode($this->data),
         ];
     }
 

@@ -5,9 +5,9 @@ namespace Thinktomorrow\Trader\Domain\Model\ShippingProfile;
 
 use Money\Money;
 use Thinktomorrow\Trader\Domain\Common\Cash\Price;
-use Thinktomorrow\Trader\Domain\Common\Entity\HasData;
 use Thinktomorrow\Trader\Domain\Common\Cash\PriceTotal;
 use Thinktomorrow\Trader\Domain\Common\Entity\Aggregate;
+use Thinktomorrow\Trader\Domain\Common\Entity\HasData;
 use Thinktomorrow\Trader\Domain\Common\Event\RecordsEvents;
 use Thinktomorrow\Trader\Domain\Model\Order\Address\ShippingCountry;
 
@@ -34,7 +34,7 @@ final class ShippingProfile implements Aggregate
 
         /** @var Tariff $tariff */
         foreach ($this->tariffs as $tariff) {
-            if($tariff->withinRange($normalizedAmount)) {
+            if ($tariff->withinRange($normalizedAmount)) {
                 return $tariff;
             }
         }
@@ -71,9 +71,8 @@ final class ShippingProfile implements Aggregate
     public function deleteCountry(ShippingCountry $country): void
     {
         /** @var \Thinktomorrow\Trader\Domain\Model\Order\Address\ShippingCountry $existingCountry */
-        foreach($this->countries as $index => $existingCountry)
-        {
-            if($country->equals($existingCountry)) {
+        foreach ($this->countries as $index => $existingCountry) {
+            if ($country->equals($existingCountry)) {
                 unset($this->countries[$index]);
             }
         }
@@ -99,8 +98,8 @@ final class ShippingProfile implements Aggregate
     public function hasCountry(ShippingCountry $country): bool
     {
         /** @var \Thinktomorrow\Trader\Domain\Model\Order\Address\ShippingCountry $existingCountry */
-        foreach($this->countries as $existingCountry) {
-            if($existingCountry->equals($country)) {
+        foreach ($this->countries as $existingCountry) {
+            if ($existingCountry->equals($country)) {
                 return true;
             }
         }
@@ -119,8 +118,8 @@ final class ShippingProfile implements Aggregate
         $shipping->shippingProfileId = ShippingProfileId::fromString($state['shipping_profile_id']);
         $shipping->data = json_decode($state['data'], true);
 
-        $shipping->tariffs = array_map(fn($tariffState) => Tariff::fromMappedData($tariffState, $state), $childEntities[Tariff::class]);
-        $shipping->countries = array_map(fn($countryKey) => ShippingCountry::fromString($countryKey), $childEntities[ShippingCountry::class]);
+        $shipping->tariffs = array_map(fn ($tariffState) => Tariff::fromMappedData($tariffState, $state), $childEntities[Tariff::class]);
+        $shipping->countries = array_map(fn ($countryKey) => ShippingCountry::fromString($countryKey), $childEntities[ShippingCountry::class]);
 
         return $shipping;
     }

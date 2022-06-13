@@ -5,5 +5,4 @@ namespace Thinktomorrow\Trader\Domain\Common\Cash;
 
 class PriceCannotContainMultipleTaxRates extends \DomainException
 {
-
 }

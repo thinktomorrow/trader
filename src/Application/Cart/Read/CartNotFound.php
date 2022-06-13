@@ -5,5 +5,4 @@ namespace Thinktomorrow\Trader\Application\Cart\Read;
 
 class CartNotFound extends \Exception
 {
-
 }

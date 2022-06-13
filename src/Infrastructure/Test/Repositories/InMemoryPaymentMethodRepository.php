@@ -3,10 +3,10 @@ declare(strict_types=1);
 
 namespace Thinktomorrow\Trader\Infrastructure\Test\Repositories;
 
+use Thinktomorrow\Trader\Domain\Model\PaymentMethod\Exceptions\CouldNotFindPaymentMethod;
 use Thinktomorrow\Trader\Domain\Model\PaymentMethod\PaymentMethod;
 use Thinktomorrow\Trader\Domain\Model\PaymentMethod\PaymentMethodId;
 use Thinktomorrow\Trader\Domain\Model\PaymentMethod\PaymentMethodRepository;
-use Thinktomorrow\Trader\Domain\Model\PaymentMethod\Exceptions\CouldNotFindPaymentMethod;
 
 class InMemoryPaymentMethodRepository implements PaymentMethodRepository
 {
@@ -21,7 +21,7 @@ class InMemoryPaymentMethodRepository implements PaymentMethodRepository
 
     public function find(PaymentMethodId $paymentMethodId): PaymentMethod
     {
-        if(!isset(static::$paymentMethods[$paymentMethodId->get()])) {
+        if (! isset(static::$paymentMethods[$paymentMethodId->get()])) {
             throw new CouldNotFindPaymentMethod('No payment found by id ' . $paymentMethodId);
         }
 
@@ -30,7 +30,7 @@ class InMemoryPaymentMethodRepository implements PaymentMethodRepository
 
     public function delete(PaymentMethodId $paymentMethodId): void
     {
-        if(!isset(static::$paymentMethods[$paymentMethodId->get()])) {
+        if (! isset(static::$paymentMethods[$paymentMethodId->get()])) {
             throw new CouldNotFindPaymentMethod('No available payment found by id ' . $paymentMethodId);
         }
 

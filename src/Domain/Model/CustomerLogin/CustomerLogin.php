@@ -5,8 +5,8 @@ namespace Thinktomorrow\Trader\Domain\Model\CustomerLogin;
 
 use Thinktomorrow\Trader\Domain\Common\Email;
 use Thinktomorrow\Trader\Domain\Common\Entity\Aggregate;
-use Thinktomorrow\Trader\Domain\Model\Customer\CustomerId;
 use Thinktomorrow\Trader\Domain\Common\Event\RecordsEvents;
+use Thinktomorrow\Trader\Domain\Model\Customer\CustomerId;
 use Thinktomorrow\Trader\Domain\Model\CustomerLogin\Events\PasswordChanged;
 
 class CustomerLogin implements Aggregate

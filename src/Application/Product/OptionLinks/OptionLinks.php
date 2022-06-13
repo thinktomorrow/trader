@@ -26,8 +26,10 @@ class OptionLinks extends ArrayCollection
         $grouped = [];
 
         /** @var OptionLink $item */
-        foreach($this->items as $item) {
-            if(!isset($grouped[$item->getOptionId()])) $grouped[$item->getOptionId()] = [];
+        foreach ($this->items as $item) {
+            if (! isset($grouped[$item->getOptionId()])) {
+                $grouped[$item->getOptionId()] = [];
+            }
             $grouped[$item->getOptionId()][] = $item;
         }
 

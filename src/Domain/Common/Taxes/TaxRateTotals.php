@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace Thinktomorrow\Trader\Domain\Common\Taxes;
 
-use Money\Money;
 use Assert\Assertion;
+use Money\Money;
 use Thinktomorrow\Trader\Domain\Common\Cash\Cash;
 
 class TaxRateTotals
@@ -39,14 +39,14 @@ class TaxRateTotals
         $taxRateTotals = $this->taxRateTotals;
 
         $match = false;
-        foreach($taxRateTotals as $i => $taxRateTotal) {
-            if($taxRateTotal->getTaxRate()->equals($taxRate)) {
+        foreach ($taxRateTotals as $i => $taxRateTotal) {
+            if ($taxRateTotal->getTaxRate()->equals($taxRate)) {
                 $taxRateTotals[$i] = $taxRateTotal->add($taxableTotal);
                 $match = true;
             }
         }
 
-        if(!$match) {
+        if (! $match) {
             $taxRateTotals[] = new TaxRateTotal($taxRate, $taxableTotal);
         }
 
@@ -58,14 +58,14 @@ class TaxRateTotals
         $taxRateTotals = $this->taxRateTotals;
 
         $match = false;
-        foreach($taxRateTotals as $i => $taxRateTotal) {
-            if($taxRateTotal->getTaxRate()->equals($taxRate)) {
+        foreach ($taxRateTotals as $i => $taxRateTotal) {
+            if ($taxRateTotal->getTaxRate()->equals($taxRate)) {
                 $taxRateTotals[$i] = $taxRateTotal->subtract($taxableTotal);
                 $match = true;
             }
         }
 
-        if(!$match) {
+        if (! $match) {
             $taxRateTotals[] = new TaxRateTotal($taxRate, $taxableTotal->negative());
         }
 
@@ -79,8 +79,8 @@ class TaxRateTotals
 
     public function find(TaxRate $taxRate): ?TaxRateTotal
     {
-        foreach($this->taxRateTotals as $taxRateTotal) {
-            if($taxRateTotal->getTaxRate()->equals($taxRate)) {
+        foreach ($this->taxRateTotals as $taxRateTotal) {
+            if ($taxRateTotal->getTaxRate()->equals($taxRate)) {
                 return $taxRateTotal;
             }
         }
@@ -92,7 +92,7 @@ class TaxRateTotals
     {
         return array_reduce(
             $this->taxRateTotals,
-            fn($carry, $taxRateTotal) => $carry->add($taxRateTotal->getTaxableTotal()),
+            fn ($carry, $taxRateTotal) => $carry->add($taxRateTotal->getTaxableTotal()),
             Cash::zero()
         );
     }
@@ -101,11 +101,11 @@ class TaxRateTotals
     {
         $total = array_reduce(
             $this->taxRateTotals,
-            fn($carry, $taxRateTotal) => $carry->add($taxRateTotal->getTaxTotal()),
+            fn ($carry, $taxRateTotal) => $carry->add($taxRateTotal->getTaxTotal()),
             Cash::zero()
         );
 
-        if($total->isNegative()) {
+        if ($total->isNegative()) {
             return new Money(0, $total->getCurrency());
         }
 

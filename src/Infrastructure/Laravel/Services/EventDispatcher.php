@@ -16,7 +16,7 @@ class EventDispatcher implements \Thinktomorrow\Trader\Domain\Common\Event\Event
 
     public function dispatchAll(array $events): void
     {
-        foreach($events as $event) {
+        foreach ($events as $event) {
             $this->dispatcher->dispatch($event);
         }
     }

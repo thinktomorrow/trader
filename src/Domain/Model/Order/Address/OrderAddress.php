@@ -3,9 +3,9 @@ declare(strict_types=1);
 
 namespace Thinktomorrow\Trader\Domain\Model\Order\Address;
 
-use Thinktomorrow\Trader\Domain\Model\Order\OrderId;
-use Thinktomorrow\Trader\Domain\Common\Entity\HasData;
 use Thinktomorrow\Trader\Domain\Common\Address\Address;
+use Thinktomorrow\Trader\Domain\Common\Entity\HasData;
+use Thinktomorrow\Trader\Domain\Model\Order\OrderId;
 
 abstract class OrderAddress
 {
@@ -42,13 +42,13 @@ abstract class OrderAddress
     public function getMappedData(): array
     {
         return [
-            'order_id'    => $this->orderId->get(),
-            'country'     => $this->address->country,
-            'line_1'      => $this->address->line1,
-            'line_2'      => $this->address->line2,
+            'order_id' => $this->orderId->get(),
+            'country' => $this->address->country,
+            'line_1' => $this->address->line1,
+            'line_2' => $this->address->line2,
             'postal_code' => $this->address->postalCode,
-            'city'        => $this->address->city,
-            'data'        => json_encode($this->data),
+            'city' => $this->address->city,
+            'data' => json_encode($this->data),
         ];
     }
 

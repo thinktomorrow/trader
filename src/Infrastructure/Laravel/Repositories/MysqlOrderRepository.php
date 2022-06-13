@@ -3,23 +3,23 @@ declare(strict_types=1);
 
 namespace Thinktomorrow\Trader\Infrastructure\Laravel\Repositories;
 
-use Ramsey\Uuid\Uuid;
 use Illuminate\Support\Facades\DB;
-use Thinktomorrow\Trader\Domain\Model\Order\Order;
-use Thinktomorrow\Trader\Domain\Model\Order\OrderId;
-use Thinktomorrow\Trader\Domain\Model\Order\Shopper;
-use Thinktomorrow\Trader\Domain\Model\Order\Line\Line;
-use Thinktomorrow\Trader\Domain\Model\Order\ShopperId;
+use Ramsey\Uuid\Uuid;
 use Thinktomorrow\Trader\Domain\Common\Address\AddressType;
-use Thinktomorrow\Trader\Domain\Model\Order\OrderRepository;
-use Thinktomorrow\Trader\Domain\Model\Order\Payment\Payment;
-use Thinktomorrow\Trader\Domain\Model\Order\Discount\Discount;
-use Thinktomorrow\Trader\Domain\Model\Order\Shipping\Shipping;
-use Thinktomorrow\Trader\Domain\Model\Order\Payment\PaymentId;
-use Thinktomorrow\Trader\Domain\Model\Order\Shipping\ShippingId;
 use Thinktomorrow\Trader\Domain\Model\Order\Address\BillingAddress;
 use Thinktomorrow\Trader\Domain\Model\Order\Address\ShippingAddress;
+use Thinktomorrow\Trader\Domain\Model\Order\Discount\Discount;
 use Thinktomorrow\Trader\Domain\Model\Order\Exceptions\CouldNotFindOrder;
+use Thinktomorrow\Trader\Domain\Model\Order\Line\Line;
+use Thinktomorrow\Trader\Domain\Model\Order\Order;
+use Thinktomorrow\Trader\Domain\Model\Order\OrderId;
+use Thinktomorrow\Trader\Domain\Model\Order\OrderRepository;
+use Thinktomorrow\Trader\Domain\Model\Order\Payment\Payment;
+use Thinktomorrow\Trader\Domain\Model\Order\Payment\PaymentId;
+use Thinktomorrow\Trader\Domain\Model\Order\Shipping\Shipping;
+use Thinktomorrow\Trader\Domain\Model\Order\Shipping\ShippingId;
+use Thinktomorrow\Trader\Domain\Model\Order\Shopper;
+use Thinktomorrow\Trader\Domain\Model\Order\ShopperId;
 
 final class MysqlOrderRepository implements OrderRepository
 {
@@ -35,7 +35,7 @@ final class MysqlOrderRepository implements OrderRepository
     {
         $state = $order->getMappedData();
 
-        if (!$this->exists($order->orderId)) {
+        if (! $this->exists($order->orderId)) {
             DB::table(static::$orderTable)->insert($state);
         } else {
             DB::table(static::$orderTable)->where('order_id', $order->orderId)->update($state);
@@ -51,7 +51,7 @@ final class MysqlOrderRepository implements OrderRepository
 
     private function upsertLines(Order $order): void
     {
-        $lineIds = array_map(fn($lineState) => $lineState['line_id'], $order->getChildEntities()[Line::class]);
+        $lineIds = array_map(fn ($lineState) => $lineState['line_id'], $order->getChildEntities()[Line::class]);
 
         DB::table(static::$orderLinesTable)
             ->where('order_id', $order->orderId)
@@ -62,14 +62,14 @@ final class MysqlOrderRepository implements OrderRepository
             DB::table(static::$orderLinesTable)
                 ->updateOrInsert([
                     'order_id' => $order->orderId->get(),
-                    'line_id'  => $lineState['line_id'],
+                    'line_id' => $lineState['line_id'],
                 ], $lineState);
         }
     }
 
     private function upsertDiscounts(Order $order): void
     {
-        $discountIds = array_map(fn($discountState) => $discountState['discount_id'], $order->getChildEntities()[Discount::class]);
+        $discountIds = array_map(fn ($discountState) => $discountState['discount_id'], $order->getChildEntities()[Discount::class]);
 
         DB::table(static::$orderDiscountsTable)
             ->where('order_id', $order->orderId)
@@ -79,7 +79,7 @@ final class MysqlOrderRepository implements OrderRepository
         foreach ($order->getChildEntities()[Discount::class] as $discountState) {
             DB::table(static::$orderDiscountsTable)
                 ->updateOrInsert([
-                    'order_id'    => $order->orderId->get(),
+                    'order_id' => $order->orderId->get(),
                     'discount_id' => $discountState['discount_id'],
                 ], $discountState);
         }
@@ -87,7 +87,7 @@ final class MysqlOrderRepository implements OrderRepository
 
     private function upsertShippings(Order $order): void
     {
-        $shippingIds = array_map(fn($shippingState) => $shippingState['shipping_id'], $order->getChildEntities()[Shipping::class]);
+        $shippingIds = array_map(fn ($shippingState) => $shippingState['shipping_id'], $order->getChildEntities()[Shipping::class]);
 
         DB::table(static::$orderShippingTable)
             ->where('order_id', $order->orderId)
@@ -97,7 +97,7 @@ final class MysqlOrderRepository implements OrderRepository
         foreach ($order->getChildEntities()[Shipping::class] as $shippingState) {
             DB::table(static::$orderShippingTable)
                 ->updateOrInsert([
-                    'order_id'    => $order->orderId->get(),
+                    'order_id' => $order->orderId->get(),
                     'shipping_id' => $shippingState['shipping_id'],
                 ], $shippingState);
         }
@@ -115,7 +115,7 @@ final class MysqlOrderRepository implements OrderRepository
 
         DB::table(static::$orderPaymentTable)
             ->updateOrInsert([
-                'order_id'   => $order->orderId->get(),
+                'order_id' => $order->orderId->get(),
                 'payment_id' => $paymentState['payment_id'],
             ], $paymentState);
     }
@@ -126,7 +126,7 @@ final class MysqlOrderRepository implements OrderRepository
             DB::table(static::$orderAddressTable)
                 ->updateOrInsert([
                     'order_id' => $order->orderId->get(),
-                    'type'     => AddressType::shipping->value,
+                    'type' => AddressType::shipping->value,
                 ], $shippingAddressState);
         } else {
             DB::table(static::$orderAddressTable)
@@ -139,7 +139,7 @@ final class MysqlOrderRepository implements OrderRepository
             DB::table(static::$orderAddressTable)
                 ->updateOrInsert([
                     'order_id' => $order->orderId->get(),
-                    'type'     => AddressType::billing->value,
+                    'type' => AddressType::billing->value,
                 ], $billingAddressState);
         } else {
             DB::table(static::$orderAddressTable)
@@ -161,7 +161,7 @@ final class MysqlOrderRepository implements OrderRepository
 
         DB::table(static::$orderShopperTable)
             ->updateOrInsert([
-                'order_id'   => $order->orderId->get(),
+                'order_id' => $order->orderId->get(),
                 'shopper_id' => $shopperState['shopper_id'],
             ], $shopperState);
     }
@@ -177,36 +177,36 @@ final class MysqlOrderRepository implements OrderRepository
             ->where(static::$orderTable . '.order_id', $orderId->get())
             ->first();
 
-        if (!$orderState) {
+        if (! $orderState) {
             throw new CouldNotFindOrder('No order found by id [' . $orderId->get() . ']');
         }
 
         $lineStates = DB::table(static::$orderLinesTable)
             ->where(static::$orderLinesTable . '.order_id', $orderId->get())
             ->get()
-            ->map(fn($item) => (array)$item)
-            ->map(fn($item) => array_merge($item, ['includes_vat' => (bool)$item['includes_vat']]))
+            ->map(fn ($item) => (array)$item)
+            ->map(fn ($item) => array_merge($item, ['includes_vat' => (bool)$item['includes_vat']]))
             ->toArray();
 
         $discountStates = DB::table(static::$orderDiscountsTable)
             ->where(static::$orderDiscountsTable . '.order_id', $orderId->get())
             ->get()
-            ->map(fn($item) => (array)$item)
-            ->map(fn($item) => array_merge($item, ['includes_vat' => (bool)$item['includes_vat']]))
+            ->map(fn ($item) => (array)$item)
+            ->map(fn ($item) => array_merge($item, ['includes_vat' => (bool)$item['includes_vat']]))
             ->toArray();
 
         $shippingStates = DB::table(static::$orderShippingTable)
             ->where(static::$orderShippingTable . '.order_id', $orderId->get())
             ->get()
-            ->map(fn($item) => (array)$item)
-            ->map(fn($item) => array_merge($item, ['includes_vat' => (bool)$item['includes_vat']]))
+            ->map(fn ($item) => (array)$item)
+            ->map(fn ($item) => array_merge($item, ['includes_vat' => (bool)$item['includes_vat']]))
             ->toArray();
 
         $paymentState = DB::table(static::$orderPaymentTable)
             ->where(static::$orderPaymentTable . '.order_id', $orderId->get())
             ->first();
 
-        if (!is_null($paymentState)) {
+        if (! is_null($paymentState)) {
             $paymentState = (array)$paymentState;
             $paymentState = array_merge($paymentState, ['includes_vat' => (bool)$paymentState['includes_vat']]);
         }
@@ -215,26 +215,26 @@ final class MysqlOrderRepository implements OrderRepository
             ->where(static::$orderAddressTable . '.order_id', $orderId->get())
             ->get();
 
-        $shippingAddressState = $addressStates->first(fn($address) => $address->type == AddressType::shipping->value);
-        $billingAddressState = $addressStates->first(fn($address) => $address->type == AddressType::billing->value);
+        $shippingAddressState = $addressStates->first(fn ($address) => $address->type == AddressType::shipping->value);
+        $billingAddressState = $addressStates->first(fn ($address) => $address->type == AddressType::billing->value);
 
         $shopperState = DB::table(static::$orderShopperTable)
             ->where(static::$orderShopperTable . '.order_id', $orderId->get())
             ->first();
 
-        if (!is_null($shopperState)) {
+        if (! is_null($shopperState)) {
             $shopperState = (array)$shopperState;
             $shopperState = array_merge($shopperState, ['register_after_checkout' => (bool)$shopperState['register_after_checkout']]);
         }
 
         $childEntities = [
-            Line::class            => $lineStates,
-            Discount::class        => $discountStates,
-            Shipping::class        => $shippingStates,
-            Payment::class         => $paymentState,
-            Shopper::class         => $shopperState,
+            Line::class => $lineStates,
+            Discount::class => $discountStates,
+            Shipping::class => $shippingStates,
+            Payment::class => $paymentState,
+            Shopper::class => $shopperState,
             ShippingAddress::class => $shippingAddressState ? (array)$shippingAddressState : null,
-            BillingAddress::class  => $billingAddressState ? (array)$billingAddressState : null,
+            BillingAddress::class => $billingAddressState ? (array)$billingAddressState : null,
         ];
 
         return Order::fromMappedData((array)$orderState, $childEntities);

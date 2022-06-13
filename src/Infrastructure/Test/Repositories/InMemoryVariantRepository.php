@@ -3,15 +3,14 @@ declare(strict_types=1);
 
 namespace Thinktomorrow\Trader\Infrastructure\Test\Repositories;
 
+use Thinktomorrow\Trader\Application\Cart\VariantForCart\VariantForCart;
+use Thinktomorrow\Trader\Application\Cart\VariantForCart\VariantForCartRepository;
+use Thinktomorrow\Trader\Domain\Model\Product\Exceptions\CouldNotFindVariant;
 use Thinktomorrow\Trader\Domain\Model\Product\ProductId;
-use Thinktomorrow\Trader\Domain\Model\Product\Option\Option;
 use Thinktomorrow\Trader\Domain\Model\Product\Variant\Variant;
 use Thinktomorrow\Trader\Domain\Model\Product\Variant\VariantId;
 use Thinktomorrow\Trader\Domain\Model\Product\VariantRepository;
-use Thinktomorrow\Trader\Application\Cart\VariantForCart\VariantForCart;
-use Thinktomorrow\Trader\Domain\Model\Product\Exceptions\CouldNotFindVariant;
 use Thinktomorrow\Trader\Infrastructure\Laravel\Models\DefaultVariantForCart;
-use Thinktomorrow\Trader\Application\Cart\VariantForCart\VariantForCartRepository;
 
 final class InMemoryVariantRepository implements VariantRepository, VariantForCartRepository
 {
@@ -29,8 +28,8 @@ final class InMemoryVariantRepository implements VariantRepository, VariantForCa
         $result = [];
 
         /** @var Variant $variant */
-        foreach(static::$variants as $variant) {
-            if($variant->productId->equals($productId)) {
+        foreach (static::$variants as $variant) {
+            if ($variant->productId->equals($productId)) {
                 $result[] = $variant->getMappedData();
             }
         }
@@ -40,7 +39,7 @@ final class InMemoryVariantRepository implements VariantRepository, VariantForCa
 
     public function delete(VariantId $variantId): void
     {
-        if(!isset(static::$variants[$variantId->get()])) {
+        if (! isset(static::$variants[$variantId->get()])) {
             throw new CouldNotFindVariant('No variant found by id ' . $variantId);
         }
 
@@ -65,8 +64,8 @@ final class InMemoryVariantRepository implements VariantRepository, VariantForCa
 
     public function findVariantForCart(VariantId $variantId): VariantForCart
     {
-        foreach(static::$variants as $variant) {
-            if($variant->variantId->equals($variantId)) {
+        foreach (static::$variants as $variant) {
+            if ($variant->variantId->equals($variantId)) {
                 return DefaultVariantForCart::fromMappedData([
                     'variant_id' => $variant->variantId->get(),
                     'sale_price' => $variant->getSalePrice()->getMoney()->getAmount(),

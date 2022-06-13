@@ -3,12 +3,12 @@ declare(strict_types=1);
 
 namespace Thinktomorrow\Trader\Application\Taxon;
 
-use Thinktomorrow\Trader\TraderConfig;
+use Thinktomorrow\Trader\Domain\Common\Event\EventDispatcher;
+use Thinktomorrow\Trader\Domain\Model\Taxon\Events\TaxonDeleted;
 use Thinktomorrow\Trader\Domain\Model\Taxon\Taxon;
 use Thinktomorrow\Trader\Domain\Model\Taxon\TaxonId;
 use Thinktomorrow\Trader\Domain\Model\Taxon\TaxonRepository;
-use Thinktomorrow\Trader\Domain\Common\Event\EventDispatcher;
-use Thinktomorrow\Trader\Domain\Model\Taxon\Events\TaxonDeleted;
+use Thinktomorrow\Trader\TraderConfig;
 
 final class TaxonApplication
 {
@@ -47,7 +47,7 @@ final class TaxonApplication
     {
         $taxon = $this->taxonRepository->find($moveTaxon->getTaxonId());
 
-        if($moveTaxon->hasParentTaxonId()) {
+        if ($moveTaxon->hasParentTaxonId()) {
             $taxon->changeParent($moveTaxon->getParentTaxonId());
         } else {
             $taxon->moveToRoot();
@@ -56,7 +56,6 @@ final class TaxonApplication
         $this->taxonRepository->save($taxon);
 
         $this->eventDispatcher->dispatchAll($taxon->releaseEvents());
-
     }
 
     public function deleteTaxon(DeleteTaxon $deleteTaxon): void
@@ -66,15 +65,14 @@ final class TaxonApplication
         $childTaxa = $this->taxonRepository->getByParentId($taxon->taxonId);
 
         // Move direct children to either the above parent or the root
-        foreach($childTaxa as $childTaxon) {
+        foreach ($childTaxa as $childTaxon) {
             $this->moveTaxon(new MoveTaxon($childTaxon->taxonId->get(), $taxon->getParentId()?->get()));
         }
 
         $this->taxonRepository->delete($deleteTaxon->getTaxonId());
 
         $this->eventDispatcher->dispatchAll([
-            new TaxonDeleted($deleteTaxon->getTaxonId())
+            new TaxonDeleted($deleteTaxon->getTaxonId()),
         ]);
-
     }
 }

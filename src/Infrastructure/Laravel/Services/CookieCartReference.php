@@ -3,8 +3,6 @@ declare(strict_types=1);
 
 namespace Thinktomorrow\Trader\Infrastructure\Laravel\Services;
 
-use Thinktomorrow\Trader\Domain\Model\Order\OrderId;
-
 class CookieCartReference
 {
     use InteractsWithCookies;

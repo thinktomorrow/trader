@@ -4,8 +4,8 @@ declare(strict_types=1);
 namespace Thinktomorrow\Trader\Domain\Model\Product;
 
 use Assert\Assertion;
-use Thinktomorrow\Trader\Domain\Model\Taxon\TaxonId;
 use Thinktomorrow\Trader\Domain\Model\Product\Event\ProductTaxaUpdated;
+use Thinktomorrow\Trader\Domain\Model\Taxon\TaxonId;
 
 trait BelongsToTaxa
 {

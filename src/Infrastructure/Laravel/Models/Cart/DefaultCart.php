@@ -4,17 +4,17 @@ declare(strict_types=1);
 namespace Thinktomorrow\Trader\Infrastructure\Laravel\Models\Cart;
 
 use Money\Money;
-use Thinktomorrow\Trader\Domain\Common\Cash\Price;
 use Thinktomorrow\Trader\Application\Cart\Read\Cart;
-use Thinktomorrow\Trader\Domain\Common\Cash\PriceTotal;
+use Thinktomorrow\Trader\Application\Cart\Read\CartBillingAddress;
 use Thinktomorrow\Trader\Application\Cart\Read\CartLine;
+use Thinktomorrow\Trader\Application\Cart\Read\CartPayment;
+use Thinktomorrow\Trader\Application\Cart\Read\CartShipping;
+use Thinktomorrow\Trader\Application\Cart\Read\CartShippingAddress;
+use Thinktomorrow\Trader\Application\Cart\Read\CartShopper;
 use Thinktomorrow\Trader\Application\Common\RendersData;
 use Thinktomorrow\Trader\Application\Common\RendersMoney;
-use Thinktomorrow\Trader\Application\Cart\Read\CartPayment;
-use Thinktomorrow\Trader\Application\Cart\Read\CartShopper;
-use Thinktomorrow\Trader\Application\Cart\Read\CartShipping;
-use Thinktomorrow\Trader\Application\Cart\Read\CartBillingAddress;
-use Thinktomorrow\Trader\Application\Cart\Read\CartShippingAddress;
+use Thinktomorrow\Trader\Domain\Common\Cash\Price;
+use Thinktomorrow\Trader\Domain\Common\Cash\PriceTotal;
 
 class DefaultCart implements Cart
 {
@@ -85,7 +85,7 @@ class DefaultCart implements Cart
 
     public function getQuantity(): int
     {
-        return array_reduce((array) $this->getLines(), fn($carry, $line) => $carry + $line->getQuantity(), 0);
+        return array_reduce((array) $this->getLines(), fn ($carry, $line) => $carry + $line->getQuantity(), 0);
     }
 
     public function includeTax(bool $includeTax = true): void
@@ -97,54 +97,60 @@ class DefaultCart implements Cart
     {
         return $this->renderMoney(
             $this->include_tax ? $this->total->getIncludingVat() : $this->total->getExcludingVat(),
-            $this->getLocale());
+            $this->getLocale()
+        );
     }
 
     public function getSubtotalPrice(): string
     {
         return $this->renderMoney(
             $this->include_tax ? $this->subtotal->getIncludingVat() : $this->subtotal->getExcludingVat(),
-            $this->getLocale());
+            $this->getLocale()
+        );
     }
 
     public function getShippingCost(): ?string
     {
-        if(!$this->shippingCost->getMoney()->isPositive()) {
+        if (! $this->shippingCost->getMoney()->isPositive()) {
             return null;
         }
 
         return $this->renderMoney(
             $this->include_tax ? $this->shippingCost->getIncludingVat() : $this->shippingCost->getExcludingVat(),
-            $this->getLocale());
+            $this->getLocale()
+        );
     }
 
     public function getPaymentCost(): ?string
     {
-        if(!$this->paymentCost->getMoney()->isPositive()) {
+        if (! $this->paymentCost->getMoney()->isPositive()) {
             return null;
         }
 
         return $this->renderMoney(
             $this->include_tax ? $this->paymentCost->getIncludingVat() : $this->paymentCost->getExcludingVat(),
-            $this->getLocale());
+            $this->getLocale()
+        );
     }
 
     public function getDiscountPrice(): ?string
     {
-        if(!$this->discountTotal->getMoney()->isPositive()) {
+        if (! $this->discountTotal->getMoney()->isPositive()) {
             return null;
         }
 
         return $this->renderMoney(
             $this->include_tax ? $this->discountTotal->getIncludingVat() : $this->discountTotal->getExcludingVat(),
-            $this->getLocale());
+            $this->getLocale()
+        );
     }
 
     public function getTaxPrice(): string
     {
         return $this->renderMoney(
             $this->taxTotal,
-            $this->getLocale());
+            $this->getLocale()
+        );
     }
 
     public function getShopper(): CartShopper

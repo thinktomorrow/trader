@@ -5,5 +5,4 @@ namespace Thinktomorrow\Trader\Domain\Model\Order\Exceptions;
 
 final class CouldNotFindOrder extends \RuntimeException
 {
-
 }

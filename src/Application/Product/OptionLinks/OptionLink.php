@@ -3,8 +3,8 @@
 namespace Thinktomorrow\Trader\Application\Product\OptionLinks;
 
 use Thinktomorrow\Trader\Domain\Model\Product\Option\Option;
-use Thinktomorrow\Trader\Domain\Model\Product\Variant\Variant;
 use Thinktomorrow\Trader\Domain\Model\Product\Option\OptionValue;
+use Thinktomorrow\Trader\Domain\Model\Product\Variant\Variant;
 
 interface OptionLink
 {

@@ -7,5 +7,4 @@ use Thinktomorrow\Vine\NodeCollection;
 
 class TaxonTree extends NodeCollection
 {
-
 }

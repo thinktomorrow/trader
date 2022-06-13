@@ -3,8 +3,8 @@ declare(strict_types=1);
 
 namespace Thinktomorrow\Trader\Domain\Model\Taxon;
 
-use Thinktomorrow\Trader\Domain\Common\Entity\HasData;
 use Thinktomorrow\Trader\Domain\Common\Entity\Aggregate;
+use Thinktomorrow\Trader\Domain\Common\Entity\HasData;
 use Thinktomorrow\Trader\Domain\Common\Event\RecordsEvents;
 use Thinktomorrow\Trader\Domain\Model\Taxon\Events\TaxonCreated;
 use Thinktomorrow\Trader\Domain\Model\Taxon\Exceptions\InvalidParentTaxonId;
@@ -44,7 +44,7 @@ class Taxon implements Aggregate
 
     public function changeParent(TaxonId $parentTaxonId): void
     {
-        if($this->taxonId->equals($parentTaxonId)) {
+        if ($this->taxonId->equals($parentTaxonId)) {
             throw new InvalidParentTaxonId('Parent taxon id should be different than child taxon id.');
         }
 

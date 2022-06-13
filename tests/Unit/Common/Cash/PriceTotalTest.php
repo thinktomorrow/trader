@@ -5,8 +5,8 @@ namespace Tests\Unit\Common\Cash;
 
 use Money\Money;
 use PHPUnit\Framework\TestCase;
-use Thinktomorrow\Trader\Domain\Common\Taxes\TaxRate;
 use Thinktomorrow\Trader\Domain\Common\Cash\PriceCannotBeNegative;
+use Thinktomorrow\Trader\Domain\Common\Taxes\TaxRate;
 
 class PriceTotalTest extends TestCase
 {
@@ -15,7 +15,9 @@ class PriceTotalTest extends TestCase
     {
         $object = PriceTotalStub::zero();
         $object = $object->add(PriceStub::fromMoney(
-            Money::EUR(100), TaxRate::fromString('20'), false
+            Money::EUR(100),
+            TaxRate::fromString('20'),
+            false
         ));
 
         $this->assertEquals(Money::EUR(120), $object->getIncludingVat());

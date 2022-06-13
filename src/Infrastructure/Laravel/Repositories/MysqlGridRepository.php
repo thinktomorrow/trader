@@ -3,18 +3,18 @@ declare(strict_types=1);
 
 namespace Thinktomorrow\Trader\Infrastructure\Laravel\Repositories;
 
+use Illuminate\Contracts\Pagination\LengthAwarePaginator;
+use Illuminate\Database\Query\Builder;
+use Illuminate\Database\Query\Expression;
 use Illuminate\Support\Facades\DB;
 use Psr\Container\ContainerInterface;
-use Illuminate\Database\Query\Builder;
-use Thinktomorrow\Trader\TraderConfig;
-use Illuminate\Database\Query\Expression;
-use Thinktomorrow\Trader\Domain\Common\Locale;
-use Illuminate\Contracts\Pagination\LengthAwarePaginator;
-use Thinktomorrow\Trader\Domain\Model\Product\ProductState;
+use Thinktomorrow\Trader\Application\Product\Grid\FlattenedTaxonIdsComposer;
 use Thinktomorrow\Trader\Application\Product\Grid\GridItem;
 use Thinktomorrow\Trader\Application\Product\Grid\GridRepository;
+use Thinktomorrow\Trader\Domain\Common\Locale;
+use Thinktomorrow\Trader\Domain\Model\Product\ProductState;
 use Thinktomorrow\Trader\Domain\Model\Product\Variant\VariantState;
-use Thinktomorrow\Trader\Application\Product\Grid\FlattenedTaxonIdsComposer;
+use Thinktomorrow\Trader\TraderConfig;
 
 class MysqlGridRepository implements GridRepository
 {
@@ -90,11 +90,11 @@ class MysqlGridRepository implements GridRepository
 
     public function filterByPrice(?string $minimumPriceAmount = null, ?string $maximumPriceAmount = null): static
     {
-        if (!is_null($minimumPriceAmount)) {
+        if (! is_null($minimumPriceAmount)) {
             $this->builder->where(static::$variantTable . '.sale_price', '>=', $minimumPriceAmount);
         }
 
-        if (!is_null($maximumPriceAmount)) {
+        if (! is_null($maximumPriceAmount)) {
             $this->builder->where(static::$variantTable . '.sale_price', '<=', $maximumPriceAmount);
         }
 
@@ -168,7 +168,7 @@ class MysqlGridRepository implements GridRepository
     public function getResults(): LengthAwarePaginator
     {
         // Default ordering if no ordering has been applied yet.
-        if (!$this->builder->orders || count($this->builder->orders) < 1) {
+        if (! $this->builder->orders || count($this->builder->orders) < 1) {
             $this->builder->orderBy(static::$productTable . '.order_column', 'ASC');
         }
 
@@ -205,9 +205,9 @@ class MysqlGridRepository implements GridRepository
             static::$variantTable => ['title'],
         ];
 
-        $this->builder->where(function($builder) use($value, $keys){
-            foreach([static::$productTable, static::$variantTable] as $table) {
-                foreach($keys[$table] as $key) {
+        $this->builder->where(function ($builder) use ($value, $keys) {
+            foreach ([static::$productTable, static::$variantTable] as $table) {
+                foreach ($keys[$table] as $key) {
                     $builder->orWhereRaw('LOWER(json_extract(`'.$table.'`.`data`, "$.'.$key.'")) LIKE ?', '%'. $value . '%');
                 }
             }

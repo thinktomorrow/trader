@@ -14,7 +14,7 @@ trait HasDiscounts
         // TODO:: assert order id matches
         // TODO: assert discount isnt already added... (cf. addShipping)
 
-        if (!in_array($discount, $this->discounts)) {
+        if (! in_array($discount, $this->discounts)) {
             $this->discounts[] = $discount;
         }
     }
@@ -22,8 +22,8 @@ trait HasDiscounts
     public function deleteDiscount(DiscountId $discountId): void
     {
         /** @var Discount $existingDiscount */
-        foreach($this->discounts as $indexToBeDeleted => $existingDiscount) {
-            if($existingDiscount->discountId->equals($discountId)) {
+        foreach ($this->discounts as $indexToBeDeleted => $existingDiscount) {
+            if ($existingDiscount->discountId->equals($discountId)) {
                 unset($this->discounts[$indexToBeDeleted]);
             }
         }

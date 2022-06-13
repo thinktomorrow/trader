@@ -3,26 +3,22 @@ declare(strict_types=1);
 
 namespace Tests\Infrastructure\Repositories;
 
+use Illuminate\Foundation\Testing\RefreshDatabase;
 use Money\Money;
 use Tests\Infrastructure\TestCase;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Foundation\Testing\RefreshDatabase;
-use Thinktomorrow\Trader\Infrastructure\Test\TestContainer;
 use Thinktomorrow\Trader\Application\Product\Grid\GridItem;
-use Thinktomorrow\Trader\Application\Taxon\TaxonApplication;
-use Thinktomorrow\Trader\Infrastructure\Test\TestTraderConfig;
 use Thinktomorrow\Trader\Application\Product\ProductApplication;
-use Thinktomorrow\Trader\Infrastructure\Test\EventDispatcherSpy;
+use Thinktomorrow\Trader\Application\Taxon\TaxonApplication;
 use Thinktomorrow\Trader\Infrastructure\Laravel\Models\DefaultGridItem;
-use Thinktomorrow\Trader\Infrastructure\Vine\VineFlattenedTaxonIdsComposer;
 use Thinktomorrow\Trader\Infrastructure\Laravel\Repositories\MysqlGridRepository;
-use Thinktomorrow\Trader\Infrastructure\Test\Repositories\InMemoryTaxonRepository;
-use Thinktomorrow\Trader\Infrastructure\Laravel\Repositories\MysqlTaxonRepository;
-use Thinktomorrow\Trader\Infrastructure\Test\Repositories\InMemoryProductRepository;
-use Thinktomorrow\Trader\Infrastructure\Test\Repositories\InMemoryVariantRepository;
 use Thinktomorrow\Trader\Infrastructure\Laravel\Repositories\MysqlProductRepository;
-use Thinktomorrow\Trader\Infrastructure\Laravel\Repositories\MysqlVariantRepository;
+use Thinktomorrow\Trader\Infrastructure\Laravel\Repositories\MysqlTaxonRepository;
 use Thinktomorrow\Trader\Infrastructure\Laravel\Repositories\MysqlTaxonTreeRepository;
+use Thinktomorrow\Trader\Infrastructure\Laravel\Repositories\MysqlVariantRepository;
+use Thinktomorrow\Trader\Infrastructure\Test\EventDispatcherSpy;
+use Thinktomorrow\Trader\Infrastructure\Test\TestContainer;
+use Thinktomorrow\Trader\Infrastructure\Test\TestTraderConfig;
+use Thinktomorrow\Trader\Infrastructure\Vine\VineFlattenedTaxonIdsComposer;
 
 class GridRepositoryTest extends TestCase
 {
@@ -176,11 +172,13 @@ class GridRepositoryTest extends TestCase
 
     protected function createMysqlCatalog()
     {
-        $this->createCatalog(new TaxonApplication(
+        $this->createCatalog(
+            new TaxonApplication(
             new TestTraderConfig(),
             new EventDispatcherSpy(),
             new MysqlTaxonRepository(),
-        ), new ProductApplication(
+        ),
+            new ProductApplication(
             new TestTraderConfig(),
             new EventDispatcherSpy(),
             new MysqlProductRepository(new MysqlVariantRepository(new TestContainer())),

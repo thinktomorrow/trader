@@ -1,7 +1,8 @@
 <?php
 
-if(!function_exists('dd')) {
-    function dd() {
+if (! function_exists('dd')) {
+    function dd()
+    {
         var_dump(...func_get_args());
         die();
     }
@@ -11,7 +12,7 @@ if(!function_exists('dd')) {
  * Wrapper around the dd helper. This function provides the file from where the
  * dd function has been called, so you won't be in the dark when finding it again.
  */
-if (!function_exists('trap')) {
+if (! function_exists('trap')) {
     function trap($var, ...$moreVars): void
     {
         $trace = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1);

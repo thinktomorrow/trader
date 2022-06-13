@@ -3,17 +3,17 @@ declare(strict_types=1);
 
 namespace Tests\Infrastructure\Vine;
 
-use Tests\Infrastructure\TestCase;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Tests\Infrastructure\TestCase;
 use Thinktomorrow\Trader\Domain\Model\Taxon\Taxon;
 use Thinktomorrow\Trader\Domain\Model\Taxon\TaxonId;
 use Thinktomorrow\Trader\Domain\Model\Taxon\TaxonKey;
 use Thinktomorrow\Trader\Domain\Model\Taxon\TaxonState;
-use Thinktomorrow\Trader\Infrastructure\Test\TestContainer;
-use Thinktomorrow\Trader\Infrastructure\Vine\VineTaxonFilterTreeComposer;
+use Thinktomorrow\Trader\Infrastructure\Laravel\Repositories\MysqlTaxonTreeRepository;
 use Thinktomorrow\Trader\Infrastructure\Test\Repositories\InMemoryTaxonRepository;
 use Thinktomorrow\Trader\Infrastructure\Test\Repositories\InMemoryTaxonTreeRepository;
-use Thinktomorrow\Trader\Infrastructure\Laravel\Repositories\MysqlTaxonTreeRepository;
+use Thinktomorrow\Trader\Infrastructure\Test\TestContainer;
+use Thinktomorrow\Trader\Infrastructure\Vine\VineTaxonFilterTreeComposer;
 
 final class TaxonFilterTreeComposerTest extends TestCase
 {
@@ -28,11 +28,11 @@ final class TaxonFilterTreeComposerTest extends TestCase
     }
 
     /** @test */
-    public function it_can_retrieve_an_available_taxonFilter_tree()
+    public function it_can_retrieve_an_available_taxon_filter_tree()
     {
         $this->createDefaultTaxons();
 
-        foreach($this->repositories() as $repository) {
+        foreach ($this->repositories() as $repository) {
             $composer = new VineTaxonFilterTreeComposer($repository);
 
             $taxonFilterTree = $composer->getAvailableFilters('taxon-first');
@@ -58,7 +58,7 @@ final class TaxonFilterTreeComposerTest extends TestCase
         $this->createTaxon(Taxon::create(TaxonId::fromString('second'), TaxonKey::fromString('taxon-second'), TaxonId::fromString('first')), ['bbb']);
         $this->createTaxon(Taxon::create(TaxonId::fromString('third'), TaxonKey::fromString('taxon-third'), TaxonId::fromString('first')), []);
 
-        foreach($this->repositories() as $repository) {
+        foreach ($this->repositories() as $repository) {
             $composer = new VineTaxonFilterTreeComposer($repository);
 
             $taxonFilterTree = $composer->getAvailableFilters('taxon-first');
@@ -81,7 +81,7 @@ final class TaxonFilterTreeComposerTest extends TestCase
         $this->createTaxon($first, ['aaa']);
         $this->createTaxon($second, ['aaa']);
 
-        foreach($this->repositories() as $repository) {
+        foreach ($this->repositories() as $repository) {
             $composer = new VineTaxonFilterTreeComposer($repository);
 
             $taxonFilterTree = $composer->getAvailableFilters('taxon-main');
@@ -102,7 +102,7 @@ final class TaxonFilterTreeComposerTest extends TestCase
 
         $this->createTaxon($taxon, ['bbb']);
 
-        foreach($this->repositories() as $repository) {
+        foreach ($this->repositories() as $repository) {
             $composer = new VineTaxonFilterTreeComposer($repository);
 
             $taxonFilterTree = $composer->getAvailableFilters('taxon-first');
@@ -114,7 +114,7 @@ final class TaxonFilterTreeComposerTest extends TestCase
     /** @test */
     public function it_returns_empty_filter_if_taxon_key_does_not_exist()
     {
-        foreach($this->repositories() as $repository) {
+        foreach ($this->repositories() as $repository) {
             $taxonFilterTree = (new VineTaxonFilterTreeComposer($repository))->getAvailableFilters('xxx');
             $this->assertCount(0, $taxonFilterTree);
         }
@@ -125,9 +125,9 @@ final class TaxonFilterTreeComposerTest extends TestCase
     {
         $this->createDefaultTaxons();
 
-        foreach($this->repositories() as $repository) {
+        foreach ($this->repositories() as $repository) {
             $taxonFilterTree = (new VineTaxonFilterTreeComposer($repository))->getActiveFilters('taxon-first', [
-                'taxon-third'
+                'taxon-third',
             ]);
 
             $this->assertCount(1, $taxonFilterTree);
@@ -138,7 +138,7 @@ final class TaxonFilterTreeComposerTest extends TestCase
     /** @test */
     public function it_returns_empty_active_filter_if_taxon_key_does_not_exist()
     {
-        foreach($this->repositories() as $repository) {
+        foreach ($this->repositories() as $repository) {
             $taxonFilterTree = (new VineTaxonFilterTreeComposer($repository))->getActiveFilters('xxx', ['taxon-first']);
             $this->assertCount(0, $taxonFilterTree);
         }

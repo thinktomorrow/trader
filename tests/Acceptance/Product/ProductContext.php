@@ -5,26 +5,26 @@ namespace Tests\Acceptance\Product;
 
 use PHPUnit\Framework\Assert;
 use Tests\Acceptance\TestCase;
-use Thinktomorrow\Trader\Domain\Model\Product\ProductId;
+use Thinktomorrow\Trader\Application\Product\CheckProductOptions\MissingOptionCombinations;
 use Thinktomorrow\Trader\Application\Product\CreateProduct;
 use Thinktomorrow\Trader\Application\Product\CreateVariant;
-use Thinktomorrow\Trader\Infrastructure\Test\TestContainer;
-use Thinktomorrow\Trader\Infrastructure\Test\TestTraderConfig;
-use Thinktomorrow\Trader\Infrastructure\Test\EventDispatcherSpy;
-use Thinktomorrow\Trader\Application\Product\ProductApplication;
-use Thinktomorrow\Trader\Domain\Model\Product\Variant\VariantId;
-use Thinktomorrow\Trader\Domain\Model\Product\Event\ProductCreated;
-use Thinktomorrow\Trader\Domain\Model\Product\Event\VariantCreated;
 use Thinktomorrow\Trader\Application\Product\OptionLinks\OptionLink;
-use Thinktomorrow\Trader\Domain\Model\Product\Event\ProductTaxaUpdated;
-use Thinktomorrow\Trader\Domain\Model\Product\Event\ProductDataUpdated;
-use Thinktomorrow\Trader\Infrastructure\Laravel\Models\DefaultOptionLink;
-use Thinktomorrow\Trader\Application\Product\OptionLinks\ProductOptionValues;
 use Thinktomorrow\Trader\Application\Product\OptionLinks\OptionLinksComposer;
+use Thinktomorrow\Trader\Application\Product\OptionLinks\ProductOptionValues;
+use Thinktomorrow\Trader\Application\Product\ProductApplication;
+use Thinktomorrow\Trader\Domain\Model\Product\Event\ProductCreated;
+use Thinktomorrow\Trader\Domain\Model\Product\Event\ProductDataUpdated;
+use Thinktomorrow\Trader\Domain\Model\Product\Event\ProductTaxaUpdated;
+use Thinktomorrow\Trader\Domain\Model\Product\Event\VariantCreated;
+use Thinktomorrow\Trader\Domain\Model\Product\ProductId;
+use Thinktomorrow\Trader\Domain\Model\Product\Variant\VariantId;
+use Thinktomorrow\Trader\Infrastructure\Laravel\Models\DefaultOptionLink;
+use Thinktomorrow\Trader\Infrastructure\Test\EventDispatcherSpy;
+use Thinktomorrow\Trader\Infrastructure\Test\Repositories\InMemoryProductDetailRepository;
 use Thinktomorrow\Trader\Infrastructure\Test\Repositories\InMemoryProductRepository;
 use Thinktomorrow\Trader\Infrastructure\Test\Repositories\InMemoryVariantRepository;
-use Thinktomorrow\Trader\Infrastructure\Test\Repositories\InMemoryProductDetailRepository;
-use Thinktomorrow\Trader\Application\Product\CheckProductOptions\MissingOptionCombinations;
+use Thinktomorrow\Trader\Infrastructure\Test\TestContainer;
+use Thinktomorrow\Trader\Infrastructure\Test\TestTraderConfig;
 
 abstract class ProductContext extends TestCase
 {
@@ -69,7 +69,10 @@ abstract class ProductContext extends TestCase
     protected function createAProduct(string $unitPrice, array $taxonIds, array $data = []): ProductId
     {
         $productId = $this->productApplication->createProduct(new CreateProduct(
-            $taxonIds, $unitPrice, '12', $data
+            $taxonIds,
+            $unitPrice,
+            '12',
+            $data
         ));
 
         Assert::assertNotNull($product = $this->productRepository->find($productId));
@@ -89,7 +92,10 @@ abstract class ProductContext extends TestCase
         InMemoryVariantRepository::setNextReference($variantId);
 
         $variantId = $this->productApplication->createVariant(new CreateVariant(
-            $productId, $unitPrice, $taxRate, $data
+            $productId,
+            $unitPrice,
+            $taxRate,
+            $data
         ));
 
         $this->assertEquals([

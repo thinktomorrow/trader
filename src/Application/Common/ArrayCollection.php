@@ -3,10 +3,10 @@ declare(strict_types=1);
 
 namespace Thinktomorrow\Trader\Application\Common;
 
-use Countable;
 use ArrayAccess;
-use Traversable;
+use Countable;
 use IteratorAggregate;
+use Traversable;
 
 abstract class ArrayCollection implements Countable, IteratorAggregate, ArrayAccess
 {

@@ -6,8 +6,8 @@ namespace Tests\Unit\Model;
 use PHPUnit\Framework\TestCase;
 use Thinktomorrow\Trader\Domain\Model\Order\OrderId;
 use Thinktomorrow\Trader\Domain\Model\Order\Shipping\Shipping;
-use Thinktomorrow\Trader\Domain\Model\Order\Shipping\ShippingId;
 use Thinktomorrow\Trader\Domain\Model\Order\Shipping\ShippingCost;
+use Thinktomorrow\Trader\Domain\Model\Order\Shipping\ShippingId;
 use Thinktomorrow\Trader\Domain\Model\Order\Shipping\ShippingState;
 use Thinktomorrow\Trader\Domain\Model\ShippingProfile\ShippingProfileId;
 
@@ -20,7 +20,7 @@ class ShippingTest extends TestCase
             OrderId::fromString('aaa'),
             $shippingId = ShippingId::fromString('yyy'),
             $shippingProfileId = ShippingProfileId::fromString('zzz'),
-            $cost = ShippingCost::fromScalars('150','EUR','10', true),
+            $cost = ShippingCost::fromScalars('150', 'EUR', '10', true),
         );
 
         $this->assertEquals([
@@ -43,8 +43,8 @@ class ShippingTest extends TestCase
         $this->assertEquals(ShippingId::fromString('yyy'), $shipping->shippingId);
         $this->assertEquals([
             'order_id' => 'aaa',
-            'shipping_id'    => 'yyy',
-            'shipping_profile_id'    => 'zzz',
+            'shipping_id' => 'yyy',
+            'shipping_profile_id' => 'zzz',
             'shipping_state' => ShippingState::transit->value,
             'cost' => '200',
             'tax_rate' => '9',

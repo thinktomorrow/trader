@@ -3,10 +3,10 @@ declare(strict_types=1);
 
 namespace Thinktomorrow\Trader\Infrastructure\Vine;
 
-use Thinktomorrow\Trader\Application\Taxon\Tree\TaxonTree;
-use Thinktomorrow\Trader\Application\Taxon\Tree\TaxonNode;
-use Thinktomorrow\Trader\Application\Taxon\Tree\TaxonTreeRepository;
 use Thinktomorrow\Trader\Application\Taxon\TaxonSelect\TaxonIdOptionsComposer;
+use Thinktomorrow\Trader\Application\Taxon\Tree\TaxonNode;
+use Thinktomorrow\Trader\Application\Taxon\Tree\TaxonTree;
+use Thinktomorrow\Trader\Application\Taxon\Tree\TaxonTreeRepository;
 
 class VineTaxonIdOptionsComposer implements TaxonIdOptionsComposer
 {
@@ -25,7 +25,7 @@ class VineTaxonIdOptionsComposer implements TaxonIdOptionsComposer
     {
         $result = [];
 
-        foreach($this->getFlattened() as ['root' => $root]) {
+        foreach ($this->getFlattened() as ['root' => $root]) {
             $result[$root->getId()] = $root->getLabel();
         }
 
@@ -48,10 +48,9 @@ class VineTaxonIdOptionsComposer implements TaxonIdOptionsComposer
     {
         $options = $this->getOptions();
 
-        return array_map(function($group){
-
+        return array_map(function ($group) {
             $values = [];
-            foreach($group['values'] as $id => $value) {
+            foreach ($group['values'] as $id => $value) {
                 $values[] = ['label' => $value, 'id' => $id];
             }
 

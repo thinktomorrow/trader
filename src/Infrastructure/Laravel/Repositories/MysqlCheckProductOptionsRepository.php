@@ -4,7 +4,6 @@ declare(strict_types=1);
 namespace Thinktomorrow\Trader\Infrastructure\Laravel\Repositories;
 
 use Illuminate\Support\Facades\DB;
-use Psr\Container\ContainerInterface;
 use Thinktomorrow\Trader\Application\Product\CheckProductOptions\CheckProductOptionsRepository;
 
 class MysqlCheckProductOptionsRepository implements CheckProductOptionsRepository

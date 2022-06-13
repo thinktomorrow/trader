@@ -3,14 +3,13 @@ declare(strict_types=1);
 
 namespace Tests\Infrastructure\Vine;
 
-use Tests\Infrastructure\TestCase;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Thinktomorrow\Trader\Infrastructure\Test\TestContainer;
-use Thinktomorrow\Trader\Infrastructure\Vine\VineTaxonIdOptionsComposer;
-use Thinktomorrow\Trader\Infrastructure\Vine\VineFlattenedTaxonIdsComposer;
+use Tests\Infrastructure\TestCase;
+use Thinktomorrow\Trader\Infrastructure\Laravel\Repositories\MysqlTaxonTreeRepository;
 use Thinktomorrow\Trader\Infrastructure\Test\Repositories\InMemoryTaxonRepository;
 use Thinktomorrow\Trader\Infrastructure\Test\Repositories\InMemoryTaxonTreeRepository;
-use Thinktomorrow\Trader\Infrastructure\Laravel\Repositories\MysqlTaxonTreeRepository;
+use Thinktomorrow\Trader\Infrastructure\Test\TestContainer;
+use Thinktomorrow\Trader\Infrastructure\Vine\VineTaxonIdOptionsComposer;
 
 final class TaxonIdOptionsComposerTest extends TestCase
 {
@@ -29,7 +28,7 @@ final class TaxonIdOptionsComposerTest extends TestCase
     {
         $this->createDefaultTaxons();
 
-        foreach($this->repositories() as $repository) {
+        foreach ($this->repositories() as $repository) {
             $result = (new VineTaxonIdOptionsComposer($repository))->getOptions();
 
             $this->assertEquals([
@@ -38,7 +37,7 @@ final class TaxonIdOptionsComposerTest extends TestCase
                     'values' => [
                         'second' => 'Taxon second',
                         'third' => 'Taxon third',
-                        'fourth' => 'Taxon third > Taxon fourth'
+                        'fourth' => 'Taxon third > Taxon fourth',
                     ],
                 ],
                 [
@@ -56,7 +55,7 @@ final class TaxonIdOptionsComposerTest extends TestCase
     {
         $this->createDefaultTaxons();
 
-        foreach($this->repositories() as $repository) {
+        foreach ($this->repositories() as $repository) {
             $this->assertEquals([
                 'first' => 'Taxon first',
                 'fifth' => 'Taxon fifth',

@@ -9,7 +9,6 @@ class GetApplicablePromos
 {
     public function __construct()
     {
-
     }
 
     public function get(Order $order): array

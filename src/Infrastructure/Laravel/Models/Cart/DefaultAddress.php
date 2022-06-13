@@ -17,7 +17,6 @@ abstract class DefaultAddress
 
     private function __construct()
     {
-
     }
 
     public static function fromMappedData(array $state, array $cartState): static

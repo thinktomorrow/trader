@@ -3,8 +3,8 @@ declare(strict_types=1);
 
 namespace Thinktomorrow\Trader\Infrastructure\Laravel\Services;
 
-use Illuminate\Http\Request;
 use Illuminate\Cookie\CookieJar;
+use Illuminate\Http\Request;
 
 trait InteractsWithCookies
 {

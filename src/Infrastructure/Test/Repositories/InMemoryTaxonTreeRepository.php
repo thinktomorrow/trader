@@ -4,14 +4,14 @@ declare(strict_types=1);
 namespace Thinktomorrow\Trader\Infrastructure\Test\Repositories;
 
 use Psr\Container\ContainerInterface;
-use Thinktomorrow\Vine\NodeCollectionFactory;
-use Thinktomorrow\Trader\Domain\Model\Taxon\TaxonId;
-use Thinktomorrow\Trader\Infrastructure\Vine\TaxonSource;
-use Thinktomorrow\Trader\Application\Taxon\Tree\TaxonTree;
+use Thinktomorrow\Trader\Application\Taxon\Category\CategoryRepository;
 use Thinktomorrow\Trader\Application\Taxon\Tree\TaxonNode;
 use Thinktomorrow\Trader\Application\Taxon\Tree\TaxonNodes;
+use Thinktomorrow\Trader\Application\Taxon\Tree\TaxonTree;
 use Thinktomorrow\Trader\Application\Taxon\Tree\TaxonTreeRepository;
-use Thinktomorrow\Trader\Application\Taxon\Category\CategoryRepository;
+use Thinktomorrow\Trader\Domain\Model\Taxon\TaxonId;
+use Thinktomorrow\Trader\Infrastructure\Vine\TaxonSource;
+use Thinktomorrow\Vine\NodeCollectionFactory;
 
 final class InMemoryTaxonTreeRepository implements TaxonTreeRepository, CategoryRepository
 {
@@ -40,14 +40,14 @@ final class InMemoryTaxonTreeRepository implements TaxonTreeRepository, Category
 
         $taxonNodeClass = $this->container->get(TaxonNode::class);
 
-        foreach(InMemoryTaxonRepository::$taxons as $taxon) {
+        foreach (InMemoryTaxonRepository::$taxons as $taxon) {
             $nodes[] = $taxonNodeClass::fromMappedData([
-                'taxon_id'    => $taxon->taxonId->get(),
-                'parent_id'   => $taxon->getMappedData()['parent_id'],
-                'key'         => $taxon->getMappedData()['key'],
+                'taxon_id' => $taxon->taxonId->get(),
+                'parent_id' => $taxon->getMappedData()['parent_id'],
+                'key' => $taxon->getMappedData()['key'],
                 'data' => json_encode($taxon->getData()),
-                'state'       => $taxon->getMappedData()['state'],
-                'order'       => $taxon->getMappedData()['order'],
+                'state' => $taxon->getMappedData()['state'],
+                'order' => $taxon->getMappedData()['order'],
                 'product_ids' => $this->getCommaSeparatedProductIds($taxon->taxonId),
             ]);
         }
@@ -57,7 +57,7 @@ final class InMemoryTaxonTreeRepository implements TaxonTreeRepository, Category
 
     private function getCommaSeparatedProductIds(TaxonId $taxonId): string
     {
-        if (!isset(InMemoryTaxonRepository::$productIds[$taxonId->get()])) {
+        if (! isset(InMemoryTaxonRepository::$productIds[$taxonId->get()])) {
             return '';
         }
 

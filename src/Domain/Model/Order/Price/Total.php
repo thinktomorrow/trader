@@ -10,4 +10,3 @@ final class Total implements PriceTotal
 {
     use PriceTotalValue;
 }
-

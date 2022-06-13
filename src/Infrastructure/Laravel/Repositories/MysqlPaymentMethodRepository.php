@@ -9,10 +9,8 @@ use Thinktomorrow\Trader\Domain\Model\PaymentMethod\PaymentMethodRepository;
 
 class MysqlPaymentMethodRepository implements PaymentMethodRepository
 {
-
     public function __construct()
     {
-
     }
 
     public function save(PaymentMethod $paymentMethod): void

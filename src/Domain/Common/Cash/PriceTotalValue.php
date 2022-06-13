@@ -14,7 +14,7 @@ trait PriceTotalValue
 
     private function __construct(Money $money, TaxRateTotals $taxRateTotals, bool $includesVat)
     {
-        if($money->isNegative()) {
+        if ($money->isNegative()) {
             throw new PriceCannotBeNegative('Price money amount cannot be negative: ' . $money->getAmount() . ' is given.');
         }
 
@@ -39,7 +39,7 @@ trait PriceTotalValue
 
     public function getIncludingVat(): Money
     {
-        if($this->includesVat) {
+        if ($this->includesVat) {
             return $this->money;
         }
 
@@ -50,7 +50,7 @@ trait PriceTotalValue
 
     public function getExcludingVat(): Money
     {
-        if(! $this->includesVat) {
+        if (! $this->includesVat) {
             return $this->money;
         }
 

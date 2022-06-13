@@ -4,8 +4,8 @@ declare(strict_types=1);
 namespace Tests\Acceptance\Taxon;
 
 use Tests\Infrastructure\Vine\TaxonHelpers;
-use Thinktomorrow\Trader\Application\Taxon\MoveTaxon;
 use Thinktomorrow\Trader\Application\Taxon\CreateTaxon;
+use Thinktomorrow\Trader\Application\Taxon\MoveTaxon;
 
 class MoveTaxonTest extends TaxonContext
 {
@@ -14,9 +14,9 @@ class MoveTaxonTest extends TaxonContext
     /** @test */
     public function it_can_move_a_taxon_to_root()
     {
-        $taxonRootId = $this->taxonApplication->createTaxon(new CreateTaxon('taxon-key-root',[]));
+        $taxonRootId = $this->taxonApplication->createTaxon(new CreateTaxon('taxon-key-root', []));
         $this->taxonRepository->setNextReference('abc');
-        $taxonId = $this->taxonApplication->createTaxon(new CreateTaxon('taxon-key',[], $taxonRootId->get()));
+        $taxonId = $this->taxonApplication->createTaxon(new CreateTaxon('taxon-key', [], $taxonRootId->get()));
 
         $taxon = $this->taxonRepository->find($taxonId);
         $this->assertEquals($taxonRootId->get(), $taxon->getMappedData()['parent_id']);
@@ -30,7 +30,7 @@ class MoveTaxonTest extends TaxonContext
     /** @test */
     public function it_can_move_a_taxon_to_another_taxon()
     {
-        $taxonRootId = $this->taxonApplication->createTaxon(new CreateTaxon('taxon-key-root',[]));
+        $taxonRootId = $this->taxonApplication->createTaxon(new CreateTaxon('taxon-key-root', []));
         $this->taxonRepository->setNextReference('abc');
         $taxonId = $this->taxonApplication->createTaxon(new CreateTaxon('taxon-key', []));
 
@@ -41,6 +41,5 @@ class MoveTaxonTest extends TaxonContext
 
         $taxon = $this->taxonRepository->find($taxonId);
         $this->assertEquals($taxonRootId->get(), $taxon->getMappedData()['parent_id']);
-
     }
 }

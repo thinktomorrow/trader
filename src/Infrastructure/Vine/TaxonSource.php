@@ -3,9 +3,9 @@ declare(strict_types=1);
 
 namespace Thinktomorrow\Trader\Infrastructure\Vine;
 
+use Thinktomorrow\Trader\Application\Taxon\Tree\TaxonNode;
 use Thinktomorrow\Vine\Node;
 use Thinktomorrow\Vine\Source;
-use Thinktomorrow\Trader\Application\Taxon\Tree\TaxonNode;
 
 class TaxonSource implements Source
 {
@@ -24,7 +24,7 @@ class TaxonSource implements Source
 
     public function createNode($entry): Node
     {
-        if(!$entry instanceof TaxonNode) {
+        if (! $entry instanceof TaxonNode) {
             throw new \InvalidArgumentException('Entry is expected to be a ' . TaxonNode::class .'.');
         }
 

@@ -3,15 +3,15 @@ declare(strict_types=1);
 
 namespace Tests\Infrastructure\Repositories;
 
-use Tests\Infrastructure\TestCase;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Tests\Infrastructure\TestCase;
+use Thinktomorrow\Trader\Domain\Model\Product\Exceptions\CouldNotFindProduct;
 use Thinktomorrow\Trader\Domain\Model\Product\Product;
 use Thinktomorrow\Trader\Domain\Model\Product\ProductId;
-use Thinktomorrow\Trader\Infrastructure\Test\TestContainer;
-use Thinktomorrow\Trader\Domain\Model\Product\Exceptions\CouldNotFindProduct;
-use Thinktomorrow\Trader\Infrastructure\Test\Repositories\InMemoryProductRepository;
 use Thinktomorrow\Trader\Infrastructure\Laravel\Repositories\MysqlProductRepository;
 use Thinktomorrow\Trader\Infrastructure\Laravel\Repositories\MysqlVariantRepository;
+use Thinktomorrow\Trader\Infrastructure\Test\Repositories\InMemoryProductRepository;
+use Thinktomorrow\Trader\Infrastructure\Test\TestContainer;
 
 final class ProductRepositoryTest extends TestCase
 {
@@ -23,7 +23,7 @@ final class ProductRepositoryTest extends TestCase
      */
     public function it_can_save_and_find_a_product(Product $product)
     {
-        foreach($this->repositories() as $repository) {
+        foreach ($this->repositories() as $repository) {
             $repository->save($product);
             $product->releaseEvents();
 
@@ -39,11 +39,11 @@ final class ProductRepositoryTest extends TestCase
     {
         $productsNotFound = 0;
 
-        foreach($this->repositories() as $repository) {
+        foreach ($this->repositories() as $repository) {
             $repository->save($product);
             $repository->delete($product->productId);
 
-            try{
+            try {
                 $repository->find($product->productId);
             } catch (CouldNotFindProduct $e) {
                 $productsNotFound++;
@@ -56,7 +56,7 @@ final class ProductRepositoryTest extends TestCase
     /** @test */
     public function it_can_generate_a_next_reference()
     {
-        foreach($this->repositories() as $repository) {
+        foreach ($this->repositories() as $repository) {
             $this->assertInstanceOf(ProductId::class, $repository->nextReference());
         }
     }

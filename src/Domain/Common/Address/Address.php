@@ -10,9 +10,9 @@ class Address
         public readonly ?string $line1,
         public readonly ?string $line2,
         public readonly ?string $postalCode,
-        public readonly ?string $city)
+        public readonly ?string $city
+    )
     {
-
     }
 
     public function replaceCountry(string $country): static
@@ -43,11 +43,11 @@ class Address
     public function toArray(): array
     {
         return [
-            'country'     => $this->country,
-            'line1'       => $this->line1,
-            'line2'       => $this->line2,
+            'country' => $this->country,
+            'line1' => $this->line1,
+            'line2' => $this->line2,
             'postal_code' => $this->postalCode,
-            'city'        => $this->city,
+            'city' => $this->city,
         ];
     }
 }

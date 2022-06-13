@@ -3,8 +3,8 @@ declare(strict_types=1);
 
 namespace Thinktomorrow\Trader\Application\Product\Grid;
 
-use Thinktomorrow\Trader\Domain\Common\Locale;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
+use Thinktomorrow\Trader\Domain\Common\Locale;
 
 interface GridRepository
 {

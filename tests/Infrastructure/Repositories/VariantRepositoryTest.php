@@ -3,14 +3,14 @@ declare(strict_types=1);
 
 namespace Tests\Infrastructure\Repositories;
 
-use Tests\Infrastructure\TestCase;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Thinktomorrow\Trader\Infrastructure\Test\TestContainer;
+use Tests\Infrastructure\TestCase;
 use Thinktomorrow\Trader\Domain\Model\Product\Variant\Variant;
 use Thinktomorrow\Trader\Domain\Model\Product\Variant\VariantId;
-use Thinktomorrow\Trader\Infrastructure\Test\Repositories\InMemoryVariantRepository;
 use Thinktomorrow\Trader\Infrastructure\Laravel\Repositories\MysqlVariantRepository;
 use Thinktomorrow\Trader\Infrastructure\Test\Repositories\InMemoryProductRepository;
+use Thinktomorrow\Trader\Infrastructure\Test\Repositories\InMemoryVariantRepository;
+use Thinktomorrow\Trader\Infrastructure\Test\TestContainer;
 
 final class VariantRepositoryTest extends TestCase
 {
@@ -22,11 +22,11 @@ final class VariantRepositoryTest extends TestCase
      */
     public function it_can_save_and_find_an_variant(Variant $variant)
     {
-        foreach($this->repositories() as $repository) {
+        foreach ($this->repositories() as $repository) {
             $repository->save($variant);
 
             $variantStates = $repository->getStatesByProduct($variant->productId);
-            $this->assertEquals([$variant], array_map(fn($variantState) => Variant::fromMappedData($variantState, ['product_id' => 'xxx']), $variantStates));
+            $this->assertEquals([$variant], array_map(fn ($variantState) => Variant::fromMappedData($variantState, ['product_id' => 'xxx']), $variantStates));
         }
     }
 
@@ -36,7 +36,7 @@ final class VariantRepositoryTest extends TestCase
      */
     public function it_can_sync_option_values(Variant $variant)
     {
-        foreach($this->repositories() as $repository) {
+        foreach ($this->repositories() as $repository) {
             $repository->save($variant);
 
             // Resave so that the sync check occurs
@@ -52,7 +52,7 @@ final class VariantRepositoryTest extends TestCase
      */
     public function it_can_delete_an_variant(Variant $variant)
     {
-        foreach($this->repositories() as $repository) {
+        foreach ($this->repositories() as $repository) {
             $repository->save($variant);
             $repository->delete($variant->variantId);
 
@@ -63,7 +63,7 @@ final class VariantRepositoryTest extends TestCase
     /** @test */
     public function it_can_generate_a_next_reference()
     {
-        foreach($this->repositories() as $repository) {
+        foreach ($this->repositories() as $repository) {
             $this->assertInstanceOf(VariantId::class, $repository->nextReference());
         }
     }
@@ -74,7 +74,7 @@ final class VariantRepositoryTest extends TestCase
      */
     public function it_can_find_variant_for_cart(Variant $variant)
     {
-        foreach($this->repositories() as $repository) {
+        foreach ($this->repositories() as $repository) {
             $repository->save($variant);
 
             $this->assertNotNull($repository->findVariantForCart($variant->variantId));

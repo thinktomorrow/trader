@@ -14,7 +14,7 @@ trait PriceValue
 
     private function __construct(Money $money, TaxRate $taxRate, bool $includesVat)
     {
-        if($money->isNegative()) {
+        if ($money->isNegative()) {
             throw new PriceCannotBeNegative('Price money amount cannot be negative: ' . $money->getAmount() . ' is given.');
         }
 
@@ -54,7 +54,7 @@ trait PriceValue
 
     public function getIncludingVat(): Money
     {
-        if($this->includesVat) {
+        if ($this->includesVat) {
             return $this->money;
         }
 
@@ -65,7 +65,7 @@ trait PriceValue
 
     public function getExcludingVat(): Money
     {
-        if(! $this->includesVat) {
+        if (! $this->includesVat) {
             return $this->money;
         }
 
@@ -143,7 +143,7 @@ trait PriceValue
 
     private function assertSameTaxRates(Price $otherPrice): void
     {
-        if(!$otherPrice->getTaxRate()->equals($this->getTaxRate())) {
+        if (! $otherPrice->getTaxRate()->equals($this->getTaxRate())) {
             throw new PriceCannotContainMultipleTaxRates($otherPrice->getTaxRate() . ' differs from expected ' . $this->getTaxRate());
         }
     }

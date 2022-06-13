@@ -4,18 +4,18 @@ declare(strict_types=1);
 namespace Thinktomorrow\Trader\Infrastructure\Laravel\Repositories;
 
 use Illuminate\Support\Facades\DB;
-use Thinktomorrow\Trader\Domain\Model\Order\Order;
-use Thinktomorrow\Trader\Domain\Model\Order\OrderId;
-use Thinktomorrow\Trader\Domain\Model\Order\Shopper;
 use Thinktomorrow\Trader\Application\Cart\Read\Cart;
-use Thinktomorrow\Trader\Domain\Model\Order\Line\Line;
-use Thinktomorrow\Trader\Domain\Model\Order\Payment\Payment;
-use Thinktomorrow\Trader\Domain\Model\Order\Discount\Discount;
-use Thinktomorrow\Trader\Domain\Model\Order\Shipping\Shipping;
 use Thinktomorrow\Trader\Application\Cart\Read\CartRepository;
 use Thinktomorrow\Trader\Domain\Model\Order\Address\BillingAddress;
 use Thinktomorrow\Trader\Domain\Model\Order\Address\ShippingAddress;
+use Thinktomorrow\Trader\Domain\Model\Order\Discount\Discount;
 use Thinktomorrow\Trader\Domain\Model\Order\Exceptions\CouldNotFindOrder;
+use Thinktomorrow\Trader\Domain\Model\Order\Line\Line;
+use Thinktomorrow\Trader\Domain\Model\Order\Order;
+use Thinktomorrow\Trader\Domain\Model\Order\OrderId;
+use Thinktomorrow\Trader\Domain\Model\Order\Payment\Payment;
+use Thinktomorrow\Trader\Domain\Model\Order\Shipping\Shipping;
+use Thinktomorrow\Trader\Domain\Model\Order\Shopper;
 
 final class MysqlCartRepository implements CartRepository
 {
@@ -37,36 +37,36 @@ final class MysqlCartRepository implements CartRepository
             ->where(static::$orderTable . '.order_id', $orderId->get())
             ->first();
 
-        if (!$orderState) {
+        if (! $orderState) {
             throw new CouldNotFindOrder('No order found by id [' . $orderId->get() . ']');
         }
 
         $lineStates = DB::table(static::$orderLinesTable)
             ->where(static::$orderLinesTable . '.order_id', $orderId->get())
             ->get()
-            ->map(fn($item) => (array) $item)
-            ->map(fn($item) => array_merge($item, ['includes_vat' => (bool) $item['includes_vat']]))
+            ->map(fn ($item) => (array) $item)
+            ->map(fn ($item) => array_merge($item, ['includes_vat' => (bool) $item['includes_vat']]))
             ->toArray();
 
         $discountStates = DB::table(static::$orderDiscountsTable)
             ->where(static::$orderDiscountsTable . '.order_id', $orderId->get())
             ->get()
-            ->map(fn($item) => (array) $item)
-            ->map(fn($item) => array_merge($item, ['includes_vat' => (bool) $item['includes_vat']]))
+            ->map(fn ($item) => (array) $item)
+            ->map(fn ($item) => array_merge($item, ['includes_vat' => (bool) $item['includes_vat']]))
             ->toArray();
 
         $shippingStates = DB::table(static::$orderShippingTable)
             ->where(static::$orderShippingTable . '.order_id', $orderId->get())
             ->get()
-            ->map(fn($item) => (array) $item)
-            ->map(fn($item) => array_merge($item, ['includes_vat' => (bool) $item['includes_vat']]))
+            ->map(fn ($item) => (array) $item)
+            ->map(fn ($item) => array_merge($item, ['includes_vat' => (bool) $item['includes_vat']]))
             ->toArray();
 
         $paymentState = DB::table(static::$orderPaymentTable)
             ->where(static::$orderPaymentTable . '.order_id', $orderId->get())
             ->first();
 
-        if(! is_null($paymentState)) {
+        if (! is_null($paymentState)) {
             $paymentState = (array) $paymentState;
             $paymentState = array_merge($paymentState, ['includes_vat' => (bool) $paymentState['includes_vat']]);
         }
@@ -75,19 +75,19 @@ final class MysqlCartRepository implements CartRepository
             ->where(static::$orderShopperTable . '.order_id', $orderId->get())
             ->first();
 
-        if(! is_null($shopperState)) {
+        if (! is_null($shopperState)) {
             $shopperState = (array) $shopperState;
             $shopperState = array_merge($shopperState, ['register_after_checkout' => (bool) $shopperState['register_after_checkout']]);
         }
 
         $childEntities = [
-            Line::class            => $lineStates,
-            Discount::class        => $discountStates,
-            Shipping::class        => $shippingStates,
-            Payment::class         => $paymentState,
-            Shopper::class         => $shopperState,
-            ShippingAddress::class => $orderState->shipping_address ? json_decode($orderState->shipping_address, TRUE) : null,
-            BillingAddress::class  => $orderState->billing_address ? json_decode($orderState->billing_address, TRUE) : null,
+            Line::class => $lineStates,
+            Discount::class => $discountStates,
+            Shipping::class => $shippingStates,
+            Payment::class => $paymentState,
+            Shopper::class => $shopperState,
+            ShippingAddress::class => $orderState->shipping_address ? json_decode($orderState->shipping_address, true) : null,
+            BillingAddress::class => $orderState->billing_address ? json_decode($orderState->billing_address, true) : null,
         ];
 
         return Order::fromMappedData((array)$orderState, $childEntities);

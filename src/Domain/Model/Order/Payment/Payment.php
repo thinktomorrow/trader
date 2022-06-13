@@ -3,8 +3,8 @@ declare(strict_types=1);
 
 namespace Thinktomorrow\Trader\Domain\Model\Order\Payment;
 
-use Thinktomorrow\Trader\Domain\Model\Order\OrderId;
 use Thinktomorrow\Trader\Domain\Common\Entity\HasData;
+use Thinktomorrow\Trader\Domain\Model\Order\OrderId;
 use Thinktomorrow\Trader\Domain\Model\PaymentMethod\PaymentMethodId;
 
 class Payment
@@ -67,14 +67,14 @@ class Payment
     public function getMappedData(): array
     {
         return [
-            'order_id'          => $this->orderId->get(),
-            'payment_id'        => $this->paymentId->get(),
+            'order_id' => $this->orderId->get(),
+            'payment_id' => $this->paymentId->get(),
             'payment_method_id' => $this->paymentMethodId->get(),
-            'payment_state'     => $this->paymentState->value,
-            'cost'              => $this->paymentCost->getMoney()->getAmount(),
-            'tax_rate'          => $this->paymentCost->getTaxRate()->toPercentage()->get(),
-            'includes_vat'      => $this->paymentCost->includesVat(),
-            'data'              => json_encode($this->data),
+            'payment_state' => $this->paymentState->value,
+            'cost' => $this->paymentCost->getMoney()->getAmount(),
+            'tax_rate' => $this->paymentCost->getTaxRate()->toPercentage()->get(),
+            'includes_vat' => $this->paymentCost->includesVat(),
+            'data' => json_encode($this->data),
         ];
     }
 
@@ -87,7 +87,10 @@ class Payment
         $payment->paymentMethodId = PaymentMethodId::fromString($state['payment_method_id']);
         $payment->paymentState = PaymentState::from($state['payment_state']);
         $payment->paymentCost = PaymentCost::fromScalars(
-            $state['cost'], 'EUR', $state['tax_rate'], $state['includes_vat']
+            $state['cost'],
+            'EUR',
+            $state['tax_rate'],
+            $state['includes_vat']
         );
         $payment->data = json_decode($state['data'], true);
 

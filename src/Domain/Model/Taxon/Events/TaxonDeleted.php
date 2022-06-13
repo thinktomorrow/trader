@@ -9,6 +9,5 @@ final class TaxonDeleted
 {
     public function __construct(public readonly TaxonId $taxonId)
     {
-
     }
 }

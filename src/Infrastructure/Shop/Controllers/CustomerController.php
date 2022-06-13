@@ -7,11 +7,9 @@ class CustomerController
 {
     public function __construct()
     {
-
     }
 
     public function dashboard()
     {
-
     }
 }

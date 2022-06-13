@@ -3,9 +3,9 @@ declare(strict_types=1);
 
 namespace Thinktomorrow\Trader\Domain\Model\Customer\Address;
 
-use Thinktomorrow\Trader\Domain\Model\Customer\CustomerId;
-use Thinktomorrow\Trader\Domain\Common\Entity\HasData;
 use Thinktomorrow\Trader\Domain\Common\Address\Address;
+use Thinktomorrow\Trader\Domain\Common\Entity\HasData;
+use Thinktomorrow\Trader\Domain\Model\Customer\CustomerId;
 
 abstract class CustomerAddress
 {
@@ -43,12 +43,12 @@ abstract class CustomerAddress
     {
         return [
             'customer_id' => $this->customerId->get(),
-            'country'     => $this->address->country,
-            'line_1'      => $this->address->line1,
-            'line_2'      => $this->address->line2,
+            'country' => $this->address->country,
+            'line_1' => $this->address->line1,
+            'line_2' => $this->address->line2,
             'postal_code' => $this->address->postalCode,
-            'city'        => $this->address->city,
-            'data'        => json_encode($this->data),
+            'city' => $this->address->city,
+            'data' => json_encode($this->data),
         ];
     }
 

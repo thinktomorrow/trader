@@ -5,11 +5,8 @@ namespace Tests\Acceptance\Product;
 
 use Tests\TestHelpers;
 use Thinktomorrow\Trader\Application\Product\DeleteProduct;
-use Thinktomorrow\Trader\Domain\Model\Product\Option\Option;
-use Thinktomorrow\Trader\Domain\Model\Product\Event\OptionsUpdated;
 use Thinktomorrow\Trader\Domain\Model\Product\Event\ProductDeleted;
 use Thinktomorrow\Trader\Domain\Model\Product\Exceptions\CouldNotFindProduct;
-use Thinktomorrow\Trader\Application\Product\UpdateProduct\UpdateProductOptions;
 
 class DeleteProductTest extends ProductContext
 {

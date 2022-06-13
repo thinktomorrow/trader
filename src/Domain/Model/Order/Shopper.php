@@ -4,8 +4,8 @@ declare(strict_types=1);
 namespace Thinktomorrow\Trader\Domain\Model\Order;
 
 use Thinktomorrow\Trader\Domain\Common\Email;
-use Thinktomorrow\Trader\Domain\Common\Entity\HasData;
 use Thinktomorrow\Trader\Domain\Common\Entity\ChildEntity;
+use Thinktomorrow\Trader\Domain\Common\Entity\HasData;
 use Thinktomorrow\Trader\Domain\Model\Customer\CustomerId;
 
 class Shopper implements ChildEntity
@@ -25,7 +25,6 @@ class Shopper implements ChildEntity
 
     private function __construct()
     {
-
     }
 
     public static function create(ShopperId $shopperId, Email $email, bool $isBusiness): static
@@ -75,7 +74,7 @@ class Shopper implements ChildEntity
 
     public function registerAfterCheckout(): bool
     {
-        return $this->registerAfterCheckout && !is_null($this->customerId);
+        return $this->registerAfterCheckout && ! is_null($this->customerId);
     }
 
     public function deleteCustomerId(): void
@@ -86,12 +85,12 @@ class Shopper implements ChildEntity
     public function getMappedData(): array
     {
         return [
-            'shopper_id'              => $this->shopperId->get(),
-            'email'                   => $this->email->get(),
-            'is_business'             => $this->isBusiness,
+            'shopper_id' => $this->shopperId->get(),
+            'email' => $this->email->get(),
+            'is_business' => $this->isBusiness,
             'register_after_checkout' => $this->registerAfterCheckout,
-            'customer_id'             => $this->customerId?->get(),
-            'data'                    => json_encode($this->data),
+            'customer_id' => $this->customerId?->get(),
+            'data' => json_encode($this->data),
         ];
     }
 

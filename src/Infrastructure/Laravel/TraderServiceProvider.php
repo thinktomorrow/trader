@@ -4,55 +4,55 @@ declare(strict_types=1);
 namespace Thinktomorrow\Trader\Infrastructure\Laravel;
 
 use Illuminate\Support\Arr;
-use Thinktomorrow\Trader\TraderConfig;
 use Illuminate\Support\ServiceProvider;
+use Thinktomorrow\Trader\Application\Cart\VariantForCart\VariantForCart;
+use Thinktomorrow\Trader\Application\Cart\VariantForCart\VariantForCartRepository;
 use Thinktomorrow\Trader\Application\Common\DataRenderer;
 use Thinktomorrow\Trader\Application\Common\DefaultLocale;
-use Thinktomorrow\Trader\Application\Taxon\Tree\TaxonNode;
+use Thinktomorrow\Trader\Application\Product\CheckProductOptions\CheckProductOptionsRepository;
+use Thinktomorrow\Trader\Application\Product\Grid\FlattenedTaxonIdsComposer;
 use Thinktomorrow\Trader\Application\Product\Grid\GridItem;
-use Thinktomorrow\Trader\Domain\Model\Order\OrderRepository;
-use Thinktomorrow\Trader\Domain\Model\Taxon\TaxonRepository;
+use Thinktomorrow\Trader\Application\Product\Grid\GridRepository;
+use Thinktomorrow\Trader\Application\Product\OptionLinks\OptionLink;
+use Thinktomorrow\Trader\Application\Product\ProductDetail\ProductDetail;
+use Thinktomorrow\Trader\Application\Product\ProductDetail\ProductDetailRepository;
+use Thinktomorrow\Trader\Application\Taxon\Category\CategoryRepository;
+use Thinktomorrow\Trader\Application\Taxon\Filter\TaxonFilterTreeComposer;
+use Thinktomorrow\Trader\Application\Taxon\Redirect\RedirectRepository;
+use Thinktomorrow\Trader\Application\Taxon\TaxonSelect\TaxonIdOptionsComposer;
+use Thinktomorrow\Trader\Application\Taxon\Tree\TaxonNode;
+use Thinktomorrow\Trader\Application\Taxon\Tree\TaxonTreeRepository;
 use Thinktomorrow\Trader\Domain\Common\Event\EventDispatcher;
+use Thinktomorrow\Trader\Domain\Model\Customer\CustomerRepository;
+use Thinktomorrow\Trader\Domain\Model\CustomerLogin\CustomerLoginRepository;
+use Thinktomorrow\Trader\Domain\Model\Order\OrderRepository;
+use Thinktomorrow\Trader\Domain\Model\PaymentMethod\PaymentMethodRepository;
 use Thinktomorrow\Trader\Domain\Model\Product\ProductRepository;
 use Thinktomorrow\Trader\Domain\Model\Product\VariantRepository;
-use Thinktomorrow\Trader\Application\Product\Grid\GridRepository;
-use Thinktomorrow\Trader\Domain\Model\Customer\CustomerRepository;
-use Thinktomorrow\Trader\Application\Taxon\Tree\TaxonTreeRepository;
-use Thinktomorrow\Trader\Application\Product\OptionLinks\OptionLink;
-use Thinktomorrow\Trader\Application\Taxon\Category\CategoryRepository;
-use Thinktomorrow\Trader\Application\Taxon\Redirect\RedirectRepository;
-use Thinktomorrow\Trader\Infrastructure\Laravel\Models\DefaultGridItem;
-use Thinktomorrow\Trader\Infrastructure\Vine\VineTaxonIdOptionsComposer;
-use Thinktomorrow\Trader\Infrastructure\Laravel\Models\DefaultTaxonNode;
-use Thinktomorrow\Trader\Application\Cart\VariantForCart\VariantForCart;
-use Thinktomorrow\Trader\Infrastructure\Vine\VineTaxonFilterTreeComposer;
-use Thinktomorrow\Trader\Application\Product\ProductDetail\ProductDetail;
-use Thinktomorrow\Trader\Infrastructure\Laravel\Models\DefaultOptionLink;
-use Thinktomorrow\Trader\Application\Taxon\Filter\TaxonFilterTreeComposer;
-use Thinktomorrow\Trader\Infrastructure\Vine\VineFlattenedTaxonIdsComposer;
-use Thinktomorrow\Trader\Domain\Model\PaymentMethod\PaymentMethodRepository;
-use Thinktomorrow\Trader\Domain\Model\CustomerLogin\CustomerLoginRepository;
-use Thinktomorrow\Trader\Application\Product\Grid\FlattenedTaxonIdsComposer;
-use Thinktomorrow\Trader\Infrastructure\Laravel\Models\DefaultProductDetail;
-use Thinktomorrow\Trader\Infrastructure\Laravel\Models\DefaultVariantForCart;
-use Thinktomorrow\Trader\Application\Taxon\TaxonSelect\TaxonIdOptionsComposer;
 use Thinktomorrow\Trader\Domain\Model\ShippingProfile\ShippingProfileRepository;
+use Thinktomorrow\Trader\Domain\Model\Taxon\TaxonRepository;
+use Thinktomorrow\Trader\Infrastructure\Laravel\Models\DefaultGridItem;
+use Thinktomorrow\Trader\Infrastructure\Laravel\Models\DefaultOptionLink;
+use Thinktomorrow\Trader\Infrastructure\Laravel\Models\DefaultProductDetail;
+use Thinktomorrow\Trader\Infrastructure\Laravel\Models\DefaultTaxonNode;
+use Thinktomorrow\Trader\Infrastructure\Laravel\Models\DefaultVariantForCart;
+use Thinktomorrow\Trader\Infrastructure\Laravel\Repositories\MysqlCheckProductOptionsRepository;
+use Thinktomorrow\Trader\Infrastructure\Laravel\Repositories\MysqlCustomerLoginRepository;
+use Thinktomorrow\Trader\Infrastructure\Laravel\Repositories\MysqlCustomerRepository;
 use Thinktomorrow\Trader\Infrastructure\Laravel\Repositories\MysqlGridRepository;
 use Thinktomorrow\Trader\Infrastructure\Laravel\Repositories\MysqlOrderRepository;
-use Thinktomorrow\Trader\Application\Cart\VariantForCart\VariantForCartRepository;
-use Thinktomorrow\Trader\Infrastructure\Laravel\Repositories\MysqlTaxonRepository;
-use Thinktomorrow\Trader\Application\Product\ProductDetail\ProductDetailRepository;
-use Thinktomorrow\Trader\Infrastructure\Laravel\Repositories\MysqlVariantRepository;
-use Thinktomorrow\Trader\Infrastructure\Laravel\Repositories\MysqlProductRepository;
-use Thinktomorrow\Trader\Infrastructure\Laravel\Repositories\MysqlCustomerRepository;
-use Thinktomorrow\Trader\Infrastructure\Laravel\Repositories\MysqlRedirectRepository;
-use Thinktomorrow\Trader\Infrastructure\Laravel\Repositories\MysqlTaxonTreeRepository;
-use Thinktomorrow\Trader\Infrastructure\Laravel\Repositories\MysqlProductDetailRepository;
 use Thinktomorrow\Trader\Infrastructure\Laravel\Repositories\MysqlPaymentMethodRepository;
-use Thinktomorrow\Trader\Infrastructure\Laravel\Repositories\MysqlCustomerLoginRepository;
+use Thinktomorrow\Trader\Infrastructure\Laravel\Repositories\MysqlProductDetailRepository;
+use Thinktomorrow\Trader\Infrastructure\Laravel\Repositories\MysqlProductRepository;
+use Thinktomorrow\Trader\Infrastructure\Laravel\Repositories\MysqlRedirectRepository;
 use Thinktomorrow\Trader\Infrastructure\Laravel\Repositories\MysqlShippingProfileRepository;
-use Thinktomorrow\Trader\Application\Product\CheckProductOptions\CheckProductOptionsRepository;
-use Thinktomorrow\Trader\Infrastructure\Laravel\Repositories\MysqlCheckProductOptionsRepository;
+use Thinktomorrow\Trader\Infrastructure\Laravel\Repositories\MysqlTaxonRepository;
+use Thinktomorrow\Trader\Infrastructure\Laravel\Repositories\MysqlTaxonTreeRepository;
+use Thinktomorrow\Trader\Infrastructure\Laravel\Repositories\MysqlVariantRepository;
+use Thinktomorrow\Trader\Infrastructure\Vine\VineFlattenedTaxonIdsComposer;
+use Thinktomorrow\Trader\Infrastructure\Vine\VineTaxonFilterTreeComposer;
+use Thinktomorrow\Trader\Infrastructure\Vine\VineTaxonIdOptionsComposer;
+use Thinktomorrow\Trader\TraderConfig;
 
 class TraderServiceProvider extends ServiceProvider
 {
@@ -71,11 +71,21 @@ class TraderServiceProvider extends ServiceProvider
         $this->app->bind(CheckProductOptionsRepository::class, MysqlCheckProductOptionsRepository::class);
 
         // Default models
-        $this->app->bind(GridItem::class, function(){ return DefaultGridItem::class; });
-        $this->app->bind(ProductDetail::class, function(){ return DefaultProductDetail::class; });
-        $this->app->bind(OptionLink::class, function(){ return DefaultOptionLink::class; });
-        $this->app->bind(TaxonNode::class, function(){ return DefaultTaxonNode::class; });
-        $this->app->bind(VariantForCart::class, function(){ return DefaultVariantForCart::class; });
+        $this->app->bind(GridItem::class, function () {
+            return DefaultGridItem::class;
+        });
+        $this->app->bind(ProductDetail::class, function () {
+            return DefaultProductDetail::class;
+        });
+        $this->app->bind(OptionLink::class, function () {
+            return DefaultOptionLink::class;
+        });
+        $this->app->bind(TaxonNode::class, function () {
+            return DefaultTaxonNode::class;
+        });
+        $this->app->bind(VariantForCart::class, function () {
+            return DefaultVariantForCart::class;
+        });
 
         // Taxon
         $this->app->bind(TaxonRepository::class, MysqlTaxonRepository::class);
@@ -113,16 +123,17 @@ class TraderServiceProvider extends ServiceProvider
          * expects that localized content is always formatted as <key>.<language>. We always
          * first try to find localized content before fetching the defaults.
          */
-        DataRenderer::setDataResolver(function(array $data, string $key, string $language = null, $default = null)
-        {
-            if(!$language) {
+        DataRenderer::setDataResolver(function (array $data, string $key, string $language = null, $default = null) {
+            if (! $language) {
                 $language = $this->app->make(TraderConfig::class)
                     ->getDefaultLocale()
                     ->getLanguage();
             }
 
             $value = Arr::get(
-                $data, $key . '.' . $language, Arr::get($data, $key, $default)
+                $data,
+                $key . '.' . $language,
+                Arr::get($data, $key, $default)
             );
 
             return $value === null ? $default :$value;

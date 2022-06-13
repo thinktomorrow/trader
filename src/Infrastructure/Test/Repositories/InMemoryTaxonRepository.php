@@ -3,11 +3,11 @@ declare(strict_types=1);
 
 namespace Thinktomorrow\Trader\Infrastructure\Test\Repositories;
 
+use Thinktomorrow\Trader\Domain\Model\Taxon\Exceptions\CouldNotFindTaxon;
 use Thinktomorrow\Trader\Domain\Model\Taxon\Taxon;
 use Thinktomorrow\Trader\Domain\Model\Taxon\TaxonId;
 use Thinktomorrow\Trader\Domain\Model\Taxon\TaxonKey;
 use Thinktomorrow\Trader\Domain\Model\Taxon\TaxonRepository;
-use Thinktomorrow\Trader\Domain\Model\Taxon\Exceptions\CouldNotFindTaxon;
 
 final class InMemoryTaxonRepository implements TaxonRepository
 {
@@ -26,7 +26,7 @@ final class InMemoryTaxonRepository implements TaxonRepository
 
     public function find(TaxonId $taxonId): Taxon
     {
-        if (!isset(static::$taxons[$taxonId->get()])) {
+        if (! isset(static::$taxons[$taxonId->get()])) {
             throw new CouldNotFindTaxon('No taxon found by id ' . $taxonId);
         }
 
@@ -37,8 +37,8 @@ final class InMemoryTaxonRepository implements TaxonRepository
     {
         $output = [];
 
-        foreach(static::$taxons as $taxon) {
-            if($taxon->getParentId()?->equals($taxonId)) {
+        foreach (static::$taxons as $taxon) {
+            if ($taxon->getParentId()?->equals($taxonId)) {
                 $output[] = $taxon;
             }
         }
@@ -48,7 +48,7 @@ final class InMemoryTaxonRepository implements TaxonRepository
 
     public function delete(TaxonId $taxonId): void
     {
-        if (!isset(static::$taxons[$taxonId->get()])) {
+        if (! isset(static::$taxons[$taxonId->get()])) {
             throw new CouldNotFindTaxon('No taxon found by id ' . $taxonId);
         }
 
@@ -75,7 +75,7 @@ final class InMemoryTaxonRepository implements TaxonRepository
         $key = $taxonKey;
         $i = 1;
 
-        while($this->existsByKey($key, $allowedTaxonId)) {
+        while ($this->existsByKey($key, $allowedTaxonId)) {
             $key = TaxonKey::fromString($taxonKey->get() . '_' . $i++);
         }
 
@@ -84,8 +84,8 @@ final class InMemoryTaxonRepository implements TaxonRepository
 
     private function existsByKey(TaxonKey $taxonKey, TaxonId $allowedTaxonId): bool
     {
-        foreach(static::$taxons as $taxon) {
-            if(!$taxon->taxonId->equals($allowedTaxonId) && $taxon->taxonKey->equals($taxonKey)) {
+        foreach (static::$taxons as $taxon) {
+            if (! $taxon->taxonId->equals($allowedTaxonId) && $taxon->taxonKey->equals($taxonKey)) {
                 return true;
             }
         }

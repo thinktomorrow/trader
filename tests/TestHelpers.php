@@ -2,45 +2,44 @@
 
 namespace Tests;
 
-use Throwable;
-use Money\Money;
-use Thinktomorrow\Trader\Domain\Common\Email;
 use Illuminate\Contracts\Debug\ExceptionHandler;
-use Thinktomorrow\Trader\Domain\Model\Order\Order;
-use Thinktomorrow\Trader\Domain\Model\Order\Shopper;
-use Thinktomorrow\Trader\Domain\Common\Taxes\TaxRate;
-use Thinktomorrow\Trader\Domain\Model\Order\Line\Line;
-use Thinktomorrow\Trader\Domain\Model\Product\Product;
-use Thinktomorrow\Trader\Domain\Model\Order\OrderState;
-use Thinktomorrow\Trader\Application\Taxon\CreateTaxon;
-use Thinktomorrow\Trader\Domain\Model\Customer\Customer;
-use Thinktomorrow\Trader\Domain\Model\Product\ProductId;
-use Thinktomorrow\Trader\Domain\Model\Customer\CustomerId;
+use Money\Money;
 use Thinktomorrow\Trader\Application\Product\CreateProduct;
 use Thinktomorrow\Trader\Application\Product\CreateVariant;
-use Thinktomorrow\Trader\Domain\Model\Product\ProductState;
-use Thinktomorrow\Trader\Domain\Common\Address\AddressType;
-use Thinktomorrow\Trader\Domain\Model\Order\Payment\Payment;
-use Thinktomorrow\Trader\Domain\Model\Product\Option\Option;
-use Thinktomorrow\Trader\Application\Taxon\TaxonApplication;
-use Thinktomorrow\Trader\Domain\Model\Product\Variant\Variant;
-use Thinktomorrow\Trader\Domain\Model\Order\Discount\Discount;
-use Thinktomorrow\Trader\Domain\Model\Order\Shipping\Shipping;
-use Thinktomorrow\Trader\Domain\Model\Product\Option\OptionId;
-use Thinktomorrow\Trader\Domain\Model\Product\Variant\VariantId;
-use Thinktomorrow\Trader\Domain\Model\Product\ProductRepository;
 use Thinktomorrow\Trader\Application\Product\ProductApplication;
-use Thinktomorrow\Trader\Domain\Model\Order\Payment\PaymentState;
-use Thinktomorrow\Trader\Domain\Model\Product\Option\OptionValue;
-use Thinktomorrow\Trader\Domain\Model\CustomerLogin\CustomerLogin;
+use Thinktomorrow\Trader\Application\Taxon\CreateTaxon;
+use Thinktomorrow\Trader\Application\Taxon\TaxonApplication;
+use Thinktomorrow\Trader\Domain\Common\Email;
+use Thinktomorrow\Trader\Domain\Common\Taxes\TaxRate;
+use Thinktomorrow\Trader\Domain\Model\Customer\Customer;
+use Thinktomorrow\Trader\Domain\Model\Customer\CustomerId;
 use Thinktomorrow\Trader\Domain\Model\Customer\CustomerRepository;
-use Thinktomorrow\Trader\Domain\Model\Order\Address\BillingAddress;
-use Thinktomorrow\Trader\Domain\Model\Order\Shipping\ShippingState;
-use Thinktomorrow\Trader\Domain\Model\Product\Option\OptionValueId;
-use Thinktomorrow\Trader\Domain\Model\Order\Address\ShippingAddress;
-use Thinktomorrow\Trader\Domain\Model\Product\Variant\VariantUnitPrice;
-use Thinktomorrow\Trader\Domain\Model\Product\Variant\VariantSalePrice;
+use Thinktomorrow\Trader\Domain\Model\CustomerLogin\CustomerLogin;
 use Thinktomorrow\Trader\Domain\Model\CustomerLogin\CustomerLoginRepository;
+use Thinktomorrow\Trader\Domain\Model\Order\Address\BillingAddress;
+use Thinktomorrow\Trader\Domain\Model\Order\Address\ShippingAddress;
+use Thinktomorrow\Trader\Domain\Model\Order\Discount\Discount;
+use Thinktomorrow\Trader\Domain\Model\Order\Line\Line;
+use Thinktomorrow\Trader\Domain\Model\Order\Order;
+use Thinktomorrow\Trader\Domain\Model\Order\OrderState;
+use Thinktomorrow\Trader\Domain\Model\Order\Payment\Payment;
+use Thinktomorrow\Trader\Domain\Model\Order\Payment\PaymentState;
+use Thinktomorrow\Trader\Domain\Model\Order\Shipping\Shipping;
+use Thinktomorrow\Trader\Domain\Model\Order\Shipping\ShippingState;
+use Thinktomorrow\Trader\Domain\Model\Order\Shopper;
+use Thinktomorrow\Trader\Domain\Model\Product\Option\Option;
+use Thinktomorrow\Trader\Domain\Model\Product\Option\OptionId;
+use Thinktomorrow\Trader\Domain\Model\Product\Option\OptionValue;
+use Thinktomorrow\Trader\Domain\Model\Product\Option\OptionValueId;
+use Thinktomorrow\Trader\Domain\Model\Product\Product;
+use Thinktomorrow\Trader\Domain\Model\Product\ProductId;
+use Thinktomorrow\Trader\Domain\Model\Product\ProductRepository;
+use Thinktomorrow\Trader\Domain\Model\Product\ProductState;
+use Thinktomorrow\Trader\Domain\Model\Product\Variant\Variant;
+use Thinktomorrow\Trader\Domain\Model\Product\Variant\VariantId;
+use Thinktomorrow\Trader\Domain\Model\Product\Variant\VariantSalePrice;
+use Thinktomorrow\Trader\Domain\Model\Product\Variant\VariantUnitPrice;
+use Throwable;
 
 trait TestHelpers
 {
@@ -122,7 +121,7 @@ trait TestHelpers
                     'tax_rate' => '10',
                     'includes_vat' => true,
                     'data' => "[]",
-                ]
+                ],
             ],
             Payment::class => [
                 'payment_id' => 'ppppp',
@@ -168,7 +167,8 @@ trait TestHelpers
         $customer = Customer::create(
             $customerId = CustomerId::fromString('azerty'),
             Email::fromString('ben@thinktomorrow.be'),
-            'Ben', 'Cavens'
+            'Ben',
+            'Cavens'
         );
 
         app(CustomerRepository::class)->save($customer);
@@ -243,7 +243,7 @@ trait TestHelpers
                     'nl' => 'option value nl 2',
                     'en' => 'option value en 2',
                 ],
-            ])
+            ]),
         ]);
 
         $option2->updateOptionValues([
@@ -256,7 +256,7 @@ trait TestHelpers
                     'nl' => 'option value nl 3',
                     'en' => 'option value en 3',
                 ],
-            ])
+            ]),
         ]);
 
         $variant = $this->createdVariantWithOption();
@@ -288,7 +288,9 @@ trait TestHelpers
             ProductId::fromString('xxx'),
             VariantId::fromString('yyy'),
             VariantUnitPrice::fromMoney(
-                Money::EUR(10), TaxRate::fromString('20'), false
+                Money::EUR(10),
+                TaxRate::fromString('20'),
+                false
             ),
             VariantSalePrice::fromMoney(Money::EUR(8), TaxRate::fromString('20'), false),
         );
@@ -302,7 +304,9 @@ trait TestHelpers
             ProductId::fromString('xxx'),
             VariantId::fromString('yyy'),
             VariantUnitPrice::fromMoney(
-                Money::EUR(10), TaxRate::fromString('20'), false
+                Money::EUR(10),
+                TaxRate::fromString('20'),
+                false
             ),
             VariantSalePrice::fromMoney(Money::EUR(8), TaxRate::fromString('20'), false),
         );
@@ -324,7 +328,7 @@ trait TestHelpers
         $product3Id = $productApplication->createProduct(new CreateProduct([], "500", "21", ['title' => ['nl' => 'product three']]));
 
         // Set every product online
-        foreach([$productId, $product2Id, $product3Id] as $prodId) {
+        foreach ([$productId, $product2Id, $product3Id] as $prodId) {
             $product = $productRepository->find($prodId);
             $product->updateState(ProductState::online);
 
@@ -341,19 +345,20 @@ trait TestHelpers
         $this->assertEquals(count($expected), count($actual), 'Count doesn\'t match: ' . $message);
         $this->assertEquals(array_keys($expected), array_keys($actual), 'Keys do not match: ' . $message);
 
-        foreach($expected as $expectedKey => $expectedValue) {
-
-            if(is_array($expectedValue) && !is_array($actual[$expectedKey])) {
+        foreach ($expected as $expectedKey => $expectedValue) {
+            if (is_array($expectedValue) && ! is_array($actual[$expectedKey])) {
                 $this->assertEquals($expectedValue, $actual[$expectedKey], $message);
             }
 
-            if(is_array($expectedValue)) {
+            if (is_array($expectedValue)) {
                 $this->assertArrayEqualsWithWildcard($expectedValue, $actual[$expectedKey], $message);
+
                 continue;
             }
 
-            if($expectedValue == '*') {
+            if ($expectedValue == '*') {
                 $this->assertNotNull($actual[$expectedKey]);
+
                 continue;
             }
 

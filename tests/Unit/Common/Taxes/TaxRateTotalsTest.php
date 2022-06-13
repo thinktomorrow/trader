@@ -4,8 +4,8 @@ namespace Tests\Unit\Common\Taxes;
 
 use Money\Money;
 use PHPUnit\Framework\TestCase;
-use Thinktomorrow\Trader\Domain\Common\Taxes\TaxRate;
 use Thinktomorrow\Trader\Domain\Common\Taxes\Taxable;
+use Thinktomorrow\Trader\Domain\Common\Taxes\TaxRate;
 use Thinktomorrow\Trader\Domain\Common\Taxes\TaxRateTotals;
 
 class TaxRateTotalsTest extends TestCase

@@ -3,16 +3,16 @@ declare(strict_types=1);
 
 namespace Tests\Acceptance\Cart;
 
-use Thinktomorrow\Trader\Domain\Model\Order\OrderId;
 use Thinktomorrow\Trader\Application\Cart\Read\Cart;
 use Thinktomorrow\Trader\Application\Cart\Read\CartPayment;
-use Thinktomorrow\Trader\Application\Cart\Read\CartShopper;
 use Thinktomorrow\Trader\Application\Cart\Read\CartShipping;
+use Thinktomorrow\Trader\Application\Cart\Read\CartShopper;
+use Thinktomorrow\Trader\Domain\Model\Order\OrderId;
 
 class CartReadTest extends CartContext
 {
     /** @test */
-    public function in_order_to_know_how_much_to_pay_as_a_visitor_I_need_to_be_able_to_see_the_cart_totals()
+    public function in_order_to_know_how_much_to_pay_as_a_visitor__i_need_to_be_able_to_see_the_cart_totals()
     {
         $this->givenThereIsAProductWhichCostsEur('aaa', 5);
         $this->whenIAddTheVariantToTheCart('aaa-123', 2);
@@ -31,7 +31,7 @@ class CartReadTest extends CartContext
     }
 
     /** @test */
-    public function in_order_to_confirm_my_product_choice_as_a_visitor_I_need_to_be_able_to_see_each_line_of_my_cart()
+    public function in_order_to_confirm_my_product_choice_as_a_visitor__i_need_to_be_able_to_see_each_line_of_my_cart()
     {
         $this->givenThereIsAProductWhichCostsEur('lightsaber', 5);
         $this->whenIAddTheVariantToTheCart('lightsaber-123', 2);

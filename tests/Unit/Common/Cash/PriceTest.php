@@ -5,9 +5,9 @@ namespace Tests\Unit\Common\Cash;
 
 use Money\Money;
 use PHPUnit\Framework\TestCase;
-use Thinktomorrow\Trader\Domain\Common\Taxes\TaxRate;
 use Thinktomorrow\Trader\Domain\Common\Cash\PriceCannotBeNegative;
 use Thinktomorrow\Trader\Domain\Common\Cash\PriceCannotContainMultipleTaxRates;
+use Thinktomorrow\Trader\Domain\Common\Taxes\TaxRate;
 
 class PriceTest extends TestCase
 {
@@ -15,7 +15,9 @@ class PriceTest extends TestCase
     public function it_can_make_price_including_vat()
     {
         $object = PriceStub::fromMoney(
-            Money::EUR(120), TaxRate::fromString('20'), true
+            Money::EUR(120),
+            TaxRate::fromString('20'),
+            true
         );
 
         $this->assertEquals(Money::EUR(120), $object->getIncludingVat());
@@ -26,7 +28,9 @@ class PriceTest extends TestCase
     public function it_can_make_price_excluding_vat()
     {
         $object = PriceStub::fromMoney(
-            Money::EUR(100), TaxRate::fromString('20'), false
+            Money::EUR(100),
+            TaxRate::fromString('20'),
+            false
         );
 
         $this->assertEquals(Money::EUR(100), $object->getExcludingVat());
@@ -37,11 +41,15 @@ class PriceTest extends TestCase
     public function it_can_add_a_price()
     {
         $object = PriceStub::fromMoney(
-            Money::EUR(120), TaxRate::fromString('20'), true
+            Money::EUR(120),
+            TaxRate::fromString('20'),
+            true
         );
 
         $object = $object->add(PriceStub::fromMoney(
-            Money::EUR(72), TaxRate::fromString('20'), true
+            Money::EUR(72),
+            TaxRate::fromString('20'),
+            true
         ));
 
         $this->assertEquals(Money::EUR(160), $object->getExcludingVat());
@@ -52,11 +60,15 @@ class PriceTest extends TestCase
     public function it_can_subtract_a_price()
     {
         $object = PriceStub::fromMoney(
-            Money::EUR(120), TaxRate::fromString('20'), true
+            Money::EUR(120),
+            TaxRate::fromString('20'),
+            true
         );
 
         $object = $object->subtract(PriceStub::fromMoney(
-            Money::EUR(72), TaxRate::fromString('20'), true
+            Money::EUR(72),
+            TaxRate::fromString('20'),
+            true
         ));
 
         $this->assertEquals(Money::EUR(40), $object->getExcludingVat());
@@ -67,7 +79,9 @@ class PriceTest extends TestCase
     public function it_can_multiply_a_price()
     {
         $object = PriceStub::fromMoney(
-            Money::EUR(100), TaxRate::fromString('20'), false
+            Money::EUR(100),
+            TaxRate::fromString('20'),
+            false
         );
 
         $this->assertEquals(Money::EUR(200), $object->multiply(2)->getExcludingVat());
@@ -79,7 +93,9 @@ class PriceTest extends TestCase
     {
         // From price excluding vat
         $object = PriceStub::fromMoney(
-            Money::EUR(100), TaxRate::fromString('20'), false
+            Money::EUR(100),
+            TaxRate::fromString('20'),
+            false
         );
 
         $object = $object->changeTaxRate(TaxRate::fromString('6'));
@@ -89,7 +105,9 @@ class PriceTest extends TestCase
 
         // From price including vat
         $object = PriceStub::fromMoney(
-            Money::EUR(120), TaxRate::fromString('20'), true
+            Money::EUR(120),
+            TaxRate::fromString('20'),
+            true
         );
 
         $object = $object->changeTaxRate(TaxRate::fromString('6'));
@@ -102,7 +120,9 @@ class PriceTest extends TestCase
     public function it_can_get_tax_total()
     {
         $object = PriceStub::fromMoney(
-            Money::EUR(100), TaxRate::fromString('20'), false
+            Money::EUR(100),
+            TaxRate::fromString('20'),
+            false
         );
 
         $this->assertEquals(TaxRate::fromString('20'), $object->getTaxRate());
@@ -113,11 +133,15 @@ class PriceTest extends TestCase
     public function it_can_subtract_to_zero()
     {
         $object = PriceStub::fromMoney(
-            Money::EUR(100), TaxRate::fromString('20'), false
+            Money::EUR(100),
+            TaxRate::fromString('20'),
+            false
         );
 
         $object = $object->subtract(PriceStub::fromMoney(
-            Money::EUR(100), TaxRate::fromString('20'), false
+            Money::EUR(100),
+            TaxRate::fromString('20'),
+            false
         ));
 
         $this->assertEquals(Money::EUR(0), $object->getExcludingVat());
@@ -130,11 +154,15 @@ class PriceTest extends TestCase
         $this->expectException(PriceCannotBeNegative::class);
 
         $object = PriceStub::fromMoney(
-            Money::EUR(100), TaxRate::fromString('20'), false
+            Money::EUR(100),
+            TaxRate::fromString('20'),
+            false
         );
 
         $object->subtract(PriceStub::fromMoney(
-            Money::EUR(101), TaxRate::fromString('20'), false
+            Money::EUR(101),
+            TaxRate::fromString('20'),
+            false
         ));
     }
 
@@ -144,11 +172,15 @@ class PriceTest extends TestCase
         $this->expectException(PriceCannotContainMultipleTaxRates::class);
 
         $object = PriceStub::fromMoney(
-            Money::EUR(100), TaxRate::fromString('20'), false
+            Money::EUR(100),
+            TaxRate::fromString('20'),
+            false
         );
 
         $object->subtract(PriceStub::fromMoney(
-            Money::EUR(80), TaxRate::fromString('6'), false
+            Money::EUR(80),
+            TaxRate::fromString('6'),
+            false
         ));
     }
 
@@ -158,11 +190,15 @@ class PriceTest extends TestCase
         $this->expectException(PriceCannotContainMultipleTaxRates::class);
 
         $object = PriceStub::fromMoney(
-            Money::EUR(100), TaxRate::fromString('20'), false
+            Money::EUR(100),
+            TaxRate::fromString('20'),
+            false
         );
 
         $object->add(PriceStub::fromMoney(
-            Money::EUR(80), TaxRate::fromString('6'), false
+            Money::EUR(80),
+            TaxRate::fromString('6'),
+            false
         ));
     }
 
@@ -170,11 +206,15 @@ class PriceTest extends TestCase
     public function it_can_subtract_with_different_tax_inclusions()
     {
         $object = PriceStub::fromMoney(
-            Money::EUR(100), TaxRate::fromString('20'), false
+            Money::EUR(100),
+            TaxRate::fromString('20'),
+            false
         );
 
         $object = $object->subtract(PriceStub::fromMoney(
-            Money::EUR(72), TaxRate::fromString('20'), true // 60 excl.
+            Money::EUR(72),
+            TaxRate::fromString('20'),
+            true // 60 excl.
         ));
 
         $this->assertEquals(Money::EUR(40), $object->getExcludingVat());
@@ -185,11 +225,15 @@ class PriceTest extends TestCase
     public function it_can_add_with_different_tax_inclusions()
     {
         $object = PriceStub::fromMoney(
-            Money::EUR(100), TaxRate::fromString('20'), false
+            Money::EUR(100),
+            TaxRate::fromString('20'),
+            false
         );
 
         $object = $object->add(PriceStub::fromMoney(
-            Money::EUR(72), TaxRate::fromString('20'), true
+            Money::EUR(72),
+            TaxRate::fromString('20'),
+            true
         ));
 
         $this->assertEquals(Money::EUR(160), $object->getExcludingVat());
@@ -200,11 +244,15 @@ class PriceTest extends TestCase
     public function it_can_force_subtracting_with_different_tax_rate()
     {
         $object = PriceStub::fromMoney(
-            Money::EUR(100), TaxRate::fromString('20'), false
+            Money::EUR(100),
+            TaxRate::fromString('20'),
+            false
         );
 
         $object = $object->subtractDifferent(PriceStub::fromMoney(
-            Money::EUR(80), TaxRate::fromString('6'), false
+            Money::EUR(80),
+            TaxRate::fromString('6'),
+            false
         ));
 
         $this->assertEquals(TaxRate::fromString('20'), $object->getTaxRate());
@@ -216,11 +264,15 @@ class PriceTest extends TestCase
     public function it_can_force_adding_with_different_tax_rate()
     {
         $object = PriceStub::fromMoney(
-            Money::EUR(100), TaxRate::fromString('20'), false
+            Money::EUR(100),
+            TaxRate::fromString('20'),
+            false
         );
 
         $object = $object->addDifferent(PriceStub::fromMoney(
-            Money::EUR(80), TaxRate::fromString('6'), false
+            Money::EUR(80),
+            TaxRate::fromString('6'),
+            false
         ));
 
         $this->assertEquals(TaxRate::fromString('20'), $object->getTaxRate());

@@ -4,10 +4,10 @@ declare(strict_types=1);
 namespace Thinktomorrow\Trader\Domain\Model\Product\Variant;
 
 use Assert\Assertion;
-use Thinktomorrow\Trader\Domain\Common\Entity\HasData;
-use Thinktomorrow\Trader\Domain\Model\Product\ProductId;
 use Thinktomorrow\Trader\Domain\Common\Entity\ChildEntity;
+use Thinktomorrow\Trader\Domain\Common\Entity\HasData;
 use Thinktomorrow\Trader\Domain\Model\Product\Option\OptionValueId;
+use Thinktomorrow\Trader\Domain\Model\Product\ProductId;
 use Thinktomorrow\Trader\Infrastructure\Laravel\Models\DefaultOptionLink;
 
 final class Variant implements ChildEntity
@@ -26,7 +26,9 @@ final class Variant implements ChildEntity
     private bool $show_in_grid = false;
     private array $data = [];
 
-    private function __construct(){}
+    private function __construct()
+    {
+    }
 
     public function getSalePrice(): VariantSalePrice
     {
@@ -88,7 +90,7 @@ final class Variant implements ChildEntity
             'sale_price' => $this->salePrice->getMoney()->getAmount(),
             'tax_rate' => $this->unitPrice->getTaxRate()->toPercentage()->get(),
             'includes_vat' => $this->unitPrice->includesVat(),
-            'option_value_ids' => array_map(fn($optionValueId) => $optionValueId->get(), $this->optionValueIds),
+            'option_value_ids' => array_map(fn ($optionValueId) => $optionValueId->get(), $this->optionValueIds),
             'show_in_grid' => $this->show_in_grid,
             'data' => json_encode($this->data),
         ];
@@ -106,9 +108,8 @@ final class Variant implements ChildEntity
         $variant->show_in_grid = $state['show_in_grid'] ? (bool) $state['show_in_grid'] : false;
         $variant->data = json_decode($state['data'], true);
 
-        $variant->optionValueIds = array_map(fn($optionValueState) => OptionValueId::fromString($optionValueState), $state['option_value_ids']);
+        $variant->optionValueIds = array_map(fn ($optionValueState) => OptionValueId::fromString($optionValueState), $state['option_value_ids']);
 
         return $variant;
     }
-
 }

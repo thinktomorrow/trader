@@ -4,9 +4,9 @@ declare(strict_types=1);
 namespace Tests\Acceptance\Product;
 
 use Tests\TestHelpers;
-use Thinktomorrow\Trader\Domain\Model\Product\Option\Option;
-use Thinktomorrow\Trader\Domain\Model\Product\Event\OptionsUpdated;
 use Thinktomorrow\Trader\Application\Product\UpdateProduct\UpdateProductOptions;
+use Thinktomorrow\Trader\Domain\Model\Product\Event\OptionsUpdated;
+use Thinktomorrow\Trader\Domain\Model\Product\Option\Option;
 
 class UpdateProductOptionsTest extends ProductContext
 {
@@ -28,8 +28,8 @@ class UpdateProductOptionsTest extends ProductContext
             'values' => [
                 [
                     'option_value_id' => null,
-                    'data' => $dataPayload
-                ]
+                    'data' => $dataPayload,
+                ],
 
             ],
         ]]));
@@ -46,9 +46,9 @@ class UpdateProductOptionsTest extends ProductContext
                         'option_id' => '*',
                         'option_value_id' => '*',
                         'data' => json_encode($dataPayload),
-                    ]
+                    ],
                ],
-           ]
+           ],
         ], $product->getChildEntities()[Option::class]);
 
         $this->assertEquals([
@@ -72,8 +72,8 @@ class UpdateProductOptionsTest extends ProductContext
             'values' => [
                 [
                     'option_value_id' => null,
-                    'data' => $dataPayload
-                ]
+                    'data' => $dataPayload,
+                ],
 
             ],
         ]]));
@@ -94,12 +94,12 @@ class UpdateProductOptionsTest extends ProductContext
             'values' => [
                 [
                     'option_value_id' => $option_value_id,
-                    'data' => $dataPayload
+                    'data' => $dataPayload,
                 ],
                 [
                     'option_value_id' => null,
-                    'data' => array_merge($dataPayload, ['foo' => 'bar'])
-                ]
+                    'data' => array_merge($dataPayload, ['foo' => 'bar']),
+                ],
 
             ],
         ]]));
@@ -119,9 +119,9 @@ class UpdateProductOptionsTest extends ProductContext
                         'option_id' => $option_id,
                         'option_value_id' => '*',
                         'data' => json_encode(array_merge($dataPayload, ['foo' => 'bar'])),
-                    ]
+                    ],
                 ],
-            ]
+            ],
         ], $product->getChildEntities()[Option::class]);
 
         $this->assertEquals([
@@ -158,8 +158,8 @@ class UpdateProductOptionsTest extends ProductContext
             'values' => [
                 [
                     'option_value_id' => null,
-                    'data' => $dataPayload
-                ]
+                    'data' => $dataPayload,
+                ],
 
             ],
         ]]));
@@ -182,13 +182,12 @@ class UpdateProductOptionsTest extends ProductContext
                 'option_id' => $option_id,
                 'data' => json_encode([]),
                 'values' => [],
-            ]
+            ],
         ], $product->getChildEntities()[Option::class]);
     }
 
     /** @test */
     public function it_can_reorder_options()
     {
-
     }
 }

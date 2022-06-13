@@ -17,7 +17,7 @@ trait AggregateId
      */
     public static function fromString(string $id): static
     {
-        if($id === '') {
+        if ($id === '') {
             throw new \DomainException('Aggregate id string cannot be empty.');
         }
 

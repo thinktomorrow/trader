@@ -3,17 +3,17 @@ declare(strict_types=1);
 
 namespace Thinktomorrow\Trader\Infrastructure\Laravel\Repositories;
 
-use Ramsey\Uuid\Uuid;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\DB;
+use Ramsey\Uuid\Uuid;
+use Thinktomorrow\Trader\Application\Common\TraderHelpers;
+use Thinktomorrow\Trader\Domain\Model\Product\Exceptions\CouldNotFindProduct;
+use Thinktomorrow\Trader\Domain\Model\Product\Option\Option;
 use Thinktomorrow\Trader\Domain\Model\Product\Product;
 use Thinktomorrow\Trader\Domain\Model\Product\ProductId;
-use Thinktomorrow\Trader\Application\Common\TraderHelpers;
-use Thinktomorrow\Trader\Domain\Model\Product\Option\Option;
-use Thinktomorrow\Trader\Domain\Model\Product\Variant\Variant;
 use Thinktomorrow\Trader\Domain\Model\Product\ProductRepository;
+use Thinktomorrow\Trader\Domain\Model\Product\Variant\Variant;
 use Thinktomorrow\Trader\Domain\Model\Product\VariantRepository;
-use Thinktomorrow\Trader\Domain\Model\Product\Exceptions\CouldNotFindProduct;
 
 class MysqlProductRepository implements ProductRepository
 {
@@ -42,7 +42,7 @@ class MysqlProductRepository implements ProductRepository
         $state = $product->getMappedData();
         $taxon_ids = TraderHelpers::array_remove($state, 'taxon_ids');
 
-        if (!$this->exists($product->productId)) {
+        if (! $this->exists($product->productId)) {
             DB::table(static::$productTable)->insert($state);
         } else {
             DB::table(static::$productTable)->where('product_id', $product->productId)->update($state);
@@ -57,7 +57,7 @@ class MysqlProductRepository implements ProductRepository
 
     private function upsertOptions(Product $product): void
     {
-        $option_ids = array_map(fn($optionState) => $optionState['option_id'], $product->getChildEntities()[Option::class]);
+        $option_ids = array_map(fn ($optionState) => $optionState['option_id'], $product->getChildEntities()[Option::class]);
 
         DB::table(static::$optionTable)
             ->where('product_id', $product->productId)
@@ -65,22 +65,21 @@ class MysqlProductRepository implements ProductRepository
             ->delete();
 
         foreach ($product->getChildEntities()[Option::class] as $i => $optionState) {
-
             $option_values = TraderHelpers::array_remove($optionState, 'values');
 
             DB::table(static::$optionTable)
                 ->updateOrInsert([
                     'product_id' => $product->productId->get(),
-                    'option_id'  => $optionState['option_id'],
-                ], array_merge($optionState,['order_column' => $i]));
+                    'option_id' => $optionState['option_id'],
+                ], array_merge($optionState, ['order_column' => $i]));
 
             // TODO: do this in one query...
 //            trap($option_values);
-            foreach($option_values as $j => $option_value) {
+            foreach ($option_values as $j => $option_value) {
                 DB::table(static::$optionValueTable)
                     ->updateOrInsert([
-                        'option_id'  => $option_value['option_id'],
-                        'option_value_id'  => $option_value['option_value_id'],
+                        'option_id' => $option_value['option_id'],
+                        'option_value_id' => $option_value['option_value_id'],
                     ], array_merge($option_value, ['order_column' => $j]));
             }
         }
@@ -88,14 +87,14 @@ class MysqlProductRepository implements ProductRepository
 
     private function upsertVariants(Product $product): void
     {
-        $variant_ids = array_map(fn($variant) => $variant->variantId->get(), $product->getVariants());
+        $variant_ids = array_map(fn ($variant) => $variant->variantId->get(), $product->getVariants());
 
         DB::table(static::$variantTable)
             ->where('product_id', $product->productId)
             ->whereNotIn('variant_id', $variant_ids)
             ->delete();
 
-        foreach($product->getVariants() as $variant) {
+        foreach ($product->getVariants() as $variant) {
             $this->variantRepository->save($variant);
         }
     }
@@ -113,7 +112,7 @@ class MysqlProductRepository implements ProductRepository
 
         // Remove the ones that are not in the new list
         $detachTaxonIds = $existingTaxonIds->diff($changedTaxonIds);
-        if($detachTaxonIds->count() > 0) {
+        if ($detachTaxonIds->count() > 0) {
             DB::table(static::$productTaxonLookupTable)
                 ->where('product_id', $productId)
                 ->whereIn('taxon_id', $detachTaxonIds->all())
@@ -123,7 +122,7 @@ class MysqlProductRepository implements ProductRepository
         // Insert the new taxon ids
         $attachTaxonIds = $changedTaxonIds->diff($existingTaxonIds);
 
-        $insertData = $attachTaxonIds->map(function($taxon_id) use($productId) {
+        $insertData = $attachTaxonIds->map(function ($taxon_id) use ($productId) {
             return ['product_id' => $productId->get(), 'taxon_id' => $taxon_id];
         })->all();
 
@@ -140,16 +139,16 @@ class MysqlProductRepository implements ProductRepository
         $productState = DB::table(static::$productTable)
             ->select([static::$productTable . '.*', DB::raw('GROUP_CONCAT(`taxon_id`) AS taxon_ids')])
             ->where(static::$productTable . '.product_id', $productId->get())
-            ->leftJoin(static::$productTaxonLookupTable, static::$productTable . '.product_id','=',static::$productTaxonLookupTable.'.product_id')
+            ->leftJoin(static::$productTaxonLookupTable, static::$productTable . '.product_id', '=', static::$productTaxonLookupTable.'.product_id')
             ->groupBy(static::$productTable . '.product_id')
             ->first();
 
         // Handle a bug in laravel where raw group concat statement would return a record with falsy null values
-        if($productState && null === $productState->product_id) {
+        if ($productState && null === $productState->product_id) {
             $productState = null;
         }
 
-        if (!$productState) {
+        if (! $productState) {
             throw new CouldNotFindProduct('No product found by id [' . $productId->get() . ']');
         }
 
@@ -158,7 +157,7 @@ class MysqlProductRepository implements ProductRepository
         $variantStates = $this->variantRepository->getStatesByProduct($productId);
 
         $optionStates = DB::table(static::$optionTable)
-            ->join(static::$optionValueTable, static::$optionTable.'.option_id' ,'=',static::$optionValueTable.'.option_id')
+            ->join(static::$optionValueTable, static::$optionTable.'.option_id', '=', static::$optionValueTable.'.option_id')
             ->where(static::$optionTable . '.product_id', $productId->get())
             ->orderBy(static::$optionTable . '.order_column')
             ->orderBy('option_value_order_column')
@@ -170,20 +169,19 @@ class MysqlProductRepository implements ProductRepository
             ])
             ->get()
             ->groupBy('option_id')
-            ->map(function(Collection $item) {
-
+            ->map(function (Collection $item) {
                 $first = $item->first();
 
                 return [
                     'option_id' => $first->option_id,
                     'product_id' => $first->product_id,
                     'data' => $first->data,
-                    'values' => array_map(fn($value) => [
+                    'values' => array_map(fn ($value) => [
                         'option_id' => $value->option_id,
                         'option_value_id' => $value->option_value_id,
                         'data' => $value->option_value_data,
                         'order_column' => $value->option_value_order_column,
-                    ], $item->all())
+                    ], $item->all()),
                 ];
             })
             ->toArray();

@@ -3,30 +3,29 @@ declare(strict_types=1);
 
 namespace Thinktomorrow\Trader\Infrastructure\Test\Repositories;
 
-use Thinktomorrow\Trader\Domain\Model\Order\OrderId;
 use Thinktomorrow\Trader\Application\Cart\Read\Cart;
-use Thinktomorrow\Trader\Application\Cart\Read\CartLine;
-use Thinktomorrow\Trader\Infrastructure\Test\TestContainer;
-use Thinktomorrow\Trader\Application\Cart\Read\CartPayment;
-use Thinktomorrow\Trader\Application\Cart\Read\CartShopper;
-use Thinktomorrow\Trader\Application\Cart\Read\CartShipping;
-use Thinktomorrow\Trader\Application\Cart\Read\CartRepository;
 use Thinktomorrow\Trader\Application\Cart\Read\CartBillingAddress;
+use Thinktomorrow\Trader\Application\Cart\Read\CartLine;
+use Thinktomorrow\Trader\Application\Cart\Read\CartPayment;
+use Thinktomorrow\Trader\Application\Cart\Read\CartRepository;
+use Thinktomorrow\Trader\Application\Cart\Read\CartShipping;
 use Thinktomorrow\Trader\Application\Cart\Read\CartShippingAddress;
-use Thinktomorrow\Trader\Infrastructure\Laravel\Models\Cart\DefaultCart;
+use Thinktomorrow\Trader\Application\Cart\Read\CartShopper;
 use Thinktomorrow\Trader\Domain\Model\Order\Exceptions\CouldNotFindOrder;
+use Thinktomorrow\Trader\Domain\Model\Order\OrderId;
+use Thinktomorrow\Trader\Infrastructure\Laravel\Models\Cart\DefaultCart;
+use Thinktomorrow\Trader\Infrastructure\Laravel\Models\Cart\DefaultCartBillingAddress;
 use Thinktomorrow\Trader\Infrastructure\Laravel\Models\Cart\DefaultCartLine;
 use Thinktomorrow\Trader\Infrastructure\Laravel\Models\Cart\DefaultCartPayment;
-use Thinktomorrow\Trader\Infrastructure\Laravel\Models\Cart\DefaultCartShopper;
 use Thinktomorrow\Trader\Infrastructure\Laravel\Models\Cart\DefaultCartShipping;
-use Thinktomorrow\Trader\Infrastructure\Laravel\Models\Cart\DefaultCartBillingAddress;
 use Thinktomorrow\Trader\Infrastructure\Laravel\Models\Cart\DefaultCartShippingAddress;
+use Thinktomorrow\Trader\Infrastructure\Laravel\Models\Cart\DefaultCartShopper;
 
 final class InMemoryCartRepository implements CartRepository
 {
     public function findCart(OrderId $orderId): Cart
     {
-        if(!isset(InMemoryOrderRepository::$orders[$orderId->get()])) {
+        if (! isset(InMemoryOrderRepository::$orders[$orderId->get()])) {
             throw new CouldNotFindOrder('No order found by id ' . $orderId);
         }
 
@@ -41,7 +40,7 @@ final class InMemoryCartRepository implements CartRepository
             'paymentCost' => $order->getPaymentCost(),
         ]);
 
-        $lines = array_map(fn($line) => DefaultCartLine::fromMappedData(
+        $lines = array_map(fn ($line) => DefaultCartLine::fromMappedData(
             array_merge($line->getMappedData(), [
                 'total' => $line->getTotal(),
                 'taxTotal' => $line->getTaxTotal(),
@@ -62,9 +61,9 @@ final class InMemoryCartRepository implements CartRepository
             $orderState
         ) : null;
 
-        $shippings = array_map(fn($shipping) => DefaultCartShipping::fromMappedData(
+        $shippings = array_map(fn ($shipping) => DefaultCartShipping::fromMappedData(
             array_merge($shipping->getMappedData(), [
-                'cost' => $shipping->getShippingCost()
+                'cost' => $shipping->getShippingCost(),
             ]),
             $orderState,
             []// TODO: cart shipping discounts
@@ -72,7 +71,7 @@ final class InMemoryCartRepository implements CartRepository
 
         $payment = $order->getPayment() ? DefaultCartPayment::fromMappedData(
             array_merge($order->getPayment()->getMappedData(), [
-                'cost' => $order->getPayment()->getPaymentCost()
+                'cost' => $order->getPayment()->getPaymentCost(),
             ]),
             $orderState,
             [], // TODO: cart payment discounts

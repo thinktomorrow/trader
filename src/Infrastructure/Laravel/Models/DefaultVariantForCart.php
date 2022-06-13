@@ -3,10 +3,10 @@ declare(strict_types=1);
 
 namespace Thinktomorrow\Trader\Infrastructure\Laravel\Models;
 
+use Thinktomorrow\Trader\Application\Cart\VariantForCart\VariantForCart;
 use Thinktomorrow\Trader\Application\Common\RendersData;
 use Thinktomorrow\Trader\Domain\Model\Product\Variant\VariantId;
 use Thinktomorrow\Trader\Domain\Model\Product\Variant\VariantSalePrice;
-use Thinktomorrow\Trader\Application\Cart\VariantForCart\VariantForCart;
 
 class DefaultVariantForCart implements VariantForCart
 {
@@ -15,8 +15,8 @@ class DefaultVariantForCart implements VariantForCart
     private VariantId $variantId;
     private VariantSalePrice $variantSalePrice;
 
-    private function __construct() {
-
+    private function __construct()
+    {
     }
 
     public static function fromMappedData(array $state): static

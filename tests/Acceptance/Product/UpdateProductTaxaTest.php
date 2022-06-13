@@ -4,8 +4,8 @@ declare(strict_types=1);
 namespace Tests\Acceptance\Product;
 
 use Tests\TestHelpers;
-use Thinktomorrow\Trader\Domain\Model\Product\Event\ProductTaxaUpdated;
 use Thinktomorrow\Trader\Application\Product\UpdateProduct\UpdateProductTaxa;
+use Thinktomorrow\Trader\Domain\Model\Product\Event\ProductTaxaUpdated;
 
 class UpdateProductTaxaTest extends ProductContext
 {

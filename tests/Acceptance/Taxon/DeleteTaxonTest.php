@@ -26,13 +26,12 @@ class DeleteTaxonTest extends TaxonContext
         $this->assertEquals([
             new TaxonDeleted($taxonId),
         ], $this->eventDispatcher->releaseDispatchedEvents());
-
     }
 
     /** @test */
     public function deleting_taxon_moves_child_taxa_to_level_above()
     {
-        $taxonRootId = $this->taxonApplication->createTaxon(new CreateTaxon('taxon-key-root',[]));
+        $taxonRootId = $this->taxonApplication->createTaxon(new CreateTaxon('taxon-key-root', []));
         $this->taxonRepository->setNextReference('abc');
         $taxonId = $this->taxonApplication->createTaxon(new CreateTaxon('taxon-key', [], $taxonRootId->get()));
 
@@ -43,6 +42,5 @@ class DeleteTaxonTest extends TaxonContext
 
         $taxon = $this->taxonRepository->find($nestedTaxonId);
         $this->assertEquals($taxonRootId, $taxon->getParentId());
-
     }
 }

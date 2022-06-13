@@ -3,8 +3,8 @@ declare(strict_types=1);
 
 namespace Thinktomorrow\Trader\Infrastructure\Laravel\Models\Cart;
 
-use Thinktomorrow\Trader\Application\Common\RendersData;
 use Thinktomorrow\Trader\Application\Cart\Read\CartShopper;
+use Thinktomorrow\Trader\Application\Common\RendersData;
 
 class DefaultCartShopper implements CartShopper
 {
@@ -18,7 +18,6 @@ class DefaultCartShopper implements CartShopper
 
     private function __construct()
     {
-
     }
 
     public static function fromMappedData(array $state, array $cartState): static
@@ -46,7 +45,7 @@ class DefaultCartShopper implements CartShopper
 
     public function isCustomer(): bool
     {
-        return !is_null($this->customer_id);
+        return ! is_null($this->customer_id);
     }
 
     public function isGuest(): bool

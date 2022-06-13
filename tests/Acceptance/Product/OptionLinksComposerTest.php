@@ -4,11 +4,11 @@ declare(strict_types=1);
 namespace Tests\Acceptance\Product;
 
 use Tests\TestHelpers;
-use Thinktomorrow\Trader\Domain\Common\Locale;
-use Thinktomorrow\Trader\Infrastructure\Test\TestContainer;
 use Thinktomorrow\Trader\Application\Product\OptionLinks\OptionLinks;
 use Thinktomorrow\Trader\Application\Product\OptionLinks\OptionLinksComposer;
+use Thinktomorrow\Trader\Domain\Common\Locale;
 use Thinktomorrow\Trader\Infrastructure\Test\Repositories\InMemoryProductRepository;
+use Thinktomorrow\Trader\Infrastructure\Test\TestContainer;
 
 class OptionLinksComposerTest extends ProductContext
 {

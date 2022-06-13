@@ -3,10 +3,10 @@ declare(strict_types=1);
 
 namespace Thinktomorrow\Trader\Infrastructure\Laravel\Models\Cart;
 
-use Thinktomorrow\Trader\Domain\Common\Cash\Price;
+use Thinktomorrow\Trader\Application\Cart\Read\CartShipping;
 use Thinktomorrow\Trader\Application\Common\RendersData;
 use Thinktomorrow\Trader\Application\Common\RendersMoney;
-use Thinktomorrow\Trader\Application\Cart\Read\CartShipping;
+use Thinktomorrow\Trader\Domain\Common\Cash\Price;
 
 class DefaultCartShipping implements CartShipping
 {

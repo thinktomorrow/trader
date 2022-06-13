@@ -5,20 +5,20 @@ namespace Tests\Unit\Model;
 
 use Money\Money;
 use Tests\Unit\TestCase;
-use Thinktomorrow\Trader\Domain\Model\Taxon\TaxonId;
 use Thinktomorrow\Trader\Domain\Common\Taxes\TaxRate;
+use Thinktomorrow\Trader\Domain\Model\Product\Event\ProductCreated;
+use Thinktomorrow\Trader\Domain\Model\Product\Event\ProductTaxaUpdated;
+use Thinktomorrow\Trader\Domain\Model\Product\Event\VariantCreated;
+use Thinktomorrow\Trader\Domain\Model\Product\Event\VariantDeleted;
+use Thinktomorrow\Trader\Domain\Model\Product\Exceptions\CouldNotDeleteVariant;
 use Thinktomorrow\Trader\Domain\Model\Product\Product;
 use Thinktomorrow\Trader\Domain\Model\Product\ProductId;
 use Thinktomorrow\Trader\Domain\Model\Product\ProductState;
 use Thinktomorrow\Trader\Domain\Model\Product\Variant\Variant;
 use Thinktomorrow\Trader\Domain\Model\Product\Variant\VariantId;
-use Thinktomorrow\Trader\Domain\Model\Product\Event\ProductCreated;
-use Thinktomorrow\Trader\Domain\Model\Product\Event\VariantCreated;
-use Thinktomorrow\Trader\Domain\Model\Product\Event\VariantDeleted;
-use Thinktomorrow\Trader\Domain\Model\Product\Variant\VariantUnitPrice;
 use Thinktomorrow\Trader\Domain\Model\Product\Variant\VariantSalePrice;
-use Thinktomorrow\Trader\Domain\Model\Product\Event\ProductTaxaUpdated;
-use Thinktomorrow\Trader\Domain\Model\Product\Exceptions\CouldNotDeleteVariant;
+use Thinktomorrow\Trader\Domain\Model\Product\Variant\VariantUnitPrice;
+use Thinktomorrow\Trader\Domain\Model\Taxon\TaxonId;
 
 class ProductTest extends TestCase
 {
@@ -130,7 +130,7 @@ class ProductTest extends TestCase
         $this->assertEquals('0', $product->getChildEntities()[Variant::class][0]['unit_price']);
         $this->assertEquals('0', $product->getChildEntities()[Variant::class][0]['sale_price']);
         $this->assertEquals([
-            'option-value-id'
+            'option-value-id',
         ], $product->getVariants()[0]->getMappedData()['option_value_ids']);
     }
 

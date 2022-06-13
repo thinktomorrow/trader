@@ -4,7 +4,6 @@ declare(strict_types=1);
 namespace Tests\Acceptance\Product;
 
 use Tests\TestHelpers;
-use Thinktomorrow\Trader\Application\Product\CheckProductOptions\MissingOptionCombinations;
 
 class MissingOptionCombinationsTest extends ProductContext
 {
@@ -34,7 +33,7 @@ class MissingOptionCombinationsTest extends ProductContext
         $this->assertCount(1, $missingComboLabels);
         $this->assertEquals([
             'bar: option value nl 2',
-            'baz: option value nl 3'
+            'baz: option value nl 3',
         ], $missingComboLabels[0]);
     }
 }

@@ -6,9 +6,9 @@ namespace Tests\Unit\Common\Cash;
 use Money\Currency;
 use Money\Money;
 use PHPUnit\Framework\TestCase;
-use Thinktomorrow\Trader\Domain\Common\Locale;
 use Thinktomorrow\Trader\Domain\Common\Cash\Cash;
 use Thinktomorrow\Trader\Domain\Common\Cash\Percentage;
+use Thinktomorrow\Trader\Domain\Common\Locale;
 
 class CashTest extends TestCase
 {

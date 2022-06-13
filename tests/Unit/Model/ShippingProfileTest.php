@@ -5,11 +5,11 @@ namespace Tests\Unit\Model;
 
 use Money\Money;
 use PHPUnit\Framework\TestCase;
-use Thinktomorrow\Trader\Domain\Model\ShippingProfile\Tariff;
-use Thinktomorrow\Trader\Domain\Model\ShippingProfile\TariffNumber;
 use Thinktomorrow\Trader\Domain\Model\Order\Address\ShippingCountry;
 use Thinktomorrow\Trader\Domain\Model\ShippingProfile\ShippingProfile;
 use Thinktomorrow\Trader\Domain\Model\ShippingProfile\ShippingProfileId;
+use Thinktomorrow\Trader\Domain\Model\ShippingProfile\Tariff;
+use Thinktomorrow\Trader\Domain\Model\ShippingProfile\TariffNumber;
 
 class ShippingProfileTest extends TestCase
 {
@@ -40,11 +40,11 @@ class ShippingProfileTest extends TestCase
         $this->assertEquals('bar', $shippingProfile->getData('foo'));
         $this->assertCount(2, $shippingProfile->getChildEntities()[Tariff::class]);
         $this->assertEquals([
-            'shipping_profile_id'    => 'yyy',
-            'tariff_number'    => 1,
-            'rate'             => '500',
-            'from'             => '0',
-            'to'               => '1000',
+            'shipping_profile_id' => 'yyy',
+            'tariff_number' => 1,
+            'rate' => '500',
+            'from' => '0',
+            'to' => '1000',
         ], $shippingProfile->getChildEntities()[Tariff::class][0]->getMappedData());
 
         $this->assertCount(2, $shippingProfile->getChildEntities()[ShippingCountry::class]);
@@ -81,10 +81,10 @@ class ShippingProfileTest extends TestCase
 
         $this->assertEquals([
             'shipping_profile_id' => 'yyy',
-            'tariff_number'    => 2,
-            'rate'             => '30',
-            'from'             => '3001',
-            'to'               => '4000',
+            'tariff_number' => 2,
+            'rate' => '30',
+            'from' => '3001',
+            'to' => '4000',
         ], $shippingProfile->getChildEntities()[Tariff::class][1]->getMappedData());
     }
 
@@ -108,17 +108,17 @@ class ShippingProfileTest extends TestCase
         ], [
             Tariff::class => [
                 [
-                    'tariff_number'    => 1,
-                    'rate'             => '500',
-                    'from'             => '0',
-                    'to'               => '1000',
+                    'tariff_number' => 1,
+                    'rate' => '500',
+                    'from' => '0',
+                    'to' => '1000',
                 ],
                 [
-                    'tariff_number'    => 2,
-                    'rate'             => '0',
-                    'from'             => '1001',
-                    'to'               => '2000',
-                ]
+                    'tariff_number' => 2,
+                    'rate' => '0',
+                    'from' => '1001',
+                    'to' => '2000',
+                ],
             ],
             ShippingCountry::class => ['BE', 'NL'],
         ]);

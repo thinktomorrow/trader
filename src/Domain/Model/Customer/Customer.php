@@ -4,8 +4,8 @@ declare(strict_types=1);
 namespace Thinktomorrow\Trader\Domain\Model\Customer;
 
 use Thinktomorrow\Trader\Domain\Common\Email;
-use Thinktomorrow\Trader\Domain\Common\Entity\HasData;
 use Thinktomorrow\Trader\Domain\Common\Entity\Aggregate;
+use Thinktomorrow\Trader\Domain\Common\Entity\HasData;
 use Thinktomorrow\Trader\Domain\Common\Event\RecordsEvents;
 
 class Customer implements Aggregate
@@ -19,7 +19,6 @@ class Customer implements Aggregate
 
     private function __construct()
     {
-
     }
 
     public static function create(CustomerId $customerId, Email $email, bool $isBusiness)
@@ -56,9 +55,9 @@ class Customer implements Aggregate
     {
         return [
             'customer_id' => $this->customerId->get(),
-            'email'       => $this->email->get(),
+            'email' => $this->email->get(),
             'is_business' => $this->isBusiness,
-            'data'        => json_encode($this->data),
+            'data' => json_encode($this->data),
         ];
     }
 
