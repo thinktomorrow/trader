@@ -6,8 +6,8 @@ namespace Thinktomorrow\Trader\Domain\Model\Order;
 use Money\Money;
 use Thinktomorrow\Trader\Domain\Common\Cash\Price;
 use Thinktomorrow\Trader\Domain\Model\Order\Line\Line;
+use Thinktomorrow\Trader\Domain\Common\Cash\PriceTotal;
 use Thinktomorrow\Trader\Domain\Model\Order\Price\Total;
-use Thinktomorrow\Trader\Domain\Model\Order\Price\SubTotal;
 use Thinktomorrow\Trader\Domain\Model\Order\Discount\Discount;
 use Thinktomorrow\Trader\Domain\Model\Order\Shipping\Shipping;
 use Thinktomorrow\Trader\Domain\Model\Order\Payment\PaymentCost;
@@ -16,24 +16,24 @@ use Thinktomorrow\Trader\Domain\Model\Order\Discount\DiscountTotal;
 
 trait HasTotals
 {
-    public function getSubTotal(): SubTotal
+    public function getSubTotal(): Total
     {
+        $total = Total::zero();
+
         if (count($this->lines) < 1) {
-            return SubTotal::zero();
+            return $total;
         }
 
-        $price = array_reduce($this->lines, function (?Price $carry, Line $line) {
+        return array_reduce($this->lines, function (?PriceTotal $carry, Line $line) {
             return $carry === null
                 ? $line->getTotal()
                 : $carry->add($line->getTotal());
-        }, null);
-
-        return SubTotal::fromPrice($price);
+        }, $total);
     }
 
     public function getTotal(): Total
     {
-        return Total::fromPrice($this->getSubTotal())
+        return $this->getSubTotal()
             ->subtract($this->getDiscountTotal())
             ->add($this->getShippingCost())
             ->add($this->getPaymentCost());
@@ -52,7 +52,7 @@ trait HasTotals
             return DiscountTotal::zero();
         }
 
-        return array_reduce($this->discounts, function (?Price $carry, Discount $discount) {
+        return array_reduce($this->discounts, function (?PriceTotal $carry, Discount $discount) {
             return $carry === null
                 ? $discount->getTotal()
                 : $carry->add($discount->getTotal());
@@ -65,7 +65,7 @@ trait HasTotals
             return ShippingCost::zero();
         }
 
-        return array_reduce($this->shippings, function (?Price $carry, Shipping $shipping) {
+        return array_reduce($this->shippings, function (?PriceTotal $carry, Shipping $shipping) {
             return $carry === null
                 ? $shipping->getShippingCost()
                 : $carry->add($shipping->getShippingCost());

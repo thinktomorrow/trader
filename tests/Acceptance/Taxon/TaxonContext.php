@@ -3,7 +3,7 @@ declare(strict_types=1);
 
 namespace Tests\Acceptance\Taxon;
 
-use PHPUnit\Framework\TestCase;
+use Tests\Acceptance\TestCase;
 use Thinktomorrow\Trader\Application\Taxon\Tree\TaxonNode;
 use Thinktomorrow\Trader\Infrastructure\Test\TestContainer;
 use Thinktomorrow\Trader\Application\Taxon\TaxonApplication;

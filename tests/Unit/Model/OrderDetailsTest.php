@@ -3,13 +3,15 @@ declare(strict_types=1);
 
 namespace Tests\Unit\Model;
 
+use Money\Money;
 use Tests\Unit\TestCase;
 use Thinktomorrow\Trader\Domain\Model\Order\Price\Total;
-use Thinktomorrow\Trader\Domain\Model\Order\Price\SubTotal;
+use Thinktomorrow\Trader\Domain\Common\Address\AddressType;
 use Thinktomorrow\Trader\Domain\Model\Order\Payment\PaymentCost;
 use Thinktomorrow\Trader\Domain\Model\Order\Shipping\ShippingCost;
 use Thinktomorrow\Trader\Domain\Model\Order\Shipping\ShippingState;
 use Thinktomorrow\Trader\Domain\Model\Order\Discount\DiscountTotal;
+use Thinktomorrow\Trader\Domain\Model\Product\Variant\VariantSalePrice;
 
 class OrderDetailsTest extends TestCase
 {
@@ -19,12 +21,12 @@ class OrderDetailsTest extends TestCase
         $order = $this->createdOrder();
 
         $this->assertEquals(
-            SubTotal::fromScalars(400, 'EUR', '10', true),
+            Total::zero()->add(VariantSalePrice::fromScalars(400, 'EUR', '10', true)),
             $order->getSubTotal()
         );
 
         $this->assertEquals(
-            Total::fromScalars(440, 'EUR', '10', true),
+            Total::zero()->add(VariantSalePrice::fromScalars(440, 'EUR', '10', true)),
             $order->getTotal()
         );
 
@@ -53,13 +55,15 @@ class OrderDetailsTest extends TestCase
         $this->assertEquals(ShippingState::initialized, $order->getShippings()[0]->getShippingState());
 
         $this->assertEquals([
+            'order_id' => 'xxx',
             'country' => 'BE',
-            'street' => 'Lierseweg',
-            'number' => '81',
-            'bus' => null,
-            'zipcode' => '2200',
+            'line_1' => 'Lierseweg 81',
+            'line_2' => null,
+            'postal_code' => '2200',
             'city' => 'Herentals',
-        ], $order->getShippingAddress()->toArray());
+            'data' => "[]",
+            'type' => AddressType::shipping->value,
+        ], $order->getShippingAddress()->getMappedData());
     }
 
     /** @test */
@@ -68,12 +72,14 @@ class OrderDetailsTest extends TestCase
         $order = $this->createdOrder();
 
         $this->assertEquals([
+            'order_id' => 'xxx',
             'country' => 'NL',
-            'street' => 'example',
-            'number' => '12',
-            'bus' => 'bus 2',
-            'zipcode' => '1000',
+            'line_1' => 'example 12',
+            'line_2' => 'bus 2',
+            'postal_code' => '1000',
             'city' => 'Amsterdam',
-        ], $order->getBillingAddress()->toArray());
+            'data' => "[]",
+            'type' => AddressType::billing->value,
+        ], $order->getBillingAddress()->getMappedData());
     }
 }

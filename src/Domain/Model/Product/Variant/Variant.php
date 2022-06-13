@@ -18,7 +18,7 @@ final class Variant implements ChildEntity
     public readonly VariantId $variantId;
     private VariantState $state;
     private VariantUnitPrice $unitPrice;
-    private VariantSalePrice $salePrice;
+    private VariantSalePrice $salePrice; // bedrag, btw perc, bool includes_tax?
 
     /** @var DefaultOptionLink[] */
     private array $optionValueIds = [];

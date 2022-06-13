@@ -4,30 +4,112 @@ declare(strict_types=1);
 
 namespace Thinktomorrow\Trader\Domain\Common\Taxes;
 
+use Money\Money;
 use Assert\Assertion;
 use Thinktomorrow\Trader\Domain\Common\Cash\Cash;
 
 class TaxRateTotals
 {
-    private $taxables;
+    /** @var TaxRateTotal[] */
+    private iterable $taxRateTotals;
 
-    private function __construct(array $taxables)
+    private function __construct(iterable $taxRateTotals)
+    {
+        Assertion::allIsInstanceOf((array) $taxRateTotals, TaxRateTotal::class);
+
+        $this->taxRateTotals = $taxRateTotals;
+    }
+
+    public static function fromTaxables(array $taxables): static
     {
         Assertion::allIsInstanceOf($taxables, Taxable::class);
 
-        $this->taxables = $taxables;
+        $taxRateTotals = static::convertTaxablesToTotals($taxables);
+
+        return new static($taxRateTotals);
     }
 
-    public static function fromTaxables(array $taxables): self
+    public static function zero(): static
     {
-        return new static($taxables);
+        return new static([]);
     }
 
-    public function get(): array
+    public function addTaxableTotal(TaxRate $taxRate, Money $taxableTotal): static
     {
-        $totalsByRate = $this->groupTotalsByRate();
+        $taxRateTotals = $this->taxRateTotals;
 
-        return $this->addTaxToEachRate($totalsByRate);
+        $match = false;
+        foreach($taxRateTotals as $i => $taxRateTotal) {
+            if($taxRateTotal->getTaxRate()->equals($taxRate)) {
+                $taxRateTotals[$i] = $taxRateTotal->add($taxableTotal);
+                $match = true;
+            }
+        }
+
+        if(!$match) {
+            $taxRateTotals[] = new TaxRateTotal($taxRate, $taxableTotal);
+        }
+
+        return new static($taxRateTotals);
+    }
+
+    public function subtractTaxableTotal(TaxRate $taxRate, Money $taxableTotal): static
+    {
+        $taxRateTotals = $this->taxRateTotals;
+
+        $match = false;
+        foreach($taxRateTotals as $i => $taxRateTotal) {
+            if($taxRateTotal->getTaxRate()->equals($taxRate)) {
+                $taxRateTotals[$i] = $taxRateTotal->subtract($taxableTotal);
+                $match = true;
+            }
+        }
+
+        if(!$match) {
+            $taxRateTotals[] = new TaxRateTotal($taxRate, $taxableTotal->negative());
+        }
+
+        return new static($taxRateTotals);
+    }
+
+    public function get(): iterable
+    {
+        return $this->taxRateTotals;
+    }
+
+    public function find(TaxRate $taxRate): ?TaxRateTotal
+    {
+        foreach($this->taxRateTotals as $taxRateTotal) {
+            if($taxRateTotal->getTaxRate()->equals($taxRate)) {
+                return $taxRateTotal;
+            }
+        }
+
+        return null;
+    }
+
+    public function getTaxableTotal(): Money
+    {
+        return array_reduce(
+            $this->taxRateTotals,
+            fn($carry, $taxRateTotal) => $carry->add($taxRateTotal->getTaxableTotal()),
+            Cash::zero()
+        );
+    }
+
+    public function getTaxTotal(): Money
+    {
+        $total = array_reduce(
+            $this->taxRateTotals,
+            fn($carry, $taxRateTotal) => $carry->add($taxRateTotal->getTaxTotal()),
+            Cash::zero()
+        );
+
+        if($total->isNegative()) {
+            return new Money(0, $total->getCurrency());
+        }
+
+        return $total;
     }
 
     /**
@@ -36,39 +118,22 @@ class TaxRateTotals
      *
      * @return array
      */
-    private function groupTotalsByRate(): array
+    private static function convertTaxablesToTotals(iterable $taxables): array
     {
+        /** @var TaxRateTotal[] $totalsPerRate */
         $totalsPerRate = [];
 
         /** @var Taxable $taxable */
-        foreach ($this->taxables as $taxable) {
-            $key = (string) $taxable->getTaxRate()->toPercentage()->get();
+        foreach ($taxables as $taxable) {
+            $key = $taxable->getTaxRate()->toPercentage()->get();
 
             if (! isset($totalsPerRate[$key])) {
-                $totalsPerRate[$key] = ['percent' => $taxable->getTaxRate()->toPercentage(), 'total' => Cash::zero()];
+                $totalsPerRate[$key] = TaxRateTotal::zero($taxable->getTaxRate());
             }
 
-            $totalsPerRate[$key]['total'] = $totalsPerRate[$key]['total']->add($taxable->getTaxableTotal());
+            $totalsPerRate[$key] = $totalsPerRate[$key]->add($taxable->getTaxableTotal());
         }
 
         return $totalsPerRate;
-    }
-
-    /**
-     * Add a 'tax' entry for each tax rate. This represents
-     * the tax amount for each rate total.
-     *
-     * @param array $totalsByRate
-     *
-     * @return mixed
-     */
-    private function addTaxToEachRate(array $totalsByRate): array
-    {
-        foreach ($totalsByRate as $key => $totalByRate) {
-            $nettTotal = Cash::from($totalByRate['total'])->subtractTaxPercentage($totalByRate['percent']);
-            $totalsByRate[$key]['tax'] = $totalByRate['total']->subtract($nettTotal);
-        }
-
-        return $totalsByRate;
     }
 }

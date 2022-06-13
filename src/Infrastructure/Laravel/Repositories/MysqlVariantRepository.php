@@ -5,6 +5,7 @@ namespace Thinktomorrow\Trader\Infrastructure\Laravel\Repositories;
 
 use Ramsey\Uuid\Uuid;
 use Illuminate\Support\Facades\DB;
+use Psr\Container\ContainerInterface;
 use Thinktomorrow\Trader\Domain\Model\Product\ProductId;
 use Thinktomorrow\Trader\Application\Common\TraderHelpers;
 use Thinktomorrow\Trader\Domain\Model\Product\Variant\Variant;
@@ -19,6 +20,13 @@ class MysqlVariantRepository implements VariantRepository, VariantForCartReposit
     private static string $optionTable = 'trader_product_options';
     private static string $optionValueTable = 'trader_product_option_values';
     private static string $variantOptionValueLookupTable = 'trader_variant_option_values';
+
+    private ContainerInterface $container;
+
+    public function __construct(ContainerInterface $container)
+    {
+        $this->container = $container;
+    }
 
     public function save(Variant $variant): void
     {
@@ -94,32 +102,6 @@ class MysqlVariantRepository implements VariantRepository, VariantForCartReposit
         return $variantStates;
     }
 
-//    public function find(VariantId $variantId): Variant
-//    {
-//        $state = DB::table(static::$variantTable)
-//            ->where(static::$variantTable . '.variant_id', $variantId->get())
-//            ->first();
-//
-//        if (!$state) {
-//            throw new CouldNotFindVariant('No variant found by id [' . $variantId->get() . ']');
-//        }
-//
-//        $optionValueStates = DB::table(static::$optionValueTable)
-//            ->where(static::$optionValueTable . '.variant_id', $variantId->get())
-//            ->get()
-//            ->map(fn($item) => (array) $item)
-//            ->toArray();
-//
-//        $state = (array) $state;
-//        $state['includes_vat'] = (bool) $state['includes_vat'];
-//
-//        return Variant::fromMappedData($state, [
-//            'product_id' => $state['product_id'],
-//        ], [
-//            OptionValue::class => $optionValueStates,
-//        ]);
-//    }
-
     public function delete(VariantId $variantId): void
     {
         DB::table(static::$optionValueTable)->where('variant_id', $variantId->get())->delete();
@@ -140,7 +122,8 @@ class MysqlVariantRepository implements VariantRepository, VariantForCartReposit
                 'variant_id',
                 'sale_price',
                 'tax_rate',
-                'includes_vat'
+                'includes_vat',
+                'data',
             ])
             ->first();
 
@@ -150,7 +133,7 @@ class MysqlVariantRepository implements VariantRepository, VariantForCartReposit
 
         $state = (array) $state;
 
-        return VariantForCart::fromMappedData(array_merge($state, [
+        return $this->container->get(VariantForCart::class)::fromMappedData(array_merge($state, [
             'includes_vat' => (bool) $state['includes_vat'],
         ]));
     }

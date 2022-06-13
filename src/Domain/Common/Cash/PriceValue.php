@@ -12,14 +12,20 @@ trait PriceValue
     private TaxRate $taxRate;
     private bool $includesVat;
 
-    private function __construct()
+    private function __construct(Money $money, TaxRate $taxRate, bool $includesVat)
     {
-        //
+        if($money->isNegative()) {
+            throw new PriceCannotBeNegative('Price money amount cannot be negative: ' . $money->getAmount() . ' is given.');
+        }
+
+        $this->money = $money;
+        $this->taxRate = $taxRate;
+        $this->includesVat = $includesVat;
     }
 
     public static function fromScalars(string|int $amount, string $currency, string $taxRate, bool $includesVat): static
     {
-        return static::fromMoney(
+        return new static(
             Cash::make($amount, $currency),
             TaxRate::fromString($taxRate),
             $includesVat
@@ -29,29 +35,21 @@ trait PriceValue
     public static function zero(): static
     {
         // TODO: how to get default settings for this here?
-        return static::fromScalars('0','EUR','0',true);
+        return new static(Cash::zero(), TaxRate::fromString('0'), true);
     }
 
     public static function fromPrice(Price $otherPrice): static
     {
-        $price = new static();
-
-        $price->money = $otherPrice->getMoney();
-        $price->taxRate = $otherPrice->getTaxRate();
-        $price->includesVat = $otherPrice->includesVat();
-
-        return $price;
+        return new static(
+            $otherPrice->getMoney(),
+            $otherPrice->getTaxRate(),
+            $otherPrice->includesVat()
+        );
     }
 
     public static function fromMoney(Money $money, TaxRate $taxRate, bool $includesVat): static
     {
-        $price = new static();
-
-        $price->money = $money;
-        $price->taxRate = $taxRate;
-        $price->includesVat = $includesVat;
-
-        return $price;
+        return new static($money, $taxRate, $includesVat);
     }
 
     public function getIncludingVat(): Money
@@ -86,6 +84,12 @@ trait PriceValue
         return $this->taxRate;
     }
 
+    public function getTaxTotal(): Money
+    {
+        return $this->getIncludingVat()
+            ->subtract($this->getExcludingVat());
+    }
+
     public function includesVat(): bool
     {
         return $this->includesVat;
@@ -98,6 +102,8 @@ trait PriceValue
 
     public function add(Price $otherPrice): static
     {
+        $this->assertSameTaxRates($otherPrice);
+
         $otherMoney = $this->includesVat()
             ? $otherPrice->getIncludingVat()
             : $otherPrice->getExcludingVat();
@@ -107,10 +113,38 @@ trait PriceValue
 
     public function subtract(Price $otherPrice): static
     {
+        $this->assertSameTaxRates($otherPrice);
+
         $otherMoney = $this->includesVat()
             ? $otherPrice->getIncludingVat()
             : $otherPrice->getExcludingVat();
 
         return static::fromMoney($this->money->subtract($otherMoney), $this->taxRate, $this->includesVat);
+    }
+
+    public function changeTaxRate(TaxRate $taxRate): static
+    {
+        return static::fromMoney($this->getExcludingVat(), $taxRate, false);
+    }
+
+    public function addDifferent(Price $otherPrice): static
+    {
+        return $this->add(
+            $otherPrice->changeTaxRate($this->taxRate)
+        );
+    }
+
+    public function subtractDifferent(Price $otherPrice): static
+    {
+        return $this->subtract(
+            $otherPrice->changeTaxRate($this->taxRate)
+        );
+    }
+
+    private function assertSameTaxRates(Price $otherPrice): void
+    {
+        if(!$otherPrice->getTaxRate()->equals($this->getTaxRate())) {
+            throw new PriceCannotContainMultipleTaxRates($otherPrice->getTaxRate() . ' differs from expected ' . $this->getTaxRate());
+        }
     }
 }

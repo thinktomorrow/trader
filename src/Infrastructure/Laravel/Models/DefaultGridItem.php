@@ -6,7 +6,7 @@ namespace Thinktomorrow\Trader\Infrastructure\Laravel\Models;
 use Thinktomorrow\Trader\Application\Common\HasLocale;
 use Thinktomorrow\Trader\Application\Common\RendersData;
 use Thinktomorrow\Trader\Domain\Model\Product\ProductId;
-use Thinktomorrow\Trader\Application\Common\RendersPrices;
+use Thinktomorrow\Trader\Application\Common\RendersVariantPrices;
 use Thinktomorrow\Trader\Application\Product\Grid\GridItem;
 use Thinktomorrow\Trader\Domain\Model\Product\Variant\VariantId;
 use Thinktomorrow\Trader\Domain\Model\Product\Variant\VariantState;
@@ -15,7 +15,7 @@ use Thinktomorrow\Trader\Domain\Model\Product\Variant\VariantUnitPrice;
 
 class DefaultGridItem implements GridItem
 {
-    use RendersPrices;
+    use RendersVariantPrices;
     use RendersData;
     use HasLocale;
 

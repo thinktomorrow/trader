@@ -6,7 +6,7 @@ use Money\Money;
 use Thinktomorrow\Trader\Domain\Model\Product\Variant\VariantSalePrice;
 use Thinktomorrow\Trader\Domain\Model\Product\Variant\VariantUnitPrice;
 
-trait RendersPrices
+trait RendersVariantPrices
 {
     use HasLocale;
     use RendersMoney;

@@ -4,11 +4,8 @@ declare(strict_types=1);
 namespace Tests\Acceptance\Product;
 
 use PHPUnit\Framework\Assert;
-use PHPUnit\Framework\TestCase;
-use Thinktomorrow\Trader\Domain\Common\Locale;
+use Tests\Acceptance\TestCase;
 use Thinktomorrow\Trader\Domain\Model\Product\ProductId;
-use Thinktomorrow\Trader\Application\Common\DataRenderer;
-use Thinktomorrow\Trader\Application\Common\DefaultLocale;
 use Thinktomorrow\Trader\Application\Product\CreateProduct;
 use Thinktomorrow\Trader\Application\Product\CreateVariant;
 use Thinktomorrow\Trader\Infrastructure\Test\TestContainer;
@@ -40,24 +37,7 @@ abstract class ProductContext extends TestCase
 
     protected function setUp(): void
     {
-        DefaultLocale::set(Locale::fromString('nl', 'BE'));
-
-        DataRenderer::setDataResolver(function(array $data, string $key, string $language = null, string $default = null)
-        {
-            if(!isset($data[$key])) {
-                return $default;
-            }
-
-            if(!$language) {
-                $language = 'nl';
-            }
-
-            if(isset($data[$key][$language])) {
-                return $data[$key][$language];
-            }
-
-            return $data[$key];
-        });
+        parent::setUp();
 
         $this->productApplication = new ProductApplication(
             new TestTraderConfig(),

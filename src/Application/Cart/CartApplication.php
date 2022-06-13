@@ -4,7 +4,9 @@ declare(strict_types=1);
 namespace Thinktomorrow\Trader\Application\Cart;
 
 use Thinktomorrow\Trader\TraderConfig;
+use Thinktomorrow\Trader\Domain\Model\Order\Order;
 use Thinktomorrow\Trader\Domain\Model\Order\Shopper;
+use Thinktomorrow\Trader\Domain\Model\Order\OrderId;
 use Thinktomorrow\Trader\Domain\Common\Taxes\TaxRate;
 use Thinktomorrow\Trader\Application\Cart\Line\AddLine;
 use Thinktomorrow\Trader\Domain\Model\Order\Line\LineId;
@@ -15,15 +17,18 @@ use Thinktomorrow\Trader\Domain\Model\Order\OrderRepository;
 use Thinktomorrow\Trader\Domain\Common\Event\EventDispatcher;
 use Thinktomorrow\Trader\Domain\Model\Order\Shipping\Shipping;
 use Thinktomorrow\Trader\Domain\Model\Order\Payment\PaymentCost;
+use Thinktomorrow\Trader\Application\Cart\Line\AddLineToNewOrder;
 use Thinktomorrow\Trader\Domain\Model\Order\Shipping\ShippingCost;
 use Thinktomorrow\Trader\Domain\Model\Customer\CustomerRepository;
 use Thinktomorrow\Trader\Application\Cart\Line\ChangeLineQuantity;
-use Thinktomorrow\Trader\Domain\Model\Order\Shipping\ShippingCountry;
+use Thinktomorrow\Trader\Domain\Model\Order\Address\BillingAddress;
+use Thinktomorrow\Trader\Domain\Model\Order\Address\ShippingCountry;
+use Thinktomorrow\Trader\Domain\Model\Order\Address\ShippingAddress;
 use Thinktomorrow\Trader\Domain\Model\PaymentMethod\PaymentMethodRepository;
 use Thinktomorrow\Trader\Domain\Model\ShippingProfile\ShippingProfileRepository;
 use Thinktomorrow\Trader\Application\Cart\VariantForCart\VariantForCartRepository;
 use Thinktomorrow\Trader\Domain\Model\ShippingProfile\Exceptions\ShippingProfileNotSelectableForCountry;
-use Thinktomorrow\Trader\Domain\Model\ShippingProfile\Exceptions\CouldNotSelectShippingCountryDueToMissingShippingCountry;
+use Thinktomorrow\Trader\Domain\Model\ShippingProfile\Exceptions\CouldNotSelectShippingProfileDueToMissingShippingCountry;
 
 final class CartApplication
 {
@@ -54,9 +59,29 @@ final class CartApplication
         $this->config = $config;
     }
 
-    public function addLine(AddLine $addLine): void
+    public function addLineToNewOrder(AddLineToNewOrder $addLineToNewOrder): OrderId
     {
-        $order = $this->orderRepository->find($addLine->getOrderId());
+        $orderId = $this->createNewOrder();
+
+        return $this->addLine(AddLine::fromAddLineToNewOrder($addLineToNewOrder, $orderId));
+    }
+
+    private function createNewOrder(): OrderId
+    {
+        $order = Order::create($this->orderRepository->nextReference());
+
+        $this->orderRepository->save($order);
+
+        $this->eventDispatcher->dispatchAll($order->releaseEvents());
+
+        return $order->orderId;
+    }
+
+    public function addLine(AddLine $addLine): OrderId
+    {
+        $orderId = $addLine->getOrderId();
+        $order = $this->orderRepository->find($orderId);
+
         $variant = $this->findVariantDetailsForCart->findVariantForCart($addLine->getVariantId());
 
         // Lines are unique per variant.
@@ -73,6 +98,8 @@ final class CartApplication
         $this->orderRepository->save($order);
 
         $this->eventDispatcher->dispatchAll($order->releaseEvents());
+
+        return $orderId;
     }
 
     public function changeLineQuantity(ChangeLineQuantity $changeLineQuantity): void
@@ -102,26 +129,42 @@ final class CartApplication
         $this->eventDispatcher->dispatchAll($order->releaseEvents());
     }
 
-    public function chooseShippingCountry(ChooseShippingCountry $chooseShippingCountry): void
+    public function updateShippingAddress(UpdateShippingAddress $updateShippingAddress): void
     {
-        $order = $this->orderRepository->find($chooseShippingCountry->getOrderId());
+        $order = $this->orderRepository->find($updateShippingAddress->getOrderId());
 
-        $order->updateShippingAddress(
-            $order->getShippingAddress()->replaceCountry($chooseShippingCountry->getShippingCountry()->get())
-        );
-
-        // TODO: Maybe do the refresh-cart here? before the save.
+        // Get existing address_id, if not we create one here
+        $order->updateShippingAddress(ShippingAddress::create(
+            $order->orderId,
+            $updateShippingAddress->getAddress(),
+        ));
 
         $this->orderRepository->save($order);
 
         $this->eventDispatcher->dispatchAll($order->releaseEvents());
     }
 
-    public function chooseShippingAddress(ChooseShippingAddress $chooseShippingAddress): void
+    public function updateBillingAddress(UpdateBillingAddress $updateBillingAddress): void
     {
-        $order = $this->orderRepository->find($chooseShippingAddress->getOrderId());
+        $order = $this->orderRepository->find($updateBillingAddress->getOrderId());
 
-        $order->updateShippingAddress($chooseShippingAddress->getShippingAddress());
+        // Get existing address_id, if not we create one here
+        $order->updateBillingAddress(BillingAddress::create(
+            $order->orderId,
+            $updateBillingAddress->getAddress(),
+        ));
+
+        $this->orderRepository->save($order);
+
+        $this->eventDispatcher->dispatchAll($order->releaseEvents());
+    }
+
+    // TODO...
+    public function chooseCustomerShippingAddress(ChooseCustomerShippingAddress $chooseCustomerShippingAddress): void
+    {
+        $order = $this->orderRepository->find($chooseCustomerShippingAddress->getOrderId());
+
+        $order->updateShippingAddress($chooseCustomerShippingAddress->getAddress());
 
         // TODO: do the refresh-cart here? before the save.
 
@@ -130,11 +173,12 @@ final class CartApplication
         $this->eventDispatcher->dispatchAll($order->releaseEvents());
     }
 
-    public function chooseBillingAddress(ChooseBillingAddress $chooseBillingAddress): void
+    // TODO...
+    public function chooseCustomerBillingAddress(ChooseCustomerBillingAddress $chooseCustomerBillingAddress): void
     {
-        $order = $this->orderRepository->find($chooseBillingAddress->getOrderId());
+        $order = $this->orderRepository->find($chooseCustomerBillingAddress->getOrderId());
 
-        $order->updateBillingAddress($chooseBillingAddress->getBillingAddress());
+        $order->updateBillingAddress($chooseCustomerBillingAddress->getBillingAddress());
 
         // TODO: do the refresh-cart here? before the save.
 
@@ -149,9 +193,9 @@ final class CartApplication
         $order = $this->orderRepository->find($chooseShippingProfile->getOrderId());
 
         // Country of shipment
-        if(!$shippingCountry = $order->getShippingAddress()?->getCountry()){
-            throw new CouldNotSelectShippingCountryDueToMissingShippingCountry(
-                'Order ['.$order->orderId->get().'] missing shipping country that is required when selecting profile ' . $shippingProfile->shippingProfileId->get()
+        if(!$shippingCountry = $order->getShippingAddress()?->getAddress()->country){
+            throw new CouldNotSelectShippingProfileDueToMissingShippingCountry(
+                'Order ['.$order->orderId->get().'] missing a shipping country that is required when selecting a shipping profile ' . $shippingProfile->shippingProfileId->get()
             );
         }
 
@@ -175,15 +219,21 @@ final class CartApplication
             $existingShipping = $order->getShippings()[0];
             $existingShipping->updateShippingProfile($shippingProfile->shippingProfileId);
             $existingShipping->updateCost($shippingCost);
+            $existingShipping->addData($shippingProfile->getData());
 
             $order->updateShipping($existingShipping);
         } else {
-            $order->addShipping(Shipping::create(
+
+            $shipping = Shipping::create(
                 $order->orderId,
                 $this->orderRepository->nextShippingReference(),
                 $shippingProfile->shippingProfileId,
                 $shippingCost
-            ));
+            );
+
+            $shipping->addData($shippingProfile->getData());
+
+            $order->addShipping($shipping);
         }
 
         // TODO: Maybe do the refresh-cart here? before the save.
@@ -204,21 +254,53 @@ final class CartApplication
         $paymentMethod = $this->paymentMethodRepository->find($choosePaymentMethod->getPaymentMethodId());
         $order = $this->orderRepository->find($choosePaymentMethod->getOrderId());
 
-        // Currently no restrictions on payment selection... if any, this should be checked here.
-
-        $payment = Payment::create(
-            $order->orderId,
-            $paymentMethod->paymentMethodId,
-            PaymentCost::fromMoney(
-                $paymentMethod->getRate(),
-                TaxRate::fromString($this->config->getDefaultTaxRate()),
-                $this->config->doesPriceInputIncludesVat()
-            )
+        $paymentCost = PaymentCost::fromMoney(
+            $paymentMethod->getRate(),
+            TaxRate::fromString($this->config->getDefaultTaxRate()),
+            $this->config->doesPriceInputIncludesVat()
         );
 
+        // Currently no restrictions on payment selection... if any, this should be checked here.
+
+        if($payment = $order->getPayment()) {
+            $payment->updatePaymentMethod($paymentMethod->paymentMethodId);
+            $payment->updateCost($paymentCost);
+        } else {
+            $payment = Payment::create(
+                $order->orderId,
+                $this->orderRepository->nextPaymentReference(),
+                $paymentMethod->paymentMethodId,
+                $paymentCost
+            );
+        }
+
+        $payment->addData($paymentMethod->getData());
         $order->updatePayment($payment);
 
         // TODO: Maybe do the refresh-cart here? before the save.
+
+        $this->orderRepository->save($order);
+
+        $this->eventDispatcher->dispatchAll($order->releaseEvents());
+    }
+
+    public function updateShopper(UpdateShopper $updateShopper): void
+    {
+        $order = $this->orderRepository->find($updateShopper->getOrderId());
+
+        if($shopper = $order->getShopper()) {
+            $shopper->updateEmail($updateShopper->getEmail());
+            $shopper->updateBusiness($updateShopper->isBusiness());
+        } else {
+            $shopper = Shopper::create(
+                $this->orderRepository->nextShopperReference(),
+                $updateShopper->getEmail(),
+                $updateShopper->isBusiness()
+            );
+        }
+
+        $shopper->addData($updateShopper->getData());
+        $order->updateShopper($shopper);
 
         $this->orderRepository->save($order);
 
@@ -230,11 +312,20 @@ final class CartApplication
         $order = $this->orderRepository->find($chooseCustomer->getOrderId());
         $customer = $this->customerRepository->find($chooseCustomer->getCustomerId());
 
-        $shopper = Shopper::create();
+        if($shopper = $order->getShopper()) {
+            $shopper->updateEmail($customer->getEmail());
+            $shopper->updateBusiness($customer->isBusiness());
+        } else {
+            $shopper = Shopper::create(
+                $this->orderRepository->nextShopperReference(),
+                $customer->getEmail(),
+                $customer->isBusiness()
+            );
+        }
 
+        $shopper->updateCustomerId($customer->customerId);
+        $shopper->addData($customer->getData());
         $order->updateShopper($shopper);
-
-        // TODO: do the refresh-cart here? before the save.
 
         $this->orderRepository->save($order);
 

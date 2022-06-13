@@ -13,8 +13,8 @@ use Thinktomorrow\Trader\Domain\Model\Order\Discount\Discount;
 use Thinktomorrow\Trader\Domain\Common\Entity\RecordsChangelog;
 use Thinktomorrow\Trader\Domain\Model\Order\Events\OrderUpdated;
 use Thinktomorrow\Trader\Domain\Model\Order\Events\OrderCreated;
-use Thinktomorrow\Trader\Domain\Model\Order\Payment\BillingAddress;
-use Thinktomorrow\Trader\Domain\Model\Order\Shipping\ShippingAddress;
+use Thinktomorrow\Trader\Domain\Model\Order\Address\BillingAddress;
+use Thinktomorrow\Trader\Domain\Model\Order\Address\ShippingAddress;
 
 final class Order implements Aggregate
 {
@@ -54,9 +54,9 @@ final class Order implements Aggregate
         return $this->orderState;
     }
 
-    public function getShippingAddress(): ShippingAddress
+    public function getShippingAddress(): ?ShippingAddress
     {
-        return $this->shippingAddress ?? ShippingAddress::empty();
+        return $this->shippingAddress;
     }
 
     public function getShippings(): array
@@ -69,9 +69,9 @@ final class Order implements Aggregate
         return $this->payment;
     }
 
-    public function getBillingAddress(): BillingAddress
+    public function getBillingAddress(): ?BillingAddress
     {
-        return $this->billingAddress ?? BillingAddress::empty();
+        return $this->billingAddress;
     }
 
     public function getShopper(): ?Shopper
@@ -118,12 +118,26 @@ final class Order implements Aggregate
     public function getMappedData(): array
     {
         return [
-            'order_id'     => $this->orderId->get(),
-            'order_state'  => $this->orderState->value,
-            'total'        => $this->getTotal()->getMoney()->getAmount(),
-            'tax_total'    => $this->getTaxTotal()->getAmount(),
-            'includes_vat' => $this->getTotal()->includesVat(),
-            'data'         => json_encode($this->data),
+            'order_id'    => $this->orderId->get(),
+            'order_state' => $this->orderState->value,
+
+            'total'          => $this->getTotal()->getMoney()->getAmount(),
+            'tax_total'      => $this->getTaxTotal()->getAmount(),
+            'includes_vat'   => $this->getTotal()->includesVat(),
+            'subtotal'       => $this->getTotal()->includesVat()
+                ? $this->getSubTotal()->getIncludingVat()->getAmount()
+                : $this->getSubTotal()->getExcludingVat()->getAmount(),
+            'discount_total' => $this->getTotal()->includesVat()
+                ? $this->getDiscountTotal()->getIncludingVat()->getAmount()
+                : $this->getDiscountTotal()->getExcludingVat()->getAmount(),
+            'shipping_cost'  => $this->getTotal()->includesVat()
+                ? $this->getShippingCost()->getIncludingVat()->getAmount()
+                : $this->getShippingCost()->getExcludingVat()->getAmount(),
+            'payment_cost'   => $this->getTotal()->includesVat()
+                ? $this->getPaymentCost()->getIncludingVat()->getAmount()
+                : $this->getPaymentCost()->getExcludingVat()->getAmount(),
+
+            'data' => json_encode($this->data),
         ];
     }
 
@@ -133,8 +147,8 @@ final class Order implements Aggregate
             Line::class            => array_map(fn($line) => $line->getMappedData(), $this->lines),
             Discount::class        => array_map(fn($discount) => $discount->getMappedData(), $this->discounts),
             Shipping::class        => array_map(fn($shipping) => $shipping->getMappedData(), $this->shippings),
-            ShippingAddress::class => $this->shippingAddress?->toArray(),
-            BillingAddress::class  => $this->billingAddress?->toArray(),
+            ShippingAddress::class => $this->shippingAddress?->getMappedData(),
+            BillingAddress::class  => $this->billingAddress?->getMappedData(),
             Payment::class         => $this->payment?->getMappedData(),
             Shopper::class         => $this->shopper?->getMappedData(),
         ];
@@ -150,8 +164,8 @@ final class Order implements Aggregate
         $order->lines = array_map(fn($lineState) => Line::fromMappedData($lineState, $state), $childEntities[Line::class]);
         $order->discounts = array_map(fn($discountState) => Discount::fromMappedData($discountState, $state), $childEntities[Discount::class]);
         $order->shippings = array_map(fn($shippingState) => Shipping::fromMappedData($shippingState, $state), $childEntities[Shipping::class]);
-        $order->shippingAddress = $childEntities[ShippingAddress::class] ? ShippingAddress::fromArray($childEntities[ShippingAddress::class]) : null;
-        $order->billingAddress = $childEntities[BillingAddress::class] ? BillingAddress::fromArray($childEntities[BillingAddress::class]) : null;
+        $order->shippingAddress = $childEntities[ShippingAddress::class] ? ShippingAddress::fromMappedData($childEntities[ShippingAddress::class], $state) : null;
+        $order->billingAddress = $childEntities[BillingAddress::class] ? BillingAddress::fromMappedData($childEntities[BillingAddress::class], $state) : null;
         $order->payment = $childEntities[Payment::class] ? Payment::fromMappedData($childEntities[Payment::class], $state) : null;
         $order->shopper = $childEntities[Shopper::class] ? Shopper::fromMappedData($childEntities[Shopper::class], $state) : null;
 

@@ -5,6 +5,7 @@ namespace Tests\Infrastructure\Repositories;
 
 use Tests\Infrastructure\TestCase;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Thinktomorrow\Trader\Infrastructure\Test\TestContainer;
 use Thinktomorrow\Trader\Infrastructure\Laravel\Repositories\MysqlProductRepository;
 use Thinktomorrow\Trader\Infrastructure\Laravel\Repositories\MysqlVariantRepository;
 use Thinktomorrow\Trader\Infrastructure\Laravel\Repositories\MysqlCheckProductOptionsRepository;
@@ -17,7 +18,7 @@ final class CheckProductOptionsRepositoryTest extends TestCase
     public function it_can_check_if_option_combination_is_already_used()
     {
         $product = $this->createdProductWithOptions();
-        (new MysqlProductRepository(new MysqlVariantRepository()))->save($product);
+        (new MysqlProductRepository(new MysqlVariantRepository(new TestContainer())))->save($product);
 
         $variant = $product->getVariants()[0];
 

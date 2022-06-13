@@ -179,8 +179,10 @@ class CreateBasicTraderTables extends Migration
             $table->integer('total')->unsigned();
             $table->boolean('includes_vat');
             $table->integer('tax_total')->unsigned();
-            $table->json('billing_address')->nullable();
-            $table->json('shipping_address')->nullable();
+            $table->integer('subtotal')->unsigned();
+            $table->integer('discount_total')->unsigned();
+            $table->integer('shipping_cost')->unsigned();
+            $table->integer('payment_cost')->unsigned();
             $table->json('data')->nullable();
         });
 
@@ -244,6 +246,21 @@ class CreateBasicTraderTables extends Migration
 
             $table->foreign('order_id')->references('order_id')->on(static::PREFIX.'orders')->onDelete('cascade');
             $table->foreign('payment_method_id')->references('payment_method_id')->on(static::PREFIX.'payment_methods')->nullOnDelete();
+        });
+
+        Schema::create(static::PREFIX.'order_addresses', function (Blueprint $table)
+        {
+            $table->id('address_id');
+            $table->char('type');
+            $table->char('order_id', 36)->index();
+            $table->string('line_1')->nullable();
+            $table->string('line_2')->nullable();
+            $table->string('postal_code')->nullable();
+            $table->string('city')->nullable();
+            $table->string('country')->nullable();
+            $table->json('data')->nullable();
+
+            $table->foreign('order_id')->references('order_id')->on(static::PREFIX.'orders')->onDelete('cascade');
         });
 
         Schema::create(static::PREFIX.'order_events', function (Blueprint $table)

@@ -28,10 +28,10 @@ use Thinktomorrow\Trader\Domain\Model\Order\Events\OrderCreated;
 use Thinktomorrow\Trader\Domain\Model\Order\Events\OrderUpdated;
 use Thinktomorrow\Trader\Domain\Model\Order\Events\ShippingAdded;
 use Thinktomorrow\Trader\Domain\Model\Order\Shipping\ShippingCost;
-use Thinktomorrow\Trader\Domain\Model\Order\Payment\BillingAddress;
+use Thinktomorrow\Trader\Domain\Model\Order\Address\BillingAddress;
 use Thinktomorrow\Trader\Domain\Model\Order\Events\ShippingUpdated;
 use Thinktomorrow\Trader\Domain\Model\PaymentMethod\PaymentMethodId;
-use Thinktomorrow\Trader\Domain\Model\Order\Shipping\ShippingAddress;
+use Thinktomorrow\Trader\Domain\Model\Order\Address\ShippingAddress;
 use Thinktomorrow\Trader\Domain\Model\ShippingProfile\ShippingProfileId;
 
 class OrderTest extends TestCase
@@ -44,12 +44,16 @@ class OrderTest extends TestCase
         );
 
         $this->assertEquals([
-            'order_id' => $orderId->get(),
-            'order_state' => OrderState::cart_pending->value,
-            'total' => '0',
-            'tax_total' => '0',
-            'includes_vat' => true,
-            'data' => "[]",
+            'order_id'       => $orderId->get(),
+            'order_state'    => OrderState::cart_pending->value,
+            'total'          => '0',
+            'tax_total'      => '0',
+            'subtotal'       => '0',
+            'discount_total' => '0',
+            'shipping_cost'  => '0',
+            'payment_cost'   => '0',
+            'includes_vat'   => true,
+            'data'           => "[]",
         ], $order->getMappedData());
 
         $this->assertEquals([
@@ -68,8 +72,7 @@ class OrderTest extends TestCase
 
         $this->assertEquals(CustomerId::fromString('zzz'), $order->getShopper()->getCustomerId());
         $this->assertEquals(Email::fromString('ben@thinktomorrow.be'), $order->getShopper()->getEmail());
-        $this->assertEquals('Ben', $order->getShopper()->getFirstname());
-        $this->assertEquals('Cavens', $order->getShopper()->getLastname());
+        $this->assertFalse($order->getShopper()->isBusiness());
         $this->assertTrue($order->getShopper()->registerAfterCheckout());
 
         $this->assertEquals([
@@ -86,7 +89,7 @@ class OrderTest extends TestCase
             $order->orderId, // TODO: avoid this here or assert it is the same...
             $shippingId = ShippingId::fromString('qqqq'),
             ShippingProfileId::fromString('postnl_home'),
-            ShippingCost::fromScalars('23','EUR','1',false)
+            ShippingCost::fromScalars('23', 'EUR', '1', false)
         ));
 
         $this->assertCount(2, $order->getShippings());
@@ -104,7 +107,7 @@ class OrderTest extends TestCase
 
         /** @var \Thinktomorrow\Trader\Domain\Model\Order\Shipping\Shipping $shipping */
         $shipping = $order->getShippings()[0];
-        $shipping->updateCost($cost = ShippingCost::fromScalars('23','EUR','1',false));
+        $shipping->updateCost($cost = ShippingCost::fromScalars('23', 'EUR', '1', false));
 
         $order->updateShipping($shipping);
 
@@ -142,17 +145,18 @@ class OrderTest extends TestCase
         $order = $this->createdOrder();
 
         $addressPayload = [
-            'country' => 'NL',
-            'street' => 'example',
-            'number' => '12',
-            'bus' => 'bus 2',
-            'zipcode' => '1000',
-            'city' => 'Amsterdam',
+            'address_id'  => 'abc',
+            'country'     => 'NL',
+            'line_1'      => 'example 12',
+            'line_2'      => 'bus 2',
+            'postal_code' => '1000',
+            'city'        => 'Amsterdam',
+            'data'        => "[]",
         ];
 
-        $order->updateShippingAddress(ShippingAddress::fromArray($addressPayload));
+        $order->updateShippingAddress(ShippingAddress::fromMappedData($addressPayload, $order->getMappedData()));
 
-        $this->assertEquals(ShippingAddress::fromArray($addressPayload)->toArray(), $order->getChildEntities()[ShippingAddress::class]);
+        $this->assertEquals(ShippingAddress::fromMappedData($addressPayload, $order->getMappedData())->getMappedData(), $order->getChildEntities()[ShippingAddress::class]);
     }
 
     /** @test */
@@ -161,17 +165,18 @@ class OrderTest extends TestCase
         $order = $this->createdOrder();
 
         $addressPayload = [
-            'country' => 'FR',
-            'street' => 'rue de napoleon',
-            'number' => '222',
-            'bus' => 'bus 999',
-            'zipcode' => '3000',
-            'city' => 'Paris',
+            'address_id'  => 'def',
+            'country'     => 'FR',
+            'line_1'      => 'rue de napoleon 222',
+            'line_2'      => 'bus 999',
+            'postal_code' => '3000',
+            'city'        => 'Paris',
+            'data'        => "[]",
         ];
 
-        $order->updateBillingAddress(BillingAddress::fromArray($addressPayload));
+        $order->updateBillingAddress(BillingAddress::fromMappedData($addressPayload, $order->getMappedData()));
 
-        $this->assertEquals(BillingAddress::fromArray($addressPayload)->toArray(), $order->getChildEntities()[BillingAddress::class]);
+        $this->assertEquals(BillingAddress::fromMappedData($addressPayload, $order->getMappedData())->getMappedData(), $order->getChildEntities()[BillingAddress::class]);
     }
 
     /** @test */
@@ -206,7 +211,7 @@ class OrderTest extends TestCase
         $order->addOrUpdateLine(
             LineId::fromString('abc'),
             VariantId::fromString('yyy'),
-            $linePrice = LinePrice::fromScalars('200','EUR','10', true),
+            $linePrice = LinePrice::fromScalars('200', 'EUR', '10', true),
             Quantity::fromInt(3),
             ['foo' => 'bar']
         );
@@ -256,9 +261,9 @@ class OrderTest extends TestCase
 
         $order->addDiscount(
             Discount::fromMappedData([
-                'discount_id' => 'ababab',
-                'total' => '32',
-                'tax_rate' => '9',
+                'discount_id'  => 'ababab',
+                'total'        => '32',
+                'tax_rate'     => '9',
                 'includes_vat' => true,
             ], [
                 'order_id' => $order->orderId->get(),

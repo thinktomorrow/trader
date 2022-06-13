@@ -16,11 +16,15 @@ interface Price
 
     public static function zero(): static;
 
+    public function getMoney(): Money;
+
     public function getIncludingVat(): Money;
 
     public function getExcludingVat(): Money;
 
     public function getTaxRate(): TaxRate;
+
+    public function getTaxTotal(): Money;
 
     public function includesVat(): bool;
 
@@ -29,4 +33,12 @@ interface Price
     public function add(Price $otherPrice): static;
 
     public function subtract(Price $otherPrice): static;
+
+    public function changeTaxRate(TaxRate $taxRate): static;
+
+    /** Allows to add a price with a potential different tax rate. */
+    public function addDifferent(Price $otherPrice): static;
+
+    /** Allows to subtract a price with a potential different tax rate. */
+    public function subtractDifferent(Price $otherPrice): static;
 }

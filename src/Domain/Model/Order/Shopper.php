@@ -4,16 +4,18 @@ declare(strict_types=1);
 namespace Thinktomorrow\Trader\Domain\Model\Order;
 
 use Thinktomorrow\Trader\Domain\Common\Email;
+use Thinktomorrow\Trader\Domain\Common\Entity\HasData;
 use Thinktomorrow\Trader\Domain\Common\Entity\ChildEntity;
 use Thinktomorrow\Trader\Domain\Model\Customer\CustomerId;
 
 class Shopper implements ChildEntity
 {
+    use HasData;
+
     public readonly ShopperId $shopperId;
     private Email $email;
-    private string $firstname;
-    private string $lastname;
     private ?CustomerId $customerId = null;
+    private bool $isBusiness;
 
     /**
      * Flag to indicate that this guest shopper
@@ -26,14 +28,12 @@ class Shopper implements ChildEntity
 
     }
 
-    public static function create(ShopperId $shopperId, Email $email, string $firstname, string $lastname): static
+    public static function create(ShopperId $shopperId, Email $email, bool $isBusiness): static
     {
-        // locale, preferences, customer -> fixed discounts, email, firstname, lastname
         $shopper = new static();
         $shopper->shopperId = $shopperId;
         $shopper->email = $email;
-        $shopper->firstname = $firstname;
-        $shopper->lastname = $lastname;
+        $shopper->isBusiness = $isBusiness;
 
         return $shopper;
     }
@@ -41,16 +41,6 @@ class Shopper implements ChildEntity
     public function getEmail(): Email
     {
         return $this->email;
-    }
-
-    public function getFirstname(): string
-    {
-        return $this->firstname;
-    }
-
-    public function getLastname(): string
-    {
-        return $this->lastname;
     }
 
     public function getCustomerId(): ?CustomerId
@@ -61,6 +51,21 @@ class Shopper implements ChildEntity
     public function updateCustomerId(CustomerId $customerId): void
     {
         $this->customerId = $customerId;
+    }
+
+    public function updateEmail(Email $email): void
+    {
+        $this->email = $email;
+    }
+
+    public function updateBusiness(bool $isBusiness): void
+    {
+        $this->isBusiness = $isBusiness;
+    }
+
+    public function isBusiness(): bool
+    {
+        return $this->isBusiness;
     }
 
     public function updateRegisterAfterCheckout(bool $registerAfterCheckout): void
@@ -81,12 +86,12 @@ class Shopper implements ChildEntity
     public function getMappedData(): array
     {
         return [
-            'shopper_id'                   => $this->shopperId->get(),
+            'shopper_id'              => $this->shopperId->get(),
             'email'                   => $this->email->get(),
-            'firstname'               => $this->firstname,
-            'lastname'                => $this->lastname,
+            'is_business'             => $this->isBusiness,
             'register_after_checkout' => $this->registerAfterCheckout,
             'customer_id'             => $this->customerId?->get(),
+            'data'                    => json_encode($this->data),
         ];
     }
 
@@ -95,10 +100,10 @@ class Shopper implements ChildEntity
         $shopper = new static();
         $shopper->shopperId = ShopperId::fromString($state['shopper_id']);
         $shopper->email = Email::fromString($state['email']);
-        $shopper->firstname = $state['firstname'];
-        $shopper->lastname = $state['lastname'];
+        $shopper->isBusiness = $state['is_business'];
         $shopper->registerAfterCheckout = $state['register_after_checkout'];
         $shopper->customerId = $state['customer_id'] ? CustomerId::fromString($state['customer_id']) : null;
+        $shopper->data = json_decode($state['data'], true);
 
         return $shopper;
     }

@@ -11,13 +11,66 @@ use Thinktomorrow\Trader\Domain\Common\Taxes\TaxRateTotals;
 class TaxRateTotalsTest extends TestCase
 {
     /** @test */
+    public function it_can_sum_up_taxes()
+    {
+        $sum = TaxRateTotals::zero();
+
+        $sum = $sum->addTaxableTotal(TaxRate::fromString('6'), Money::EUR(100));
+        $sum = $sum->addTaxableTotal(TaxRate::fromString('6'), Money::EUR(100));
+        $sum = $sum->addTaxableTotal(TaxRate::fromString('20'), Money::EUR(100));
+
+        $this->assertCount(2, $sum->get());
+        $this->assertEquals(Money::EUR(300), $sum->getTaxableTotal());
+        $this->assertEquals(Money::EUR(32), $sum->getTaxTotal());
+        $this->assertEquals(TaxRate::fromString('6'), $sum->find(TaxRate::fromString('6'))->getTaxRate());
+        $this->assertEquals(TaxRate::fromString('20'), $sum->find(TaxRate::fromString('20'))->getTaxRate());
+        $this->assertEquals(Money::EUR(200), $sum->find(TaxRate::fromString('6'))->getTaxableTotal());
+        $this->assertEquals(Money::EUR(100), $sum->find(TaxRate::fromString('20'))->getTaxableTotal());
+    }
+
+    /** @test */
+    public function it_can_subtract_taxes()
+    {
+        $sum = TaxRateTotals::zero();
+
+        $sum = $sum->addTaxableTotal(TaxRate::fromString('6'), Money::EUR(100));
+        $sum = $sum->addTaxableTotal(TaxRate::fromString('6'), Money::EUR(100));
+        $sum = $sum->addTaxableTotal(TaxRate::fromString('20'), Money::EUR(100));
+
+        $this->assertEquals(Money::EUR(100), $sum->find(TaxRate::fromString('20'))->getTaxableTotal());
+        $this->assertEquals(Money::EUR(300), $sum->getTaxableTotal());
+
+        $sum = $sum->subtractTaxableTotal(TaxRate::fromString('20'), Money::EUR(60));
+        $this->assertEquals(Money::EUR(40), $sum->find(TaxRate::fromString('20'))->getTaxableTotal());
+        $this->assertEquals(Money::EUR(240), $sum->getTaxableTotal());
+
+        $sum = $sum->subtractTaxableTotal(TaxRate::fromString('6'), Money::EUR(60));
+        $this->assertEquals(Money::EUR(140), $sum->find(TaxRate::fromString('6'))->getTaxableTotal());
+        $this->assertEquals(Money::EUR(180), $sum->getTaxableTotal());
+    }
+
+    /** @test */
+    public function it_cannot_subtract_below_zero()
+    {
+        $sum = TaxRateTotals::zero();
+
+        $sum = $sum->addTaxableTotal(TaxRate::fromString('6'), Money::EUR(100));
+        $sum = $sum->subtractTaxableTotal(TaxRate::fromString('6'), Money::EUR(200));
+        $this->assertEquals(Money::EUR(0), $sum->find(TaxRate::fromString('6'))->getTaxableTotal());
+        $this->assertEquals(Money::EUR(0), $sum->getTaxableTotal());
+        $this->assertEquals(Money::EUR(0), $sum->getTaxTotal());
+    }
+
+    /** @test */
     public function it_can_sum_up_taxes_of_taxable_items()
     {
         $sum = TaxRateTotals::fromTaxables($this->dummyTaxablesEqualTaxRate());
 
         $this->assertCount(1, $sum->get());
-        $this->assertEquals(TaxRate::fromString('6')->toPercentage(), $sum->get()[6]['percent']);
-        $this->assertEquals(Money::EUR(100 + 100), $sum->get()[6]['total']);
+        $this->assertEquals(Money::EUR(200), $sum->getTaxableTotal());
+        $this->assertEquals(Money::EUR(12), $sum->getTaxTotal());
+        $this->assertEquals(TaxRate::fromString('6'), $sum->find(TaxRate::fromString('6'))->getTaxRate());
+        $this->assertEquals(Money::EUR(200), $sum->find(TaxRate::fromString('6'))->getTaxableTotal());
     }
 
     /** @test */
@@ -26,10 +79,12 @@ class TaxRateTotalsTest extends TestCase
         $sum = TaxRateTotals::fromTaxables($this->dummyTaxables());
 
         $this->assertCount(2, $sum->get());
-        $this->assertEquals(TaxRate::fromString('6')->toPercentage(), $sum->get()[6]['percent']);
-        $this->assertEquals(TaxRate::fromString('12')->toPercentage(), $sum->get()[12]['percent']);
-        $this->assertEquals(Money::EUR(100), $sum->get()[6]['total']);
-        $this->assertEquals(Money::EUR(100 + 100), $sum->get()[12]['total']);
+        $this->assertEquals(Money::EUR(300), $sum->getTaxableTotal());
+        $this->assertEquals(Money::EUR(12 + 12 + 6), $sum->getTaxTotal());
+        $this->assertEquals(TaxRate::fromString('6'), $sum->find(TaxRate::fromString('6'))->getTaxRate());
+        $this->assertEquals(TaxRate::fromString('12'), $sum->find(TaxRate::fromString('12'))->getTaxRate());
+        $this->assertEquals(Money::EUR(100), $sum->find(TaxRate::fromString('6'))->getTaxableTotal());
+        $this->assertEquals(Money::EUR(200), $sum->find(TaxRate::fromString('12'))->getTaxableTotal());
     }
 
     /** @test */
@@ -37,7 +92,7 @@ class TaxRateTotalsTest extends TestCase
     {
         $sum = TaxRateTotals::fromTaxables($this->dummyTaxablesEqualTaxRate());
 
-        $this->assertEquals(Money::EUR(11), $sum->get()[6]['tax']);
+        $this->assertEquals(Money::EUR(12), $sum->find(TaxRate::fromString('6'))->getTaxTotal());
     }
 
     /** @test */
@@ -45,8 +100,8 @@ class TaxRateTotalsTest extends TestCase
     {
         $sum = TaxRateTotals::fromTaxables($this->dummyTaxables());
 
-        $this->assertEquals(Money::EUR(6), $sum->get()[6]['tax']);
-        $this->assertEquals(Money::EUR(21), $sum->get()[12]['tax']);
+        $this->assertEquals(Money::EUR(6), $sum->find(TaxRate::fromString('6'))->getTaxTotal());
+        $this->assertEquals(Money::EUR(24), $sum->find(TaxRate::fromString('12'))->getTaxTotal());
     }
 
     private function dummyTaxablesEqualTaxRate(): array

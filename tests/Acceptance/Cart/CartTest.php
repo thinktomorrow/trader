@@ -3,8 +3,7 @@ declare(strict_types=1);
 
 namespace Tests\Acceptance\Cart;
 
-use Thinktomorrow\Trader\Application\Cart\ChooseBillingAddress;
-use Thinktomorrow\Trader\Application\Cart\ChooseShippingAddress;
+use Thinktomorrow\Trader\Application\Cart\UpdateBillingAddress;
 
 class CartTest extends CartContext
 {
@@ -15,6 +14,14 @@ class CartTest extends CartContext
         $this->whenIAddTheVariantToTheCart('lightsaber-123', 2);
         $this->thenIShouldHaveProductInTheCart(1, 2);
         $this->thenTheOverallCartPriceShouldBeEur(10);
+    }
+
+    /** @test */
+    public function in_order_to_buy_a_product_as_a_visitor_the_order_is_created_when_I_add_a_first_item_in_my_cart()
+    {
+        $this->givenThereIsAProductWhichCostsEur('lightsaber', 5);
+        $this->whenIAddTheFirstVariantToTheCart('lightsaber-123', 1);
+        $this->thenIShouldHaveProductInTheCart(1, 1, 'xxx-123');
     }
 
     /** @test */
@@ -75,30 +82,29 @@ class CartTest extends CartContext
         $this->givenThereIsAProductWhichCostsEur('lightsaber', 5);
         $this->whenIAddTheVariantToTheCart('lightsaber-123', 1);
         $this->thenIShouldHaveProductInTheCart(1, 1);
+
+        $this->whenIChooseShipping('bpost_home');
+        $this->thenIShouldHaveAShippingCost(2);
         $this->thenTheOverallCartPriceShouldBeEur(7);
     }
 
     /** @test */
     public function shipping_address_can_be_added()
     {
-        $address = ['NL', 'example', '12', 'bus 2', '1000', 'Amsterdam'];
+        $this->whenIAddShippingAddress('NL', 'example 12', 'bus 2', '1000', 'Amsterdam');
 
-        $this->cartApplication->chooseShippingAddress(new ChooseShippingAddress(
-            $this->getOrder()->orderId->get(), ...$address
-        ));
-
-        $this->assertEquals($address, array_values($this->getOrder()->getShippingAddress()->toArray()));
+        $this->assertEquals(['NL', 'example 12', 'bus 2', '1000', 'Amsterdam'], array_values($this->getOrder()->getShippingAddress()->getAddress()->toArray()));
     }
 
     /** @test */
     public function billing_address_can_be_added()
     {
-        $address = ['NL', 'example', '12', 'bus 2', '1000', 'Amsterdam'];
+        $address = ['NL', 'example 12', 'bus 2', '1000', 'Amsterdam'];
 
-        $this->cartApplication->chooseBillingAddress(new ChooseBillingAddress(
+        $this->cartApplication->updateBillingAddress(new UpdateBillingAddress(
             $this->getOrder()->orderId->get(), ...$address
         ));
 
-        $this->assertEquals($address, array_values($this->getOrder()->getBillingAddress()->toArray()));
+        $this->assertEquals($address, array_values($this->getOrder()->getBillingAddress()->getAddress()->toArray()));
     }
 }

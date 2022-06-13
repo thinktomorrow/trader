@@ -7,7 +7,7 @@ use Money\Money;
 use PHPUnit\Framework\TestCase;
 use Thinktomorrow\Trader\Domain\Model\ShippingProfile\Tariff;
 use Thinktomorrow\Trader\Domain\Model\ShippingProfile\TariffNumber;
-use Thinktomorrow\Trader\Domain\Model\Order\Shipping\ShippingCountry;
+use Thinktomorrow\Trader\Domain\Model\Order\Address\ShippingCountry;
 use Thinktomorrow\Trader\Domain\Model\ShippingProfile\ShippingProfile;
 use Thinktomorrow\Trader\Domain\Model\ShippingProfile\ShippingProfileId;
 
@@ -22,6 +22,7 @@ class ShippingProfileTest extends TestCase
 
         $this->assertEquals([
             'shipping_profile_id' => $shippingProfileId->get(),
+            'data' => "[]",
         ], $shippingProfile->getMappedData());
 
         $this->assertEquals([
@@ -36,6 +37,7 @@ class ShippingProfileTest extends TestCase
         $shippingProfile = $this->createdShippingProfile();
 
         $this->assertEquals(ShippingProfileId::fromString('yyy'), $shippingProfile->shippingProfileId);
+        $this->assertEquals('bar', $shippingProfile->getData('foo'));
         $this->assertCount(2, $shippingProfile->getChildEntities()[Tariff::class]);
         $this->assertEquals([
             'shipping_profile_id'    => 'yyy',
@@ -102,6 +104,7 @@ class ShippingProfileTest extends TestCase
     {
         return ShippingProfile::fromMappedData([
             'shipping_profile_id' => 'yyy',
+            'data' => json_encode(['foo' => 'bar']),
         ], [
             Tariff::class => [
                 [

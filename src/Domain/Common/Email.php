@@ -25,4 +25,9 @@ class Email
     {
         return $this->email;
     }
+
+    public function equals($other): bool
+    {
+        return (get_class($other) === get_class($this) && $other->email === $this->email);
+    }
 }

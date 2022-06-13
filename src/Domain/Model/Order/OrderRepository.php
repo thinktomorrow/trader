@@ -3,7 +3,9 @@ declare(strict_types=1);
 
 namespace Thinktomorrow\Trader\Domain\Model\Order;
 
+use Thinktomorrow\Trader\Domain\Model\Order\Payment\PaymentId;
 use Thinktomorrow\Trader\Domain\Model\Order\Shipping\ShippingId;
+use Thinktomorrow\Trader\Domain\Model\Order\Address\OrderAddressId;
 
 interface OrderRepository
 {
@@ -16,4 +18,8 @@ interface OrderRepository
     public function nextReference(): OrderId;
 
     public function nextShippingReference(): ShippingId;
+
+    public function nextPaymentReference(): PaymentId;
+
+    public function nextShopperReference(): ShopperId;
 }

@@ -7,7 +7,6 @@ use Money\Money;
 use Thinktomorrow\Trader\Domain\Common\Email;
 use Illuminate\Contracts\Debug\ExceptionHandler;
 use Thinktomorrow\Trader\Domain\Model\Order\Order;
-use Thinktomorrow\Trader\Domain\Model\Taxon\Taxon;
 use Thinktomorrow\Trader\Domain\Model\Order\Shopper;
 use Thinktomorrow\Trader\Domain\Common\Taxes\TaxRate;
 use Thinktomorrow\Trader\Domain\Model\Order\Line\Line;
@@ -20,9 +19,9 @@ use Thinktomorrow\Trader\Domain\Model\Customer\CustomerId;
 use Thinktomorrow\Trader\Application\Product\CreateProduct;
 use Thinktomorrow\Trader\Application\Product\CreateVariant;
 use Thinktomorrow\Trader\Domain\Model\Product\ProductState;
+use Thinktomorrow\Trader\Domain\Common\Address\AddressType;
 use Thinktomorrow\Trader\Domain\Model\Order\Payment\Payment;
 use Thinktomorrow\Trader\Domain\Model\Product\Option\Option;
-use Thinktomorrow\Trader\Domain\Model\Taxon\TaxonRepository;
 use Thinktomorrow\Trader\Application\Taxon\TaxonApplication;
 use Thinktomorrow\Trader\Domain\Model\Product\Variant\Variant;
 use Thinktomorrow\Trader\Domain\Model\Order\Discount\Discount;
@@ -35,10 +34,10 @@ use Thinktomorrow\Trader\Domain\Model\Order\Payment\PaymentState;
 use Thinktomorrow\Trader\Domain\Model\Product\Option\OptionValue;
 use Thinktomorrow\Trader\Domain\Model\CustomerLogin\CustomerLogin;
 use Thinktomorrow\Trader\Domain\Model\Customer\CustomerRepository;
-use Thinktomorrow\Trader\Domain\Model\Order\Payment\BillingAddress;
+use Thinktomorrow\Trader\Domain\Model\Order\Address\BillingAddress;
 use Thinktomorrow\Trader\Domain\Model\Order\Shipping\ShippingState;
 use Thinktomorrow\Trader\Domain\Model\Product\Option\OptionValueId;
-use Thinktomorrow\Trader\Domain\Model\Order\Shipping\ShippingAddress;
+use Thinktomorrow\Trader\Domain\Model\Order\Address\ShippingAddress;
 use Thinktomorrow\Trader\Domain\Model\Product\Variant\VariantUnitPrice;
 use Thinktomorrow\Trader\Domain\Model\Product\Variant\VariantSalePrice;
 use Thinktomorrow\Trader\Domain\Model\CustomerLogin\CustomerLoginRepository;
@@ -91,19 +90,19 @@ trait TestHelpers
             ],
             ShippingAddress::class => [
                 'country' => 'BE',
-                'street' => 'Lierseweg',
-                'number' => '81',
-                'bus' => null,
-                'zipcode' => '2200',
+                'line_1' => 'Lierseweg 81',
+                'line_2' => null,
+                'postal_code' => '2200',
                 'city' => 'Herentals',
+                'data' => "[]",
             ],
             BillingAddress::class => [
                 'country' => 'NL',
-                'street' => 'example',
-                'number' => '12',
-                'bus' => 'bus 2',
-                'zipcode' => '1000',
+                'line_1' => 'example 12',
+                'line_2' => 'bus 2',
+                'postal_code' => '1000',
                 'city' => 'Amsterdam',
+                'data' => "[]",
             ],
             Discount::class => [
                 [
@@ -137,10 +136,10 @@ trait TestHelpers
             Shopper::class => [
                 'shopper_id' => 'abcdef',
                 'email' => 'ben@thinktomorrow.be',
-                'firstname' => 'Ben',
-                'lastname' => 'Cavens',
+                'is_business' => false,
                 'register_after_checkout' => true,
                 'customer_id' => null,
+                'data' => "[]",
             ],
         ]);
     }

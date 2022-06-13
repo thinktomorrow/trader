@@ -4,8 +4,10 @@ declare(strict_types=1);
 namespace Tests\Acceptance\Cart;
 
 use Money\Money;
+use Illuminate\Support\Str;
 use PHPUnit\Framework\Assert;
-use PHPUnit\Framework\TestCase;
+use Tests\Acceptance\TestCase;
+use Thinktomorrow\Trader\Domain\Common\Email;
 use Thinktomorrow\Trader\Domain\Common\Cash\Cash;
 use Thinktomorrow\Trader\Domain\Model\Order\Order;
 use Thinktomorrow\Trader\Domain\Model\Order\OrderId;
@@ -15,25 +17,35 @@ use Thinktomorrow\Trader\Domain\Model\Product\Product;
 use Thinktomorrow\Trader\Application\Cart\Line\AddLine;
 use Thinktomorrow\Trader\Domain\Model\Product\ProductId;
 use Thinktomorrow\Trader\Domain\Model\Order\Line\LineId;
+use Thinktomorrow\Trader\Application\Cart\UpdateShopper;
+use Thinktomorrow\Trader\Domain\Model\Customer\Customer;
+use Thinktomorrow\Trader\Application\Cart\ChooseCustomer;
 use Thinktomorrow\Trader\Domain\Model\Order\Line\Quantity;
 use Thinktomorrow\Trader\Application\Cart\CartApplication;
 use Thinktomorrow\Trader\Application\Cart\Line\RemoveLine;
+use Thinktomorrow\Trader\Domain\Model\Customer\CustomerId;
 use Thinktomorrow\Trader\Infrastructure\Test\TestContainer;
 use Thinktomorrow\Trader\Domain\Model\Product\Variant\Variant;
 use Thinktomorrow\Trader\Infrastructure\Test\TestTraderConfig;
+use Thinktomorrow\Trader\Application\Cart\ChoosePaymentMethod;
+use Thinktomorrow\Trader\Application\Cart\UpdateBillingAddress;
 use Thinktomorrow\Trader\Domain\Model\Product\Variant\VariantId;
 use Thinktomorrow\Trader\Application\Cart\ChooseShippingProfile;
 use Thinktomorrow\Trader\Infrastructure\Test\EventDispatcherSpy;
-use Thinktomorrow\Trader\Application\Cart\ChooseShippingCountry;
+use Thinktomorrow\Trader\Application\Cart\UpdateShippingAddress;
+use Thinktomorrow\Trader\Application\Cart\Line\AddLineToNewOrder;
 use Thinktomorrow\Trader\Application\Cart\Line\ChangeLineQuantity;
+use Thinktomorrow\Trader\Domain\Model\PaymentMethod\PaymentMethod;
 use Thinktomorrow\Trader\Domain\Model\ShippingProfile\TariffNumber;
-use Thinktomorrow\Trader\Domain\Model\Order\Shipping\ShippingCountry;
+use Thinktomorrow\Trader\Domain\Model\Order\Address\ShippingCountry;
+use Thinktomorrow\Trader\Domain\Model\PaymentMethod\PaymentMethodId;
 use Thinktomorrow\Trader\Domain\Model\ShippingProfile\ShippingProfile;
 use Thinktomorrow\Trader\Domain\Model\Product\Variant\VariantSalePrice;
 use Thinktomorrow\Trader\Domain\Model\Product\Variant\VariantUnitPrice;
 use Thinktomorrow\Trader\Domain\Model\ShippingProfile\ShippingProfileId;
 use Thinktomorrow\Trader\Domain\Model\Order\Exceptions\CouldNotFindOrder;
 use Thinktomorrow\Trader\Application\RefreshCart\Adjusters\AdjustShipping;
+use Thinktomorrow\Trader\Infrastructure\Test\Repositories\InMemoryCartRepository;
 use Thinktomorrow\Trader\Infrastructure\Test\Repositories\InMemoryOrderRepository;
 use Thinktomorrow\Trader\Infrastructure\Test\Repositories\InMemoryProductRepository;
 use Thinktomorrow\Trader\Infrastructure\Test\Repositories\InMemoryVariantRepository;
@@ -48,20 +60,26 @@ abstract class CartContext extends TestCase
     protected InMemoryOrderRepository $orderRepository;
     protected InMemoryShippingProfileRepository $shippingProfileRepository;
     protected InMemoryVariantRepository $variantRepository;
+    protected InMemoryCartRepository $cartRepository;
+    protected InMemoryPaymentMethodRepository $paymentMethodRepository;
+    protected InMemoryCustomerRepository $customerRepository;
 
-    public function setUp(): void
+    protected function setUp(): void
     {
+        parent::setUp();
+
         $this->cartApplication = new CartApplication(
             new TestTraderConfig(),
             $this->variantRepository = new InMemoryVariantRepository(),
             $this->orderRepository = new InMemoryOrderRepository(),
             $this->shippingProfileRepository = new InMemoryShippingProfileRepository(),
-            new InMemoryPaymentMethodRepository(),
-            new InMemoryCustomerRepository(),
+            $this->paymentMethodRepository = new InMemoryPaymentMethodRepository(),
+            $this->customerRepository = new InMemoryCustomerRepository(),
             new EventDispatcherSpy(),
         );
 
         $this->productRepository = new InMemoryProductRepository();
+        $this->cartRepository = new InMemoryCartRepository();
 
         // Container bindings
         (new TestContainer())->add(AdjustShipping::class, new AdjustShipping(
@@ -83,20 +101,25 @@ abstract class CartContext extends TestCase
         $this->variantRepository->clear();
         $this->orderRepository->clear();
         $this->shippingProfileRepository->clear();
+        $this->paymentMethodRepository->clear();
     }
 
     protected function givenThereIsAProductWhichCostsEur($productTitle, $price)
     {
         // Create a product
         $product = Product::create(ProductId::fromString($productTitle));
-        $product->createVariant(Variant::create(
+
+        $variant = Variant::create(
             ProductId::fromString($productTitle),
             VariantId::fromString($productTitle . '-123'),
             VariantUnitPrice::fromMoney(
                 Cash::make(1000), TaxRate::fromString('20'), true
             ),
             VariantSalePrice::fromMoney(Money::EUR($price * 100), TaxRate::fromString('20'), true),
-        ));
+        );
+
+        $variant->addData(['title' => ['nl' => $productTitle . ' variant']]);
+        $product->createVariant($variant);
 
         $this->productRepository->save($product);
 
@@ -108,12 +131,13 @@ abstract class CartContext extends TestCase
     {
         $order = $this->getOrder();
 
-        $this->cartApplication->chooseShippingCountry(new ChooseShippingCountry($order->orderId->get(), $country));
+        $this->cartApplication->updateShippingAddress(new UpdateShippingAddress($order->orderId->get(), $country));
     }
 
-    public function givenShippingCostsForAPurchaseOfEur($shippingCost, $from, $to, array $countries = ['BE'])
+    public function givenShippingCostsForAPurchaseOfEur($shippingCost, $from, $to, array $countries = ['BE'], string $shippingProfileId = 'bpost_home')
     {
-        $shippingProfile = ShippingProfile::create(ShippingProfileId::fromString('bpost_home'));
+        $shippingProfile = ShippingProfile::create(ShippingProfileId::fromString($shippingProfileId));
+        $shippingProfile->addData(['title' => ['nl' => Str::headline($shippingProfileId)]]);
 
         foreach($countries as $country) {
             $shippingProfile->addCountry(ShippingCountry::fromString($country));
@@ -127,11 +151,25 @@ abstract class CartContext extends TestCase
         );
 
         $this->shippingProfileRepository->save($shippingProfile);
+    }
 
-        $order = $this->getOrder();
+    public function givenPaymentMethod($paymentRate, string $paymentMethodId = 'visa')
+    {
+        $paymentMethod = PaymentMethod::create(PaymentMethodId::fromString($paymentMethodId), Cash::make($paymentRate * 100));
+        $paymentMethod->addData(['title' => ['nl' => Str::headline($paymentMethodId)]]);
 
-        // Choose this shipping profile for the cart
-        $this->cartApplication->chooseShippingProfile(new ChooseShippingProfile($order->orderId->get(), $shippingProfile->shippingProfileId->get()));
+       $this->paymentMethodRepository->save($paymentMethod);
+    }
+
+    public function givenACustomerExists(string $email, bool $is_business = false)
+    {
+        $customer = Customer::create(
+            $this->customerRepository->nextReference(),
+            Email::fromString($email),
+            $is_business
+        );
+
+        $this->customerRepository->save($customer);
     }
 
     protected function whenIAddTheVariantToTheCart($productVariantId, $quantity = 1, array $data = [])
@@ -150,6 +188,28 @@ abstract class CartContext extends TestCase
 
         $checkFlag = false;
         $lines = $this->orderRepository->find($order->orderId)->getChildEntities()[Line::class];
+        foreach($lines as $line) {
+            if($line['variant_id'] == $productVariantId) {
+                $checkFlag = true;
+            }
+        }
+
+        if(!$checkFlag){
+            throw new \Exception('Cartitem presence check failed. No line found by ' . $productVariantId);
+        }
+    }
+
+    protected function whenIAddTheFirstVariantToTheCart($productVariantId, $quantity = 1, array $data = [])
+    {
+        // Add product to a new order
+        $orderId = $this->cartApplication->addLineToNewOrder(new AddLineToNewOrder(
+            VariantId::fromString($productVariantId)->get(),
+            Quantity::fromInt((int)$quantity)->asInt(),
+            $data
+        ));
+
+        $checkFlag = false;
+        $lines = $this->orderRepository->find($orderId)->getChildEntities()[Line::class];
         foreach($lines as $line) {
             if($line['variant_id'] == $productVariantId) {
                 $checkFlag = true;
@@ -200,15 +260,80 @@ abstract class CartContext extends TestCase
         ));
     }
 
-    protected function thenIShouldHaveProductInTheCart($times, $quantity)
+    protected function whenIEnterShopperDetails(string $email, bool $is_business = false, array $data = [])
     {
-        $order = $this->orderRepository->find(OrderId::fromString('xxx'));
+        $order = $this->getOrder();
+
+        $this->cartApplication->updateShopper(new UpdateShopper(
+            $order->orderId->get(),
+            $email,
+            $is_business,
+            $data,
+        ));
+
+        $this->assertNotNull($order->getShopper());
+    }
+
+    protected function whenIChooseCustomer(string $email)
+    {
+        $customer = $this->customerRepository->findByEmail(Email::fromString($email));
+
+        $this->cartApplication->chooseCustomer(new ChooseCustomer(
+            $this->getOrder()->orderId->get(),
+            $customer->customerId->get(),
+        ));
+    }
+
+    protected function thenIShouldHaveProductInTheCart($times, $quantity, string $orderId = 'xxx')
+    {
+        $order = $this->orderRepository->find(OrderId::fromString($orderId));
         $lines = $this->orderRepository->find($order->orderId)->getChildEntities()[Line::class];
 
         Assert::assertCount((int) $times, $lines);
         if(count($lines) > 0) {
             Assert::assertEquals((int) $quantity, $lines[0]['quantity']);
         }
+    }
+
+    protected function thenIShouldHaveAShippingCost($cost)
+    {
+        $this->assertEquals(Cash::make($cost * 100), $this->getOrder()->getShippingCost()->getIncludingVat());
+    }
+
+    protected function whenIAddShippingAddress(?string $country = null, ?string $line1 = null, ?string $line2 = null, ?string $postalCode = null, ?string $city = null)
+    {
+        $this->cartApplication->updateShippingAddress(new UpdateShippingAddress(
+            $this->getOrder()->orderId->get(), $country, $line1, $line2, $postalCode, $city
+        ));
+
+        $this->assertEquals([$country, $line1, $line2, $postalCode, $city], array_values($this->getOrder()->getShippingAddress()->getAddress()->toArray()));
+    }
+
+    protected function whenIAddBillingAddress(?string $country = null, ?string $line1 = null, ?string $line2 = null, ?string $postalCode = null, ?string $city = null)
+    {
+        $this->cartApplication->updateBillingAddress(new UpdateBillingAddress(
+            $this->getOrder()->orderId->get(), $country, $line1, $line2, $postalCode, $city
+        ));
+
+        $this->assertEquals([$country, $line1, $line2, $postalCode, $city], array_values($this->getOrder()->getBillingAddress()->getAddress()->toArray()));
+    }
+
+    protected function whenIChooseShipping(string $shippingProfileId)
+    {
+        $this->cartApplication->chooseShippingProfile(new ChooseShippingProfile(
+            $this->getOrder()->orderId->get(), $shippingProfileId
+        ));
+
+        $this->assertEquals($shippingProfileId, $this->getOrder()->getShippings()[0]->getShippingProfileId()->get());
+    }
+
+    protected function whenIChoosePayment(string $paymentMethodId)
+    {
+        $this->cartApplication->choosePaymentMethod(new ChoosePaymentMethod(
+            $this->getOrder()->orderId->get(), $paymentMethodId
+        ));
+
+        $this->assertEquals($paymentMethodId, $this->getOrder()->getPayment()->getPaymentMethodId()->get());
     }
 
     protected function thenTheOverallCartPriceShouldBeEur($total)

@@ -9,18 +9,18 @@ class CookieCartReference
 {
     use InteractsWithCookies;
 
-    public function get(): OrderId
+    public function get(): string
     {
         if (! $this->exists()) {
-            throw new \Exception('Trying to retrieve an cart reference cookie value that doesn\'t exist.');
+            throw new \Exception('Trying to retrieve a cart reference cookie value that doesn\'t exist.');
         }
 
-        return OrderId::fromString($this->getCookieValue());
+        return $this->getCookieValue();
     }
 
-    public function set(OrderId $orderId): void
+    public function set(string $orderId): void
     {
-        $this->setCookieValue($orderId->get());
+        $this->setCookieValue($orderId);
     }
 
     protected function getCookieKey(): string

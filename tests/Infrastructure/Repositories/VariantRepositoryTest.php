@@ -5,9 +5,9 @@ namespace Tests\Infrastructure\Repositories;
 
 use Tests\Infrastructure\TestCase;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Thinktomorrow\Trader\Infrastructure\Test\TestContainer;
 use Thinktomorrow\Trader\Domain\Model\Product\Variant\Variant;
 use Thinktomorrow\Trader\Domain\Model\Product\Variant\VariantId;
-use Thinktomorrow\Trader\Domain\Model\Product\Exceptions\CouldNotFindVariant;
 use Thinktomorrow\Trader\Infrastructure\Test\Repositories\InMemoryVariantRepository;
 use Thinktomorrow\Trader\Infrastructure\Laravel\Repositories\MysqlVariantRepository;
 use Thinktomorrow\Trader\Infrastructure\Test\Repositories\InMemoryProductRepository;
@@ -68,10 +68,23 @@ final class VariantRepositoryTest extends TestCase
         }
     }
 
+    /**
+     * @test
+     * @dataProvider variants
+     */
+    public function it_can_find_variant_for_cart(Variant $variant)
+    {
+        foreach($this->repositories() as $repository) {
+            $repository->save($variant);
+
+            $this->assertNotNull($repository->findVariantForCart($variant->variantId));
+        }
+    }
+
     private function repositories(): \Generator
     {
         yield new InMemoryVariantRepository(new InMemoryProductRepository());
-        yield new MysqlVariantRepository();
+        yield new MysqlVariantRepository(new TestContainer());
     }
 
     public function variants(): \Generator

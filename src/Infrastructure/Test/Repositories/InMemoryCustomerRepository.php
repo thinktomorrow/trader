@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace Thinktomorrow\Trader\Infrastructure\Test\Repositories;
 
+use Thinktomorrow\Trader\Domain\Common\Email;
 use Thinktomorrow\Trader\Domain\Model\Customer\Customer;
 use Thinktomorrow\Trader\Domain\Model\Customer\CustomerId;
 use Thinktomorrow\Trader\Domain\Model\Customer\CustomerRepository;
@@ -10,7 +11,8 @@ use Thinktomorrow\Trader\Domain\Model\Customer\Exceptions\CouldNotFindCustomer;
 
 final class InMemoryCustomerRepository implements CustomerRepository
 {
-    private static array $customers = [];
+    /** @var Customer[] */
+    public static array $customers = [];
 
     private string $nextReference = 'ccc-123';
 
@@ -26,6 +28,17 @@ final class InMemoryCustomerRepository implements CustomerRepository
         }
 
         return static::$customers[$customerId->get()];
+    }
+
+    public function findByEmail(Email $email): Customer
+    {
+        foreach(static::$customers as $customer) {
+            if($customer->getEmail()->equals($email)) {
+                return $customer;
+            }
+        }
+
+        throw new CouldNotFindCustomer('No customer found by email ' . $email->get());
     }
 
     public function delete(CustomerId $customerId): void

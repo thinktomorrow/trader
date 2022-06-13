@@ -24,6 +24,7 @@ use Thinktomorrow\Trader\Application\Taxon\Redirect\RedirectRepository;
 use Thinktomorrow\Trader\Infrastructure\Laravel\Models\DefaultGridItem;
 use Thinktomorrow\Trader\Infrastructure\Vine\VineTaxonIdOptionsComposer;
 use Thinktomorrow\Trader\Infrastructure\Laravel\Models\DefaultTaxonNode;
+use Thinktomorrow\Trader\Application\Cart\VariantForCart\VariantForCart;
 use Thinktomorrow\Trader\Infrastructure\Vine\VineTaxonFilterTreeComposer;
 use Thinktomorrow\Trader\Application\Product\ProductDetail\ProductDetail;
 use Thinktomorrow\Trader\Infrastructure\Laravel\Models\DefaultOptionLink;
@@ -33,6 +34,7 @@ use Thinktomorrow\Trader\Domain\Model\PaymentMethod\PaymentMethodRepository;
 use Thinktomorrow\Trader\Domain\Model\CustomerLogin\CustomerLoginRepository;
 use Thinktomorrow\Trader\Application\Product\Grid\FlattenedTaxonIdsComposer;
 use Thinktomorrow\Trader\Infrastructure\Laravel\Models\DefaultProductDetail;
+use Thinktomorrow\Trader\Infrastructure\Laravel\Models\DefaultVariantForCart;
 use Thinktomorrow\Trader\Application\Taxon\TaxonSelect\TaxonIdOptionsComposer;
 use Thinktomorrow\Trader\Domain\Model\ShippingProfile\ShippingProfileRepository;
 use Thinktomorrow\Trader\Infrastructure\Laravel\Repositories\MysqlGridRepository;
@@ -73,6 +75,7 @@ class TraderServiceProvider extends ServiceProvider
         $this->app->bind(ProductDetail::class, function(){ return DefaultProductDetail::class; });
         $this->app->bind(OptionLink::class, function(){ return DefaultOptionLink::class; });
         $this->app->bind(TaxonNode::class, function(){ return DefaultTaxonNode::class; });
+        $this->app->bind(VariantForCart::class, function(){ return DefaultVariantForCart::class; });
 
         // Taxon
         $this->app->bind(TaxonRepository::class, MysqlTaxonRepository::class);

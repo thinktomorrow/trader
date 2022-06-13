@@ -3,128 +3,51 @@ declare(strict_types=1);
 
 namespace Thinktomorrow\Trader\Domain\Common\Address;
 
-trait Address
+class Address
 {
-    private ?string $country;
-    private ?string $street;
-    private ?string $number;
-    private ?string $bus;
-    private ?string $zipcode;
-    private ?string $city;
-
-    public function __construct(?string $country, ?string $street, ?string $number, ?string $bus, ?string $zipcode, ?string $city)
+    public function __construct(
+        public readonly ?string $country,
+        public readonly ?string $line1,
+        public readonly ?string $line2,
+        public readonly ?string $postalCode,
+        public readonly ?string $city)
     {
-        $this->country = $country;
-        $this->street = $street;
-        $this->number = $number;
-        $this->bus = $bus;
-        $this->zipcode = $zipcode;
-        $this->city = $city;
+
     }
 
-    public static function fromArray(array $values): self
+    public function replaceCountry(string $country): static
     {
-        self::validateArrayKeys($values);
-
-        return new static(
-            $values['country'],
-            $values['street'],
-            $values['number'],
-            $values['bus'],
-            $values['zipcode'],
-            $values['city']
-        );
+        return new static($country, $this->line1, $this->line2, $this->postalCode, $this->city);
     }
 
-    public static function empty(): self
+    public function replaceLine1(string $line1): static
     {
-        return new static(null, null, null, null, null, null);
+        return new static($this->country, $line1, $this->line2, $this->postalCode, $this->city);
     }
 
-    public function isEmpty(): bool
+    public function replaceLine2(string $line2): static
     {
-        return (! $this->country || ! $this->street || ! $this->number || ! $this->zipcode);
+        return new static($this->country, $this->line1, $line2, $this->postalCode, $this->city);
     }
 
-    public function getCountry(): ?string
+    public function replacePostalCode(string $postalCode): static
     {
-        return $this->country;
+        return new static($this->country, $this->line1, $this->line2, $postalCode, $this->city);
     }
 
-    public function getStreet(): ?string
+    public function replaceCity(string $city): static
     {
-        return $this->street;
-    }
-
-    public function getNumber(): ?string
-    {
-        return $this->number;
-    }
-
-    public function getBus(): ?string
-    {
-        return $this->bus;
-    }
-
-    public function getZipcode(): ?string
-    {
-        return $this->zipcode;
-    }
-
-    public function getCity(): ?string
-    {
-        return $this->city;
-    }
-
-    public function replaceCountry(string $country): self
-    {
-        return new static($country, $this->street, $this->number, $this->bus, $this->zipcode, $this->city);
-    }
-
-    public function replaceStreet(string $street): self
-    {
-        return new static($this->country, $street, $this->number, $this->bus, $this->zipcode, $this->city);
-    }
-
-    public function replaceNumber(string $number): self
-    {
-        return new static($this->country, $this->street, $number, $this->bus, $this->zipcode, $this->city);
-    }
-
-    public function replaceBus(string $bus): self
-    {
-        return new static($this->country, $this->street, $this->number, $bus, $this->zipcode, $this->city);
-    }
-
-    public function replaceZipcode(string $zipcode): self
-    {
-        return new static($this->country, $this->street, $this->number, $this->bus, $zipcode, $this->city);
-    }
-
-    public function replaceCity(string $city): self
-    {
-        return new static($this->country, $this->street, $this->number, $this->bus, $this->zipcode, $city);
+        return new static($this->country, $this->line1, $this->line2, $this->postalCode, $city);
     }
 
     public function toArray(): array
     {
         return [
-            'country' => $this->country,
-            'street' => $this->street,
-            'number' => $this->number,
-            'bus' => $this->bus,
-            'zipcode' => $this->zipcode,
-            'city' => $this->city,
+            'country'     => $this->country,
+            'line1'       => $this->line1,
+            'line2'       => $this->line2,
+            'postal_code' => $this->postalCode,
+            'city'        => $this->city,
         ];
-    }
-
-    private static function validateArrayKeys(array $values): void
-    {
-        $allowedKeys = ['country', 'street', 'number', 'bus', 'zipcode', 'city'];
-        $detectedUnallowedKeys = array_diff_key(array_flip($allowedKeys), $values);
-
-        if (count($detectedUnallowedKeys) > 0) {
-            throw new \InvalidArgumentException('Invalid array keys passed to Address object ['.static::class.']. Array keys should be: [' . implode(',', $allowedKeys) . '] instead of passed keys: [' . implode(',', $detectedUnallowedKeys) . ']');
-        }
     }
 }

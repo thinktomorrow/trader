@@ -44,6 +44,11 @@ class Payment
         $this->paymentCost = $paymentCost;
     }
 
+    public function updatePaymentMethod(PaymentMethodId $paymentMethodId): void
+    {
+        $this->paymentMethodId = $paymentMethodId;
+    }
+
     public function getPaymentMethodId(): PaymentMethodId
     {
         return $this->paymentMethodId;
@@ -72,19 +77,6 @@ class Payment
             'data'              => json_encode($this->data),
         ];
     }
-
-//    public static function make(OrderId $orderId, PaymentMethodId $paymentMethodId, PaymentState $paymentState, PaymentCost $paymentTotal, array $data): static
-//    {
-//        $payment = new static();
-//
-//        $payment->orderId = $orderId;
-//        $payment->paymentMethodId = $paymentMethodId;
-//        $payment->paymentState = $paymentState;
-//        $payment->paymentCost = $paymentTotal;
-//        $payment->data = $data;
-//
-//        return $payment;
-//    }
 
     public static function fromMappedData(array $state, array $aggregateState): static
     {

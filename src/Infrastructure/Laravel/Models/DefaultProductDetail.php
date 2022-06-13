@@ -8,7 +8,7 @@ use Illuminate\Support\Str;
 use Thinktomorrow\Trader\Application\Common\HasLocale;
 use Thinktomorrow\Trader\Application\Common\RendersData;
 use Thinktomorrow\Trader\Domain\Model\Product\ProductId;
-use Thinktomorrow\Trader\Application\Common\RendersPrices;
+use Thinktomorrow\Trader\Application\Common\RendersVariantPrices;
 use Thinktomorrow\Trader\Domain\Model\Product\Variant\VariantId;
 use Thinktomorrow\Trader\Domain\Model\Product\Variant\VariantState;
 use Thinktomorrow\Trader\Domain\Model\Product\Variant\VariantSalePrice;
@@ -17,7 +17,7 @@ use Thinktomorrow\Trader\Application\Product\ProductDetail\ProductDetail;
 
 class DefaultProductDetail implements ProductDetail
 {
-    use RendersPrices;
+    use RendersVariantPrices;
     use RendersData;
     use HasLocale;
 

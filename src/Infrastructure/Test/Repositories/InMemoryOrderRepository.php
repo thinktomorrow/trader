@@ -5,16 +5,21 @@ namespace Thinktomorrow\Trader\Infrastructure\Test\Repositories;
 
 use Thinktomorrow\Trader\Domain\Model\Order\Order;
 use Thinktomorrow\Trader\Domain\Model\Order\OrderId;
+use Thinktomorrow\Trader\Domain\Model\Order\ShopperId;
 use Thinktomorrow\Trader\Domain\Model\Order\OrderRepository;
+use Thinktomorrow\Trader\Domain\Model\Order\Payment\PaymentId;
 use Thinktomorrow\Trader\Domain\Model\Order\Shipping\ShippingId;
 use Thinktomorrow\Trader\Domain\Model\Order\Exceptions\CouldNotFindOrder;
 
 final class InMemoryOrderRepository implements OrderRepository
 {
-    private static array $orders = [];
+    /** @var Order[] */
+    public static array $orders = [];
 
     private string $nextReference = 'xxx-123';
     private string $nextShippingReference = 'shipping-123';
+    private string $nextPaymentReference = 'payment-123';
+    private string $nextShopperReference = 'shopper-123';
 
     public function save(Order $order): void
     {
@@ -49,6 +54,16 @@ final class InMemoryOrderRepository implements OrderRepository
         return ShippingId::fromString($this->nextShippingReference);
     }
 
+    public function nextPaymentReference(): PaymentId
+    {
+        return PaymentId::fromString($this->nextPaymentReference);
+    }
+
+    public function nextShopperReference(): ShopperId
+    {
+        return ShopperId::fromString($this->nextShopperReference);
+    }
+
     // For testing purposes only
     public function setNextReference(string $nextReference): void
     {
@@ -58,6 +73,16 @@ final class InMemoryOrderRepository implements OrderRepository
     public function setNextShippingReference(string $nextShippingReference): void
     {
         $this->nextShippingReference = $nextShippingReference;
+    }
+
+    public function setNextPaymentReference(string $nextPaymentReference): void
+    {
+        $this->nextPaymentReference = $nextPaymentReference;
+    }
+
+    public function setNextShopperReference(string $nextShopperReference): void
+    {
+        $this->nextShopperReference = $nextShopperReference;
     }
 
     public function clear()

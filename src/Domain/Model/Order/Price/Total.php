@@ -3,10 +3,11 @@ declare(strict_types=1);
 
 namespace Thinktomorrow\Trader\Domain\Model\Order\Price;
 
-use Thinktomorrow\Trader\Domain\Common\Cash\Price;
-use Thinktomorrow\Trader\Domain\Common\Cash\PriceValue;
+use Thinktomorrow\Trader\Domain\Common\Cash\PriceTotal;
+use Thinktomorrow\Trader\Domain\Common\Cash\PriceTotalValue;
 
-final class Total implements Price
+final class Total implements PriceTotal
 {
-    use PriceValue;
+    use PriceTotalValue;
 }
+

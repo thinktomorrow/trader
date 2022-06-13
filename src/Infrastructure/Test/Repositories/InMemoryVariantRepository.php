@@ -10,6 +10,7 @@ use Thinktomorrow\Trader\Domain\Model\Product\Variant\VariantId;
 use Thinktomorrow\Trader\Domain\Model\Product\VariantRepository;
 use Thinktomorrow\Trader\Application\Cart\VariantForCart\VariantForCart;
 use Thinktomorrow\Trader\Domain\Model\Product\Exceptions\CouldNotFindVariant;
+use Thinktomorrow\Trader\Infrastructure\Laravel\Models\DefaultVariantForCart;
 use Thinktomorrow\Trader\Application\Cart\VariantForCart\VariantForCartRepository;
 
 final class InMemoryVariantRepository implements VariantRepository, VariantForCartRepository
@@ -66,9 +67,13 @@ final class InMemoryVariantRepository implements VariantRepository, VariantForCa
     {
         foreach(static::$variants as $variant) {
             if($variant->variantId->equals($variantId)) {
-                return new VariantForCart(
-                    $variant->getSalePrice()
-                );
+                return DefaultVariantForCart::fromMappedData([
+                    'variant_id' => $variant->variantId->get(),
+                    'sale_price' => $variant->getSalePrice()->getMoney()->getAmount(),
+                    'tax_rate' => $variant->getSalePrice()->getTaxRate()->toPercentage()->get(),
+                    'includes_vat' => $variant->getSalePrice()->includesVat(),
+                    'data' => json_encode($variant->getData()),
+                ]);
             }
         }
 

@@ -5,13 +5,16 @@ namespace Thinktomorrow\Trader\Domain\Model\ShippingProfile;
 
 use Money\Money;
 use Thinktomorrow\Trader\Domain\Common\Cash\Price;
+use Thinktomorrow\Trader\Domain\Common\Entity\HasData;
+use Thinktomorrow\Trader\Domain\Common\Cash\PriceTotal;
 use Thinktomorrow\Trader\Domain\Common\Entity\Aggregate;
 use Thinktomorrow\Trader\Domain\Common\Event\RecordsEvents;
-use Thinktomorrow\Trader\Domain\Model\Order\Shipping\ShippingCountry;
+use Thinktomorrow\Trader\Domain\Model\Order\Address\ShippingCountry;
 
 final class ShippingProfile implements Aggregate
 {
     use RecordsEvents;
+    use HasData;
 
     public readonly ShippingProfileId $shippingProfileId;
     private array $tariffs = [];
@@ -25,7 +28,7 @@ final class ShippingProfile implements Aggregate
         return $shipping;
     }
 
-    public function findTariffByPrice(Price $price, bool $tariff_amounts_include_tax): ?Tariff
+    public function findTariffByPrice(Price|PriceTotal $price, bool $tariff_amounts_include_tax): ?Tariff
     {
         $normalizedAmount = $tariff_amounts_include_tax ? $price->getIncludingVat() : $price->getExcludingVat();
 
@@ -67,7 +70,7 @@ final class ShippingProfile implements Aggregate
 
     public function deleteCountry(ShippingCountry $country): void
     {
-        /** @var \Thinktomorrow\Trader\Domain\Model\Order\Shipping\ShippingCountry $existingCountry */
+        /** @var \Thinktomorrow\Trader\Domain\Model\Order\Address\ShippingCountry $existingCountry */
         foreach($this->countries as $index => $existingCountry)
         {
             if($country->equals($existingCountry)) {
@@ -80,6 +83,7 @@ final class ShippingProfile implements Aggregate
     {
         return [
             'shipping_profile_id' => $this->shippingProfileId->get(),
+            'data' => json_encode($this->data),
         ];
     }
 
@@ -94,7 +98,7 @@ final class ShippingProfile implements Aggregate
 
     public function hasCountry(ShippingCountry $country): bool
     {
-        /** @var \Thinktomorrow\Trader\Domain\Model\Order\Shipping\ShippingCountry $existingCountry */
+        /** @var \Thinktomorrow\Trader\Domain\Model\Order\Address\ShippingCountry $existingCountry */
         foreach($this->countries as $existingCountry) {
             if($existingCountry->equals($country)) {
                 return true;
@@ -113,6 +117,7 @@ final class ShippingProfile implements Aggregate
     {
         $shipping = new static();
         $shipping->shippingProfileId = ShippingProfileId::fromString($state['shipping_profile_id']);
+        $shipping->data = json_decode($state['data'], true);
 
         $shipping->tariffs = array_map(fn($tariffState) => Tariff::fromMappedData($tariffState, $state), $childEntities[Tariff::class]);
         $shipping->countries = array_map(fn($countryKey) => ShippingCountry::fromString($countryKey), $childEntities[ShippingCountry::class]);

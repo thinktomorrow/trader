@@ -183,10 +183,10 @@ class GridRepositoryTest extends TestCase
         ), new ProductApplication(
             new TestTraderConfig(),
             new EventDispatcherSpy(),
-            new MysqlProductRepository(new MysqlVariantRepository()),
-            new MysqlVariantRepository(),
+            new MysqlProductRepository(new MysqlVariantRepository(new TestContainer())),
+            new MysqlVariantRepository(new TestContainer()),
         ),
-            new MysqlProductRepository(new MysqlVariantRepository())
+            new MysqlProductRepository(new MysqlVariantRepository(new TestContainer()))
         );
     }
 
