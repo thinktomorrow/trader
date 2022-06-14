@@ -5,7 +5,13 @@ namespace Thinktomorrow\Trader\Infrastructure\Laravel;
 
 use Illuminate\Support\Arr;
 use Illuminate\Support\ServiceProvider;
+use Thinktomorrow\Trader\Application\Cart\Read\Cart;
+use Thinktomorrow\Trader\Application\Cart\Read\CartLine;
+use Thinktomorrow\Trader\Application\Cart\Read\CartRepository;
 use Thinktomorrow\Trader\Application\Cart\VariantForCart\VariantForCart;
+use Thinktomorrow\Trader\Infrastructure\Laravel\Models\Cart\DefaultCart;
+use Thinktomorrow\Trader\Infrastructure\Laravel\Models\Cart\DefaultCartLine;
+use Thinktomorrow\Trader\Infrastructure\Laravel\Repositories\MysqlCartRepository;
 use Thinktomorrow\Trader\Application\Cart\VariantForCart\VariantForCartRepository;
 use Thinktomorrow\Trader\Application\Common\DataRenderer;
 use Thinktomorrow\Trader\Application\Common\DefaultLocale;
@@ -102,6 +108,12 @@ class TraderServiceProvider extends ServiceProvider
         $this->app->bind(PaymentMethodRepository::class, MysqlPaymentMethodRepository::class);
         $this->app->bind(CustomerRepository::class, MysqlCustomerRepository::class);
         $this->app->bind(CustomerLoginRepository::class, MysqlCustomerLoginRepository::class);
+
+        // Cart
+        $this->app->bind(CartRepository::class, MysqlCartRepository::class);
+        $this->app->bind(Cart::class, DefaultCart::class);
+        $this->app->bind(CartLine::class, DefaultCartLine::class);
+
     }
 
     public function boot()
