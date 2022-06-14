@@ -9,9 +9,6 @@ use Thinktomorrow\Trader\Application\Cart\Read\Cart;
 use Thinktomorrow\Trader\Application\Cart\Read\CartLine;
 use Thinktomorrow\Trader\Application\Cart\Read\CartRepository;
 use Thinktomorrow\Trader\Application\Cart\VariantForCart\VariantForCart;
-use Thinktomorrow\Trader\Infrastructure\Laravel\Models\Cart\DefaultCart;
-use Thinktomorrow\Trader\Infrastructure\Laravel\Models\Cart\DefaultCartLine;
-use Thinktomorrow\Trader\Infrastructure\Laravel\Repositories\MysqlCartRepository;
 use Thinktomorrow\Trader\Application\Cart\VariantForCart\VariantForCartRepository;
 use Thinktomorrow\Trader\Application\Common\DataRenderer;
 use Thinktomorrow\Trader\Application\Common\DefaultLocale;
@@ -37,11 +34,14 @@ use Thinktomorrow\Trader\Domain\Model\Product\ProductRepository;
 use Thinktomorrow\Trader\Domain\Model\Product\VariantRepository;
 use Thinktomorrow\Trader\Domain\Model\ShippingProfile\ShippingProfileRepository;
 use Thinktomorrow\Trader\Domain\Model\Taxon\TaxonRepository;
+use Thinktomorrow\Trader\Infrastructure\Laravel\Models\Cart\DefaultCart;
+use Thinktomorrow\Trader\Infrastructure\Laravel\Models\Cart\DefaultCartLine;
 use Thinktomorrow\Trader\Infrastructure\Laravel\Models\DefaultGridItem;
 use Thinktomorrow\Trader\Infrastructure\Laravel\Models\DefaultOptionLink;
 use Thinktomorrow\Trader\Infrastructure\Laravel\Models\DefaultProductDetail;
 use Thinktomorrow\Trader\Infrastructure\Laravel\Models\DefaultTaxonNode;
 use Thinktomorrow\Trader\Infrastructure\Laravel\Models\DefaultVariantForCart;
+use Thinktomorrow\Trader\Infrastructure\Laravel\Repositories\MysqlCartRepository;
 use Thinktomorrow\Trader\Infrastructure\Laravel\Repositories\MysqlCheckProductOptionsRepository;
 use Thinktomorrow\Trader\Infrastructure\Laravel\Repositories\MysqlCustomerLoginRepository;
 use Thinktomorrow\Trader\Infrastructure\Laravel\Repositories\MysqlCustomerRepository;
@@ -113,7 +113,6 @@ class TraderServiceProvider extends ServiceProvider
         $this->app->bind(CartRepository::class, MysqlCartRepository::class);
         $this->app->bind(Cart::class, DefaultCart::class);
         $this->app->bind(CartLine::class, DefaultCartLine::class);
-
     }
 
     public function boot()
