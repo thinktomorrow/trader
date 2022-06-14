@@ -3,13 +3,13 @@ declare(strict_types=1);
 
 namespace Tests\Acceptance\Cart;
 
+use Thinktomorrow\Trader\Application\Cart\RefreshCart\CannotRefreshCart;
+use Thinktomorrow\Trader\Application\Cart\RefreshCart\RefreshCart;
 use Thinktomorrow\Trader\Domain\Model\Order\OrderId;
 use Thinktomorrow\Trader\Domain\Model\Order\OrderState;
 use Thinktomorrow\Trader\Domain\Model\Product\ProductId;
-use Thinktomorrow\Trader\Application\Cart\RefreshCart\RefreshCart;
 use Thinktomorrow\Trader\Domain\Model\Product\Variant\VariantState;
 use Thinktomorrow\Trader\Domain\Model\Product\Variant\VariantUnitPrice;
-use Thinktomorrow\Trader\Application\Cart\RefreshCart\CannotRefreshCart;
 
 class RefreshCartTest extends CartContext
 {
@@ -92,19 +92,16 @@ class RefreshCartTest extends CartContext
     /** @test */
     public function it_can_refresh_discounts()
     {
-
     }
 
     /** @test */
     public function it_can_refresh_shipping_profile_cost()
     {
-
     }
 
     /** @test */
     public function it_can_refresh_payment_method_cost()
     {
-
     }
 
     /**
@@ -116,7 +113,7 @@ class RefreshCartTest extends CartContext
         $variant = $product->getVariants()[0];
         $variant->updatePrice(VariantUnitPrice::fromPrice($variant->getSalePrice()), $variant->getSalePrice()->multiply(2));
 
-        if($state) {
+        if ($state) {
             $variant->updateState($state);
         }
 

@@ -70,7 +70,7 @@ class Customer implements Aggregate
     {
         $customer = new static();
         $customer->customerId = $state['customer_id'] ? CustomerId::fromString($state['customer_id']) : null;
-        $customer->isBusiness = !!$state['is_business'];
+        $customer->isBusiness = ! ! $state['is_business'];
         $customer->email = Email::fromString($state['email']);
         $customer->data = json_decode($state['data'], true);
 

@@ -5,30 +5,30 @@ namespace Tests\Infrastructure;
 
 use Tests\TestHelpers;
 use Thinktomorrow\Trader\Application\Cart\Read\Cart;
+use Thinktomorrow\Trader\Application\Cart\Read\CartBillingAddress;
 use Thinktomorrow\Trader\Application\Cart\Read\CartLine;
 use Thinktomorrow\Trader\Application\Cart\Read\CartPayment;
-use Thinktomorrow\Trader\Application\Cart\Read\CartShopper;
 use Thinktomorrow\Trader\Application\Cart\Read\CartShipping;
-use Thinktomorrow\Trader\Application\Cart\Read\CartBillingAddress;
 use Thinktomorrow\Trader\Application\Cart\Read\CartShippingAddress;
+use Thinktomorrow\Trader\Application\Cart\Read\CartShopper;
 use Thinktomorrow\Trader\Application\Cart\VariantForCart\VariantForCart;
 use Thinktomorrow\Trader\Application\Taxon\Tree\TaxonNode;
-use Thinktomorrow\Trader\Infrastructure\Laravel\Models\DefaultTaxonNode;
 use Thinktomorrow\Trader\Infrastructure\Laravel\Models\Cart\DefaultCart;
+use Thinktomorrow\Trader\Infrastructure\Laravel\Models\Cart\DefaultCartBillingAddress;
 use Thinktomorrow\Trader\Infrastructure\Laravel\Models\Cart\DefaultCartLine;
+use Thinktomorrow\Trader\Infrastructure\Laravel\Models\Cart\DefaultCartPayment;
+use Thinktomorrow\Trader\Infrastructure\Laravel\Models\Cart\DefaultCartShipping;
+use Thinktomorrow\Trader\Infrastructure\Laravel\Models\Cart\DefaultCartShippingAddress;
+use Thinktomorrow\Trader\Infrastructure\Laravel\Models\Cart\DefaultCartShopper;
+use Thinktomorrow\Trader\Infrastructure\Laravel\Models\DefaultTaxonNode;
 use Thinktomorrow\Trader\Infrastructure\Laravel\Models\DefaultVariantForCart;
 use Thinktomorrow\Trader\Infrastructure\Laravel\TraderServiceProvider;
 use Thinktomorrow\Trader\Infrastructure\Shop\ShopServiceProvider;
-use Thinktomorrow\Trader\Infrastructure\Laravel\Models\Cart\DefaultCartPayment;
-use Thinktomorrow\Trader\Infrastructure\Laravel\Models\Cart\DefaultCartShopper;
-use Thinktomorrow\Trader\Infrastructure\Laravel\Models\Cart\DefaultCartShipping;
 use Thinktomorrow\Trader\Infrastructure\Test\Repositories\InMemoryOrderRepository;
 use Thinktomorrow\Trader\Infrastructure\Test\Repositories\InMemoryProductRepository;
 use Thinktomorrow\Trader\Infrastructure\Test\Repositories\InMemoryTaxonRepository;
 use Thinktomorrow\Trader\Infrastructure\Test\Repositories\InMemoryVariantRepository;
 use Thinktomorrow\Trader\Infrastructure\Test\TestContainer;
-use Thinktomorrow\Trader\Infrastructure\Laravel\Models\Cart\DefaultCartBillingAddress;
-use Thinktomorrow\Trader\Infrastructure\Laravel\Models\Cart\DefaultCartShippingAddress;
 
 abstract class TestCase extends \Orchestra\Testbench\TestCase
 {

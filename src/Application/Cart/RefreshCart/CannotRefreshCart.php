@@ -5,5 +5,4 @@ namespace Thinktomorrow\Trader\Application\Cart\RefreshCart;
 
 class CannotRefreshCart extends \DomainException
 {
-
 }

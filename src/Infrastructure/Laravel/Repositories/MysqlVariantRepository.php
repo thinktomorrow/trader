@@ -6,11 +6,11 @@ namespace Thinktomorrow\Trader\Infrastructure\Laravel\Repositories;
 use Illuminate\Support\Facades\DB;
 use Psr\Container\ContainerInterface;
 use Ramsey\Uuid\Uuid;
-use Thinktomorrow\Trader\Domain\Model\Product\ProductState;
 use Thinktomorrow\Trader\Application\Cart\VariantForCart\VariantForCart;
 use Thinktomorrow\Trader\Application\Cart\VariantForCart\VariantForCartRepository;
 use Thinktomorrow\Trader\Application\Common\TraderHelpers;
 use Thinktomorrow\Trader\Domain\Model\Product\ProductId;
+use Thinktomorrow\Trader\Domain\Model\Product\ProductState;
 use Thinktomorrow\Trader\Domain\Model\Product\Variant\Variant;
 use Thinktomorrow\Trader\Domain\Model\Product\Variant\VariantId;
 use Thinktomorrow\Trader\Domain\Model\Product\VariantRepository;
@@ -140,14 +140,14 @@ class MysqlVariantRepository implements VariantRepository, VariantForCartReposit
         $states = DB::table(static::$variantTable)
             ->join(static::$productTable, static::$variantTable . '.product_id', '=', static::$productTable . '.product_id')
             ->whereIn(static::$productTable . '.state', ProductState::onlineStates())
-            ->whereIn(static::$variantTable . '.variant_id', array_map(fn($variantId) => $variantId->get(),$variantIds))
+            ->whereIn(static::$variantTable . '.variant_id', array_map(fn ($variantId) => $variantId->get(), $variantIds))
             ->select([
                 static::$variantTable . '.*',
                 static::$productTable . '.data AS product_data',
             ])
             ->get();
 
-        return $states->map(fn($state) => $this->composeVariantForCart((array) $state))->toArray();
+        return $states->map(fn ($state) => $this->composeVariantForCart((array) $state))->toArray();
     }
 
     private function composeVariantForCart(array $state): VariantForCart

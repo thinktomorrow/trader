@@ -4,13 +4,7 @@ declare(strict_types=1);
 namespace Thinktomorrow\Trader\Application\Cart\RefreshCart;
 
 use Assert\Assertion;
-use Psr\Container\ContainerInterface;
-use Thinktomorrow\Trader\Domain\Common\Context;
 use Thinktomorrow\Trader\Domain\Model\Order\Order;
-use Thinktomorrow\Trader\Domain\Model\Order\OrderId;
-use Thinktomorrow\Trader\Domain\Model\Order\OrderRepository;
-use Thinktomorrow\Trader\Domain\Common\Event\EventDispatcher;
-use function trap;
 
 class RefreshCartAction
 {
@@ -36,7 +30,7 @@ class RefreshCartAction
 
     private function assertCartState(Order $order): void
     {
-        if(!$order->getOrderState()->inCustomerHands()) {
+        if (! $order->getOrderState()->inCustomerHands()) {
             throw new CannotRefreshCart('Refresh cart is not allowed. Order has state ' . $order->getOrderState()->value .' and is no longer in customer hands.');
         }
     }

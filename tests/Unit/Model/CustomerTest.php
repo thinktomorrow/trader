@@ -23,7 +23,7 @@ class CustomerTest extends TestCase
             'customer_id' => $customerId->get(),
             'email' => $customerEmail->get(),
             'is_business' => false,
-            'data' => json_encode([])
+            'data' => json_encode([]),
         ], $customer->getMappedData());
 
         $this->assertEquals([], $customer->getChildEntities());
@@ -39,7 +39,7 @@ class CustomerTest extends TestCase
             'email' => 'ben@thinktomorrow.be',
             'customer_id' => 'yyy',
             'is_business' => true,
-            'data' => json_encode(['foo' => 'bar'])
+            'data' => json_encode(['foo' => 'bar']),
         ], $customer->getMappedData());
     }
 
@@ -49,7 +49,7 @@ class CustomerTest extends TestCase
             'email' => 'ben@thinktomorrow.be',
             'is_business' => true,
             'customer_id' => 'yyy',
-            'data' => json_encode(['foo' => 'bar'])
+            'data' => json_encode(['foo' => 'bar']),
         ]);
     }
 }
