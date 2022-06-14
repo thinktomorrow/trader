@@ -97,7 +97,7 @@ trait PriceValue
 
     public function multiply(int $quantity): static
     {
-        return static::fromMoney($this->money->multiply($quantity), $this->taxRate, $this->includesVat);
+        return static::fromMoney($this->money->multiply((string)$quantity), $this->taxRate, $this->includesVat);
     }
 
     public function add(Price $otherPrice): static
