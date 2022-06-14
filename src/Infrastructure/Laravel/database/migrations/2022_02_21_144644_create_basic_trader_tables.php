@@ -148,9 +148,7 @@ class CreateBasicTraderTables extends Migration
             $table->string('email')->unique();
             $table->string('password')->nullable();
             $table->rememberToken();
-            $table->string('firstname');
-            $table->string('lastname');
-            $table->string('phone')->nullable();
+            $table->boolean('is_business');
             $table->json('data')->nullable();
             $table->timestamps();
         });
@@ -182,6 +180,9 @@ class CreateBasicTraderTables extends Migration
             $table->char('line_id', 36)->primary();
             $table->char('order_id', 36)->index();
             $table->char('variant_id', 36)->nullable()->index(); // reference to original/current product
+            $table->integer('total')->unsigned();
+            $table->integer('discount_total')->unsigned();
+            $table->integer('tax_total')->unsigned();
             $table->smallInteger('quantity')->unsigned();
             $table->integer('line_price')->unsigned();
             $table->string('tax_rate');
@@ -197,8 +198,7 @@ class CreateBasicTraderTables extends Migration
             $table->char('order_id', 36)->index();
             $table->char('customer_id', 36)->nullable()->index();
             $table->string('email');
-            $table->string('firstname');
-            $table->string('lastname');
+            $table->boolean('is_business');
             $table->boolean('register_after_checkout');
             $table->json('data')->nullable();
 

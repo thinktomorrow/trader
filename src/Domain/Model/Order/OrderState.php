@@ -39,4 +39,13 @@ enum OrderState: string
     case shipped = 'shipped'; // in hands of logistic partner
     case fulfilled = 'fulfilled'; // delivered to customer
     case returned = 'returned'; // order is returned to merchant
+
+    public function inCustomerHands(): bool
+    {
+        return in_array($this, [
+            self::cart_pending,
+            self::cart_abandoned,
+            self::cart_revived,
+        ]);
+    }
 }

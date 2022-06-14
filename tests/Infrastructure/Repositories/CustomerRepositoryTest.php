@@ -73,8 +73,13 @@ final class CustomerRepositoryTest extends TestCase
         yield [Customer::create(
             CustomerId::fromString('xxx'),
             Email::fromString('ben@thinktomorrow.be'),
-            'Ben',
-            'Cavens'
+            false,
+        )];
+
+        yield [Customer::create(
+            CustomerId::fromString('xxx'),
+            Email::fromString('ben@thinktomorrow.be'),
+            true,
         )];
     }
 }

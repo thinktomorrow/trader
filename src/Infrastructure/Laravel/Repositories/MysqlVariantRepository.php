@@ -6,6 +6,7 @@ namespace Thinktomorrow\Trader\Infrastructure\Laravel\Repositories;
 use Illuminate\Support\Facades\DB;
 use Psr\Container\ContainerInterface;
 use Ramsey\Uuid\Uuid;
+use Thinktomorrow\Trader\Domain\Model\Product\ProductState;
 use Thinktomorrow\Trader\Application\Cart\VariantForCart\VariantForCart;
 use Thinktomorrow\Trader\Application\Cart\VariantForCart\VariantForCartRepository;
 use Thinktomorrow\Trader\Application\Common\TraderHelpers;
@@ -16,6 +17,7 @@ use Thinktomorrow\Trader\Domain\Model\Product\VariantRepository;
 
 class MysqlVariantRepository implements VariantRepository, VariantForCartRepository
 {
+    private static string $productTable = 'trader_products';
     private static string $variantTable = 'trader_product_variants';
     private static string $optionTable = 'trader_product_options';
     private static string $optionValueTable = 'trader_product_option_values';
@@ -117,13 +119,12 @@ class MysqlVariantRepository implements VariantRepository, VariantForCartReposit
     {
         // Basic builder query
         $state = DB::table(static::$variantTable)
+            ->join(static::$productTable, static::$variantTable . '.product_id', '=', static::$productTable . '.product_id')
+            ->whereIn(static::$productTable . '.state', ProductState::onlineStates())
             ->where(static::$variantTable . '.variant_id', $variantId->get())
             ->select([
-                'variant_id',
-                'sale_price',
-                'tax_rate',
-                'includes_vat',
-                'data',
+                static::$variantTable . '.*',
+                static::$productTable . '.data AS product_data',
             ])
             ->first();
 
@@ -131,8 +132,26 @@ class MysqlVariantRepository implements VariantRepository, VariantForCartReposit
             throw new \RuntimeException('No online variant found by id [' . $variantId->get(). ']');
         }
 
-        $state = (array) $state;
+        return $this->composeVariantForCart((array) $state);
+    }
 
+    public function findAllVariantsForCart(array $variantIds): array
+    {
+        $states = DB::table(static::$variantTable)
+            ->join(static::$productTable, static::$variantTable . '.product_id', '=', static::$productTable . '.product_id')
+            ->whereIn(static::$productTable . '.state', ProductState::onlineStates())
+            ->whereIn(static::$variantTable . '.variant_id', array_map(fn($variantId) => $variantId->get(),$variantIds))
+            ->select([
+                static::$variantTable . '.*',
+                static::$productTable . '.data AS product_data',
+            ])
+            ->get();
+
+        return $states->map(fn($state) => $this->composeVariantForCart((array) $state))->toArray();
+    }
+
+    private function composeVariantForCart(array $state): VariantForCart
+    {
         return $this->container->get(VariantForCart::class)::fromMappedData(array_merge($state, [
             'includes_vat' => (bool) $state['includes_vat'],
         ]));

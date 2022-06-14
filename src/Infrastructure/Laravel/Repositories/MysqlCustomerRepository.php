@@ -5,6 +5,7 @@ namespace Thinktomorrow\Trader\Infrastructure\Laravel\Repositories;
 
 use Illuminate\Support\Facades\DB;
 use Ramsey\Uuid\Uuid;
+use Thinktomorrow\Trader\Domain\Common\Email;
 use Thinktomorrow\Trader\Domain\Model\Customer\Customer;
 use Thinktomorrow\Trader\Domain\Model\Customer\CustomerId;
 use Thinktomorrow\Trader\Domain\Model\Customer\CustomerRepository;
@@ -38,6 +39,19 @@ class MysqlCustomerRepository implements CustomerRepository
 
         if (! $customerState) {
             throw new CouldNotFindCustomer('No customer found by id [' . $customerId->get() . ']');
+        }
+
+        return Customer::fromMappedData((array) $customerState, []);
+    }
+
+    public function findByEmail(Email $email): Customer
+    {
+        $customerState = DB::table(static::$customerTable)
+            ->where(static::$customerTable . '.email', $email->get())
+            ->first();
+
+        if (! $customerState) {
+            throw new CouldNotFindCustomer('No customer found by email [' . $email->get() . ']');
         }
 
         return Customer::fromMappedData((array) $customerState, []);

@@ -29,7 +29,7 @@ class ProductTest extends TestCase
 
         $this->assertEquals([
             'product_id' => 'xxx',
-            'state' => ProductState::offline->value,
+            'state' => ProductState::online->value,
             'taxon_ids' => [],
             'data' => '[]',
         ], $product->getMappedData());
@@ -52,12 +52,13 @@ class ProductTest extends TestCase
 
         $product = Product::fromMappedData([
             'product_id' => 'xxx',
-            'state' => ProductState::online->value,
+            'state' => ProductState::offline->value,
             'data' => $data,
             'taxon_ids' => ['1','2'],
         ]);
 
         $this->assertEquals(ProductId::fromString('xxx'), $product->getMappedData()['product_id']);
+        $this->assertEquals(ProductState::offline, $product->getState());
         $this->assertEquals(['1','2'], $product->getMappedData()['taxon_ids']);
         $this->assertEquals([
             'nl' => 'title nl',

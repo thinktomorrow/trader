@@ -66,16 +66,23 @@ final class InMemoryVariantRepository implements VariantRepository, VariantForCa
     {
         foreach (static::$variants as $variant) {
             if ($variant->variantId->equals($variantId)) {
-                return DefaultVariantForCart::fromMappedData([
-                    'variant_id' => $variant->variantId->get(),
-                    'sale_price' => $variant->getSalePrice()->getMoney()->getAmount(),
-                    'tax_rate' => $variant->getSalePrice()->getTaxRate()->toPercentage()->get(),
-                    'includes_vat' => $variant->getSalePrice()->includesVat(),
-                    'data' => json_encode($variant->getData()),
-                ]);
+                return DefaultVariantForCart::fromMappedData($variant->getMappedData());
             }
         }
 
         throw new CouldNotFindVariant('No variant found by id ' . $variantId->get());
+    }
+
+    public function findAllVariantsForCart(array $variantIds): array
+    {
+        $result = [];
+
+        foreach (static::$variants as $variant) {
+            if (in_array($variant->variantId, $variantIds)) {
+                $result[] = DefaultVariantForCart::fromMappedData($variant->getMappedData());
+            }
+        }
+
+        return $result;
     }
 }

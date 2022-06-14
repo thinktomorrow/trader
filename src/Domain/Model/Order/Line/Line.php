@@ -98,6 +98,7 @@ final class Line implements ChildEntity
             'line_price' => $this->linePrice->getMoney()->getAmount(),
             'tax_rate' => $this->linePrice->getTaxRate()->toPercentage()->get(),
             'includes_vat' => $this->linePrice->includesVat(),
+            'total' => $this->getTotal()->getMoney()->getAmount(),
             'tax_total' => $this->getTaxTotal()->getAmount(),
             'discount_total' => $this->getTotal()->includesVat()
                 ? $this->getDiscountTotal()->getIncludingVat()->getAmount()

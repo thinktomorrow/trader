@@ -1,12 +1,11 @@
 <?php
 declare(strict_types=1);
 
-namespace Thinktomorrow\Trader\Application\RefreshCart\Adjusters;
+namespace Thinktomorrow\Trader\Application\Cart\RefreshCart\Adjusters;
 
-use Thinktomorrow\Trader\Application\RefreshCart\Adjuster;
-use Thinktomorrow\Trader\Domain\Common\Context;
-use Thinktomorrow\Trader\Domain\Model\Order\Address\ShippingCountry;
 use Thinktomorrow\Trader\Domain\Model\Order\Order;
+use Thinktomorrow\Trader\Application\Cart\RefreshCart\Adjuster;
+use Thinktomorrow\Trader\Domain\Model\Order\Address\ShippingCountry;
 
 final class AdjustShipping implements Adjuster
 {
@@ -17,7 +16,7 @@ final class AdjustShipping implements Adjuster
         $this->shippingRepository = $shippingRepository;
     }
 
-    public function adjust(Order $order, Context $context): void
+    public function adjust(Order $order): void
     {
         dd('Adjustshipping: ', $order);
         // Repo to check if shipping for order already exists...

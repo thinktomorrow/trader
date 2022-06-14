@@ -79,7 +79,7 @@ trait TestHelpers
             Line::class => [
                 [
                     'line_id' => 'abc',
-                    'variant_id' => 'xxx',
+                    'variant_id' => 'yyy',
                     'line_price' => 200,
                     'tax_rate' => '10',
                     'includes_vat' => true,
@@ -148,8 +148,8 @@ trait TestHelpers
         return Customer::fromMappedData([
             'customer_id' => 'abc',
             'email' => 'ben@thinktomorrow.be',
-            'firstname' => 'Ben',
-            'lastname' => 'Cavens',
+            'is_business' => false,
+            'data' => json_encode(['foo' => 'bar']),
         ]);
     }
 
@@ -186,7 +186,10 @@ trait TestHelpers
 
     protected function createdProduct(): Product
     {
-        return Product::create(ProductId::fromString('xxx'));
+        $product = Product::create(ProductId::fromString('xxx'));
+        $product->updateState(ProductState::online);
+
+        return $product;
     }
 
     protected function createdProductWithOption(): Product
@@ -264,7 +267,6 @@ trait TestHelpers
         // TODO: how/where to protect from duplicates (multiple values from same option). In create/updateVariant of product
         $variant->updateOptionValueIds([
             OptionValueId::fromString('xxx'),
-//            OptionValueId::fromString('yyy'),
             OptionValueId::fromString('zzz'),
         ]);
         $product->createVariant($variant);
@@ -282,21 +284,21 @@ trait TestHelpers
         return $product;
     }
 
-    protected function createdVariant(): Variant
-    {
-        $variant = Variant::create(
-            ProductId::fromString('xxx'),
-            VariantId::fromString('yyy'),
-            VariantUnitPrice::fromMoney(
-                Money::EUR(10),
-                TaxRate::fromString('20'),
-                false
-            ),
-            VariantSalePrice::fromMoney(Money::EUR(8), TaxRate::fromString('20'), false),
-        );
-
-        return $variant;
-    }
+//    protected function createdVariant(): Variant
+//    {
+//        $variant = Variant::create(
+//            ProductId::fromString('xxx'),
+//            VariantId::fromString('yyy'),
+//            VariantUnitPrice::fromMoney(
+//                Money::EUR(10),
+//                TaxRate::fromString('20'),
+//                false
+//            ),
+//            VariantSalePrice::fromMoney(Money::EUR(8), TaxRate::fromString('20'), false),
+//        );
+//
+//        return $variant;
+//    }
 
     protected function createdVariantWithOption(): Variant
     {

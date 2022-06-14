@@ -224,7 +224,10 @@ final class MysqlOrderRepository implements OrderRepository
 
         if (! is_null($shopperState)) {
             $shopperState = (array)$shopperState;
-            $shopperState = array_merge($shopperState, ['register_after_checkout' => (bool)$shopperState['register_after_checkout']]);
+            $shopperState = array_merge($shopperState, [
+                'register_after_checkout' => (bool)$shopperState['register_after_checkout'],
+                'is_business' => (bool)$shopperState['is_business'],
+            ]);
         }
 
         $childEntities = [

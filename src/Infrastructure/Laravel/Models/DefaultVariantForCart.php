@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace Thinktomorrow\Trader\Infrastructure\Laravel\Models;
 
+use Thinktomorrow\Trader\Domain\Model\Product\Variant\VariantState;
 use Thinktomorrow\Trader\Application\Cart\VariantForCart\VariantForCart;
 use Thinktomorrow\Trader\Application\Common\RendersData;
 use Thinktomorrow\Trader\Domain\Model\Product\Variant\VariantId;
@@ -13,6 +14,7 @@ class DefaultVariantForCart implements VariantForCart
     use RendersData;
 
     private VariantId $variantId;
+    private VariantState $state;
     private VariantSalePrice $variantSalePrice;
 
     private function __construct()
@@ -24,6 +26,7 @@ class DefaultVariantForCart implements VariantForCart
         $object = new static();
 
         $object->variantId = VariantId::fromString($state['variant_id']);
+        $object->state = VariantState::from($state['state']);
         $object->variantSalePrice = VariantSalePrice::fromScalars($state['sale_price'], 'EUR', $state['tax_rate'], $state['includes_vat']);
         $object->data = json_decode($state['data'], true);
 
@@ -33,6 +36,11 @@ class DefaultVariantForCart implements VariantForCart
     public function getVariantId(): VariantId
     {
         return $this->variantId;
+    }
+
+    public function getState(): VariantState
+    {
+        return $this->state;
     }
 
     public function getSalePrice(): VariantSalePrice

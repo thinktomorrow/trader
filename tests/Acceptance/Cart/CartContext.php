@@ -3,54 +3,58 @@ declare(strict_types=1);
 
 namespace Tests\Acceptance\Cart;
 
-use Illuminate\Support\Str;
 use Money\Money;
+use Illuminate\Support\Str;
 use PHPUnit\Framework\Assert;
 use Tests\Acceptance\TestCase;
-use Thinktomorrow\Trader\Application\Cart\CartApplication;
-use Thinktomorrow\Trader\Application\Cart\ChooseCustomer;
-use Thinktomorrow\Trader\Application\Cart\ChoosePaymentMethod;
-use Thinktomorrow\Trader\Application\Cart\ChooseShippingProfile;
-use Thinktomorrow\Trader\Application\Cart\Line\AddLine;
-use Thinktomorrow\Trader\Application\Cart\Line\AddLineToNewOrder;
-use Thinktomorrow\Trader\Application\Cart\Line\ChangeLineQuantity;
-use Thinktomorrow\Trader\Application\Cart\Line\RemoveLine;
-use Thinktomorrow\Trader\Application\Cart\UpdateBillingAddress;
-use Thinktomorrow\Trader\Application\Cart\UpdateShippingAddress;
-use Thinktomorrow\Trader\Application\Cart\UpdateShopper;
-use Thinktomorrow\Trader\Application\RefreshCart\Adjusters\AdjustShipping;
-use Thinktomorrow\Trader\Domain\Common\Cash\Cash;
 use Thinktomorrow\Trader\Domain\Common\Email;
-use Thinktomorrow\Trader\Domain\Common\Taxes\TaxRate;
-use Thinktomorrow\Trader\Domain\Model\Customer\Customer;
-use Thinktomorrow\Trader\Domain\Model\Order\Address\ShippingCountry;
-use Thinktomorrow\Trader\Domain\Model\Order\Exceptions\CouldNotFindOrder;
-use Thinktomorrow\Trader\Domain\Model\Order\Line\Line;
-use Thinktomorrow\Trader\Domain\Model\Order\Line\LineId;
-use Thinktomorrow\Trader\Domain\Model\Order\Line\Quantity;
+use Thinktomorrow\Trader\Domain\Common\Cash\Cash;
 use Thinktomorrow\Trader\Domain\Model\Order\Order;
 use Thinktomorrow\Trader\Domain\Model\Order\OrderId;
-use Thinktomorrow\Trader\Domain\Model\PaymentMethod\PaymentMethod;
-use Thinktomorrow\Trader\Domain\Model\PaymentMethod\PaymentMethodId;
+use Thinktomorrow\Trader\Domain\Common\Taxes\TaxRate;
+use Thinktomorrow\Trader\Domain\Model\Order\Line\Line;
 use Thinktomorrow\Trader\Domain\Model\Product\Product;
+use Thinktomorrow\Trader\Application\Cart\Line\AddLine;
+use Thinktomorrow\Trader\Application\Cart\UpdateShopper;
+use Thinktomorrow\Trader\Domain\Model\Customer\Customer;
+use Thinktomorrow\Trader\Domain\Model\Order\Line\LineId;
 use Thinktomorrow\Trader\Domain\Model\Product\ProductId;
+use Thinktomorrow\Trader\Application\Cart\ChooseCustomer;
+use Thinktomorrow\Trader\Application\Cart\CartApplication;
+use Thinktomorrow\Trader\Application\Cart\Line\RemoveLine;
+use Thinktomorrow\Trader\Domain\Model\Order\Line\Quantity;
+use Thinktomorrow\Trader\Infrastructure\Test\TestContainer;
+use Thinktomorrow\Trader\Application\Cart\ChoosePaymentMethod;
 use Thinktomorrow\Trader\Domain\Model\Product\Variant\Variant;
+use Thinktomorrow\Trader\Infrastructure\Test\TestTraderConfig;
+use Thinktomorrow\Trader\Application\Cart\UpdateBillingAddress;
+use Thinktomorrow\Trader\Application\Cart\ChooseShippingProfile;
+use Thinktomorrow\Trader\Application\Cart\UpdateShippingAddress;
 use Thinktomorrow\Trader\Domain\Model\Product\Variant\VariantId;
+use Thinktomorrow\Trader\Infrastructure\Test\EventDispatcherSpy;
+use Thinktomorrow\Trader\Application\Cart\Line\AddLineToNewOrder;
+use Thinktomorrow\Trader\Application\Cart\Line\ChangeLineQuantity;
+use Thinktomorrow\Trader\Domain\Model\PaymentMethod\PaymentMethod;
+use Thinktomorrow\Trader\Domain\Model\ShippingProfile\TariffNumber;
+use Thinktomorrow\Trader\Domain\Model\Order\Address\ShippingCountry;
+use Thinktomorrow\Trader\Domain\Model\PaymentMethod\PaymentMethodId;
+use Thinktomorrow\Trader\Domain\Model\ShippingProfile\ShippingProfile;
 use Thinktomorrow\Trader\Domain\Model\Product\Variant\VariantSalePrice;
 use Thinktomorrow\Trader\Domain\Model\Product\Variant\VariantUnitPrice;
-use Thinktomorrow\Trader\Domain\Model\ShippingProfile\ShippingProfile;
 use Thinktomorrow\Trader\Domain\Model\ShippingProfile\ShippingProfileId;
-use Thinktomorrow\Trader\Domain\Model\ShippingProfile\TariffNumber;
-use Thinktomorrow\Trader\Infrastructure\Test\EventDispatcherSpy;
+use Thinktomorrow\Trader\Application\Cart\RefreshCart\RefreshCartAction;
+use Thinktomorrow\Trader\Domain\Model\Order\Exceptions\CouldNotFindOrder;
+use Thinktomorrow\Trader\Application\Cart\RefreshCart\Adjusters\AdjustLines;
+use Thinktomorrow\Trader\Application\Cart\RefreshCart\Adjusters\AdjustShipping;
 use Thinktomorrow\Trader\Infrastructure\Test\Repositories\InMemoryCartRepository;
-use Thinktomorrow\Trader\Infrastructure\Test\Repositories\InMemoryCustomerRepository;
 use Thinktomorrow\Trader\Infrastructure\Test\Repositories\InMemoryOrderRepository;
-use Thinktomorrow\Trader\Infrastructure\Test\Repositories\InMemoryPaymentMethodRepository;
+use Thinktomorrow\Trader\Application\Cart\VariantForCart\VariantForCartRepository;
 use Thinktomorrow\Trader\Infrastructure\Test\Repositories\InMemoryProductRepository;
-use Thinktomorrow\Trader\Infrastructure\Test\Repositories\InMemoryShippingProfileRepository;
 use Thinktomorrow\Trader\Infrastructure\Test\Repositories\InMemoryVariantRepository;
-use Thinktomorrow\Trader\Infrastructure\Test\TestContainer;
-use Thinktomorrow\Trader\Infrastructure\Test\TestTraderConfig;
+use Thinktomorrow\Trader\Infrastructure\Laravel\Repositories\MysqlVariantRepository;
+use Thinktomorrow\Trader\Infrastructure\Test\Repositories\InMemoryCustomerRepository;
+use Thinktomorrow\Trader\Infrastructure\Test\Repositories\InMemoryPaymentMethodRepository;
+use Thinktomorrow\Trader\Infrastructure\Test\Repositories\InMemoryShippingProfileRepository;
 
 abstract class CartContext extends TestCase
 {
@@ -67,10 +71,15 @@ abstract class CartContext extends TestCase
     {
         parent::setUp();
 
+        // Adjusters are loaded via container so set them up here
+        (new TestContainer())->add(AdjustLines::class, new AdjustLines(new InMemoryVariantRepository()));
+
         $this->cartApplication = new CartApplication(
             new TestTraderConfig(),
+            new TestContainer(),
             $this->variantRepository = new InMemoryVariantRepository(),
             $this->orderRepository = new InMemoryOrderRepository(),
+            new RefreshCartAction(),
             $this->shippingProfileRepository = new InMemoryShippingProfileRepository(),
             $this->paymentMethodRepository = new InMemoryPaymentMethodRepository(),
             $this->customerRepository = new InMemoryCustomerRepository(),

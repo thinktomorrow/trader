@@ -219,7 +219,7 @@ class OrderTest extends TestCase
         $firstLine = $order->getChildEntities()[Line::class][0];
 
         $this->assertCount(1, $order->getChildEntities()[Line::class]);
-        $this->assertEquals('xxx', $firstLine['variant_id']);
+        $this->assertEquals('yyy', $firstLine['variant_id']);
         $this->assertEquals($linePrice->getMoney()->getAmount(), $firstLine['line_price']);
         $this->assertEquals(3, $firstLine['quantity']);
         $this->assertEquals(json_encode(['foo' => 'bar']), $firstLine['data']);
@@ -249,7 +249,7 @@ class OrderTest extends TestCase
             new LineDeleted(
                 $order->orderId,
                 LineId::fromString('abc'),
-                VariantId::fromString('xxx'),
+                VariantId::fromString('yyy'),
             ),
         ], $order->releaseEvents());
     }

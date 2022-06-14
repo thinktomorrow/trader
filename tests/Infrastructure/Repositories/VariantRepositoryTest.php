@@ -5,12 +5,14 @@ namespace Tests\Infrastructure\Repositories;
 
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\Infrastructure\TestCase;
+use Thinktomorrow\Trader\Domain\Model\Product\Product;
 use Thinktomorrow\Trader\Domain\Model\Product\Variant\Variant;
 use Thinktomorrow\Trader\Domain\Model\Product\Variant\VariantId;
 use Thinktomorrow\Trader\Infrastructure\Laravel\Repositories\MysqlVariantRepository;
 use Thinktomorrow\Trader\Infrastructure\Test\Repositories\InMemoryProductRepository;
 use Thinktomorrow\Trader\Infrastructure\Test\Repositories\InMemoryVariantRepository;
 use Thinktomorrow\Trader\Infrastructure\Test\TestContainer;
+use Thinktomorrow\Trader\Infrastructure\Laravel\Repositories\MysqlProductRepository;
 
 final class VariantRepositoryTest extends TestCase
 {
@@ -20,7 +22,7 @@ final class VariantRepositoryTest extends TestCase
      * @test
      * @dataProvider variants
      */
-    public function it_can_save_and_find_an_variant(Variant $variant)
+    public function it_can_save_and_find_an_variant(Product $product, Variant $variant)
     {
         foreach ($this->repositories() as $repository) {
             $repository->save($variant);
@@ -34,7 +36,7 @@ final class VariantRepositoryTest extends TestCase
      * @test
      * @dataProvider variants
      */
-    public function it_can_sync_option_values(Variant $variant)
+    public function it_can_sync_option_values(Product $product, Variant $variant)
     {
         foreach ($this->repositories() as $repository) {
             $repository->save($variant);
@@ -50,7 +52,7 @@ final class VariantRepositoryTest extends TestCase
      * @test
      * @dataProvider variants
      */
-    public function it_can_delete_an_variant(Variant $variant)
+    public function it_can_delete_an_variant(Product $product, Variant $variant)
     {
         foreach ($this->repositories() as $repository) {
             $repository->save($variant);
@@ -72,24 +74,49 @@ final class VariantRepositoryTest extends TestCase
      * @test
      * @dataProvider variants
      */
-    public function it_can_find_variant_for_cart(Variant $variant)
+    public function it_can_find_variant_for_cart(Product $product, Variant $variant)
     {
-        foreach ($this->repositories() as $repository) {
-            $repository->save($variant);
+        foreach ($this->repositories() as $i => $repository) {
+            $this->productRepositories()[$i]->save($product);
 
             $this->assertNotNull($repository->findVariantForCart($variant->variantId));
         }
     }
 
+    /**
+     * @test
+     * @dataProvider variants
+     */
+    public function it_can_find_all_variants_for_cart(Product $product, Variant $variant)
+    {
+        foreach ($this->repositories() as $i => $repository) {
+            $this->productRepositories()[$i]->save($product);
+
+            $this->assertNotNull($repository->findAllVariantsForCart([$variant->variantId]));
+        }
+    }
+
     private function repositories(): \Generator
     {
-        yield new InMemoryVariantRepository(new InMemoryProductRepository());
+        yield new InMemoryVariantRepository();
         yield new MysqlVariantRepository(new TestContainer());
+    }
+
+    private function productRepositories(): array
+    {
+        return [
+            new InMemoryProductRepository(),
+            new MysqlProductRepository(new MysqlVariantRepository(new TestContainer())),
+        ];
     }
 
     public function variants(): \Generator
     {
-        yield [$this->createdVariant()];
-        yield [$this->createdVariantWithOption()];
+        $product = $this->createdProductWithVariant();
+
+        yield [
+            $product,
+            $product->getVariants()[0],
+        ];
     }
 }

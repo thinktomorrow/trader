@@ -16,15 +16,14 @@ class CustomerTest extends TestCase
         $customer = Customer::create(
             $customerId = CustomerId::fromString('yyy'),
             $customerEmail = Email::fromString('ben@thinktomorrow.be'),
-            'bennie',
-            'caveman'
+            false,
         );
 
         $this->assertEquals([
             'customer_id' => $customerId->get(),
             'email' => $customerEmail->get(),
-            'firstname' => 'bennie',
-            'lastname' => 'caveman',
+            'is_business' => false,
+            'data' => json_encode([])
         ], $customer->getMappedData());
 
         $this->assertEquals([], $customer->getChildEntities());
@@ -38,9 +37,9 @@ class CustomerTest extends TestCase
         $this->assertEquals(CustomerId::fromString('yyy'), $customer->customerId);
         $this->assertEquals([
             'email' => 'ben@thinktomorrow.be',
-            'firstname' => 'Ben',
-            'lastname' => 'Cavens',
             'customer_id' => 'yyy',
+            'is_business' => true,
+            'data' => json_encode(['foo' => 'bar'])
         ], $customer->getMappedData());
     }
 
@@ -48,9 +47,9 @@ class CustomerTest extends TestCase
     {
         return Customer::fromMappedData([
             'email' => 'ben@thinktomorrow.be',
-            'firstname' => 'Ben',
-            'lastname' => 'Cavens',
+            'is_business' => true,
             'customer_id' => 'yyy',
+            'data' => json_encode(['foo' => 'bar'])
         ]);
     }
 }

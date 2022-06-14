@@ -4,9 +4,17 @@ declare(strict_types=1);
 namespace Thinktomorrow\Trader\Infrastructure\Laravel\Repositories;
 
 use Illuminate\Support\Facades\DB;
+use Psr\Container\ContainerInterface;
 use Thinktomorrow\Trader\Application\Cart\Read\Cart;
+use Thinktomorrow\Trader\Application\Cart\Read\CartLine;
+use Thinktomorrow\Trader\Application\Cart\Read\CartPayment;
+use Thinktomorrow\Trader\Application\Cart\Read\CartShopper;
+use Thinktomorrow\Trader\Domain\Model\Order\OrderRepository;
+use Thinktomorrow\Trader\Application\Cart\Read\CartShipping;
 use Thinktomorrow\Trader\Application\Cart\Read\CartRepository;
+use Thinktomorrow\Trader\Application\Cart\Read\CartBillingAddress;
 use Thinktomorrow\Trader\Domain\Model\Order\Address\BillingAddress;
+use Thinktomorrow\Trader\Application\Cart\Read\CartShippingAddress;
 use Thinktomorrow\Trader\Domain\Model\Order\Address\ShippingAddress;
 use Thinktomorrow\Trader\Domain\Model\Order\Discount\Discount;
 use Thinktomorrow\Trader\Domain\Model\Order\Exceptions\CouldNotFindOrder;
@@ -16,15 +24,22 @@ use Thinktomorrow\Trader\Domain\Model\Order\OrderId;
 use Thinktomorrow\Trader\Domain\Model\Order\Payment\Payment;
 use Thinktomorrow\Trader\Domain\Model\Order\Shipping\Shipping;
 use Thinktomorrow\Trader\Domain\Model\Order\Shopper;
+use Thinktomorrow\Trader\Application\Cart\VariantForCart\VariantForCartRepository;
 
 final class MysqlCartRepository implements CartRepository
 {
+    private ContainerInterface $container;
+    private OrderRepository $orderRepository;
+    private VariantForCartRepository $variantForCartRepository;
+
     private static $orderTable = 'trader_orders';
-    private static $orderLinesTable = 'trader_order_lines';
-    private static $orderDiscountsTable = 'trader_order_discounts';
-    private static $orderShippingTable = 'trader_order_shipping';
-    private static $orderPaymentTable = 'trader_order_payment';
-    private static $orderShopperTable = 'trader_order_shoppers';
+
+    public function __construct(ContainerInterface $container, OrderRepository $orderRepository, VariantForCartRepository $variantForCartRepository)
+    {
+        $this->container = $container;
+        $this->orderRepository = $orderRepository;
+        $this->variantForCartRepository = $variantForCartRepository;
+    }
 
     private function exists(OrderId $orderId): bool
     {
@@ -33,63 +48,72 @@ final class MysqlCartRepository implements CartRepository
 
     public function findCart(OrderId $orderId): Cart
     {
-        $orderState = DB::table(static::$orderTable)
-            ->where(static::$orderTable . '.order_id', $orderId->get())
-            ->first();
+        $order = $this->orderRepository->find($orderId);
 
-        if (! $orderState) {
-            throw new CouldNotFindOrder('No order found by id [' . $orderId->get() . ']');
-        }
+        $orderState = array_merge($order->getMappedData(), [
+            'total' => $order->getTotal(),
+            'taxTotal' => $order->getTaxTotal(),
+            'subtotal' => $order->getSubTotal(),
+            'discountTotal' => $order->getDiscountTotal(),
+            'shippingCost' => $order->getShippingCost(),
+            'paymentCost' => $order->getPaymentCost(),
+        ]);
 
-        $lineStates = DB::table(static::$orderLinesTable)
-            ->where(static::$orderLinesTable . '.order_id', $orderId->get())
-            ->get()
-            ->map(fn ($item) => (array) $item)
-            ->map(fn ($item) => array_merge($item, ['includes_vat' => (bool) $item['includes_vat']]))
-            ->toArray();
+        // TODO: how to refresh data based on the latest variant price or actual discounts, ...? not on read but better on a dedicated time in the cart...
+        // Need to make note of any change in that case.
+        $lines = array_map(fn ($line) => $this->container->get(CartLine::class)::fromMappedData(
+            array_merge($line->getMappedData(), [
+                'total' => $line->getTotal(),
+                'taxTotal' => $line->getTaxTotal(),
+                'discountTotal' => $line->getDiscountTotal(),
+                'linePrice' => $line->getLinePrice(),
+            ]),
+            $this->variantForCartRepository->findVariantForCart($line->getVariantId()),
+            [] // TODO: cartline discounts...
+        ), $order->getLines());
 
-        $discountStates = DB::table(static::$orderDiscountsTable)
-            ->where(static::$orderDiscountsTable . '.order_id', $orderId->get())
-            ->get()
-            ->map(fn ($item) => (array) $item)
-            ->map(fn ($item) => array_merge($item, ['includes_vat' => (bool) $item['includes_vat']]))
-            ->toArray();
+        $shippingAddress = $order->getShippingAddress() ? $this->container->get(CartShippingAddress::class)::fromMappedData(
+            $order->getShippingAddress()->getMappedData(),
+            $orderState
+        ) : null;
 
-        $shippingStates = DB::table(static::$orderShippingTable)
-            ->where(static::$orderShippingTable . '.order_id', $orderId->get())
-            ->get()
-            ->map(fn ($item) => (array) $item)
-            ->map(fn ($item) => array_merge($item, ['includes_vat' => (bool) $item['includes_vat']]))
-            ->toArray();
+        $billingAddress = $order->getBillingAddress() ? $this->container->get(CartBillingAddress::class)::fromMappedData(
+            $order->getBillingAddress()->getMappedData(),
+            $orderState
+        ) : null;
 
-        $paymentState = DB::table(static::$orderPaymentTable)
-            ->where(static::$orderPaymentTable . '.order_id', $orderId->get())
-            ->first();
+        $shippings = array_map(fn ($shipping) => $this->container->get(CartShipping::class)::fromMappedData(
+            array_merge($shipping->getMappedData(), [
+                'cost' => $shipping->getShippingCost(),
+            ]),
+            $orderState,
+            []// TODO: cart shipping discounts
+        ), $order->getShippings());
 
-        if (! is_null($paymentState)) {
-            $paymentState = (array) $paymentState;
-            $paymentState = array_merge($paymentState, ['includes_vat' => (bool) $paymentState['includes_vat']]);
-        }
+        $payment = $order->getPayment() ? $this->container->get(CartPayment::class)::fromMappedData(
+            array_merge($order->getPayment()->getMappedData(), [
+                'cost' => $order->getPayment()->getPaymentCost(),
+            ]),
+            $orderState,
+            [], // TODO: cart payment discounts
+        ) : null;
 
-        $shopperState = DB::table(static::$orderShopperTable)
-            ->where(static::$orderShopperTable . '.order_id', $orderId->get())
-            ->first();
+        $shopper = $order->getShopper() ? $this->container->get(CartShopper::class)::fromMappedData(
+            $order->getShopper()->getMappedData(),
+            $orderState,
+        ) : null;
 
-        if (! is_null($shopperState)) {
-            $shopperState = (array) $shopperState;
-            $shopperState = array_merge($shopperState, ['register_after_checkout' => (bool) $shopperState['register_after_checkout']]);
-        }
-
-        $childEntities = [
-            Line::class => $lineStates,
-            Discount::class => $discountStates,
-            Shipping::class => $shippingStates,
-            Payment::class => $paymentState,
-            Shopper::class => $shopperState,
-            ShippingAddress::class => $orderState->shipping_address ? json_decode($orderState->shipping_address, true) : null,
-            BillingAddress::class => $orderState->billing_address ? json_decode($orderState->billing_address, true) : null,
-        ];
-
-        return Order::fromMappedData((array)$orderState, $childEntities);
+        return $this->container->get(Cart::class)::fromMappedData(
+            $orderState,
+            [
+                CartLine::class => $lines,
+                CartShippingAddress::class => $shippingAddress,
+                CartBillingAddress::class => $billingAddress,
+                CartShipping::class => count($shippings) ? reset($shippings) : null, // In the cart we expect one shipping
+                CartPayment::class => $payment,
+                CartShopper::class => $shopper,
+            ],
+            [], // TODO: cart discounts
+        );
     }
 }
