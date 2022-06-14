@@ -3,9 +3,9 @@ declare(strict_types=1);
 
 namespace Thinktomorrow\Trader\Application\Promo;
 
-use Thinktomorrow\Trader\Domain\Model\Order\Order;
 use Thinktomorrow\Trader\Domain\Model\Order\Discount\Discount;
 use Thinktomorrow\Trader\Domain\Model\Order\Discount\DiscountTotal;
+use Thinktomorrow\Trader\Domain\Model\Order\Order;
 
 class CalculateDiscountTotal
 {
