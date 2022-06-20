@@ -5,7 +5,7 @@ namespace Thinktomorrow\Trader\Domain\Common\Entity;
 
 trait HasData
 {
-    private array $data = [];
+    protected array $data = [];
 
     public function addData(array $data): void
     {

@@ -80,18 +80,22 @@ class Promo implements Aggregate
 
     public static function fromMappedData(array $state, array $childEntities = []): static
     {
+        Assertion::allIsInstanceOf($childEntities[Discount::class], Discount::class);
+
         $promo = new static();
+
         $promo->promoId = PromoId::fromString($state['promo_id']);
         $promo->state = PromoState::from($state['state']);
         $promo->coupon_code = $state['coupon_code'];
         $promo->startAt = $state['start_at'] ? \DateTime::createFromFormat('Y-m-d H:i:s', $state['start_at']) : null;
         $promo->endAt = $state['end_at'] ? \DateTime::createFromFormat('Y-m-d H:i:s', $state['end_at']) : null;
-
-        $promo->discounts = array_key_exists(Discount::class, $childEntities)
-            ? array_map(fn ($discountState) => Discount::fromMappedData($discountState, $state, [Condition::class => $discountState[Condition::class]]), $childEntities[Discount::class])
-            : [];
-
         $promo->data = json_decode($state['data'], true);
+        $promo->discounts = $childEntities[Discount::class];
+
+//        $promo->discounts = array_key_exists(Discount::class, $childEntities)
+//            ? array_map(fn ($discountState) => Discount::fromMappedData($discountState, $state, [Condition::class => $discountState[Condition::class]]), $childEntities[Discount::class])
+//            : [];
+
 
         return $promo;
     }

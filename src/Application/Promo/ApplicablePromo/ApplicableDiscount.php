@@ -8,7 +8,7 @@ use Thinktomorrow\Trader\Domain\Common\Map\Mappable;
 use Thinktomorrow\Trader\Domain\Model\Order\Discount\Discountable;
 use Thinktomorrow\Trader\Domain\Model\Order\Order;
 
-interface Discount extends Mappable
+interface ApplicableDiscount extends Mappable
 {
     public static function fromMappedData(array $state, array $aggregateState, array $conditions): static;
 

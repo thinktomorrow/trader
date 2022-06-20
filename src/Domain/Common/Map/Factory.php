@@ -3,19 +3,19 @@ declare(strict_types=1);
 
 namespace Thinktomorrow\Trader\Domain\Common\Map;
 
-trait HasMapping
+class Factory
 {
     protected array $mapping;
 
-    protected function setMapping(array $mapping): void
+    public function __construct(array $mapping)
     {
         foreach ($mapping as $mappable) {
             $this->assertClassIsMappable($mappable);
-            $mapping[$mappable::getMapKey()] = $mappable;
+            $this->mapping[$mappable::getMapKey()] = $mappable;
         }
     }
 
-    protected function findMappable(string $key): string
+    public function findMappable(string $key): string
     {
         if (! isset($this->mapping[$key])) {
             throw new \RuntimeException('No mappable class found by key ' . $key);

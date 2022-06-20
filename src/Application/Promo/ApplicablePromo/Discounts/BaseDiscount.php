@@ -4,13 +4,13 @@ declare(strict_types=1);
 namespace Thinktomorrow\Trader\Application\Promo\ApplicablePromo\Discounts;
 
 use Money\Money;
-use Thinktomorrow\Trader\Application\Promo\ApplicablePromo\Condition;
+use Thinktomorrow\Trader\Application\Promo\ApplicablePromo\ApplicableCondition;
 use Thinktomorrow\Trader\Domain\Model\Order\Discount\Discountable;
 use Thinktomorrow\Trader\Domain\Model\Order\Order;
 
 abstract class BaseDiscount
 {
-    /** @var Condition[] */
+    /** @var ApplicableCondition[] */
     protected array $conditions;
 
     protected function isApplicable(Order $order, Discountable $discountable): bool

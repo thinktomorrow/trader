@@ -4,20 +4,22 @@ declare(strict_types=1);
 namespace Thinktomorrow\Trader\Infrastructure\Laravel\Repositories;
 
 use Carbon\Carbon;
-use Illuminate\Database\Query\Builder;
+use Ramsey\Uuid\Uuid;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
-use Ramsey\Uuid\Uuid;
-use Thinktomorrow\Trader\Application\Promo\ApplicablePromo\ApplicablePromo;
-use Thinktomorrow\Trader\Application\Promo\ApplicablePromo\ApplicablePromoRepository;
-use Thinktomorrow\Trader\Application\Promo\ApplicablePromo\Discount;
-use Thinktomorrow\Trader\Application\Promo\ApplicablePromo\DiscountFactory;
-use Thinktomorrow\Trader\Domain\Model\Promo\Condition;
-use Thinktomorrow\Trader\Domain\Model\Promo\Exceptions\CouldNotFindPromo;
+use Illuminate\Database\Query\Builder;
 use Thinktomorrow\Trader\Domain\Model\Promo\Promo;
+use Thinktomorrow\Trader\Domain\Common\Map\Factory;
 use Thinktomorrow\Trader\Domain\Model\Promo\PromoId;
-use Thinktomorrow\Trader\Domain\Model\Promo\PromoRepository;
+use Thinktomorrow\Trader\Domain\Model\Promo\Discount;
+use Thinktomorrow\Trader\Domain\Model\Promo\Condition;
 use Thinktomorrow\Trader\Domain\Model\Promo\PromoState;
+use Thinktomorrow\Trader\Domain\Model\Promo\DiscountFactory;
+use Thinktomorrow\Trader\Domain\Model\Promo\PromoRepository;
+use Thinktomorrow\Trader\Domain\Model\Promo\Exceptions\CouldNotFindPromo;
+use Thinktomorrow\Trader\Application\Promo\ApplicablePromo\ApplicablePromo;
+use Thinktomorrow\Trader\Application\Promo\ApplicablePromo\ApplicableDiscount;
+use Thinktomorrow\Trader\Application\Promo\ApplicablePromo\ApplicablePromoRepository;
 
 final class MysqlPromoRepository implements PromoRepository, ApplicablePromoRepository
 {
@@ -34,48 +36,15 @@ final class MysqlPromoRepository implements PromoRepository, ApplicablePromoRepo
 
     public function getActivePromos(): array
     {
-        $results = $this->baseActiveQuery()
-            ->get();
+        $results = $this->baseActiveQuery()->get();
 
-        $promoIds = $results->pluck('promo_id')->toArray();
+        $discountStates = $this->getDiscountStates($results->pluck('promo_id')->toArray());
 
-        $discountResults = DB::table(static::$promoDiscountTable)
-            ->leftJoin(static::$promoConditionTable, static::$promoDiscountTable.'.discount_id', '=', static::$promoConditionTable.'.discount_id')
-            ->whereIn('promo_id', $promoIds)
-            ->select([
-                static::$promoDiscountTable.'.*',
-                DB::raw(static::$promoConditionTable.'.key AS condition_key'),
-                DB::raw(static::$promoConditionTable.'.data AS condition_data'),
-            ])
-            ->get();
-
-        return array_map(function ($promoResult) use ($discountResults) {
+        return array_map(function ($promoResult) use ($discountStates) {
             $promoResult = (array) $promoResult;
 
-            $discounts = $discountResults
-                ->where('promo_id', $promoResult['promo_id'])
-                ->groupBy('discount_id')
-                ->reject(fn (Collection $group) => $group->isEmpty())
-                ->map(function (Collection $group) use ($promoResult) {
-                    $conditionStates = $group
-                        ->map(fn ($item) => (array) $item)
-                        ->map(fn ($conditionState) => array_merge($conditionState, [
-                            'key' => $conditionState['condition_key'],
-                            'data' => $conditionState['condition_data'],
-                        ]))
-                        ->toArray();
-
-                    return $this->discountFactory->make(
-                        $group->first()->key,
-                        (array) $group->first(),
-                        $promoResult,
-                        $conditionStates
-                    );
-                })->toArray();
-
-
             return ApplicablePromo::fromMappedData($promoResult, [
-                Discount::class => $discounts,
+                ApplicableDiscount::class => $this->makeDiscounts($discountStates, $promoResult, $this->discountFactory),
             ]);
         }, $results->toArray());
     }
@@ -170,25 +139,51 @@ final class MysqlPromoRepository implements PromoRepository, ApplicablePromoRepo
 
         $promoState = (array) $promoState;
 
-        $conditions = DB::table(static::$promoConditionTable)
-            ->where('promo_id', $promoId->get())
-            ->get()
-            ->map(fn ($record) => (array) $record)
-            ->toArray();
-
-        $discounts = DB::table(static::$promoDiscountTable)
-            ->where('promo_id', $promoId->get())
-            ->get()
-            ->map(fn ($record) => (array) $record)
-            // WE need the classes because of validation constraints.hill
-//            ->map(fn($discountState) => $this->discountFactory->make($discountState['key'], $discountState, $promoState, $conditions))
-            ->map(fn ($discountState) => \Thinktomorrow\Trader\Domain\Model\Promo\Discount::fromMappedData($discountState, $promoState, $conditions))
-            ->toArray();
-        trap($discounts);
+        $discountStates = $this->getDiscountStates($promoId->get());
+        $discounts = $this->makeDiscounts($discountStates, $promoState, $this->discountFactory);
 
         return Promo::fromMappedData($promoState, [
             Discount::class => $discounts,
         ]);
+    }
+
+    private function getDiscountStates(array|string $promoIds): Collection
+    {
+        return DB::table(static::$promoDiscountTable)
+            ->leftJoin(static::$promoConditionTable, static::$promoDiscountTable.'.discount_id', '=', static::$promoConditionTable.'.discount_id')
+            ->whereIn('promo_id', (array) $promoIds)
+            ->select([
+                static::$promoDiscountTable.'.*',
+                DB::raw(static::$promoConditionTable.'.key AS condition_key'),
+                DB::raw(static::$promoConditionTable.'.data AS condition_data'),
+            ])
+            ->get();
+    }
+
+    private function makeDiscounts(Collection $discountResults, array $promoState, Factory $factory): array
+    {
+        return $discountResults
+            ->where('promo_id', $promoState['promo_id'])
+            ->groupBy('discount_id')
+            ->reject(fn (Collection $group) => $group->isEmpty())
+            ->map(function (Collection $group) use ($promoState, $factory) {
+
+                $conditionStates = $group
+                    ->reject(fn($item) => !$item->condition_key)
+                    ->map(fn ($item) => (array) $item)
+                    ->map(fn ($conditionState) => array_merge($conditionState, [
+                        'key' => $conditionState['condition_key'],
+                        'data' => $conditionState['condition_data'],
+                    ]))
+                    ->toArray();
+
+                return $factory->make(
+                    $group->first()->key,
+                    (array) $group->first(),
+                    $promoState,
+                    $conditionStates
+                );
+            })->values()->toArray();
     }
 
     public function delete(PromoId $promoId): void

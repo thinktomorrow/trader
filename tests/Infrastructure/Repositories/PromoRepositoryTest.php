@@ -3,19 +3,20 @@ declare(strict_types=1);
 
 namespace Tests\Infrastructure\Repositories;
 
-use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\Infrastructure\TestCase;
-use Thinktomorrow\Trader\Application\Promo\ApplicablePromo\ApplicablePromoRepository;
-use Thinktomorrow\Trader\Application\Promo\ApplicablePromo\ConditionFactory;
-use Thinktomorrow\Trader\Application\Promo\ApplicablePromo\DiscountFactory;
-use Thinktomorrow\Trader\Application\Promo\ApplicablePromo\Discounts\PercentageOffDiscount;
-use Thinktomorrow\Trader\Domain\Model\Promo\Discount;
-use Thinktomorrow\Trader\Domain\Model\Promo\Exceptions\CouldNotFindPromo;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 use Thinktomorrow\Trader\Domain\Model\Promo\Promo;
 use Thinktomorrow\Trader\Domain\Model\Promo\PromoId;
 use Thinktomorrow\Trader\Domain\Model\Promo\PromoState;
+use Thinktomorrow\Trader\Domain\Model\Promo\DiscountFactory;
+use Thinktomorrow\Trader\Domain\Model\Promo\ConditionFactory;
+use Thinktomorrow\Trader\Domain\Model\Promo\Exceptions\CouldNotFindPromo;
+use Thinktomorrow\Trader\Domain\Model\Promo\Discounts\FixedAmountDiscount;
+use Thinktomorrow\Trader\Domain\Model\Promo\Conditions\MinimumLinesQuantity;
 use Thinktomorrow\Trader\Infrastructure\Laravel\Repositories\MysqlPromoRepository;
 use Thinktomorrow\Trader\Infrastructure\Test\Repositories\InMemoryPromoRepository;
+use Thinktomorrow\Trader\Application\Promo\ApplicablePromo\ApplicablePromoRepository;
+use Thinktomorrow\Trader\Application\Promo\ApplicablePromo\Discounts\PercentageOffApplicableDiscount;
 
 final class PromoRepositoryTest extends TestCase
 {
@@ -32,7 +33,6 @@ final class PromoRepositoryTest extends TestCase
             $promo->releaseEvents();
 
             $this->assertEquals($promo, $repository->find($promo->promoId));
-            $this->assertCount(1, $repository->find($promo->promoId)->getChildEntities()[Discount::class]);
         }
     }
 
@@ -67,24 +67,6 @@ final class PromoRepositoryTest extends TestCase
     }
 
     /** @test */
-    public function it_shall_not_get_inactive_promos()
-    {
-        /** @var ApplicablePromoRepository $repository */
-        foreach ($this->repositories() as $repository) {
-            $promoOffline = $this->createPromo(['promo_id' => 'aaa', 'state' => PromoState::offline->value]);
-            $repository->save($promoOffline);
-
-            $promoScheduled = $this->createPromo(['promo_id' => 'bbb', 'start_at' => now()->addDay()->format('Y-m-d H:i:s')]);
-            $repository->save($promoScheduled);
-
-            $promoFinished = $this->createPromo(['promo_id' => 'ccc', 'end_at' => now()->subDay()->format('Y-m-d H:i:s')]);
-            $repository->save($promoFinished);
-
-            $this->assertCount(0, $repository->getActivePromos());
-        }
-    }
-
-    /** @test */
     public function it_can_get_active_promos()
     {
         /** @var ApplicablePromoRepository $repository */
@@ -109,30 +91,44 @@ final class PromoRepositoryTest extends TestCase
         }
     }
 
+    /** @test */
+    public function it_shall_not_get_inactive_promos()
+    {
+        /** @var ApplicablePromoRepository $repository */
+        foreach ($this->repositories() as $repository) {
+            $promoOffline = $this->createPromo(['promo_id' => 'aaa', 'state' => PromoState::offline->value]);
+            $repository->save($promoOffline);
+
+            $promoScheduled = $this->createPromo(['promo_id' => 'bbb', 'start_at' => now()->addDay()->format('Y-m-d H:i:s')]);
+            $repository->save($promoScheduled);
+
+            $promoFinished = $this->createPromo(['promo_id' => 'ccc', 'end_at' => now()->subDay()->format('Y-m-d H:i:s')]);
+            $repository->save($promoFinished);
+
+            $this->assertCount(0, $repository->getActivePromos());
+        }
+    }
+
     private function repositories(): \Generator
     {
-//        yield new InMemoryPromoRepository();
+        yield new InMemoryPromoRepository();
         yield new MysqlPromoRepository(new DiscountFactory([
-            PercentageOffDiscount::class,
-            // TODO: how to set this because application layer should not be present in domain layer...
-            // Else list of discounts/conditions with values in domain and actual class in application? -> Application then uses this class as data.
+            FixedAmountDiscount::class,
+            PercentageOffApplicableDiscount::class,
         ], new ConditionFactory([
-
+            MinimumLinesQuantity::class,
         ])));
     }
 
     public function promos(): \Generator
     {
-        yield [$this->createPromo([], [Discount::class => [
-                array_merge(
-                    $this->createDiscount()->getMappedData(),
-                    $this->createDiscount()->getChildEntities()
-                ),
-            ],
+        yield [$this->createPromo([], [
+            $this->createDiscount([], [$this->createCondition()]),
+            $this->createDiscount(),
         ])];
         yield [$this->createPromo()];
-        yield [$this->createPromo(['coupon_code' => 'foobar'])];
-        yield [$this->createPromo(['start_at' => '2022-02-02 10:10:10'])];
-        yield [$this->createPromo(['end_at' => '2022-02-02 10:10:10'])];
+        yield [$this->createPromo(['coupon_code' => 'foobar'], [$this->createDiscount()])];
+        yield [$this->createPromo(['start_at' => '2022-02-02 10:10:10']), [$this->createDiscount([], [$this->createCondition()])]];
+        yield [$this->createPromo(['end_at' => '2022-02-02 10:10:10'], [$this->createDiscount([], [$this->createCondition()])])];
     }
 }

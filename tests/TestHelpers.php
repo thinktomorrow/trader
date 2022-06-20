@@ -15,6 +15,7 @@ use Thinktomorrow\Trader\Domain\Model\Customer\Customer;
 use Thinktomorrow\Trader\Domain\Model\Customer\CustomerId;
 use Thinktomorrow\Trader\Domain\Model\Customer\CustomerRepository;
 use Thinktomorrow\Trader\Domain\Model\CustomerLogin\CustomerLogin;
+use Thinktomorrow\Trader\Domain\Model\Promo\Discounts\FixedAmountDiscount;
 use Thinktomorrow\Trader\Domain\Model\CustomerLogin\CustomerLoginRepository;
 use Thinktomorrow\Trader\Domain\Model\Order\Address\BillingAddress;
 use Thinktomorrow\Trader\Domain\Model\Order\Address\ShippingAddress;
@@ -43,6 +44,7 @@ use Thinktomorrow\Trader\Domain\Model\Promo\Condition;
 use Thinktomorrow\Trader\Domain\Model\Promo\Promo;
 use Thinktomorrow\Trader\Domain\Model\Promo\PromoState;
 use Throwable;
+use Thinktomorrow\Trader\Domain\Model\Promo\Conditions\MinimumLinesQuantity;
 
 trait TestHelpers
 {
@@ -343,7 +345,7 @@ trait TestHelpers
         $productApplication->createVariant(new CreateVariant($productId->get(), "120", "6", ['title' => ['nl' => 'product one - variant two']]));
     }
 
-    protected function createPromo(array $mappedData = [], array $childEntities = []): Promo
+    protected function createPromo(array $mappedData = [], array $discounts = []): Promo
     {
         return Promo::fromMappedData(array_merge([
             'promo_id' => 'xxx',
@@ -352,28 +354,25 @@ trait TestHelpers
             'start_at' => null,
             'end_at' => null,
             'data' => json_encode([]),
-        ], $mappedData), $childEntities);
+        ], $mappedData), [\Thinktomorrow\Trader\Domain\Model\Promo\Discount::class => $discounts]);
     }
 
-    protected function createDiscount(array $mappedData = [], ?array $conditions = null)
+    protected function createDiscount(array $mappedData = [], array $conditions = [])
     {
-        if (! $conditions) {
-            $conditions = [
-                [
-                    'key' => 'minimum_lines_quantity',
-                    'data' => json_encode(['quantity' => '5']),
-                ],
-            ];
-        }
-
-        return \Thinktomorrow\Trader\Domain\Model\Promo\Discount::fromMappedData(array_merge([
-            'key' => 'percentage_off',
-            'data' => json_encode(['percentage' => '40']),
+        return FixedAmountDiscount::fromMappedData(array_merge([
+            'data' => json_encode(['amount' => '40']),
         ], $mappedData), [
             'promo_id' => 'xxx',
         ], [
             Condition::class => $conditions,
         ]);
+    }
+
+    protected function createCondition(array $mappedData = [])
+    {
+        return MinimumLinesQuantity::fromMappedData(array_merge([
+            'data' => json_encode(['minimum_quantity' => 5]),
+        ], $mappedData), []);
     }
 
 

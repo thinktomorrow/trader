@@ -3,11 +3,11 @@ declare(strict_types=1);
 
 namespace Thinktomorrow\Trader\Application\Promo\ApplicablePromo\Conditions;
 
-use Thinktomorrow\Trader\Application\Promo\ApplicablePromo\Condition;
+use Thinktomorrow\Trader\Application\Promo\ApplicablePromo\ApplicableCondition;
 use Thinktomorrow\Trader\Domain\Model\Order\Discount\Discountable;
 use Thinktomorrow\Trader\Domain\Model\Order\Order;
 
-final class MinimumLinesQuantity implements Condition
+final class MinimumLinesQuantity implements ApplicableCondition
 {
     private int $minimum_quantity;
 

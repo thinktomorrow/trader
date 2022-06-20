@@ -14,6 +14,7 @@ use Thinktomorrow\Trader\Application\Cart\Read\CartShopper;
 use Thinktomorrow\Trader\Application\Cart\VariantForCart\VariantForCart;
 use Thinktomorrow\Trader\Application\Taxon\Tree\TaxonNode;
 use Thinktomorrow\Trader\Infrastructure\Laravel\Models\Cart\DefaultCart;
+use Thinktomorrow\Trader\Infrastructure\Test\Repositories\InMemoryPromoRepository;
 use Thinktomorrow\Trader\Infrastructure\Laravel\Models\Cart\DefaultCartBillingAddress;
 use Thinktomorrow\Trader\Infrastructure\Laravel\Models\Cart\DefaultCartLine;
 use Thinktomorrow\Trader\Infrastructure\Laravel\Models\Cart\DefaultCartPayment;
@@ -65,6 +66,7 @@ abstract class TestCase extends \Orchestra\Testbench\TestCase
         (new InMemoryProductRepository())->clear();
         (new InMemoryVariantRepository())->clear();
         (new InMemoryTaxonRepository())->clear();
+        (new InMemoryPromoRepository())->clear();
 
         parent::tearDown();
     }

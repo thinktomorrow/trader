@@ -3,23 +3,22 @@ declare(strict_types=1);
 
 namespace Thinktomorrow\Trader\Domain\Model\Promo\Discounts;
 
-use Money\Money;
-use Thinktomorrow\Trader\Domain\Common\Cash\Cash;
 use Thinktomorrow\Trader\Domain\Model\Promo\Discount;
+use Thinktomorrow\Trader\Domain\Common\Cash\Percentage;
 
-final class FixedAmountDiscount extends BaseDiscount implements Discount
+class PercentageOffDiscount extends BaseDiscount implements Discount
 {
-    private Money $amount;
+    private Percentage $percentage;
 
     public static function getMapKey(): string
     {
-        return 'fixed_amount';
+        return 'percentage_off';
     }
 
     public function getMappedData(): array
     {
         return array_merge(parent::getMappedData(), [
-            'data' => json_encode(array_merge($this->data, ['amount' => $this->amount->getAmount()])),
+            'data' => json_encode(array_merge($this->data, ['percentage' => $this->percentage->get()])),
         ]);
     }
 
@@ -28,7 +27,7 @@ final class FixedAmountDiscount extends BaseDiscount implements Discount
         $discount = parent::fromMappedData($state, $aggregateState, $childEntities);
 
         $data = json_decode($state['data'], true);
-        $discount->amount = Cash::make($data['amount']);
+        $discount->percentage = Percentage::fromString($data['percentage']);
 
         return $discount;
     }

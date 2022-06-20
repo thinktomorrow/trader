@@ -8,7 +8,7 @@ use Thinktomorrow\Trader\Domain\Model\Order\Order;
 
 class ApplicablePromo
 {
-    /** @var Discount[] */
+    /** @var ApplicableDiscount[] */
     private array $discounts;
 
 //    public function isApplicable(Order $order, Discountable $discountable): bool
@@ -53,11 +53,11 @@ class ApplicablePromo
 
     public static function fromMappedData(array $state, array $childEntities = []): static
     {
-        Assertion::allIsInstanceOf($childEntities[Discount::class], Discount::class);
+        Assertion::allIsInstanceOf($childEntities[ApplicableDiscount::class], ApplicableDiscount::class);
 
         $promo = new static();
 
-        $promo->discounts = $childEntities[Discount::class];
+        $promo->discounts = $childEntities[ApplicableDiscount::class];
 
         return $promo;
     }

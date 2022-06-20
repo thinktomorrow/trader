@@ -4,19 +4,18 @@ declare(strict_types=1);
 namespace Thinktomorrow\Trader\Application\Promo\ApplicablePromo\Discounts;
 
 use Money\Money;
-use Thinktomorrow\Trader\Application\Promo\ApplicablePromo\Discount;
+use Thinktomorrow\Trader\Application\Promo\ApplicablePromo\ApplicableDiscount;
 use Thinktomorrow\Trader\Domain\Common\Cash\Cash;
-use Thinktomorrow\Trader\Domain\Common\Cash\Percentage;
 use Thinktomorrow\Trader\Domain\Model\Order\Discount\Discountable;
 use Thinktomorrow\Trader\Domain\Model\Order\Order;
 
-class PercentageOffDiscount extends BaseDiscount implements Discount
+class FixedAmountApplicableDiscount extends BaseDiscount implements ApplicableDiscount
 {
-    private Percentage $percentage;
+    private Money $amount;
 
     public static function getMapKey(): string
     {
-        return 'percentage_off';
+        return 'fixed_amount';
     }
 
     public function isApplicable(Order $order, Discountable $discountable): bool
@@ -31,17 +30,15 @@ class PercentageOffDiscount extends BaseDiscount implements Discount
 
     public function getDiscountTotal(Order $order, Discountable $discountable): Money
     {
-        return Cash::from(
-            $order->getSubTotal()->getIncludingVat()
-        )->percentage($this->percentage);
+        return $this->amount;
     }
 
     public static function fromMappedData(array $state, array $aggregateState, array $conditions): static
     {
-        $values = json_decode($state['values'], true);
+        $data = json_decode($state['data'], true);
 
         $discount = new static();
-        $discount->percentage = Percentage::fromString($values['percentage']);
+        $discount->amount = Cash::make($data['amount']);
         $discount->conditions = $conditions;
 
         return $discount;
