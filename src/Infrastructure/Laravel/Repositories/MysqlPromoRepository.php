@@ -4,22 +4,22 @@ declare(strict_types=1);
 namespace Thinktomorrow\Trader\Infrastructure\Laravel\Repositories;
 
 use Carbon\Carbon;
-use Ramsey\Uuid\Uuid;
+use Illuminate\Database\Query\Builder;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Database\Query\Builder;
-use Thinktomorrow\Trader\Domain\Model\Promo\Promo;
-use Thinktomorrow\Trader\Domain\Common\Map\Factory;
-use Thinktomorrow\Trader\Domain\Model\Promo\PromoId;
-use Thinktomorrow\Trader\Domain\Model\Promo\Discount;
-use Thinktomorrow\Trader\Domain\Model\Promo\Condition;
-use Thinktomorrow\Trader\Domain\Model\Promo\PromoState;
-use Thinktomorrow\Trader\Domain\Model\Promo\DiscountFactory;
-use Thinktomorrow\Trader\Domain\Model\Promo\PromoRepository;
-use Thinktomorrow\Trader\Domain\Model\Promo\Exceptions\CouldNotFindPromo;
-use Thinktomorrow\Trader\Application\Promo\ApplicablePromo\ApplicablePromo;
+use Ramsey\Uuid\Uuid;
 use Thinktomorrow\Trader\Application\Promo\ApplicablePromo\ApplicableDiscount;
+use Thinktomorrow\Trader\Application\Promo\ApplicablePromo\ApplicablePromo;
 use Thinktomorrow\Trader\Application\Promo\ApplicablePromo\ApplicablePromoRepository;
+use Thinktomorrow\Trader\Domain\Common\Map\Factory;
+use Thinktomorrow\Trader\Domain\Model\Promo\Condition;
+use Thinktomorrow\Trader\Domain\Model\Promo\Discount;
+use Thinktomorrow\Trader\Domain\Model\Promo\DiscountFactory;
+use Thinktomorrow\Trader\Domain\Model\Promo\Exceptions\CouldNotFindPromo;
+use Thinktomorrow\Trader\Domain\Model\Promo\Promo;
+use Thinktomorrow\Trader\Domain\Model\Promo\PromoId;
+use Thinktomorrow\Trader\Domain\Model\Promo\PromoRepository;
+use Thinktomorrow\Trader\Domain\Model\Promo\PromoState;
 
 final class MysqlPromoRepository implements PromoRepository, ApplicablePromoRepository
 {
@@ -167,9 +167,8 @@ final class MysqlPromoRepository implements PromoRepository, ApplicablePromoRepo
             ->groupBy('discount_id')
             ->reject(fn (Collection $group) => $group->isEmpty())
             ->map(function (Collection $group) use ($promoState, $factory) {
-
                 $conditionStates = $group
-                    ->reject(fn($item) => !$item->condition_key)
+                    ->reject(fn ($item) => ! $item->condition_key)
                     ->map(fn ($item) => (array) $item)
                     ->map(fn ($conditionState) => array_merge($conditionState, [
                         'key' => $conditionState['condition_key'],
