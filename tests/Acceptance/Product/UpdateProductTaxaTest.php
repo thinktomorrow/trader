@@ -5,7 +5,7 @@ namespace Tests\Acceptance\Product;
 
 use Tests\TestHelpers;
 use Thinktomorrow\Trader\Application\Product\UpdateProduct\UpdateProductTaxa;
-use Thinktomorrow\Trader\Domain\Model\Product\Event\ProductTaxaUpdated;
+use Thinktomorrow\Trader\Domain\Model\Product\Events\ProductTaxaUpdated;
 
 class UpdateProductTaxaTest extends ProductContext
 {

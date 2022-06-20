@@ -89,13 +89,13 @@ class Cash
     }
 
     /**
-     * @param float $percentage
+     * @param string|Percentage $percentage
      * @param int $rounding_mode
      * @param bool $returnAsMoney
      * @param null $round
      * @return Money|int
      */
-    public function percentage($percentage, $rounding_mode = Money::ROUND_HALF_UP, $returnAsMoney = true, $round = null)
+    public function percentage(string|Percentage $percentage, $rounding_mode = Money::ROUND_HALF_UP, $returnAsMoney = true, $round = null)
     {
         if ($percentage instanceof Percentage) {
             $percentage = $percentage->get();

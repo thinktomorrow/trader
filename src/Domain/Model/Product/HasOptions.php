@@ -4,8 +4,8 @@ declare(strict_types=1);
 namespace Thinktomorrow\Trader\Domain\Model\Product;
 
 use Assert\Assertion;
-use Thinktomorrow\Trader\Domain\Model\Product\Event\OptionsUpdated;
-use Thinktomorrow\Trader\Domain\Model\Product\Event\OptionValuesUpdated;
+use Thinktomorrow\Trader\Domain\Model\Product\Events\OptionsUpdated;
+use Thinktomorrow\Trader\Domain\Model\Product\Events\OptionValuesUpdated;
 use Thinktomorrow\Trader\Domain\Model\Product\Exceptions\CouldNotFindOptionOnProduct;
 use Thinktomorrow\Trader\Domain\Model\Product\Option\Option;
 use Thinktomorrow\Trader\Domain\Model\Product\Option\OptionId;

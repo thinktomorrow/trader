@@ -5,7 +5,7 @@ namespace Tests\Acceptance\Product;
 
 use Tests\TestHelpers;
 use Thinktomorrow\Trader\Application\Product\DeleteVariant;
-use Thinktomorrow\Trader\Domain\Model\Product\Event\VariantDeleted;
+use Thinktomorrow\Trader\Domain\Model\Product\Events\VariantDeleted;
 use Thinktomorrow\Trader\Domain\Model\Product\Exceptions\CouldNotDeleteVariant;
 
 class DeleteVariantTest extends ProductContext

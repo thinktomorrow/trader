@@ -3,23 +3,27 @@ declare(strict_types=1);
 
 namespace Thinktomorrow\Trader\Domain\Model\Order\Discount;
 
+use Money\Money;
+use Thinktomorrow\Trader\Domain\Common\Cash\Cash;
+use Thinktomorrow\Trader\Domain\Common\Entity\HasData;
 use Thinktomorrow\Trader\Domain\Common\Entity\ChildEntity;
 use Thinktomorrow\Trader\Domain\Model\Order\OrderId;
 
 final class Discount implements ChildEntity
 {
-    public readonly OrderId $orderId;
-    public readonly DiscountId $discountId;
-    private DiscountTotal $discountTotal;
+    use HasData;
 
-    private function __construct(OrderId $orderId, DiscountId $discountId, DiscountTotal $discountTotal)
+    public readonly OrderId $orderId;
+    private Money $discountTotal;
+
+    public function __construct(OrderId $orderId, Money $discountTotal, array $data)
     {
         $this->orderId = $orderId;
-        $this->discountId = $discountId;
         $this->discountTotal = $discountTotal;
+        $this->data = $data;
     }
 
-    public function getTotal(): DiscountTotal
+    public function getTotal(): Money
     {
         return $this->discountTotal;
     }
@@ -28,10 +32,8 @@ final class Discount implements ChildEntity
     {
         return [
             'order_id' => $this->orderId->get(),
-            'discount_id' => $this->discountId->get(),
-            'total' => $this->discountTotal->getMoney()->getAmount(),
-            'tax_rate' => $this->discountTotal->getTaxRate()->toPercentage()->get(),
-            'includes_vat' => $this->discountTotal->includesVat(),
+            'total' => $this->discountTotal->getAmount(),
+            'data' => json_encode($this->data),
         ];
     }
 
@@ -39,8 +41,8 @@ final class Discount implements ChildEntity
     {
         return new static(
             OrderId::fromString($aggregateState['order_id']),
-            DiscountId::fromString($state['discount_id']),
-            DiscountTotal::fromScalars($state['total'], 'EUR', $state['tax_rate'], $state['includes_vat']),
+            Cash::make($state['total']),
+            json_decode($state['data'], true),
         );
     }
 }

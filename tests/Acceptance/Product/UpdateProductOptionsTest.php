@@ -5,7 +5,7 @@ namespace Tests\Acceptance\Product;
 
 use Tests\TestHelpers;
 use Thinktomorrow\Trader\Application\Product\UpdateProduct\UpdateProductOptions;
-use Thinktomorrow\Trader\Domain\Model\Product\Event\OptionsUpdated;
+use Thinktomorrow\Trader\Domain\Model\Product\Events\OptionsUpdated;
 use Thinktomorrow\Trader\Domain\Model\Product\Option\Option;
 
 class UpdateProductOptionsTest extends ProductContext

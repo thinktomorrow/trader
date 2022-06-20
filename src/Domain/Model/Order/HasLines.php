@@ -21,6 +21,14 @@ trait HasLines
         return $this->lines;
     }
 
+    public function getQuantity(): Quantity
+    {
+        return Quantity::fromInt(array_reduce(
+            $this->lines,
+            fn($carry, Line $line) => $carry + $line->getQuantity()->asInt(), 0),
+        );
+    }
+
     public function addOrUpdateLine(LineId $lineId, VariantId $productId, LinePrice $linePrice, Quantity $quantity, array $data): void
     {
         if (null !== $this->findLineIndex($lineId)) {

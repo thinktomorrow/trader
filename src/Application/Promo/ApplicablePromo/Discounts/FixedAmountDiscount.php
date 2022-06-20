@@ -1,15 +1,15 @@
 <?php
 declare(strict_types=1);
 
-namespace Thinktomorrow\Trader\Domain\Model\Promo\Discounts;
+namespace Thinktomorrow\Trader\Application\Promo\ApplicablePromo\Discounts;
 
 use Money\Money;
 use Thinktomorrow\Trader\Domain\Common\Cash\Cash;
 use Thinktomorrow\Trader\Domain\Model\Order\Order;
-use Thinktomorrow\Trader\Domain\Common\Entity\ChildAggregate;
 use Thinktomorrow\Trader\Domain\Model\Order\Discount\Discountable;
+use Thinktomorrow\Trader\Application\Promo\ApplicablePromo\Discount;
 
-final class FixedAmountDiscount implements ChildAggregate
+class FixedAmountDiscount extends BaseDiscount implements Discount
 {
     private Money $amount;
 
@@ -18,14 +18,17 @@ final class FixedAmountDiscount implements ChildAggregate
         return 'fixed_amount';
     }
 
-    public function getMappedData(): array
+    public function isApplicable(Order $order, Discountable $discountable): bool
     {
-        // TODO: Implement getMappedData() method.
+        // This is a global discount: it only applies to the order total
+        if(! $discountable instanceof Order) return false;
+
+        return parent::isApplicable($order, $discountable);
     }
 
-    public function getChildEntities(): array
+    public function getDiscountTotal(Order $order, Discountable $discountable): Money
     {
-        // TODO: Implement getChildEntities() method.
+        return $this->amount;
     }
 
     public static function fromMappedData(array $state, array $aggregateState, array $conditions): static

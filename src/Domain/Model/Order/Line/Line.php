@@ -48,6 +48,11 @@ final class Line implements ChildEntity
         $this->linePrice = $linePrice;
     }
 
+    public function getQuantity(): Quantity
+    {
+        return $this->quantity;
+    }
+
     public function updateQuantity(Quantity $quantity): void
     {
         $this->quantity = $quantity;

@@ -1,11 +1,11 @@
 <?php
 declare(strict_types=1);
 
-namespace Thinktomorrow\Trader\Domain\Model\Product\Event;
+namespace Thinktomorrow\Trader\Domain\Model\Product\Events;
 
 use Thinktomorrow\Trader\Domain\Model\Product\ProductId;
 
-final class ProductTaxaUpdated
+final class ProductDeleted
 {
     public readonly ProductId $productId;
 

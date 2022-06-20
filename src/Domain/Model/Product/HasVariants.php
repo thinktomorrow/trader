@@ -4,9 +4,9 @@ declare(strict_types=1);
 namespace Thinktomorrow\Trader\Domain\Model\Product;
 
 use Assert\Assertion;
-use Thinktomorrow\Trader\Domain\Model\Product\Event\VariantCreated;
-use Thinktomorrow\Trader\Domain\Model\Product\Event\VariantDeleted;
-use Thinktomorrow\Trader\Domain\Model\Product\Event\VariantUpdated;
+use Thinktomorrow\Trader\Domain\Model\Product\Events\VariantCreated;
+use Thinktomorrow\Trader\Domain\Model\Product\Events\VariantDeleted;
+use Thinktomorrow\Trader\Domain\Model\Product\Events\VariantUpdated;
 use Thinktomorrow\Trader\Domain\Model\Product\Exceptions\CouldNotDeleteVariant;
 use Thinktomorrow\Trader\Domain\Model\Product\Exceptions\CouldNotFindVariantOnProduct;
 use Thinktomorrow\Trader\Domain\Model\Product\Exceptions\VariantAlreadyExistsOnProduct;

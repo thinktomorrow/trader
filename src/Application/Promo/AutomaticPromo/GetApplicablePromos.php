@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 
-namespace Thinktomorrow\Trader\Application\Promo;
+namespace Thinktomorrow\Trader\Application\Promo\AutomaticPromo;
 
 use Thinktomorrow\Trader\Domain\Model\Order\Order;
 

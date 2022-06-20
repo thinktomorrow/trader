@@ -19,6 +19,7 @@ class CreateBasicTraderTables extends Migration
         $this->upServices();
         $this->upCustomers();
         $this->upOrders();
+        $this->upPromos();
     }
 
     private function upCatalog()
@@ -273,6 +274,36 @@ class CreateBasicTraderTables extends Migration
         });
     }
 
+    private function upPromos()
+    {
+        Schema::create(static::PREFIX.'promos', function (Blueprint $table) {
+            $table->char('promo_id', 36)->primary();
+            $table->string('coupon_code')->nullable()->unique();
+            $table->string('state', 32);
+            $table->dateTime('start_at')->nullable();
+            $table->dateTime('end_at')->nullable();
+            $table->json('data')->nullable();
+        });
+
+        Schema::create(static::PREFIX.'promo_discounts', function (Blueprint $table) {
+            $table->id('discount_id');
+            $table->char('promo_id', 36)->index();
+            $table->string('key'); // class reference
+            $table->json('data')->nullable();
+
+            $table->foreign('promo_id')->references('promo_id')->on(static::PREFIX.'promos')->onDelete('cascade');
+        });
+
+        Schema::create(static::PREFIX.'promo_conditions', function (Blueprint $table) {
+            $table->id();
+            $table->foreignId('discount_id')->index();
+            $table->string('key'); // class reference
+            $table->json('data')->nullable();
+
+            $table->foreign('discount_id')->references('discount_id')->on(static::PREFIX.'promo_discounts')->onDelete('cascade');
+        });
+    }
+
     /**
      * Reverse the migrations.
      *
@@ -298,5 +329,8 @@ class CreateBasicTraderTables extends Migration
         Schema::dropIfExists(static::PREFIX.'taxa');
         Schema::dropIfExists(static::PREFIX.'product_variants');
         Schema::dropIfExists(static::PREFIX.'products');
+        Schema::dropIfExists(static::PREFIX.'promos');
+        Schema::dropIfExists(static::PREFIX.'promo_discounts');
+        Schema::dropIfExists(static::PREFIX.'promo_conditions');
     }
 }

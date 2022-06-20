@@ -8,7 +8,7 @@ use Thinktomorrow\Trader\Application\Product\UpdateProduct\UpdateProductOptions;
 use Thinktomorrow\Trader\Application\Product\UpdateProduct\UpdateProductTaxa;
 use Thinktomorrow\Trader\Application\Product\UpdateVariant\UpdateVariantOptionValues;
 use Thinktomorrow\Trader\Domain\Common\Event\EventDispatcher;
-use Thinktomorrow\Trader\Domain\Model\Product\Event\ProductDeleted;
+use Thinktomorrow\Trader\Domain\Model\Product\Events\ProductDeleted;
 use Thinktomorrow\Trader\Domain\Model\Product\Option\Option;
 use Thinktomorrow\Trader\Domain\Model\Product\Option\OptionValue;
 use Thinktomorrow\Trader\Domain\Model\Product\Product;

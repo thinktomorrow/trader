@@ -4,6 +4,10 @@ namespace Tests;
 
 use Illuminate\Contracts\Debug\ExceptionHandler;
 use Money\Money;
+use Thinktomorrow\Trader\Domain\Model\Promo\Promo;
+use Thinktomorrow\Trader\Domain\Model\Promo\PromoId;
+use Thinktomorrow\Trader\Domain\Model\Promo\Condition;
+use Thinktomorrow\Trader\Domain\Model\Promo\PromoState;
 use Thinktomorrow\Trader\Application\Product\CreateProduct;
 use Thinktomorrow\Trader\Application\Product\CreateVariant;
 use Thinktomorrow\Trader\Application\Product\ProductApplication;
@@ -339,6 +343,40 @@ trait TestHelpers
 
         $productApplication->createVariant(new CreateVariant($productId->get(), "120", "6", ['title' => ['nl' => 'product one - variant two']]));
     }
+
+    protected function createPromo(array $mappedData = [], array $childEntities = []): Promo
+    {
+        return Promo::fromMappedData(array_merge([
+            'promo_id' => 'xxx',
+            'state' => PromoState::online->value,
+            'coupon_code' => null,
+            'start_at' => null,
+            'end_at' => null,
+            'data' => json_encode([]),
+        ],$mappedData), $childEntities);
+    }
+
+    protected function createDiscount(array $mappedData = [], ?array $conditions = null)
+    {
+        if(!$conditions) {
+            $conditions = [
+                [
+                    'key' => 'minimum_lines_quantity',
+                    'data' => json_encode(['quantity' => '5']),
+                ]
+            ];
+        }
+
+        return \Thinktomorrow\Trader\Domain\Model\Promo\Discount::fromMappedData(array_merge([
+            'key' => 'percentage_off',
+            'data' => json_encode(['percentage' => '40']),
+        ], $mappedData), [
+            'promo_id' => 'xxx',
+        ], [
+            Condition::class => $conditions,
+        ]);
+    }
+
 
     protected function assertArrayEqualsWithWildcard(array $expected, array $actual, $message = null): void
     {

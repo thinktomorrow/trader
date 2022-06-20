@@ -12,6 +12,11 @@ trait HasData
         $this->data = array_merge($this->data, $data);
     }
 
+    public function replaceData(array $data): void
+    {
+        $this->data = $data;
+    }
+
     public function deleteData(string $key): void
     {
         if (isset($this->data[$key])) {

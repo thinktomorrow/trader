@@ -53,7 +53,9 @@ final class TaxonRepositoryTest extends TestCase
         $this->assertEquals(count(iterator_to_array($this->taxonRepositories())), $taxonsNotFound);
     }
 
-    /** @test */
+    /**
+     * @test
+     */
     public function it_can_generate_a_next_reference()
     {
         foreach ($this->taxonRepositories() as $taxonRepository) {
