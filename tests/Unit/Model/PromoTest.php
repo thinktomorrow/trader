@@ -5,13 +5,13 @@ namespace Tests\Unit\Model;
 
 use Tests\Unit\TestCase;
 use Thinktomorrow\Trader\Domain\Model\Promo\Condition;
+use Thinktomorrow\Trader\Domain\Model\Promo\Conditions\MinimumLinesQuantity;
 use Thinktomorrow\Trader\Domain\Model\Promo\Discount;
+use Thinktomorrow\Trader\Domain\Model\Promo\Discounts\PercentageOffDiscount;
 use Thinktomorrow\Trader\Domain\Model\Promo\Events\PromoCreated;
 use Thinktomorrow\Trader\Domain\Model\Promo\Promo;
 use Thinktomorrow\Trader\Domain\Model\Promo\PromoId;
 use Thinktomorrow\Trader\Domain\Model\Promo\PromoState;
-use Thinktomorrow\Trader\Domain\Model\Promo\Discounts\PercentageOffDiscount;
-use Thinktomorrow\Trader\Domain\Model\Promo\Conditions\MinimumLinesQuantity;
 
 final class PromoTest extends TestCase
 {
@@ -40,7 +40,7 @@ final class PromoTest extends TestCase
         $discount = $this->createDiscount([], [
             MinimumLinesQuantity::fromMappedData([
                 'data' => json_encode(['minimum_quantity' => '5']),
-            ], [])
+            ], []),
         ]);
 
         $this->assertEquals([
@@ -77,9 +77,9 @@ final class PromoTest extends TestCase
                 Condition::class => [
                     MinimumLinesQuantity::fromMappedData([
                         'data' => json_encode(['minimum_quantity' => '5']),
-                    ], [])
+                    ], []),
                 ],
-            ])
+            ]),
         ]);
 
         $this->assertEquals([
@@ -159,7 +159,7 @@ final class PromoTest extends TestCase
         $discount->updateConditions([
             MinimumLinesQuantity::fromMappedData([
                 'data' => json_encode(['minimum_quantity' => 10]),
-            ], $discount->getMappedData())
+            ], $discount->getMappedData()),
         ]);
 
         $this->assertCount(1, $discount->getChildEntities()[Condition::class]);
@@ -181,13 +181,13 @@ final class PromoTest extends TestCase
         $discount->updateConditions([
             MinimumLinesQuantity::fromMappedData([
                 'data' => json_encode(['minimum_quantity' => 10]),
-            ], $discount->getMappedData())
+            ], $discount->getMappedData()),
         ]);
 
         $discount->updateConditions([
             MinimumLinesQuantity::fromMappedData([
                 'data' => json_encode(['minimum_quantity' => 20]),
-            ], $discount->getMappedData())
+            ], $discount->getMappedData()),
         ]);
 
         $this->assertCount(1, $discount->getChildEntities()[Condition::class]);
@@ -209,7 +209,7 @@ final class PromoTest extends TestCase
         $discount->updateConditions([
             MinimumLinesQuantity::fromMappedData([
                 'data' => json_encode(['minimum_quantity' => 10]),
-            ], $discount->getMappedData())
+            ], $discount->getMappedData()),
         ]);
 
         $this->assertCount(1, $discount->getChildEntities()[Condition::class]);

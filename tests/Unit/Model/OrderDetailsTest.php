@@ -4,7 +4,6 @@ declare(strict_types=1);
 namespace Tests\Unit\Model;
 
 use Tests\Unit\TestCase;
-use Thinktomorrow\Trader\Domain\Common\Taxes\TaxRate;
 use Thinktomorrow\Trader\Domain\Common\Address\AddressType;
 use Thinktomorrow\Trader\Domain\Model\Order\Discount\DiscountTotal;
 use Thinktomorrow\Trader\Domain\Model\Order\Payment\PaymentCost;

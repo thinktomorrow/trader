@@ -5,7 +5,6 @@ namespace Thinktomorrow\Trader\Domain\Model\Order;
 
 use Money\Money;
 use Thinktomorrow\Trader\Domain\Common\Cash\PriceTotal;
-use Thinktomorrow\Trader\Domain\Common\Taxes\TaxRate;
 use Thinktomorrow\Trader\Domain\Model\Order\Discount\Discount;
 use Thinktomorrow\Trader\Domain\Model\Order\Discount\DiscountTotal;
 use Thinktomorrow\Trader\Domain\Model\Order\Line\Line;

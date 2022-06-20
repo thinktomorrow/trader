@@ -17,7 +17,9 @@ final class Discount implements ChildEntity
     public readonly DiscountId $discountId;
     private readonly Money $total;
 
-    private function __construct(){}
+    private function __construct()
+    {
+    }
 
     public function getTotal(): Money
     {

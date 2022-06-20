@@ -5,8 +5,8 @@ namespace Thinktomorrow\Trader\Domain\Model\Order\Discount;
 
 use Money\Money;
 use Thinktomorrow\Trader\Domain\Common\Cash\Price;
-use Thinktomorrow\Trader\Domain\Common\Taxes\TaxRate;
 use Thinktomorrow\Trader\Domain\Common\Cash\PriceValue;
+use Thinktomorrow\Trader\Domain\Common\Taxes\TaxRate;
 
 final class DiscountTotal implements Price
 {
@@ -33,7 +33,7 @@ final class DiscountTotal implements Price
 
     public static function getDiscountTaxRate(): TaxRate
     {
-        if(!isset(static::$discountTaxRate)) {
+        if (! isset(static::$discountTaxRate)) {
             throw new \DomainException('Please set the default tax rate for the discount. Use the DiscountTotal::setTaxRate() method.');
         }
 
