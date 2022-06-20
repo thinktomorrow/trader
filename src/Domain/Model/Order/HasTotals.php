@@ -58,8 +58,7 @@ trait HasTotals
                 : $carry->add($discount->getTotal());
         }, null);
 
-        // TODO: how to get the default taxrate here for the discounts...
-        return DiscountTotal::fromMoney($discountMoney, TaxRate::fromString('21'), true);
+        return DiscountTotal::fromDefault($discountMoney);
     }
 
     public function getShippingCost(): ShippingCost

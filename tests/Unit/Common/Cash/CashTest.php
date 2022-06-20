@@ -71,24 +71,24 @@ class CashTest extends TestCase
     public function it_can_get_new_result_as_percentage_of_original()
     {
         $money = new Money(1000, new Currency('EUR'));
-        $percentaged = Cash::from($money)->percentage(50);
+        $percentaged = Cash::from($money)->percentage('50');
 
         $this->assertInstanceOf(Money::class, $percentaged);
         $this->assertEquals(500, $percentaged->getAmount());
 
-        $this->assertEquals(Money::EUR(50), Cash::from(Money::EUR(500))->percentage(10.0));
+        $this->assertEquals(Money::EUR(50), Cash::from(Money::EUR(500))->percentage('10.0'));
     }
 
     /** @test */
     public function percentage_can_be_rounded()
     {
         $money = new Money(1000, new Currency('EUR'));
-        $percentaged = Cash::from($money)->percentage(50);
+        $percentaged = Cash::from($money)->percentage('50');
 
         $this->assertInstanceOf(Money::class, $percentaged);
         $this->assertEquals(500, $percentaged->getAmount());
 
-        $this->assertEquals(50.00, Cash::from(Money::EUR(500))->percentage(10.0, Money::ROUND_HALF_UP, false, 2));
+        $this->assertEquals(50.00, Cash::from(Money::EUR(500))->percentage('10.0', Money::ROUND_HALF_UP, false, 2));
     }
 
     /** @test */

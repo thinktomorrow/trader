@@ -24,7 +24,6 @@ final class Variant implements ChildEntity
     private array $optionValueIds = [];
     private array $personalisations = [];
     private bool $show_in_grid = false;
-    private array $data = [];
 
     private function __construct()
     {

@@ -37,7 +37,11 @@ final class PromoTest extends TestCase
     /** @test */
     public function it_can_build_discount_from_mapped_data()
     {
-        $discount = $this->createDiscount();
+        $discount = $this->createDiscount([], [
+            MinimumLinesQuantity::fromMappedData([
+                'data' => json_encode(['minimum_quantity' => '5']),
+            ], [])
+        ]);
 
         $this->assertEquals([
             'promo_id' => 'xxx',
@@ -67,17 +71,15 @@ final class PromoTest extends TestCase
             'end_at' => '2022-05-09 10:10:10',
             'data' => json_encode(['foo' => 'bar']),
         ], [
-            Discount::class => [
-                PercentageOffDiscount::fromMappedData([
-                    'data' => json_encode(['percentage' => '40']),
-                ], ['promo_id' => 'xxx'], [
-                    Condition::class => [
-                        MinimumLinesQuantity::fromMappedData([
-                            'data' => json_encode(['minimum_quantity' => '5']),
-                        ], [])
-                    ],
-                ])
-            ],
+            PercentageOffDiscount::fromMappedData([
+                'data' => json_encode(['percentage' => '40']),
+            ], ['promo_id' => 'xxx'], [
+                Condition::class => [
+                    MinimumLinesQuantity::fromMappedData([
+                        'data' => json_encode(['minimum_quantity' => '5']),
+                    ], [])
+                ],
+            ])
         ]);
 
         $this->assertEquals([

@@ -14,35 +14,37 @@ final class Discount implements ChildEntity
     use HasData;
 
     public readonly OrderId $orderId;
-    private Money $discountTotal;
+    public readonly DiscountId $discountId;
+    private readonly Money $total;
 
-    public function __construct(OrderId $orderId, Money $discountTotal, array $data)
-    {
-        $this->orderId = $orderId;
-        $this->discountTotal = $discountTotal;
-        $this->data = $data;
-    }
+    private function __construct(){}
 
     public function getTotal(): Money
     {
-        return $this->discountTotal;
+        return $this->total;
     }
 
     public function getMappedData(): array
     {
         return [
             'order_id' => $this->orderId->get(),
-            'total' => $this->discountTotal->getAmount(),
+            'discount_id' => $this->discountId->get(),
+            'total' => $this->total->getAmount(),
+            'tax_rate' => DiscountTotal::getDiscountTaxRate()->toPercentage()->get(),
+            'includes_vat' => true,
             'data' => json_encode($this->data),
         ];
     }
 
     public static function fromMappedData(array $state, array $aggregateState): static
     {
-        return new static(
-            OrderId::fromString($aggregateState['order_id']),
-            Cash::make($state['total']),
-            json_decode($state['data'], true),
-        );
+        $discount = new static();
+
+        $discount->orderId = OrderId::fromString($aggregateState['order_id']);
+        $discount->discountId = DiscountId::fromString($state['discount_id']);
+        $discount->total = Cash::make($state['total']);
+        $discount->data = json_decode($state['data'], true);
+
+        return $discount;
     }
 }

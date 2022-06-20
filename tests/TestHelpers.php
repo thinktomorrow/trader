@@ -115,6 +115,7 @@ trait TestHelpers
                     'total' => '10',
                     'tax_rate' => '10',
                     'includes_vat' => true,
+                    'data' => "[]",
                 ],
             ],
             Shipping::class => [

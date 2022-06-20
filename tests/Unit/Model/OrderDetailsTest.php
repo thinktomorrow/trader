@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace Tests\Unit\Model;
 
 use Tests\Unit\TestCase;
+use Thinktomorrow\Trader\Domain\Common\Taxes\TaxRate;
 use Thinktomorrow\Trader\Domain\Common\Address\AddressType;
 use Thinktomorrow\Trader\Domain\Model\Order\Discount\DiscountTotal;
 use Thinktomorrow\Trader\Domain\Model\Order\Payment\PaymentCost;
@@ -25,7 +26,9 @@ class OrderDetailsTest extends TestCase
         );
 
         $this->assertEquals(
-            Total::zero()->add(VariantSalePrice::fromScalars(440, 'EUR', '10', true)),
+            Total::zero()
+                ->add(VariantSalePrice::fromScalars(450, 'EUR', '10', true))
+                ->subtract(DiscountTotal::fromScalars(10, 'EUR', '21', true)),
             $order->getTotal()
         );
 
@@ -40,7 +43,7 @@ class OrderDetailsTest extends TestCase
         );
 
         $this->assertEquals(
-            DiscountTotal::fromScalars(10, 'EUR', '10', true),
+            DiscountTotal::fromScalars(10, 'EUR', '21', true), // Default percentage
             $order->getDiscountTotal()
         );
     }

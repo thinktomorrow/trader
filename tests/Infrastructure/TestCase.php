@@ -5,12 +5,14 @@ namespace Tests\Infrastructure;
 
 use Tests\TestHelpers;
 use Thinktomorrow\Trader\Application\Cart\Read\Cart;
+use Thinktomorrow\Trader\Domain\Common\Taxes\TaxRate;
 use Thinktomorrow\Trader\Application\Cart\Read\CartBillingAddress;
 use Thinktomorrow\Trader\Application\Cart\Read\CartLine;
 use Thinktomorrow\Trader\Application\Cart\Read\CartPayment;
 use Thinktomorrow\Trader\Application\Cart\Read\CartShipping;
 use Thinktomorrow\Trader\Application\Cart\Read\CartShippingAddress;
 use Thinktomorrow\Trader\Application\Cart\Read\CartShopper;
+use Thinktomorrow\Trader\Domain\Model\Order\Discount\DiscountTotal;
 use Thinktomorrow\Trader\Application\Cart\VariantForCart\VariantForCart;
 use Thinktomorrow\Trader\Application\Taxon\Tree\TaxonNode;
 use Thinktomorrow\Trader\Infrastructure\Laravel\Models\Cart\DefaultCart;
@@ -38,6 +40,8 @@ abstract class TestCase extends \Orchestra\Testbench\TestCase
     protected function setUp(): void
     {
         parent::setUp();
+
+        DiscountTotal::setDiscountTaxRate(TaxRate::fromString('21'));
 
         (new TestContainer())->add(TaxonNode::class, DefaultTaxonNode::class);
         (new TestContainer())->add(VariantForCart::class, DefaultVariantForCart::class);

@@ -265,6 +265,7 @@ class OrderTest extends TestCase
                 'total' => '32',
                 'tax_rate' => '9',
                 'includes_vat' => true,
+                'data' => json_encode(['foo' => 'bar']),
             ], [
                 'order_id' => $order->orderId->get(),
             ])
