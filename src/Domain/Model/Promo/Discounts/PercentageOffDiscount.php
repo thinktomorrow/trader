@@ -3,8 +3,8 @@ declare(strict_types=1);
 
 namespace Thinktomorrow\Trader\Domain\Model\Promo\Discounts;
 
-use Thinktomorrow\Trader\Domain\Model\Promo\Discount;
 use Thinktomorrow\Trader\Domain\Common\Cash\Percentage;
+use Thinktomorrow\Trader\Domain\Model\Promo\Discount;
 
 class PercentageOffDiscount extends BaseDiscount implements Discount
 {

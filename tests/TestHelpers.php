@@ -15,7 +15,6 @@ use Thinktomorrow\Trader\Domain\Model\Customer\Customer;
 use Thinktomorrow\Trader\Domain\Model\Customer\CustomerId;
 use Thinktomorrow\Trader\Domain\Model\Customer\CustomerRepository;
 use Thinktomorrow\Trader\Domain\Model\CustomerLogin\CustomerLogin;
-use Thinktomorrow\Trader\Domain\Model\Promo\Discounts\FixedAmountDiscount;
 use Thinktomorrow\Trader\Domain\Model\CustomerLogin\CustomerLoginRepository;
 use Thinktomorrow\Trader\Domain\Model\Order\Address\BillingAddress;
 use Thinktomorrow\Trader\Domain\Model\Order\Address\ShippingAddress;
@@ -41,10 +40,11 @@ use Thinktomorrow\Trader\Domain\Model\Product\Variant\VariantId;
 use Thinktomorrow\Trader\Domain\Model\Product\Variant\VariantSalePrice;
 use Thinktomorrow\Trader\Domain\Model\Product\Variant\VariantUnitPrice;
 use Thinktomorrow\Trader\Domain\Model\Promo\Condition;
+use Thinktomorrow\Trader\Domain\Model\Promo\Conditions\MinimumLinesQuantity;
+use Thinktomorrow\Trader\Domain\Model\Promo\Discounts\FixedAmountDiscount;
 use Thinktomorrow\Trader\Domain\Model\Promo\Promo;
 use Thinktomorrow\Trader\Domain\Model\Promo\PromoState;
 use Throwable;
-use Thinktomorrow\Trader\Domain\Model\Promo\Conditions\MinimumLinesQuantity;
 
 trait TestHelpers
 {

@@ -3,20 +3,20 @@ declare(strict_types=1);
 
 namespace Tests\Infrastructure\Repositories;
 
-use Tests\Infrastructure\TestCase;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Tests\Infrastructure\TestCase;
+use Thinktomorrow\Trader\Application\Promo\ApplicablePromo\ApplicablePromoRepository;
+use Thinktomorrow\Trader\Application\Promo\ApplicablePromo\Discounts\PercentageOffApplicableDiscount;
+use Thinktomorrow\Trader\Domain\Model\Promo\ConditionFactory;
+use Thinktomorrow\Trader\Domain\Model\Promo\Conditions\MinimumLinesQuantity;
+use Thinktomorrow\Trader\Domain\Model\Promo\DiscountFactory;
+use Thinktomorrow\Trader\Domain\Model\Promo\Discounts\FixedAmountDiscount;
+use Thinktomorrow\Trader\Domain\Model\Promo\Exceptions\CouldNotFindPromo;
 use Thinktomorrow\Trader\Domain\Model\Promo\Promo;
 use Thinktomorrow\Trader\Domain\Model\Promo\PromoId;
 use Thinktomorrow\Trader\Domain\Model\Promo\PromoState;
-use Thinktomorrow\Trader\Domain\Model\Promo\DiscountFactory;
-use Thinktomorrow\Trader\Domain\Model\Promo\ConditionFactory;
-use Thinktomorrow\Trader\Domain\Model\Promo\Exceptions\CouldNotFindPromo;
-use Thinktomorrow\Trader\Domain\Model\Promo\Discounts\FixedAmountDiscount;
-use Thinktomorrow\Trader\Domain\Model\Promo\Conditions\MinimumLinesQuantity;
 use Thinktomorrow\Trader\Infrastructure\Laravel\Repositories\MysqlPromoRepository;
 use Thinktomorrow\Trader\Infrastructure\Test\Repositories\InMemoryPromoRepository;
-use Thinktomorrow\Trader\Application\Promo\ApplicablePromo\ApplicablePromoRepository;
-use Thinktomorrow\Trader\Application\Promo\ApplicablePromo\Discounts\PercentageOffApplicableDiscount;
 
 final class PromoRepositoryTest extends TestCase
 {

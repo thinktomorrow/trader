@@ -4,9 +4,9 @@ declare(strict_types=1);
 namespace Thinktomorrow\Trader\Domain\Model\Promo\Discounts;
 
 use Assert\Assertion;
-use Thinktomorrow\Trader\Domain\Model\Promo\PromoId;
-use Thinktomorrow\Trader\Domain\Model\Promo\Condition;
 use Thinktomorrow\Trader\Domain\Common\Entity\HasData;
+use Thinktomorrow\Trader\Domain\Model\Promo\Condition;
+use Thinktomorrow\Trader\Domain\Model\Promo\PromoId;
 
 abstract class BaseDiscount
 {
@@ -27,7 +27,7 @@ abstract class BaseDiscount
     public function getChildEntities(): array
     {
         return [
-            Condition::class => array_map(fn(Condition $condition) => $condition->getMappedData(), $this->conditions),
+            Condition::class => array_map(fn (Condition $condition) => $condition->getMappedData(), $this->conditions),
         ];
     }
 
