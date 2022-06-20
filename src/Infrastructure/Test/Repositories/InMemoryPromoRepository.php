@@ -3,13 +3,13 @@ declare(strict_types=1);
 
 namespace Thinktomorrow\Trader\Infrastructure\Test\Repositories;
 
-use Thinktomorrow\Trader\Domain\Model\Promo\Promo;
-use Thinktomorrow\Trader\Domain\Model\Promo\PromoId;
-use Thinktomorrow\Trader\Domain\Model\Promo\PromoState;
-use Thinktomorrow\Trader\Domain\Model\Promo\PromoRepository;
-use Thinktomorrow\Trader\Domain\Model\Promo\Exceptions\CouldNotFindPromo;
 use Thinktomorrow\Trader\Application\Promo\ApplicablePromo\ApplicablePromo;
 use Thinktomorrow\Trader\Application\Promo\ApplicablePromo\ApplicablePromoRepository;
+use Thinktomorrow\Trader\Domain\Model\Promo\Exceptions\CouldNotFindPromo;
+use Thinktomorrow\Trader\Domain\Model\Promo\Promo;
+use Thinktomorrow\Trader\Domain\Model\Promo\PromoId;
+use Thinktomorrow\Trader\Domain\Model\Promo\PromoRepository;
+use Thinktomorrow\Trader\Domain\Model\Promo\PromoState;
 
 final class InMemoryPromoRepository implements PromoRepository, ApplicablePromoRepository
 {
@@ -61,19 +61,19 @@ final class InMemoryPromoRepository implements PromoRepository, ApplicablePromoR
     {
         $result = [];
 
-        foreach(static::$promos as $promo) {
-            if(! in_array($promo->getState(), PromoState::onlineStates())) {
+        foreach (static::$promos as $promo) {
+            if (! in_array($promo->getState(), PromoState::onlineStates())) {
                 continue;
             }
 
             $start_at = $promo->getMappedData()['start_at'];
             $end_at = $promo->getMappedData()['end_at'];
 
-            if($start_at && \DateTime::createFromFormat('Y-m-d H:i:s', $start_at) > now()) {
+            if ($start_at && \DateTime::createFromFormat('Y-m-d H:i:s', $start_at) > now()) {
                 continue;
             }
 
-            if($end_at && \DateTime::createFromFormat('Y-m-d H:i:s', $end_at) < now()) {
+            if ($end_at && \DateTime::createFromFormat('Y-m-d H:i:s', $end_at) < now()) {
                 continue;
             }
 

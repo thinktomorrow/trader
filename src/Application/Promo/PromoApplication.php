@@ -4,10 +4,10 @@ declare(strict_types=1);
 namespace Thinktomorrow\Trader\Application\Promo;
 
 use Psr\Container\ContainerInterface;
-use Thinktomorrow\Trader\TraderConfig;
-use Thinktomorrow\Trader\Domain\Model\Order\OrderRepository;
-use Thinktomorrow\Trader\Domain\Common\Event\EventDispatcher;
 use Thinktomorrow\Trader\Application\Promo\ApplicablePromo\ApplicablePromoRepository;
+use Thinktomorrow\Trader\Domain\Common\Event\EventDispatcher;
+use Thinktomorrow\Trader\Domain\Model\Order\OrderRepository;
+use Thinktomorrow\Trader\TraderConfig;
 
 final class PromoApplication
 {
@@ -36,7 +36,7 @@ final class PromoApplication
         $order = $this->orderRepository->find($enterCoupon->getOrderId());
 
         // Find by coupon in active promo's
-        if(!$promo = $this->applicablePromoRepository->findActivePromoByCouponCode($enterCoupon->getCouponCode())) {
+        if (! $promo = $this->applicablePromoRepository->findActivePromoByCouponCode($enterCoupon->getCouponCode())) {
             return;
         }
 

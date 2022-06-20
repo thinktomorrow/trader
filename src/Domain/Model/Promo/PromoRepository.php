@@ -12,5 +12,4 @@ interface PromoRepository
     public function delete(PromoId $promoId): void;
 
     public function nextReference(): PromoId;
-
 }

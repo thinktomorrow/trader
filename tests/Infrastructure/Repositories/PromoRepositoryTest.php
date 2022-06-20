@@ -3,20 +3,19 @@ declare(strict_types=1);
 
 namespace Tests\Infrastructure\Repositories;
 
-use Tests\Infrastructure\TestCase;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Tests\Infrastructure\TestCase;
+use Thinktomorrow\Trader\Application\Promo\ApplicablePromo\ApplicablePromoRepository;
+use Thinktomorrow\Trader\Application\Promo\ApplicablePromo\ConditionFactory;
+use Thinktomorrow\Trader\Application\Promo\ApplicablePromo\DiscountFactory;
+use Thinktomorrow\Trader\Application\Promo\ApplicablePromo\Discounts\PercentageOffDiscount;
+use Thinktomorrow\Trader\Domain\Model\Promo\Discount;
+use Thinktomorrow\Trader\Domain\Model\Promo\Exceptions\CouldNotFindPromo;
 use Thinktomorrow\Trader\Domain\Model\Promo\Promo;
 use Thinktomorrow\Trader\Domain\Model\Promo\PromoId;
-use Thinktomorrow\Trader\Domain\Model\Promo\Discount;
-use Thinktomorrow\Trader\Domain\Model\Promo\Condition;
 use Thinktomorrow\Trader\Domain\Model\Promo\PromoState;
-use Thinktomorrow\Trader\Domain\Model\Promo\Exceptions\CouldNotFindPromo;
-use Thinktomorrow\Trader\Application\Promo\ApplicablePromo\DiscountFactory;
-use Thinktomorrow\Trader\Application\Promo\ApplicablePromo\ConditionFactory;
-use Thinktomorrow\Trader\Infrastructure\Test\Repositories\InMemoryPromoRepository;
 use Thinktomorrow\Trader\Infrastructure\Laravel\Repositories\MysqlPromoRepository;
-use Thinktomorrow\Trader\Application\Promo\ApplicablePromo\ApplicablePromoRepository;
-use Thinktomorrow\Trader\Application\Promo\ApplicablePromo\Discounts\PercentageOffDiscount;
+use Thinktomorrow\Trader\Infrastructure\Test\Repositories\InMemoryPromoRepository;
 
 final class PromoRepositoryTest extends TestCase
 {
@@ -72,7 +71,6 @@ final class PromoRepositoryTest extends TestCase
     {
         /** @var ApplicablePromoRepository $repository */
         foreach ($this->repositories() as $repository) {
-
             $promoOffline = $this->createPromo(['promo_id' => 'aaa', 'state' => PromoState::offline->value]);
             $repository->save($promoOffline);
 
@@ -91,7 +89,6 @@ final class PromoRepositoryTest extends TestCase
     {
         /** @var ApplicablePromoRepository $repository */
         foreach ($this->repositories() as $repository) {
-
             $promoOffline = $this->createPromo(['promo_id' => 'xxx', 'state' => PromoState::online->value]);
             $repository->save($promoOffline);
 
@@ -127,10 +124,11 @@ final class PromoRepositoryTest extends TestCase
     public function promos(): \Generator
     {
         yield [$this->createPromo([], [Discount::class => [
-                array_merge($this->createDiscount()->getMappedData(),
+                array_merge(
+                    $this->createDiscount()->getMappedData(),
                     $this->createDiscount()->getChildEntities()
-                )
-            ]
+                ),
+            ],
         ])];
         yield [$this->createPromo()];
         yield [$this->createPromo(['coupon_code' => 'foobar'])];

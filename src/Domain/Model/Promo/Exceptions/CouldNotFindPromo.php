@@ -5,5 +5,4 @@ namespace Thinktomorrow\Trader\Domain\Model\Promo\Exceptions;
 
 final class CouldNotFindPromo extends \Exception
 {
-
 }

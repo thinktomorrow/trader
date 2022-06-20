@@ -3,8 +3,8 @@ declare(strict_types=1);
 
 namespace Thinktomorrow\Trader\Domain\Model\Promo;
 
-use Thinktomorrow\Trader\Domain\Common\Entity\HasData;
 use Thinktomorrow\Trader\Domain\Common\Entity\ChildEntity;
+use Thinktomorrow\Trader\Domain\Common\Entity\HasData;
 
 final class Condition implements ChildEntity
 {
@@ -15,8 +15,8 @@ final class Condition implements ChildEntity
     public function getMappedData(): array
     {
         return [
-            'key'        => $this->mappingKey,
-            'data'       => json_encode($this->data),
+            'key' => $this->mappingKey,
+            'data' => json_encode($this->data),
         ];
     }
 

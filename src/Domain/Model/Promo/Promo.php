@@ -74,7 +74,7 @@ class Promo implements Aggregate
     public function getChildEntities(): array
     {
         return [
-            Discount::class => array_map(fn(Discount $discount) => $discount->getMappedData(), $this->discounts),
+            Discount::class => array_map(fn (Discount $discount) => $discount->getMappedData(), $this->discounts),
         ];
     }
 
@@ -88,7 +88,7 @@ class Promo implements Aggregate
         $promo->endAt = $state['end_at'] ? \DateTime::createFromFormat('Y-m-d H:i:s', $state['end_at']) : null;
 
         $promo->discounts = array_key_exists(Discount::class, $childEntities)
-            ? array_map(fn($discountState) => Discount::fromMappedData($discountState, $state, [Condition::class => $discountState[Condition::class]]), $childEntities[Discount::class])
+            ? array_map(fn ($discountState) => Discount::fromMappedData($discountState, $state, [Condition::class => $discountState[Condition::class]]), $childEntities[Discount::class])
             : [];
 
         $promo->data = json_decode($state['data'], true);

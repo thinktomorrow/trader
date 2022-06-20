@@ -9,7 +9,7 @@ trait HasMapping
 
     protected function setMapping(array $mapping): void
     {
-        foreach($mapping as $mappable) {
+        foreach ($mapping as $mappable) {
             $this->assertClassIsMappable($mappable);
             $mapping[$mappable::getMapKey()] = $mappable;
         }
@@ -17,7 +17,7 @@ trait HasMapping
 
     protected function findMappable(string $key): string
     {
-        if(!isset($this->mapping[$key])) {
+        if (! isset($this->mapping[$key])) {
             throw new \RuntimeException('No mappable class found by key ' . $key);
         }
 

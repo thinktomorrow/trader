@@ -5,8 +5,8 @@ namespace Thinktomorrow\Trader\Domain\Model\Order\Discount;
 
 use Money\Money;
 use Thinktomorrow\Trader\Domain\Common\Cash\Cash;
-use Thinktomorrow\Trader\Domain\Common\Entity\HasData;
 use Thinktomorrow\Trader\Domain\Common\Entity\ChildEntity;
+use Thinktomorrow\Trader\Domain\Common\Entity\HasData;
 use Thinktomorrow\Trader\Domain\Model\Order\OrderId;
 
 final class Discount implements ChildEntity

@@ -23,9 +23,12 @@ trait HasLines
 
     public function getQuantity(): Quantity
     {
-        return Quantity::fromInt(array_reduce(
+        return Quantity::fromInt(
+            array_reduce(
             $this->lines,
-            fn($carry, Line $line) => $carry + $line->getQuantity()->asInt(), 0),
+            fn ($carry, Line $line) => $carry + $line->getQuantity()->asInt(),
+            0
+        ),
         );
     }
 

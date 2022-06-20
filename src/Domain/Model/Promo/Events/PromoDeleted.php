@@ -9,6 +9,5 @@ final class PromoDeleted
 {
     public function __construct(public readonly PromoId $promoId)
     {
-
     }
 }

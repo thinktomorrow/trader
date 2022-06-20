@@ -4,10 +4,9 @@ declare(strict_types=1);
 namespace Thinktomorrow\Trader\Application\Promo\ApplicablePromo\Discounts;
 
 use Money\Money;
-use Thinktomorrow\Trader\Domain\Model\Order\Order;
-use Thinktomorrow\Trader\Domain\Model\Order\Line\Line;
-use Thinktomorrow\Trader\Domain\Model\Order\Discount\Discountable;
 use Thinktomorrow\Trader\Application\Promo\ApplicablePromo\Condition;
+use Thinktomorrow\Trader\Domain\Model\Order\Discount\Discountable;
+use Thinktomorrow\Trader\Domain\Model\Order\Order;
 
 abstract class BaseDiscount
 {
@@ -16,8 +15,8 @@ abstract class BaseDiscount
 
     protected function isApplicable(Order $order, Discountable $discountable): bool
     {
-        foreach($this->conditions as $condition) {
-            if(!$condition->check($order, $discountable)) {
+        foreach ($this->conditions as $condition) {
+            if (! $condition->check($order, $discountable)) {
                 return false;
             }
         }
@@ -27,7 +26,9 @@ abstract class BaseDiscount
 
     public function apply(Order $order, Discountable $discountable): void
     {
-        if(!$this->isApplicable($order, $discountable)) return;
+        if (! $this->isApplicable($order, $discountable)) {
+            return;
+        }
 
         $discountable->addDiscount(new \Thinktomorrow\Trader\Domain\Model\Order\Discount\Discount(
             $order->orderId,

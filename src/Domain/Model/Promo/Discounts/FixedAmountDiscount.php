@@ -5,9 +5,7 @@ namespace Thinktomorrow\Trader\Domain\Model\Promo\Discounts;
 
 use Money\Money;
 use Thinktomorrow\Trader\Domain\Common\Cash\Cash;
-use Thinktomorrow\Trader\Domain\Model\Order\Order;
 use Thinktomorrow\Trader\Domain\Common\Entity\ChildAggregate;
-use Thinktomorrow\Trader\Domain\Model\Order\Discount\Discountable;
 
 final class FixedAmountDiscount implements ChildAggregate
 {

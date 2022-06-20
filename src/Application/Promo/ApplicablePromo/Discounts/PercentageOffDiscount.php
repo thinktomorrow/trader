@@ -4,11 +4,11 @@ declare(strict_types=1);
 namespace Thinktomorrow\Trader\Application\Promo\ApplicablePromo\Discounts;
 
 use Money\Money;
+use Thinktomorrow\Trader\Application\Promo\ApplicablePromo\Discount;
 use Thinktomorrow\Trader\Domain\Common\Cash\Cash;
-use Thinktomorrow\Trader\Domain\Model\Order\Order;
 use Thinktomorrow\Trader\Domain\Common\Cash\Percentage;
 use Thinktomorrow\Trader\Domain\Model\Order\Discount\Discountable;
-use Thinktomorrow\Trader\Application\Promo\ApplicablePromo\Discount;
+use Thinktomorrow\Trader\Domain\Model\Order\Order;
 
 class PercentageOffDiscount extends BaseDiscount implements Discount
 {
@@ -22,7 +22,9 @@ class PercentageOffDiscount extends BaseDiscount implements Discount
     public function isApplicable(Order $order, Discountable $discountable): bool
     {
         // This is a global discount: it only applies to the order total
-        if(! $discountable instanceof Order) return false;
+        if (! $discountable instanceof Order) {
+            return false;
+        }
 
         return parent::isApplicable($order, $discountable);
     }

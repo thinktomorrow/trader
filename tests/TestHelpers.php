@@ -4,10 +4,6 @@ namespace Tests;
 
 use Illuminate\Contracts\Debug\ExceptionHandler;
 use Money\Money;
-use Thinktomorrow\Trader\Domain\Model\Promo\Promo;
-use Thinktomorrow\Trader\Domain\Model\Promo\PromoId;
-use Thinktomorrow\Trader\Domain\Model\Promo\Condition;
-use Thinktomorrow\Trader\Domain\Model\Promo\PromoState;
 use Thinktomorrow\Trader\Application\Product\CreateProduct;
 use Thinktomorrow\Trader\Application\Product\CreateVariant;
 use Thinktomorrow\Trader\Application\Product\ProductApplication;
@@ -43,6 +39,9 @@ use Thinktomorrow\Trader\Domain\Model\Product\Variant\Variant;
 use Thinktomorrow\Trader\Domain\Model\Product\Variant\VariantId;
 use Thinktomorrow\Trader\Domain\Model\Product\Variant\VariantSalePrice;
 use Thinktomorrow\Trader\Domain\Model\Product\Variant\VariantUnitPrice;
+use Thinktomorrow\Trader\Domain\Model\Promo\Condition;
+use Thinktomorrow\Trader\Domain\Model\Promo\Promo;
+use Thinktomorrow\Trader\Domain\Model\Promo\PromoState;
 use Throwable;
 
 trait TestHelpers
@@ -353,17 +352,17 @@ trait TestHelpers
             'start_at' => null,
             'end_at' => null,
             'data' => json_encode([]),
-        ],$mappedData), $childEntities);
+        ], $mappedData), $childEntities);
     }
 
     protected function createDiscount(array $mappedData = [], ?array $conditions = null)
     {
-        if(!$conditions) {
+        if (! $conditions) {
             $conditions = [
                 [
                     'key' => 'minimum_lines_quantity',
                     'data' => json_encode(['quantity' => '5']),
-                ]
+                ],
             ];
         }
 

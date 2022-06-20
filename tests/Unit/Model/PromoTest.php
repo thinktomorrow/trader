@@ -4,12 +4,12 @@ declare(strict_types=1);
 namespace Tests\Unit\Model;
 
 use Tests\Unit\TestCase;
+use Thinktomorrow\Trader\Domain\Model\Promo\Condition;
+use Thinktomorrow\Trader\Domain\Model\Promo\Discount;
+use Thinktomorrow\Trader\Domain\Model\Promo\Events\PromoCreated;
 use Thinktomorrow\Trader\Domain\Model\Promo\Promo;
 use Thinktomorrow\Trader\Domain\Model\Promo\PromoId;
-use Thinktomorrow\Trader\Domain\Model\Promo\Discount;
-use Thinktomorrow\Trader\Domain\Model\Promo\Condition;
 use Thinktomorrow\Trader\Domain\Model\Promo\PromoState;
-use Thinktomorrow\Trader\Domain\Model\Promo\Events\PromoCreated;
 
 final class PromoTest extends TestCase
 {
@@ -51,7 +51,7 @@ final class PromoTest extends TestCase
                 [
                     'key' => 'minimum_lines_quantity',
                     'data' => json_encode(['quantity' => '5']),
-                ]
+                ],
             ],
         ], $discount->getChildEntities());
     }
@@ -63,7 +63,7 @@ final class PromoTest extends TestCase
             'coupon_code' => 'foobar',
             'start_at' => '2022-05-05 10:10:10',
             'end_at' => '2022-05-09 10:10:10',
-            'data' => json_encode(['foo' => 'bar'])
+            'data' => json_encode(['foo' => 'bar']),
         ], [
             Discount::class => [
                 [
@@ -72,7 +72,7 @@ final class PromoTest extends TestCase
                     Condition::class => [
 
                     ],
-                ]
+                ],
             ],
         ]);
 
@@ -92,7 +92,7 @@ final class PromoTest extends TestCase
                     'promo_id' => 'xxx',
                     'key' => 'percentage_off',
                     'data' => json_encode(['percentage' => '40']),
-                ]
+                ],
             ],
         ], $promo->getChildEntities());
     }
@@ -103,7 +103,7 @@ final class PromoTest extends TestCase
         $promo = Promo::create(PromoId::fromString('xxx'));
 
         $promo->updateDiscounts([
-            $this->createDiscount()
+            $this->createDiscount(),
         ]);
 
         $this->assertCount(1, $promo->getChildEntities()[Discount::class]);
@@ -113,7 +113,7 @@ final class PromoTest extends TestCase
                     'promo_id' => 'xxx',
                     'key' => 'percentage_off',
                     'data' => json_encode(['percentage' => '40']),
-                ]
+                ],
             ],
         ], $promo->getChildEntities());
     }
@@ -143,7 +143,6 @@ final class PromoTest extends TestCase
         $promo->updateDiscounts([]);
 
         $this->assertCount(0, $promo->getChildEntities()[Discount::class]);
-
     }
 
     /** @test */
@@ -164,7 +163,7 @@ final class PromoTest extends TestCase
                 [
                     'key' => 'minimum_lines_quantity',
                     'data' => json_encode(['quantity' => 5]),
-                ]
+                ],
             ],
         ], $discount->getChildEntities());
     }
@@ -194,7 +193,7 @@ final class PromoTest extends TestCase
                 [
                     'key' => 'minimum_lines_quantity',
                     'data' => json_encode(['quantity' => 10]),
-                ]
+                ],
             ],
         ], $discount->getChildEntities());
     }
@@ -217,5 +216,4 @@ final class PromoTest extends TestCase
 
         $this->assertCount(0, $discount->getChildEntities()[Condition::class]);
     }
-
 }

@@ -4,68 +4,68 @@ declare(strict_types=1);
 namespace Thinktomorrow\Trader\Infrastructure\Laravel;
 
 use Illuminate\Support\Arr;
-use Thinktomorrow\Trader\TraderConfig;
 use Illuminate\Support\ServiceProvider;
 use Thinktomorrow\Trader\Application\Cart\Read\Cart;
 use Thinktomorrow\Trader\Application\Cart\Read\CartLine;
+use Thinktomorrow\Trader\Application\Cart\Read\CartRepository;
+use Thinktomorrow\Trader\Application\Cart\VariantForCart\VariantForCart;
+use Thinktomorrow\Trader\Application\Cart\VariantForCart\VariantForCartRepository;
 use Thinktomorrow\Trader\Application\Common\DataRenderer;
 use Thinktomorrow\Trader\Application\Common\DefaultLocale;
-use Thinktomorrow\Trader\Application\Taxon\Tree\TaxonNode;
+use Thinktomorrow\Trader\Application\Product\CheckProductOptions\CheckProductOptionsRepository;
+use Thinktomorrow\Trader\Application\Product\Grid\FlattenedTaxonIdsComposer;
 use Thinktomorrow\Trader\Application\Product\Grid\GridItem;
-use Thinktomorrow\Trader\Domain\Model\Order\OrderRepository;
-use Thinktomorrow\Trader\Domain\Model\Taxon\TaxonRepository;
-use Thinktomorrow\Trader\Domain\Model\Promo\PromoRepository;
+use Thinktomorrow\Trader\Application\Product\Grid\GridRepository;
+use Thinktomorrow\Trader\Application\Product\OptionLinks\OptionLink;
+use Thinktomorrow\Trader\Application\Product\ProductDetail\ProductDetail;
+use Thinktomorrow\Trader\Application\Product\ProductDetail\ProductDetailRepository;
+use Thinktomorrow\Trader\Application\Promo\ApplicablePromo\ApplicablePromoRepository;
+use Thinktomorrow\Trader\Application\Promo\ApplicablePromo\ConditionFactory;
+use Thinktomorrow\Trader\Application\Promo\ApplicablePromo\Conditions\MinimumLinesQuantity;
+use Thinktomorrow\Trader\Application\Promo\ApplicablePromo\DiscountFactory;
+use Thinktomorrow\Trader\Application\Promo\ApplicablePromo\Discounts\PercentageOffDiscount;
+use Thinktomorrow\Trader\Application\Taxon\Category\CategoryRepository;
+use Thinktomorrow\Trader\Application\Taxon\Filter\TaxonFilterTreeComposer;
+use Thinktomorrow\Trader\Application\Taxon\Redirect\RedirectRepository;
+use Thinktomorrow\Trader\Application\Taxon\TaxonSelect\TaxonIdOptionsComposer;
+use Thinktomorrow\Trader\Application\Taxon\Tree\TaxonNode;
+use Thinktomorrow\Trader\Application\Taxon\Tree\TaxonTreeRepository;
 use Thinktomorrow\Trader\Domain\Common\Event\EventDispatcher;
-use Thinktomorrow\Trader\Application\Cart\Read\CartRepository;
+use Thinktomorrow\Trader\Domain\Model\Customer\CustomerRepository;
+use Thinktomorrow\Trader\Domain\Model\CustomerLogin\CustomerLoginRepository;
+use Thinktomorrow\Trader\Domain\Model\Order\OrderRepository;
+use Thinktomorrow\Trader\Domain\Model\PaymentMethod\PaymentMethodRepository;
 use Thinktomorrow\Trader\Domain\Model\Product\ProductRepository;
 use Thinktomorrow\Trader\Domain\Model\Product\VariantRepository;
-use Thinktomorrow\Trader\Application\Product\Grid\GridRepository;
-use Thinktomorrow\Trader\Domain\Model\Customer\CustomerRepository;
-use Thinktomorrow\Trader\Application\Product\OptionLinks\OptionLink;
-use Thinktomorrow\Trader\Application\Taxon\Tree\TaxonTreeRepository;
-use Thinktomorrow\Trader\Application\Taxon\Category\CategoryRepository;
-use Thinktomorrow\Trader\Application\Taxon\Redirect\RedirectRepository;
-use Thinktomorrow\Trader\Infrastructure\Laravel\Models\DefaultGridItem;
-use Thinktomorrow\Trader\Application\Cart\VariantForCart\VariantForCart;
-use Thinktomorrow\Trader\Infrastructure\Laravel\Models\Cart\DefaultCart;
-use Thinktomorrow\Trader\Infrastructure\Laravel\Models\DefaultTaxonNode;
-use Thinktomorrow\Trader\Infrastructure\Vine\VineTaxonIdOptionsComposer;
-use Thinktomorrow\Trader\Application\Product\ProductDetail\ProductDetail;
-use Thinktomorrow\Trader\Infrastructure\Laravel\Models\DefaultOptionLink;
-use Thinktomorrow\Trader\Infrastructure\Vine\VineTaxonFilterTreeComposer;
-use Thinktomorrow\Trader\Application\Taxon\Filter\TaxonFilterTreeComposer;
-use Thinktomorrow\Trader\Infrastructure\Vine\VineFlattenedTaxonIdsComposer;
-use Thinktomorrow\Trader\Application\Promo\ApplicablePromo\DiscountFactory;
-use Thinktomorrow\Trader\Application\Product\Grid\FlattenedTaxonIdsComposer;
-use Thinktomorrow\Trader\Domain\Model\CustomerLogin\CustomerLoginRepository;
-use Thinktomorrow\Trader\Domain\Model\PaymentMethod\PaymentMethodRepository;
-use Thinktomorrow\Trader\Infrastructure\Laravel\Models\Cart\DefaultCartLine;
-use Thinktomorrow\Trader\Infrastructure\Laravel\Models\DefaultProductDetail;
-use Thinktomorrow\Trader\Application\Promo\ApplicablePromo\ConditionFactory;
-use Thinktomorrow\Trader\Infrastructure\Laravel\Models\DefaultVariantForCart;
-use Thinktomorrow\Trader\Application\Taxon\TaxonSelect\TaxonIdOptionsComposer;
+use Thinktomorrow\Trader\Domain\Model\Promo\PromoRepository;
 use Thinktomorrow\Trader\Domain\Model\ShippingProfile\ShippingProfileRepository;
+use Thinktomorrow\Trader\Domain\Model\Taxon\TaxonRepository;
+use Thinktomorrow\Trader\Infrastructure\Laravel\Models\Cart\DefaultCart;
+use Thinktomorrow\Trader\Infrastructure\Laravel\Models\Cart\DefaultCartLine;
+use Thinktomorrow\Trader\Infrastructure\Laravel\Models\DefaultGridItem;
+use Thinktomorrow\Trader\Infrastructure\Laravel\Models\DefaultOptionLink;
+use Thinktomorrow\Trader\Infrastructure\Laravel\Models\DefaultProductDetail;
+use Thinktomorrow\Trader\Infrastructure\Laravel\Models\DefaultTaxonNode;
+use Thinktomorrow\Trader\Infrastructure\Laravel\Models\DefaultVariantForCart;
 use Thinktomorrow\Trader\Infrastructure\Laravel\Repositories\MysqlCartRepository;
-use Thinktomorrow\Trader\Infrastructure\Laravel\Repositories\MysqlGridRepository;
-use Thinktomorrow\Trader\Application\Cart\VariantForCart\VariantForCartRepository;
-use Thinktomorrow\Trader\Infrastructure\Laravel\Repositories\MysqlOrderRepository;
-use Thinktomorrow\Trader\Infrastructure\Laravel\Repositories\MysqlTaxonRepository;
-use Thinktomorrow\Trader\Infrastructure\Laravel\Repositories\MysqlPromoRepository;
-use Thinktomorrow\Trader\Application\Product\ProductDetail\ProductDetailRepository;
-use Thinktomorrow\Trader\Infrastructure\Laravel\Repositories\MysqlProductRepository;
-use Thinktomorrow\Trader\Infrastructure\Laravel\Repositories\MysqlVariantRepository;
-use Thinktomorrow\Trader\Infrastructure\Laravel\Repositories\MysqlCustomerRepository;
-use Thinktomorrow\Trader\Infrastructure\Laravel\Repositories\MysqlRedirectRepository;
-use Thinktomorrow\Trader\Application\Promo\ApplicablePromo\ApplicablePromoRepository;
-use Thinktomorrow\Trader\Infrastructure\Laravel\Repositories\MysqlTaxonTreeRepository;
+use Thinktomorrow\Trader\Infrastructure\Laravel\Repositories\MysqlCheckProductOptionsRepository;
 use Thinktomorrow\Trader\Infrastructure\Laravel\Repositories\MysqlCustomerLoginRepository;
+use Thinktomorrow\Trader\Infrastructure\Laravel\Repositories\MysqlCustomerRepository;
+use Thinktomorrow\Trader\Infrastructure\Laravel\Repositories\MysqlGridRepository;
+use Thinktomorrow\Trader\Infrastructure\Laravel\Repositories\MysqlOrderRepository;
 use Thinktomorrow\Trader\Infrastructure\Laravel\Repositories\MysqlPaymentMethodRepository;
 use Thinktomorrow\Trader\Infrastructure\Laravel\Repositories\MysqlProductDetailRepository;
-use Thinktomorrow\Trader\Application\Promo\ApplicablePromo\Discounts\PercentageOffDiscount;
-use Thinktomorrow\Trader\Application\Promo\ApplicablePromo\Conditions\MinimumLinesQuantity;
+use Thinktomorrow\Trader\Infrastructure\Laravel\Repositories\MysqlProductRepository;
+use Thinktomorrow\Trader\Infrastructure\Laravel\Repositories\MysqlPromoRepository;
+use Thinktomorrow\Trader\Infrastructure\Laravel\Repositories\MysqlRedirectRepository;
 use Thinktomorrow\Trader\Infrastructure\Laravel\Repositories\MysqlShippingProfileRepository;
-use Thinktomorrow\Trader\Application\Product\CheckProductOptions\CheckProductOptionsRepository;
-use Thinktomorrow\Trader\Infrastructure\Laravel\Repositories\MysqlCheckProductOptionsRepository;
+use Thinktomorrow\Trader\Infrastructure\Laravel\Repositories\MysqlTaxonRepository;
+use Thinktomorrow\Trader\Infrastructure\Laravel\Repositories\MysqlTaxonTreeRepository;
+use Thinktomorrow\Trader\Infrastructure\Laravel\Repositories\MysqlVariantRepository;
+use Thinktomorrow\Trader\Infrastructure\Vine\VineFlattenedTaxonIdsComposer;
+use Thinktomorrow\Trader\Infrastructure\Vine\VineTaxonFilterTreeComposer;
+use Thinktomorrow\Trader\Infrastructure\Vine\VineTaxonIdOptionsComposer;
+use Thinktomorrow\Trader\TraderConfig;
 
 class TraderServiceProvider extends ServiceProvider
 {
@@ -124,17 +124,19 @@ class TraderServiceProvider extends ServiceProvider
         $this->app->bind(PromoRepository::class, MysqlPromoRepository::class);
         $this->app->bind(ApplicablePromoRepository::class, MysqlPromoRepository::class);
 
-        $this->app->bind(ConditionFactory::class, function() {
+        $this->app->bind(ConditionFactory::class, function () {
             return new ConditionFactory([
                 MinimumLinesQuantity::class,
             ]);
         });
 
-        $this->app->bind(DiscountFactory::class, function($app) {
-            return new DiscountFactory([
+        $this->app->bind(DiscountFactory::class, function ($app) {
+            return new DiscountFactory(
+                [
                 PercentageOffDiscount::class,
             ],
-            $app->get(ConditionFactory::class));
+                $app->get(ConditionFactory::class)
+            );
         });
     }
 

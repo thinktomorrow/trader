@@ -19,7 +19,7 @@ class DiscountFactory
 
     public function make(string $key, array $state, array $aggregateState, $conditionStates): Discount
     {
-        $conditions = array_map(fn($conditionState) => $this->conditionFactory->make($conditionState['type'], $conditionState, $state), $conditionStates);
+        $conditions = array_map(fn ($conditionState) => $this->conditionFactory->make($conditionState['type'], $conditionState, $state), $conditionStates);
 
         return $this->findMappable($key)::fromMappedData($state, $aggregateState, $conditions);
     }
