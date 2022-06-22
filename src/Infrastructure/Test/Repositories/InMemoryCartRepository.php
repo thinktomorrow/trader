@@ -108,4 +108,13 @@ final class InMemoryCartRepository implements CartRepository
             ]), $orderState), $order->getDiscounts()), // TODO: cart discounts
         );
     }
+
+    public function existsCart(OrderId $orderId): bool
+    {
+        foreach(InMemoryOrderRepository::$orders as $order) {
+            if($order->orderId->equals($orderId)) return true;
+        }
+
+        return false;
+    }
 }

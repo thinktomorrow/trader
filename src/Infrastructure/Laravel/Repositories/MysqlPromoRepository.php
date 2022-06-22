@@ -20,6 +20,7 @@ use Thinktomorrow\Trader\Domain\Model\Promo\Promo;
 use Thinktomorrow\Trader\Domain\Model\Promo\PromoId;
 use Thinktomorrow\Trader\Domain\Model\Promo\PromoRepository;
 use Thinktomorrow\Trader\Domain\Model\Promo\PromoState;
+use Thinktomorrow\Trader\Application\Promo\OrderPromo\OrderDiscountFactory;
 
 final class MysqlPromoRepository implements PromoRepository, OrderPromoRepository
 {
@@ -28,10 +29,12 @@ final class MysqlPromoRepository implements PromoRepository, OrderPromoRepositor
     private static string $promoConditionTable = 'trader_promo_conditions';
 
     private DiscountFactory $discountFactory;
+    private OrderDiscountFactory $orderDiscountFactory;
 
-    public function __construct(DiscountFactory $discountFactory)
+    public function __construct(DiscountFactory $discountFactory, OrderDiscountFactory $orderDiscountFactory)
     {
         $this->discountFactory = $discountFactory;
+        $this->orderDiscountFactory = $orderDiscountFactory;
     }
 
     public function getAvailableOrderPromos(): array
@@ -48,7 +51,7 @@ final class MysqlPromoRepository implements PromoRepository, OrderPromoRepositor
             return OrderPromo::fromMappedData(array_merge($promoResult, [
                 'is_combinable' => (bool) $promoResult['is_combinable'],
             ]), [
-                OrderDiscount::class => $this->makeDiscounts($discountStates, $promoResult, $this->discountFactory),
+                OrderDiscount::class => $this->makeDiscounts($discountStates, $promoResult, $this->orderDiscountFactory),
             ]);
         }, $results->toArray());
     }
@@ -67,7 +70,7 @@ final class MysqlPromoRepository implements PromoRepository, OrderPromoRepositor
         return OrderPromo::fromMappedData(array_merge($result, [
             'is_combinable' => (bool) $result['is_combinable'],
         ]), [
-            OrderDiscount::class => $this->makeDiscounts($discountStates, $result, $this->discountFactory),
+            OrderDiscount::class => $this->makeDiscounts($discountStates, $result, $this->orderDiscountFactory),
         ]);
     }
 

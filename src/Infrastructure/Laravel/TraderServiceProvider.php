@@ -6,8 +6,10 @@ namespace Thinktomorrow\Trader\Infrastructure\Laravel;
 use Illuminate\Support\Arr;
 use Illuminate\Support\ServiceProvider;
 use Thinktomorrow\Trader\Application\Cart\Read\Cart;
+use Thinktomorrow\Trader\Domain\Common\Taxes\TaxRate;
 use Thinktomorrow\Trader\Application\Cart\Read\CartLine;
 use Thinktomorrow\Trader\Application\Cart\Read\CartRepository;
+use Thinktomorrow\Trader\Domain\Model\Order\Discount\DiscountTotal;
 use Thinktomorrow\Trader\Application\Cart\VariantForCart\VariantForCart;
 use Thinktomorrow\Trader\Application\Cart\VariantForCart\VariantForCartRepository;
 use Thinktomorrow\Trader\Application\Common\DataRenderer;
@@ -148,6 +150,9 @@ class TraderServiceProvider extends ServiceProvider
 
         // Migrations
         $this->loadMigrationsFrom(__DIR__.'/database/migrations');
+
+        // Default discount tax rate
+        DiscountTotal::setDiscountTaxRate(TaxRate::fromString($this->app->make(TraderConfig::class)->getDefaultTaxRate()));
 
         // Default locale
         DefaultLocale::set($this->app->make(TraderConfig::class)->getDefaultLocale());

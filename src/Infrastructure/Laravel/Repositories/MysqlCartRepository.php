@@ -16,8 +16,6 @@ use Thinktomorrow\Trader\Application\Cart\Read\CartShopper;
 use Thinktomorrow\Trader\Application\Cart\VariantForCart\VariantForCartRepository;
 use Thinktomorrow\Trader\Domain\Model\Order\OrderId;
 use Thinktomorrow\Trader\Domain\Model\Order\OrderRepository;
-use Thinktomorrow\Trader\Domain\Model\Order\Payment\Payment;
-use Thinktomorrow\Trader\Domain\Model\Order\Shipping\Shipping;
 
 final class MysqlCartRepository implements CartRepository
 {
@@ -32,11 +30,6 @@ final class MysqlCartRepository implements CartRepository
         $this->container = $container;
         $this->orderRepository = $orderRepository;
         $this->variantForCartRepository = $variantForCartRepository;
-    }
-
-    private function exists(OrderId $orderId): bool
-    {
-        return DB::table(static::$orderTable)->where('order_id', $orderId->get())->exists();
     }
 
     public function findCart(OrderId $orderId): Cart
@@ -108,5 +101,10 @@ final class MysqlCartRepository implements CartRepository
             ],
             [], // TODO: cart discounts
         );
+    }
+
+    public function existsCart(OrderId $orderId): bool
+    {
+        return DB::table(static::$orderTable)->where('order_id', $orderId->get())->exists();
     }
 }
