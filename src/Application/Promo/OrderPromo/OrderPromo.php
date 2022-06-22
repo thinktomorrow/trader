@@ -4,10 +4,10 @@ declare(strict_types=1);
 namespace Thinktomorrow\Trader\Application\Promo\OrderPromo;
 
 use Assert\Assertion;
-use Thinktomorrow\Trader\Domain\Model\Order\Order;
-use Thinktomorrow\Trader\Domain\Model\Promo\PromoId;
 use Thinktomorrow\Trader\Domain\Common\Entity\HasData;
 use Thinktomorrow\Trader\Domain\Model\Order\Discount\DiscountTotal;
+use Thinktomorrow\Trader\Domain\Model\Order\Order;
+use Thinktomorrow\Trader\Domain\Model\Promo\PromoId;
 
 class OrderPromo
 {
@@ -48,7 +48,7 @@ class OrderPromo
             }
         }
 
-        if($this->coupon_code && $hasBeenApplied) {
+        if ($this->coupon_code && $hasBeenApplied) {
             $order->setEnteredCouponCode($this->coupon_code);
         }
     }
@@ -60,7 +60,7 @@ class OrderPromo
 
     public function getCombinedDiscountTotal(Order $order): DiscountTotal
     {
-        return array_reduce($this->discounts, fn($carry, OrderDiscount $discount) => $discount->getCombinedDiscountTotal($order), DiscountTotal::zero());
+        return array_reduce($this->discounts, fn ($carry, OrderDiscount $discount) => $discount->getCombinedDiscountTotal($order), DiscountTotal::zero());
     }
 
     public static function fromMappedData(array $state, array $childEntities = []): static

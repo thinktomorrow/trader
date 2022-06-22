@@ -3,19 +3,18 @@ declare(strict_types=1);
 
 namespace Thinktomorrow\Trader\Infrastructure\Test\Repositories;
 
-use Assert\Assertion;
-use Thinktomorrow\Trader\Domain\Model\Promo\Discount;
-use Thinktomorrow\Trader\Domain\Model\Promo\Condition;
-use Thinktomorrow\Trader\Domain\Model\Promo\DiscountFactory;
-use Thinktomorrow\Trader\Application\Promo\OrderPromo\OrderPromo;
 use Thinktomorrow\Trader\Application\Promo\OrderPromo\OrderDiscount;
+use Thinktomorrow\Trader\Application\Promo\OrderPromo\OrderDiscountFactory;
+use Thinktomorrow\Trader\Application\Promo\OrderPromo\OrderPromo;
 use Thinktomorrow\Trader\Application\Promo\OrderPromo\OrderPromoRepository;
+use Thinktomorrow\Trader\Domain\Model\Promo\Condition;
+use Thinktomorrow\Trader\Domain\Model\Promo\Discount;
+use Thinktomorrow\Trader\Domain\Model\Promo\DiscountFactory;
 use Thinktomorrow\Trader\Domain\Model\Promo\Exceptions\CouldNotFindPromo;
 use Thinktomorrow\Trader\Domain\Model\Promo\Promo;
 use Thinktomorrow\Trader\Domain\Model\Promo\PromoId;
 use Thinktomorrow\Trader\Domain\Model\Promo\PromoRepository;
 use Thinktomorrow\Trader\Domain\Model\Promo\PromoState;
-use Thinktomorrow\Trader\Application\Promo\OrderPromo\OrderDiscountFactory;
 
 final class InMemoryPromoRepository implements PromoRepository, OrderPromoRepository
 {
@@ -77,7 +76,9 @@ final class InMemoryPromoRepository implements PromoRepository, OrderPromoReposi
         $result = [];
 
         foreach ($this->filterActivePromos() as $promo) {
-            if($promo->hasCouponCode()) continue;
+            if ($promo->hasCouponCode()) {
+                continue;
+            }
             $result[] = $this->createApplicablePromoFromPromo($promo);
         }
 
@@ -86,8 +87,8 @@ final class InMemoryPromoRepository implements PromoRepository, OrderPromoReposi
 
     public function findOrderPromoByCouponCode(string $couponCode): ?OrderPromo
     {
-        foreach($this->filterActivePromos() as $promo) {
-            if($promo->hasCouponCode() && $promo->getCouponCode() == $couponCode) {
+        foreach ($this->filterActivePromos() as $promo) {
+            if ($promo->hasCouponCode() && $promo->getCouponCode() == $couponCode) {
                 return $this->createApplicablePromoFromPromo($promo);
             };
         }
@@ -119,7 +120,6 @@ final class InMemoryPromoRepository implements PromoRepository, OrderPromoReposi
         }
 
         return $result;
-
     }
 
     private function createApplicablePromoFromPromo(Promo $promo): OrderPromo
@@ -127,8 +127,11 @@ final class InMemoryPromoRepository implements PromoRepository, OrderPromoReposi
         return OrderPromo::fromMappedData(
             $promo->getMappedData(),
             [
-                OrderDiscount::class => array_map(fn(Discount $discount) => $this->orderDiscountFactory->make($discount::getMapKey(), $discount->getMappedData(), $promo->getMappedData(),
-                    array_map(fn(Condition $condition) => $condition->getMappedData(), $discount->getConditions())
+                OrderDiscount::class => array_map(fn (Discount $discount) => $this->orderDiscountFactory->make(
+                    $discount::getMapKey(),
+                    $discount->getMappedData(),
+                    $promo->getMappedData(),
+                    array_map(fn (Condition $condition) => $condition->getMappedData(), $discount->getConditions())
                 ), $promo->getDiscounts()),
             ]
         );

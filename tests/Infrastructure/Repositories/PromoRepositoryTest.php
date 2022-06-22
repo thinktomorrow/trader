@@ -5,12 +5,12 @@ namespace Tests\Infrastructure\Repositories;
 
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\Infrastructure\TestCase;
-use Thinktomorrow\Trader\Application\Promo\OrderPromo\OrderPromo;
-use Thinktomorrow\Trader\Application\Promo\OrderPromo\OrderPromoRepository;
-use Thinktomorrow\Trader\Application\Promo\OrderPromo\OrderDiscountFactory;
-use Thinktomorrow\Trader\Application\Promo\OrderPromo\OrderConditionFactory;
 use Thinktomorrow\Trader\Application\Promo\OrderPromo\Discounts\FixedAmountOrderDiscount;
 use Thinktomorrow\Trader\Application\Promo\OrderPromo\Discounts\PercentageOffOrderDiscount;
+use Thinktomorrow\Trader\Application\Promo\OrderPromo\OrderConditionFactory;
+use Thinktomorrow\Trader\Application\Promo\OrderPromo\OrderDiscountFactory;
+use Thinktomorrow\Trader\Application\Promo\OrderPromo\OrderPromo;
+use Thinktomorrow\Trader\Application\Promo\OrderPromo\OrderPromoRepository;
 use Thinktomorrow\Trader\Domain\Model\Promo\ConditionFactory;
 use Thinktomorrow\Trader\Domain\Model\Promo\Conditions\MinimumLinesQuantity;
 use Thinktomorrow\Trader\Domain\Model\Promo\DiscountFactory;

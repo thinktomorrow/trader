@@ -4,13 +4,13 @@ declare(strict_types=1);
 namespace Thinktomorrow\Trader\Domain\Model\Order\Payment;
 
 use Thinktomorrow\Trader\Domain\Common\Cash\Price;
-use Thinktomorrow\Trader\Domain\Common\Entity\HasData;
-use Thinktomorrow\Trader\Domain\Model\Order\OrderId;
 use Thinktomorrow\Trader\Domain\Common\Cash\PriceTotal;
-use Thinktomorrow\Trader\Domain\Model\Order\HasDiscounts;
-use Thinktomorrow\Trader\Domain\Model\Order\Line\Quantity;
+use Thinktomorrow\Trader\Domain\Common\Entity\HasData;
 use Thinktomorrow\Trader\Domain\Model\Order\Discount\Discountable;
 use Thinktomorrow\Trader\Domain\Model\Order\Discount\DiscountTotal;
+use Thinktomorrow\Trader\Domain\Model\Order\HasDiscounts;
+use Thinktomorrow\Trader\Domain\Model\Order\Line\Quantity;
+use Thinktomorrow\Trader\Domain\Model\Order\OrderId;
 use Thinktomorrow\Trader\Domain\Model\PaymentMethod\PaymentMethodId;
 
 class Payment implements Discountable

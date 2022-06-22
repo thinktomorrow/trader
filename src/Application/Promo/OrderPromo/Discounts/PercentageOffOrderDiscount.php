@@ -3,11 +3,11 @@ declare(strict_types=1);
 
 namespace Thinktomorrow\Trader\Application\Promo\OrderPromo\Discounts;
 
-use Thinktomorrow\Trader\Domain\Model\Order\Discount\DiscountTotal;
 use Thinktomorrow\Trader\Application\Promo\OrderPromo\OrderDiscount;
 use Thinktomorrow\Trader\Domain\Common\Cash\Cash;
 use Thinktomorrow\Trader\Domain\Common\Cash\Percentage;
 use Thinktomorrow\Trader\Domain\Model\Order\Discount\Discountable;
+use Thinktomorrow\Trader\Domain\Model\Order\Discount\DiscountTotal;
 use Thinktomorrow\Trader\Domain\Model\Order\Order;
 
 class PercentageOffOrderDiscount extends BaseDiscount implements OrderDiscount
@@ -36,7 +36,6 @@ class PercentageOffOrderDiscount extends BaseDiscount implements OrderDiscount
         )->percentage($this->percentage);
 
         return DiscountTotal::fromDefault($amount);
-
     }
 
     public static function fromMappedData(array $state, array $aggregateState, array $conditions): static

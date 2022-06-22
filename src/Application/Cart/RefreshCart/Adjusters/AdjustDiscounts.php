@@ -3,10 +3,10 @@ declare(strict_types=1);
 
 namespace Thinktomorrow\Trader\Application\Cart\RefreshCart\Adjusters;
 
-use Thinktomorrow\Trader\Domain\Model\Order\Order;
 use Thinktomorrow\Trader\Application\Cart\RefreshCart\Adjuster;
 use Thinktomorrow\Trader\Application\Promo\OrderPromo\OrderPromo;
 use Thinktomorrow\Trader\Application\Promo\OrderPromo\OrderPromoRepository;
+use Thinktomorrow\Trader\Domain\Model\Order\Order;
 
 class AdjustDiscounts implements Adjuster
 {
@@ -26,13 +26,12 @@ class AdjustDiscounts implements Adjuster
         $combinablePromoIds = [];
 
         // If coupon is given on cart, we'll refresh that promo first
-        if($order->getEnteredCouponCode() && $couponPromo = $this->orderPromoRepository->findOrderPromoByCouponCode($order->getEnteredCouponCode())) {
+        if ($order->getEnteredCouponCode() && $couponPromo = $this->orderPromoRepository->findOrderPromoByCouponCode($order->getEnteredCouponCode())) {
             $couponPromo->apply($order);
 
-            if($couponPromo->isCombinable()) {
+            if ($couponPromo->isCombinable()) {
                 $combinablePromoIds[] = $couponPromo->promoId;
             }
-
         } else {
             $order->removeEnteredCouponCode();
         }
@@ -40,19 +39,22 @@ class AdjustDiscounts implements Adjuster
         $promos = $this->orderPromoRepository->getAvailableOrderPromos();
 
         // Sort them by highest impact
-        usort($promos, fn(OrderPromo $promo) => $promo->getCombinedDiscountTotal($order)->getIncludingVat()->getAmount());
+        usort($promos, fn (OrderPromo $promo) => $promo->getCombinedDiscountTotal($order)->getIncludingVat()->getAmount());
 
-        foreach($promos as $promo) {
-
-            if($promo->isCombinable()) {
+        foreach ($promos as $promo) {
+            if ($promo->isCombinable()) {
                 $combinablePromoIds[] = $promo->promoId;
             }
 
             // Check if existing promos are combinable
-            if(! $this->areExistingPromosCombinable($order, $combinablePromoIds)) break;
+            if (! $this->areExistingPromosCombinable($order, $combinablePromoIds)) {
+                break;
+            }
 
             // Check if this promo is combinable when there are already promos on the order present
-            if($this->hasPromo($order) && !$promo->isCombinable()) continue;
+            if ($this->hasPromo($order) && ! $promo->isCombinable()) {
+                continue;
+            }
 
             $promo->apply($order);
         }
@@ -73,31 +75,30 @@ class AdjustDiscounts implements Adjuster
 
     private function areExistingPromosCombinable(Order $order, array $combinablePromoIds)
     {
-        foreach($this->getExistingPromoIds($order) as $existingPromoId) {
-            if(!in_array($existingPromoId, $combinablePromoIds)) {
+        foreach ($this->getExistingPromoIds($order) as $existingPromoId) {
+            if (! in_array($existingPromoId, $combinablePromoIds)) {
                 return false;
             }
         }
 
         return true;
-
     }
 
     private function hasPromo(Order $order): bool
     {
         foreach ($order->getShippings() as $shipping) {
-            if(count($shipping->getDiscounts()) > 0) {
+            if (count($shipping->getDiscounts()) > 0) {
                 return true;
             }
         }
 
         foreach ($order->getLines() as $line) {
-            if(count($line->getDiscounts()) > 0) {
+            if (count($line->getDiscounts()) > 0) {
                 return true;
             }
         }
 
-        if(count($order->getDiscounts()) > 0) {
+        if (count($order->getDiscounts()) > 0) {
             return true;
         }
 
@@ -109,18 +110,18 @@ class AdjustDiscounts implements Adjuster
         $promoIds = [];
 
         foreach ($order->getShippings() as $shipping) {
-            foreach($shipping->getDiscounts() as $discount) {
+            foreach ($shipping->getDiscounts() as $discount) {
                 $promoIds[] = $discount->promoId;
             };
         }
 
         foreach ($order->getLines() as $line) {
-            foreach($line->getDiscounts() as $discount) {
+            foreach ($line->getDiscounts() as $discount) {
                 $promoIds[] = $discount->promoId;
             };
         }
 
-        foreach($order->getDiscounts() as $discount) {
+        foreach ($order->getDiscounts() as $discount) {
             $promoIds[] = $discount->promoId;
         };
 

@@ -45,7 +45,7 @@ class Promo implements Aggregate
      */
     public function hasCouponCode(): bool
     {
-        return !!$this->coupon_code;
+        return ! ! $this->coupon_code;
     }
 
     public function getCouponCode(): ?string

@@ -62,7 +62,9 @@ final class MysqlPromoRepository implements PromoRepository, OrderPromoRepositor
             ->where('coupon_code', $couponCode)
             ->first();
 
-        if(!$result) return null;
+        if (! $result) {
+            return null;
+        }
         $result = (array) $result;
 
         $discountStates = $this->getDiscountStates($result['promo_id']);

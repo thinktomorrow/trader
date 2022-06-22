@@ -5,9 +5,9 @@ namespace Tests\Acceptance\Promo;
 
 use Money\Money;
 use Tests\Acceptance\Cart\CartContext;
-use Thinktomorrow\Trader\Domain\Common\Cash\Cash;
-use Thinktomorrow\Trader\Application\Promo\EnterCoupon;
 use Thinktomorrow\Trader\Application\Cart\RefreshCart\RefreshCart;
+use Thinktomorrow\Trader\Application\Promo\EnterCoupon;
+use Thinktomorrow\Trader\Domain\Common\Cash\Cash;
 
 class OrderPromoTest extends CartContext
 {
@@ -170,18 +170,15 @@ class OrderPromoTest extends CartContext
     /** @test */
     public function it_can_apply_discount_on_entire_order()
     {
-
     }
 
     /** @test */
     public function it_can_apply_discount_on_line()
     {
-
     }
 
     /** @test */
     public function it_can_apply_discount_on_shipping()
     {
-
     }
 }
