@@ -6,8 +6,8 @@ namespace Thinktomorrow\Trader\Domain\Model\Promo\Discounts;
 use Assert\Assertion;
 use Thinktomorrow\Trader\Domain\Common\Entity\HasData;
 use Thinktomorrow\Trader\Domain\Model\Promo\Condition;
-use Thinktomorrow\Trader\Domain\Model\Promo\PromoId;
 use Thinktomorrow\Trader\Domain\Model\Promo\DiscountId;
+use Thinktomorrow\Trader\Domain\Model\Promo\PromoId;
 
 abstract class BaseDiscount
 {

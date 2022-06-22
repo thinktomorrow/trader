@@ -3,10 +3,10 @@ declare(strict_types=1);
 
 namespace Thinktomorrow\Trader\Infrastructure\Laravel\Models\Cart;
 
-use Thinktomorrow\Trader\Domain\Common\Cash\Percentage;
+use Thinktomorrow\Trader\Application\Cart\Read\CartDiscount;
 use Thinktomorrow\Trader\Application\Common\RendersData;
 use Thinktomorrow\Trader\Application\Common\RendersMoney;
-use Thinktomorrow\Trader\Application\Cart\Read\CartDiscount;
+use Thinktomorrow\Trader\Domain\Common\Cash\Percentage;
 use Thinktomorrow\Trader\Domain\Model\Order\Discount\DiscountTotal;
 
 class DefaultCartDiscount implements CartDiscount

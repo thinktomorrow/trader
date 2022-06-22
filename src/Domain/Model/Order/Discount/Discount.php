@@ -3,15 +3,14 @@ declare(strict_types=1);
 
 namespace Thinktomorrow\Trader\Domain\Model\Order\Discount;
 
-use Money\Money;
 use Thinktomorrow\Trader\Domain\Common\Cash\Cash;
-use Thinktomorrow\Trader\Domain\Common\Cash\Price;
-use Thinktomorrow\Trader\Domain\Model\Promo\PromoId;
-use Thinktomorrow\Trader\Domain\Common\Cash\PriceTotal;
 use Thinktomorrow\Trader\Domain\Common\Cash\Percentage;
+use Thinktomorrow\Trader\Domain\Common\Cash\Price;
+use Thinktomorrow\Trader\Domain\Common\Cash\PriceTotal;
 use Thinktomorrow\Trader\Domain\Common\Entity\ChildEntity;
 use Thinktomorrow\Trader\Domain\Common\Entity\HasData;
 use Thinktomorrow\Trader\Domain\Model\Order\OrderId;
+use Thinktomorrow\Trader\Domain\Model\Promo\PromoId;
 
 final class Discount implements ChildEntity
 {
