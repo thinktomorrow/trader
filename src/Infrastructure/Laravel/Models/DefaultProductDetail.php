@@ -39,8 +39,8 @@ class DefaultProductDetail implements ProductDetail
         $item->productId = ProductId::fromString($state['product_id']);
         $item->state = VariantState::from($state['state']);
         $item->taxon_ids = $state['taxon_ids'];
-        $item->salePrice = VariantSalePrice::fromScalars($state['sale_price'], 'EUR', $state['tax_rate'], $state['includes_vat']);
-        $item->unitPrice = VariantUnitPrice::fromScalars($state['unit_price'], 'EUR', $state['tax_rate'], $state['includes_vat']);
+        $item->salePrice = VariantSalePrice::fromScalars($state['sale_price'], $state['tax_rate'], $state['includes_vat']);
+        $item->unitPrice = VariantUnitPrice::fromScalars($state['unit_price'], $state['tax_rate'], $state['includes_vat']);
         $item->data = array_merge(
             json_decode($state['product_data'], true),
             json_decode($state['data'], true),

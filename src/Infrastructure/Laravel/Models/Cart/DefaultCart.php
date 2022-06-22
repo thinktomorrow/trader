@@ -28,7 +28,7 @@ class DefaultCart implements Cart
     protected ?CartShipping $shipping;
     protected ?CartPayment $payment;
     protected ?CartShopper $shopper;
-    protected iterable $discounts;
+    protected array $discounts;
     protected array $data;
 
     protected PriceTotal $total;
@@ -180,6 +180,6 @@ class DefaultCart implements Cart
 
     public function getDiscounts(): array
     {
-        // TODO: Implement getDiscounts() method.
+        return $this->discounts;
     }
 }

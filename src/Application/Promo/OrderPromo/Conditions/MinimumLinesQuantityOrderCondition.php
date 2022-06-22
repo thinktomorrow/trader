@@ -1,13 +1,13 @@
 <?php
 declare(strict_types=1);
 
-namespace Thinktomorrow\Trader\Application\Promo\ApplicablePromo\Conditions;
+namespace Thinktomorrow\Trader\Application\Promo\OrderPromo\Conditions;
 
-use Thinktomorrow\Trader\Application\Promo\ApplicablePromo\ApplicableCondition;
+use Thinktomorrow\Trader\Application\Promo\OrderPromo\OrderCondition;
 use Thinktomorrow\Trader\Domain\Model\Order\Discount\Discountable;
 use Thinktomorrow\Trader\Domain\Model\Order\Order;
 
-final class MinimumLinesQuantity implements ApplicableCondition
+final class MinimumLinesQuantityOrderCondition implements OrderCondition
 {
     private int $minimum_quantity;
 
@@ -27,10 +27,10 @@ final class MinimumLinesQuantity implements ApplicableCondition
 
     public static function fromMappedData(array $state, array $aggregateState): static
     {
-        $values = json_decode($state['values'], true);
+        $data = json_decode($state['data'], true);
 
         $condition = new static();
-        $condition->minimum_quantity = $values['minimum_quantity'];
+        $condition->minimum_quantity = $data['minimum_quantity'];
 
         return $condition;
     }

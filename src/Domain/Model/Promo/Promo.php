@@ -17,6 +17,7 @@ class Promo implements Aggregate
     public readonly PromoId $promoId;
     private PromoState $state;
     private ?string $coupon_code;
+    private bool $isCombinable;
     private ?\DateTime $startAt;
     private ?\DateTime $endAt;
 
@@ -28,6 +29,7 @@ class Promo implements Aggregate
         $promo = new static();
         $promo->promoId = $promoId;
         $promo->state = PromoState::online;
+        $promo->isCombinable = false;
         $promo->coupon_code = null;
         $promo->startAt = null;
         $promo->endAt = null;
@@ -35,6 +37,20 @@ class Promo implements Aggregate
         $promo->recordEvent(new PromoCreated($promoId));
 
         return $promo;
+    }
+
+    /**
+     * Having a coupon code denotes the difference between an automatic applicable promo or
+     * a promo that can only be applied when manually entering the corresponding code.
+     */
+    public function hasCouponCode(): bool
+    {
+        return !!$this->coupon_code;
+    }
+
+    public function getCouponCode(): ?string
+    {
+        return $this->coupon_code;
     }
 
     public function updateState(PromoState $state): void
@@ -64,6 +80,7 @@ class Promo implements Aggregate
         return [
             'promo_id' => $this->promoId->get(),
             'state' => $this->state->value,
+            'is_combinable' => $this->isCombinable,
             'coupon_code' => $this->coupon_code,
             'start_at' => $this->startAt?->format('Y-m-d H:i:s'),
             'end_at' => $this->endAt?->format('Y-m-d H:i:s'),
@@ -86,6 +103,7 @@ class Promo implements Aggregate
 
         $promo->promoId = PromoId::fromString($state['promo_id']);
         $promo->state = PromoState::from($state['state']);
+        $promo->isCombinable = $state['is_combinable'];
         $promo->coupon_code = $state['coupon_code'];
         $promo->startAt = $state['start_at'] ? \DateTime::createFromFormat('Y-m-d H:i:s', $state['start_at']) : null;
         $promo->endAt = $state['end_at'] ? \DateTime::createFromFormat('Y-m-d H:i:s', $state['end_at']) : null;

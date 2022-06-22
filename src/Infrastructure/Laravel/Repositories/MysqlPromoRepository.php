@@ -8,9 +8,9 @@ use Illuminate\Database\Query\Builder;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 use Ramsey\Uuid\Uuid;
-use Thinktomorrow\Trader\Application\Promo\ApplicablePromo\ApplicableDiscount;
-use Thinktomorrow\Trader\Application\Promo\ApplicablePromo\ApplicablePromo;
-use Thinktomorrow\Trader\Application\Promo\ApplicablePromo\ApplicablePromoRepository;
+use Thinktomorrow\Trader\Application\Promo\OrderPromo\OrderDiscount;
+use Thinktomorrow\Trader\Application\Promo\OrderPromo\OrderPromo;
+use Thinktomorrow\Trader\Application\Promo\OrderPromo\OrderPromoRepository;
 use Thinktomorrow\Trader\Domain\Common\Map\Factory;
 use Thinktomorrow\Trader\Domain\Model\Promo\Condition;
 use Thinktomorrow\Trader\Domain\Model\Promo\Discount;
@@ -21,7 +21,7 @@ use Thinktomorrow\Trader\Domain\Model\Promo\PromoId;
 use Thinktomorrow\Trader\Domain\Model\Promo\PromoRepository;
 use Thinktomorrow\Trader\Domain\Model\Promo\PromoState;
 
-final class MysqlPromoRepository implements PromoRepository, ApplicablePromoRepository
+final class MysqlPromoRepository implements PromoRepository, OrderPromoRepository
 {
     private static string $promoTable = 'trader_promos';
     private static string $promoDiscountTable = 'trader_promo_discounts';
@@ -34,30 +34,41 @@ final class MysqlPromoRepository implements PromoRepository, ApplicablePromoRepo
         $this->discountFactory = $discountFactory;
     }
 
-    public function getActivePromos(): array
+    public function getAvailableOrderPromos(): array
     {
-        $results = $this->baseActiveQuery()->get();
+        $results = $this->baseActiveQuery()
+            ->whereNull('coupon_code')
+            ->get();
 
         $discountStates = $this->getDiscountStates($results->pluck('promo_id')->toArray());
 
         return array_map(function ($promoResult) use ($discountStates) {
             $promoResult = (array) $promoResult;
 
-            return ApplicablePromo::fromMappedData($promoResult, [
-                ApplicableDiscount::class => $this->makeDiscounts($discountStates, $promoResult, $this->discountFactory),
+            return OrderPromo::fromMappedData(array_merge($promoResult, [
+                'is_combinable' => (bool) $promoResult['is_combinable'],
+            ]), [
+                OrderDiscount::class => $this->makeDiscounts($discountStates, $promoResult, $this->discountFactory),
             ]);
         }, $results->toArray());
     }
 
-    public function findActivePromoByCouponCode(string $couponCode): ?ApplicablePromo
+    public function findOrderPromoByCouponCode(string $couponCode): ?OrderPromo
     {
         $result = $this->baseActiveQuery()
             ->where('coupon_code', $couponCode)
             ->first();
 
-        return null;
+        if(!$result) return null;
+        $result = (array) $result;
 
-        // add conditions and discounts
+        $discountStates = $this->getDiscountStates($result['promo_id']);
+
+        return OrderPromo::fromMappedData(array_merge($result, [
+            'is_combinable' => (bool) $result['is_combinable'],
+        ]), [
+            OrderDiscount::class => $this->makeDiscounts($discountStates, $result, $this->discountFactory),
+        ]);
     }
 
     private function baseActiveQuery(): Builder
@@ -109,12 +120,12 @@ final class MysqlPromoRepository implements PromoRepository, ApplicablePromoRepo
             ->delete();
 
         foreach ($promo->getDiscounts() as $discount) {
-            $insertedId = DB::table(static::$promoDiscountTable)
-                ->insertGetId($discount->getMappedData());
+            DB::table(static::$promoDiscountTable)
+                ->insert($discount->getMappedData());
 
             DB::table(static::$promoConditionTable)->insert(
                 array_map(fn ($conditionState) => array_merge($conditionState, [
-                    'discount_id' => $insertedId,
+                    'discount_id' => $discount->discountId->get(),
                 ]), $discount->getChildEntities()[Condition::class])
             );
 
@@ -142,7 +153,9 @@ final class MysqlPromoRepository implements PromoRepository, ApplicablePromoRepo
         $discountStates = $this->getDiscountStates($promoId->get());
         $discounts = $this->makeDiscounts($discountStates, $promoState, $this->discountFactory);
 
-        return Promo::fromMappedData($promoState, [
+        return Promo::fromMappedData(array_merge($promoState, [
+            'is_combinable' => (bool) $promoState['is_combinable'],
+        ]), [
             Discount::class => $discounts,
         ]);
     }

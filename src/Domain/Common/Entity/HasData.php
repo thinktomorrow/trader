@@ -24,10 +24,10 @@ trait HasData
         }
     }
 
-    public function getData(string $key = null)
+    public function getData(string $key = null, $default = null)
     {
         if (! is_null($key)) {
-            return data_get($this->data, $key);
+            return data_get($this->data, $key, $default);
         }
 
         return $this->data;

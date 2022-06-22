@@ -20,7 +20,7 @@ class ShippingTest extends TestCase
             OrderId::fromString('aaa'),
             $shippingId = ShippingId::fromString('yyy'),
             $shippingProfileId = ShippingProfileId::fromString('zzz'),
-            $cost = ShippingCost::fromScalars('150', 'EUR', '10', true),
+            $cost = ShippingCost::fromScalars('150', '10', true),
         );
 
         $this->assertEquals([

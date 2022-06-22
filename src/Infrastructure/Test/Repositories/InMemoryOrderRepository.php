@@ -85,7 +85,7 @@ final class InMemoryOrderRepository implements OrderRepository
         $this->nextShopperReference = $nextShopperReference;
     }
 
-    public function clear()
+    public static function clear()
     {
         static::$orders = [];
     }

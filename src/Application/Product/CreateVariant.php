@@ -27,14 +27,14 @@ class CreateVariant
         return ProductId::fromString($this->productId);
     }
 
-    public function getUnitPrice(bool $doesPriceInputIncludesVat, string $currency): VariantUnitPrice
+    public function getUnitPrice(bool $doesPriceInputIncludesVat): VariantUnitPrice
     {
-        return VariantUnitPrice::fromScalars($this->unitPrice, $currency, $this->taxRate, $doesPriceInputIncludesVat);
+        return VariantUnitPrice::fromScalars($this->unitPrice, $this->taxRate, $doesPriceInputIncludesVat);
     }
 
-    public function getSalePrice(bool $doesPriceInputIncludesVat, string $currency): VariantSalePrice
+    public function getSalePrice(bool $doesPriceInputIncludesVat): VariantSalePrice
     {
-        return VariantSalePrice::fromScalars($this->unitPrice, $currency, $this->taxRate, $doesPriceInputIncludesVat);
+        return VariantSalePrice::fromScalars($this->unitPrice, $this->taxRate, $doesPriceInputIncludesVat);
     }
 
     public function getData(): array

@@ -61,7 +61,7 @@ final class InMemoryCustomerRepository implements CustomerRepository
         $this->nextReference = $nextReference;
     }
 
-    public function clear()
+    public static function clear()
     {
         static::$customers = [];
     }

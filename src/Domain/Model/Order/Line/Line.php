@@ -4,17 +4,19 @@ declare(strict_types=1);
 namespace Thinktomorrow\Trader\Domain\Model\Order\Line;
 
 use Money\Money;
+use Thinktomorrow\Trader\Domain\Common\Cash\Cash;
 use Thinktomorrow\Trader\Domain\Common\Cash\Price;
 use Thinktomorrow\Trader\Domain\Common\Cash\PriceTotal;
 use Thinktomorrow\Trader\Domain\Common\Entity\ChildEntity;
 use Thinktomorrow\Trader\Domain\Common\Entity\HasData;
 use Thinktomorrow\Trader\Domain\Model\Order\Discount\Discount;
+use Thinktomorrow\Trader\Domain\Model\Order\Discount\Discountable;
 use Thinktomorrow\Trader\Domain\Model\Order\Discount\DiscountTotal;
 use Thinktomorrow\Trader\Domain\Model\Order\HasDiscounts;
 use Thinktomorrow\Trader\Domain\Model\Order\OrderId;
 use Thinktomorrow\Trader\Domain\Model\Product\Variant\VariantId;
 
-final class Line implements ChildEntity
+final class Line implements ChildEntity, Discountable
 {
     use HasData;
     use HasDiscounts;
@@ -70,6 +72,12 @@ final class Line implements ChildEntity
 
     public function getTotal(): Price
     {
+        return $this->getSubTotal()
+            ->subtract($this->getDiscountTotal());
+    }
+
+    private function getSubTotal(): Price
+    {
         return $this->linePrice
             ->multiply($this->quantity->asInt());
     }
@@ -83,15 +91,7 @@ final class Line implements ChildEntity
 
     public function getDiscountTotal(): DiscountTotal
     {
-        if (count($this->discounts) < 1) {
-            return DiscountTotal::zero();
-        }
-
-        return array_reduce($this->discounts, function (?PriceTotal $carry, Discount $discount) {
-            return $carry === null
-                ? $discount->getTotal()
-                : $carry->add($discount->getTotal());
-        }, null);
+        return $this->calculateDiscountTotal($this->getLinePrice());
     }
 
     public function getMappedData(): array
@@ -120,10 +120,25 @@ final class Line implements ChildEntity
         $line->orderId = OrderId::fromString($aggregateState['order_id']);
         $line->lineId = LineId::fromString($state['line_id']);
         $line->variantId = VariantId::fromString($state['variant_id']);
-        $line->linePrice = LinePrice::fromScalars($state['line_price'], 'EUR', $state['tax_rate'], $state['includes_vat']);
+        $line->linePrice = LinePrice::fromScalars($state['line_price'], $state['tax_rate'], $state['includes_vat']);
         $line->quantity = Quantity::fromInt($state['quantity']);
         $line->data = json_decode($state['data'], true);
 
         return $line;
+    }
+
+    public function getDiscountableTotal(array $conditions): Price|PriceTotal
+    {
+        return $this->getSubTotal();
+    }
+
+    public function getDiscountableQuantity(array $conditions): Quantity
+    {
+        return $this->quantity;
+    }
+
+    public function deleteDiscounts(): void
+    {
+        $this->discounts = [];
     }
 }

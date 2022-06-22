@@ -23,10 +23,10 @@ trait PriceValue
         $this->includesVat = $includesVat;
     }
 
-    public static function fromScalars(string|int $amount, string $currency, string $taxRate, bool $includesVat): static
+    public static function fromScalars(string|int $amount, string $taxRate, bool $includesVat): static
     {
         return new static(
-            Cash::make($amount, $currency),
+            Cash::make($amount),
             TaxRate::fromString($taxRate),
             $includesVat
         );

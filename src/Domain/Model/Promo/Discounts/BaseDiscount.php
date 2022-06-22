@@ -7,12 +7,14 @@ use Assert\Assertion;
 use Thinktomorrow\Trader\Domain\Common\Entity\HasData;
 use Thinktomorrow\Trader\Domain\Model\Promo\Condition;
 use Thinktomorrow\Trader\Domain\Model\Promo\PromoId;
+use Thinktomorrow\Trader\Domain\Model\Promo\DiscountId;
 
 abstract class BaseDiscount
 {
     use HasData;
 
     public readonly PromoId $promoId;
+    public readonly DiscountId $discountId;
 
     /** @var Condition[] */
     protected array $conditions;
@@ -22,6 +24,11 @@ abstract class BaseDiscount
         Assertion::allIsInstanceOf($conditions, Condition::class);
 
         $this->conditions = $conditions;
+    }
+
+    public function getConditions(): array
+    {
+        return $this->conditions;
     }
 
     public function getChildEntities(): array
@@ -35,6 +42,7 @@ abstract class BaseDiscount
     {
         return [
             'promo_id' => $this->promoId->get(),
+            'discount_id' => $this->discountId->get(),
             'key' => static::getMapKey(),
             'data' => json_encode($this->data),
         ];
@@ -47,6 +55,7 @@ abstract class BaseDiscount
         $object = new static();
 
         $object->promoId = PromoId::fromString($aggregateState['promo_id']);
+        $object->discountId = DiscountId::fromString($state['discount_id']);
         $object->data = json_decode($state['data'], true);
         $object->conditions = $childEntities[Condition::class];
 

@@ -3,19 +3,25 @@ declare(strict_types=1);
 
 namespace Tests\Acceptance\Cart;
 
+use Tests\TestHelpers;
 use Illuminate\Support\Str;
 use Money\Money;
 use PHPUnit\Framework\Assert;
 use Tests\Acceptance\TestCase;
 use Thinktomorrow\Trader\Application\Cart\CartApplication;
 use Thinktomorrow\Trader\Application\Cart\ChooseCustomer;
+use Thinktomorrow\Trader\Application\Promo\PromoApplication;
+use Thinktomorrow\Trader\Domain\Model\Promo\DiscountFactory;
+use Thinktomorrow\Trader\Domain\Model\Promo\ConditionFactory;
 use Thinktomorrow\Trader\Application\Cart\ChoosePaymentMethod;
 use Thinktomorrow\Trader\Application\Cart\ChooseShippingProfile;
 use Thinktomorrow\Trader\Application\Cart\Line\AddLine;
 use Thinktomorrow\Trader\Application\Cart\Line\AddLineToNewOrder;
 use Thinktomorrow\Trader\Application\Cart\Line\ChangeLineQuantity;
 use Thinktomorrow\Trader\Application\Cart\Line\RemoveLine;
+use Thinktomorrow\Trader\Domain\Model\Promo\Discounts\FixedAmountDiscount;
 use Thinktomorrow\Trader\Application\Cart\RefreshCart\Adjusters\AdjustLines;
+use Thinktomorrow\Trader\Domain\Model\Promo\Conditions\MinimumLinesQuantity;
 use Thinktomorrow\Trader\Application\Cart\RefreshCart\Adjusters\AdjustShipping;
 use Thinktomorrow\Trader\Application\Cart\RefreshCart\RefreshCartAction;
 use Thinktomorrow\Trader\Application\Cart\UpdateBillingAddress;
@@ -44,19 +50,28 @@ use Thinktomorrow\Trader\Domain\Model\ShippingProfile\ShippingProfile;
 use Thinktomorrow\Trader\Domain\Model\ShippingProfile\ShippingProfileId;
 use Thinktomorrow\Trader\Domain\Model\ShippingProfile\TariffNumber;
 use Thinktomorrow\Trader\Infrastructure\Test\EventDispatcherSpy;
+use Thinktomorrow\Trader\Application\Cart\RefreshCart\Adjusters\AdjustDiscounts;
 use Thinktomorrow\Trader\Infrastructure\Test\Repositories\InMemoryCartRepository;
+use Thinktomorrow\Trader\Infrastructure\Test\Repositories\InMemoryPromoRepository;
 use Thinktomorrow\Trader\Infrastructure\Test\Repositories\InMemoryCustomerRepository;
 use Thinktomorrow\Trader\Infrastructure\Test\Repositories\InMemoryOrderRepository;
+use Thinktomorrow\Trader\Application\Promo\OrderPromo\OrderDiscountFactory;
+use Thinktomorrow\Trader\Application\Promo\OrderPromo\OrderConditionFactory;
 use Thinktomorrow\Trader\Infrastructure\Test\Repositories\InMemoryPaymentMethodRepository;
 use Thinktomorrow\Trader\Infrastructure\Test\Repositories\InMemoryProductRepository;
 use Thinktomorrow\Trader\Infrastructure\Test\Repositories\InMemoryShippingProfileRepository;
 use Thinktomorrow\Trader\Infrastructure\Test\Repositories\InMemoryVariantRepository;
 use Thinktomorrow\Trader\Infrastructure\Test\TestContainer;
 use Thinktomorrow\Trader\Infrastructure\Test\TestTraderConfig;
+use Thinktomorrow\Trader\Application\Promo\OrderPromo\Discounts\FixedAmountOrderDiscount;
+use Thinktomorrow\Trader\Application\Promo\OrderPromo\Discounts\PercentageOffOrderDiscount;
 
 abstract class CartContext extends TestCase
 {
+    use TestHelpers;
+
     protected CartApplication $cartApplication;
+    protected PromoApplication $promoApplication;
     protected InMemoryProductRepository $productRepository;
     protected InMemoryOrderRepository $orderRepository;
     protected InMemoryShippingProfileRepository $shippingProfileRepository;
@@ -64,13 +79,32 @@ abstract class CartContext extends TestCase
     protected InMemoryCartRepository $cartRepository;
     protected InMemoryPaymentMethodRepository $paymentMethodRepository;
     protected InMemoryCustomerRepository $customerRepository;
+    protected InMemoryPromoRepository $promoRepository;
 
     protected function setUp(): void
     {
         parent::setUp();
 
+        $this->productRepository = new InMemoryProductRepository();
+        $this->cartRepository = new InMemoryCartRepository();
+        $this->promoRepository = new InMemoryPromoRepository(
+            new DiscountFactory([
+                FixedAmountDiscount::class,
+                PercentageOffOrderDiscount::class,
+            ], new ConditionFactory([
+                MinimumLinesQuantity::class,
+            ])),
+            new OrderDiscountFactory([
+                FixedAmountOrderDiscount::class,
+                PercentageOffOrderDiscount::class,
+            ], new OrderConditionFactory([
+                \Thinktomorrow\Trader\Application\Promo\OrderPromo\Conditions\MinimumLinesQuantityOrderCondition::class,
+            ]))
+        );
+
         // Adjusters are loaded via container so set them up here
         (new TestContainer())->add(AdjustLines::class, new AdjustLines(new InMemoryVariantRepository()));
+        (new TestContainer())->add(AdjustDiscounts::class, new AdjustDiscounts($this->promoRepository));
 
         $this->cartApplication = new CartApplication(
             new TestTraderConfig(),
@@ -84,8 +118,13 @@ abstract class CartContext extends TestCase
             new EventDispatcherSpy(),
         );
 
-        $this->productRepository = new InMemoryProductRepository();
-        $this->cartRepository = new InMemoryCartRepository();
+        $this->promoApplication = new PromoApplication(
+            new TestTraderConfig(),
+            new TestContainer(),
+            $this->orderRepository,
+            $this->promoRepository,
+            new EventDispatcherSpy(),
+        );
 
         // Container bindings
         (new TestContainer())->add(AdjustShipping::class, new AdjustShipping(
@@ -108,6 +147,7 @@ abstract class CartContext extends TestCase
         $this->orderRepository->clear();
         $this->shippingProfileRepository->clear();
         $this->paymentMethodRepository->clear();
+        $this->promoRepository->clear();
     }
 
     protected function givenThereIsAProductWhichCostsEur($productTitle, $price)
@@ -178,6 +218,13 @@ abstract class CartContext extends TestCase
         );
 
         $this->customerRepository->save($customer);
+    }
+
+    public function givenThereIsAPromo(array $mappedData = [], array $discounts = [])
+    {
+        $promo = $this->createPromo($mappedData, $discounts ?: [ $this->createDiscount([], [ $this->createCondition() ]) ]);
+
+        $this->promoRepository->save($promo);
     }
 
     protected function whenIAddTheVariantToTheCart($productVariantId, $quantity = 1, array $data = [])

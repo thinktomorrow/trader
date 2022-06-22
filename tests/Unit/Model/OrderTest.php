@@ -89,7 +89,7 @@ class OrderTest extends TestCase
             $order->orderId, // TODO: avoid this here or assert it is the same...
             $shippingId = ShippingId::fromString('qqqq'),
             ShippingProfileId::fromString('postnl_home'),
-            ShippingCost::fromScalars('23', 'EUR', '1', false)
+            ShippingCost::fromScalars('23', '1', false)
         ));
 
         $this->assertCount(2, $order->getShippings());
@@ -107,7 +107,7 @@ class OrderTest extends TestCase
 
         /** @var \Thinktomorrow\Trader\Domain\Model\Order\Shipping\Shipping $shipping */
         $shipping = $order->getShippings()[0];
-        $shipping->updateCost($cost = ShippingCost::fromScalars('23', 'EUR', '1', false));
+        $shipping->updateCost($cost = ShippingCost::fromScalars('23', '1', false));
 
         $order->updateShipping($shipping);
 
@@ -187,7 +187,7 @@ class OrderTest extends TestCase
         $order->addOrUpdateLine(
             LineId::fromString('abcdef'),
             VariantId::fromString('xxx'),
-            $linePrice = LinePrice::fromScalars('250', 'EUR', '9', true),
+            $linePrice = LinePrice::fromScalars('250', '9', true),
             Quantity::fromInt(2),
             ['foo' => 'bar']
         );
@@ -211,7 +211,7 @@ class OrderTest extends TestCase
         $order->addOrUpdateLine(
             LineId::fromString('abc'),
             VariantId::fromString('yyy'),
-            $linePrice = LinePrice::fromScalars('200', 'EUR', '10', true),
+            $linePrice = LinePrice::fromScalars('200', '10', true),
             Quantity::fromInt(3),
             ['foo' => 'bar']
         );

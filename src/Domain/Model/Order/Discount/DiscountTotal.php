@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace Thinktomorrow\Trader\Domain\Model\Order\Discount;
 
 use Money\Money;
+use Thinktomorrow\Trader\Domain\Common\Cash\Cash;
 use Thinktomorrow\Trader\Domain\Common\Cash\Price;
 use Thinktomorrow\Trader\Domain\Common\Cash\PriceValue;
 use Thinktomorrow\Trader\Domain\Common\Taxes\TaxRate;
@@ -24,6 +25,11 @@ final class DiscountTotal implements Price
     public static function fromDefault(Money $money): static
     {
         return static::fromMoney($money, static::getDiscountTaxRate(), true);
+    }
+
+    public static function zero(): static
+    {
+        return new static(Cash::zero(), static::getDiscountTaxRate(), true);
     }
 
     public static function setDiscountTaxRate(TaxRate $taxRate)

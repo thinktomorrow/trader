@@ -3,10 +3,14 @@ declare(strict_types=1);
 
 namespace Thinktomorrow\Trader\Domain\Model\Order;
 
+use Thinktomorrow\Trader\Domain\Common\Cash\Price;
+use Thinktomorrow\Trader\Domain\Common\Cash\PriceTotal;
 use Thinktomorrow\Trader\Domain\Common\Entity\Aggregate;
 use Thinktomorrow\Trader\Domain\Common\Entity\HasData;
+use Thinktomorrow\Trader\Domain\Model\Order\Line\Quantity;
 use Thinktomorrow\Trader\Domain\Common\Entity\RecordsChangelog;
 use Thinktomorrow\Trader\Domain\Common\Event\RecordsEvents;
+use Thinktomorrow\Trader\Domain\Model\Order\Discount\Discountable;
 use Thinktomorrow\Trader\Domain\Model\Order\Address\BillingAddress;
 use Thinktomorrow\Trader\Domain\Model\Order\Address\ShippingAddress;
 use Thinktomorrow\Trader\Domain\Model\Order\Discount\Discount;
@@ -16,7 +20,7 @@ use Thinktomorrow\Trader\Domain\Model\Order\Line\Line;
 use Thinktomorrow\Trader\Domain\Model\Order\Payment\Payment;
 use Thinktomorrow\Trader\Domain\Model\Order\Shipping\Shipping;
 
-final class Order implements Aggregate
+final class Order implements Aggregate, Discountable
 {
     use RecordsEvents;
     use RecordsChangelog;
@@ -114,6 +118,20 @@ final class Order implements Aggregate
         $this->recordEvent(new OrderUpdated($this->orderId));
     }
 
+    public function getEnteredCouponCode(): ?string
+    {
+        return $this->getData('coupon_code');
+    }
+
+    public function setEnteredCouponCode(string $coupon_code): void
+    {
+        $this->addData(['coupon_code' => $coupon_code]);
+    }
+
+    public function removeEnteredCouponCode(): void
+    {
+        $this->deleteData('coupon_code');
+    }
 
     public function getMappedData(): array
     {
@@ -172,5 +190,15 @@ final class Order implements Aggregate
         $order->data = json_decode($state['data'], true);
 
         return $order;
+    }
+
+    public function getDiscountableTotal(array $conditions): Price|PriceTotal
+    {
+        return $this->getSubTotal();
+    }
+
+    public function getDiscountableQuantity(array $conditions): Quantity
+    {
+        return $this->getQuantity();
     }
 }

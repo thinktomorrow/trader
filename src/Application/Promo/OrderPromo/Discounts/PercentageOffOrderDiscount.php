@@ -1,16 +1,16 @@
 <?php
 declare(strict_types=1);
 
-namespace Thinktomorrow\Trader\Application\Promo\ApplicablePromo\Discounts;
+namespace Thinktomorrow\Trader\Application\Promo\OrderPromo\Discounts;
 
-use Money\Money;
-use Thinktomorrow\Trader\Application\Promo\ApplicablePromo\ApplicableDiscount;
+use Thinktomorrow\Trader\Domain\Model\Order\Discount\DiscountTotal;
+use Thinktomorrow\Trader\Application\Promo\OrderPromo\OrderDiscount;
 use Thinktomorrow\Trader\Domain\Common\Cash\Cash;
 use Thinktomorrow\Trader\Domain\Common\Cash\Percentage;
 use Thinktomorrow\Trader\Domain\Model\Order\Discount\Discountable;
 use Thinktomorrow\Trader\Domain\Model\Order\Order;
 
-class PercentageOffApplicableDiscount extends BaseDiscount implements ApplicableDiscount
+class PercentageOffOrderDiscount extends BaseDiscount implements OrderDiscount
 {
     private Percentage $percentage;
 
@@ -29,20 +29,22 @@ class PercentageOffApplicableDiscount extends BaseDiscount implements Applicable
         return parent::isApplicable($order, $discountable);
     }
 
-    public function getDiscountTotal(Order $order, Discountable $discountable): Money
+    public function getDiscountTotal(Order $order, Discountable $discountable): DiscountTotal
     {
-        return Cash::from(
+        $amount = Cash::from(
             $order->getSubTotal()->getIncludingVat()
         )->percentage($this->percentage);
+
+        return DiscountTotal::fromDefault($amount);
+
     }
 
     public static function fromMappedData(array $state, array $aggregateState, array $conditions): static
     {
-        $data = json_decode($state['data'], true);
+        $discount = parent::fromMappedData($state, $aggregateState, $conditions);
 
-        $discount = new static();
+        $data = json_decode($state['data'], true);
         $discount->percentage = Percentage::fromString($data['percentage']);
-        $discount->conditions = $conditions;
 
         return $discount;
     }

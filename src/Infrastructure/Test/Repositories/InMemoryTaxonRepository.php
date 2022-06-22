@@ -93,7 +93,7 @@ final class InMemoryTaxonRepository implements TaxonRepository
         return false;
     }
 
-    public function clear()
+    public static function clear()
     {
         static::$taxons = [];
         static::$productIds = [];

@@ -56,7 +56,7 @@ final class InMemoryProductRepository implements ProductRepository
         $this->nextReference = $nextReference;
     }
 
-    public function clear()
+    public static function clear()
     {
         static::$products = [];
     }

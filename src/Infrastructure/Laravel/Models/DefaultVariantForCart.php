@@ -27,7 +27,7 @@ class DefaultVariantForCart implements VariantForCart
 
         $object->variantId = VariantId::fromString($state['variant_id']);
         $object->state = VariantState::from($state['state']);
-        $object->variantSalePrice = VariantSalePrice::fromScalars($state['sale_price'], 'EUR', $state['tax_rate'], $state['includes_vat']);
+        $object->variantSalePrice = VariantSalePrice::fromScalars($state['sale_price'], $state['tax_rate'], $state['includes_vat']);
         $object->data = json_decode($state['data'], true);
 
         return $object;

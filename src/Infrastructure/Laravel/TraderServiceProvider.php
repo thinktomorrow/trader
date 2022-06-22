@@ -19,9 +19,9 @@ use Thinktomorrow\Trader\Application\Product\Grid\GridRepository;
 use Thinktomorrow\Trader\Application\Product\OptionLinks\OptionLink;
 use Thinktomorrow\Trader\Application\Product\ProductDetail\ProductDetail;
 use Thinktomorrow\Trader\Application\Product\ProductDetail\ProductDetailRepository;
-use Thinktomorrow\Trader\Application\Promo\ApplicablePromo\ApplicablePromoRepository;
-use Thinktomorrow\Trader\Application\Promo\ApplicablePromo\Conditions\MinimumLinesQuantity;
-use Thinktomorrow\Trader\Application\Promo\ApplicablePromo\Discounts\PercentageOffApplicableDiscount;
+use Thinktomorrow\Trader\Application\Promo\OrderPromo\OrderPromoRepository;
+use Thinktomorrow\Trader\Application\Promo\OrderPromo\Conditions\MinimumLinesQuantityOrderCondition;
+use Thinktomorrow\Trader\Application\Promo\OrderPromo\Discounts\PercentageOffOrderDiscount;
 use Thinktomorrow\Trader\Application\Taxon\Category\CategoryRepository;
 use Thinktomorrow\Trader\Application\Taxon\Filter\TaxonFilterTreeComposer;
 use Thinktomorrow\Trader\Application\Taxon\Redirect\RedirectRepository;
@@ -122,18 +122,18 @@ class TraderServiceProvider extends ServiceProvider
         $this->app->bind(CartLine::class, DefaultCartLine::class);
 
         $this->app->bind(PromoRepository::class, MysqlPromoRepository::class);
-        $this->app->bind(ApplicablePromoRepository::class, MysqlPromoRepository::class);
+        $this->app->bind(OrderPromoRepository::class, MysqlPromoRepository::class);
 
         $this->app->bind(ConditionFactory::class, function () {
             return new ConditionFactory([
-                MinimumLinesQuantity::class,
+                MinimumLinesQuantityOrderCondition::class,
             ]);
         });
 
         $this->app->bind(DiscountFactory::class, function ($app) {
             return new DiscountFactory(
                 [
-                PercentageOffApplicableDiscount::class,
+                PercentageOffOrderDiscount::class,
             ],
                 $app->get(ConditionFactory::class)
             );

@@ -20,30 +20,30 @@ class OrderDetailsTest extends TestCase
         $order = $this->createdOrder();
 
         $this->assertEquals(
-            Total::zero()->add(VariantSalePrice::fromScalars(400, 'EUR', '10', true)),
+            Total::zero()->add(VariantSalePrice::fromScalars(400, '10', true)),
             $order->getSubTotal()
         );
 
         $this->assertEquals(
-            Total::zero()
-                ->add(VariantSalePrice::fromScalars(450, 'EUR', '10', true))
-                ->subtract(DiscountTotal::fromScalars(10, 'EUR', '21', true)),
-            $order->getTotal()
-        );
-
-        $this->assertEquals(
-            ShippingCost::fromScalars(30, 'EUR', '10', true),
+            ShippingCost::fromScalars(30, '10', true),
             $order->getShippingCost()
         );
 
         $this->assertEquals(
-            PaymentCost::fromScalars(20, 'EUR', '10', true),
+            PaymentCost::fromScalars(20, '10', true),
             $order->getPaymentCost()
         );
 
         $this->assertEquals(
-            DiscountTotal::fromScalars(10, 'EUR', '21', true), // Default percentage
+            DiscountTotal::fromScalars(10, '10', true), // Default percentage
             $order->getDiscountTotal()
+        );
+
+        $this->assertEquals(
+            Total::zero()
+                ->add(VariantSalePrice::fromScalars(450, '10', true))
+                ->subtract(DiscountTotal::fromScalars(10, '10', true)),
+            $order->getTotal()
         );
     }
 

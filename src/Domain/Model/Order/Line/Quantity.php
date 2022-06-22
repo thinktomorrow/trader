@@ -11,7 +11,7 @@ final class Quantity
 
     private function __construct(int $quantity)
     {
-        Assertion::greaterThan($quantity, 0);
+        Assertion::greaterOrEqualThan($quantity, 0);
 
         $this->quantity = $quantity;
     }

@@ -52,7 +52,7 @@ final class InMemoryShippingProfileRepository implements ShippingProfileReposito
         $this->nextReference = $nextReference;
     }
 
-    public function clear()
+    public static function clear()
     {
         static::$shippingProfiles = [];
     }

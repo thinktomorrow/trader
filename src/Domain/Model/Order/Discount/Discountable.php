@@ -4,6 +4,9 @@ declare(strict_types=1);
 namespace Thinktomorrow\Trader\Domain\Model\Order\Discount;
 
 use Money\Money;
+use Thinktomorrow\Trader\Domain\Common\Cash\Price;
+use Thinktomorrow\Trader\Domain\Common\Cash\PriceTotal;
+use Thinktomorrow\Trader\Domain\Model\Order\Line\Quantity;
 
 interface Discountable
 {
@@ -11,25 +14,32 @@ interface Discountable
      * Total amount on which the discounts should be calculated.
      *
      * @param array $conditions
-     * @return Money
      */
-    public function discountableTotal(array $conditions): Money;
+    public function getDiscountableTotal(array $conditions): Price|PriceTotal;
 
     /**
      * Quantity of all whitelisted items. Used by quantity specific
      * discount conditions such as MinimumItems.
      *
      * @param array $conditions
-     * @return int
      */
-    public function discountableQuantity(array $conditions): int;
+    public function getDiscountableQuantity(array $conditions): Quantity;
 
-    public function discountTotal(): Money;
+    /**
+     * The total amount of the calculated discount.
+     *
+     * @return DiscountTotal
+     */
+    public function getDiscountTotal(): DiscountTotal;
 
     /**
      * @return Discount[]
      */
-    public function discounts(): array;
+    public function getDiscounts(): array;
 
-    public function addDiscount(Discount $discount);
+    public function addDiscount(Discount $discount): void;
+
+    public function deleteDiscount(DiscountId $discountId): void;
+
+    public function deleteDiscounts(): void;
 }

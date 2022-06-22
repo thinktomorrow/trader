@@ -3,7 +3,10 @@ declare(strict_types=1);
 
 namespace Thinktomorrow\Trader\Infrastructure\Test\Repositories;
 
+use Illuminate\Support\Facades\DB;
+use Thinktomorrow\Trader\Domain\Common\Cash\Cash;
 use Thinktomorrow\Trader\Application\Cart\Read\Cart;
+use Thinktomorrow\Trader\Domain\Model\Order\Discount\Discount;
 use Thinktomorrow\Trader\Application\Cart\Read\CartBillingAddress;
 use Thinktomorrow\Trader\Application\Cart\Read\CartLine;
 use Thinktomorrow\Trader\Application\Cart\Read\CartPayment;
@@ -14,6 +17,7 @@ use Thinktomorrow\Trader\Application\Cart\Read\CartShopper;
 use Thinktomorrow\Trader\Domain\Model\Order\Exceptions\CouldNotFindOrder;
 use Thinktomorrow\Trader\Domain\Model\Order\OrderId;
 use Thinktomorrow\Trader\Infrastructure\Laravel\Models\Cart\DefaultCart;
+use Thinktomorrow\Trader\Infrastructure\Laravel\Models\Cart\DefaultCartDiscount;
 use Thinktomorrow\Trader\Infrastructure\Laravel\Models\Cart\DefaultCartBillingAddress;
 use Thinktomorrow\Trader\Infrastructure\Laravel\Models\Cart\DefaultCartLine;
 use Thinktomorrow\Trader\Infrastructure\Laravel\Models\Cart\DefaultCartPayment;
@@ -48,7 +52,9 @@ final class InMemoryCartRepository implements CartRepository
                 'linePrice' => $line->getLinePrice(),
             ]),
             (new InMemoryVariantRepository())->findVariantForCart($line->getVariantId()),
-            [] // TODO: cartline discounts...
+            array_map(fn(Discount $discount) => DefaultCartDiscount::fromMappedData([
+                // TODO:: fill it up with our cart discount data - also title, description, ...
+            ], $orderState), $line->getDiscounts()) // TODO: cartline discounts...
         ), $order->getLines());
 
         $shippingAddress = $order->getShippingAddress() ? DefaultCartShippingAddress::fromMappedData(
@@ -66,7 +72,9 @@ final class InMemoryCartRepository implements CartRepository
                 'cost' => $shipping->getShippingCost(),
             ]),
             $orderState,
-            []// TODO: cart shipping discounts
+            array_map(fn(Discount $discount) => DefaultCartDiscount::fromMappedData([
+                // TODO:: fill it up with our cart discount data - also title, description, ...
+            ], $orderState), $shipping->getDiscounts())// TODO: cart shipping discounts
         ), $order->getShippings());
 
         $payment = $order->getPayment() ? DefaultCartPayment::fromMappedData(
@@ -74,7 +82,9 @@ final class InMemoryCartRepository implements CartRepository
                 'cost' => $order->getPayment()->getPaymentCost(),
             ]),
             $orderState,
-            [], // TODO: cart payment discounts
+            array_map(fn(Discount $discount) => DefaultCartDiscount::fromMappedData([
+                // TODO:: fill it up with our cart discount data - also title, description, ...
+            ], $orderState), $order->getPayment()->getDiscounts()), // TODO: cart payment discounts
         ) : null;
 
         $shopper = $order->getShopper() ? DefaultCartShopper::fromMappedData(
@@ -92,7 +102,10 @@ final class InMemoryCartRepository implements CartRepository
                 CartPayment::class => $payment,
                 CartShopper::class => $shopper,
             ],
-            [], // TODO: cart discounts
+            array_map(fn(Discount $discount) => DefaultCartDiscount::fromMappedData(array_merge($discount->getMappedData(), [
+                'total' => $discount->getTotal(),
+                'percentage' => $discount->getPercentage($order->getSubTotal())
+            ]), $orderState), $order->getDiscounts()), // TODO: cart discounts
         );
     }
 }

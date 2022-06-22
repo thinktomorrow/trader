@@ -3,14 +3,21 @@ declare(strict_types=1);
 
 namespace Thinktomorrow\Trader\Domain\Model\Order\Shipping;
 
+use Thinktomorrow\Trader\Domain\Common\Cash\Price;
+use Thinktomorrow\Trader\Domain\Common\Cash\PriceTotal;
+use Thinktomorrow\Trader\Domain\Model\Order\HasDiscounts;
 use Thinktomorrow\Trader\Domain\Common\Entity\ChildEntity;
 use Thinktomorrow\Trader\Domain\Common\Entity\HasData;
 use Thinktomorrow\Trader\Domain\Model\Order\OrderId;
+use Thinktomorrow\Trader\Domain\Model\Order\Line\Quantity;
+use Thinktomorrow\Trader\Domain\Model\Order\Discount\Discountable;
+use Thinktomorrow\Trader\Domain\Model\Order\Discount\DiscountTotal;
 use Thinktomorrow\Trader\Domain\Model\ShippingProfile\ShippingProfileId;
 
-final class Shipping implements ChildEntity
+final class Shipping implements ChildEntity, Discountable
 {
     use HasData;
+    use HasDiscounts;
 
     public readonly OrderId $orderId;
     public readonly ShippingId $shippingId;
@@ -89,12 +96,26 @@ final class Shipping implements ChildEntity
         $shipping->shippingState = ShippingState::from($state['shipping_state']);
         $shipping->shippingCost = ShippingCost::fromScalars(
             $state['cost'],
-            'EUR',
             $state['tax_rate'],
             $state['includes_vat']
         );
         $shipping->data = json_decode($state['data'], true);
 
         return $shipping;
+    }
+
+    public function getDiscountableTotal(array $conditions): Price|PriceTotal
+    {
+        return $this->getShippingCost();
+    }
+
+    public function getDiscountableQuantity(array $conditions): Quantity
+    {
+        return Quantity::fromInt(1);
+    }
+
+    public function getDiscountTotal(): DiscountTotal
+    {
+        return $this->calculateDiscountTotal($this->getShippingCost());
     }
 }

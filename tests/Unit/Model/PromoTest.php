@@ -24,6 +24,7 @@ final class PromoTest extends TestCase
             'promo_id' => 'xxx',
             'state' => PromoState::online->value,
             'data' => json_encode([]),
+            'is_combinable' => false,
             'coupon_code' => null,
             'start_at' => null,
             'end_at' => null,
@@ -45,6 +46,7 @@ final class PromoTest extends TestCase
 
         $this->assertEquals([
             'promo_id' => 'xxx',
+            'discount_id' => 'abc',
             'key' => 'fixed_amount',
             'data' => json_encode(['amount' => '40']),
         ], $discount->getMappedData());
@@ -72,6 +74,7 @@ final class PromoTest extends TestCase
             'data' => json_encode(['foo' => 'bar']),
         ], [
             PercentageOffDiscount::fromMappedData([
+                'discount_id' => 'ddd',
                 'data' => json_encode(['percentage' => '40']),
             ], ['promo_id' => 'xxx'], [
                 Condition::class => [
@@ -87,6 +90,7 @@ final class PromoTest extends TestCase
             'state' => PromoState::online->value,
             'data' => json_encode(['foo' => 'bar']),
             'coupon_code' => 'foobar',
+            'is_combinable' => false,
             'start_at' => '2022-05-05 10:10:10',
             'end_at' => '2022-05-09 10:10:10',
         ], $promo->getMappedData());
@@ -96,6 +100,7 @@ final class PromoTest extends TestCase
             Discount::class => [
                 [
                     'promo_id' => 'xxx',
+                    'discount_id' => 'ddd',
                     'key' => 'percentage_off',
                     'data' => json_encode(['percentage' => '40']),
                 ],
@@ -117,6 +122,7 @@ final class PromoTest extends TestCase
             Discount::class => [
                 [
                     'promo_id' => 'xxx',
+                    'discount_id' => 'abc',
                     'key' => 'fixed_amount',
                     'data' => json_encode(['amount' => '40']),
                 ],

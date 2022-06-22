@@ -47,17 +47,7 @@ trait HasTotals
 
     public function getDiscountTotal(): DiscountTotal
     {
-        if (count($this->discounts) < 1) {
-            return DiscountTotal::zero();
-        }
-
-        $discountMoney = array_reduce($this->discounts, function (?Money $carry, Discount $discount) {
-            return $carry === null
-                ? $discount->getTotal()
-                : $carry->add($discount->getTotal());
-        }, null);
-
-        return DiscountTotal::fromDefault($discountMoney);
+        return $this->calculateDiscountTotal($this->getSubTotal());
     }
 
     public function getShippingCost(): ShippingCost

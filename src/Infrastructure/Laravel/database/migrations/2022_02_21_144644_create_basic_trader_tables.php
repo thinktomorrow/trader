@@ -279,6 +279,7 @@ class CreateBasicTraderTables extends Migration
         Schema::create(static::PREFIX.'promos', function (Blueprint $table) {
             $table->char('promo_id', 36)->primary();
             $table->string('coupon_code')->nullable()->unique();
+            $table->boolean('is_combinable')->default(0);
             $table->string('state', 32);
             $table->dateTime('start_at')->nullable();
             $table->dateTime('end_at')->nullable();
@@ -286,7 +287,7 @@ class CreateBasicTraderTables extends Migration
         });
 
         Schema::create(static::PREFIX.'promo_discounts', function (Blueprint $table) {
-            $table->id('discount_id');
+            $table->char('discount_id', 36)->primary();
             $table->char('promo_id', 36)->index();
             $table->string('key'); // class reference
             $table->json('data')->nullable();
@@ -296,7 +297,7 @@ class CreateBasicTraderTables extends Migration
 
         Schema::create(static::PREFIX.'promo_conditions', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('discount_id')->index();
+            $table->char('discount_id', 36)->index();
             $table->string('key'); // class reference
             $table->json('data')->nullable();
 

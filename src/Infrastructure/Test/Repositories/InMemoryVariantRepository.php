@@ -57,7 +57,7 @@ final class InMemoryVariantRepository implements VariantRepository, VariantForCa
         static::$nextReference = $nextReference;
     }
 
-    public function clear()
+    public static function clear()
     {
         static::$variants = [];
     }

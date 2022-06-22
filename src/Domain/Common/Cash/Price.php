@@ -8,7 +8,7 @@ use Thinktomorrow\Trader\Domain\Common\Taxes\TaxRate;
 
 interface Price
 {
-    public static function fromScalars(string|int $amount, string $currency, string $taxRate, bool $includesVat): static;
+    public static function fromScalars(string|int $amount, string $taxRate, bool $includesVat): static;
 
     public static function fromPrice(self $otherPrice): static;
 

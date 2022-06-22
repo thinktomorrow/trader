@@ -66,11 +66,11 @@ abstract class TestCase extends \Orchestra\Testbench\TestCase
 
     protected function tearDown(): void
     {
-        (new InMemoryOrderRepository())->clear();
-        (new InMemoryProductRepository())->clear();
-        (new InMemoryVariantRepository())->clear();
-        (new InMemoryTaxonRepository())->clear();
-        (new InMemoryPromoRepository())->clear();
+        InMemoryOrderRepository::clear();
+        InMemoryProductRepository::clear();
+        InMemoryVariantRepository::clear();
+        InMemoryTaxonRepository::clear();
+        InMemoryPromoRepository::clear();
 
         parent::tearDown();
     }

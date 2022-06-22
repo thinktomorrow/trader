@@ -48,7 +48,7 @@ class InMemoryPaymentMethodRepository implements PaymentMethodRepository
         $this->nextReference = $nextReference;
     }
 
-    public function clear()
+    public static function clear()
     {
         static::$paymentMethods = [];
     }

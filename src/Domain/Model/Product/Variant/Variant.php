@@ -102,8 +102,8 @@ final class Variant implements ChildEntity
         $variant->productId = ProductId::fromString($aggregateState['product_id']);
         $variant->variantId = VariantId::fromString($state['variant_id']);
         $variant->state = VariantState::from($state['state']);
-        $variant->unitPrice = VariantUnitPrice::fromScalars($state['unit_price'], 'EUR', $state['tax_rate'], $state['includes_vat']);
-        $variant->salePrice = VariantSalePrice::fromScalars($state['sale_price'], 'EUR', $state['tax_rate'], $state['includes_vat']);
+        $variant->unitPrice = VariantUnitPrice::fromScalars($state['unit_price'], $state['tax_rate'], $state['includes_vat']);
+        $variant->salePrice = VariantSalePrice::fromScalars($state['sale_price'], $state['tax_rate'], $state['includes_vat']);
         $variant->show_in_grid = $state['show_in_grid'] ? (bool) $state['show_in_grid'] : false;
         $variant->data = json_decode($state['data'], true);
 

@@ -351,6 +351,7 @@ trait TestHelpers
         return Promo::fromMappedData(array_merge([
             'promo_id' => 'xxx',
             'state' => PromoState::online->value,
+            'is_combinable' => false,
             'coupon_code' => null,
             'start_at' => null,
             'end_at' => null,
@@ -361,6 +362,7 @@ trait TestHelpers
     protected function createDiscount(array $mappedData = [], array $conditions = [])
     {
         return FixedAmountDiscount::fromMappedData(array_merge([
+            'discount_id' => 'abc',
             'data' => json_encode(['amount' => '40']),
         ], $mappedData), [
             'promo_id' => 'xxx',

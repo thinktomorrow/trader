@@ -11,6 +11,7 @@ use Thinktomorrow\Trader\Application\Cart\Line\RemoveLine;
 use Thinktomorrow\Trader\Application\Cart\RefreshCart\Adjusters\AdjustLines;
 use Thinktomorrow\Trader\Application\Cart\RefreshCart\RefreshCart;
 use Thinktomorrow\Trader\Application\Cart\RefreshCart\RefreshCartAction;
+use Thinktomorrow\Trader\Application\Cart\RefreshCart\Adjusters\AdjustDiscounts;
 use Thinktomorrow\Trader\Application\Cart\VariantForCart\VariantForCartRepository;
 use Thinktomorrow\Trader\Domain\Common\Event\EventDispatcher;
 use Thinktomorrow\Trader\Domain\Common\Taxes\TaxRate;
@@ -74,6 +75,7 @@ final class CartApplication
 
         $this->refreshCartAction->handle($order, [
             $this->container->get(AdjustLines::class),
+            $this->container->get(AdjustDiscounts::class),
         ]);
 
         $this->orderRepository->save($order);
