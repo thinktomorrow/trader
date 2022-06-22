@@ -9,6 +9,7 @@ use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 use Ramsey\Uuid\Uuid;
 use Thinktomorrow\Trader\Application\Promo\OrderPromo\OrderDiscount;
+use Thinktomorrow\Trader\Application\Promo\OrderPromo\OrderDiscountFactory;
 use Thinktomorrow\Trader\Application\Promo\OrderPromo\OrderPromo;
 use Thinktomorrow\Trader\Application\Promo\OrderPromo\OrderPromoRepository;
 use Thinktomorrow\Trader\Domain\Common\Map\Factory;
@@ -20,7 +21,6 @@ use Thinktomorrow\Trader\Domain\Model\Promo\Promo;
 use Thinktomorrow\Trader\Domain\Model\Promo\PromoId;
 use Thinktomorrow\Trader\Domain\Model\Promo\PromoRepository;
 use Thinktomorrow\Trader\Domain\Model\Promo\PromoState;
-use Thinktomorrow\Trader\Application\Promo\OrderPromo\OrderDiscountFactory;
 
 final class MysqlPromoRepository implements PromoRepository, OrderPromoRepository
 {
