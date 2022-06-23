@@ -192,15 +192,15 @@ class DefaultCart implements Cart
     {
         $allDiscounts = $this->getDiscounts();
 
-        if($this->getShipping()) {
+        if ($this->getShipping()) {
             $allDiscounts = array_merge($allDiscounts, $this->getShipping()->getDiscounts());
         }
 
-        if($this->getPayment()) {
+        if ($this->getPayment()) {
             $allDiscounts = array_merge($allDiscounts, $this->getPayment()->getDiscounts());
         }
 
-        foreach($this->getLines() as $line) {
+        foreach ($this->getLines() as $line) {
             $allDiscounts = array_merge($allDiscounts, $line->getDiscounts());
         }
 
