@@ -42,7 +42,7 @@ class DefaultCart implements Cart
     protected bool $include_tax = true;
 
 
-    public static function fromMappedData(array $state, array $childObjects, iterable $discounts): static
+    public static function fromMappedData(array $state, array $childObjects, array $discounts): static
     {
         $cart = new static();
 
@@ -181,5 +181,30 @@ class DefaultCart implements Cart
     public function getDiscounts(): array
     {
         return $this->discounts;
+    }
+
+    public function getEnteredCoupon(): ?string
+    {
+        return $this->data('coupon_code');
+    }
+
+    public function getAllDiscounts(): iterable
+    {
+        $allDiscounts = $this->getDiscounts();
+
+        if($this->getShipping()) {
+            $allDiscounts = array_merge($allDiscounts, $this->getShipping()->getDiscounts());
+        }
+
+        if($this->getPayment()) {
+            $allDiscounts = array_merge($allDiscounts, $this->getPayment()->getDiscounts());
+        }
+
+        foreach($this->getLines() as $line) {
+            $allDiscounts = array_merge($allDiscounts, $line->getDiscounts());
+        }
+
+        // TODO:: make sure they are unique...
+        return $allDiscounts;
     }
 }

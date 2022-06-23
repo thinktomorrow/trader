@@ -8,9 +8,11 @@ use Illuminate\Support\ServiceProvider;
 use Thinktomorrow\Trader\Application\Cart\Read\Cart;
 use Thinktomorrow\Trader\Domain\Common\Taxes\TaxRate;
 use Thinktomorrow\Trader\Application\Cart\Read\CartLine;
+use Thinktomorrow\Trader\Application\Cart\Read\CartDiscount;
 use Thinktomorrow\Trader\Application\Cart\Read\CartRepository;
 use Thinktomorrow\Trader\Domain\Model\Order\Discount\DiscountTotal;
 use Thinktomorrow\Trader\Application\Cart\VariantForCart\VariantForCart;
+use Thinktomorrow\Trader\Infrastructure\Laravel\Models\Cart\DefaultCartDiscount;
 use Thinktomorrow\Trader\Application\Cart\VariantForCart\VariantForCartRepository;
 use Thinktomorrow\Trader\Application\Common\DataRenderer;
 use Thinktomorrow\Trader\Application\Common\DefaultLocale;
@@ -122,6 +124,7 @@ class TraderServiceProvider extends ServiceProvider
         $this->app->bind(CartRepository::class, MysqlCartRepository::class);
         $this->app->bind(Cart::class, DefaultCart::class);
         $this->app->bind(CartLine::class, DefaultCartLine::class);
+        $this->app->bind(CartDiscount::class, DefaultCartDiscount::class);
 
         $this->app->bind(PromoRepository::class, MysqlPromoRepository::class);
         $this->app->bind(OrderPromoRepository::class, MysqlPromoRepository::class);

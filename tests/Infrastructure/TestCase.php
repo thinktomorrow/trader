@@ -5,6 +5,7 @@ namespace Tests\Infrastructure;
 
 use Tests\TestHelpers;
 use Thinktomorrow\Trader\Application\Cart\Read\Cart;
+use Thinktomorrow\Trader\Application\Cart\Read\CartDiscount;
 use Thinktomorrow\Trader\Application\Cart\Read\CartBillingAddress;
 use Thinktomorrow\Trader\Application\Cart\Read\CartLine;
 use Thinktomorrow\Trader\Application\Cart\Read\CartPayment;
@@ -16,6 +17,7 @@ use Thinktomorrow\Trader\Application\Taxon\Tree\TaxonNode;
 use Thinktomorrow\Trader\Domain\Common\Taxes\TaxRate;
 use Thinktomorrow\Trader\Domain\Model\Order\Discount\DiscountTotal;
 use Thinktomorrow\Trader\Infrastructure\Laravel\Models\Cart\DefaultCart;
+use Thinktomorrow\Trader\Infrastructure\Laravel\Models\Cart\DefaultCartDiscount;
 use Thinktomorrow\Trader\Infrastructure\Laravel\Models\Cart\DefaultCartBillingAddress;
 use Thinktomorrow\Trader\Infrastructure\Laravel\Models\Cart\DefaultCartLine;
 use Thinktomorrow\Trader\Infrastructure\Laravel\Models\Cart\DefaultCartPayment;
@@ -54,6 +56,7 @@ abstract class TestCase extends \Orchestra\Testbench\TestCase
         (new TestContainer())->add(CartShipping::class, DefaultCartShipping::class);
         (new TestContainer())->add(CartPayment::class, DefaultCartPayment::class);
         (new TestContainer())->add(CartShopper::class, DefaultCartShopper::class);
+        (new TestContainer())->add(CartDiscount::class, DefaultCartDiscount::class);
     }
 
     public function getPackageProviders($app)

@@ -58,4 +58,15 @@ final class PromoApplication
 
         $this->eventDispatcher->dispatchAll($order->releaseEvents());
     }
+
+    public function removeCoupon(RemoveCoupon $removeCoupon): void
+    {
+        $order = $this->orderRepository->find($removeCoupon->getOrderId());
+
+        $order->removeEnteredCouponCode();
+
+        $this->orderRepository->save($order);
+
+        $this->eventDispatcher->dispatchAll($order->releaseEvents());
+    }
 }

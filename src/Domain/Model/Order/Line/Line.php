@@ -68,16 +68,16 @@ final class Line implements ChildEntity, Discountable
         return $this->linePrice;
     }
 
+    public function getSubTotal(): Price
+    {
+        return $this->linePrice
+            ->multiply($this->quantity->asInt());
+    }
+
     public function getTotal(): Price
     {
         return $this->getSubTotal()
             ->subtract($this->getDiscountTotal());
-    }
-
-    private function getSubTotal(): Price
-    {
-        return $this->linePrice
-            ->multiply($this->quantity->asInt());
     }
 
     public function getTaxTotal(): Money

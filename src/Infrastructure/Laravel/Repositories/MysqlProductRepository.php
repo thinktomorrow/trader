@@ -45,7 +45,7 @@ class MysqlProductRepository implements ProductRepository
         if (! $this->exists($product->productId)) {
             DB::table(static::$productTable)->insert($state);
         } else {
-            DB::table(static::$productTable)->where('product_id', $product->productId)->update($state);
+            DB::table(static::$productTable)->where('product_id', $product->productId->get())->update($state);
         }
 
         // TODO: upsertOptions and option values

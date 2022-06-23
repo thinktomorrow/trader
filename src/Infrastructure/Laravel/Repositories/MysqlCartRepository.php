@@ -6,6 +6,9 @@ namespace Thinktomorrow\Trader\Infrastructure\Laravel\Repositories;
 use Illuminate\Support\Facades\DB;
 use Psr\Container\ContainerInterface;
 use Thinktomorrow\Trader\Application\Cart\Read\Cart;
+use Thinktomorrow\Trader\Application\Cart\Read\CartDiscount;
+use Thinktomorrow\Trader\Domain\Model\Order\Discount\Discount;
+use Thinktomorrow\Trader\Domain\Model\Order\Shipping\Shipping;
 use Thinktomorrow\Trader\Application\Cart\Read\CartBillingAddress;
 use Thinktomorrow\Trader\Application\Cart\Read\CartLine;
 use Thinktomorrow\Trader\Application\Cart\Read\CartPayment;
@@ -55,7 +58,10 @@ final class MysqlCartRepository implements CartRepository
                 'linePrice' => $line->getLinePrice(),
             ]),
             $this->variantForCartRepository->findVariantForCart($line->getVariantId()),
-            [] // TODO: cartline discounts...
+            array_map(fn (Discount $discount) => $this->container->get(CartDiscount::class)::fromMappedData(array_merge($discount->getMappedData(), [
+                'total' => $discount->getTotal(),
+                'percentage' => $discount->getPercentage($line->getSubTotal()),
+            ]), $orderState), $line->getDiscounts()) // TODO: cartline discounts...
         ), $order->getLines());
 
         $shippingAddress = $order->getShippingAddress() ? $this->container->get(CartShippingAddress::class)::fromMappedData(
@@ -68,12 +74,15 @@ final class MysqlCartRepository implements CartRepository
             $orderState
         ) : null;
 
-        $shippings = array_map(fn ($shipping) => $this->container->get(CartShipping::class)::fromMappedData(
+        $shippings = array_map(fn (Shipping $shipping) => $this->container->get(CartShipping::class)::fromMappedData(
             array_merge($shipping->getMappedData(), [
                 'cost' => $shipping->getShippingCost(),
             ]),
             $orderState,
-            []// TODO: cart shipping discounts
+            array_map(fn (Discount $discount) => $this->container->get(CartDiscount::class)::fromMappedData(array_merge($discount->getMappedData(), [
+                'total' => $discount->getTotal(),
+                'percentage' => $discount->getPercentage($shipping->getShippingCost()),
+            ]), $orderState), $shipping->getDiscounts())// TODO: cart shipping discounts
         ), $order->getShippings());
 
         $payment = $order->getPayment() ? $this->container->get(CartPayment::class)::fromMappedData(
@@ -81,7 +90,10 @@ final class MysqlCartRepository implements CartRepository
                 'cost' => $order->getPayment()->getPaymentCost(),
             ]),
             $orderState,
-            [], // TODO: cart payment discounts
+            array_map(fn (Discount $discount) => $this->container->get(CartDiscount::class)::fromMappedData(array_merge($discount->getMappedData(), [
+                'total' => $discount->getTotal(),
+                'percentage' => $discount->getPercentage($order->getPayment()->getPaymentCost()),
+            ]), $orderState), $order->getPayment()->getDiscounts()), // TODO: cart payment discounts
         ) : null;
 
         $shopper = $order->getShopper() ? $this->container->get(CartShopper::class)::fromMappedData(
@@ -99,7 +111,10 @@ final class MysqlCartRepository implements CartRepository
                 CartPayment::class => $payment,
                 CartShopper::class => $shopper,
             ],
-            [], // TODO: cart discounts
+            array_map(fn (Discount $discount) => $this->container->get(CartDiscount::class)::fromMappedData(array_merge($discount->getMappedData(), [
+                'total' => $discount->getTotal(),
+                'percentage' => $discount->getPercentage($order->getSubTotal()),
+            ]), $orderState), $order->getDiscounts()),
         );
     }
 

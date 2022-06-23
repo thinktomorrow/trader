@@ -22,7 +22,7 @@ class MysqlCustomerRepository implements CustomerRepository
         if (! $this->exists($customer->customerId)) {
             DB::table(static::$customerTable)->insert($state);
         } else {
-            DB::table(static::$customerTable)->where('customer_id', $customer->customerId)->update($state);
+            DB::table(static::$customerTable)->where('customer_id', $customer->customerId->get())->update($state);
         }
     }
 

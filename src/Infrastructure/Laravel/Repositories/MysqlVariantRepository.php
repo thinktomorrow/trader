@@ -39,7 +39,7 @@ class MysqlVariantRepository implements VariantRepository, VariantForCartReposit
         if (! $this->exists($variant->variantId)) {
             DB::table(static::$variantTable)->insert($state);
         } else {
-            DB::table(static::$variantTable)->where('variant_id', $variant->variantId)->update($state);
+            DB::table(static::$variantTable)->where('variant_id', $variant->variantId->get())->update($state);
         }
 
         $this->syncVariantOptionValueIds($variant->variantId, $option_value_ids);

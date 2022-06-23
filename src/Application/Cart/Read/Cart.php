@@ -4,7 +4,7 @@ namespace Thinktomorrow\Trader\Application\Cart\Read;
 
 interface Cart
 {
-    public static function fromMappedData(array $state, array $childObjects, iterable $discounts): static;
+    public static function fromMappedData(array $state, array $childObjects, array $discounts): static;
 
     public function getOrderId(): string;
 
@@ -33,4 +33,13 @@ interface Cart
 
     /** @return CartDiscount[] */
     public function getDiscounts(): iterable;
+    public function getEnteredCoupon(): ?string;
+
+    /**
+     * The combined collection of applied discounts.
+     * Next to the order discounts, this also includes line, shipping or payment discounts.
+     *
+     * @return CartDiscount[]
+     */
+    public function getAllDiscounts(): iterable;
 }

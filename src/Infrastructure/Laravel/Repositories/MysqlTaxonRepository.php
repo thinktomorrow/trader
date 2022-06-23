@@ -23,7 +23,7 @@ class MysqlTaxonRepository implements TaxonRepository
         if (! $this->exists($taxon->taxonId)) {
             DB::table(static::$taxonTable)->insert($state);
         } else {
-            DB::table(static::$taxonTable)->where('taxon_id', $taxon->taxonId)->update($state);
+            DB::table(static::$taxonTable)->where('taxon_id', $taxon->taxonId->get())->update($state);
         }
     }
 

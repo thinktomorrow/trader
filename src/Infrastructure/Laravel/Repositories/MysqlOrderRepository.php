@@ -38,7 +38,7 @@ final class MysqlOrderRepository implements OrderRepository
         if (! $this->exists($order->orderId)) {
             DB::table(static::$orderTable)->insert($state);
         } else {
-            DB::table(static::$orderTable)->where('order_id', $order->orderId)->update($state);
+            DB::table(static::$orderTable)->where('order_id', $order->orderId->get())->update($state);
         }
 
         $this->upsertLines($order);
@@ -54,7 +54,7 @@ final class MysqlOrderRepository implements OrderRepository
         $lineIds = array_map(fn ($lineState) => $lineState['line_id'], $order->getChildEntities()[Line::class]);
 
         DB::table(static::$orderLinesTable)
-            ->where('order_id', $order->orderId)
+            ->where('order_id', $order->orderId->get())
             ->whereNotIn('line_id', $lineIds)
             ->delete();
 
@@ -72,7 +72,7 @@ final class MysqlOrderRepository implements OrderRepository
         $discountIds = array_map(fn ($discountState) => $discountState['discount_id'], $order->getChildEntities()[Discount::class]);
 
         DB::table(static::$orderDiscountsTable)
-            ->where('order_id', $order->orderId)
+            ->where('order_id', $order->orderId->get())
             ->whereNotIn('discount_id', $discountIds)
             ->delete();
 
@@ -90,7 +90,7 @@ final class MysqlOrderRepository implements OrderRepository
         $shippingIds = array_map(fn ($shippingState) => $shippingState['shipping_id'], $order->getChildEntities()[Shipping::class]);
 
         DB::table(static::$orderShippingTable)
-            ->where('order_id', $order->orderId)
+            ->where('order_id', $order->orderId->get())
             ->whereNotIn('shipping_id', $shippingIds)
             ->delete();
 
@@ -108,7 +108,7 @@ final class MysqlOrderRepository implements OrderRepository
         $paymentState = $order->getChildEntities()[Payment::class];
 
         if (is_null($paymentState)) {
-            DB::table(static::$orderPaymentTable)->where('order_id', $order->orderId)->delete();
+            DB::table(static::$orderPaymentTable)->where('order_id', $order->orderId->get())->delete();
 
             return;
         }
@@ -130,7 +130,7 @@ final class MysqlOrderRepository implements OrderRepository
                 ], $shippingAddressState);
         } else {
             DB::table(static::$orderAddressTable)
-                ->where('order_id', $order->orderId)
+                ->where('order_id', $order->orderId->get())
                 ->where('type', AddressType::shipping->value)
                 ->delete();
         }
@@ -143,7 +143,7 @@ final class MysqlOrderRepository implements OrderRepository
                 ], $billingAddressState);
         } else {
             DB::table(static::$orderAddressTable)
-                ->where('order_id', $order->orderId)
+                ->where('order_id', $order->orderId->get())
                 ->where('type', AddressType::billing->value)
                 ->delete();
         }
@@ -154,7 +154,7 @@ final class MysqlOrderRepository implements OrderRepository
         $shopperState = $order->getChildEntities()[Shopper::class];
 
         if (is_null($shopperState)) {
-            DB::table(static::$orderShopperTable)->where('order_id', $order->orderId)->delete();
+            DB::table(static::$orderShopperTable)->where('order_id', $order->orderId->get())->delete();
 
             return;
         }
