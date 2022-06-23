@@ -33,6 +33,11 @@ final class Variant implements ChildEntity
     {
         return $this->salePrice;
     }
+    
+    public function getUnitPrice(): VariantUnitPrice
+    {
+        return $this->unitPrice;
+    }
 
     public static function create(ProductId $productId, VariantId $variantId, VariantUnitPrice $unitPrice, VariantSalePrice $salePrice): static
     {

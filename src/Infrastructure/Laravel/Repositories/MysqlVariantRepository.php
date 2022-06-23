@@ -129,7 +129,7 @@ class MysqlVariantRepository implements VariantRepository, VariantForCartReposit
             ->first();
 
         if (! $state) {
-            throw new \RuntimeException('No online variant found by id [' . $variantId->get(). ']');
+            throw new \RuntimeException('No online/available variant found by id [' . $variantId->get(). ']');
         }
 
         return $this->composeVariantForCart((array) $state);
