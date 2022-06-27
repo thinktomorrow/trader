@@ -28,6 +28,7 @@ class DefaultCartLine implements CartLine
 
     // General flag for all line prices to render with or without tax.
     protected bool $include_tax = true;
+    private iterable $images;
 
     public static function fromMappedData(array $state, VariantForCart $variantForCart, iterable $discounts): static
     {
@@ -43,6 +44,7 @@ class DefaultCartLine implements CartLine
         $line->quantity = $state['quantity'];
         $line->data = json_decode($state['data'], true);
         $line->discounts = $discounts;
+        $line->images = [];
 
         return $line;
     }
@@ -50,6 +52,16 @@ class DefaultCartLine implements CartLine
     public function getLineId(): string
     {
         return $this->line_id;
+    }
+
+    public function getProductId(): string
+    {
+        return $this->variantForCart->getProductId()->get();
+    }
+
+    public function getVariantId(): string
+    {
+        return $this->variantForCart->getVariantId()->get();
     }
 
     public function includeTax(bool $includeTax = true): void
@@ -106,9 +118,14 @@ class DefaultCartLine implements CartLine
         return $this->quantity;
     }
 
+    public function setImages(iterable $images): void
+    {
+        $this->images = $images;
+    }
+
     public function getImages(): iterable
     {
-        return [];
+        return $this->images;
     }
 
     public function getTitle(): string

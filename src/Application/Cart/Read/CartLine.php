@@ -9,6 +9,8 @@ interface CartLine
     public static function fromMappedData(array $state, VariantForCart $variantForCart, iterable $discounts): static;
 
     public function getLineId(): string;
+    public function getProductId(): string;
+    public function getVariantId(): string;
 
     public function getLinePrice(): string;
     public function getTotalPrice(): string;
@@ -18,9 +20,11 @@ interface CartLine
     public function includeTax(bool $includeTax = true): void;
 
     public function getQuantity(): int;
-    public function getImages(): iterable;
+
     public function getTitle(): string;
     public function getDescription(): ?string;
+    public function setImages(iterable $images): void;
+    public function getImages(): iterable;
 
     /** @return CartDiscount[] */
     public function getDiscounts(): iterable;
