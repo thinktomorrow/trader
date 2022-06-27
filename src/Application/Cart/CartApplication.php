@@ -264,12 +264,6 @@ final class CartApplication
         $this->orderRepository->save($order);
 
         $this->eventDispatcher->dispatchAll($order->releaseEvents());
-
-        // Trigger refresh (should be after event)
-//        $this->refreshCart(new RefreshCart($order->orderId->get(), [
-//            AdjustShipping::class,
-//        ], new Context(), // TODO: create testcontext?
-//        ));
     }
 
     public function choosePaymentMethod(ChoosePaymentMethod $choosePaymentMethod): void
@@ -349,6 +343,10 @@ final class CartApplication
         $shopper->updateCustomerId($customer->customerId);
         $shopper->addData($customer->getData());
         $order->updateShopper($shopper);
+
+        // TODO:: update shipping / billing address if not already filled
+        // TODO: update shipping profile and payment method if not already filled
+        // Proceed in checkout should be done based on filled data no?  
 
         $this->orderRepository->save($order);
 
