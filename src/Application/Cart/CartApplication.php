@@ -346,7 +346,7 @@ final class CartApplication
 
         // TODO:: update shipping / billing address if not already filled
         // TODO: update shipping profile and payment method if not already filled
-        // Proceed in checkout should be done based on filled data no?  
+        // Proceed in checkout should be done based on filled data no?
 
         $this->orderRepository->save($order);
 
