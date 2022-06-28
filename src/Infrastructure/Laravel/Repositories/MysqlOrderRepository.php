@@ -58,12 +58,16 @@ final class MysqlOrderRepository implements OrderRepository
             ->whereNotIn('line_id', $lineIds)
             ->delete();
 
+        // TODO:delete line discounts...
+
         foreach ($order->getChildEntities()[Line::class] as $lineState) {
             DB::table(static::$orderLinesTable)
                 ->updateOrInsert([
                     'order_id' => $order->orderId->get(),
                     'line_id' => $lineState['line_id'],
                 ], $lineState);
+
+            // TODO: how to save line discounts...
         }
     }
 
@@ -100,6 +104,8 @@ final class MysqlOrderRepository implements OrderRepository
                     'order_id' => $order->orderId->get(),
                     'shipping_id' => $shippingState['shipping_id'],
                 ], $shippingState);
+
+            // TODO: how to save shipping discounts...
         }
     }
 
