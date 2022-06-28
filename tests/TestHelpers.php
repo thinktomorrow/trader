@@ -4,6 +4,7 @@ namespace Tests;
 
 use Illuminate\Contracts\Debug\ExceptionHandler;
 use Money\Money;
+use Thinktomorrow\Trader\Domain\Model\Order\OrderId;
 use Thinktomorrow\Trader\Application\Product\CreateProduct;
 use Thinktomorrow\Trader\Application\Product\CreateVariant;
 use Thinktomorrow\Trader\Application\Product\ProductApplication;
@@ -15,6 +16,7 @@ use Thinktomorrow\Trader\Domain\Model\Customer\Customer;
 use Thinktomorrow\Trader\Domain\Model\Customer\CustomerId;
 use Thinktomorrow\Trader\Domain\Model\Customer\CustomerRepository;
 use Thinktomorrow\Trader\Domain\Model\CustomerLogin\CustomerLogin;
+use Thinktomorrow\Trader\Domain\Model\Order\Discount\DiscountableType;
 use Thinktomorrow\Trader\Domain\Model\CustomerLogin\CustomerLoginRepository;
 use Thinktomorrow\Trader\Domain\Model\Order\Address\BillingAddress;
 use Thinktomorrow\Trader\Domain\Model\Order\Address\ShippingAddress;
@@ -83,6 +85,7 @@ trait TestHelpers
         ], [
             Line::class => [
                 [
+                    'order_id' => 'xxx',
                     'line_id' => 'abc',
                     'variant_id' => 'yyy',
                     'line_price' => 200,
@@ -90,6 +93,7 @@ trait TestHelpers
                     'includes_vat' => true,
                     'quantity' => 2,
                     'data' => json_encode(['foo' => 'bar']),
+                    Discount::class => [$this->createOrderDiscount(OrderId::fromString('xxx'), ['discount_id' => 'line-abc', 'discountable_type' => DiscountableType::line->value, 'discountable_id' => 'abc'])->getMappedData()],
                 ],
             ],
             ShippingAddress::class => [
@@ -109,17 +113,11 @@ trait TestHelpers
                 'data' => "[]",
             ],
             Discount::class => [
-                [
-                    'discount_id' => 'ddd',
-                    'discount_type' => 'percentage_off',
-                    'total' => '10',
-                    'tax_rate' => '10',
-                    'includes_vat' => true,
-                    'data' => "[]",
-                ],
+                $this->createOrderDiscount(OrderId::fromString('xxx'))->getMappedData(),
             ],
             Shipping::class => [
                 [
+                    'order_id' => 'xxx',
                     'shipping_id' => 'sss',
                     'shipping_profile_id' => 'ppp',
                     'shipping_state' => ShippingState::initialized->value,
@@ -127,6 +125,7 @@ trait TestHelpers
                     'tax_rate' => '10',
                     'includes_vat' => true,
                     'data' => "[]",
+                    Discount::class => [$this->createOrderDiscount(OrderId::fromString('xxx'), ['discount_id' => 'shipping-uuu', 'discountable_type' => DiscountableType::shipping->value, 'discountable_id' => 'sss'])->getMappedData()],
                 ],
             ],
             Payment::class => [
@@ -137,6 +136,7 @@ trait TestHelpers
                 'tax_rate' => '10',
                 'includes_vat' => true,
                 'data' => "[]",
+                Discount::class => [],
             ],
             Shopper::class => [
                 'shopper_id' => 'abcdef',
@@ -146,6 +146,23 @@ trait TestHelpers
                 'customer_id' => null,
                 'data' => "[]",
             ],
+        ]);
+    }
+
+    protected function createOrderDiscount(OrderId $orderId, array $data = []): Discount
+    {
+        return Discount::fromMappedData(array_merge([
+            'discount_id' => 'ababab',
+            'discountable_type' => DiscountableType::order->value,
+            'discountable_id' => $orderId->get(),
+            'promo_id' => 'def',
+            'promo_discount_id' => 'abc',
+            'total' => '30',
+            'tax_rate' => '9',
+            'includes_vat' => true,
+            'data' => json_encode(['foo' => 'bar']),
+        ],$data), [
+            'order_id' => $orderId->get(),
         ]);
     }
 

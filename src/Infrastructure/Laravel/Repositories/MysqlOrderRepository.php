@@ -6,9 +6,11 @@ namespace Thinktomorrow\Trader\Infrastructure\Laravel\Repositories;
 use Illuminate\Support\Facades\DB;
 use Ramsey\Uuid\Uuid;
 use Thinktomorrow\Trader\Domain\Common\Address\AddressType;
+use Thinktomorrow\Trader\Domain\Model\Order\Discount\DiscountId;
 use Thinktomorrow\Trader\Domain\Model\Order\Address\BillingAddress;
 use Thinktomorrow\Trader\Domain\Model\Order\Address\ShippingAddress;
 use Thinktomorrow\Trader\Domain\Model\Order\Discount\Discount;
+use Thinktomorrow\Trader\Domain\Model\Order\Discount\DiscountableType;
 use Thinktomorrow\Trader\Domain\Model\Order\Exceptions\CouldNotFindOrder;
 use Thinktomorrow\Trader\Domain\Model\Order\Line\Line;
 use Thinktomorrow\Trader\Domain\Model\Order\Order;
@@ -73,18 +75,30 @@ final class MysqlOrderRepository implements OrderRepository
 
     private function upsertDiscounts(Order $order): void
     {
-        $discountIds = array_map(fn ($discountState) => $discountState['discount_id'], $order->getChildEntities()[Discount::class]);
+        $discountStates = $order->getChildEntities()[Discount::class];
+
+        foreach($order->getLines() as $line) {
+            $discountStates = array_merge($discountStates, $line->getChildEntities()[Discount::class]);
+        }
+
+        foreach($order->getShippings() as $shipping) {
+            $discountStates = array_merge($discountStates, $shipping->getChildEntities()[Discount::class]);
+        }
+
+        $discountStates = array_merge($discountStates, $order->getPayment() ? $order->getPayment()->getChildEntities()[Discount::class] : []);
 
         DB::table(static::$orderDiscountsTable)
             ->where('order_id', $order->orderId->get())
-            ->whereNotIn('discount_id', $discountIds)
+            ->whereNotIn('discount_id', array_map(fn ($discountState) => $discountState['discount_id'], $discountStates))
             ->delete();
 
-        foreach ($order->getChildEntities()[Discount::class] as $discountState) {
+        foreach ($discountStates as $discountState) {
             DB::table(static::$orderDiscountsTable)
                 ->updateOrInsert([
                     'order_id' => $order->orderId->get(),
                     'discount_id' => $discountState['discount_id'],
+                    'discountable_type' => $discountState['discountable_type'],
+                    'discountable_id' => $discountState['discountable_id'],
                 ], $discountState);
         }
     }
@@ -187,25 +201,30 @@ final class MysqlOrderRepository implements OrderRepository
             throw new CouldNotFindOrder('No order found by id [' . $orderId->get() . ']');
         }
 
+        $allDiscountStates = DB::table(static::$orderDiscountsTable)
+            ->where(static::$orderDiscountsTable . '.order_id', $orderId->get())
+            ->get()
+            ->map(fn ($item) => (array)$item)
+            ->map(fn ($item) => array_merge($item, ['includes_vat' => (bool)$item['includes_vat']]));
+
         $lineStates = DB::table(static::$orderLinesTable)
             ->where(static::$orderLinesTable . '.order_id', $orderId->get())
             ->get()
             ->map(fn ($item) => (array)$item)
-            ->map(fn ($item) => array_merge($item, ['includes_vat' => (bool)$item['includes_vat']]))
-            ->toArray();
-
-        $discountStates = DB::table(static::$orderDiscountsTable)
-            ->where(static::$orderDiscountsTable . '.order_id', $orderId->get())
-            ->get()
-            ->map(fn ($item) => (array)$item)
-            ->map(fn ($item) => array_merge($item, ['includes_vat' => (bool)$item['includes_vat']]))
+            ->map(fn ($item) => array_merge($item, [
+                'includes_vat' => (bool)$item['includes_vat'],
+                Discount::class => $allDiscountStates->filter(fn($discountState) => $discountState['discountable_type'] == DiscountableType::line->value && $discountState['discountable_id'] == $item['line_id'])->values()->toArray()
+            ]))
             ->toArray();
 
         $shippingStates = DB::table(static::$orderShippingTable)
             ->where(static::$orderShippingTable . '.order_id', $orderId->get())
             ->get()
             ->map(fn ($item) => (array)$item)
-            ->map(fn ($item) => array_merge($item, ['includes_vat' => (bool)$item['includes_vat']]))
+            ->map(fn ($item) => array_merge($item, [
+                'includes_vat' => (bool)$item['includes_vat'],
+                Discount::class => $allDiscountStates->filter(fn($discountState) => $discountState['discountable_type'] == DiscountableType::shipping->value && $discountState['discountable_id'] == $item['shipping_id'])->values()->toArray()
+            ]))
             ->toArray();
 
         $paymentState = DB::table(static::$orderPaymentTable)
@@ -214,7 +233,10 @@ final class MysqlOrderRepository implements OrderRepository
 
         if (! is_null($paymentState)) {
             $paymentState = (array)$paymentState;
-            $paymentState = array_merge($paymentState, ['includes_vat' => (bool)$paymentState['includes_vat']]);
+            $paymentState = array_merge($paymentState, [
+                'includes_vat' => (bool)$paymentState['includes_vat'],
+                Discount::class => $allDiscountStates->filter(fn($discountState) => $discountState['discountable_type'] == DiscountableType::payment->value && $discountState['discountable_id'] == $paymentState['payment_id'])->values()->toArray()
+            ]);
         }
 
         $addressStates = DB::table(static::$orderAddressTable)
@@ -238,7 +260,7 @@ final class MysqlOrderRepository implements OrderRepository
 
         $childEntities = [
             Line::class => $lineStates,
-            Discount::class => $discountStates,
+            Discount::class => $allDiscountStates->filter(fn($discountState) => $discountState['discountable_type'] == DiscountableType::order->value && $discountState['discountable_id'] == $orderState->order_id)->values()->toArray(),
             Shipping::class => $shippingStates,
             Payment::class => $paymentState,
             Shopper::class => $shopperState,
@@ -272,5 +294,10 @@ final class MysqlOrderRepository implements OrderRepository
     public function nextShopperReference(): ShopperId
     {
         return ShopperId::fromString((string)Uuid::uuid4());
+    }
+
+    public function nextDiscountReference(): DiscountId
+    {
+        return DiscountId::fromString((string)Uuid::uuid4());
     }
 }

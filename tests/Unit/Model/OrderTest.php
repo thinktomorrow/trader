@@ -8,8 +8,6 @@ use Thinktomorrow\Trader\Domain\Common\Email;
 use Thinktomorrow\Trader\Domain\Model\Customer\CustomerId;
 use Thinktomorrow\Trader\Domain\Model\Order\Address\BillingAddress;
 use Thinktomorrow\Trader\Domain\Model\Order\Address\ShippingAddress;
-use Thinktomorrow\Trader\Domain\Model\Order\Discount\Discount;
-use Thinktomorrow\Trader\Domain\Model\Order\Discount\DiscountId;
 use Thinktomorrow\Trader\Domain\Model\Order\Events\LineAdded;
 use Thinktomorrow\Trader\Domain\Model\Order\Events\LineDeleted;
 use Thinktomorrow\Trader\Domain\Model\Order\Events\LineUpdated;
@@ -252,40 +250,6 @@ class OrderTest extends TestCase
                 VariantId::fromString('yyy'),
             ),
         ], $order->releaseEvents());
-    }
-
-    /** @test */
-    public function it_can_add_a_discount()
-    {
-        $order = $this->createdOrder();
-
-        $order->addDiscount(
-            Discount::fromMappedData([
-                'discount_id' => 'ababab',
-                'total' => '32',
-                'tax_rate' => '9',
-                'includes_vat' => true,
-                'data' => json_encode(['foo' => 'bar']),
-            ], [
-                'order_id' => $order->orderId->get(),
-            ])
-        );
-
-        $this->assertCount(2, $order->getChildEntities()[Discount::class]);
-    }
-
-    /** @test */
-    public function it_can_delete_a_discount()
-    {
-        $order = $this->createdOrder();
-
-        $this->assertCount(1, $order->getChildEntities()[Discount::class]);
-
-        $order->deleteDiscount(
-            DiscountId::fromString('ddd'),
-        );
-
-        $this->assertCount(0, $order->getChildEntities()[Discount::class]);
     }
 
     /** @test */

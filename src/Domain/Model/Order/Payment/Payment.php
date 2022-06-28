@@ -6,14 +6,18 @@ namespace Thinktomorrow\Trader\Domain\Model\Order\Payment;
 use Thinktomorrow\Trader\Domain\Common\Cash\Price;
 use Thinktomorrow\Trader\Domain\Common\Cash\PriceTotal;
 use Thinktomorrow\Trader\Domain\Common\Entity\HasData;
+use Thinktomorrow\Trader\Domain\Common\Entity\ChildAggregate;
+use Thinktomorrow\Trader\Domain\Model\Order\Discount\Discount;
 use Thinktomorrow\Trader\Domain\Model\Order\Discount\Discountable;
 use Thinktomorrow\Trader\Domain\Model\Order\Discount\DiscountTotal;
 use Thinktomorrow\Trader\Domain\Model\Order\HasDiscounts;
 use Thinktomorrow\Trader\Domain\Model\Order\Line\Quantity;
 use Thinktomorrow\Trader\Domain\Model\Order\OrderId;
 use Thinktomorrow\Trader\Domain\Model\PaymentMethod\PaymentMethodId;
+use Thinktomorrow\Trader\Domain\Model\Order\Discount\DiscountableId;
+use Thinktomorrow\Trader\Domain\Model\Order\Discount\DiscountableType;
 
-class Payment implements Discountable
+class Payment implements ChildAggregate, Discountable
 {
     use HasData;
     use HasDiscounts;
@@ -85,7 +89,14 @@ class Payment implements Discountable
         ];
     }
 
-    public static function fromMappedData(array $state, array $aggregateState): static
+    public function getChildEntities(): array
+    {
+        return [
+            Discount::class => array_map(fn ($discount) => $discount->getMappedData(), $this->discounts),
+        ];
+    }
+
+    public static function fromMappedData(array $state, array $aggregateState, array $childEntities = []): static
     {
         $payment = new static();
 
@@ -98,6 +109,7 @@ class Payment implements Discountable
             $state['tax_rate'],
             $state['includes_vat']
         );
+        $payment->discounts = array_map(fn ($discountState) => Discount::fromMappedData($discountState, $state), $childEntities[Discount::class]);
         $payment->data = json_decode($state['data'], true);
 
         return $payment;
@@ -116,5 +128,15 @@ class Payment implements Discountable
     public function getDiscountTotal(): DiscountTotal
     {
         return $this->calculateDiscountTotal($this->getPaymentCost());
+    }
+
+    public function getDiscountableId(): DiscountableId
+    {
+        return DiscountableId::fromString($this->paymentId->get());
+    }
+
+    public function getDiscountableType(): DiscountableType
+    {
+        return DiscountableType::payment;
     }
 }

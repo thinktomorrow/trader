@@ -16,6 +16,7 @@ use Thinktomorrow\Trader\Application\Cart\Line\AddLine;
 use Thinktomorrow\Trader\Application\Cart\Line\AddLineToNewOrder;
 use Thinktomorrow\Trader\Application\Cart\Line\ChangeLineQuantity;
 use Thinktomorrow\Trader\Application\Cart\Line\RemoveLine;
+use Thinktomorrow\Trader\Application\Promo\OrderPromo\ApplyPromoToOrder;
 use Thinktomorrow\Trader\Application\Cart\RefreshCart\Adjusters\AdjustDiscounts;
 use Thinktomorrow\Trader\Application\Cart\RefreshCart\Adjusters\AdjustLines;
 use Thinktomorrow\Trader\Application\Cart\RefreshCart\Adjusters\AdjustShipping;
@@ -102,15 +103,18 @@ abstract class CartContext extends TestCase
             ]))
         );
 
+        $this->orderRepository = new InMemoryOrderRepository();
+
         // Adjusters are loaded via container so set them up here
+        (new TestContainer())->add(ApplyPromoToOrder::class, new ApplyPromoToOrder($this->orderRepository));
         (new TestContainer())->add(AdjustLines::class, new AdjustLines(new InMemoryVariantRepository()));
-        (new TestContainer())->add(AdjustDiscounts::class, new AdjustDiscounts($this->promoRepository));
+        (new TestContainer())->add(AdjustDiscounts::class, new AdjustDiscounts($this->promoRepository, (new TestContainer())->get(ApplyPromoToOrder::class)));
 
         $this->cartApplication = new CartApplication(
             new TestTraderConfig(),
             new TestContainer(),
             $this->variantRepository = new InMemoryVariantRepository(),
-            $this->orderRepository = new InMemoryOrderRepository(),
+            $this->orderRepository,
             new RefreshCartAction(),
             $this->shippingProfileRepository = new InMemoryShippingProfileRepository(),
             $this->paymentMethodRepository = new InMemoryPaymentMethodRepository(),
@@ -123,6 +127,7 @@ abstract class CartContext extends TestCase
             new TestContainer(),
             $this->orderRepository,
             $this->promoRepository,
+            (new TestContainer())->get(ApplyPromoToOrder::class),
             new EventDispatcherSpy(),
         );
 

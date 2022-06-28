@@ -8,13 +8,17 @@ use Thinktomorrow\Trader\Domain\Common\Cash\Price;
 use Thinktomorrow\Trader\Domain\Common\Cash\PriceTotal;
 use Thinktomorrow\Trader\Domain\Common\Entity\ChildEntity;
 use Thinktomorrow\Trader\Domain\Common\Entity\HasData;
+use Thinktomorrow\Trader\Domain\Common\Entity\ChildAggregate;
+use Thinktomorrow\Trader\Domain\Model\Order\Discount\Discount;
 use Thinktomorrow\Trader\Domain\Model\Order\Discount\Discountable;
 use Thinktomorrow\Trader\Domain\Model\Order\Discount\DiscountTotal;
 use Thinktomorrow\Trader\Domain\Model\Order\HasDiscounts;
 use Thinktomorrow\Trader\Domain\Model\Order\OrderId;
 use Thinktomorrow\Trader\Domain\Model\Product\Variant\VariantId;
+use Thinktomorrow\Trader\Domain\Model\Order\Discount\DiscountableId;
+use Thinktomorrow\Trader\Domain\Model\Order\Discount\DiscountableType;
 
-final class Line implements ChildEntity, Discountable
+final class Line implements ChildAggregate, Discountable
 {
     use HasData;
     use HasDiscounts;
@@ -111,7 +115,14 @@ final class Line implements ChildEntity, Discountable
         ];
     }
 
-    public static function fromMappedData(array $state, array $aggregateState): static
+    public function getChildEntities(): array
+    {
+        return [
+            Discount::class => array_map(fn ($discount) => $discount->getMappedData(), $this->discounts),
+        ];
+    }
+
+    public static function fromMappedData(array $state, array $aggregateState, array $childEntities = []): static
     {
         $line = new static();
 
@@ -120,6 +131,7 @@ final class Line implements ChildEntity, Discountable
         $line->variantId = VariantId::fromString($state['variant_id']);
         $line->linePrice = LinePrice::fromScalars($state['line_price'], $state['tax_rate'], $state['includes_vat']);
         $line->quantity = Quantity::fromInt($state['quantity']);
+        $line->discounts = array_map(fn ($discountState) => Discount::fromMappedData($discountState, $state), $childEntities[Discount::class]);
         $line->data = json_decode($state['data'], true);
 
         return $line;
@@ -133,6 +145,16 @@ final class Line implements ChildEntity, Discountable
     public function getDiscountableQuantity(array $conditions): Quantity
     {
         return $this->quantity;
+    }
+
+    public function getDiscountableId(): DiscountableId
+    {
+        return DiscountableId::fromString($this->lineId->get());
+    }
+
+    public function getDiscountableType(): DiscountableType
+    {
+        return DiscountableType::line;
     }
 
     public function deleteDiscounts(): void

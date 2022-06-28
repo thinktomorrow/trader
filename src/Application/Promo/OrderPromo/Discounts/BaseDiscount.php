@@ -4,18 +4,19 @@ declare(strict_types=1);
 namespace Thinktomorrow\Trader\Application\Promo\OrderPromo\Discounts;
 
 use Assert\Assertion;
+use Thinktomorrow\Trader\Domain\Model\Promo\PromoId;
 use Thinktomorrow\Trader\Application\Promo\OrderPromo\OrderCondition;
 use Thinktomorrow\Trader\Domain\Model\Order\Discount\Discount;
 use Thinktomorrow\Trader\Domain\Model\Order\Discount\Discountable;
 use Thinktomorrow\Trader\Domain\Model\Order\Discount\DiscountId;
 use Thinktomorrow\Trader\Domain\Model\Order\Discount\DiscountTotal;
 use Thinktomorrow\Trader\Domain\Model\Order\Order;
-use Thinktomorrow\Trader\Domain\Model\Promo\PromoId;
+use Thinktomorrow\Trader\Domain\Model\Promo\DiscountId as PromoDiscountId;
 
 abstract class BaseDiscount
 {
     protected readonly PromoId $promoId;
-    protected readonly DiscountId $discountId;
+    protected readonly PromoDiscountId $promoDiscountId;
     protected array $promoData;
 
     /** @var OrderCondition[] */
@@ -32,7 +33,7 @@ abstract class BaseDiscount
         return true;
     }
 
-    public function apply(Order $order, Discountable $discountable): void
+    public function apply(Order $order, Discountable $discountable, DiscountId $nextDiscountId): void
     {
         if (! $this->isApplicable($order, $discountable)) {
             return;
@@ -40,8 +41,11 @@ abstract class BaseDiscount
 
         $discount = Discount::fromApplicableDiscount(
             $order->orderId,
+            $nextDiscountId,
+            $discountable->getDiscountableType(),
+            $discountable->getDiscountableId(),
             $this->promoId,
-            $this->discountId,
+            $this->promoDiscountId,
             $this->getDiscountTotal($order, $discountable),
             $this->promoData,
         );
@@ -55,7 +59,7 @@ abstract class BaseDiscount
 
         $discount = new static();
         $discount->promoId = PromoId::fromString($aggregateState['promo_id']);
-        $discount->discountId = DiscountId::fromString($state['discount_id']);
+        $discount->promoDiscountId = PromoDiscountId::fromString($state['discount_id']);
         $discount->promoData = json_decode($aggregateState['data'], true);
         $discount->conditions = $conditions;
 

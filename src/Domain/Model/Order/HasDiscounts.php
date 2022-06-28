@@ -2,6 +2,7 @@
 
 namespace Thinktomorrow\Trader\Domain\Model\Order;
 
+use Assert\Assertion;
 use Thinktomorrow\Trader\Domain\Common\Cash\Cash;
 use Thinktomorrow\Trader\Domain\Common\Cash\Price;
 use Thinktomorrow\Trader\Domain\Common\Cash\PriceTotal;
@@ -24,9 +25,7 @@ trait HasDiscounts
     {
         $discountTaxRate = DiscountTotal::getDiscountTaxRate();
 
-        if (count($this->discounts) > 0) {
-            $discountTaxRate = $this->discounts[0]->getTotal()->getTaxRate();
-        } elseif ($basePrice instanceof Price) {
+        if ($basePrice instanceof Price) {
             $discountTaxRate = $basePrice->getTaxRate();
         }
 
@@ -40,10 +39,14 @@ trait HasDiscounts
             return $zeroDiscountTotal;
         }
 
-        $discountTotal = array_reduce($this->discounts, function (?DiscountTotal $carry, Discount $discount) {
+        $discountTotal = array_reduce($this->discounts, function (?DiscountTotal $carry, Discount $discount) use($discountTaxRate) {
             return $carry === null
                 ? $discount->getTotal()
-                : $carry->add($discount->getTotal());
+                : $carry->add(DiscountTotal::fromMoney(
+                    $discount->getTotal()->getIncludingVat(),
+                    $discountTaxRate,
+                    true
+                ));
         }, $zeroDiscountTotal);
 
         if ($discountTotal->getIncludingVat()->greaterThanOrEqual($basePrice->getIncludingVat())) {
@@ -55,12 +58,9 @@ trait HasDiscounts
 
     public function addDiscount(Discount $discount): void
     {
-        // TODO:: assert order id matches
-        // TODO: assert discount isnt already added... (cf. addShipping)
+        $this->assertDiscountCanBeAdded($discount);
 
-        if (! in_array($discount, $this->discounts)) {
-            $this->discounts[] = $discount;
-        }
+        $this->discounts[] = $discount;
     }
 
     public function deleteDiscount(DiscountId $discountId): void
@@ -81,5 +81,32 @@ trait HasDiscounts
     public function deleteDiscounts(): void
     {
         $this->discounts = [];
+    }
+
+    /**
+     * @param Discount $discount
+     * @return void
+     */
+    private function assertDiscountCanBeAdded(Discount $discount): void
+    {
+        // TODO:: test assert order id matches
+        // TODO:: test assert owner_type and owner_id matches
+        // TODO: test assert discount isnt already added... (cf. addShipping)
+
+        if (!$discount->discountableId->equals($this->getDiscountableId())) {
+            throw new \InvalidArgumentException('Cannot add discount when discountable id doesn\'t match. Discountable id: ' . $this->getDiscountableId()->get() . '. Passed: ' .$discount->discountableId->get());
+        }
+
+        if ($discount->discountableType !== $this->getDiscountableType()) {
+            throw new \InvalidArgumentException('Cannot add discount when discountable type doesn\'t match.  Discountable type: ' . $this->getDiscountableType()->value . '. Passed: ' .$discount->discountableType->value);
+        }
+
+        if (in_array($discount->discountId, array_map(fn(Discount $discount) => $discount->discountId, $this->discounts))) {
+            throw new \InvalidArgumentException('Cannot add same discount (with same discount id: '.$discount->discountId->get().') twice.');
+        }
+
+        if (in_array($discount->promoDiscountId, array_map(fn(Discount $discount) => $discount->promoDiscountId, $this->discounts))) {
+            throw new \InvalidArgumentException('Cannot add same discount (with same promo discount id: '.$discount->promoDiscountId->get().') twice.');
+        }
     }
 }

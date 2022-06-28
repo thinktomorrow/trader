@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace Thinktomorrow\Trader\Application\Promo;
 
 use Psr\Container\ContainerInterface;
+use Thinktomorrow\Trader\Application\Promo\OrderPromo\ApplyPromoToOrder;
 use Thinktomorrow\Trader\Application\Promo\OrderPromo\OrderPromoRepository;
 use Thinktomorrow\Trader\Domain\Common\Event\EventDispatcher;
 use Thinktomorrow\Trader\Domain\Model\Order\OrderRepository;
@@ -16,12 +17,14 @@ final class PromoApplication
     private TraderConfig $config;
     private ContainerInterface $container;
     private OrderPromoRepository $orderPromoRepository;
+    private ApplyPromoToOrder $applyPromoToOrder;
 
     public function __construct(
         TraderConfig         $config,
         ContainerInterface   $container,
         OrderRepository      $orderRepository,
         OrderPromoRepository $orderPromoRepository,
+        ApplyPromoToOrder $applyPromoToOrder,
         EventDispatcher      $eventDispatcher
     ) {
         $this->orderRepository = $orderRepository;
@@ -29,6 +32,7 @@ final class PromoApplication
         $this->config = $config;
         $this->container = $container;
         $this->orderPromoRepository = $orderPromoRepository;
+        $this->applyPromoToOrder = $applyPromoToOrder;
     }
 
     public function enterCoupon(EnterCoupon $enterCoupon): void
@@ -40,7 +44,7 @@ final class PromoApplication
             return;
         }
 
-        $promo->apply($order); // Let the discount determine if it applies to order, line, shipping or other?
+        $this->applyPromoToOrder->apply($order, $promo->getDiscounts(), $enterCoupon->getCouponCode());
 
 //        if($promo->)
 //        $order->setEnteredCouponCode($enterCoupon->getCouponCode());

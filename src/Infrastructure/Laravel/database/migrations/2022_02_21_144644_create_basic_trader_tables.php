@@ -263,13 +263,18 @@ class CreateBasicTraderTables extends Migration
         Schema::create(static::PREFIX.'order_discounts', function (Blueprint $table) {
             $table->char('discount_id', 36)->primary();
             $table->char('order_id', 36)->index();
+            $table->string('discountable_type', 72);
+            $table->char('discountable_id', 36);
             $table->char('promo_id', 36)->nullable()->index(); // Refers to original promo
+            $table->char('promo_discount_id', 36)->nullable()->index(); // Refers to original promo discount
             $table->integer('total')->unsigned();
             $table->string('tax_rate');
             $table->boolean('includes_vat');
             $table->json('data')->nullable();
 
             $table->foreign('order_id')->references('order_id')->on(static::PREFIX.'orders')->onDelete('cascade');
+            $table->foreign('promo_id')->references('promo_id')->on(static::PREFIX.'promos')->nullOnDelete();
+            $table->foreign('promo_discount_id')->references('discount_id')->on(static::PREFIX.'promo_discount_conditions')->nullOnDelete();
         });
     }
 
@@ -294,7 +299,7 @@ class CreateBasicTraderTables extends Migration
             $table->foreign('promo_id')->references('promo_id')->on(static::PREFIX.'promos')->onDelete('cascade');
         });
 
-        Schema::create(static::PREFIX.'promo_conditions', function (Blueprint $table) {
+        Schema::create(static::PREFIX.'promo_discount_conditions', function (Blueprint $table) {
             $table->id();
             $table->char('discount_id', 36)->index();
             $table->string('key'); // class reference
@@ -331,6 +336,6 @@ class CreateBasicTraderTables extends Migration
         Schema::dropIfExists(static::PREFIX.'products');
         Schema::dropIfExists(static::PREFIX.'promos');
         Schema::dropIfExists(static::PREFIX.'promo_discounts');
-        Schema::dropIfExists(static::PREFIX.'promo_conditions');
+        Schema::dropIfExists(static::PREFIX.'promo_discount_conditions');
     }
 }

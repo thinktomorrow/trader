@@ -19,6 +19,8 @@ use Thinktomorrow\Trader\Domain\Model\Order\Line\Line;
 use Thinktomorrow\Trader\Domain\Model\Order\Line\Quantity;
 use Thinktomorrow\Trader\Domain\Model\Order\Payment\Payment;
 use Thinktomorrow\Trader\Domain\Model\Order\Shipping\Shipping;
+use Thinktomorrow\Trader\Domain\Model\Order\Discount\DiscountableId;
+use Thinktomorrow\Trader\Domain\Model\Order\Discount\DiscountableType;
 
 final class Order implements Aggregate, Discountable
 {
@@ -179,12 +181,12 @@ final class Order implements Aggregate, Discountable
         $order->orderId = OrderId::fromString($state['order_id']);
         $order->orderState = OrderState::from($state['order_state']);
 
-        $order->lines = array_map(fn ($lineState) => Line::fromMappedData($lineState, $state), $childEntities[Line::class]);
         $order->discounts = array_map(fn ($discountState) => Discount::fromMappedData($discountState, $state), $childEntities[Discount::class]);
-        $order->shippings = array_map(fn ($shippingState) => Shipping::fromMappedData($shippingState, $state), $childEntities[Shipping::class]);
+        $order->lines = array_map(fn ($lineState) => Line::fromMappedData($lineState, $state, [Discount::class => $lineState[Discount::class]]), $childEntities[Line::class]);
+        $order->shippings = array_map(fn ($shippingState) => Shipping::fromMappedData($shippingState, $state, [Discount::class => $shippingState[Discount::class]]), $childEntities[Shipping::class]);
         $order->shippingAddress = $childEntities[ShippingAddress::class] ? ShippingAddress::fromMappedData($childEntities[ShippingAddress::class], $state) : null;
         $order->billingAddress = $childEntities[BillingAddress::class] ? BillingAddress::fromMappedData($childEntities[BillingAddress::class], $state) : null;
-        $order->payment = $childEntities[Payment::class] ? Payment::fromMappedData($childEntities[Payment::class], $state) : null;
+        $order->payment = $childEntities[Payment::class] ? Payment::fromMappedData($childEntities[Payment::class], $state, [Discount::class => $childEntities[Payment::class][Discount::class]]) : null;
         $order->shopper = $childEntities[Shopper::class] ? Shopper::fromMappedData($childEntities[Shopper::class], $state) : null;
 
         $order->data = json_decode($state['data'], true);
@@ -200,5 +202,15 @@ final class Order implements Aggregate, Discountable
     public function getDiscountableQuantity(array $conditions): Quantity
     {
         return $this->getQuantity();
+    }
+
+    public function getDiscountableId(): DiscountableId
+    {
+        return DiscountableId::fromString($this->orderId->get());
+    }
+
+    public function getDiscountableType(): DiscountableType
+    {
+        return DiscountableType::order;
     }
 }

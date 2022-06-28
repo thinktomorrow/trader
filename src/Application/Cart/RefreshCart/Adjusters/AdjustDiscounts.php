@@ -5,16 +5,19 @@ namespace Thinktomorrow\Trader\Application\Cart\RefreshCart\Adjusters;
 
 use Thinktomorrow\Trader\Application\Cart\RefreshCart\Adjuster;
 use Thinktomorrow\Trader\Application\Promo\OrderPromo\OrderPromo;
+use Thinktomorrow\Trader\Application\Promo\OrderPromo\ApplyPromoToOrder;
 use Thinktomorrow\Trader\Application\Promo\OrderPromo\OrderPromoRepository;
 use Thinktomorrow\Trader\Domain\Model\Order\Order;
 
 class AdjustDiscounts implements Adjuster
 {
     private OrderPromoRepository $orderPromoRepository;
+    private ApplyPromoToOrder $applyPromoToOrder;
 
-    public function __construct(OrderPromoRepository $orderPromoRepository)
+    public function __construct(OrderPromoRepository $orderPromoRepository, ApplyPromoToOrder $applyPromoToOrder)
     {
         $this->orderPromoRepository = $orderPromoRepository;
+        $this->applyPromoToOrder = $applyPromoToOrder;
     }
 
     public function adjust(Order $order): void
@@ -27,7 +30,7 @@ class AdjustDiscounts implements Adjuster
 
         // If coupon is given on cart, we'll refresh that promo first
         if ($order->getEnteredCouponCode() && $couponPromo = $this->orderPromoRepository->findOrderPromoByCouponCode($order->getEnteredCouponCode())) {
-            $couponPromo->apply($order);
+            $this->applyPromoToOrder->apply($order, $couponPromo->getDiscounts());
 
             if ($couponPromo->isCombinable()) {
                 $combinablePromoIds[] = $couponPromo->promoId;
@@ -56,7 +59,7 @@ class AdjustDiscounts implements Adjuster
                 continue;
             }
 
-            $promo->apply($order);
+            $this->applyPromoToOrder->apply($order, $promo->getDiscounts(), $promo->getCouponCode());
         }
     }
 

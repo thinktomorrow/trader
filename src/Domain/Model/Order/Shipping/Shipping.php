@@ -7,14 +7,18 @@ use Thinktomorrow\Trader\Domain\Common\Cash\Price;
 use Thinktomorrow\Trader\Domain\Common\Cash\PriceTotal;
 use Thinktomorrow\Trader\Domain\Common\Entity\ChildEntity;
 use Thinktomorrow\Trader\Domain\Common\Entity\HasData;
+use Thinktomorrow\Trader\Domain\Common\Entity\ChildAggregate;
+use Thinktomorrow\Trader\Domain\Model\Order\Discount\Discount;
 use Thinktomorrow\Trader\Domain\Model\Order\Discount\Discountable;
 use Thinktomorrow\Trader\Domain\Model\Order\Discount\DiscountTotal;
 use Thinktomorrow\Trader\Domain\Model\Order\HasDiscounts;
 use Thinktomorrow\Trader\Domain\Model\Order\Line\Quantity;
 use Thinktomorrow\Trader\Domain\Model\Order\OrderId;
+use Thinktomorrow\Trader\Domain\Model\Order\Discount\DiscountableId;
+use Thinktomorrow\Trader\Domain\Model\Order\Discount\DiscountableType;
 use Thinktomorrow\Trader\Domain\Model\ShippingProfile\ShippingProfileId;
 
-final class Shipping implements ChildEntity, Discountable
+final class Shipping implements ChildAggregate, Discountable
 {
     use HasData;
     use HasDiscounts;
@@ -86,7 +90,14 @@ final class Shipping implements ChildEntity, Discountable
         ];
     }
 
-    public static function fromMappedData(array $state, array $aggregateState): static
+    public function getChildEntities(): array
+    {
+        return [
+            Discount::class => array_map(fn ($discount) => $discount->getMappedData(), $this->discounts),
+        ];
+    }
+
+    public static function fromMappedData(array $state, array $aggregateState, array $childEntities = []): static
     {
         $shipping = new static();
 
@@ -99,6 +110,7 @@ final class Shipping implements ChildEntity, Discountable
             $state['tax_rate'],
             $state['includes_vat']
         );
+        $shipping->discounts = array_map(fn ($discountState) => Discount::fromMappedData($discountState, $state), $childEntities[Discount::class]);
         $shipping->data = json_decode($state['data'], true);
 
         return $shipping;
@@ -117,5 +129,15 @@ final class Shipping implements ChildEntity, Discountable
     public function getDiscountTotal(): DiscountTotal
     {
         return $this->calculateDiscountTotal($this->getShippingCost());
+    }
+
+    public function getDiscountableId(): DiscountableId
+    {
+        return DiscountableId::fromString($this->shippingId->get());
+    }
+
+    public function getDiscountableType(): DiscountableType
+    {
+        return DiscountableType::shipping;
     }
 }

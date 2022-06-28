@@ -5,6 +5,7 @@ namespace Thinktomorrow\Trader\Domain\Model\Order;
 
 use Thinktomorrow\Trader\Domain\Model\Order\Payment\PaymentId;
 use Thinktomorrow\Trader\Domain\Model\Order\Shipping\ShippingId;
+use Thinktomorrow\Trader\Domain\Model\Order\Discount\DiscountId;
 
 interface OrderRepository
 {
@@ -21,4 +22,6 @@ interface OrderRepository
     public function nextPaymentReference(): PaymentId;
 
     public function nextShopperReference(): ShopperId;
+
+    public function nextDiscountReference(): DiscountId;
 }

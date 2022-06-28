@@ -5,6 +5,8 @@ namespace Tests\Infrastructure\Repositories;
 
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\Infrastructure\TestCase;
+use Thinktomorrow\Trader\Domain\Model\Order\Discount\Discount;
+use Thinktomorrow\Trader\Domain\Model\Order\Discount\DiscountableType;
 use Thinktomorrow\Trader\Domain\Model\Order\Exceptions\CouldNotFindOrder;
 use Thinktomorrow\Trader\Domain\Model\Order\Order;
 use Thinktomorrow\Trader\Domain\Model\Order\OrderId;
@@ -77,6 +79,28 @@ final class OrderRepositoryTest extends TestCase
     public function orders(): \Generator
     {
         yield [$this->createdOrder()];
+
+        $orderWithDiscount = $this->createdOrder();
+        $orderWithDiscount->addDiscount($this->createOrderDiscount($orderWithDiscount->orderId, ['discount_id' => 'def', 'promo_discount_id' => 'ghi']));
+        yield [$orderWithDiscount];
+
+        $orderWithLineDiscount = $this->createdOrder();
+        $orderWithLineDiscount->getLines()[0]->addDiscount($this->createOrderDiscount($orderWithLineDiscount->orderId, [
+            'discount_id' => 'def',
+            'promo_discount_id' => 'ghi',
+            'discountable_id' => $orderWithLineDiscount->getLines()[0]->lineId->get(),
+            'discountable_type' => DiscountableType::line->value,
+        ]));
+        yield [$orderWithLineDiscount];
+
+        $orderWithShippingDiscount = $this->createdOrder();
+        $orderWithShippingDiscount->getShippings()[0]->addDiscount($this->createOrderDiscount($orderWithShippingDiscount->orderId, [
+            'discount_id' => 'def',
+            'promo_discount_id' => 'ghi',
+            'discountable_id' => $orderWithShippingDiscount->getShippings()[0]->shippingId->get(),
+            'discountable_type' => DiscountableType::shipping->value,
+        ]));
+        yield [$orderWithShippingDiscount];
 
         yield [
             Order::create(

@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace Thinktomorrow\Trader\Application\Promo\OrderPromo;
 
 use Thinktomorrow\Trader\Domain\Common\Map\Mappable;
+use Thinktomorrow\Trader\Domain\Model\Order\Discount\DiscountId;
 use Thinktomorrow\Trader\Domain\Model\Order\Discount\Discountable;
 use Thinktomorrow\Trader\Domain\Model\Order\Discount\DiscountTotal;
 use Thinktomorrow\Trader\Domain\Model\Order\Order;
@@ -14,7 +15,7 @@ interface OrderDiscount extends Mappable
 
     public function isApplicable(Order $order, Discountable $discountable): bool;
 
-    public function apply(Order $order, Discountable $discountable): void;
+    public function apply(Order $order, Discountable $discountable, DiscountId $nextDiscountId): void;
 
     public function getDiscountTotal(Order $order, Discountable $discountable): DiscountTotal;
 

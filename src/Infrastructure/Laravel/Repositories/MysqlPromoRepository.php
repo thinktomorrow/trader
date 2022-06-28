@@ -26,7 +26,7 @@ final class MysqlPromoRepository implements PromoRepository, OrderPromoRepositor
 {
     private static string $promoTable = 'trader_promos';
     private static string $promoDiscountTable = 'trader_promo_discounts';
-    private static string $promoConditionTable = 'trader_promo_conditions';
+    private static string $promoConditionTable = 'trader_promo_discount_conditions';
 
     private DiscountFactory $discountFactory;
     private OrderDiscountFactory $orderDiscountFactory;

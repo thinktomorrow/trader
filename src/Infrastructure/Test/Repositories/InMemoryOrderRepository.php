@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace Thinktomorrow\Trader\Infrastructure\Test\Repositories;
 
+use Thinktomorrow\Trader\Domain\Model\Order\Discount\DiscountId;
 use Thinktomorrow\Trader\Domain\Model\Order\Exceptions\CouldNotFindOrder;
 use Thinktomorrow\Trader\Domain\Model\Order\Order;
 use Thinktomorrow\Trader\Domain\Model\Order\OrderId;
@@ -20,6 +21,7 @@ final class InMemoryOrderRepository implements OrderRepository
     private string $nextShippingReference = 'shipping-123';
     private string $nextPaymentReference = 'payment-123';
     private string $nextShopperReference = 'shopper-123';
+    private string $nextDiscountReference = 'discount-123';
 
     public function save(Order $order): void
     {
@@ -64,6 +66,11 @@ final class InMemoryOrderRepository implements OrderRepository
         return ShopperId::fromString($this->nextShopperReference);
     }
 
+    public function nextDiscountReference(): DiscountId
+    {
+        return DiscountId::fromString($this->nextDiscountReference . '-' . mt_rand(1,999));
+    }
+
     // For testing purposes only
     public function setNextReference(string $nextReference): void
     {
@@ -83,6 +90,11 @@ final class InMemoryOrderRepository implements OrderRepository
     public function setNextShopperReference(string $nextShopperReference): void
     {
         $this->nextShopperReference = $nextShopperReference;
+    }
+
+    public function setNextDiscountReference(string $nextDiscountReference): void
+    {
+        $this->nextDiscountReference = $nextDiscountReference;
     }
 
     public static function clear()

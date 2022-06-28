@@ -6,6 +6,7 @@ namespace Tests\Unit\Model;
 use PHPUnit\Framework\TestCase;
 use Thinktomorrow\Trader\Domain\Model\Order\OrderId;
 use Thinktomorrow\Trader\Domain\Model\Order\Shipping\Shipping;
+use Thinktomorrow\Trader\Domain\Model\Order\Discount\Discount;
 use Thinktomorrow\Trader\Domain\Model\Order\Shipping\ShippingCost;
 use Thinktomorrow\Trader\Domain\Model\Order\Shipping\ShippingId;
 use Thinktomorrow\Trader\Domain\Model\Order\Shipping\ShippingState;
@@ -65,6 +66,8 @@ class ShippingTest extends TestCase
             'data' => json_encode([]),
         ], [
             'order_id' => 'aaa',
+        ], [
+            Discount::class => [],
         ]);
     }
 }

@@ -9,6 +9,10 @@ use Thinktomorrow\Trader\Domain\Model\Order\Line\Quantity;
 
 interface Discountable
 {
+    public function getDiscountableId(): DiscountableId;
+
+    public function getDiscountableType(): DiscountableType;
+
     /**
      * Total amount on which the discounts should be calculated.
      *
