@@ -18,8 +18,8 @@ class CreateBasicTraderTables extends Migration
         $this->upCatalog();
         $this->upServices();
         $this->upCustomers();
-        $this->upOrders();
         $this->upPromos();
+        $this->upOrders();
     }
 
     private function upCatalog()

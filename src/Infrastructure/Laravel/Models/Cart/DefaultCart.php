@@ -78,6 +78,11 @@ class DefaultCart implements Cart
         return $this->lines;
     }
 
+    public function isEmpty(): bool
+    {
+        return $this->getSize() < 1;
+    }
+
     public function getSize(): int
     {
         return count($this->getLines());

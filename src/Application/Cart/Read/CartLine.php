@@ -23,6 +23,7 @@ interface CartLine
 
     public function getTitle(): string;
     public function getDescription(): ?string;
+    public function getUrl(): string;
     public function setImages(iterable $images): void;
     public function getImages(): iterable;
 

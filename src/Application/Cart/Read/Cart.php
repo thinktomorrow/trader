@@ -11,6 +11,8 @@ interface Cart
     /** @return CartLine[] */
     public function getLines(): iterable;
 
+    public function isEmpty(): bool;
+
     /** The amount of different items */
     public function getSize(): int;
 

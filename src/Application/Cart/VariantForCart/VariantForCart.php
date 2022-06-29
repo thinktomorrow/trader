@@ -7,6 +7,7 @@ use Thinktomorrow\Trader\Domain\Model\Product\ProductId;
 use Thinktomorrow\Trader\Domain\Model\Product\Variant\VariantId;
 use Thinktomorrow\Trader\Domain\Model\Product\Variant\VariantSalePrice;
 use Thinktomorrow\Trader\Domain\Model\Product\Variant\VariantState;
+use Thinktomorrow\Trader\Domain\Model\Product\Variant\VariantUnitPrice;
 
 interface VariantForCart
 {
@@ -15,6 +16,7 @@ interface VariantForCart
     public function getVariantId(): VariantId;
     public function getProductId(): ProductId;
     public function getState(): VariantState;
+    public function getUnitPrice(): VariantUnitPrice;
     public function getSalePrice(): VariantSalePrice;
     public function getTitle(): string;
 }

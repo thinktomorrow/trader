@@ -142,4 +142,9 @@ class DefaultCartLine implements CartLine
     {
         return $this->discounts;
     }
+
+    public function getUrl(): string
+    {
+        return $this->getVariantId();
+    }
 }
