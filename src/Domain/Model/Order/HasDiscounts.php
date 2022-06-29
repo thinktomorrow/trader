@@ -2,7 +2,6 @@
 
 namespace Thinktomorrow\Trader\Domain\Model\Order;
 
-use Assert\Assertion;
 use Thinktomorrow\Trader\Domain\Common\Cash\Cash;
 use Thinktomorrow\Trader\Domain\Common\Cash\Price;
 use Thinktomorrow\Trader\Domain\Common\Cash\PriceTotal;
@@ -39,7 +38,7 @@ trait HasDiscounts
             return $zeroDiscountTotal;
         }
 
-        $discountTotal = array_reduce($this->discounts, function (?DiscountTotal $carry, Discount $discount) use($discountTaxRate) {
+        $discountTotal = array_reduce($this->discounts, function (?DiscountTotal $carry, Discount $discount) use ($discountTaxRate) {
             return $carry === null
                 ? $discount->getTotal()
                 : $carry->add(DiscountTotal::fromMoney(
@@ -93,7 +92,7 @@ trait HasDiscounts
         // TODO:: test assert owner_type and owner_id matches
         // TODO: test assert discount isnt already added... (cf. addShipping)
 
-        if (!$discount->discountableId->equals($this->getDiscountableId())) {
+        if (! $discount->discountableId->equals($this->getDiscountableId())) {
             throw new \InvalidArgumentException('Cannot add discount when discountable id doesn\'t match. Discountable id: ' . $this->getDiscountableId()->get() . '. Passed: ' .$discount->discountableId->get());
         }
 
@@ -101,11 +100,11 @@ trait HasDiscounts
             throw new \InvalidArgumentException('Cannot add discount when discountable type doesn\'t match.  Discountable type: ' . $this->getDiscountableType()->value . '. Passed: ' .$discount->discountableType->value);
         }
 
-        if (in_array($discount->discountId, array_map(fn(Discount $discount) => $discount->discountId, $this->discounts))) {
+        if (in_array($discount->discountId, array_map(fn (Discount $discount) => $discount->discountId, $this->discounts))) {
             throw new \InvalidArgumentException('Cannot add same discount (with same discount id: '.$discount->discountId->get().') twice.');
         }
 
-        if (in_array($discount->promoDiscountId, array_map(fn(Discount $discount) => $discount->promoDiscountId, $this->discounts))) {
+        if (in_array($discount->promoDiscountId, array_map(fn (Discount $discount) => $discount->promoDiscountId, $this->discounts))) {
             throw new \InvalidArgumentException('Cannot add same discount (with same promo discount id: '.$discount->promoDiscountId->get().') twice.');
         }
     }
