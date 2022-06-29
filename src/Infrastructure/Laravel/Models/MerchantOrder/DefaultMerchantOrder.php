@@ -1,33 +1,33 @@
 <?php
 declare(strict_types=1);
 
-namespace Thinktomorrow\Trader\Infrastructure\Laravel\Models\Cart;
+namespace Thinktomorrow\Trader\Infrastructure\Laravel\Models\MerchantOrder;
 
 use Money\Money;
-use Thinktomorrow\Trader\Application\Cart\Read\Cart;
-use Thinktomorrow\Trader\Application\Cart\Read\CartBillingAddress;
-use Thinktomorrow\Trader\Application\Cart\Read\CartLine;
-use Thinktomorrow\Trader\Application\Cart\Read\CartPayment;
-use Thinktomorrow\Trader\Application\Cart\Read\CartShipping;
-use Thinktomorrow\Trader\Application\Cart\Read\CartShippingAddress;
-use Thinktomorrow\Trader\Application\Cart\Read\CartShopper;
 use Thinktomorrow\Trader\Application\Common\RendersData;
 use Thinktomorrow\Trader\Application\Common\RendersMoney;
 use Thinktomorrow\Trader\Domain\Common\Cash\Price;
 use Thinktomorrow\Trader\Domain\Common\Cash\PriceTotal;
+use Thinktomorrow\Trader\Application\Order\MerchantOrder\MerchantOrder;
+use Thinktomorrow\Trader\Application\Order\MerchantOrder\MerchantOrderLine;
+use Thinktomorrow\Trader\Application\Order\MerchantOrder\MerchantOrderPayment;
+use Thinktomorrow\Trader\Application\Order\MerchantOrder\MerchantOrderShopper;
+use Thinktomorrow\Trader\Application\Order\MerchantOrder\MerchantOrderShipping;
+use Thinktomorrow\Trader\Application\Order\MerchantOrder\MerchantOrderBillingAddress;
+use Thinktomorrow\Trader\Application\Order\MerchantOrder\MerchantOrderShippingAddress;
 
-class DefaultCart implements Cart
+class DefaultMerchantOrder implements MerchantOrder
 {
     use RendersData;
     use RendersMoney;
 
     protected string $orderId;
     protected iterable $lines;
-    protected ?CartShippingAddress $shippingAddress;
-    protected ?CartBillingAddress $billingAddress;
-    protected ?CartShipping $shipping;
-    protected ?CartPayment $payment;
-    protected ?CartShopper $shopper;
+    protected ?MerchantOrderShippingAddress $shippingAddress;
+    protected ?MerchantOrderBillingAddress $billingAddress;
+    protected ?MerchantOrderShipping $shipping;
+    protected ?MerchantOrderPayment $payment;
+    protected ?MerchantOrderShopper $shopper;
     protected array $discounts;
     protected array $data;
 
@@ -44,28 +44,28 @@ class DefaultCart implements Cart
 
     public static function fromMappedData(array $state, array $childObjects, array $discounts): static
     {
-        $cart = new static();
+        $order = new static();
 
-        $cart->orderId = $state['order_id'];
+        $order->orderId = $state['order_id'];
 
-        $cart->total = $state['total'];
-        $cart->taxTotal = $state['taxTotal'];
-        $cart->subtotal = $state['subtotal'];
-        $cart->discountTotal = $state['discountTotal'];
-        $cart->shippingCost = $state['shippingCost'];
-        $cart->paymentCost = $state['paymentCost'];
+        $order->total = $state['total'];
+        $order->taxTotal = $state['taxTotal'];
+        $order->subtotal = $state['subtotal'];
+        $order->discountTotal = $state['discountTotal'];
+        $order->shippingCost = $state['shippingCost'];
+        $order->paymentCost = $state['paymentCost'];
 
-        $cart->lines = $childObjects[CartLine::class];
-        $cart->shippingAddress = $childObjects[CartShippingAddress::class];
-        $cart->billingAddress = $childObjects[CartBillingAddress::class];
-        $cart->shipping = $childObjects[CartShipping::class];
-        $cart->payment = $childObjects[CartPayment::class];
-        $cart->shopper = $childObjects[CartShopper::class];
+        $order->lines = $childObjects[MerchantOrderLine::class];
+        $order->shippingAddress = $childObjects[MerchantOrderShippingAddress::class];
+        $order->billingAddress = $childObjects[MerchantOrderBillingAddress::class];
+        $order->shipping = $childObjects[MerchantOrderShipping::class];
+        $order->payment = $childObjects[MerchantOrderPayment::class];
+        $order->shopper = $childObjects[MerchantOrderShopper::class];
 
-        $cart->data = json_decode($state['data'], true);
-        $cart->discounts = $discounts;
+        $order->data = json_decode($state['data'], true);
+        $order->discounts = $discounts;
 
-        return $cart;
+        return $order;
     }
 
     public function getOrderId(): string
@@ -158,27 +158,27 @@ class DefaultCart implements Cart
         );
     }
 
-    public function getShopper(): ?CartShopper
+    public function getShopper(): MerchantOrderShopper
     {
         return $this->shopper;
     }
 
-    public function getShipping(): ?CartShipping
+    public function getShipping(): ?MerchantOrderShipping
     {
         return $this->shipping;
     }
 
-    public function getPayment(): ?CartPayment
+    public function getPayment(): ?MerchantOrderPayment
     {
         return $this->payment;
     }
 
-    public function getShippingAddress(): ?CartShippingAddress
+    public function getShippingAddress(): ?MerchantOrderShippingAddress
     {
         return $this->shippingAddress;
     }
 
-    public function getBillingAddress(): ?CartBillingAddress
+    public function getBillingAddress(): ?MerchantOrderBillingAddress
     {
         return $this->billingAddress;
     }

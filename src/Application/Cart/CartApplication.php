@@ -116,7 +116,9 @@ final class CartApplication
             $addLine->getVariantId(),
             LinePrice::fromPrice($variant->getSalePrice()),
             $addLine->getQuantity(),
-            $addLine->getData()
+            array_merge($addLine->getData(), [
+                'title' => $variant->getTitle(),
+            ])
         );
 
         $this->orderRepository->save($order);

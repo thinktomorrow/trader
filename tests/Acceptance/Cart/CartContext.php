@@ -25,6 +25,7 @@ use Thinktomorrow\Trader\Application\Cart\UpdateShippingAddress;
 use Thinktomorrow\Trader\Application\Cart\UpdateShopper;
 use Thinktomorrow\Trader\Application\Promo\OrderPromo\ApplyPromoToOrder;
 use Thinktomorrow\Trader\Application\Promo\OrderPromo\Discounts\FixedAmountOrderDiscount;
+use Thinktomorrow\Trader\Infrastructure\Test\Repositories\InMemoryMerchantOrderRepository;
 use Thinktomorrow\Trader\Application\Promo\OrderPromo\Discounts\PercentageOffOrderDiscount;
 use Thinktomorrow\Trader\Application\Promo\OrderPromo\OrderConditionFactory;
 use Thinktomorrow\Trader\Application\Promo\OrderPromo\OrderDiscountFactory;
@@ -88,6 +89,7 @@ abstract class CartContext extends TestCase
 
         $this->productRepository = new InMemoryProductRepository();
         $this->cartRepository = new InMemoryCartRepository();
+        $this->merchantOrderRepository = new InMemoryMerchantOrderRepository();
         $this->promoRepository = new InMemoryPromoRepository(
             new DiscountFactory([
                 FixedAmountDiscount::class,
