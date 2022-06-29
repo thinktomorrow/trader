@@ -16,10 +16,6 @@ class DefaultCartShopper implements CartShopper
     protected bool $is_business;
     protected array $data;
 
-    private function __construct()
-    {
-    }
-
     public static function fromMappedData(array $state, array $cartState): static
     {
         $shopper = new static();
