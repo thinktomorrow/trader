@@ -15,10 +15,6 @@ abstract class DefaultAddress
     protected ?string $postalCode;
     protected ?string $city;
 
-    private function __construct()
-    {
-    }
-
     public static function fromMappedData(array $state, array $cartState): static
     {
         $address = new static();
