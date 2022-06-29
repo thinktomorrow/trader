@@ -5,9 +5,9 @@ namespace Thinktomorrow\Trader\Infrastructure\Laravel\Models\MerchantOrder;
 
 use Thinktomorrow\Trader\Application\Common\RendersData;
 use Thinktomorrow\Trader\Application\Common\RendersMoney;
+use Thinktomorrow\Trader\Application\Order\MerchantOrder\MerchantOrderDiscount;
 use Thinktomorrow\Trader\Domain\Common\Cash\Percentage;
 use Thinktomorrow\Trader\Domain\Model\Order\Discount\DiscountTotal;
-use Thinktomorrow\Trader\Application\Order\MerchantOrder\MerchantOrderDiscount;
 
 class DefaultMerchantOrderDiscount implements MerchantOrderDiscount
 {

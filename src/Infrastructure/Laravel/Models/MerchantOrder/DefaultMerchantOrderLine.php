@@ -6,8 +6,8 @@ namespace Thinktomorrow\Trader\Infrastructure\Laravel\Models\MerchantOrder;
 use Money\Money;
 use Thinktomorrow\Trader\Application\Common\RendersData;
 use Thinktomorrow\Trader\Application\Common\RendersMoney;
-use Thinktomorrow\Trader\Domain\Common\Cash\Price;
 use Thinktomorrow\Trader\Application\Order\MerchantOrder\MerchantOrderLine;
+use Thinktomorrow\Trader\Domain\Common\Cash\Price;
 
 class DefaultMerchantOrderLine implements MerchantOrderLine
 {
