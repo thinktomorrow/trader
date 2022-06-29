@@ -68,7 +68,7 @@ final class InMemoryOrderRepository implements OrderRepository
 
     public function nextDiscountReference(): DiscountId
     {
-        return DiscountId::fromString($this->nextDiscountReference . '-' . mt_rand(1,999));
+        return DiscountId::fromString($this->nextDiscountReference . '-' . mt_rand(1, 999));
     }
 
     // For testing purposes only

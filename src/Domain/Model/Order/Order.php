@@ -13,14 +13,14 @@ use Thinktomorrow\Trader\Domain\Model\Order\Address\BillingAddress;
 use Thinktomorrow\Trader\Domain\Model\Order\Address\ShippingAddress;
 use Thinktomorrow\Trader\Domain\Model\Order\Discount\Discount;
 use Thinktomorrow\Trader\Domain\Model\Order\Discount\Discountable;
+use Thinktomorrow\Trader\Domain\Model\Order\Discount\DiscountableId;
+use Thinktomorrow\Trader\Domain\Model\Order\Discount\DiscountableType;
 use Thinktomorrow\Trader\Domain\Model\Order\Events\OrderCreated;
 use Thinktomorrow\Trader\Domain\Model\Order\Events\OrderUpdated;
 use Thinktomorrow\Trader\Domain\Model\Order\Line\Line;
 use Thinktomorrow\Trader\Domain\Model\Order\Line\Quantity;
 use Thinktomorrow\Trader\Domain\Model\Order\Payment\Payment;
 use Thinktomorrow\Trader\Domain\Model\Order\Shipping\Shipping;
-use Thinktomorrow\Trader\Domain\Model\Order\Discount\DiscountableId;
-use Thinktomorrow\Trader\Domain\Model\Order\Discount\DiscountableType;
 
 final class Order implements Aggregate, Discountable
 {

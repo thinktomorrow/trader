@@ -4,8 +4,8 @@ declare(strict_types=1);
 namespace Thinktomorrow\Trader\Application\Promo\OrderPromo;
 
 use Thinktomorrow\Trader\Domain\Common\Map\Mappable;
-use Thinktomorrow\Trader\Domain\Model\Order\Discount\DiscountId;
 use Thinktomorrow\Trader\Domain\Model\Order\Discount\Discountable;
+use Thinktomorrow\Trader\Domain\Model\Order\Discount\DiscountId;
 use Thinktomorrow\Trader\Domain\Model\Order\Discount\DiscountTotal;
 use Thinktomorrow\Trader\Domain\Model\Order\Order;
 

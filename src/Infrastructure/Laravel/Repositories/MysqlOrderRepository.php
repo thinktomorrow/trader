@@ -6,11 +6,11 @@ namespace Thinktomorrow\Trader\Infrastructure\Laravel\Repositories;
 use Illuminate\Support\Facades\DB;
 use Ramsey\Uuid\Uuid;
 use Thinktomorrow\Trader\Domain\Common\Address\AddressType;
-use Thinktomorrow\Trader\Domain\Model\Order\Discount\DiscountId;
 use Thinktomorrow\Trader\Domain\Model\Order\Address\BillingAddress;
 use Thinktomorrow\Trader\Domain\Model\Order\Address\ShippingAddress;
 use Thinktomorrow\Trader\Domain\Model\Order\Discount\Discount;
 use Thinktomorrow\Trader\Domain\Model\Order\Discount\DiscountableType;
+use Thinktomorrow\Trader\Domain\Model\Order\Discount\DiscountId;
 use Thinktomorrow\Trader\Domain\Model\Order\Exceptions\CouldNotFindOrder;
 use Thinktomorrow\Trader\Domain\Model\Order\Line\Line;
 use Thinktomorrow\Trader\Domain\Model\Order\Order;
@@ -77,11 +77,11 @@ final class MysqlOrderRepository implements OrderRepository
     {
         $discountStates = $order->getChildEntities()[Discount::class];
 
-        foreach($order->getLines() as $line) {
+        foreach ($order->getLines() as $line) {
             $discountStates = array_merge($discountStates, $line->getChildEntities()[Discount::class]);
         }
 
-        foreach($order->getShippings() as $shipping) {
+        foreach ($order->getShippings() as $shipping) {
             $discountStates = array_merge($discountStates, $shipping->getChildEntities()[Discount::class]);
         }
 
@@ -213,7 +213,7 @@ final class MysqlOrderRepository implements OrderRepository
             ->map(fn ($item) => (array)$item)
             ->map(fn ($item) => array_merge($item, [
                 'includes_vat' => (bool)$item['includes_vat'],
-                Discount::class => $allDiscountStates->filter(fn($discountState) => $discountState['discountable_type'] == DiscountableType::line->value && $discountState['discountable_id'] == $item['line_id'])->values()->toArray()
+                Discount::class => $allDiscountStates->filter(fn ($discountState) => $discountState['discountable_type'] == DiscountableType::line->value && $discountState['discountable_id'] == $item['line_id'])->values()->toArray(),
             ]))
             ->toArray();
 
@@ -223,7 +223,7 @@ final class MysqlOrderRepository implements OrderRepository
             ->map(fn ($item) => (array)$item)
             ->map(fn ($item) => array_merge($item, [
                 'includes_vat' => (bool)$item['includes_vat'],
-                Discount::class => $allDiscountStates->filter(fn($discountState) => $discountState['discountable_type'] == DiscountableType::shipping->value && $discountState['discountable_id'] == $item['shipping_id'])->values()->toArray()
+                Discount::class => $allDiscountStates->filter(fn ($discountState) => $discountState['discountable_type'] == DiscountableType::shipping->value && $discountState['discountable_id'] == $item['shipping_id'])->values()->toArray(),
             ]))
             ->toArray();
 
@@ -235,7 +235,7 @@ final class MysqlOrderRepository implements OrderRepository
             $paymentState = (array)$paymentState;
             $paymentState = array_merge($paymentState, [
                 'includes_vat' => (bool)$paymentState['includes_vat'],
-                Discount::class => $allDiscountStates->filter(fn($discountState) => $discountState['discountable_type'] == DiscountableType::payment->value && $discountState['discountable_id'] == $paymentState['payment_id'])->values()->toArray()
+                Discount::class => $allDiscountStates->filter(fn ($discountState) => $discountState['discountable_type'] == DiscountableType::payment->value && $discountState['discountable_id'] == $paymentState['payment_id'])->values()->toArray(),
             ]);
         }
 
@@ -260,7 +260,7 @@ final class MysqlOrderRepository implements OrderRepository
 
         $childEntities = [
             Line::class => $lineStates,
-            Discount::class => $allDiscountStates->filter(fn($discountState) => $discountState['discountable_type'] == DiscountableType::order->value && $discountState['discountable_id'] == $orderState->order_id)->values()->toArray(),
+            Discount::class => $allDiscountStates->filter(fn ($discountState) => $discountState['discountable_type'] == DiscountableType::order->value && $discountState['discountable_id'] == $orderState->order_id)->values()->toArray(),
             Shipping::class => $shippingStates,
             Payment::class => $paymentState,
             Shopper::class => $shopperState,

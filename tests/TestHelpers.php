@@ -4,7 +4,6 @@ namespace Tests;
 
 use Illuminate\Contracts\Debug\ExceptionHandler;
 use Money\Money;
-use Thinktomorrow\Trader\Domain\Model\Order\OrderId;
 use Thinktomorrow\Trader\Application\Product\CreateProduct;
 use Thinktomorrow\Trader\Application\Product\CreateVariant;
 use Thinktomorrow\Trader\Application\Product\ProductApplication;
@@ -16,13 +15,14 @@ use Thinktomorrow\Trader\Domain\Model\Customer\Customer;
 use Thinktomorrow\Trader\Domain\Model\Customer\CustomerId;
 use Thinktomorrow\Trader\Domain\Model\Customer\CustomerRepository;
 use Thinktomorrow\Trader\Domain\Model\CustomerLogin\CustomerLogin;
-use Thinktomorrow\Trader\Domain\Model\Order\Discount\DiscountableType;
 use Thinktomorrow\Trader\Domain\Model\CustomerLogin\CustomerLoginRepository;
 use Thinktomorrow\Trader\Domain\Model\Order\Address\BillingAddress;
 use Thinktomorrow\Trader\Domain\Model\Order\Address\ShippingAddress;
 use Thinktomorrow\Trader\Domain\Model\Order\Discount\Discount;
+use Thinktomorrow\Trader\Domain\Model\Order\Discount\DiscountableType;
 use Thinktomorrow\Trader\Domain\Model\Order\Line\Line;
 use Thinktomorrow\Trader\Domain\Model\Order\Order;
+use Thinktomorrow\Trader\Domain\Model\Order\OrderId;
 use Thinktomorrow\Trader\Domain\Model\Order\OrderState;
 use Thinktomorrow\Trader\Domain\Model\Order\Payment\Payment;
 use Thinktomorrow\Trader\Domain\Model\Order\Payment\PaymentState;
@@ -161,7 +161,7 @@ trait TestHelpers
             'tax_rate' => '9',
             'includes_vat' => true,
             'data' => json_encode(['foo' => 'bar']),
-        ],$data), [
+        ], $data), [
             'order_id' => $orderId->get(),
         ]);
     }

@@ -92,8 +92,8 @@ class OrderPromoTest extends CartContext
     /** @test */
     public function it_can_apply_multiple_combinable_automatic_applicable_promos()
     {
-        $this->givenThereIsAPromo(['promo_id' => 'aaa', 'is_combinable' => true],[$this->createDiscount(['discount_id' => 'abc'])]);
-        $this->givenThereIsAPromo(['promo_id' => 'bbb', 'is_combinable' => true],[$this->createDiscount(['discount_id' => 'abcd'])]);
+        $this->givenThereIsAPromo(['promo_id' => 'aaa', 'is_combinable' => true], [$this->createDiscount(['discount_id' => 'abc'])]);
+        $this->givenThereIsAPromo(['promo_id' => 'bbb', 'is_combinable' => true], [$this->createDiscount(['discount_id' => 'abcd'])]);
         $this->givenThereIsAProductWhichCostsEur('lightsaber', 5);
         $this->whenIAddTheVariantToTheCart('lightsaber-123', 5);
 
@@ -130,8 +130,8 @@ class OrderPromoTest extends CartContext
     /** @test */
     public function it_can_apply_combinable_automatic_applicable_promos_with_coupon_promo()
     {
-        $this->givenThereIsAPromo(['promo_id' => 'aaa', 'coupon_code' => 'foobar', 'is_combinable' => true],[$this->createDiscount(['discount_id' => 'abc'])]);
-        $this->givenThereIsAPromo(['promo_id' => 'bbb', 'is_combinable' => true],[$this->createDiscount(['discount_id' => 'abcd'])]);
+        $this->givenThereIsAPromo(['promo_id' => 'aaa', 'coupon_code' => 'foobar', 'is_combinable' => true], [$this->createDiscount(['discount_id' => 'abc'])]);
+        $this->givenThereIsAPromo(['promo_id' => 'bbb', 'is_combinable' => true], [$this->createDiscount(['discount_id' => 'abcd'])]);
         $this->givenThereIsAProductWhichCostsEur('lightsaber', 5);
         $this->whenIAddTheVariantToTheCart('lightsaber-123', 5);
 

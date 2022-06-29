@@ -4,7 +4,6 @@ declare(strict_types=1);
 namespace Thinktomorrow\Trader\Application\Promo\OrderPromo\Discounts;
 
 use Assert\Assertion;
-use Thinktomorrow\Trader\Domain\Model\Promo\PromoId;
 use Thinktomorrow\Trader\Application\Promo\OrderPromo\OrderCondition;
 use Thinktomorrow\Trader\Domain\Model\Order\Discount\Discount;
 use Thinktomorrow\Trader\Domain\Model\Order\Discount\Discountable;
@@ -12,6 +11,7 @@ use Thinktomorrow\Trader\Domain\Model\Order\Discount\DiscountId;
 use Thinktomorrow\Trader\Domain\Model\Order\Discount\DiscountTotal;
 use Thinktomorrow\Trader\Domain\Model\Order\Order;
 use Thinktomorrow\Trader\Domain\Model\Promo\DiscountId as PromoDiscountId;
+use Thinktomorrow\Trader\Domain\Model\Promo\PromoId;
 
 abstract class BaseDiscount
 {
