@@ -25,11 +25,11 @@ interface MerchantOrder
     public function getTaxPrice(): string;
     public function includeTax(bool $includeTax = true): void;
 
-    public function getShopper(): ?MerchantOrderShopper;
-    public function getShipping(): ?MerchantOrderShipping;
-    public function getPayment(): ?MerchantOrderPayment;
-    public function getShippingAddress(): ?MerchantOrderShippingAddress;
-    public function getBillingAddress(): ?MerchantOrderBillingAddress;
+    public function getShopper(): MerchantOrderShopper;
+    public function getShipping(): MerchantOrderShipping;
+    public function getPayment(): MerchantOrderPayment;
+    public function getShippingAddress(): MerchantOrderShippingAddress;
+    public function getBillingAddress(): MerchantOrderBillingAddress;
 
     /** @return MerchantOrderDiscount[] */
     public function getDiscounts(): iterable;
