@@ -2,8 +2,6 @@
 
 namespace Thinktomorrow\Trader\Application\Order\MerchantOrder;
 
-use Thinktomorrow\Trader\Application\Cart\VariantForCart\VariantForCart;
-
 interface MerchantOrderLine
 {
     public static function fromMappedData(array $state, array $orderState, iterable $discounts): static;
