@@ -10,7 +10,9 @@ interface MerchantOrderLine
 
     public function getLineId(): string;
     public function getVariantId(): string;
+    public function getProductId(): string;
 
+    public function getUnitPrice(): string;
     public function getLinePrice(): string;
     public function getTotalPrice(): string;
     public function getSubtotalPrice(): string;
@@ -22,8 +24,8 @@ interface MerchantOrderLine
 
     public function getTitle(): string;
     public function getDescription(): ?string;
-    public function setImage(string $image): void;
-    public function getImage(): ?string;
+    public function setImages(iterable $images): void;
+    public function getImages(): iterable;
 
     /** @return MerchantOrderDiscount[] */
     public function getDiscounts(): iterable;

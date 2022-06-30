@@ -220,7 +220,7 @@ class OrderTest extends TestCase
         $this->assertEquals('yyy', $firstLine['variant_id']);
         $this->assertEquals($linePrice->getMoney()->getAmount(), $firstLine['line_price']);
         $this->assertEquals(3, $firstLine['quantity']);
-        $this->assertEquals(json_encode(['foo' => 'bar']), $firstLine['data']);
+        $this->assertEquals(json_encode(['product_id' => 'aab', 'unit_price' => '1000', 'foo' => 'bar']), $firstLine['data']);
 
         $this->assertEquals([
             new LineUpdated(

@@ -1,11 +1,11 @@
 <?php
 declare(strict_types=1);
 
-namespace Thinktomorrow\Trader\Infrastructure\Laravel\Models\Cart;
+namespace Thinktomorrow\Trader\Infrastructure\Laravel\Models\OrderRead;
 
 use Thinktomorrow\Trader\Application\Common\RendersData;
 
-abstract class DefaultAddress
+abstract class Address
 {
     use RendersData;
 
@@ -15,7 +15,7 @@ abstract class DefaultAddress
     protected ?string $postalCode;
     protected ?string $city;
 
-    public static function fromMappedData(array $state, array $cartState): static
+    public static function fromMappedData(array $state, array $orderState): static
     {
         $address = new static();
 

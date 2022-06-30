@@ -92,7 +92,7 @@ trait TestHelpers
                     'tax_rate' => '10',
                     'includes_vat' => true,
                     'quantity' => 2,
-                    'data' => json_encode(['foo' => 'bar']),
+                    'data' => json_encode(['product_id' => 'aab', 'unit_price' => '1000', 'foo' => 'bar']),
                     Discount::class => [$this->createOrderDiscount(OrderId::fromString('xxx'), ['discount_id' => 'line-abc', 'discountable_type' => DiscountableType::line->value, 'discountable_id' => 'abc'])->getMappedData()],
                 ],
             ],

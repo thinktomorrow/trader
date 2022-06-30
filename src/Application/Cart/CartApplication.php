@@ -117,7 +117,10 @@ final class CartApplication
             LinePrice::fromPrice($variant->getSalePrice()),
             $addLine->getQuantity(),
             array_merge($addLine->getData(), [
+                // TODO: this should be done on refresh as well...
                 'title' => $variant->getTitle(),
+                'product_id' => $variant->getProductId()->get(),
+                'unit_price' => $variant->getUnitPrice()->getMoney()->getAmount(),
             ])
         );
 

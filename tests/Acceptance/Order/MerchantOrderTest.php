@@ -50,7 +50,7 @@ class MerchantOrderTest extends CartContext
         $this->assertEquals('€ 10', $line->getSubtotalPrice());
         $this->assertEquals('€ 1,67', $line->getTaxPrice()); // tax is 20%
         $this->assertEquals(2, $line->getQuantity());
-        $this->assertNull( $line->getImage());
+        $this->assertCount(0, $line->getImages());
         $this->assertEquals('lightsaber variant', $line->getTitle());
         $this->assertNull($line->getDescription());
         $this->assertCount(0, $line->getDiscounts());

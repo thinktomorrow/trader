@@ -57,7 +57,7 @@ final class MysqlCartRepository implements CartRepository
                 'discountTotal' => $line->getDiscountTotal(),
                 'linePrice' => $line->getLinePrice(),
             ]),
-            $this->variantForCartRepository->findVariantForCart($line->getVariantId()),
+            $orderState,
             array_map(fn (Discount $discount) => $this->container->get(CartDiscount::class)::fromMappedData(array_merge($discount->getMappedData(), [
                 'total' => $discount->getTotal(),
                 'percentage' => $discount->getPercentage($line->getSubTotal()),

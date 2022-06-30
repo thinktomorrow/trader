@@ -49,7 +49,7 @@ final class InMemoryCartRepository implements CartRepository
                 'discountTotal' => $line->getDiscountTotal(),
                 'linePrice' => $line->getLinePrice(),
             ]),
-            (new InMemoryVariantRepository())->findVariantForCart($line->getVariantId()),
+            $orderState,
             array_map(fn (Discount $discount) => DefaultCartDiscount::fromMappedData(array_merge($discount->getMappedData(), [
                 'total' => $discount->getTotal(),
                 'percentage' => $discount->getPercentage($line->getSubTotal()),
