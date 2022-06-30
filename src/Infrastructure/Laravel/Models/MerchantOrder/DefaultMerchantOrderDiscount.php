@@ -8,5 +8,4 @@ use Thinktomorrow\Trader\Infrastructure\Laravel\Models\OrderRead\OrderReadDiscou
 
 class DefaultMerchantOrderDiscount extends OrderReadDiscount implements MerchantOrderDiscount
 {
-
 }

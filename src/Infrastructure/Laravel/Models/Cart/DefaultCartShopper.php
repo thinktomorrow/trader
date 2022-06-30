@@ -8,5 +8,4 @@ use Thinktomorrow\Trader\Infrastructure\Laravel\Models\OrderRead\OrderReadShoppe
 
 class DefaultCartShopper extends OrderReadShopper implements CartShopper
 {
-
 }

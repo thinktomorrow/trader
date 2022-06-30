@@ -3,11 +3,11 @@ declare(strict_types=1);
 
 namespace Thinktomorrow\Trader\Infrastructure\Laravel\Models\OrderRead;
 
-use Money\Money;
 use Assert\Assertion;
-use Thinktomorrow\Trader\Domain\Common\Cash\Cash;
+use Money\Money;
 use Thinktomorrow\Trader\Application\Common\RendersData;
 use Thinktomorrow\Trader\Application\Common\RendersMoney;
+use Thinktomorrow\Trader\Domain\Common\Cash\Cash;
 use Thinktomorrow\Trader\Domain\Common\Cash\Price;
 use Thinktomorrow\Trader\Domain\Model\Product\Variant\VariantUnitPrice;
 

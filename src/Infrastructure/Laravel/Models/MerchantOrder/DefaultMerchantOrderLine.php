@@ -8,5 +8,4 @@ use Thinktomorrow\Trader\Infrastructure\Laravel\Models\OrderRead\OrderReadLine;
 
 class DefaultMerchantOrderLine extends OrderReadLine implements MerchantOrderLine
 {
-
 }

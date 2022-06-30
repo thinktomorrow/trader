@@ -8,5 +8,4 @@ use Thinktomorrow\Trader\Infrastructure\Laravel\Models\OrderRead\OrderReadPaymen
 
 class DefaultMerchantOrderPayment extends OrderReadPayment implements MerchantOrderPayment
 {
-
 }

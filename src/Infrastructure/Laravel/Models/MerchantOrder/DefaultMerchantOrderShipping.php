@@ -8,5 +8,4 @@ use Thinktomorrow\Trader\Infrastructure\Laravel\Models\OrderRead\OrderReadShippi
 
 class DefaultMerchantOrderShipping extends OrderReadShipping implements MerchantOrderShipping
 {
-
 }

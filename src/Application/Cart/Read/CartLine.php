@@ -2,8 +2,6 @@
 
 namespace Thinktomorrow\Trader\Application\Cart\Read;
 
-use Thinktomorrow\Trader\Application\Cart\VariantForCart\VariantForCart;
-
 interface CartLine
 {
     public static function fromMappedData(array $state, array $orderState, iterable $discounts): static;

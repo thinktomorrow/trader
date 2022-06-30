@@ -4,11 +4,11 @@ declare(strict_types=1);
 namespace Tests\Acceptance\Order;
 
 use Tests\Acceptance\Cart\CartContext;
-use Thinktomorrow\Trader\Domain\Model\Order\OrderId;
 use Thinktomorrow\Trader\Application\Order\MerchantOrder\MerchantOrder;
 use Thinktomorrow\Trader\Application\Order\MerchantOrder\MerchantOrderPayment;
-use Thinktomorrow\Trader\Application\Order\MerchantOrder\MerchantOrderShopper;
 use Thinktomorrow\Trader\Application\Order\MerchantOrder\MerchantOrderShipping;
+use Thinktomorrow\Trader\Application\Order\MerchantOrder\MerchantOrderShopper;
+use Thinktomorrow\Trader\Domain\Model\Order\OrderId;
 
 class MerchantOrderTest extends CartContext
 {
@@ -32,7 +32,7 @@ class MerchantOrderTest extends CartContext
     }
 
     /** @test */
-    public function  as_a_merchant_i_need_to_be_able_to_see_each_line_of_my_cart()
+    public function as_a_merchant_i_need_to_be_able_to_see_each_line_of_my_cart()
     {
         $this->givenThereIsAProductWhichCostsEur('lightsaber', 5);
         $this->whenIAddTheVariantToTheCart('lightsaber-123', 2);
@@ -57,7 +57,7 @@ class MerchantOrderTest extends CartContext
     }
 
     /** @test */
-    public function  as_a_merchant_i_need_to_be_able_to_see_prices_with_or_without_tax()
+    public function as_a_merchant_i_need_to_be_able_to_see_prices_with_or_without_tax()
     {
         $this->givenThereIsAProductWhichCostsEur('lightsaber', 5);
         $this->whenIAddTheVariantToTheCart('lightsaber-123', 2);
@@ -80,7 +80,7 @@ class MerchantOrderTest extends CartContext
     }
 
     /** @test */
-    public function  as_a_merchant_i_need_to_be_able_to_see_shipping_address()
+    public function as_a_merchant_i_need_to_be_able_to_see_shipping_address()
     {
         $this->givenThereIsAProductWhichCostsEur('lightsaber', 5);
         $this->whenIAddTheVariantToTheCart('lightsaber-123', 2);
@@ -98,7 +98,7 @@ class MerchantOrderTest extends CartContext
     }
 
     /** @test */
-    public function  as_a_merchant_i_need_to_be_able_to_see_billing_address()
+    public function as_a_merchant_i_need_to_be_able_to_see_billing_address()
     {
         $this->givenThereIsAProductWhichCostsEur('lightsaber', 5);
         $this->whenIAddTheVariantToTheCart('lightsaber-123', 2);
@@ -116,7 +116,7 @@ class MerchantOrderTest extends CartContext
     }
 
     /** @test */
-    public function  as_a_merchant_i_need_to_be_able_to_see_shipping()
+    public function as_a_merchant_i_need_to_be_able_to_see_shipping()
     {
         $this->givenOrderHasAShippingCountry('BE');
         $this->givenShippingCostsForAPurchaseOfEur(30, 0, 1000);
@@ -134,7 +134,7 @@ class MerchantOrderTest extends CartContext
     }
 
     /** @test */
-    public function  as_a_merchant_i_need_to_be_able_to_see_payment()
+    public function as_a_merchant_i_need_to_be_able_to_see_payment()
     {
         $this->givenPaymentMethod(30, 'bancontact');
         $this->givenThereIsAProductWhichCostsEur('lightsaber', 5);
@@ -150,7 +150,7 @@ class MerchantOrderTest extends CartContext
     }
 
     /** @test */
-    public function  as_a_merchant_i_need_to_be_able_to_see_guest_shopper_info()
+    public function as_a_merchant_i_need_to_be_able_to_see_guest_shopper_info()
     {
         $this->whenIEnterShopperDetails('foo@example.com');
 
@@ -164,7 +164,7 @@ class MerchantOrderTest extends CartContext
     }
 
     /** @test */
-    public function  as_a_merchant_i_need_to_be_able_to_see_customer_shopper_info()
+    public function as_a_merchant_i_need_to_be_able_to_see_customer_shopper_info()
     {
         $this->givenACustomerExists('foo@example.com');
         $this->whenIChooseCustomer('foo@example.com');
@@ -179,7 +179,7 @@ class MerchantOrderTest extends CartContext
     }
 
     /** @test */
-    public function  as_a_merchant_i_need_to_be_able_to_see_business_shopper_info()
+    public function as_a_merchant_i_need_to_be_able_to_see_business_shopper_info()
     {
         $this->givenACustomerExists('foo@example.com', true);
         $this->whenIChooseCustomer('foo@example.com');
