@@ -11,7 +11,7 @@ use Thinktomorrow\Trader\Domain\Model\PaymentMethod\PaymentMethodId;
 class PaymentMethodTest extends TestCase
 {
     /** @test */
-    public function it_can_create_an_paymentMethod_entity()
+    public function it_can_create_an_payment_method_entity()
     {
         $paymentMethod = PaymentMethod::create(
             $paymentMethodId = PaymentMethodId::fromString('xxx'),
