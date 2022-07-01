@@ -3,14 +3,13 @@ declare(strict_types=1);
 
 namespace Tests\Infrastructure\Repositories;
 
-use Tests\Infrastructure\TestCase;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Tests\Infrastructure\TestCase;
+use Thinktomorrow\Trader\Domain\Model\PaymentMethod\Exceptions\CouldNotFindPaymentMethod;
 use Thinktomorrow\Trader\Domain\Model\PaymentMethod\PaymentMethod;
 use Thinktomorrow\Trader\Domain\Model\PaymentMethod\PaymentMethodId;
-use Thinktomorrow\Trader\Domain\Model\Product\Exceptions\CouldNotFindProduct;
-use Thinktomorrow\Trader\Domain\Model\PaymentMethod\Exceptions\CouldNotFindPaymentMethod;
-use Thinktomorrow\Trader\Infrastructure\Test\Repositories\InMemoryPaymentMethodRepository;
 use Thinktomorrow\Trader\Infrastructure\Laravel\Repositories\MysqlPaymentMethodRepository;
+use Thinktomorrow\Trader\Infrastructure\Test\Repositories\InMemoryPaymentMethodRepository;
 
 class PaymentMethodRepositoryTest extends TestCase
 {

@@ -3,12 +3,12 @@ declare(strict_types=1);
 
 namespace Thinktomorrow\Trader\Infrastructure\Laravel\Repositories;
 
-use Ramsey\Uuid\Uuid;
 use Illuminate\Support\Facades\DB;
+use Ramsey\Uuid\Uuid;
+use Thinktomorrow\Trader\Domain\Model\PaymentMethod\Exceptions\CouldNotFindPaymentMethod;
 use Thinktomorrow\Trader\Domain\Model\PaymentMethod\PaymentMethod;
 use Thinktomorrow\Trader\Domain\Model\PaymentMethod\PaymentMethodId;
 use Thinktomorrow\Trader\Domain\Model\PaymentMethod\PaymentMethodRepository;
-use Thinktomorrow\Trader\Domain\Model\PaymentMethod\Exceptions\CouldNotFindPaymentMethod;
 
 class MysqlPaymentMethodRepository implements PaymentMethodRepository
 {
