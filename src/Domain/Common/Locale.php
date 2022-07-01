@@ -67,7 +67,7 @@ final class Locale
      */
     public function toIso639(): string
     {
-        if($this->language == $this->region) {
+        if ($this->language == $this->region) {
             return $this->language;
         }
 

@@ -291,7 +291,7 @@ final class MysqlOrderRepository implements OrderRepository
     {
         $orderReference = null;
 
-        while(!$orderReference || $this->existsReference($orderReference)) {
+        while (! $orderReference || $this->existsReference($orderReference)) {
             $orderReference = OrderReference::fromString(date('ymdHis').'-'. str_pad((string) mt_rand(1, 999), 3, "0"));
         }
 
