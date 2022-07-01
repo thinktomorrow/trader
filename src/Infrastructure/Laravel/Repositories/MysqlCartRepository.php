@@ -6,7 +6,6 @@ namespace Thinktomorrow\Trader\Infrastructure\Laravel\Repositories;
 use Illuminate\Support\Facades\DB;
 use Psr\Container\ContainerInterface;
 use Thinktomorrow\Trader\Application\Cart\Read\Cart;
-use Thinktomorrow\Trader\Domain\Model\Order\OrderState;
 use Thinktomorrow\Trader\Application\Cart\Read\CartBillingAddress;
 use Thinktomorrow\Trader\Application\Cart\Read\CartDiscount;
 use Thinktomorrow\Trader\Application\Cart\Read\CartLine;
@@ -18,6 +17,7 @@ use Thinktomorrow\Trader\Application\Cart\Read\CartShopper;
 use Thinktomorrow\Trader\Domain\Model\Order\Discount\Discount;
 use Thinktomorrow\Trader\Domain\Model\Order\OrderId;
 use Thinktomorrow\Trader\Domain\Model\Order\OrderRepository;
+use Thinktomorrow\Trader\Domain\Model\Order\OrderState;
 use Thinktomorrow\Trader\Domain\Model\Order\Shipping\Shipping;
 
 final class MysqlCartRepository implements CartRepository
@@ -37,7 +37,7 @@ final class MysqlCartRepository implements CartRepository
     {
         $order = $this->orderRepository->find($orderId);
 
-        if(!$order->inCustomerHands()) {
+        if (! $order->inCustomerHands()) {
             throw new \DomainException('Cannot fetch cart. Order is no longer in customer hands and has already the following state: ' . $order->getOrderState()->value);
         }
 
@@ -124,7 +124,7 @@ final class MysqlCartRepository implements CartRepository
     {
         return DB::table(static::$orderTable)
             ->where('order_id', $orderId->get())
-            ->whereIn('order_state', array_map(fn(OrderState $state) => $state->value, OrderState::customerStates()))
+            ->whereIn('order_state', array_map(fn (OrderState $state) => $state->value, OrderState::customerStates()))
             ->exists();
     }
 }
