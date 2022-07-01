@@ -6,6 +6,7 @@ namespace Thinktomorrow\Trader\Infrastructure\Laravel\Repositories;
 use Illuminate\Support\Facades\DB;
 use Ramsey\Uuid\Uuid;
 use Thinktomorrow\Trader\Domain\Common\Address\AddressType;
+use Thinktomorrow\Trader\Domain\Model\Order\OrderReference;
 use Thinktomorrow\Trader\Domain\Model\Order\Address\BillingAddress;
 use Thinktomorrow\Trader\Domain\Model\Order\Address\ShippingAddress;
 use Thinktomorrow\Trader\Domain\Model\Order\Discount\Discount;
@@ -279,6 +280,13 @@ final class MysqlOrderRepository implements OrderRepository
     public function nextReference(): OrderId
     {
         return OrderId::fromString((string)Uuid::uuid4());
+    }
+
+    public function nextExternalReference(): OrderReference
+    {
+        return OrderReference::fromString(
+            date('ymdHis') . str_pad((string) mt_rand(1,999),3, "0")
+        );
     }
 
     public function nextShippingReference(): ShippingId

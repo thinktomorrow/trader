@@ -92,7 +92,10 @@ final class CartApplication
 
     private function createNewOrder(): OrderId
     {
-        $order = Order::create($this->orderRepository->nextReference());
+        $order = Order::create(
+            $this->orderRepository->nextReference(),
+            $this->orderRepository->nextExternalReference()
+        );
 
         $this->orderRepository->save($order);
 
@@ -313,11 +316,13 @@ final class CartApplication
         if ($shopper = $order->getShopper()) {
             $shopper->updateEmail($updateShopper->getEmail());
             $shopper->updateBusiness($updateShopper->isBusiness());
+            $shopper->updateLocale($updateShopper->getLocale());
         } else {
             $shopper = Shopper::create(
                 $this->orderRepository->nextShopperReference(),
                 $updateShopper->getEmail(),
-                $updateShopper->isBusiness()
+                $updateShopper->isBusiness(),
+                $updateShopper->getLocale()
             );
         }
 
@@ -337,11 +342,13 @@ final class CartApplication
         if ($shopper = $order->getShopper()) {
             $shopper->updateEmail($customer->getEmail());
             $shopper->updateBusiness($customer->isBusiness());
+            $shopper->updateLocale($customer->getLocale());
         } else {
             $shopper = Shopper::create(
                 $this->orderRepository->nextShopperReference(),
                 $customer->getEmail(),
-                $customer->isBusiness()
+                $customer->isBusiness(),
+                $customer->getLocale(),
             );
         }
 

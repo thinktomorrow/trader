@@ -8,4 +8,8 @@ use Thinktomorrow\Trader\Infrastructure\Laravel\Models\OrderRead\OrderRead;
 
 class DefaultMerchantOrder extends OrderRead implements MerchantOrder
 {
+    public function getOrderReference(): string
+    {
+        return $this->orderReference;
+    }
 }

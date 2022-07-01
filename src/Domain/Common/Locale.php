@@ -14,24 +14,28 @@ final class Locale
         $this->region = strtolower($region);
     }
 
-    public static function fromString(string $language, string $region): self
+    public static function make(string $language, string $region): self
     {
         return new static($language, $region);
     }
 
     /**
-     * From ISO 639-1 standard
+     * From string e.g. nl-be, nl_BE or nl
      *
-     * @param string $isoCode
+     * @param string $iso15897String
      * @return $this
      */
-    public static function fromIsoCode(string $isoCode): self
+    public static function fromString(string $iso15897String): self
     {
-        if (! strpos($isoCode, '-')) {
-            throw new \InvalidArgumentException('Invalid isocode format: ' . $isoCode);
+        if (strpos($iso15897String, '-')) {
+            return static::make(...explode('-', $iso15897String));
         }
 
-        return static::fromString(...explode('-', $isoCode));
+        if (strpos($iso15897String, '_')) {
+            return static::make(...explode('_', $iso15897String));
+        }
+
+        return static::make($iso15897String, $iso15897String);
     }
 
     public function getLanguage(): string
@@ -45,12 +49,16 @@ final class Locale
     }
 
     /**
-     * ISO 639-1 standard
+     * To RFC 1766 standard which consists of the:
+     * - ISO standard 639 language code
+     * - uppercased ISO 3166-1 country/region codes
+     *
+     * https://en.wikipedia.org/wiki/ISO/IEC_15897
      * @return string
      */
-    public function toIsoCode(): string
+    public function toIso15897(): string
     {
-        return $this->language . '-' . $this->region;
+        return $this->language . '_' . strtoupper($this->region);
     }
 
     public function __toString(): string

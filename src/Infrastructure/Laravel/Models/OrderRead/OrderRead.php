@@ -21,6 +21,7 @@ abstract class OrderRead
     use RendersMoney;
 
     protected string $orderId;
+    protected string $orderReference;
     protected iterable $lines;
     protected ?MerchantOrderShippingAddress $shippingAddress;
     protected ?MerchantOrderBillingAddress $billingAddress;
@@ -46,6 +47,7 @@ abstract class OrderRead
         $order = new static();
 
         $order->orderId = $state['order_id'];
+        $order->orderReference = $state['order_ref'];
 
         $order->total = $state['total'];
         $order->taxTotal = $state['taxTotal'];

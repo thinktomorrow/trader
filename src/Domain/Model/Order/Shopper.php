@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace Thinktomorrow\Trader\Domain\Model\Order;
 
 use Thinktomorrow\Trader\Domain\Common\Email;
+use Thinktomorrow\Trader\Domain\Common\Locale;
 use Thinktomorrow\Trader\Domain\Common\Entity\ChildEntity;
 use Thinktomorrow\Trader\Domain\Common\Entity\HasData;
 use Thinktomorrow\Trader\Domain\Model\Customer\CustomerId;
@@ -16,6 +17,7 @@ class Shopper implements ChildEntity
     private Email $email;
     private ?CustomerId $customerId = null;
     private bool $isBusiness;
+    private Locale $locale;
 
     /**
      * Flag to indicate that this guest shopper
@@ -27,12 +29,13 @@ class Shopper implements ChildEntity
     {
     }
 
-    public static function create(ShopperId $shopperId, Email $email, bool $isBusiness): static
+    public static function create(ShopperId $shopperId, Email $email, bool $isBusiness, Locale $locale): static
     {
         $shopper = new static();
         $shopper->shopperId = $shopperId;
         $shopper->email = $email;
         $shopper->isBusiness = $isBusiness;
+        $shopper->locale = $locale;
 
         return $shopper;
     }
@@ -55,6 +58,11 @@ class Shopper implements ChildEntity
     public function updateEmail(Email $email): void
     {
         $this->email = $email;
+    }
+
+    public function updateLocale(Locale $locale): void
+    {
+        $this->locale = $locale;
     }
 
     public function updateBusiness(bool $isBusiness): void
@@ -88,6 +96,7 @@ class Shopper implements ChildEntity
             'shopper_id' => $this->shopperId->get(),
             'email' => $this->email->get(),
             'is_business' => $this->isBusiness,
+            'locale' => $this->locale->toIso15897(),
             'register_after_checkout' => $this->registerAfterCheckout,
             'customer_id' => $this->customerId?->get(),
             'data' => json_encode($this->data),
@@ -100,6 +109,7 @@ class Shopper implements ChildEntity
         $shopper->shopperId = ShopperId::fromString($state['shopper_id']);
         $shopper->email = Email::fromString($state['email']);
         $shopper->isBusiness = $state['is_business'];
+        $shopper->locale = Locale::fromString($state['locale']);
         $shopper->registerAfterCheckout = $state['register_after_checkout'];
         $shopper->customerId = $state['customer_id'] ? CustomerId::fromString($state['customer_id']) : null;
         $shopper->data = json_decode($state['data'], true);

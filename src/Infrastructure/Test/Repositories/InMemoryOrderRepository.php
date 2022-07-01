@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace Thinktomorrow\Trader\Infrastructure\Test\Repositories;
 
+use Thinktomorrow\Trader\Domain\Model\Order\OrderReference;
 use Thinktomorrow\Trader\Domain\Model\Order\Discount\DiscountId;
 use Thinktomorrow\Trader\Domain\Model\Order\Exceptions\CouldNotFindOrder;
 use Thinktomorrow\Trader\Domain\Model\Order\Order;
@@ -95,6 +96,13 @@ final class InMemoryOrderRepository implements OrderRepository
     public function setNextDiscountReference(string $nextDiscountReference): void
     {
         $this->nextDiscountReference = $nextDiscountReference;
+    }
+
+    public function nextExternalReference(): OrderReference
+    {
+        return OrderReference::fromString(
+            date('ymdHis') . str_pad((string) mt_rand(1,999),3, "0")
+        );
     }
 
     public static function clear()

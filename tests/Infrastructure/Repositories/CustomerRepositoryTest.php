@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace Tests\Infrastructure\Repositories;
 
+use Thinktomorrow\Trader\Domain\Common\Locale;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\Infrastructure\TestCase;
 use Thinktomorrow\Trader\Domain\Common\Email;
@@ -74,12 +75,14 @@ final class CustomerRepositoryTest extends TestCase
             CustomerId::fromString('xxx'),
             Email::fromString('ben@thinktomorrow.be'),
             false,
+            Locale::fromString('nl-be')
         )];
 
         yield [Customer::create(
             CustomerId::fromString('xxx'),
             Email::fromString('ben@thinktomorrow.be'),
             true,
+            Locale::fromString('nl_BE')
         )];
     }
 }

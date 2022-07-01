@@ -192,7 +192,7 @@ class Cash
         if (! static::$formatter) {
             $currencies = new ISOCurrencies();
 
-            $numberFormatter = new NumberFormatter($locale->toIsoCode(), NumberFormatter::DECIMAL);
+            $numberFormatter = new NumberFormatter($locale->toIso15897(), NumberFormatter::DECIMAL);
             $numberFormatter->setAttribute(NumberFormatter::FRACTION_DIGITS, 2);
 
             static::$formatter = new IntlMoneyFormatter($numberFormatter, $currencies);

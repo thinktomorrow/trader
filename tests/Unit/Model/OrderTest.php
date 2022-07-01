@@ -6,6 +6,7 @@ namespace Tests\Unit\Model;
 use Tests\Unit\TestCase;
 use Thinktomorrow\Trader\Domain\Common\Email;
 use Thinktomorrow\Trader\Domain\Model\Customer\CustomerId;
+use Thinktomorrow\Trader\Domain\Model\Order\OrderReference;
 use Thinktomorrow\Trader\Domain\Model\Order\Address\BillingAddress;
 use Thinktomorrow\Trader\Domain\Model\Order\Address\ShippingAddress;
 use Thinktomorrow\Trader\Domain\Model\Order\Events\LineAdded;
@@ -39,10 +40,12 @@ class OrderTest extends TestCase
     {
         $order = Order::create(
             $orderId = OrderId::fromString('xxx'),
+            $orderReference = OrderReference::fromString('xx-ref')
         );
 
         $this->assertEquals([
             'order_id' => $orderId->get(),
+            'order_ref' => $orderReference->get(),
             'order_state' => OrderState::cart_pending->value,
             'total' => '0',
             'tax_total' => '0',

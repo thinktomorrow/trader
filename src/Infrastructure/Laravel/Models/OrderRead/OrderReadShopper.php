@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace Thinktomorrow\Trader\Infrastructure\Laravel\Models\OrderRead;
 
+use Thinktomorrow\Trader\Domain\Common\Locale;
 use Thinktomorrow\Trader\Application\Common\RendersData;
 
 abstract class OrderReadShopper
@@ -13,6 +14,7 @@ abstract class OrderReadShopper
     protected ?string $customer_id;
     protected string $email;
     protected bool $is_business;
+    protected Locale $shopperLocale;
     protected array $data;
 
     public static function fromMappedData(array $state, array $orderState): static
@@ -23,6 +25,7 @@ abstract class OrderReadShopper
         $shopper->customer_id = $state['customer_id'];
         $shopper->email = $state['email'];
         $shopper->is_business = $state['is_business'];
+        $shopper->shopperLocale = Locale::fromString($state['locale']);
         $shopper->data = json_decode($state['data'], true);
 
         return $shopper;
@@ -51,5 +54,10 @@ abstract class OrderReadShopper
     public function isBusiness(): bool
     {
         return $this->is_business;
+    }
+
+    public function getShopperLocale(): Locale
+    {
+        return $this->shopperLocale;
     }
 }

@@ -9,7 +9,7 @@ class TraderConfig implements \Thinktomorrow\Trader\TraderConfig
 {
     public function getDefaultLocale(): Locale
     {
-        return Locale::fromIsoCode(
+        return Locale::fromString(
             config('trader.locale')
         );
     }

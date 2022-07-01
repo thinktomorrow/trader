@@ -33,6 +33,7 @@ final class Order implements Aggregate, Discountable
     use HasData;
 
     public readonly OrderId $orderId;
+    public readonly OrderReference $orderReference;
     private OrderState $orderState;
     private ?Shopper $shopper = null;
     private ?Payment $payment = null;
@@ -43,11 +44,12 @@ final class Order implements Aggregate, Discountable
     {
     }
 
-    public static function create(OrderId $orderId)
+    public static function create(OrderId $orderId, OrderReference $orderReference)
     {
         $order = new static();
 
         $order->orderId = $orderId;
+        $order->orderReference = $orderReference;
         $order->orderState = OrderState::cart_pending;
 
         $order->recordEvent(new OrderCreated($order->orderId));
@@ -139,6 +141,7 @@ final class Order implements Aggregate, Discountable
     {
         return [
             'order_id' => $this->orderId->get(),
+            'order_ref' => $this->orderReference->get(),
             'order_state' => $this->orderState->value,
 
             'total' => $this->getTotal()->getMoney()->getAmount(),
@@ -179,6 +182,7 @@ final class Order implements Aggregate, Discountable
         $order = new static();
 
         $order->orderId = OrderId::fromString($state['order_id']);
+        $order->orderReference = OrderReference::fromString($state['order_ref']);
         $order->orderState = OrderState::from($state['order_state']);
 
         $order->discounts = array_map(fn ($discountState) => Discount::fromMappedData($discountState, $state), $childEntities[Discount::class]);

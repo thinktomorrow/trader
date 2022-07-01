@@ -149,6 +149,7 @@ class CreateBasicTraderTables extends Migration
             $table->string('password')->nullable();
             $table->rememberToken();
             $table->boolean('is_business');
+            $table->string('locale');
             $table->json('data')->nullable();
             $table->timestamps();
         });
@@ -164,6 +165,7 @@ class CreateBasicTraderTables extends Migration
     {
         Schema::create(static::PREFIX.'orders', function (Blueprint $table) {
             $table->char('order_id', 36)->primary();
+            $table->char('order_ref', 16)->unique(); // For customer / external communication
             $table->string('order_state', 32);
 
             $table->integer('total')->unsigned();
@@ -199,6 +201,7 @@ class CreateBasicTraderTables extends Migration
             $table->char('customer_id', 36)->nullable()->index();
             $table->string('email');
             $table->boolean('is_business');
+            $table->string('locale');
             $table->boolean('register_after_checkout');
             $table->json('data')->nullable();
 

@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace Thinktomorrow\Trader\Domain\Model\Customer;
 
 use Thinktomorrow\Trader\Domain\Common\Email;
+use Thinktomorrow\Trader\Domain\Common\Locale;
 use Thinktomorrow\Trader\Domain\Common\Entity\Aggregate;
 use Thinktomorrow\Trader\Domain\Common\Entity\HasData;
 use Thinktomorrow\Trader\Domain\Common\Event\RecordsEvents;
@@ -16,17 +17,19 @@ class Customer implements Aggregate
     public readonly CustomerId $customerId;
     private Email $email;
     private bool $isBusiness;
+    private Locale $locale;
 
     private function __construct()
     {
     }
 
-    public static function create(CustomerId $customerId, Email $email, bool $isBusiness)
+    public static function create(CustomerId $customerId, Email $email, bool $isBusiness, Locale $locale)
     {
         $customer = new static();
         $customer->customerId = $customerId;
         $customer->email = $email;
         $customer->isBusiness = $isBusiness;
+        $customer->locale = $locale;
 
         return $customer;
     }
@@ -39,6 +42,16 @@ class Customer implements Aggregate
     public function updateEmail(Email $email): void
     {
         $this->email = $email;
+    }
+
+    public function getLocale(): Locale
+    {
+        return $this->locale;
+    }
+
+    public function updateLocale(Locale $locale): void
+    {
+        $this->locale = $locale;
     }
 
     public function updateBusiness(bool $isBusiness): void
@@ -57,6 +70,7 @@ class Customer implements Aggregate
             'customer_id' => $this->customerId->get(),
             'email' => $this->email->get(),
             'is_business' => $this->isBusiness,
+            'locale' => $this->locale->toIso15897(),
             'data' => json_encode($this->data),
         ];
     }
@@ -70,8 +84,9 @@ class Customer implements Aggregate
     {
         $customer = new static();
         $customer->customerId = $state['customer_id'] ? CustomerId::fromString($state['customer_id']) : null;
-        $customer->isBusiness = ! ! $state['is_business'];
         $customer->email = Email::fromString($state['email']);
+        $customer->isBusiness = ! ! $state['is_business'];
+        $customer->locale = Locale::fromString($state['locale']);
         $customer->data = json_decode($state['data'], true);
 
         return $customer;

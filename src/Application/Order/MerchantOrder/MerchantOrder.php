@@ -8,6 +8,8 @@ interface MerchantOrder
 
     public function getOrderId(): string;
 
+    public function getOrderReference(): string;
+
     /** @return MerchantOrderLine[] */
     public function getLines(): iterable;
 

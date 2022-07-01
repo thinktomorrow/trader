@@ -17,6 +17,8 @@ interface OrderRepository
 
     public function nextReference(): OrderId;
 
+    public function nextExternalReference(): OrderReference;
+
     public function nextShippingReference(): ShippingId;
 
     public function nextPaymentReference(): PaymentId;

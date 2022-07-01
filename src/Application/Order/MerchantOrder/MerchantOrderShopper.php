@@ -3,6 +3,8 @@ declare(strict_types=1);
 
 namespace Thinktomorrow\Trader\Application\Order\MerchantOrder;
 
+use Thinktomorrow\Trader\Domain\Common\Locale;
+
 interface MerchantOrderShopper
 {
     public static function fromMappedData(array $state, array $cartState): static;
@@ -19,4 +21,6 @@ interface MerchantOrderShopper
 
     /** Does the shopper have a business profile */
     public function isBusiness(): bool;
+
+    public function getShopperLocale(): Locale;
 }

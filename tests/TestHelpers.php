@@ -2,6 +2,7 @@
 
 namespace Tests;
 
+use Thinktomorrow\Trader\Domain\Common\Locale;
 use Illuminate\Contracts\Debug\ExceptionHandler;
 use Money\Money;
 use Thinktomorrow\Trader\Application\Product\CreateProduct;
@@ -80,6 +81,7 @@ trait TestHelpers
     {
         return Order::fromMappedData([
             'order_id' => 'xxx',
+            'order_ref' => 'xx-ref',
             'order_state' => OrderState::cart_revived->value,
             'data' => "[]",
         ], [
@@ -144,6 +146,7 @@ trait TestHelpers
                 'is_business' => false,
                 'register_after_checkout' => true,
                 'customer_id' => null,
+                'locale' => 'en_GB',
                 'data' => "[]",
             ],
         ]);
@@ -172,6 +175,7 @@ trait TestHelpers
             'customer_id' => 'abc',
             'email' => 'ben@thinktomorrow.be',
             'is_business' => false,
+            'locale' => 'fr_BE',
             'data' => json_encode(['foo' => 'bar']),
         ]);
     }
@@ -190,8 +194,8 @@ trait TestHelpers
         $customer = Customer::create(
             $customerId = CustomerId::fromString('azerty'),
             Email::fromString('ben@thinktomorrow.be'),
-            'Ben',
-            'Cavens'
+            true,
+            Locale::fromString('fr-be'),
         );
 
         app(CustomerRepository::class)->save($customer);

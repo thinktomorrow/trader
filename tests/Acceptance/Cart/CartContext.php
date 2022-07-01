@@ -8,8 +8,10 @@ use Money\Money;
 use PHPUnit\Framework\Assert;
 use Tests\Acceptance\TestCase;
 use Tests\TestHelpers;
+use Thinktomorrow\Trader\Domain\Common\Locale;
 use Thinktomorrow\Trader\Application\Cart\CartApplication;
 use Thinktomorrow\Trader\Application\Cart\ChooseCustomer;
+use Thinktomorrow\Trader\Domain\Model\Order\OrderReference;
 use Thinktomorrow\Trader\Application\Cart\ChoosePaymentMethod;
 use Thinktomorrow\Trader\Application\Cart\ChooseShippingProfile;
 use Thinktomorrow\Trader\Application\Cart\Line\AddLine;
@@ -216,12 +218,13 @@ abstract class CartContext extends TestCase
         $this->paymentMethodRepository->save($paymentMethod);
     }
 
-    public function givenACustomerExists(string $email, bool $is_business = false)
+    public function givenACustomerExists(string $email, bool $is_business = false, string $locale = 'nl_BE')
     {
         $customer = Customer::create(
             $this->customerRepository->nextReference(),
             Email::fromString($email),
-            $is_business
+            $is_business,
+            Locale::fromString($locale)
         );
 
         $this->customerRepository->save($customer);
@@ -322,7 +325,7 @@ abstract class CartContext extends TestCase
         ));
     }
 
-    protected function whenIEnterShopperDetails(string $email, bool $is_business = false, array $data = [])
+    protected function whenIEnterShopperDetails(string $email, bool $is_business = false, string $locale = 'nl_BE', array $data = [])
     {
         $order = $this->getOrder();
 
@@ -330,6 +333,7 @@ abstract class CartContext extends TestCase
             $order->orderId->get(),
             $email,
             $is_business,
+            $locale,
             $data,
         ));
 
@@ -444,6 +448,7 @@ abstract class CartContext extends TestCase
         } catch (CouldNotFindOrder $e) {
             $this->orderRepository->save($order = Order::create(
                 OrderId::fromString('xxx'),
+                OrderReference::fromString('xx-ref')
             ));
 
             return $order;
