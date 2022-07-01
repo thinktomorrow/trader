@@ -57,7 +57,6 @@ final class CartRepositoryTest extends TestCase
         $order->updateState(OrderState::cart_pending);
 
         foreach ($this->orderRepositories() as $i => $orderRepository) {
-
             $orderRepository->save($order);
 
             $cartRepository = iterator_to_array($this->cartRepositories())[$i];
@@ -73,7 +72,6 @@ final class CartRepositoryTest extends TestCase
         $order->updateState(OrderState::confirmed);
 
         foreach ($this->orderRepositories() as $i => $orderRepository) {
-
             $orderRepository->save($order);
 
             $cartRepository = iterator_to_array($this->cartRepositories())[$i];
