@@ -51,6 +51,38 @@ final class CartRepositoryTest extends TestCase
     }
 
     /** @test */
+    public function it_can_check_if_cart_exists()
+    {
+        $order = $this->createdOrder();
+        $order->updateState(OrderState::cart_pending);
+
+        foreach ($this->orderRepositories() as $i => $orderRepository) {
+
+            $orderRepository->save($order);
+
+            $cartRepository = iterator_to_array($this->cartRepositories())[$i];
+
+            $this->assertTrue($cartRepository->existsCart($order->orderId));
+        }
+    }
+
+    /** @test */
+    public function it_checks_if_cart_is_in_customer_hands()
+    {
+        $order = $this->createdOrder();
+        $order->updateState(OrderState::confirmed);
+
+        foreach ($this->orderRepositories() as $i => $orderRepository) {
+
+            $orderRepository->save($order);
+
+            $cartRepository = iterator_to_array($this->cartRepositories())[$i];
+
+            $this->assertFalse($cartRepository->existsCart($order->orderId));
+        }
+    }
+
+    /** @test */
     public function it_should_not_find_an_order_no_longer_in_customer_hands()
     {
         $calls = 0;

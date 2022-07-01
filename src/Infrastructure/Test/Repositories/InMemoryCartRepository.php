@@ -117,7 +117,7 @@ final class InMemoryCartRepository implements CartRepository
     public function existsCart(OrderId $orderId): bool
     {
         foreach (InMemoryOrderRepository::$orders as $order) {
-            if ($order->orderId->equals($orderId)) {
+            if ($order->orderId->equals($orderId) && $order->inCustomerHands()) {
                 return true;
             }
         }

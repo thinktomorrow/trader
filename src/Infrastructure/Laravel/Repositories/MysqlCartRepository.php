@@ -124,7 +124,7 @@ final class MysqlCartRepository implements CartRepository
     {
         return DB::table(static::$orderTable)
             ->where('order_id', $orderId->get())
-            ->whereIn('state', array_map(fn(OrderState $state) => $state->value, OrderState::customerStates()))
+            ->whereIn('order_state', array_map(fn(OrderState $state) => $state->value, OrderState::customerStates()))
             ->exists();
     }
 }
