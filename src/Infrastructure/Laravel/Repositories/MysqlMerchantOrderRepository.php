@@ -4,19 +4,19 @@ declare(strict_types=1);
 namespace Thinktomorrow\Trader\Infrastructure\Laravel\Repositories;
 
 use Psr\Container\ContainerInterface;
-use Thinktomorrow\Trader\Domain\Model\Order\OrderId;
-use Thinktomorrow\Trader\Domain\Model\Order\OrderRepository;
-use Thinktomorrow\Trader\Domain\Model\Order\Discount\Discount;
-use Thinktomorrow\Trader\Domain\Model\Order\Shipping\Shipping;
 use Thinktomorrow\Trader\Application\Order\MerchantOrder\MerchantOrder;
+use Thinktomorrow\Trader\Application\Order\MerchantOrder\MerchantOrderBillingAddress;
+use Thinktomorrow\Trader\Application\Order\MerchantOrder\MerchantOrderDiscount;
 use Thinktomorrow\Trader\Application\Order\MerchantOrder\MerchantOrderLine;
 use Thinktomorrow\Trader\Application\Order\MerchantOrder\MerchantOrderPayment;
-use Thinktomorrow\Trader\Application\Order\MerchantOrder\MerchantOrderShopper;
-use Thinktomorrow\Trader\Application\Order\MerchantOrder\MerchantOrderDiscount;
-use Thinktomorrow\Trader\Application\Order\MerchantOrder\MerchantOrderShipping;
 use Thinktomorrow\Trader\Application\Order\MerchantOrder\MerchantOrderRepository;
-use Thinktomorrow\Trader\Application\Order\MerchantOrder\MerchantOrderBillingAddress;
+use Thinktomorrow\Trader\Application\Order\MerchantOrder\MerchantOrderShipping;
 use Thinktomorrow\Trader\Application\Order\MerchantOrder\MerchantOrderShippingAddress;
+use Thinktomorrow\Trader\Application\Order\MerchantOrder\MerchantOrderShopper;
+use Thinktomorrow\Trader\Domain\Model\Order\Discount\Discount;
+use Thinktomorrow\Trader\Domain\Model\Order\OrderId;
+use Thinktomorrow\Trader\Domain\Model\Order\OrderRepository;
+use Thinktomorrow\Trader\Domain\Model\Order\Shipping\Shipping;
 
 class MysqlMerchantOrderRepository implements MerchantOrderRepository
 {

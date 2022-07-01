@@ -4,10 +4,10 @@ declare(strict_types=1);
 namespace Thinktomorrow\Trader\Domain\Model\Customer;
 
 use Thinktomorrow\Trader\Domain\Common\Email;
-use Thinktomorrow\Trader\Domain\Common\Locale;
 use Thinktomorrow\Trader\Domain\Common\Entity\Aggregate;
 use Thinktomorrow\Trader\Domain\Common\Entity\HasData;
 use Thinktomorrow\Trader\Domain\Common\Event\RecordsEvents;
+use Thinktomorrow\Trader\Domain\Common\Locale;
 
 class Customer implements Aggregate
 {

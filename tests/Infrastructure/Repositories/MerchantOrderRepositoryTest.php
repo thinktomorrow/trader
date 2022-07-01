@@ -3,23 +3,20 @@ declare(strict_types=1);
 
 namespace Tests\Infrastructure\Repositories;
 
-use Tests\Infrastructure\TestCase;
-use Thinktomorrow\Trader\Domain\Common\Locale;
-use Thinktomorrow\Trader\Domain\Common\Cash\Cash;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Thinktomorrow\Trader\Domain\Model\Order\Order;
-use Thinktomorrow\Trader\Application\Cart\Read\Cart;
-use Thinktomorrow\Trader\Infrastructure\Test\TestContainer;
+use Tests\Infrastructure\TestCase;
 use Thinktomorrow\Trader\Application\Order\MerchantOrder\MerchantOrder;
-use Thinktomorrow\Trader\Infrastructure\Test\Repositories\InMemoryCartRepository;
-use Thinktomorrow\Trader\Infrastructure\Laravel\Repositories\MysqlCartRepository;
-use Thinktomorrow\Trader\Infrastructure\Test\Repositories\InMemoryOrderRepository;
-use Thinktomorrow\Trader\Infrastructure\Laravel\Repositories\MysqlOrderRepository;
-use Thinktomorrow\Trader\Infrastructure\Laravel\Repositories\MysqlVariantRepository;
-use Thinktomorrow\Trader\Infrastructure\Test\Repositories\InMemoryProductRepository;
-use Thinktomorrow\Trader\Infrastructure\Laravel\Repositories\MysqlProductRepository;
-use Thinktomorrow\Trader\Infrastructure\Test\Repositories\InMemoryMerchantOrderRepository;
+use Thinktomorrow\Trader\Domain\Common\Cash\Cash;
+use Thinktomorrow\Trader\Domain\Common\Locale;
+use Thinktomorrow\Trader\Domain\Model\Order\Order;
 use Thinktomorrow\Trader\Infrastructure\Laravel\Repositories\MysqlMerchantOrderRepository;
+use Thinktomorrow\Trader\Infrastructure\Laravel\Repositories\MysqlOrderRepository;
+use Thinktomorrow\Trader\Infrastructure\Laravel\Repositories\MysqlProductRepository;
+use Thinktomorrow\Trader\Infrastructure\Laravel\Repositories\MysqlVariantRepository;
+use Thinktomorrow\Trader\Infrastructure\Test\Repositories\InMemoryMerchantOrderRepository;
+use Thinktomorrow\Trader\Infrastructure\Test\Repositories\InMemoryOrderRepository;
+use Thinktomorrow\Trader\Infrastructure\Test\Repositories\InMemoryProductRepository;
+use Thinktomorrow\Trader\Infrastructure\Test\TestContainer;
 
 class MerchantOrderRepositoryTest extends TestCase
 {
@@ -53,7 +50,7 @@ class MerchantOrderRepositoryTest extends TestCase
     }
 
     /** @test */
-    public function it_can_find_merchantOrder_without_variant_when_variant_is_no_longer_present()
+    public function it_can_find_merchant_order_without_variant_when_variant_is_no_longer_present()
     {
         // TODO: this should be detected by refresh job of the order. Triggered by variant
     }
