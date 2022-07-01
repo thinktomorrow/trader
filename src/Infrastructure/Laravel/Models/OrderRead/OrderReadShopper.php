@@ -3,8 +3,8 @@ declare(strict_types=1);
 
 namespace Thinktomorrow\Trader\Infrastructure\Laravel\Models\OrderRead;
 
-use Thinktomorrow\Trader\Domain\Common\Locale;
 use Thinktomorrow\Trader\Application\Common\RendersData;
+use Thinktomorrow\Trader\Domain\Common\Locale;
 
 abstract class OrderReadShopper
 {

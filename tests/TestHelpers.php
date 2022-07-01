@@ -2,7 +2,6 @@
 
 namespace Tests;
 
-use Thinktomorrow\Trader\Domain\Common\Locale;
 use Illuminate\Contracts\Debug\ExceptionHandler;
 use Money\Money;
 use Thinktomorrow\Trader\Application\Product\CreateProduct;
@@ -11,6 +10,7 @@ use Thinktomorrow\Trader\Application\Product\ProductApplication;
 use Thinktomorrow\Trader\Application\Taxon\CreateTaxon;
 use Thinktomorrow\Trader\Application\Taxon\TaxonApplication;
 use Thinktomorrow\Trader\Domain\Common\Email;
+use Thinktomorrow\Trader\Domain\Common\Locale;
 use Thinktomorrow\Trader\Domain\Common\Taxes\TaxRate;
 use Thinktomorrow\Trader\Domain\Model\Customer\Customer;
 use Thinktomorrow\Trader\Domain\Model\Customer\CustomerId;
