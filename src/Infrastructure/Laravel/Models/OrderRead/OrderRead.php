@@ -74,6 +74,11 @@ abstract class OrderRead
         return $this->orderId;
     }
 
+    public function getOrderReference(): string
+    {
+        return $this->orderReference;
+    }
+
     public function getLines(): iterable
     {
         return $this->lines;
