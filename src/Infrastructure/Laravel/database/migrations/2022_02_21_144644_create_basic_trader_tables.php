@@ -132,7 +132,6 @@ class CreateBasicTraderTables extends Migration
 
         Schema::create(static::PREFIX.'payment_methods', function (Blueprint $table) {
             $table->char('payment_method_id', 36)->primary();
-            $table->string('label');
             $table->integer('rate')->unsigned();
             $table->json('data')->nullable();
             $table->boolean('active')->default(1);

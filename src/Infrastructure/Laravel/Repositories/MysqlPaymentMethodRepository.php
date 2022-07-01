@@ -3,33 +3,53 @@ declare(strict_types=1);
 
 namespace Thinktomorrow\Trader\Infrastructure\Laravel\Repositories;
 
+use Ramsey\Uuid\Uuid;
+use Illuminate\Support\Facades\DB;
 use Thinktomorrow\Trader\Domain\Model\PaymentMethod\PaymentMethod;
 use Thinktomorrow\Trader\Domain\Model\PaymentMethod\PaymentMethodId;
 use Thinktomorrow\Trader\Domain\Model\PaymentMethod\PaymentMethodRepository;
+use Thinktomorrow\Trader\Domain\Model\PaymentMethod\Exceptions\CouldNotFindPaymentMethod;
 
 class MysqlPaymentMethodRepository implements PaymentMethodRepository
 {
-    public function __construct()
-    {
-    }
+    private static $paymentMethodTable = 'trader_payment_methods';
 
     public function save(PaymentMethod $paymentMethod): void
     {
-        // TODO: Implement save() method.
+        $state = $paymentMethod->getMappedData();
+
+        if (! $this->exists($paymentMethod->paymentMethodId)) {
+            DB::table(static::$paymentMethodTable)->insert($state);
+        } else {
+            DB::table(static::$paymentMethodTable)->where('payment_method_id', $paymentMethod->paymentMethodId->get())->update($state);
+        }
+    }
+
+    private function exists(PaymentMethodId $paymentMethodId): bool
+    {
+        return DB::table(static::$paymentMethodTable)->where('payment_method_id', $paymentMethodId->get())->exists();
     }
 
     public function find(PaymentMethodId $paymentMethodId): PaymentMethod
     {
-        // TODO: Implement find() method.
+        $paymentMethodState = DB::table(static::$paymentMethodTable)
+            ->where(static::$paymentMethodTable . '.payment_method_id', $paymentMethodId->get())
+            ->first();
+
+        if (! $paymentMethodState) {
+            throw new CouldNotFindPaymentMethod('No payment method found by id [' . $paymentMethodId->get() . ']');
+        }
+
+        return PaymentMethod::fromMappedData((array)$paymentMethodState, []);
     }
 
     public function delete(PaymentMethodId $paymentMethodId): void
     {
-        // TODO: Implement delete() method.
+        DB::table(static::$paymentMethodTable)->where('payment_method_id', $paymentMethodId->get())->delete();
     }
 
     public function nextReference(): PaymentMethodId
     {
-        // TODO: Implement nextReference() method.
+        return PaymentMethodId::fromString((string)Uuid::uuid4());
     }
 }

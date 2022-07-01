@@ -184,7 +184,9 @@ trait TestHelpers
     protected function createPaymentMethod(array $values = []): PaymentMethod
     {
         return PaymentMethod::fromMappedData(array_merge([
-            ''
+            'payment_method_id' => 'ppp',
+            'rate' => '123',
+            'data' => json_encode([])
         ], $values));
     }
 

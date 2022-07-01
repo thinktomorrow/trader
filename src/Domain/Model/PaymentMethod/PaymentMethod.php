@@ -7,10 +7,12 @@ use Money\Money;
 use Thinktomorrow\Trader\Domain\Common\Cash\Cash;
 use Thinktomorrow\Trader\Domain\Common\Entity\Aggregate;
 use Thinktomorrow\Trader\Domain\Common\Entity\HasData;
+use Thinktomorrow\Trader\Domain\Common\Event\RecordsEvents;
 
 class PaymentMethod implements Aggregate
 {
     use HasData;
+    use RecordsEvents;
 
     public readonly PaymentMethodId $paymentMethodId;
     private Money $rate;
@@ -62,7 +64,7 @@ class PaymentMethod implements Aggregate
     {
         $method = new static();
 
-        $method->paymentMethodId = PaymentMethodId::fromString($state['payment_id']);
+        $method->paymentMethodId = PaymentMethodId::fromString($state['payment_method_id']);
         $method->rate = Cash::make($state['rate']);
         $method->data = json_decode($state['data'], true);
 

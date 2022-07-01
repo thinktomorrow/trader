@@ -10,7 +10,7 @@ use Thinktomorrow\Trader\Domain\Model\PaymentMethod\PaymentMethodRepository;
 
 class InMemoryPaymentMethodRepository implements PaymentMethodRepository
 {
-    private static array $paymentMethods = [];
+    public static array $paymentMethods = [];
 
     private string $nextReference = 'ppp-123';
 
