@@ -33,6 +33,10 @@ final class InMemoryCartRepository implements CartRepository
 
         $order = InMemoryOrderRepository::$orders[$orderId->get()];
 
+        if(!$order->inCustomerHands()) {
+            throw new \DomainException('Cannot fetch cart. Order is no longer in customer hands and has already the following state: ' . $order->getOrderState()->value);
+        }
+
         $orderState = array_merge(InMemoryOrderRepository::$orders[$orderId->get()]->getMappedData(), [
             'total' => $order->getTotal(),
             'taxTotal' => $order->getTaxTotal(),

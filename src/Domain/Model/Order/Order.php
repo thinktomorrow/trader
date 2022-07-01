@@ -62,6 +62,11 @@ final class Order implements Aggregate, Discountable
         return $this->orderState;
     }
 
+    public function inCustomerHands(): bool
+    {
+        return $this->getOrderState()->inCustomerHands();
+    }
+
     public function getShippingAddress(): ?ShippingAddress
     {
         return $this->shippingAddress;

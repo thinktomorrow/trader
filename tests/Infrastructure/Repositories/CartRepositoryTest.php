@@ -9,6 +9,7 @@ use Thinktomorrow\Trader\Application\Cart\Read\Cart;
 use Thinktomorrow\Trader\Domain\Common\Cash\Cash;
 use Thinktomorrow\Trader\Domain\Common\Locale;
 use Thinktomorrow\Trader\Domain\Model\Order\Order;
+use Thinktomorrow\Trader\Domain\Model\Order\OrderState;
 use Thinktomorrow\Trader\Infrastructure\Laravel\Repositories\MysqlCartRepository;
 use Thinktomorrow\Trader\Infrastructure\Laravel\Repositories\MysqlOrderRepository;
 use Thinktomorrow\Trader\Infrastructure\Laravel\Repositories\MysqlProductRepository;
@@ -50,6 +51,29 @@ final class CartRepositoryTest extends TestCase
     }
 
     /** @test */
+    public function it_should_not_find_an_order_no_longer_in_customer_hands()
+    {
+        $calls = 0;
+
+        $order = $this->createdOrder();
+        $order->updateState(OrderState::confirmed);
+
+        foreach ($this->orderRepositories() as $i => $orderRepository) {
+
+            $orderRepository->save($order);
+
+            $cartRepository = iterator_to_array($this->cartRepositories())[$i];
+            try{
+                $cartRepository->findCart($order->orderId);
+            } catch(\DomainException $e) {
+                $calls++;
+            }
+        }
+
+        $this->assertEquals(2, $calls);
+    }
+
+    /** @test */
     public function it_can_find_cart_without_variant_when_variant_is_no_longer_present()
     {
         // TODO: this should be detected by refresh job of the order. Triggered by variant
@@ -64,7 +88,7 @@ final class CartRepositoryTest extends TestCase
     private function cartRepositories(): \Generator
     {
         yield new InMemoryCartRepository();
-        yield new MysqlCartRepository(new TestContainer(), new MysqlOrderRepository(), new MysqlVariantRepository(new TestContainer()));
+        yield new MysqlCartRepository(new TestContainer(), new MysqlOrderRepository());
     }
 
     private function productRepositories(): \Generator

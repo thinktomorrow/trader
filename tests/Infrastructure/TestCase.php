@@ -12,16 +12,24 @@ use Thinktomorrow\Trader\Application\Cart\Read\CartPayment;
 use Thinktomorrow\Trader\Application\Cart\Read\CartShipping;
 use Thinktomorrow\Trader\Application\Cart\Read\CartShippingAddress;
 use Thinktomorrow\Trader\Application\Cart\Read\CartShopper;
+use Thinktomorrow\Trader\Application\Order\MerchantOrder\MerchantOrder;
 use Thinktomorrow\Trader\Application\Cart\VariantForCart\VariantForCart;
 use Thinktomorrow\Trader\Application\Taxon\Tree\TaxonNode;
 use Thinktomorrow\Trader\Domain\Common\Taxes\TaxRate;
 use Thinktomorrow\Trader\Domain\Model\Order\Discount\DiscountTotal;
 use Thinktomorrow\Trader\Infrastructure\Laravel\Models\Cart\DefaultCart;
+use Thinktomorrow\Trader\Application\Order\MerchantOrder\MerchantOrderLine;
+use Thinktomorrow\Trader\Application\Order\MerchantOrder\MerchantOrderPayment;
+use Thinktomorrow\Trader\Application\Order\MerchantOrder\MerchantOrderShopper;
+use Thinktomorrow\Trader\Application\Order\MerchantOrder\MerchantOrderShipping;
+use Thinktomorrow\Trader\Application\Order\MerchantOrder\MerchantOrderDiscount;
+use Thinktomorrow\Trader\Application\Order\MerchantOrder\MerchantOrderBillingAddress;
 use Thinktomorrow\Trader\Infrastructure\Laravel\Models\Cart\DefaultCartBillingAddress;
 use Thinktomorrow\Trader\Infrastructure\Laravel\Models\Cart\DefaultCartDiscount;
 use Thinktomorrow\Trader\Infrastructure\Laravel\Models\Cart\DefaultCartLine;
 use Thinktomorrow\Trader\Infrastructure\Laravel\Models\Cart\DefaultCartPayment;
 use Thinktomorrow\Trader\Infrastructure\Laravel\Models\Cart\DefaultCartShipping;
+use Thinktomorrow\Trader\Application\Order\MerchantOrder\MerchantOrderShippingAddress;
 use Thinktomorrow\Trader\Infrastructure\Laravel\Models\Cart\DefaultCartShippingAddress;
 use Thinktomorrow\Trader\Infrastructure\Laravel\Models\Cart\DefaultCartShopper;
 use Thinktomorrow\Trader\Infrastructure\Laravel\Models\DefaultTaxonNode;
@@ -34,6 +42,14 @@ use Thinktomorrow\Trader\Infrastructure\Test\Repositories\InMemoryPromoRepositor
 use Thinktomorrow\Trader\Infrastructure\Test\Repositories\InMemoryTaxonRepository;
 use Thinktomorrow\Trader\Infrastructure\Test\Repositories\InMemoryVariantRepository;
 use Thinktomorrow\Trader\Infrastructure\Test\TestContainer;
+use Thinktomorrow\Trader\Infrastructure\Laravel\Models\MerchantOrder\DefaultMerchantOrder;
+use Thinktomorrow\Trader\Infrastructure\Laravel\Models\MerchantOrder\DefaultMerchantOrderLine;
+use Thinktomorrow\Trader\Infrastructure\Laravel\Models\MerchantOrder\DefaultMerchantOrderPayment;
+use Thinktomorrow\Trader\Infrastructure\Laravel\Models\MerchantOrder\DefaultMerchantOrderShopper;
+use Thinktomorrow\Trader\Infrastructure\Laravel\Models\MerchantOrder\DefaultMerchantOrderDiscount;
+use Thinktomorrow\Trader\Infrastructure\Laravel\Models\MerchantOrder\DefaultMerchantOrderShipping;
+use Thinktomorrow\Trader\Infrastructure\Laravel\Models\MerchantOrder\DefaultMerchantOrderBillingAddress;
+use Thinktomorrow\Trader\Infrastructure\Laravel\Models\MerchantOrder\DefaultMerchantOrderShippingAddress;
 
 abstract class TestCase extends \Orchestra\Testbench\TestCase
 {
@@ -57,6 +73,16 @@ abstract class TestCase extends \Orchestra\Testbench\TestCase
         (new TestContainer())->add(CartPayment::class, DefaultCartPayment::class);
         (new TestContainer())->add(CartShopper::class, DefaultCartShopper::class);
         (new TestContainer())->add(CartDiscount::class, DefaultCartDiscount::class);
+
+        // MerchantOrder
+        (new TestContainer())->add(MerchantOrder::class, DefaultMerchantOrder::class);
+        (new TestContainer())->add(MerchantOrderLine::class, DefaultMerchantOrderLine::class);
+        (new TestContainer())->add(MerchantOrderShippingAddress::class, DefaultMerchantOrderShippingAddress::class);
+        (new TestContainer())->add(MerchantOrderBillingAddress::class, DefaultMerchantOrderBillingAddress::class);
+        (new TestContainer())->add(MerchantOrderShipping::class, DefaultMerchantOrderShipping::class);
+        (new TestContainer())->add(MerchantOrderPayment::class, DefaultMerchantOrderPayment::class);
+        (new TestContainer())->add(MerchantOrderShopper::class, DefaultMerchantOrderShopper::class);
+        (new TestContainer())->add(MerchantOrderDiscount::class, DefaultMerchantOrderDiscount::class);
     }
 
     public function getPackageProviders($app)

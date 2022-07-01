@@ -42,10 +42,15 @@ enum OrderState: string
 
     public function inCustomerHands(): bool
     {
-        return in_array($this, [
+        return in_array($this, static::customerStates());
+    }
+
+    public static function customerStates(): array
+    {
+        return [
             self::cart_pending,
             self::cart_abandoned,
             self::cart_revived,
-        ]);
+        ];
     }
 }

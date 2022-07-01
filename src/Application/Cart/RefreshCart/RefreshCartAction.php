@@ -30,7 +30,7 @@ class RefreshCartAction
 
     private function assertCartState(Order $order): void
     {
-        if (! $order->getOrderState()->inCustomerHands()) {
+        if (! $order->inCustomerHands()) {
             throw new CannotRefreshCart('Refresh cart is not allowed. Order has state ' . $order->getOrderState()->value .' and is no longer in customer hands.');
         }
     }

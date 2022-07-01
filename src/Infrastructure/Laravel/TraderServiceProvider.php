@@ -12,10 +12,20 @@ use Thinktomorrow\Trader\Application\Cart\Read\CartLine;
 use Thinktomorrow\Trader\Application\Cart\Read\CartRepository;
 use Thinktomorrow\Trader\Application\Cart\Read\CartShippingAddress;
 use Thinktomorrow\Trader\Application\Cart\Read\CartShopper;
+use Thinktomorrow\Trader\Application\Order\MerchantOrder\MerchantOrder;
 use Thinktomorrow\Trader\Application\Cart\VariantForCart\VariantForCart;
+use Thinktomorrow\Trader\Application\Order\MerchantOrder\MerchantOrderLine;
+use Thinktomorrow\Trader\Application\Order\MerchantOrder\MerchantOrderShopper;
+use Thinktomorrow\Trader\Application\Order\MerchantOrder\MerchantOrderDiscount;
+use Thinktomorrow\Trader\Application\Order\MerchantOrder\MerchantOrderRepository;
 use Thinktomorrow\Trader\Application\Cart\VariantForCart\VariantForCartRepository;
 use Thinktomorrow\Trader\Application\Common\DataRenderer;
 use Thinktomorrow\Trader\Application\Common\DefaultLocale;
+use Thinktomorrow\Trader\Application\Order\MerchantOrder\MerchantOrderBillingAddress;
+use Thinktomorrow\Trader\Application\Order\MerchantOrder\MerchantOrderShippingAddress;
+use Thinktomorrow\Trader\Infrastructure\Laravel\Repositories\MysqlMerchantOrderRepository;
+use Thinktomorrow\Trader\Infrastructure\Laravel\Models\MerchantOrder\DefaultMerchantOrder;
+use Thinktomorrow\Trader\Infrastructure\Laravel\Models\MerchantOrder\DefaultMerchantOrderLine;
 use Thinktomorrow\Trader\Application\Product\CheckProductOptions\CheckProductOptionsRepository;
 use Thinktomorrow\Trader\Application\Product\Grid\FlattenedTaxonIdsComposer;
 use Thinktomorrow\Trader\Application\Product\Grid\GridItem;
@@ -23,6 +33,8 @@ use Thinktomorrow\Trader\Application\Product\Grid\GridRepository;
 use Thinktomorrow\Trader\Application\Product\OptionLinks\OptionLink;
 use Thinktomorrow\Trader\Application\Product\ProductDetail\ProductDetail;
 use Thinktomorrow\Trader\Application\Product\ProductDetail\ProductDetailRepository;
+use Thinktomorrow\Trader\Infrastructure\Laravel\Models\MerchantOrder\DefaultMerchantOrderShopper;
+use Thinktomorrow\Trader\Infrastructure\Laravel\Models\MerchantOrder\DefaultMerchantOrderDiscount;
 use Thinktomorrow\Trader\Application\Promo\OrderPromo\Conditions\MinimumLinesQuantityOrderCondition;
 use Thinktomorrow\Trader\Application\Promo\OrderPromo\Discounts\PercentageOffOrderDiscount;
 use Thinktomorrow\Trader\Application\Promo\OrderPromo\OrderPromoRepository;
@@ -76,6 +88,8 @@ use Thinktomorrow\Trader\Infrastructure\Vine\VineFlattenedTaxonIdsComposer;
 use Thinktomorrow\Trader\Infrastructure\Vine\VineTaxonFilterTreeComposer;
 use Thinktomorrow\Trader\Infrastructure\Vine\VineTaxonIdOptionsComposer;
 use Thinktomorrow\Trader\TraderConfig;
+use Thinktomorrow\Trader\Infrastructure\Laravel\Models\MerchantOrder\DefaultMerchantOrderBillingAddress;
+use Thinktomorrow\Trader\Infrastructure\Laravel\Models\MerchantOrder\DefaultMerchantOrderShippingAddress;
 
 class TraderServiceProvider extends ServiceProvider
 {
@@ -134,6 +148,15 @@ class TraderServiceProvider extends ServiceProvider
         $this->app->bind(CartShippingAddress::class, DefaultCartShippingAddress::class);
         $this->app->bind(CartBillingAddress::class, DefaultCartBillingAddress::class);
         $this->app->bind(CartShopper::class, DefaultCartShopper::class);
+
+        // MerchantOrder
+        $this->app->bind(MerchantOrderRepository::class, MysqlMerchantOrderRepository::class);
+        $this->app->bind(MerchantOrder::class, DefaultMerchantOrder::class);
+        $this->app->bind(MerchantOrderLine::class, DefaultMerchantOrderLine::class);
+        $this->app->bind(MerchantOrderDiscount::class, DefaultMerchantOrderDiscount::class);
+        $this->app->bind(MerchantOrderShippingAddress::class, DefaultMerchantOrderShippingAddress::class);
+        $this->app->bind(MerchantOrderBillingAddress::class, DefaultMerchantOrderBillingAddress::class);
+        $this->app->bind(MerchantOrderShopper::class, DefaultMerchantOrderShopper::class);
 
         $this->app->bind(PromoRepository::class, MysqlPromoRepository::class);
         $this->app->bind(OrderPromoRepository::class, MysqlPromoRepository::class);
