@@ -61,6 +61,19 @@ final class Locale
         return $this->language . '_' . strtoupper($this->region);
     }
 
+    /**
+     * The language (in ISO 639-1 format) and optionally a region (in ISO 3166-1 Alpha 2 format)
+     * @return string
+     */
+    public function toIso639(): string
+    {
+        if($this->language == $this->region) {
+            return $this->language;
+        }
+
+        return $this->language . '-' . strtoupper($this->region);
+    }
+
     public function __toString(): string
     {
         return $this->language;

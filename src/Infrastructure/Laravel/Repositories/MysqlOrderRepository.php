@@ -192,6 +192,11 @@ final class MysqlOrderRepository implements OrderRepository
         return DB::table(static::$orderTable)->where('order_id', $orderId->get())->exists();
     }
 
+    private function existsReference(OrderReference $orderReference): bool
+    {
+        return DB::table(static::$orderTable)->where('order_ref', $orderReference->get())->exists();
+    }
+
     public function find(OrderId $orderId): Order
     {
         $orderState = DB::table(static::$orderTable)
@@ -284,9 +289,13 @@ final class MysqlOrderRepository implements OrderRepository
 
     public function nextExternalReference(): OrderReference
     {
-        return OrderReference::fromString(
-            date('ymdHis') . str_pad((string) mt_rand(1, 999), 3, "0")
-        );
+        $orderReference = null;
+
+        while(!$orderReference || $this->existsReference($orderReference)) {
+            $orderReference = OrderReference::fromString(date('ymdHis').'-'. str_pad((string) mt_rand(1, 999), 3, "0"));
+        }
+
+        return $orderReference;
     }
 
     public function nextShippingReference(): ShippingId

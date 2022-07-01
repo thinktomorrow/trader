@@ -16,6 +16,7 @@ use Thinktomorrow\Trader\Domain\Model\Customer\Customer;
 use Thinktomorrow\Trader\Domain\Model\Customer\CustomerId;
 use Thinktomorrow\Trader\Domain\Model\Customer\CustomerRepository;
 use Thinktomorrow\Trader\Domain\Model\CustomerLogin\CustomerLogin;
+use Thinktomorrow\Trader\Domain\Model\PaymentMethod\PaymentMethod;
 use Thinktomorrow\Trader\Domain\Model\CustomerLogin\CustomerLoginRepository;
 use Thinktomorrow\Trader\Domain\Model\Order\Address\BillingAddress;
 use Thinktomorrow\Trader\Domain\Model\Order\Address\ShippingAddress;
@@ -178,6 +179,13 @@ trait TestHelpers
             'locale' => 'fr_BE',
             'data' => json_encode(['foo' => 'bar']),
         ]);
+    }
+
+    protected function createPaymentMethod(array $values = []): PaymentMethod
+    {
+        return PaymentMethod::fromMappedData(array_merge([
+            ''
+        ], $values));
     }
 
     protected function createdCustomerLogin(): CustomerLogin

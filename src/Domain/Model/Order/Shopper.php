@@ -60,6 +60,11 @@ class Shopper implements ChildEntity
         $this->email = $email;
     }
 
+    public function getLocale(): Locale
+    {
+        return $this->locale;
+    }
+
     public function updateLocale(Locale $locale): void
     {
         $this->locale = $locale;
