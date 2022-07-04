@@ -6,9 +6,10 @@ namespace Thinktomorrow\Trader\Infrastructure\Test\Repositories;
 use Thinktomorrow\Trader\Domain\Model\Country\Country;
 use Thinktomorrow\Trader\Domain\Model\Country\CountryId;
 use Thinktomorrow\Trader\Domain\Model\Country\CountryRepository;
+use Thinktomorrow\Trader\Application\Cart\BillingCountryRepository;
 use Thinktomorrow\Trader\Domain\Model\Country\Exceptions\CouldNotFindCountry;
 
-class InMemoryCountryRepository implements CountryRepository
+class InMemoryCountryRepository implements CountryRepository, BillingCountryRepository
 {
     public static array $countries = [];
 
@@ -38,5 +39,10 @@ class InMemoryCountryRepository implements CountryRepository
     public static function clear()
     {
         static::$countries = [];
+    }
+
+    public function getAvailableBillingCountries(): iterable
+    {
+        return array_values(static::$countries);
     }
 }

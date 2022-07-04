@@ -7,9 +7,10 @@ use Illuminate\Support\Facades\DB;
 use Thinktomorrow\Trader\Domain\Model\Country\CountryId;
 use Thinktomorrow\Trader\Domain\Model\Country\Country;
 use Thinktomorrow\Trader\Domain\Model\Country\CountryRepository;
+use Thinktomorrow\Trader\Application\Cart\BillingCountryRepository;
 use Thinktomorrow\Trader\Domain\Model\Country\Exceptions\CouldNotFindCountry;
 
-class MysqlCountryRepository implements CountryRepository
+class MysqlCountryRepository implements CountryRepository, BillingCountryRepository
 {
     private static $countryTable = 'trader_countries';
 
@@ -45,5 +46,17 @@ class MysqlCountryRepository implements CountryRepository
     public function delete(CountryId $countryId): void
     {
         DB::table(static::$countryTable)->where('country_id', $countryId->get())->delete();
+    }
+
+    public function getAvailableBillingCountries(): iterable
+    {
+        $countryStates = DB::table(static::$countryTable)
+            ->where('active', '1')
+            ->orderBy('order_column')
+            ->get()
+            ->map(fn ($item) => (array)$item)
+            ->toArray();
+
+        return array_map(fn($countryState) => Country::fromMappedData($countryState), $countryStates);
     }
 }

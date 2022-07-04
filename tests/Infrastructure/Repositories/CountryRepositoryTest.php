@@ -50,6 +50,23 @@ class CountryRepositoryTest extends TestCase
         $this->assertEquals(count(iterator_to_array($this->repositories())), $countrysNotFound);
     }
 
+    /** @test */
+    public function it_can_get_available_billing_countries()
+    {
+        foreach ($this->repositories() as $i => $repository) {
+
+            $country = $this->createCountry(['country_id' => 'BE']);
+            $country2 = $this->createCountry(['country_id' => 'NL']);
+            $repository->save($country);
+            $repository->save($country2);
+
+            $this->assertEquals([
+                $country,
+                $country2,
+            ], $repository->getAvailableBillingCountries());
+        }
+    }
+
     private function repositories(): \Generator
     {
         yield new InMemoryCountryRepository();
