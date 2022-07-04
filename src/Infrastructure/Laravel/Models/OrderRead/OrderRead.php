@@ -4,16 +4,16 @@ declare(strict_types=1);
 namespace Thinktomorrow\Trader\Infrastructure\Laravel\Models\OrderRead;
 
 use Money\Money;
+use Thinktomorrow\Trader\Domain\Common\Price\Price;
 use Thinktomorrow\Trader\Application\Common\RendersData;
+use Thinktomorrow\Trader\Domain\Common\Price\PriceTotal;
 use Thinktomorrow\Trader\Application\Common\RendersMoney;
-use Thinktomorrow\Trader\Application\Order\MerchantOrder\MerchantOrderBillingAddress;
 use Thinktomorrow\Trader\Application\Order\MerchantOrder\MerchantOrderLine;
 use Thinktomorrow\Trader\Application\Order\MerchantOrder\MerchantOrderPayment;
-use Thinktomorrow\Trader\Application\Order\MerchantOrder\MerchantOrderShipping;
-use Thinktomorrow\Trader\Application\Order\MerchantOrder\MerchantOrderShippingAddress;
 use Thinktomorrow\Trader\Application\Order\MerchantOrder\MerchantOrderShopper;
-use Thinktomorrow\Trader\Domain\Common\Cash\Price;
-use Thinktomorrow\Trader\Domain\Common\Cash\PriceTotal;
+use Thinktomorrow\Trader\Application\Order\MerchantOrder\MerchantOrderShipping;
+use Thinktomorrow\Trader\Application\Order\MerchantOrder\MerchantOrderBillingAddress;
+use Thinktomorrow\Trader\Application\Order\MerchantOrder\MerchantOrderShippingAddress;
 
 abstract class OrderRead
 {

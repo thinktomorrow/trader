@@ -5,11 +5,10 @@ namespace Tests\Unit\Model;
 
 use Money\Money;
 use PHPUnit\Framework\TestCase;
-use Thinktomorrow\Trader\Domain\Model\Order\Address\ShippingCountry;
+use Thinktomorrow\Trader\Domain\Model\Country\CountryId;
+use Thinktomorrow\Trader\Domain\Model\ShippingProfile\Tariff;
 use Thinktomorrow\Trader\Domain\Model\ShippingProfile\ShippingProfile;
 use Thinktomorrow\Trader\Domain\Model\ShippingProfile\ShippingProfileId;
-use Thinktomorrow\Trader\Domain\Model\ShippingProfile\Tariff;
-use Thinktomorrow\Trader\Domain\Model\ShippingProfile\TariffNumber;
 
 class ShippingProfileTest extends TestCase
 {
@@ -27,7 +26,7 @@ class ShippingProfileTest extends TestCase
 
         $this->assertEquals([
             Tariff::class => [],
-            ShippingCountry::class => [],
+            CountryId::class => [],
         ], $shippingProfile->getChildEntities());
     }
 
@@ -41,13 +40,12 @@ class ShippingProfileTest extends TestCase
         $this->assertCount(2, $shippingProfile->getChildEntities()[Tariff::class]);
         $this->assertEquals([
             'shipping_profile_id' => 'yyy',
-            'tariff_number' => 1,
             'rate' => '500',
             'from' => '0',
             'to' => '1000',
-        ], $shippingProfile->getChildEntities()[Tariff::class][0]->getMappedData());
+        ], $shippingProfile->getChildEntities()[Tariff::class][0]);
 
-        $this->assertCount(2, $shippingProfile->getChildEntities()[ShippingCountry::class]);
+        $this->assertCount(2, $shippingProfile->getChildEntities()[CountryId::class]);
     }
 
     /** @test */
@@ -56,10 +54,12 @@ class ShippingProfileTest extends TestCase
         $shippingProfile = $this->createdShippingProfile();
 
         $shippingProfile->addTariff(
-            TariffNumber::fromInt(123),
-            Money::EUR(30),
-            Money::EUR(3001),
-            Money::EUR(4000)
+            Tariff::create(
+                $shippingProfile->shippingProfileId,
+                Money::EUR(30),
+                Money::EUR(3001),
+                Money::EUR(4000)
+            )
         );
 
         $this->assertCount(3, $shippingProfile->getChildEntities()[Tariff::class]);
@@ -70,34 +70,68 @@ class ShippingProfileTest extends TestCase
     {
         $shippingProfile = $this->createdShippingProfile();
 
-        $shippingProfile->updateTariff(
-            TariffNumber::fromInt(2),
-            Money::EUR(30),
-            Money::EUR(3001),
-            Money::EUR(4000)
-        );
+        $shippingProfile->updateTariffs([
+            Tariff::create(
+                $shippingProfile->shippingProfileId,
+                Money::EUR(30),
+                Money::EUR(3001),
+                Money::EUR(4000)
+            )
+        ]);
 
-        $this->assertCount(2, $shippingProfile->getChildEntities()[Tariff::class]);
+        $this->assertCount(1, $shippingProfile->getChildEntities()[Tariff::class]);
 
         $this->assertEquals([
             'shipping_profile_id' => 'yyy',
-            'tariff_number' => 2,
             'rate' => '30',
             'from' => '3001',
             'to' => '4000',
-        ], $shippingProfile->getChildEntities()[Tariff::class][1]->getMappedData());
+        ], $shippingProfile->getChildEntities()[Tariff::class][0]);
     }
 
     /** @test */
-    public function it_can_delete_a_tariff()
+    public function it_can_update_countries()
     {
         $shippingProfile = $this->createdShippingProfile();
 
-        $shippingProfile->deleteTariff(
-            TariffNumber::fromInt(1),
-        );
+        $countries = [
+            CountryId::fromString('FR'),
+            CountryId::fromString('NL'),
+        ];
 
-        $this->assertCount(1, $shippingProfile->getChildEntities()[Tariff::class]);
+        $shippingProfile->updateCountries($countries);
+
+        $this->assertCount(2, $shippingProfile->getCountryIds());
+        $this->assertCount(2, $shippingProfile->getChildEntities()[CountryId::class]);
+        $this->assertEquals($countries, $shippingProfile->getCountryIds());
+    }
+
+    /** @test */
+    public function it_can_add_country()
+    {
+        $shippingProfile = $this->createdShippingProfile();
+
+        $shippingProfile->addCountry(CountryId::fromString('FR'));
+
+        $this->assertCount(3, $shippingProfile->getCountryIds());
+        $this->assertEquals([
+            CountryId::fromString('BE'),
+            CountryId::fromString('NL'),
+            CountryId::fromString('FR'),
+        ], $shippingProfile->getCountryIds());
+    }
+
+    /** @test */
+    public function it_can_delete_country()
+    {
+        $shippingProfile = $this->createdShippingProfile();
+
+        $shippingProfile->deleteCountry(CountryId::fromString('BE'));
+
+        $this->assertCount(1, $shippingProfile->getCountryIds());
+        $this->assertEquals([
+            CountryId::fromString('NL'),
+        ], $shippingProfile->getCountryIds());
     }
 
     private function createdShippingProfile(): ShippingProfile
@@ -108,19 +142,20 @@ class ShippingProfileTest extends TestCase
         ], [
             Tariff::class => [
                 [
-                    'tariff_number' => 1,
                     'rate' => '500',
                     'from' => '0',
                     'to' => '1000',
                 ],
                 [
-                    'tariff_number' => 2,
                     'rate' => '0',
                     'from' => '1001',
                     'to' => '2000',
                 ],
             ],
-            ShippingCountry::class => ['BE', 'NL'],
+            CountryId::class => [
+                ['country_id' => 'BE'],
+                ['country_id' => 'NL'],
+            ],
         ]);
     }
 }

@@ -1,12 +1,12 @@
 <?php
 declare(strict_types=1);
 
-namespace Thinktomorrow\Trader\Domain\Common\Cash;
+namespace Thinktomorrow\Trader\Domain\Common\Price;
 
 use Money\Money;
 use Thinktomorrow\Trader\Domain\Common\Taxes\TaxRate;
 
-interface Price
+interface Price extends ConvertsToMoney
 {
     public static function fromScalars(string|int $amount, string $taxRate, bool $includesVat): static;
 
@@ -15,12 +15,6 @@ interface Price
     public static function fromMoney(Money $money, TaxRate $taxRate, bool $includesVat): static;
 
     public static function zero(): static;
-
-    public function getMoney(): Money;
-
-    public function getIncludingVat(): Money;
-
-    public function getExcludingVat(): Money;
 
     public function getTaxRate(): TaxRate;
 

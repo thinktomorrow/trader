@@ -3,12 +3,12 @@ declare(strict_types=1);
 
 namespace Thinktomorrow\Trader\Infrastructure\Laravel\Models\OrderRead;
 
-use Assert\Assertion;
 use Money\Money;
+use Assert\Assertion;
+use Thinktomorrow\Trader\Domain\Common\Cash\Cash;
+use Thinktomorrow\Trader\Domain\Common\Price\Price;
 use Thinktomorrow\Trader\Application\Common\RendersData;
 use Thinktomorrow\Trader\Application\Common\RendersMoney;
-use Thinktomorrow\Trader\Domain\Common\Cash\Cash;
-use Thinktomorrow\Trader\Domain\Common\Cash\Price;
 use Thinktomorrow\Trader\Domain\Model\Product\Variant\VariantUnitPrice;
 
 abstract class OrderReadLine

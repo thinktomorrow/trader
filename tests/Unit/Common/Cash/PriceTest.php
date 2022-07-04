@@ -5,9 +5,9 @@ namespace Tests\Unit\Common\Cash;
 
 use Money\Money;
 use PHPUnit\Framework\TestCase;
-use Thinktomorrow\Trader\Domain\Common\Cash\PriceCannotBeNegative;
-use Thinktomorrow\Trader\Domain\Common\Cash\PriceCannotContainMultipleTaxRates;
 use Thinktomorrow\Trader\Domain\Common\Taxes\TaxRate;
+use Thinktomorrow\Trader\Domain\Common\Price\PriceCannotBeNegative;
+use Thinktomorrow\Trader\Domain\Common\Price\PriceCannotContainMultipleTaxRates;
 
 class PriceTest extends TestCase
 {

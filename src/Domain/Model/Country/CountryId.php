@@ -1,9 +1,9 @@
 <?php
 declare(strict_types=1);
 
-namespace Thinktomorrow\Trader\Domain\Common\Address;
+namespace Thinktomorrow\Trader\Domain\Model\Country;
 
-trait Country
+class CountryId
 {
     private string $country;
 

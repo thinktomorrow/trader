@@ -1,9 +1,10 @@
 <?php
 declare(strict_types=1);
 
-namespace Thinktomorrow\Trader\Domain\Common\Cash;
+namespace Thinktomorrow\Trader\Domain\Common\Price;
 
 use Money\Money;
+use Thinktomorrow\Trader\Domain\Common\Cash\Cash;
 use Thinktomorrow\Trader\Domain\Common\Taxes\TaxRate;
 
 trait PriceValue

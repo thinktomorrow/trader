@@ -3,8 +3,8 @@
 namespace Thinktomorrow\Trader\Domain\Model\Order;
 
 use Thinktomorrow\Trader\Domain\Common\Cash\Cash;
-use Thinktomorrow\Trader\Domain\Common\Cash\Price;
-use Thinktomorrow\Trader\Domain\Common\Cash\PriceTotal;
+use Thinktomorrow\Trader\Domain\Common\Price\Price;
+use Thinktomorrow\Trader\Domain\Common\Price\PriceTotal;
 use Thinktomorrow\Trader\Domain\Model\Order\Discount\Discount;
 use Thinktomorrow\Trader\Domain\Model\Order\Discount\DiscountId;
 use Thinktomorrow\Trader\Domain\Model\Order\Discount\DiscountTotal;

@@ -9,7 +9,6 @@ use Thinktomorrow\Trader\Domain\Common\Entity\ChildEntity;
 final class Tariff implements ChildEntity
 {
     public readonly ShippingProfileId $shippingProfileId;
-    public readonly TariffNumber $tariffNumber;
     private Money $rate;
     private Money $from;
     private Money $to;
@@ -18,12 +17,11 @@ final class Tariff implements ChildEntity
     {
     }
 
-    public static function create(ShippingProfileId $shippingProfileId, TariffNumber $tariffNumber, Money $rate, Money $from, Money $to): static
+    public static function create(ShippingProfileId $shippingProfileId, Money $rate, Money $from, Money $to): static
     {
         $object = new static();
 
         $object->shippingProfileId = $shippingProfileId;
-        $object->tariffNumber = $tariffNumber;
         $object->rate = $rate;
         $object->from = $from;
         $object->to = $to;
@@ -52,7 +50,6 @@ final class Tariff implements ChildEntity
     {
         return [
             'shipping_profile_id' => $this->shippingProfileId->get(),
-            'tariff_number' => $this->tariffNumber->asInt(),
             'rate' => $this->rate->getAmount(),
             'from' => $this->from->getAmount(),
             'to' => $this->to->getAmount(),
@@ -64,11 +61,19 @@ final class Tariff implements ChildEntity
         $tariff = new static();
 
         $tariff->shippingProfileId = ShippingProfileId::fromString($aggregateState['shipping_profile_id']);
-        $tariff->tariffNumber = TariffNumber::fromInt($state['tariff_number']);
         $tariff->rate = Money::EUR($state['rate']);
         $tariff->from = Money::EUR($state['from']);
         $tariff->to = Money::EUR($state['to']);
 
         return $tariff;
+    }
+
+    public function equals($other): bool
+    {
+        return get_class($other) === get_class($this)
+            && $this->shippingProfileId === $other->shippingProfileId
+            && $this->rate->equals($other->rate)
+            && $this->from->equals($other->from)
+            && $this->to->equals($other->to);
     }
 }

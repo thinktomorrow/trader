@@ -3,16 +3,17 @@ declare(strict_types=1);
 
 namespace Thinktomorrow\Trader\Infrastructure\Test\Repositories;
 
-use Thinktomorrow\Trader\Application\Cart\RefreshCart\Adjusters\FindSuitableShippingProfile;
-use Thinktomorrow\Trader\Domain\Model\Order\Address\ShippingCountry;
-use Thinktomorrow\Trader\Domain\Model\Order\Price\SubTotal;
+use Thinktomorrow\Trader\Domain\Model\Country\Country;
+use Thinktomorrow\Trader\Domain\Common\Price\ConvertsToMoney;
 use Thinktomorrow\Trader\Domain\Model\Order\Shipping\ShippingId;
-use Thinktomorrow\Trader\Domain\Model\ShippingProfile\Exceptions\CouldNotFindShippingProfile;
+use Thinktomorrow\Trader\Application\Cart\ShippingCountryRepository;
 use Thinktomorrow\Trader\Domain\Model\ShippingProfile\ShippingProfile;
 use Thinktomorrow\Trader\Domain\Model\ShippingProfile\ShippingProfileId;
 use Thinktomorrow\Trader\Domain\Model\ShippingProfile\ShippingProfileRepository;
+use Thinktomorrow\Trader\Application\Cart\RefreshCart\Adjusters\FindSuitableShippingProfile;
+use Thinktomorrow\Trader\Domain\Model\ShippingProfile\Exceptions\CouldNotFindShippingProfile;
 
-final class InMemoryShippingProfileRepository implements ShippingProfileRepository, FindSuitableShippingProfile
+final class InMemoryShippingProfileRepository implements ShippingProfileRepository, ShippingCountryRepository, FindSuitableShippingProfile
 {
     private static array $shippingProfiles = [];
 
@@ -57,8 +58,26 @@ final class InMemoryShippingProfileRepository implements ShippingProfileReposito
         static::$shippingProfiles = [];
     }
 
-    public function findMatch(ShippingId $shippingId, SubTotal $subTotal, ShippingCountry $country, \DateTimeImmutable $date): ShippingProfile
+    public function findMatch(ShippingId $shippingId, ConvertsToMoney $subTotal, Country $country, \DateTimeImmutable $date): ShippingProfile
     {
         // TODO: Implement findMatch() method.
+    }
+
+    public function getAvailableShippingCountries(): iterable
+    {
+        $result = [];
+        $countryIds = [];
+
+        foreach(static::$shippingProfiles as $shippingProfile){
+            $countryIds = array_merge($countryIds, $shippingProfile->getCountryIds());
+        }
+
+        foreach(InMemoryCountryRepository::$countries as $country) {
+            if(in_array($country->countryId, $countryIds)) {
+                $result[] = $country;
+            }
+        }
+
+        return $result;
     }
 }

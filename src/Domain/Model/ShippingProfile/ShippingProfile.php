@@ -3,22 +3,23 @@ declare(strict_types=1);
 
 namespace Thinktomorrow\Trader\Domain\Model\ShippingProfile;
 
-use Money\Money;
-use Thinktomorrow\Trader\Domain\Common\Cash\Price;
-use Thinktomorrow\Trader\Domain\Common\Cash\PriceTotal;
-use Thinktomorrow\Trader\Domain\Common\Entity\Aggregate;
+use Assert\Assertion;
+use Thinktomorrow\Trader\Domain\Common\Price\Price;
 use Thinktomorrow\Trader\Domain\Common\Entity\HasData;
+use Thinktomorrow\Trader\Domain\Common\Price\PriceTotal;
+use Thinktomorrow\Trader\Domain\Common\Entity\Aggregate;
+use Thinktomorrow\Trader\Domain\Model\Country\CountryId;
 use Thinktomorrow\Trader\Domain\Common\Event\RecordsEvents;
-use Thinktomorrow\Trader\Domain\Model\Order\Address\ShippingCountry;
+use Thinktomorrow\Trader\Domain\Model\Country\HasCountries;
 
 final class ShippingProfile implements Aggregate
 {
     use RecordsEvents;
+    use HasCountries;
     use HasData;
 
     public readonly ShippingProfileId $shippingProfileId;
     private array $tariffs = [];
-    private array $countries = [];
 
     public static function create(ShippingProfileId $shippingProfileId): static
     {
@@ -42,40 +43,16 @@ final class ShippingProfile implements Aggregate
         return null;
     }
 
-    public function addTariff(TariffNumber $tariffNumber, Money $tariff, Money $from, Money $to): void
+    public function addTariff(Tariff $tariff): void
     {
-        $this->tariffs[] = Tariff::create($this->shippingProfileId, $tariffNumber, $tariff, $from, $to);
+        $this->tariffs[] = $tariff;
     }
 
-    public function updateTariff(TariffNumber $tariffNumber, Money $tariff, Money $from, Money $to): void
+    public function updateTariffs(array $tariffs): void
     {
-        if (null !== $tariffIndexToBeUpdated = $this->findTariffIndex($tariffNumber)) {
-            $this->tariffs[$tariffIndexToBeUpdated]->update($tariff, $from, $to);
-        }
-    }
+        Assertion::allIsInstanceOf($tariffs, Tariff::class);
 
-    public function deleteTariff(TariffNumber $tariffNumber): void
-    {
-        if (null !== $tariffIndexToBeDeleted = $this->findTariffIndex($tariffNumber)) {
-            $tariffToBeDeleted = $this->tariffs[$tariffIndexToBeDeleted];
-
-            unset($this->tariffs[$tariffIndexToBeDeleted]);
-        }
-    }
-
-    public function addCountry(ShippingCountry $country): void
-    {
-        $this->countries[] = $country;
-    }
-
-    public function deleteCountry(ShippingCountry $country): void
-    {
-        /** @var \Thinktomorrow\Trader\Domain\Model\Order\Address\ShippingCountry $existingCountry */
-        foreach ($this->countries as $index => $existingCountry) {
-            if ($country->equals($existingCountry)) {
-                unset($this->countries[$index]);
-            }
-        }
+        $this->tariffs = $tariffs;
     }
 
     public function getMappedData(): array
@@ -89,28 +66,10 @@ final class ShippingProfile implements Aggregate
     public function getChildEntities(): array
     {
         return [
-            Tariff::class => $this->tariffs,
-            ShippingCountry::class => $this->countries,
+            Tariff::class => array_map(fn(Tariff $tariff) => $tariff->getMappedData(), $this->tariffs),
+            CountryId::class => array_map(fn(CountryId $countryId) => $countryId->get(), $this->countryIds),
         ];
     }
-
-
-    public function hasCountry(ShippingCountry $country): bool
-    {
-        /** @var \Thinktomorrow\Trader\Domain\Model\Order\Address\ShippingCountry $existingCountry */
-        foreach ($this->countries as $existingCountry) {
-            if ($existingCountry->equals($country)) {
-                return true;
-            }
-        }
-
-        return false;
-    }
-
-//    public function getCountries(): array
-//    {
-//        return $this->countries;
-//    }
 
     public static function fromMappedData(array $state, array $childEntities = []): static
     {
@@ -119,19 +78,8 @@ final class ShippingProfile implements Aggregate
         $shipping->data = json_decode($state['data'], true);
 
         $shipping->tariffs = array_map(fn ($tariffState) => Tariff::fromMappedData($tariffState, $state), $childEntities[Tariff::class]);
-        $shipping->countries = array_map(fn ($countryKey) => ShippingCountry::fromString($countryKey), $childEntities[ShippingCountry::class]);
+        $shipping->countryIds = array_map(fn($countryState) => CountryId::fromString($countryState['country_id']), $childEntities[CountryId::class]);
 
         return $shipping;
-    }
-
-    private function findTariffIndex(TariffNumber $tariffNumber): ?int
-    {
-        foreach ($this->tariffs as $index => $tariff) {
-            if ($tariffNumber->asInt() === $tariff->tariffNumber->asInt()) {
-                return $index;
-            }
-        }
-
-        return null;
     }
 }

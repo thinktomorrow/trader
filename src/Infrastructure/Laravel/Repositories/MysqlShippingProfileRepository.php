@@ -3,33 +3,117 @@ declare(strict_types=1);
 
 namespace Thinktomorrow\Trader\Infrastructure\Laravel\Repositories;
 
+use Ramsey\Uuid\Uuid;
+use Illuminate\Support\Facades\DB;
+use Thinktomorrow\Trader\Domain\Model\Country\Country;
+use Thinktomorrow\Trader\Domain\Model\Country\CountryId;
+use Thinktomorrow\Trader\Domain\Model\ShippingProfile\Tariff;
+use Thinktomorrow\Trader\Application\Cart\ShippingCountryRepository;
 use Thinktomorrow\Trader\Domain\Model\ShippingProfile\ShippingProfile;
 use Thinktomorrow\Trader\Domain\Model\ShippingProfile\ShippingProfileId;
 use Thinktomorrow\Trader\Domain\Model\ShippingProfile\ShippingProfileRepository;
+use Thinktomorrow\Trader\Domain\Model\ShippingProfile\Exceptions\CouldNotFindShippingProfile;
 
-class MysqlShippingProfileRepository implements ShippingProfileRepository
+class MysqlShippingProfileRepository implements ShippingProfileRepository, ShippingCountryRepository
 {
-    public function __construct()
-    {
-    }
+    private static $shippingProfileTable = 'trader_shipping_profiles';
+    private static $shippingProfileTariffTable = 'trader_shipping_profile_tariffs';
+    private static $shippingProfileCountryTable = 'trader_shipping_profile_countries';
+    private static $countryTable = 'trader_countries';
 
     public function save(ShippingProfile $shippingProfile): void
     {
-        // TODO: Implement save() method.
+        $state = $shippingProfile->getMappedData();
+
+        if (! $this->exists($shippingProfile->shippingProfileId)) {
+            DB::table(static::$shippingProfileTable)->insert($state);
+        } else {
+            DB::table(static::$shippingProfileTable)->where('shipping_profile_id', $shippingProfile->shippingProfileId->get())->update($state);
+        }
+
+        $this->upsertTariffs($shippingProfile);
+        $this->upsertCountryIds($shippingProfile);
+    }
+
+    private function upsertTariffs(ShippingProfile $shippingProfile): void
+    {
+        DB::table(static::$shippingProfileTariffTable)
+            ->where('shipping_profile_id', $shippingProfile->shippingProfileId->get())
+            ->delete();
+
+        DB::table(static::$shippingProfileTariffTable)
+            ->insert($shippingProfile->getChildEntities()[Tariff::class]);
+    }
+
+    private function upsertCountryIds(ShippingProfile $shippingProfile): void
+    {
+        DB::table(static::$shippingProfileCountryTable)
+            ->where('shipping_profile_id', $shippingProfile->shippingProfileId->get())
+            ->delete();
+
+        DB::table(static::$shippingProfileCountryTable)
+            ->insert(array_map(fn(string $countryId) => [
+                'shipping_profile_id' => $shippingProfile->shippingProfileId->get(),
+                'country_id' => $countryId,
+            ], $shippingProfile->getChildEntities()[CountryId::class]));
+    }
+
+    private function exists(ShippingProfileId $shippingProfileId): bool
+    {
+        return DB::table(static::$shippingProfileTable)->where('shipping_profile_id', $shippingProfileId->get())->exists();
     }
 
     public function find(ShippingProfileId $shippingProfileId): ShippingProfile
     {
-        // TODO: Implement find() method.
+        $shippingProfileState = DB::table(static::$shippingProfileTable)
+            ->where(static::$shippingProfileTable . '.shipping_profile_id', $shippingProfileId->get())
+            ->first();
+
+        if (! $shippingProfileState) {
+            throw new CouldNotFindShippingProfile('No shipping profile found by id [' . $shippingProfileId->get() . ']');
+        }
+
+        $tariffStates = DB::table(static::$shippingProfileTariffTable)
+            ->where(static::$shippingProfileTariffTable . '.shipping_profile_id', $shippingProfileId->get())
+            ->get()
+            ->map(fn ($item) => (array)$item)
+            ->toArray();
+
+        $countryStates = DB::table(static::$shippingProfileCountryTable)
+            ->join(static::$countryTable, static::$shippingProfileCountryTable.'.country_id', '=', static::$countryTable.'.country_id')
+            ->where(static::$shippingProfileCountryTable . '.shipping_profile_id', $shippingProfileId->get())
+            ->where(static::$countryTable . '.active', '1')
+            ->get()
+            ->map(fn ($item) => (array)$item)
+            ->toArray();
+
+        return ShippingProfile::fromMappedData((array)$shippingProfileState, [
+            Tariff::class => $tariffStates,
+            CountryId::class => $countryStates,
+        ]);
     }
 
     public function delete(ShippingProfileId $shippingProfileId): void
     {
-        // TODO: Implement delete() method.
+        DB::table(static::$shippingProfileTable)->where('shipping_profile_id', $shippingProfileId->get())->delete();
     }
 
     public function nextReference(): ShippingProfileId
     {
-        // TODO: Implement nextReference() method.
+        return ShippingProfileId::fromString((string)Uuid::uuid4());
+    }
+
+    public function getAvailableShippingCountries(): iterable
+    {
+        $countryStates = DB::table(static::$countryTable)
+            ->join(static::$shippingProfileCountryTable, static::$countryTable.'.country_id', '=', static::$shippingProfileCountryTable.'.country_id')
+            ->where(static::$countryTable . '.active', '1')
+            ->groupBy(static::$countryTable.'.country_id')
+            ->orderBy(static::$countryTable.'.order_column')
+            ->get()
+            ->map(fn ($item) => (array)$item)
+            ->toArray();
+
+        return array_map(fn($countryState) => Country::fromMappedData($countryState), $countryStates);
     }
 }

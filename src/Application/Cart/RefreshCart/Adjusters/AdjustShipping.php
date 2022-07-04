@@ -3,9 +3,9 @@ declare(strict_types=1);
 
 namespace Thinktomorrow\Trader\Application\Cart\RefreshCart\Adjusters;
 
+use Thinktomorrow\Trader\Domain\Model\Order\Order;
 use Thinktomorrow\Trader\Application\Cart\RefreshCart\Adjuster;
 use Thinktomorrow\Trader\Domain\Model\Order\Address\ShippingCountry;
-use Thinktomorrow\Trader\Domain\Model\Order\Order;
 
 final class AdjustShipping implements Adjuster
 {

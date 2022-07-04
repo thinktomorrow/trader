@@ -3,8 +3,8 @@ declare(strict_types=1);
 
 namespace Thinktomorrow\Trader\Application\Cart;
 
-use Thinktomorrow\Trader\Domain\Model\Order\Address\ShippingCountry;
 use Thinktomorrow\Trader\Domain\Model\Order\OrderId;
+use Thinktomorrow\Trader\Domain\Model\Order\Address\ShippingCountry;
 
 final class ChooseShippingCountry
 {

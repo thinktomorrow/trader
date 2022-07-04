@@ -4,17 +4,17 @@ declare(strict_types=1);
 namespace Thinktomorrow\Trader\Infrastructure\Laravel\Models\Cart;
 
 use Money\Money;
+use Thinktomorrow\Trader\Domain\Common\Price\Price;
 use Thinktomorrow\Trader\Application\Cart\Read\Cart;
-use Thinktomorrow\Trader\Application\Cart\Read\CartBillingAddress;
 use Thinktomorrow\Trader\Application\Cart\Read\CartLine;
-use Thinktomorrow\Trader\Application\Cart\Read\CartPayment;
-use Thinktomorrow\Trader\Application\Cart\Read\CartShipping;
-use Thinktomorrow\Trader\Application\Cart\Read\CartShippingAddress;
-use Thinktomorrow\Trader\Application\Cart\Read\CartShopper;
 use Thinktomorrow\Trader\Application\Common\RendersData;
+use Thinktomorrow\Trader\Domain\Common\Price\PriceTotal;
 use Thinktomorrow\Trader\Application\Common\RendersMoney;
-use Thinktomorrow\Trader\Domain\Common\Cash\Price;
-use Thinktomorrow\Trader\Domain\Common\Cash\PriceTotal;
+use Thinktomorrow\Trader\Application\Cart\Read\CartPayment;
+use Thinktomorrow\Trader\Application\Cart\Read\CartShopper;
+use Thinktomorrow\Trader\Application\Cart\Read\CartShipping;
+use Thinktomorrow\Trader\Application\Cart\Read\CartBillingAddress;
+use Thinktomorrow\Trader\Application\Cart\Read\CartShippingAddress;
 
 class DefaultCart implements Cart
 {

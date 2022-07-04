@@ -3,9 +3,9 @@ declare(strict_types=1);
 
 namespace Thinktomorrow\Trader\Infrastructure\Laravel\Models\OrderRead;
 
+use Thinktomorrow\Trader\Domain\Common\Price\Price;
 use Thinktomorrow\Trader\Application\Common\RendersData;
 use Thinktomorrow\Trader\Application\Common\RendersMoney;
-use Thinktomorrow\Trader\Domain\Common\Cash\Price;
 
 abstract class OrderReadPayment
 {

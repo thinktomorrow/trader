@@ -110,16 +110,31 @@ class CreateBasicTraderTables extends Migration
 
     private function upServices()
     {
-        Schema::create(static::PREFIX.'shipping_profiles', function (Blueprint $table) {
-            $table->char('shipping_profile_id', 36)->primary();
-            $table->string('label');
+        Schema::create(static::PREFIX.'countries', function (Blueprint $table) {
+            $table->char('country_id', 2)->primary();
             $table->json('data')->nullable();
             $table->boolean('active')->default(1);
             $table->unsignedInteger('order_column')->default(0);
         });
 
+        Schema::create(static::PREFIX.'shipping_profiles', function (Blueprint $table) {
+            $table->char('shipping_profile_id', 36)->primary();
+            $table->json('data')->nullable();
+            $table->boolean('active')->default(1);
+            $table->unsignedInteger('order_column')->default(0);
+        });
+
+        Schema::create(static::PREFIX.'shipping_profile_countries', function (Blueprint $table) {
+            $table->char('shipping_profile_id', 36);
+            $table->char('country_id', 2);
+
+            $table->primary(['shipping_profile_id', 'country_id']);
+            $table->foreign('shipping_profile_id')->references('shipping_profile_id')->on(static::PREFIX.'shipping_profiles')->onDelete('cascade');
+            $table->foreign('country_id')->references('country_id')->on(static::PREFIX.'countries')->onDelete('cascade');
+        });
+
         Schema::create(static::PREFIX.'shipping_profile_tariffs', function (Blueprint $table) {
-            $table->char('tariff_id', 36)->primary();
+            $table->id('tariff_id');
             $table->char('shipping_profile_id', 36);
             $table->integer('rate')->unsigned();
             $table->integer('from')->unsigned();
@@ -136,6 +151,15 @@ class CreateBasicTraderTables extends Migration
             $table->json('data')->nullable();
             $table->boolean('active')->default(1);
             $table->unsignedInteger('order_column')->default(0);
+        });
+
+        Schema::create(static::PREFIX.'payment_method_countries', function (Blueprint $table) {
+            $table->char('payment_method_id', 36);
+            $table->char('country_id', 2);
+
+            $table->primary(['payment_method_id', 'country_id']);
+            $table->foreign('payment_method_id')->references('payment_method_id')->on(static::PREFIX.'payment_methods')->onDelete('cascade');
+            $table->foreign('country_id')->references('country_id')->on(static::PREFIX.'countries')->onDelete('cascade');
         });
     }
 
