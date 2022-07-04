@@ -225,15 +225,15 @@ final class CartApplication
         $order = $this->orderRepository->find($chooseShippingProfile->getOrderId());
 
         // Country of shipment
-        if (! $shippingCountry = $order->getShippingAddress()?->getAddress()->country) {
+        if (! $shippingCountryId = $order->getShippingAddress()?->getAddress()->countryId) {
             throw new CouldNotSelectShippingProfileDueToMissingShippingCountry(
                 'Order [' . $order->orderId->get() . '] missing a shipping country that is required when selecting a shipping profile ' . $shippingProfile->shippingProfileId->get()
             );
         }
 
-        if (! $shippingProfile->hasCountry(CountryId::fromString($shippingCountry))) {
+        if (! $shippingProfile->hasCountry($shippingCountryId)) {
             throw new ShippingProfileNotSelectableForCountry(
-                'Shipping profile ' . $shippingProfile->shippingProfileId->get() . ' is not allowed for country ' . $shippingCountry
+                'Shipping profile ' . $shippingProfile->shippingProfileId->get() . ' is not allowed for country ' . $shippingCountryId->get()
             );
         }
 

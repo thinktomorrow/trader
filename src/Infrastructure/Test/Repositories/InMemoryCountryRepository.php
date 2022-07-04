@@ -3,10 +3,10 @@ declare(strict_types=1);
 
 namespace Thinktomorrow\Trader\Infrastructure\Test\Repositories;
 
-use Thinktomorrow\Trader\Application\Cart\BillingCountryRepository;
 use Thinktomorrow\Trader\Domain\Model\Country\Country;
 use Thinktomorrow\Trader\Domain\Model\Country\CountryId;
 use Thinktomorrow\Trader\Domain\Model\Country\CountryRepository;
+use Thinktomorrow\Trader\Application\Country\BillingCountryRepository;
 use Thinktomorrow\Trader\Domain\Model\Country\Exceptions\CouldNotFindCountry;
 
 class InMemoryCountryRepository implements CountryRepository, BillingCountryRepository
@@ -43,6 +43,6 @@ class InMemoryCountryRepository implements CountryRepository, BillingCountryRepo
 
     public function getAvailableBillingCountries(): iterable
     {
-        return array_values(static::$countries);
+        return array_values(array_map(fn($country) => \Thinktomorrow\Trader\Application\Country\Country::fromMappedData($country->getMappedData()), static::$countries));
     }
 }

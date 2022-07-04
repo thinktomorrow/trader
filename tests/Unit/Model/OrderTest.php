@@ -147,7 +147,7 @@ class OrderTest extends TestCase
 
         $addressPayload = [
             'address_id' => 'abc',
-            'country' => 'NL',
+            'country_id' => 'NL',
             'line_1' => 'example 12',
             'line_2' => 'bus 2',
             'postal_code' => '1000',
@@ -167,7 +167,7 @@ class OrderTest extends TestCase
 
         $addressPayload = [
             'address_id' => 'def',
-            'country' => 'FR',
+            'country_id' => 'FR',
             'line_1' => 'rue de napoleon 222',
             'line_2' => 'bus 999',
             'postal_code' => '3000',

@@ -3,16 +3,16 @@ declare(strict_types=1);
 
 namespace Thinktomorrow\Trader\Infrastructure\Laravel\Repositories;
 
-use Illuminate\Support\Facades\DB;
 use Ramsey\Uuid\Uuid;
-use Thinktomorrow\Trader\Application\Cart\ShippingCountryRepository;
+use Illuminate\Support\Facades\DB;
 use Thinktomorrow\Trader\Domain\Model\Country\Country;
 use Thinktomorrow\Trader\Domain\Model\Country\CountryId;
-use Thinktomorrow\Trader\Domain\Model\ShippingProfile\Exceptions\CouldNotFindShippingProfile;
+use Thinktomorrow\Trader\Domain\Model\ShippingProfile\Tariff;
 use Thinktomorrow\Trader\Domain\Model\ShippingProfile\ShippingProfile;
+use Thinktomorrow\Trader\Application\Country\ShippingCountryRepository;
 use Thinktomorrow\Trader\Domain\Model\ShippingProfile\ShippingProfileId;
 use Thinktomorrow\Trader\Domain\Model\ShippingProfile\ShippingProfileRepository;
-use Thinktomorrow\Trader\Domain\Model\ShippingProfile\Tariff;
+use Thinktomorrow\Trader\Domain\Model\ShippingProfile\Exceptions\CouldNotFindShippingProfile;
 
 class MysqlShippingProfileRepository implements ShippingProfileRepository, ShippingCountryRepository
 {
@@ -83,6 +83,7 @@ class MysqlShippingProfileRepository implements ShippingProfileRepository, Shipp
             ->join(static::$countryTable, static::$shippingProfileCountryTable.'.country_id', '=', static::$countryTable.'.country_id')
             ->where(static::$shippingProfileCountryTable . '.shipping_profile_id', $shippingProfileId->get())
             ->where(static::$countryTable . '.active', '1')
+            ->select(static::$countryTable.'.country_id')
             ->get()
             ->map(fn ($item) => (array)$item)
             ->toArray();
@@ -109,11 +110,12 @@ class MysqlShippingProfileRepository implements ShippingProfileRepository, Shipp
             ->join(static::$shippingProfileCountryTable, static::$countryTable.'.country_id', '=', static::$shippingProfileCountryTable.'.country_id')
             ->where(static::$countryTable . '.active', '1')
             ->groupBy(static::$countryTable.'.country_id')
+            ->select(static::$countryTable.'.*')
             ->orderBy(static::$countryTable.'.order_column')
             ->get()
             ->map(fn ($item) => (array)$item)
             ->toArray();
 
-        return array_map(fn ($countryState) => Country::fromMappedData($countryState), $countryStates);
+        return array_map(fn ($countryState) => \Thinktomorrow\Trader\Application\Country\Country::fromMappedData($countryState), $countryStates);
     }
 }

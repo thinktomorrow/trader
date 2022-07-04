@@ -59,7 +59,7 @@ class OrderDetailsTest extends TestCase
 
         $this->assertEquals([
             'order_id' => 'xxx',
-            'country' => 'BE',
+            'country_id' => 'BE',
             'line_1' => 'Lierseweg 81',
             'line_2' => null,
             'postal_code' => '2200',
@@ -76,7 +76,7 @@ class OrderDetailsTest extends TestCase
 
         $this->assertEquals([
             'order_id' => 'xxx',
-            'country' => 'NL',
+            'country_id' => 'NL',
             'line_1' => 'example 12',
             'line_2' => 'bus 2',
             'postal_code' => '1000',

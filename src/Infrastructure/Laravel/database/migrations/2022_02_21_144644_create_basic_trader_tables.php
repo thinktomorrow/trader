@@ -128,7 +128,7 @@ class CreateBasicTraderTables extends Migration
             $table->char('shipping_profile_id', 36);
             $table->char('country_id', 2);
 
-            $table->primary(['shipping_profile_id', 'country_id']);
+            $table->primary(['shipping_profile_id', 'country_id'], 'trader_shipping_profile_id_country_id_primary');
             $table->foreign('shipping_profile_id')->references('shipping_profile_id')->on(static::PREFIX.'shipping_profiles')->onDelete('cascade');
             $table->foreign('country_id')->references('country_id')->on(static::PREFIX.'countries')->onDelete('cascade');
         });
@@ -147,6 +147,7 @@ class CreateBasicTraderTables extends Migration
 
         Schema::create(static::PREFIX.'payment_methods', function (Blueprint $table) {
             $table->char('payment_method_id', 36)->primary();
+
             $table->integer('rate')->unsigned();
             $table->json('data')->nullable();
             $table->boolean('active')->default(1);
@@ -157,7 +158,7 @@ class CreateBasicTraderTables extends Migration
             $table->char('payment_method_id', 36);
             $table->char('country_id', 2);
 
-            $table->primary(['payment_method_id', 'country_id']);
+            $table->primary(['payment_method_id', 'country_id'], 'trader_payment_method_id_country_id_primary');
             $table->foreign('payment_method_id')->references('payment_method_id')->on(static::PREFIX.'payment_methods')->onDelete('cascade');
             $table->foreign('country_id')->references('country_id')->on(static::PREFIX.'countries')->onDelete('cascade');
         });
@@ -270,10 +271,11 @@ class CreateBasicTraderTables extends Migration
             $table->string('line_2')->nullable();
             $table->string('postal_code')->nullable();
             $table->string('city')->nullable();
-            $table->string('country')->nullable();
+            $table->string('country_id')->nullable();
             $table->json('data')->nullable();
 
             $table->foreign('order_id')->references('order_id')->on(static::PREFIX.'orders')->onDelete('cascade');
+            $table->foreign('country_id')->references('country_id')->on(static::PREFIX.'countries');
         });
 
         Schema::create(static::PREFIX.'order_events', function (Blueprint $table) {

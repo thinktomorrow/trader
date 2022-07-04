@@ -88,7 +88,7 @@ class MerchantOrderTest extends CartContext
 
         $merchantOrder = $this->merchantOrderRepository->findMerchantOrder(OrderId::fromString('xxx'));
 
-        $this->assertEquals('BE', $merchantOrder->getShippingAddress()->getCountry());
+        $this->assertEquals('BE', $merchantOrder->getShippingAddress()->getCountryId());
         $this->assertEquals('molenstraat 146', $merchantOrder->getShippingAddress()->getLine1());
         $this->assertNull($merchantOrder->getShippingAddress()->getLine2());
         $this->assertEquals('3000', $merchantOrder->getShippingAddress()->getPostalCode());
@@ -106,7 +106,7 @@ class MerchantOrderTest extends CartContext
 
         $merchantOrder = $this->merchantOrderRepository->findMerchantOrder(OrderId::fromString('xxx'));
 
-        $this->assertEquals('BE', $merchantOrder->getBillingAddress()->getCountry());
+        $this->assertEquals('BE', $merchantOrder->getBillingAddress()->getCountryId());
         $this->assertEquals('molenstraat 146', $merchantOrder->getBillingAddress()->getLine1());
         $this->assertNull($merchantOrder->getBillingAddress()->getLine2());
         $this->assertEquals('3000', $merchantOrder->getBillingAddress()->getPostalCode());

@@ -4,10 +4,10 @@ declare(strict_types=1);
 namespace Thinktomorrow\Trader\Infrastructure\Laravel\Repositories;
 
 use Illuminate\Support\Facades\DB;
-use Thinktomorrow\Trader\Application\Cart\BillingCountryRepository;
 use Thinktomorrow\Trader\Domain\Model\Country\Country;
 use Thinktomorrow\Trader\Domain\Model\Country\CountryId;
 use Thinktomorrow\Trader\Domain\Model\Country\CountryRepository;
+use Thinktomorrow\Trader\Application\Country\BillingCountryRepository;
 use Thinktomorrow\Trader\Domain\Model\Country\Exceptions\CouldNotFindCountry;
 
 class MysqlCountryRepository implements CountryRepository, BillingCountryRepository
@@ -57,6 +57,6 @@ class MysqlCountryRepository implements CountryRepository, BillingCountryReposit
             ->map(fn ($item) => (array)$item)
             ->toArray();
 
-        return array_map(fn ($countryState) => Country::fromMappedData($countryState), $countryStates);
+        return array_map(fn ($countryState) => \Thinktomorrow\Trader\Application\Country\Country::fromMappedData($countryState), $countryStates);
     }
 }

@@ -1,9 +1,7 @@
 <?php
 declare(strict_types=1);
 
-namespace Thinktomorrow\Trader\Application\Cart;
-
-use Thinktomorrow\Trader\Domain\Model\Country\Country;
+namespace Thinktomorrow\Trader\Application\Country;
 
 interface ShippingCountryRepository
 {

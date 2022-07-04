@@ -6,6 +6,7 @@ namespace Thinktomorrow\Trader\Domain\Model\Order\Address;
 use Thinktomorrow\Trader\Domain\Common\Address\Address;
 use Thinktomorrow\Trader\Domain\Common\Entity\HasData;
 use Thinktomorrow\Trader\Domain\Model\Order\OrderId;
+use Thinktomorrow\Trader\Domain\Model\Country\CountryId;
 
 abstract class OrderAddress
 {
@@ -33,7 +34,13 @@ abstract class OrderAddress
         $address = new static();
 
         $address->orderId = OrderId::fromString($aggregateState['order_id']);
-        $address->address = new Address($state['country'], $state['line_1'], $state['line_2'], $state['postal_code'], $state['city']);
+        $address->address = new Address(
+            CountryId::fromString($state['country_id']),
+            $state['line_1'],
+            $state['line_2'],
+            $state['postal_code'],
+            $state['city']
+        );
         $address->data = json_decode($state['data'], true);
 
         return $address;
@@ -43,7 +50,7 @@ abstract class OrderAddress
     {
         return [
             'order_id' => $this->orderId->get(),
-            'country' => $this->address->country,
+            'country_id' => $this->address->countryId->get(),
             'line_1' => $this->address->line1,
             'line_2' => $this->address->line2,
             'postal_code' => $this->address->postalCode,

@@ -60,8 +60,8 @@ class CountryRepositoryTest extends TestCase
             $repository->save($country2);
 
             $this->assertEquals([
-                $country,
-                $country2,
+                \Thinktomorrow\Trader\Application\Country\Country::fromMappedData($country->getMappedData()),
+                \Thinktomorrow\Trader\Application\Country\Country::fromMappedData($country2->getMappedData()),
             ], $repository->getAvailableBillingCountries());
         }
     }

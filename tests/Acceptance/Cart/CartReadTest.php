@@ -87,7 +87,7 @@ class CartReadTest extends CartContext
 
         $cart = $this->cartRepository->findCart(OrderId::fromString('xxx'));
 
-        $this->assertEquals('BE', $cart->getShippingAddress()->getCountry());
+        $this->assertEquals('BE', $cart->getShippingAddress()->getCountryId());
         $this->assertEquals('molenstraat 146', $cart->getShippingAddress()->getLine1());
         $this->assertNull($cart->getShippingAddress()->getLine2());
         $this->assertEquals('3000', $cart->getShippingAddress()->getPostalCode());
@@ -105,7 +105,7 @@ class CartReadTest extends CartContext
 
         $cart = $this->cartRepository->findCart(OrderId::fromString('xxx'));
 
-        $this->assertEquals('BE', $cart->getBillingAddress()->getCountry());
+        $this->assertEquals('BE', $cart->getBillingAddress()->getCountryId());
         $this->assertEquals('molenstraat 146', $cart->getBillingAddress()->getLine1());
         $this->assertNull($cart->getBillingAddress()->getLine2());
         $this->assertEquals('3000', $cart->getBillingAddress()->getPostalCode());

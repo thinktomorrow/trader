@@ -89,7 +89,7 @@ class ShippingProfileRepositoryTest extends TestCase
             $repository->save($profile);
 
             $this->assertEquals([
-                $this->country,
+                \Thinktomorrow\Trader\Application\Country\Country::fromMappedData($this->country->getMappedData()),
             ], $repository->getAvailableShippingCountries());
         }
     }

@@ -4,12 +4,13 @@ declare(strict_types=1);
 namespace Thinktomorrow\Trader\Infrastructure\Laravel\Models\OrderRead;
 
 use Thinktomorrow\Trader\Application\Common\RendersData;
+use Thinktomorrow\Trader\Domain\Model\Country\CountryId;
 
 abstract class Address
 {
     use RendersData;
 
-    protected ?string $country;
+    protected ?CountryId $countryId;
     protected ?string $line1;
     protected ?string $line2;
     protected ?string $postalCode;
@@ -19,7 +20,7 @@ abstract class Address
     {
         $address = new static();
 
-        $address->country = $state['country'];
+        $address->countryId = $state['country_id'] ? CountryId::fromString($state['country_id']) : null;
         $address->line1 = $state['line_1'];
         $address->line2 = $state['line_2'];
         $address->postalCode = $state['postal_code'];
@@ -29,9 +30,9 @@ abstract class Address
         return $address;
     }
 
-    public function getCountry(): ?string
+    public function getCountryId(): ?string
     {
-        return $this->country;
+        return $this->countryId?->get();
     }
 
     public function getPostalCode(): ?string
