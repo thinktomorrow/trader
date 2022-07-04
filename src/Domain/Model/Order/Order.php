@@ -9,7 +9,10 @@ use Thinktomorrow\Trader\Domain\Common\Entity\Aggregate;
 use Thinktomorrow\Trader\Domain\Common\Entity\HasData;
 use Thinktomorrow\Trader\Domain\Common\Entity\RecordsChangelog;
 use Thinktomorrow\Trader\Domain\Common\Event\RecordsEvents;
+use Thinktomorrow\Trader\Domain\Model\Order\Shipping\ShippingId;
+use Thinktomorrow\Trader\Domain\Model\Order\Payment\PaymentState;
 use Thinktomorrow\Trader\Domain\Model\Order\Address\BillingAddress;
+use Thinktomorrow\Trader\Domain\Model\Order\Shipping\ShippingState;
 use Thinktomorrow\Trader\Domain\Model\Order\Address\ShippingAddress;
 use Thinktomorrow\Trader\Domain\Model\Order\Discount\Discount;
 use Thinktomorrow\Trader\Domain\Model\Order\Discount\Discountable;
@@ -21,6 +24,8 @@ use Thinktomorrow\Trader\Domain\Model\Order\Line\Line;
 use Thinktomorrow\Trader\Domain\Model\Order\Line\Quantity;
 use Thinktomorrow\Trader\Domain\Model\Order\Payment\Payment;
 use Thinktomorrow\Trader\Domain\Model\Order\Shipping\Shipping;
+use Thinktomorrow\Trader\Domain\Model\Order\Events\PaymentStateUpdated;
+use Thinktomorrow\Trader\Domain\Model\Order\Events\ShippingStateUpdated;
 
 final class Order implements Aggregate, Discountable
 {
@@ -105,6 +110,24 @@ final class Order implements Aggregate, Discountable
     public function updatePayment(Payment $payment): void
     {
         $this->update('payment', $payment);
+    }
+
+    public function updatePaymentState( PaymentState $paymentState): void
+    {
+        $formerPaymentState = $this->getPayment()->getPaymentState();
+
+        $this->getPayment()->updateState($paymentState);
+
+        $this->recordEvent(new PaymentStateUpdated($this->orderId, $formerPaymentState, $paymentState));
+    }
+
+    public function updateShippingState(ShippingId $shippingId, ShippingState $shippingState): void
+    {
+        $formerShippingState = $this->findShipping($shippingId)->getShippingState();
+
+        $this->findShipping($shippingId)->updateState($shippingState);
+
+        $this->recordEvent(new ShippingStateUpdated($this->orderId, $shippingId, $formerShippingState, $shippingState));
     }
 
     public function updateShippingAddress(ShippingAddress $shippingAddress): void

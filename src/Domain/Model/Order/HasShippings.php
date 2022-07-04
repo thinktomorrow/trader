@@ -49,6 +49,17 @@ trait HasShippings
         }
     }
 
+    public function findShipping(ShippingId $shippingId): Shipping
+    {
+        if (null === $shippingIndex = $this->findShippingIndex($shippingId)) {
+            throw new CouldNotFindShippingOnOrder(
+                'Cannot update shipping because order ['.$this->orderId->get().'] has no shipping by id ['.$shippingId->get().']'
+            );
+        }
+
+        return $this->shippings[$shippingIndex];
+    }
+
     private function findShippingIndex(ShippingId $shippingId): ?int
     {
         foreach ($this->shippings as $index => $shipping) {
