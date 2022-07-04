@@ -3,8 +3,8 @@ declare(strict_types=1);
 
 namespace Tests\Unit\Model;
 
-use Tests\TestHelpers;
 use PHPUnit\Framework\TestCase;
+use Tests\TestHelpers;
 use Thinktomorrow\Trader\Domain\Model\Country\Country;
 use Thinktomorrow\Trader\Domain\Model\Country\CountryId;
 

@@ -3,18 +3,18 @@ declare(strict_types=1);
 
 namespace Tests\Infrastructure\Repositories;
 
+use Illuminate\Foundation\Testing\RefreshDatabase;
 use Money\Money;
 use Tests\Infrastructure\TestCase;
-use Illuminate\Foundation\Testing\RefreshDatabase;
 use Thinktomorrow\Trader\Domain\Model\Country\CountryId;
-use Thinktomorrow\Trader\Domain\Model\ShippingProfile\Tariff;
+use Thinktomorrow\Trader\Domain\Model\ShippingProfile\Exceptions\CouldNotFindShippingProfile;
 use Thinktomorrow\Trader\Domain\Model\ShippingProfile\ShippingProfile;
 use Thinktomorrow\Trader\Domain\Model\ShippingProfile\ShippingProfileId;
-use Thinktomorrow\Trader\Infrastructure\Test\Repositories\InMemoryCountryRepository;
+use Thinktomorrow\Trader\Domain\Model\ShippingProfile\Tariff;
 use Thinktomorrow\Trader\Infrastructure\Laravel\Repositories\MysqlCountryRepository;
 use Thinktomorrow\Trader\Infrastructure\Laravel\Repositories\MysqlShippingProfileRepository;
+use Thinktomorrow\Trader\Infrastructure\Test\Repositories\InMemoryCountryRepository;
 use Thinktomorrow\Trader\Infrastructure\Test\Repositories\InMemoryShippingProfileRepository;
-use Thinktomorrow\Trader\Domain\Model\ShippingProfile\Exceptions\CouldNotFindShippingProfile;
 
 class ShippingProfileRepositoryTest extends TestCase
 {
@@ -36,7 +36,6 @@ class ShippingProfileRepositoryTest extends TestCase
     public function it_can_save_and_find_a_profile(ShippingProfile $shippingProfile)
     {
         foreach ($this->repositories() as $i => $repository) {
-
             $this->countryRepositories()[$i]->save($this->country);
 
             $repository->save($shippingProfile);
@@ -80,7 +79,6 @@ class ShippingProfileRepositoryTest extends TestCase
     public function it_can_get_available_shipping_countries()
     {
         foreach ($this->repositories() as $i => $repository) {
-
             $this->countryRepositories()[$i]->save($this->country);
             $country2 = $this->createCountry(['country_id' => 'NL']);
             $this->countryRepositories()[$i]->save($country2);
@@ -106,7 +104,7 @@ class ShippingProfileRepositoryTest extends TestCase
     {
         return [
             new InMemoryCountryRepository(),
-            new MysqlCountryRepository()
+            new MysqlCountryRepository(),
         ];
     }
 

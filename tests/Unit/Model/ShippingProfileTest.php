@@ -6,9 +6,9 @@ namespace Tests\Unit\Model;
 use Money\Money;
 use PHPUnit\Framework\TestCase;
 use Thinktomorrow\Trader\Domain\Model\Country\CountryId;
-use Thinktomorrow\Trader\Domain\Model\ShippingProfile\Tariff;
 use Thinktomorrow\Trader\Domain\Model\ShippingProfile\ShippingProfile;
 use Thinktomorrow\Trader\Domain\Model\ShippingProfile\ShippingProfileId;
+use Thinktomorrow\Trader\Domain\Model\ShippingProfile\Tariff;
 
 class ShippingProfileTest extends TestCase
 {
@@ -76,7 +76,7 @@ class ShippingProfileTest extends TestCase
                 Money::EUR(30),
                 Money::EUR(3001),
                 Money::EUR(4000)
-            )
+            ),
         ]);
 
         $this->assertCount(1, $shippingProfile->getChildEntities()[Tariff::class]);

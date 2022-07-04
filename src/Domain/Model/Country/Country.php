@@ -16,7 +16,6 @@ class Country implements Entity
 
     private function __construct()
     {
-
     }
 
     public static function create(CountryId $countryId, array $data): static

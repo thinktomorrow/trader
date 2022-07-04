@@ -3,16 +3,16 @@ declare(strict_types=1);
 
 namespace Thinktomorrow\Trader\Infrastructure\Laravel\Repositories;
 
-use Ramsey\Uuid\Uuid;
 use Illuminate\Support\Facades\DB;
+use Ramsey\Uuid\Uuid;
+use Thinktomorrow\Trader\Application\Cart\ShippingCountryRepository;
 use Thinktomorrow\Trader\Domain\Model\Country\Country;
 use Thinktomorrow\Trader\Domain\Model\Country\CountryId;
-use Thinktomorrow\Trader\Domain\Model\ShippingProfile\Tariff;
-use Thinktomorrow\Trader\Application\Cart\ShippingCountryRepository;
+use Thinktomorrow\Trader\Domain\Model\ShippingProfile\Exceptions\CouldNotFindShippingProfile;
 use Thinktomorrow\Trader\Domain\Model\ShippingProfile\ShippingProfile;
 use Thinktomorrow\Trader\Domain\Model\ShippingProfile\ShippingProfileId;
 use Thinktomorrow\Trader\Domain\Model\ShippingProfile\ShippingProfileRepository;
-use Thinktomorrow\Trader\Domain\Model\ShippingProfile\Exceptions\CouldNotFindShippingProfile;
+use Thinktomorrow\Trader\Domain\Model\ShippingProfile\Tariff;
 
 class MysqlShippingProfileRepository implements ShippingProfileRepository, ShippingCountryRepository
 {
@@ -52,7 +52,7 @@ class MysqlShippingProfileRepository implements ShippingProfileRepository, Shipp
             ->delete();
 
         DB::table(static::$shippingProfileCountryTable)
-            ->insert(array_map(fn(string $countryId) => [
+            ->insert(array_map(fn (string $countryId) => [
                 'shipping_profile_id' => $shippingProfile->shippingProfileId->get(),
                 'country_id' => $countryId,
             ], $shippingProfile->getChildEntities()[CountryId::class]));
@@ -114,6 +114,6 @@ class MysqlShippingProfileRepository implements ShippingProfileRepository, Shipp
             ->map(fn ($item) => (array)$item)
             ->toArray();
 
-        return array_map(fn($countryState) => Country::fromMappedData($countryState), $countryStates);
+        return array_map(fn ($countryState) => Country::fromMappedData($countryState), $countryStates);
     }
 }

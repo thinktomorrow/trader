@@ -3,8 +3,8 @@ declare(strict_types=1);
 
 namespace Tests\Infrastructure\Repositories;
 
-use Tests\Infrastructure\TestCase;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Tests\Infrastructure\TestCase;
 use Thinktomorrow\Trader\Domain\Model\Country\Country;
 use Thinktomorrow\Trader\Domain\Model\Country\Exceptions\CouldNotFindCountry;
 use Thinktomorrow\Trader\Infrastructure\Laravel\Repositories\MysqlCountryRepository;
@@ -54,7 +54,6 @@ class CountryRepositoryTest extends TestCase
     public function it_can_get_available_billing_countries()
     {
         foreach ($this->repositories() as $i => $repository) {
-
             $country = $this->createCountry(['country_id' => 'BE']);
             $country2 = $this->createCountry(['country_id' => 'NL']);
             $repository->save($country);
