@@ -3,16 +3,15 @@ declare(strict_types=1);
 
 namespace Thinktomorrow\Trader\Infrastructure\Laravel\Repositories;
 
-use Ramsey\Uuid\Uuid;
 use Illuminate\Support\Facades\DB;
-use Thinktomorrow\Trader\Domain\Model\Country\Country;
-use Thinktomorrow\Trader\Domain\Model\Country\CountryId;
-use Thinktomorrow\Trader\Domain\Model\ShippingProfile\Tariff;
-use Thinktomorrow\Trader\Domain\Model\ShippingProfile\ShippingProfile;
+use Ramsey\Uuid\Uuid;
 use Thinktomorrow\Trader\Application\Country\ShippingCountryRepository;
+use Thinktomorrow\Trader\Domain\Model\Country\CountryId;
+use Thinktomorrow\Trader\Domain\Model\ShippingProfile\Exceptions\CouldNotFindShippingProfile;
+use Thinktomorrow\Trader\Domain\Model\ShippingProfile\ShippingProfile;
 use Thinktomorrow\Trader\Domain\Model\ShippingProfile\ShippingProfileId;
 use Thinktomorrow\Trader\Domain\Model\ShippingProfile\ShippingProfileRepository;
-use Thinktomorrow\Trader\Domain\Model\ShippingProfile\Exceptions\CouldNotFindShippingProfile;
+use Thinktomorrow\Trader\Domain\Model\ShippingProfile\Tariff;
 
 class MysqlShippingProfileRepository implements ShippingProfileRepository, ShippingCountryRepository
 {

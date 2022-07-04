@@ -3,8 +3,8 @@ declare(strict_types=1);
 
 namespace Thinktomorrow\Trader\Application\Country;
 
-use Thinktomorrow\Trader\Domain\Model\Country\CountryId;
 use Thinktomorrow\Trader\Application\Common\RendersData;
+use Thinktomorrow\Trader\Domain\Model\Country\CountryId;
 
 class Country
 {

@@ -5,8 +5,8 @@ namespace Thinktomorrow\Trader\Domain\Model\Order\Address;
 
 use Thinktomorrow\Trader\Domain\Common\Address\Address;
 use Thinktomorrow\Trader\Domain\Common\Entity\HasData;
-use Thinktomorrow\Trader\Domain\Model\Order\OrderId;
 use Thinktomorrow\Trader\Domain\Model\Country\CountryId;
+use Thinktomorrow\Trader\Domain\Model\Order\OrderId;
 
 abstract class OrderAddress
 {

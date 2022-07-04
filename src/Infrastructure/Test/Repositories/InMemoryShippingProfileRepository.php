@@ -3,15 +3,15 @@ declare(strict_types=1);
 
 namespace Thinktomorrow\Trader\Infrastructure\Test\Repositories;
 
-use Thinktomorrow\Trader\Domain\Model\Country\Country;
-use Thinktomorrow\Trader\Domain\Common\Price\ConvertsToMoney;
-use Thinktomorrow\Trader\Domain\Model\Order\Shipping\ShippingId;
-use Thinktomorrow\Trader\Domain\Model\ShippingProfile\ShippingProfile;
+use Thinktomorrow\Trader\Application\Cart\RefreshCart\Adjusters\FindSuitableShippingProfile;
 use Thinktomorrow\Trader\Application\Country\ShippingCountryRepository;
+use Thinktomorrow\Trader\Domain\Common\Price\ConvertsToMoney;
+use Thinktomorrow\Trader\Domain\Model\Country\Country;
+use Thinktomorrow\Trader\Domain\Model\Order\Shipping\ShippingId;
+use Thinktomorrow\Trader\Domain\Model\ShippingProfile\Exceptions\CouldNotFindShippingProfile;
+use Thinktomorrow\Trader\Domain\Model\ShippingProfile\ShippingProfile;
 use Thinktomorrow\Trader\Domain\Model\ShippingProfile\ShippingProfileId;
 use Thinktomorrow\Trader\Domain\Model\ShippingProfile\ShippingProfileRepository;
-use Thinktomorrow\Trader\Application\Cart\RefreshCart\Adjusters\FindSuitableShippingProfile;
-use Thinktomorrow\Trader\Domain\Model\ShippingProfile\Exceptions\CouldNotFindShippingProfile;
 
 final class InMemoryShippingProfileRepository implements ShippingProfileRepository, ShippingCountryRepository, FindSuitableShippingProfile
 {
