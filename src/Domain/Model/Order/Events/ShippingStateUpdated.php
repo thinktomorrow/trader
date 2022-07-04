@@ -14,7 +14,6 @@ class ShippingStateUpdated
         public readonly ShippingId $shippingId,
         public readonly ShippingState $formerShippingState,
         public readonly ShippingState $newShippingState
-    )
-    {
+    ) {
     }
 }
