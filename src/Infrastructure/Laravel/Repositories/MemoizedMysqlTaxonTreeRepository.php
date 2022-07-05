@@ -40,4 +40,9 @@ class MemoizedMysqlTaxonTreeRepository implements TaxonTreeRepository, CategoryR
 
         return static::$tree = $this->taxonTreeRepository->getTree();
     }
+
+    public static function clear(): void
+    {
+        static::$tree = null;
+    }
 }

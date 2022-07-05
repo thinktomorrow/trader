@@ -24,15 +24,16 @@ class Promo implements Aggregate
     /** @var Discount[] */
     private array $discounts;
 
-    public static function create(PromoId $promoId): static
+    public static function create(PromoId $promoId, ?string $coupon_code, ?\DateTime $startAt, ?\DateTime $endAt, bool $isCombinable): static
     {
         $promo = new static();
         $promo->promoId = $promoId;
         $promo->state = PromoState::online;
-        $promo->isCombinable = false;
-        $promo->coupon_code = null;
-        $promo->startAt = null;
-        $promo->endAt = null;
+        $promo->isCombinable = $isCombinable;
+        $promo->coupon_code = $coupon_code;
+        $promo->startAt = $startAt;
+        $promo->endAt = $endAt;
+        $promo->discounts = [];
 
         $promo->recordEvent(new PromoCreated($promoId));
 
@@ -73,6 +74,26 @@ class Promo implements Aggregate
     public function getDiscounts(): array
     {
         return $this->discounts;
+    }
+
+    public function updateCouponCode(string $coupon_code): void
+    {
+        $this->coupon_code = $coupon_code;
+    }
+
+    public function updateStartAt(?\DateTime $startAt): void
+    {
+        $this->startAt = $startAt;
+    }
+
+    public function updateEndAt(?\DateTime $endAt): void
+    {
+        $this->endAt = $endAt;
+    }
+
+    public function updateIsCombinable(bool $isCombinable): void
+    {
+        $this->isCombinable = $isCombinable;
     }
 
     public function getMappedData(): array

@@ -3,18 +3,20 @@ declare(strict_types=1);
 
 namespace Thinktomorrow\Trader\Application\Promo\OrderPromo\Conditions;
 
-use Thinktomorrow\Trader\Application\Promo\OrderPromo\OrderCondition;
-use Thinktomorrow\Trader\Domain\Model\Order\Discount\Discountable;
+use Money\Money;
+use Thinktomorrow\Trader\Domain\Common\Cash\Cash;
 use Thinktomorrow\Trader\Domain\Model\Order\Order;
-use Thinktomorrow\Trader\Domain\Model\Promo\Conditions\MinimumLinesQuantity;
+use Thinktomorrow\Trader\Domain\Model\Order\Discount\Discountable;
+use Thinktomorrow\Trader\Application\Promo\OrderPromo\OrderCondition;
+use Thinktomorrow\Trader\Domain\Model\Promo\Conditions\MinimumAmount;
 
-final class MinimumLinesQuantityOrderCondition implements OrderCondition
+class MinimumAmountOrderCondition implements OrderCondition
 {
-    private int $minimum_quantity;
+    private Money $amount;
 
     public static function getMapKey(): string
     {
-        return MinimumLinesQuantity::getMapKey();
+        return MinimumAmount::getMapKey();
     }
 
     public function check(Order $order, Discountable $discountable): bool
@@ -23,7 +25,7 @@ final class MinimumLinesQuantityOrderCondition implements OrderCondition
             return false;
         }
 
-        return $discountable->getQuantity()->asInt() >= $this->minimum_quantity;
+        return $discountable->getSubTotal()->getMoney()->greaterThanOrEqual($this->amount);
     }
 
     public static function fromMappedData(array $state, array $aggregateState): static
@@ -31,7 +33,7 @@ final class MinimumLinesQuantityOrderCondition implements OrderCondition
         $data = json_decode($state['data'], true);
 
         $condition = new static();
-        $condition->minimum_quantity = $data['minimum_quantity'];
+        $condition->amount = Cash::make($data['amount']);
 
         return $condition;
     }

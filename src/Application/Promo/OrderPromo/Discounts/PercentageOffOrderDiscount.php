@@ -9,6 +9,7 @@ use Thinktomorrow\Trader\Domain\Common\Cash\Percentage;
 use Thinktomorrow\Trader\Domain\Model\Order\Discount\Discountable;
 use Thinktomorrow\Trader\Domain\Model\Order\Discount\DiscountTotal;
 use Thinktomorrow\Trader\Domain\Model\Order\Order;
+use Thinktomorrow\Trader\Domain\Model\Promo\Discounts\PercentageOffDiscount;
 
 class PercentageOffOrderDiscount extends BaseDiscount implements OrderDiscount
 {
@@ -16,7 +17,7 @@ class PercentageOffOrderDiscount extends BaseDiscount implements OrderDiscount
 
     public static function getMapKey(): string
     {
-        return 'percentage_off';
+        return PercentageOffDiscount::getMapKey();
     }
 
     public function isApplicable(Order $order, Discountable $discountable): bool

@@ -302,7 +302,7 @@ class CreateBasicTraderTables extends Migration
 
             $table->foreign('order_id')->references('order_id')->on(static::PREFIX.'orders')->onDelete('cascade');
             $table->foreign('promo_id')->references('promo_id')->on(static::PREFIX.'promos')->nullOnDelete();
-            $table->foreign('promo_discount_id')->references('discount_id')->on(static::PREFIX.'promo_discount_conditions')->nullOnDelete();
+            $table->foreign('promo_discount_id')->references('discount_id')->on(static::PREFIX.'promo_discounts')->nullOnDelete();
         });
     }
 

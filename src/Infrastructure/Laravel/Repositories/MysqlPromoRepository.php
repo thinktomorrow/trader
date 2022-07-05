@@ -8,6 +8,7 @@ use Illuminate\Database\Query\Builder;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 use Ramsey\Uuid\Uuid;
+use Thinktomorrow\Trader\Domain\Model\Promo\DiscountId;
 use Thinktomorrow\Trader\Application\Promo\OrderPromo\OrderDiscount;
 use Thinktomorrow\Trader\Application\Promo\OrderPromo\OrderDiscountFactory;
 use Thinktomorrow\Trader\Application\Promo\OrderPromo\OrderPromo;
@@ -213,5 +214,10 @@ final class MysqlPromoRepository implements PromoRepository, OrderPromoRepositor
     public function nextReference(): PromoId
     {
         return PromoId::fromString((string) Uuid::uuid4());
+    }
+
+    public function nextDiscountReference(): DiscountId
+    {
+        return DiscountId::fromString((string) Uuid::uuid4());
     }
 }

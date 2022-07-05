@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace Thinktomorrow\Trader\Infrastructure\Test\Repositories;
 
+use Thinktomorrow\Trader\Domain\Model\Promo\DiscountId;
 use Thinktomorrow\Trader\Application\Promo\OrderPromo\OrderDiscount;
 use Thinktomorrow\Trader\Application\Promo\OrderPromo\OrderDiscountFactory;
 use Thinktomorrow\Trader\Application\Promo\OrderPromo\OrderPromo;
@@ -22,6 +23,7 @@ final class InMemoryPromoRepository implements PromoRepository, OrderPromoReposi
     public static array $promos = [];
 
     private string $nextReference = 'ppp-123';
+    private string $nextDiscountReference = 'ddd-123';
 
     private DiscountFactory $discountFactory;
     private OrderDiscountFactory $orderDiscountFactory;
@@ -58,6 +60,11 @@ final class InMemoryPromoRepository implements PromoRepository, OrderPromoReposi
     public function nextReference(): PromoId
     {
         return PromoId::fromString($this->nextReference);
+    }
+
+    public function nextDiscountReference(): DiscountId
+    {
+        return DiscountId::fromString($this->nextDiscountReference);
     }
 
     // For testing purposes only

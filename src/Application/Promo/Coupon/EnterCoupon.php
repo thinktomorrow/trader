@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 
-namespace Thinktomorrow\Trader\Application\Promo;
+namespace Thinktomorrow\Trader\Application\Promo\Coupon;
 
 use Thinktomorrow\Trader\Domain\Model\Order\OrderId;
 

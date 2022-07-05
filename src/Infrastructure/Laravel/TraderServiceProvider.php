@@ -13,7 +13,13 @@ use Thinktomorrow\Trader\Application\Cart\Read\CartPayment;
 use Thinktomorrow\Trader\Application\Cart\Read\CartRepository;
 use Thinktomorrow\Trader\Application\Cart\Read\CartShippingAddress;
 use Thinktomorrow\Trader\Application\Cart\Read\CartShopper;
+use Thinktomorrow\Trader\Domain\Model\Promo\Conditions\MinimumAmount;
 use Thinktomorrow\Trader\Application\Cart\VariantForCart\VariantForCart;
+use Thinktomorrow\Trader\Domain\Model\Promo\Discounts\FixedAmountDiscount;
+use Thinktomorrow\Trader\Application\Promo\OrderPromo\OrderDiscountFactory;
+use Thinktomorrow\Trader\Application\Promo\OrderPromo\OrderConditionFactory;
+use Thinktomorrow\Trader\Domain\Model\Promo\Conditions\MinimumLinesQuantity;
+use Thinktomorrow\Trader\Domain\Model\Promo\Discounts\PercentageOffDiscount;
 use Thinktomorrow\Trader\Application\Cart\VariantForCart\VariantForCartRepository;
 use Thinktomorrow\Trader\Application\Common\DataRenderer;
 use Thinktomorrow\Trader\Application\Common\DefaultLocale;
@@ -26,6 +32,8 @@ use Thinktomorrow\Trader\Application\Order\MerchantOrder\MerchantOrderLine;
 use Thinktomorrow\Trader\Application\Order\MerchantOrder\MerchantOrderRepository;
 use Thinktomorrow\Trader\Application\Order\MerchantOrder\MerchantOrderShippingAddress;
 use Thinktomorrow\Trader\Application\Order\MerchantOrder\MerchantOrderShopper;
+use Thinktomorrow\Trader\Application\Promo\OrderPromo\Discounts\FixedAmountOrderDiscount;
+use Thinktomorrow\Trader\Application\Promo\OrderPromo\Conditions\MinimumAmountOrderCondition;
 use Thinktomorrow\Trader\Application\Product\CheckProductOptions\CheckProductOptionsRepository;
 use Thinktomorrow\Trader\Application\Product\Grid\FlattenedTaxonIdsComposer;
 use Thinktomorrow\Trader\Application\Product\Grid\GridItem;
@@ -171,16 +179,35 @@ class TraderServiceProvider extends ServiceProvider
 
         $this->app->bind(ConditionFactory::class, function () {
             return new ConditionFactory([
-                MinimumLinesQuantityOrderCondition::class,
+                MinimumLinesQuantity::class,
+                MinimumAmount::class,
             ]);
         });
 
         $this->app->bind(DiscountFactory::class, function ($app) {
             return new DiscountFactory(
                 [
-                PercentageOffOrderDiscount::class,
-            ],
+                    PercentageOffDiscount::class,
+                    FixedAmountDiscount::class,
+                ],
                 $app->get(ConditionFactory::class)
+            );
+        });
+
+        $this->app->bind(OrderConditionFactory::class, function () {
+            return new OrderConditionFactory([
+                MinimumLinesQuantityOrderCondition::class,
+                MinimumAmountOrderCondition::class,
+            ]);
+        });
+
+        $this->app->bind(OrderDiscountFactory::class, function ($app) {
+            return new OrderDiscountFactory(
+                [
+                    PercentageOffOrderDiscount::class,
+                    FixedAmountOrderDiscount::class,
+                ],
+                $app->get(OrderConditionFactory::class)
             );
         });
     }

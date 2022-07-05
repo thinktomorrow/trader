@@ -19,11 +19,11 @@ class DeleteProductTest extends ProductContext
 
         $this->productApplication->deleteProduct(new DeleteProduct($productId->get()));
 
-        $this->expectException(CouldNotFindProduct::class);
-        $this->productRepository->find($productId);
-
         $this->assertEquals([
             new ProductDeleted($productId),
         ], $this->eventDispatcher->releaseDispatchedEvents());
+
+        $this->expectException(CouldNotFindProduct::class);
+        $this->productRepository->find($productId);
     }
 }

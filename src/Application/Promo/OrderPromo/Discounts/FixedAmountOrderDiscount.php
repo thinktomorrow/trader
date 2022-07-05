@@ -9,6 +9,7 @@ use Thinktomorrow\Trader\Domain\Common\Cash\Cash;
 use Thinktomorrow\Trader\Domain\Model\Order\Discount\Discountable;
 use Thinktomorrow\Trader\Domain\Model\Order\Discount\DiscountTotal;
 use Thinktomorrow\Trader\Domain\Model\Order\Order;
+use Thinktomorrow\Trader\Domain\Model\Promo\Discounts\FixedAmountDiscount;
 
 class FixedAmountOrderDiscount extends BaseDiscount implements OrderDiscount
 {
@@ -16,7 +17,7 @@ class FixedAmountOrderDiscount extends BaseDiscount implements OrderDiscount
 
     public static function getMapKey(): string
     {
-        return 'fixed_amount';
+        return FixedAmountDiscount::getMapKey();
     }
 
     public function isApplicable(Order $order, Discountable $discountable): bool
