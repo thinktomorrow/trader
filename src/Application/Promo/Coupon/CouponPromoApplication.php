@@ -4,11 +4,11 @@ declare(strict_types=1);
 namespace Thinktomorrow\Trader\Application\Promo\Coupon;
 
 use Psr\Container\ContainerInterface;
-use Thinktomorrow\Trader\TraderConfig;
-use Thinktomorrow\Trader\Domain\Model\Order\OrderRepository;
-use Thinktomorrow\Trader\Domain\Common\Event\EventDispatcher;
 use Thinktomorrow\Trader\Application\Promo\OrderPromo\ApplyPromoToOrder;
 use Thinktomorrow\Trader\Application\Promo\OrderPromo\OrderPromoRepository;
+use Thinktomorrow\Trader\Domain\Common\Event\EventDispatcher;
+use Thinktomorrow\Trader\Domain\Model\Order\OrderRepository;
+use Thinktomorrow\Trader\TraderConfig;
 
 final class CouponPromoApplication
 {

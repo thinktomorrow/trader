@@ -16,7 +16,7 @@ class DeletePromoTest extends PromoContext
     public function it_can_delete_a_promo()
     {
         $promo = $this->createPromo([], [
-            $this->createDiscount([], [$this->createCondition()])
+            $this->createDiscount([], [$this->createCondition()]),
         ]);
         $this->promoRepository->save($promo);
 

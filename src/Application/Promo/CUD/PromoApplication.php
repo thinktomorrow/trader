@@ -3,13 +3,13 @@ declare(strict_types=1);
 
 namespace Thinktomorrow\Trader\Application\Promo\CUD;
 
-use Thinktomorrow\Trader\TraderConfig;
+use Thinktomorrow\Trader\Domain\Common\Event\EventDispatcher;
+use Thinktomorrow\Trader\Domain\Model\Promo\DiscountFactory;
+use Thinktomorrow\Trader\Domain\Model\Promo\Events\PromoDeleted;
 use Thinktomorrow\Trader\Domain\Model\Promo\Promo;
 use Thinktomorrow\Trader\Domain\Model\Promo\PromoId;
 use Thinktomorrow\Trader\Domain\Model\Promo\PromoRepository;
-use Thinktomorrow\Trader\Domain\Model\Promo\DiscountFactory;
-use Thinktomorrow\Trader\Domain\Common\Event\EventDispatcher;
-use Thinktomorrow\Trader\Domain\Model\Promo\Events\PromoDeleted;
+use Thinktomorrow\Trader\TraderConfig;
 
 class PromoApplication
 {
@@ -52,13 +52,12 @@ class PromoApplication
         $promo->addData($command->getData());
 
         $discounts = [];
-        foreach($command->getDiscounts() as $commandDiscount) {
-
+        foreach ($command->getDiscounts() as $commandDiscount) {
             $discountId = $commandDiscount->getDiscountId() ?: $this->promoRepository->nextDiscountReference();
 
             // Conditions ...
             $conditionStates = [];
-            foreach($commandDiscount->getConditions() as $conditionPayload) {
+            foreach ($commandDiscount->getConditions() as $conditionPayload) {
                 $conditionStates[] = [
                     'key' => $conditionPayload->getMapKey(),
                     'data' => json_encode($conditionPayload->getData()),
@@ -70,7 +69,7 @@ class PromoApplication
                 [
                     'promo_id' => $promo->promoId->get(),
                     'discount_id' => $discountId->get(),
-                    'data' => json_encode($commandDiscount->getData())
+                    'data' => json_encode($commandDiscount->getData()),
                 ],
                 $promo->getMappedData(),
                 $conditionStates

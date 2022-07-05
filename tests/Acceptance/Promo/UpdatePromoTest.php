@@ -3,11 +3,11 @@ declare(strict_types=1);
 
 namespace Tests\Acceptance\Promo;
 
-use Thinktomorrow\Trader\Domain\Model\Promo\PromoId;
-use Thinktomorrow\Trader\Application\Promo\CUD\UpdatePromo;
 use Thinktomorrow\Trader\Application\Promo\CUD\CreateCouponPromo;
-use Thinktomorrow\Trader\Domain\Model\Promo\Discounts\FixedAmountDiscount;
+use Thinktomorrow\Trader\Application\Promo\CUD\UpdatePromo;
 use Thinktomorrow\Trader\Domain\Model\Promo\Conditions\MinimumLinesQuantity;
+use Thinktomorrow\Trader\Domain\Model\Promo\Discounts\FixedAmountDiscount;
+use Thinktomorrow\Trader\Domain\Model\Promo\PromoId;
 
 class UpdatePromoTest extends PromoContext
 {
@@ -29,12 +29,12 @@ class UpdatePromoTest extends PromoContext
                     'conditions' => [],
                     'data' => [
                         'amount' => '50',
-                        'foo' => 'bar'
+                        'foo' => 'bar',
                     ],
                 ],
             ],
             [
-                'poo' => 'bar'
+                'poo' => 'bar',
             ]
         ));
 
@@ -75,12 +75,12 @@ class UpdatePromoTest extends PromoContext
                     ],
                     'data' => [
                         'amount' => '50',
-                        'foo' => 'bar'
+                        'foo' => 'bar',
                     ],
                 ],
             ],
             [
-                'poo' => 'bar'
+                'poo' => 'bar',
             ]
         ));
 
@@ -101,7 +101,7 @@ class UpdatePromoTest extends PromoContext
             '2023-02-02 01:10:10',
             false,
             [
-                'foo' => 'bar'
+                'foo' => 'bar',
             ]
         ));
     }

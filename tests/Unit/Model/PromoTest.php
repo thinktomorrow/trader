@@ -18,7 +18,7 @@ final class PromoTest extends TestCase
     /** @test */
     public function it_can_create_a_promo()
     {
-        $promo = Promo::create(PromoId::fromString('xxx'), 'foobar',\DateTime::createFromFormat('Y-m-d H:i:s', '2022-02-02 10:10:10'), \DateTime::createFromFormat('Y-m-d H:i:s', '2023-02-02 10:10:10'), false);
+        $promo = Promo::create(PromoId::fromString('xxx'), 'foobar', \DateTime::createFromFormat('Y-m-d H:i:s', '2022-02-02 10:10:10'), \DateTime::createFromFormat('Y-m-d H:i:s', '2023-02-02 10:10:10'), false);
 
         $this->assertEquals([
             'promo_id' => 'xxx',
@@ -111,7 +111,7 @@ final class PromoTest extends TestCase
     /** @test */
     public function it_can_update_discounts()
     {
-        $promo = Promo::create(PromoId::fromString('xxx'), 'foobar',\DateTime::createFromFormat('Y-m-d H:i:s', '2022-02-02 10:10:10'), \DateTime::createFromFormat('Y-m-d H:i:s', '2023-02-02 10:10:10'), false);
+        $promo = Promo::create(PromoId::fromString('xxx'), 'foobar', \DateTime::createFromFormat('Y-m-d H:i:s', '2022-02-02 10:10:10'), \DateTime::createFromFormat('Y-m-d H:i:s', '2023-02-02 10:10:10'), false);
 
         $promo->updateDiscounts([
             $this->createDiscount(),
@@ -133,7 +133,7 @@ final class PromoTest extends TestCase
     /** @test */
     public function it_can_update_state()
     {
-        $promo = Promo::create(PromoId::fromString('xxx'), 'foobar',\DateTime::createFromFormat('Y-m-d H:i:s', '2022-02-02 10:10:10'), \DateTime::createFromFormat('Y-m-d H:i:s', '2023-02-02 10:10:10'), false);
+        $promo = Promo::create(PromoId::fromString('xxx'), 'foobar', \DateTime::createFromFormat('Y-m-d H:i:s', '2022-02-02 10:10:10'), \DateTime::createFromFormat('Y-m-d H:i:s', '2023-02-02 10:10:10'), false);
 
         $promo->updateState(PromoState::archived);
 
@@ -143,7 +143,7 @@ final class PromoTest extends TestCase
     /** @test */
     public function it_can_delete_discount()
     {
-        $promo = Promo::create(PromoId::fromString('xxx'), 'foobar',\DateTime::createFromFormat('Y-m-d H:i:s', '2022-02-02 10:10:10'), \DateTime::createFromFormat('Y-m-d H:i:s', '2023-02-02 10:10:10'), false);
+        $promo = Promo::create(PromoId::fromString('xxx'), 'foobar', \DateTime::createFromFormat('Y-m-d H:i:s', '2022-02-02 10:10:10'), \DateTime::createFromFormat('Y-m-d H:i:s', '2023-02-02 10:10:10'), false);
 
         $promo->updateDiscounts([
             $this->createDiscount(),

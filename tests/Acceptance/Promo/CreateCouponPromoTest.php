@@ -3,9 +3,8 @@ declare(strict_types=1);
 
 namespace Tests\Acceptance\Promo;
 
-use Thinktomorrow\Trader\Domain\Model\Promo\PromoId;
-use Thinktomorrow\Trader\Application\Promo\CUD\UpdateDiscounts;
 use Thinktomorrow\Trader\Application\Promo\CUD\CreateCouponPromo;
+use Thinktomorrow\Trader\Domain\Model\Promo\PromoId;
 
 class CreateCouponPromoTest extends PromoContext
 {
@@ -18,7 +17,7 @@ class CreateCouponPromoTest extends PromoContext
             '2023-02-02 01:10:10',
             false,
             [
-                'foo' => 'bar'
+                'foo' => 'bar',
             ]
         ));
 

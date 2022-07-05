@@ -5,9 +5,9 @@ namespace Tests\Acceptance\Promo;
 
 use Money\Money;
 use Tests\Acceptance\Cart\CartContext;
-use Thinktomorrow\Trader\Domain\Common\Cash\Cash;
-use Thinktomorrow\Trader\Application\Promo\Coupon\EnterCoupon;
 use Thinktomorrow\Trader\Application\Cart\RefreshCart\RefreshCart;
+use Thinktomorrow\Trader\Application\Promo\Coupon\EnterCoupon;
+use Thinktomorrow\Trader\Domain\Common\Cash\Cash;
 
 class OrderPromoTest extends CartContext
 {
