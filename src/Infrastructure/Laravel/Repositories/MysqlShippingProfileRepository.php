@@ -4,17 +4,17 @@ declare(strict_types=1);
 namespace Thinktomorrow\Trader\Infrastructure\Laravel\Repositories;
 
 use Illuminate\Support\Facades\DB;
-use Ramsey\Uuid\Uuid;
 use Psr\Container\ContainerInterface;
-use Thinktomorrow\Trader\Application\Country\ShippingCountryRepository;
-use Thinktomorrow\Trader\Domain\Model\Country\CountryId;
-use Thinktomorrow\Trader\Domain\Model\ShippingProfile\ShippingProfileState;
+use Ramsey\Uuid\Uuid;
 use Thinktomorrow\Trader\Application\Cart\ShippingProfile\ShippingProfileForCart;
 use Thinktomorrow\Trader\Application\Cart\ShippingProfile\ShippingProfileForCartRepository;
+use Thinktomorrow\Trader\Application\Country\ShippingCountryRepository;
+use Thinktomorrow\Trader\Domain\Model\Country\CountryId;
 use Thinktomorrow\Trader\Domain\Model\ShippingProfile\Exceptions\CouldNotFindShippingProfile;
 use Thinktomorrow\Trader\Domain\Model\ShippingProfile\ShippingProfile;
 use Thinktomorrow\Trader\Domain\Model\ShippingProfile\ShippingProfileId;
 use Thinktomorrow\Trader\Domain\Model\ShippingProfile\ShippingProfileRepository;
+use Thinktomorrow\Trader\Domain\Model\ShippingProfile\ShippingProfileState;
 use Thinktomorrow\Trader\Domain\Model\ShippingProfile\Tariff;
 use Thinktomorrow\Trader\Domain\Model\ShippingProfile\TariffId;
 
@@ -102,7 +102,7 @@ class MysqlShippingProfileRepository implements ShippingProfileRepository, Shipp
 
 
         return ShippingProfile::fromMappedData(array_merge((array)$shippingProfileState, [
-            'requires_address' => (bool) $shippingProfileState->requires_address
+            'requires_address' => (bool) $shippingProfileState->requires_address,
         ]), [
             Tariff::class => $tariffStates,
             CountryId::class => $countryStates,
@@ -144,7 +144,7 @@ class MysqlShippingProfileRepository implements ShippingProfileRepository, Shipp
         return DB::table(static::$shippingProfileTable)
             ->whereIn('state', ShippingProfileState::onlineStates())
             ->get()
-            ->map(fn($shippingProfileState) => $this->container->get(ShippingProfileForCart::class)::fromMappedData((array) $shippingProfileState))
+            ->map(fn ($shippingProfileState) => $this->container->get(ShippingProfileForCart::class)::fromMappedData((array) $shippingProfileState))
             ->toArray();
     }
 }
