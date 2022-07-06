@@ -5,8 +5,8 @@ namespace Thinktomorrow\Trader\Application\ShippingProfile;
 
 use Money\Money;
 use Thinktomorrow\Trader\Domain\Common\Cash\Cash;
-use Thinktomorrow\Trader\Domain\Model\ShippingProfile\TariffId;
 use Thinktomorrow\Trader\Domain\Model\ShippingProfile\ShippingProfileId;
+use Thinktomorrow\Trader\Domain\Model\ShippingProfile\TariffId;
 
 class UpdateTariff
 {

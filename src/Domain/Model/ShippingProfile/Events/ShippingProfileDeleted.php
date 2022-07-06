@@ -9,6 +9,5 @@ class ShippingProfileDeleted
 {
     public function __construct(public readonly ShippingProfileId $shippingProfileId)
     {
-
     }
 }

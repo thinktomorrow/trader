@@ -4,12 +4,12 @@ declare(strict_types=1);
 namespace Tests\Acceptance\ShippingProfile;
 
 use Tests\TestHelpers;
-use Thinktomorrow\Trader\Application\ShippingProfile\CreateTariff;
-use Thinktomorrow\Trader\Application\ShippingProfile\DeleteTariff;
 use Thinktomorrow\Trader\Application\ShippingProfile\CreateShippingProfile;
+use Thinktomorrow\Trader\Application\ShippingProfile\CreateTariff;
 use Thinktomorrow\Trader\Application\ShippingProfile\DeleteShippingProfile;
-use Thinktomorrow\Trader\Domain\Model\ShippingProfile\Events\TariffDeleted;
+use Thinktomorrow\Trader\Application\ShippingProfile\DeleteTariff;
 use Thinktomorrow\Trader\Domain\Model\ShippingProfile\Events\ShippingProfileDeleted;
+use Thinktomorrow\Trader\Domain\Model\ShippingProfile\Events\TariffDeleted;
 use Thinktomorrow\Trader\Domain\Model\ShippingProfile\Exceptions\CouldNotFindShippingProfile;
 
 class DeleteShippingProfileTest extends ShippingProfileContext

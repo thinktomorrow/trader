@@ -3,7 +3,6 @@ declare(strict_types=1);
 
 namespace Thinktomorrow\Trader\Infrastructure\Test\Repositories;
 
-use Thinktomorrow\Trader\Domain\Model\ShippingProfile\TariffId;
 use Thinktomorrow\Trader\Application\Cart\RefreshCart\Adjusters\FindSuitableShippingProfile;
 use Thinktomorrow\Trader\Application\Country\ShippingCountryRepository;
 use Thinktomorrow\Trader\Domain\Common\Price\ConvertsToMoney;
@@ -13,6 +12,7 @@ use Thinktomorrow\Trader\Domain\Model\ShippingProfile\Exceptions\CouldNotFindShi
 use Thinktomorrow\Trader\Domain\Model\ShippingProfile\ShippingProfile;
 use Thinktomorrow\Trader\Domain\Model\ShippingProfile\ShippingProfileId;
 use Thinktomorrow\Trader\Domain\Model\ShippingProfile\ShippingProfileRepository;
+use Thinktomorrow\Trader\Domain\Model\ShippingProfile\TariffId;
 
 final class InMemoryShippingProfileRepository implements ShippingProfileRepository, ShippingCountryRepository, FindSuitableShippingProfile
 {

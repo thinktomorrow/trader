@@ -26,7 +26,7 @@ class UpdateShippingProfile
 
     public function getCountryIds(): array
     {
-        return array_map(fn($country) => CountryId::fromString($country), $this->countryIds);
+        return array_map(fn ($country) => CountryId::fromString($country), $this->countryIds);
     }
 
     public function getData(): array
