@@ -10,6 +10,7 @@ use Thinktomorrow\Trader\Domain\Model\ShippingProfile\TariffId;
 use Thinktomorrow\Trader\Domain\Model\ShippingProfile\ShippingProfile;
 use Thinktomorrow\Trader\Domain\Model\ShippingProfile\ShippingProfileId;
 use Thinktomorrow\Trader\Domain\Model\ShippingProfile\Tariff;
+use Thinktomorrow\Trader\Domain\Model\ShippingProfile\ShippingProfileState;
 
 class ShippingProfileTest extends TestCase
 {
@@ -22,6 +23,7 @@ class ShippingProfileTest extends TestCase
 
         $this->assertEquals([
             'shipping_profile_id' => $shippingProfileId->get(),
+            'state' => ShippingProfileState::online->value,
             'data' => "[]",
         ], $shippingProfile->getMappedData());
 
@@ -37,6 +39,7 @@ class ShippingProfileTest extends TestCase
         $shippingProfile = $this->createdShippingProfile();
 
         $this->assertEquals(ShippingProfileId::fromString('yyy'), $shippingProfile->shippingProfileId);
+        $this->assertEquals(ShippingProfileState::offline, $shippingProfile->getState());
         $this->assertEquals('bar', $shippingProfile->getData('foo'));
         $this->assertCount(2, $shippingProfile->getChildEntities()[Tariff::class]);
         $this->assertEquals([
@@ -117,6 +120,7 @@ class ShippingProfileTest extends TestCase
     {
         return ShippingProfile::fromMappedData([
             'shipping_profile_id' => 'yyy',
+            'state' => ShippingProfileState::offline->value,
             'data' => json_encode(['foo' => 'bar']),
         ], [
             Tariff::class => [

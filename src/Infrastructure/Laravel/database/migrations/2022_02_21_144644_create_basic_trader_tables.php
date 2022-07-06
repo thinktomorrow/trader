@@ -120,6 +120,7 @@ class CreateBasicTraderTables extends Migration
         Schema::create(static::PREFIX.'shipping_profiles', function (Blueprint $table) {
             $table->char('shipping_profile_id', 36)->primary();
             $table->json('data')->nullable();
+            $table->string('state')->default(\Thinktomorrow\Trader\Domain\Model\ShippingProfile\ShippingProfileState::online->value);
             $table->boolean('active')->default(1);
             $table->unsignedInteger('order_column')->default(0);
         });

@@ -18,6 +18,7 @@ use Thinktomorrow\Trader\Domain\Model\Customer\Customer;
 use Thinktomorrow\Trader\Domain\Model\Customer\CustomerId;
 use Thinktomorrow\Trader\Domain\Model\Customer\CustomerRepository;
 use Thinktomorrow\Trader\Domain\Model\CustomerLogin\CustomerLogin;
+use Thinktomorrow\Trader\Domain\Model\ShippingProfile\ShippingProfileState;
 use Thinktomorrow\Trader\Domain\Model\CustomerLogin\CustomerLoginRepository;
 use Thinktomorrow\Trader\Domain\Model\Order\Address\BillingAddress;
 use Thinktomorrow\Trader\Domain\Model\Order\Address\ShippingAddress;
@@ -198,6 +199,7 @@ trait TestHelpers
     {
         return ShippingProfile::fromMappedData(array_merge([
             'shipping_profile_id' => 'sss',
+            'state' => ShippingProfileState::online->value,
             'data' => json_encode([]),
         ], $values), [
             Tariff::class => [],

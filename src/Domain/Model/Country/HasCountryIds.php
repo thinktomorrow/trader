@@ -4,7 +4,7 @@ namespace Thinktomorrow\Trader\Domain\Model\Country;
 
 use Assert\Assertion;
 
-trait HasCountries
+trait HasCountryIds
 {
     /** @var CountryId[] */
     protected array $countryIds = [];

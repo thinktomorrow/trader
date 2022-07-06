@@ -10,16 +10,17 @@ use Thinktomorrow\Trader\Domain\Common\Event\RecordsEvents;
 use Thinktomorrow\Trader\Domain\Common\Price\Price;
 use Thinktomorrow\Trader\Domain\Common\Price\PriceTotal;
 use Thinktomorrow\Trader\Domain\Model\Country\CountryId;
-use Thinktomorrow\Trader\Domain\Model\Country\HasCountries;
+use Thinktomorrow\Trader\Domain\Model\Country\HasCountryIds;
 use Thinktomorrow\Trader\Domain\Model\ShippingProfile\Events\TariffDeleted;
 
 final class ShippingProfile implements Aggregate
 {
     use RecordsEvents;
-    use HasCountries;
+    use HasCountryIds;
     use HasData;
 
     public readonly ShippingProfileId $shippingProfileId;
+    private ShippingProfileState $state;
 
     /** @var Tariff[] */
     private array $tariffs = [];
@@ -28,8 +29,19 @@ final class ShippingProfile implements Aggregate
     {
         $shipping = new static();
         $shipping->shippingProfileId = $shippingProfileId;
+        $shipping->state = ShippingProfileState::online;
 
         return $shipping;
+    }
+
+    public function updateState(ShippingProfileState $state): void
+    {
+        $this->state = $state;
+    }
+
+    public function getState(): ShippingProfileState
+    {
+        return $this->state;
     }
 
     public function getTariffs(): array
@@ -80,6 +92,7 @@ final class ShippingProfile implements Aggregate
     {
         return [
             'shipping_profile_id' => $this->shippingProfileId->get(),
+            'state' => $this->state->value,
             'data' => json_encode($this->data),
         ];
     }
@@ -96,6 +109,7 @@ final class ShippingProfile implements Aggregate
     {
         $shipping = new static();
         $shipping->shippingProfileId = ShippingProfileId::fromString($state['shipping_profile_id']);
+        $shipping->state = ShippingProfileState::from($state['state']);
         $shipping->data = json_decode($state['data'], true);
 
         $shipping->tariffs = array_map(fn ($tariffState) => Tariff::fromMappedData($tariffState, $state), $childEntities[Tariff::class]);
