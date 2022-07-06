@@ -16,7 +16,6 @@ class CreateTariff
 
     public function __construct(string $shippingProfileId, string $rate, string $from, ?string $to)
     {
-
         $this->shippingProfileId = $shippingProfileId;
         $this->rate = $rate;
         $this->from = $from;

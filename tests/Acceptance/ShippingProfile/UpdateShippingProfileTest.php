@@ -4,14 +4,11 @@ declare(strict_types=1);
 namespace Tests\Acceptance\ShippingProfile;
 
 use Money\Money;
-use Thinktomorrow\Trader\Domain\Model\Country\CountryId;
-use Thinktomorrow\Trader\Domain\Model\ShippingProfile\Tariff;
-use Thinktomorrow\Trader\Domain\Model\ShippingProfile\TariffId;
-use Thinktomorrow\Trader\Application\ShippingProfile\CreateTariff;
-use Thinktomorrow\Trader\Application\ShippingProfile\UpdateTariff;
-use Thinktomorrow\Trader\Domain\Model\ShippingProfile\ShippingProfileId;
 use Thinktomorrow\Trader\Application\ShippingProfile\CreateShippingProfile;
+use Thinktomorrow\Trader\Application\ShippingProfile\CreateTariff;
 use Thinktomorrow\Trader\Application\ShippingProfile\UpdateShippingProfile;
+use Thinktomorrow\Trader\Application\ShippingProfile\UpdateTariff;
+use Thinktomorrow\Trader\Domain\Model\Country\CountryId;
 
 class UpdateShippingProfileTest extends ShippingProfileContext
 {
@@ -45,7 +42,7 @@ class UpdateShippingProfileTest extends ShippingProfileContext
 
         $tariffId = $this->shippingProfileApplication->createTariff(new CreateTariff($shippingProfileId->get(), '50', '10', '30'));
 
-        $this->shippingProfileApplication->updateTariff(new UpdateTariff($tariffId->get(), $shippingProfileId->get(),'60', '20', null));
+        $this->shippingProfileApplication->updateTariff(new UpdateTariff($tariffId->get(), $shippingProfileId->get(), '60', '20', null));
 
         $tariff = $this->shippingProfileRepository->find($shippingProfileId)->findTariff($tariffId);
 

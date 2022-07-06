@@ -4,10 +4,9 @@ declare(strict_types=1);
 namespace Tests\Acceptance\ShippingProfile;
 
 use Tests\Acceptance\TestCase;
-use Thinktomorrow\Trader\Infrastructure\Test\EventDispatcherSpy;
 use Thinktomorrow\Trader\Application\ShippingProfile\ShippingProfileApplication;
+use Thinktomorrow\Trader\Infrastructure\Test\EventDispatcherSpy;
 use Thinktomorrow\Trader\Infrastructure\Test\Repositories\InMemoryShippingProfileRepository;
-
 
 class ShippingProfileContext extends TestCase
 {
