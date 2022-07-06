@@ -3,11 +3,10 @@ declare(strict_types=1);
 
 namespace Tests\Acceptance\Promo\Conditions;
 
-use Tests\TestHelpers;
 use Tests\Acceptance\Promo\PromoContext;
-use Thinktomorrow\Trader\Domain\Model\Promo\Conditions\MinimumAmount;
-use Thinktomorrow\Trader\Application\Promo\OrderPromo\OrderConditionFactory;
+use Tests\TestHelpers;
 use Thinktomorrow\Trader\Application\Promo\OrderPromo\Conditions\MinimumAmountOrderCondition;
+use Thinktomorrow\Trader\Application\Promo\OrderPromo\OrderConditionFactory;
 
 class MinimumAmountConditionTest extends PromoContext
 {

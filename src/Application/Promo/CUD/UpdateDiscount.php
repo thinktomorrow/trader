@@ -33,7 +33,7 @@ class UpdateDiscount
     /** @return UpdateCondition[] */
     public function getConditions(): array
     {
-        return array_map(fn(array $conditionPayload) => new UpdateCondition(...$conditionPayload), $this->conditions);
+        return array_map(fn (array $conditionPayload) => new UpdateCondition(...$conditionPayload), $this->conditions);
     }
 
     public function getData(): array

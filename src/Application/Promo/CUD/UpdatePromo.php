@@ -54,7 +54,7 @@ class UpdatePromo
     /** @return UpdateDiscount[] */
     public function getDiscounts(): array
     {
-        return array_map(fn(array $discountPayload) => new UpdateDiscount(...$discountPayload), $this->discounts);
+        return array_map(fn (array $discountPayload) => new UpdateDiscount(...$discountPayload), $this->discounts);
     }
 
     public function getData(): array
