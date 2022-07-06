@@ -6,6 +6,7 @@ namespace Thinktomorrow\Trader\Infrastructure\Laravel;
 use Illuminate\Support\Arr;
 use Illuminate\Support\ServiceProvider;
 use Thinktomorrow\Trader\Application\Cart\Read\Cart;
+use Thinktomorrow\Trader\Application\Cart\Read\CartShipping;
 use Thinktomorrow\Trader\Application\Cart\Read\CartBillingAddress;
 use Thinktomorrow\Trader\Application\Cart\Read\CartDiscount;
 use Thinktomorrow\Trader\Application\Cart\Read\CartLine;
@@ -14,6 +15,8 @@ use Thinktomorrow\Trader\Application\Cart\Read\CartRepository;
 use Thinktomorrow\Trader\Application\Cart\Read\CartShippingAddress;
 use Thinktomorrow\Trader\Application\Cart\Read\CartShopper;
 use Thinktomorrow\Trader\Application\Cart\VariantForCart\VariantForCart;
+use Thinktomorrow\Trader\Infrastructure\Laravel\Models\Cart\DefaultCartShipping;
+use Thinktomorrow\Trader\Application\Cart\ShippingProfile\ShippingProfileForCart;
 use Thinktomorrow\Trader\Application\Cart\VariantForCart\VariantForCartRepository;
 use Thinktomorrow\Trader\Application\Common\DataRenderer;
 use Thinktomorrow\Trader\Application\Common\DefaultLocale;
@@ -24,8 +27,10 @@ use Thinktomorrow\Trader\Application\Order\MerchantOrder\MerchantOrderBillingAdd
 use Thinktomorrow\Trader\Application\Order\MerchantOrder\MerchantOrderDiscount;
 use Thinktomorrow\Trader\Application\Order\MerchantOrder\MerchantOrderLine;
 use Thinktomorrow\Trader\Application\Order\MerchantOrder\MerchantOrderRepository;
+use Thinktomorrow\Trader\Infrastructure\Laravel\Models\DefaultShippingProfileForCart;
 use Thinktomorrow\Trader\Application\Order\MerchantOrder\MerchantOrderShippingAddress;
 use Thinktomorrow\Trader\Application\Order\MerchantOrder\MerchantOrderShopper;
+use Thinktomorrow\Trader\Application\Cart\ShippingProfile\ShippingProfileForCartRepository;
 use Thinktomorrow\Trader\Application\Product\CheckProductOptions\CheckProductOptionsRepository;
 use Thinktomorrow\Trader\Application\Product\Grid\FlattenedTaxonIdsComposer;
 use Thinktomorrow\Trader\Application\Product\Grid\GridItem;
@@ -137,6 +142,10 @@ class TraderServiceProvider extends ServiceProvider
             return DefaultVariantForCart::class;
         });
 
+        $this->app->bind(ShippingProfileForCart::class, function(){
+            return DefaultShippingProfileForCart::class;
+        });
+
         // Taxon
         $this->app->bind(TaxonRepository::class, MysqlTaxonRepository::class);
         $this->app->bind(TaxonTreeRepository::class, MysqlTaxonTreeRepository::class);
@@ -157,6 +166,7 @@ class TraderServiceProvider extends ServiceProvider
 
         // Cart
         $this->app->bind(CartRepository::class, MysqlCartRepository::class);
+        $this->app->bind(ShippingProfileForCartRepository::class, MysqlShippingProfileRepository::class);
         $this->app->bind(Cart::class, DefaultCart::class);
         $this->app->bind(CartLine::class, DefaultCartLine::class);
         $this->app->bind(CartDiscount::class, DefaultCartDiscount::class);
@@ -164,6 +174,7 @@ class TraderServiceProvider extends ServiceProvider
         $this->app->bind(CartBillingAddress::class, DefaultCartBillingAddress::class);
         $this->app->bind(CartShopper::class, DefaultCartShopper::class);
         $this->app->bind(CartPayment::class, DefaultCartPayment::class);
+        $this->app->bind(CartShipping::class, DefaultCartShipping::class);
 
         // MerchantOrder
         $this->app->bind(MerchantOrderRepository::class, MysqlMerchantOrderRepository::class);

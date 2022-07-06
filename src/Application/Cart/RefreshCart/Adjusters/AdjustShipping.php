@@ -4,46 +4,26 @@ declare(strict_types=1);
 namespace Thinktomorrow\Trader\Application\Cart\RefreshCart\Adjusters;
 
 use Thinktomorrow\Trader\Application\Cart\RefreshCart\Adjuster;
-use Thinktomorrow\Trader\Domain\Model\Order\Address\ShippingCountry;
 use Thinktomorrow\Trader\Domain\Model\Order\Order;
+use Thinktomorrow\Trader\Application\Cart\ShippingProfile\UpdateShippingProfileOnOrder;
+use Thinktomorrow\Trader\Application\Cart\ShippingProfile\ShippingProfileForCartRepository;
 
 final class AdjustShipping implements Adjuster
 {
-    private FindSuitableShippingProfile $shippingRepository;
+    private UpdateShippingProfileOnOrder $updateShippingProfileOnOrder;
 
-    public function __construct(FindSuitableShippingProfile $shippingRepository)
+    public function __construct(UpdateShippingProfileOnOrder $updateShippingProfileOnOrder)
     {
-        $this->shippingRepository = $shippingRepository;
+        $this->updateShippingProfileOnOrder = $updateShippingProfileOnOrder;
     }
 
     public function adjust(Order $order): void
     {
-        dd('Adjustshipping: ', $order);
-        // Repo to check if shipping for order already exists...
-        // else create it
+        // No shipping profile selected yet...
+        if(count($order->getShippings()) < 1) return;
 
-        // Check if shippingType (with rule) is still applicable - else remove shipping?
-        // check if cost is still ok or should be adjusted (due to discounts, customer perks or anything)
+        $shippingProfileId = $order->getShippings()[0]->getShippingProfileId();
 
-        // save changes to shipping
-
-        // If shippingId is no longer the same, update order as well
-
-        if (! $order->getShippingId()) {
-            return;
-        }
-
-        $shippingCountry = ShippingCountry::fromString(
-            $orderDetails->getShippingAddress()->getCountry() ?? $context->getDefaultShippingCountry()
-        );
-
-        $shipping = $this->shippingRepository->findMatch(
-            $order->getShippingId(),
-            $orderDetails->getSubTotal(),
-            $shippingCountry,
-            $context->getDate(),
-        );
-
-        $order->updateShipping($shipping);
+        $this->updateShippingProfileOnOrder->handle($order, $shippingProfileId);
     }
 }

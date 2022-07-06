@@ -20,17 +20,19 @@ final class ShippingProfile implements Aggregate
 
     public readonly ShippingProfileId $shippingProfileId;
     private ShippingProfileState $state;
+    private bool $requiresAddress;
 
     /** @var Tariff[] */
     private array $tariffs = [];
 
-    public static function create(ShippingProfileId $shippingProfileId): static
+    public static function create(ShippingProfileId $shippingProfileId, bool $requiresAddress): static
     {
-        $shipping = new static();
-        $shipping->shippingProfileId = $shippingProfileId;
-        $shipping->state = ShippingProfileState::online;
+        $shippingProfile = new static();
+        $shippingProfile->shippingProfileId = $shippingProfileId;
+        $shippingProfile->state = ShippingProfileState::online;
+        $shippingProfile->requiresAddress = $requiresAddress;
 
-        return $shipping;
+        return $shippingProfile;
     }
 
     public function updateState(ShippingProfileState $state): void
@@ -41,6 +43,11 @@ final class ShippingProfile implements Aggregate
     public function getState(): ShippingProfileState
     {
         return $this->state;
+    }
+
+    public function requiresAddress(): bool
+    {
+        return $this->requiresAddress;
     }
 
     public function getTariffs(): array
@@ -92,6 +99,7 @@ final class ShippingProfile implements Aggregate
         return [
             'shipping_profile_id' => $this->shippingProfileId->get(),
             'state' => $this->state->value,
+            'requires_address' => $this->requiresAddress,
             'data' => json_encode($this->data),
         ];
     }
@@ -106,14 +114,15 @@ final class ShippingProfile implements Aggregate
 
     public static function fromMappedData(array $state, array $childEntities = []): static
     {
-        $shipping = new static();
-        $shipping->shippingProfileId = ShippingProfileId::fromString($state['shipping_profile_id']);
-        $shipping->state = ShippingProfileState::from($state['state']);
-        $shipping->data = json_decode($state['data'], true);
+        $shippingProfile = new static();
+        $shippingProfile->shippingProfileId = ShippingProfileId::fromString($state['shipping_profile_id']);
+        $shippingProfile->state = ShippingProfileState::from($state['state']);
+        $shippingProfile->requiresAddress = $state['requires_address'];
+        $shippingProfile->data = json_decode($state['data'], true);
 
-        $shipping->tariffs = array_map(fn ($tariffState) => Tariff::fromMappedData($tariffState, $state), $childEntities[Tariff::class]);
-        $shipping->countryIds = array_map(fn ($countryState) => CountryId::fromString($countryState['country_id']), $childEntities[CountryId::class]);
+        $shippingProfile->tariffs = array_map(fn ($tariffState) => Tariff::fromMappedData($tariffState, $state), $childEntities[Tariff::class]);
+        $shippingProfile->countryIds = array_map(fn ($countryState) => CountryId::fromString($countryState['country_id']), $childEntities[CountryId::class]);
 
-        return $shipping;
+        return $shippingProfile;
     }
 }

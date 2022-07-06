@@ -3,6 +3,9 @@ declare(strict_types=1);
 
 namespace Thinktomorrow\Trader\Infrastructure\Test\Repositories;
 
+use Thinktomorrow\Trader\Domain\Model\ShippingProfile\ShippingProfileState;
+use Thinktomorrow\Trader\Infrastructure\Laravel\Models\DefaultShippingProfileForCart;
+use Thinktomorrow\Trader\Application\Cart\ShippingProfile\ShippingProfileForCartRepository;
 use Thinktomorrow\Trader\Application\Cart\RefreshCart\Adjusters\FindSuitableShippingProfile;
 use Thinktomorrow\Trader\Application\Country\ShippingCountryRepository;
 use Thinktomorrow\Trader\Domain\Common\Price\ConvertsToMoney;
@@ -14,8 +17,9 @@ use Thinktomorrow\Trader\Domain\Model\ShippingProfile\ShippingProfileId;
 use Thinktomorrow\Trader\Domain\Model\ShippingProfile\ShippingProfileRepository;
 use Thinktomorrow\Trader\Domain\Model\ShippingProfile\TariffId;
 
-final class InMemoryShippingProfileRepository implements ShippingProfileRepository, ShippingCountryRepository, FindSuitableShippingProfile
+final class InMemoryShippingProfileRepository implements ShippingProfileRepository, ShippingProfileForCartRepository, ShippingCountryRepository, FindSuitableShippingProfile
 {
+    /** @var ShippingProfile[] */
     private static array $shippingProfiles = [];
 
     private string $nextReference = 'sss-123';
@@ -86,5 +90,18 @@ final class InMemoryShippingProfileRepository implements ShippingProfileReposito
     public function nextTariffReference(): TariffId
     {
         return TariffId::fromString($this->nextTariffReference);
+    }
+
+    public function findAllShippingProfilesForCart(): array
+    {
+        $activeProfiles = [];
+
+        foreach (static::$shippingProfiles as $shippingProfile) {
+            if($shippingProfile->getState() == ShippingProfileState::online) {
+                $activeProfiles[] = $shippingProfile;
+            }
+        }
+
+        return array_map(fn($shippingProfile) => DefaultShippingProfileForCart::fromMappedData($shippingProfile->getMappedData()) , $activeProfiles);
     }
 }

@@ -12,6 +12,7 @@ use Thinktomorrow\Trader\Domain\Model\Order\Shipping\ShippingId;
 
 trait HasShippings
 {
+    /** @var Shipping[] */
     private array $shippings = [];
 
     public function addShipping(Shipping $shipping): void

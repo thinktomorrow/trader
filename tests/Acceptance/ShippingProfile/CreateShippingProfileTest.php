@@ -17,12 +17,14 @@ class CreateShippingProfileTest extends ShippingProfileContext
     public function it_can_create_a_shipping_profile()
     {
         $shippingProfileId = $this->shippingProfileApplication->createShippingProfile(new CreateShippingProfile(
+            false,
             ['BE','NL'],
             ['foo' => 'bar']
         ));
 
         $this->assertInstanceOf(ShippingProfileId::class, $shippingProfileId);
         $this->assertEquals($shippingProfileId, $this->shippingProfileRepository->find($shippingProfileId)->shippingProfileId);
+        $this->assertFalse($this->shippingProfileRepository->find($shippingProfileId)->requiresAddress());
         $this->assertEquals([
             CountryId::fromString('BE'),
             CountryId::fromString('NL'),
@@ -34,6 +36,7 @@ class CreateShippingProfileTest extends ShippingProfileContext
     public function it_can_create_a_tariff()
     {
         $shippingProfileId = $this->shippingProfileApplication->createShippingProfile(new CreateShippingProfile(
+            true,
             ['BE','NL'],
             ['foo' => 'bar']
         ));

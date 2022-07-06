@@ -25,6 +25,7 @@ use Thinktomorrow\Trader\Application\Cart\UpdateShippingAddress;
 use Thinktomorrow\Trader\Application\Cart\UpdateShopper;
 use Thinktomorrow\Trader\Application\Promo\Coupon\CouponPromoApplication;
 use Thinktomorrow\Trader\Application\Promo\OrderPromo\ApplyPromoToOrder;
+use Thinktomorrow\Trader\Application\Cart\ShippingProfile\UpdateShippingProfileOnOrder;
 use Thinktomorrow\Trader\Application\Promo\OrderPromo\Discounts\FixedAmountOrderDiscount;
 use Thinktomorrow\Trader\Application\Promo\OrderPromo\Discounts\PercentageOffOrderDiscount;
 use Thinktomorrow\Trader\Application\Promo\OrderPromo\OrderConditionFactory;
@@ -84,6 +85,7 @@ abstract class CartContext extends TestCase
     protected InMemoryPaymentMethodRepository $paymentMethodRepository;
     protected InMemoryCustomerRepository $customerRepository;
     protected InMemoryPromoRepository $promoRepository;
+    protected UpdateShippingProfileOnOrder $updateShippingProfileOnOrder;
 
     protected function setUp(): void
     {
@@ -121,6 +123,7 @@ abstract class CartContext extends TestCase
             $this->orderRepository,
             new RefreshCartAction(),
             $this->shippingProfileRepository = new InMemoryShippingProfileRepository(),
+            $this->updateShippingProfileOnOrder = new UpdateShippingProfileOnOrder(new TestTraderConfig(), $this->orderRepository, $this->shippingProfileRepository),
             $this->paymentMethodRepository = new InMemoryPaymentMethodRepository(),
             $this->customerRepository = new InMemoryCustomerRepository(),
             new EventDispatcherSpy(),
@@ -137,7 +140,7 @@ abstract class CartContext extends TestCase
 
         // Container bindings
         (new TestContainer())->add(AdjustShipping::class, new AdjustShipping(
-            $this->shippingProfileRepository,
+            $this->updateShippingProfileOnOrder,
         ));
 
         // Make sure we start with a clean slate
@@ -193,7 +196,7 @@ abstract class CartContext extends TestCase
 
     public function givenShippingCostsForAPurchaseOfEur($shippingCost, $from, $to, array $countries = ['BE'], string $shippingProfileId = 'bpost_home')
     {
-        $shippingProfile = ShippingProfile::create(ShippingProfileId::fromString($shippingProfileId));
+        $shippingProfile = ShippingProfile::create(ShippingProfileId::fromString($shippingProfileId), true);
         $shippingProfile->addData(['title' => ['nl' => Str::headline($shippingProfileId)]]);
 
         foreach ($countries as $country) {

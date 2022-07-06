@@ -8,6 +8,7 @@ use Thinktomorrow\Trader\Application\Cart\Line\AddLine;
 use Thinktomorrow\Trader\Application\Cart\Line\AddLineToNewOrder;
 use Thinktomorrow\Trader\Application\Cart\Line\ChangeLineQuantity;
 use Thinktomorrow\Trader\Application\Cart\Line\RemoveLine;
+use Thinktomorrow\Trader\Application\Cart\RefreshCart\Adjusters\AdjustShipping;
 use Thinktomorrow\Trader\Application\Cart\RefreshCart\Adjusters\AdjustDiscounts;
 use Thinktomorrow\Trader\Application\Cart\RefreshCart\Adjusters\AdjustLines;
 use Thinktomorrow\Trader\Application\Cart\RefreshCart\RefreshCart;
@@ -29,6 +30,7 @@ use Thinktomorrow\Trader\Domain\Model\Order\Shipping\Shipping;
 use Thinktomorrow\Trader\Domain\Model\Order\Shipping\ShippingCost;
 use Thinktomorrow\Trader\Domain\Model\Order\Shopper;
 use Thinktomorrow\Trader\Domain\Model\PaymentMethod\PaymentMethodRepository;
+use Thinktomorrow\Trader\Application\Cart\ShippingProfile\UpdateShippingProfileOnOrder;
 use Thinktomorrow\Trader\Domain\Model\ShippingProfile\Exceptions\CouldNotSelectShippingProfileDueToMissingShippingCountry;
 use Thinktomorrow\Trader\Domain\Model\ShippingProfile\Exceptions\ShippingProfileNotSelectableForCountry;
 use Thinktomorrow\Trader\Domain\Model\ShippingProfile\ShippingProfileRepository;
@@ -45,6 +47,7 @@ final class CartApplication
     private TraderConfig $config;
     private RefreshCartAction $refreshCartAction;
     private ContainerInterface $container;
+    private UpdateShippingProfileOnOrder $updateShippingProfileOnOrder;
 
     public function __construct(
         TraderConfig              $config,
@@ -53,6 +56,7 @@ final class CartApplication
         OrderRepository           $orderRepository,
         RefreshCartAction         $refreshCartAction,
         ShippingProfileRepository $shippingProfileRepository,
+        UpdateShippingProfileOnOrder $updateShippingProfileOnOrder,
         PaymentMethodRepository   $paymentMethodRepository,
         CustomerRepository        $customerRepository,
         EventDispatcher           $eventDispatcher
@@ -61,6 +65,7 @@ final class CartApplication
         $this->orderRepository = $orderRepository;
         $this->shippingProfileRepository = $shippingProfileRepository;
         $this->eventDispatcher = $eventDispatcher;
+        $this->updateShippingProfileOnOrder = $updateShippingProfileOnOrder;
         $this->paymentMethodRepository = $paymentMethodRepository;
         $this->customerRepository = $customerRepository;
         $this->config = $config;
@@ -74,6 +79,7 @@ final class CartApplication
 
         $this->refreshCartAction->handle($order, [
             $this->container->get(AdjustLines::class),
+            $this->container->get(AdjustShipping::class),
             $this->container->get(AdjustDiscounts::class),
         ]);
 
@@ -220,53 +226,9 @@ final class CartApplication
 
     public function chooseShippingProfile(ChooseShippingProfile $chooseShippingProfile): void
     {
-        $shippingProfile = $this->shippingProfileRepository->find($chooseShippingProfile->getShippingProfileId());
         $order = $this->orderRepository->find($chooseShippingProfile->getOrderId());
 
-        // Country of shipment
-        if (! $shippingCountryId = $order->getShippingAddress()?->getAddress()->countryId) {
-            throw new CouldNotSelectShippingProfileDueToMissingShippingCountry(
-                'Order [' . $order->orderId->get() . '] missing a shipping country that is required when selecting a shipping profile ' . $shippingProfile->shippingProfileId->get()
-            );
-        }
-
-        if (! $shippingProfile->hasCountry($shippingCountryId)) {
-            throw new ShippingProfileNotSelectableForCountry(
-                'Shipping profile ' . $shippingProfile->shippingProfileId->get() . ' is not allowed for country ' . $shippingCountryId->get()
-            );
-        }
-
-        // Find matching shipping tariff
-        $tariff = $shippingProfile->findTariffByPrice($order->getSubtotal(), $this->config->doesPriceInputIncludesVat());
-
-        $shippingCost = ShippingCost::fromMoney(
-            $tariff->getRate(),
-            TaxRate::fromString($this->config->getDefaultTaxRate()),
-            $this->config->doesPriceInputIncludesVat()
-        );
-
-        if (count($order->getShippings()) > 0) {
-            /** @var Shipping $existingShipping */
-            $existingShipping = $order->getShippings()[0];
-            $existingShipping->updateShippingProfile($shippingProfile->shippingProfileId);
-            $existingShipping->updateCost($shippingCost);
-            $existingShipping->addData($shippingProfile->getData());
-
-            $order->updateShipping($existingShipping);
-        } else {
-            $shipping = Shipping::create(
-                $order->orderId,
-                $this->orderRepository->nextShippingReference(),
-                $shippingProfile->shippingProfileId,
-                $shippingCost
-            );
-
-            $shipping->addData($shippingProfile->getData());
-
-            $order->addShipping($shipping);
-        }
-
-        // TODO: Maybe do the refresh-cart here? before the save.
+        $this->updateShippingProfileOnOrder->handle($order, $chooseShippingProfile->getShippingProfileId());
 
         $this->orderRepository->save($order);
 

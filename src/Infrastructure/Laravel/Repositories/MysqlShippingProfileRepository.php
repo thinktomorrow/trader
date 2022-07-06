@@ -5,8 +5,12 @@ namespace Thinktomorrow\Trader\Infrastructure\Laravel\Repositories;
 
 use Illuminate\Support\Facades\DB;
 use Ramsey\Uuid\Uuid;
+use Psr\Container\ContainerInterface;
 use Thinktomorrow\Trader\Application\Country\ShippingCountryRepository;
 use Thinktomorrow\Trader\Domain\Model\Country\CountryId;
+use Thinktomorrow\Trader\Domain\Model\ShippingProfile\ShippingProfileState;
+use Thinktomorrow\Trader\Application\Cart\ShippingProfile\ShippingProfileForCart;
+use Thinktomorrow\Trader\Application\Cart\ShippingProfile\ShippingProfileForCartRepository;
 use Thinktomorrow\Trader\Domain\Model\ShippingProfile\Exceptions\CouldNotFindShippingProfile;
 use Thinktomorrow\Trader\Domain\Model\ShippingProfile\ShippingProfile;
 use Thinktomorrow\Trader\Domain\Model\ShippingProfile\ShippingProfileId;
@@ -14,12 +18,19 @@ use Thinktomorrow\Trader\Domain\Model\ShippingProfile\ShippingProfileRepository;
 use Thinktomorrow\Trader\Domain\Model\ShippingProfile\Tariff;
 use Thinktomorrow\Trader\Domain\Model\ShippingProfile\TariffId;
 
-class MysqlShippingProfileRepository implements ShippingProfileRepository, ShippingCountryRepository
+class MysqlShippingProfileRepository implements ShippingProfileRepository, ShippingProfileForCartRepository, ShippingCountryRepository
 {
     private static $shippingProfileTable = 'trader_shipping_profiles';
     private static $shippingProfileTariffTable = 'trader_shipping_profile_tariffs';
     private static $shippingProfileCountryTable = 'trader_shipping_profile_countries';
     private static $countryTable = 'trader_countries';
+
+    private ContainerInterface $container;
+
+    public function __construct(ContainerInterface $container)
+    {
+        $this->container = $container;
+    }
 
     public function save(ShippingProfile $shippingProfile): void
     {
@@ -88,7 +99,11 @@ class MysqlShippingProfileRepository implements ShippingProfileRepository, Shipp
             ->map(fn ($item) => (array)$item)
             ->toArray();
 
-        return ShippingProfile::fromMappedData((array)$shippingProfileState, [
+
+
+        return ShippingProfile::fromMappedData(array_merge((array)$shippingProfileState, [
+            'requires_address' => (bool) $shippingProfileState->requires_address
+        ]), [
             Tariff::class => $tariffStates,
             CountryId::class => $countryStates,
         ]);
@@ -122,5 +137,14 @@ class MysqlShippingProfileRepository implements ShippingProfileRepository, Shipp
             ->toArray();
 
         return array_map(fn ($countryState) => \Thinktomorrow\Trader\Application\Country\Country::fromMappedData($countryState), $countryStates);
+    }
+
+    public function findAllShippingProfilesForCart(): array
+    {
+        return DB::table(static::$shippingProfileTable)
+            ->whereIn('state', ShippingProfileState::onlineStates())
+            ->get()
+            ->map(fn($shippingProfileState) => $this->container->get(ShippingProfileForCart::class)::fromMappedData((array) $shippingProfileState))
+            ->toArray();
     }
 }

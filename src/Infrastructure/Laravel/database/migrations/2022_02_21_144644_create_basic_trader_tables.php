@@ -119,6 +119,7 @@ class CreateBasicTraderTables extends Migration
 
         Schema::create(static::PREFIX.'shipping_profiles', function (Blueprint $table) {
             $table->char('shipping_profile_id', 36)->primary();
+            $table->boolean('requires_address')->default(1);
             $table->json('data')->nullable();
             $table->string('state')->default(\Thinktomorrow\Trader\Domain\Model\ShippingProfile\ShippingProfileState::online->value);
             $table->boolean('active')->default(1);
@@ -139,7 +140,7 @@ class CreateBasicTraderTables extends Migration
             $table->char('shipping_profile_id', 36);
             $table->integer('rate')->unsigned();
             $table->integer('from')->unsigned();
-            $table->integer('to')->unsigned();
+            $table->integer('to')->unsigned()->nullable();
 
             $table->index('shipping_profile_id');
             $table->foreign('shipping_profile_id')->references('shipping_profile_id')->on(static::PREFIX.'shipping_profiles')->onDelete('cascade');

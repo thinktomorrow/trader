@@ -200,6 +200,7 @@ trait TestHelpers
         return ShippingProfile::fromMappedData(array_merge([
             'shipping_profile_id' => 'sss',
             'state' => ShippingProfileState::online->value,
+            'requires_address' => true,
             'data' => json_encode([]),
         ], $values), [
             Tariff::class => [],

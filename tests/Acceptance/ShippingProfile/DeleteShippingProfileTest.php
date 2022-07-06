@@ -20,6 +20,7 @@ class DeleteShippingProfileTest extends ShippingProfileContext
     public function it_can_delete_a_profile()
     {
         $shippingProfileId = $this->shippingProfileApplication->createShippingProfile(new CreateShippingProfile(
+            true,
             ['BE','NL'],
             ['foo' => 'bar']
         ));
@@ -38,6 +39,7 @@ class DeleteShippingProfileTest extends ShippingProfileContext
     public function it_can_delete_a_tariff()
     {
         $shippingProfileId = $this->shippingProfileApplication->createShippingProfile(new CreateShippingProfile(
+            true,
             ['BE','NL'],
             ['foo' => 'bar']
         ));

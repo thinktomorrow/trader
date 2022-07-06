@@ -77,6 +77,7 @@ final class Order implements Aggregate, Discountable
         return $this->shippingAddress;
     }
 
+    /** @return Shipping[] */
     public function getShippings(): array
     {
         return $this->shippings;

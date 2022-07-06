@@ -16,6 +16,7 @@ class UpdateShippingProfileTest extends ShippingProfileContext
     public function it_can_update_a_profile()
     {
         $shippingProfileId = $this->shippingProfileApplication->createShippingProfile(new CreateShippingProfile(
+           true,
             ['BE','NL'],
             ['foo' => 'bar']
         ));
@@ -36,6 +37,7 @@ class UpdateShippingProfileTest extends ShippingProfileContext
     public function it_can_update_a_tariff()
     {
         $shippingProfileId = $this->shippingProfileApplication->createShippingProfile(new CreateShippingProfile(
+            true,
             ['BE','NL'],
             ['foo' => 'bar']
         ));

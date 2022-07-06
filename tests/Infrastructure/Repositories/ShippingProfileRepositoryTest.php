@@ -7,6 +7,7 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 use Money\Money;
 use Tests\Infrastructure\TestCase;
 use Thinktomorrow\Trader\Domain\Model\Country\CountryId;
+use Thinktomorrow\Trader\Infrastructure\Test\TestContainer;
 use Thinktomorrow\Trader\Domain\Model\ShippingProfile\Exceptions\CouldNotFindShippingProfile;
 use Thinktomorrow\Trader\Domain\Model\ShippingProfile\ShippingProfile;
 use Thinktomorrow\Trader\Domain\Model\ShippingProfile\ShippingProfileId;
@@ -98,7 +99,7 @@ class ShippingProfileRepositoryTest extends TestCase
     private function repositories(): \Generator
     {
         yield new InMemoryShippingProfileRepository();
-        yield new MysqlShippingProfileRepository();
+        yield new MysqlShippingProfileRepository(new TestContainer());
     }
 
     private function countryRepositories(): array

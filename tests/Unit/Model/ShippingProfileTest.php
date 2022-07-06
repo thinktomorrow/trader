@@ -5,6 +5,7 @@ namespace Tests\Unit\Model;
 
 use Money\Money;
 use PHPUnit\Framework\TestCase;
+use Thinktomorrow\Trader\Domain\Common\Cash\Cash;
 use Thinktomorrow\Trader\Domain\Model\Country\CountryId;
 use Thinktomorrow\Trader\Domain\Model\ShippingProfile\TariffId;
 use Thinktomorrow\Trader\Domain\Model\ShippingProfile\ShippingProfile;
@@ -18,12 +19,14 @@ class ShippingProfileTest extends TestCase
     public function it_can_create_a_shipping_profile()
     {
         $shippingProfile = ShippingProfile::create(
-            $shippingProfileId = ShippingProfileId::fromString('yyy')
+            $shippingProfileId = ShippingProfileId::fromString('yyy'),
+            false,
         );
 
         $this->assertEquals([
             'shipping_profile_id' => $shippingProfileId->get(),
             'state' => ShippingProfileState::online->value,
+            'requires_address' => false,
             'data' => "[]",
         ], $shippingProfile->getMappedData());
 
@@ -40,6 +43,7 @@ class ShippingProfileTest extends TestCase
 
         $this->assertEquals(ShippingProfileId::fromString('yyy'), $shippingProfile->shippingProfileId);
         $this->assertEquals(ShippingProfileState::offline, $shippingProfile->getState());
+        $this->assertTrue( $shippingProfile->requiresAddress());
         $this->assertEquals('bar', $shippingProfile->getData('foo'));
         $this->assertCount(2, $shippingProfile->getChildEntities()[Tariff::class]);
         $this->assertEquals([
@@ -116,10 +120,24 @@ class ShippingProfileTest extends TestCase
         ], $shippingProfile->getCountryIds());
     }
 
+    /** @test */
+    public function it_can_check_if_tariff_is_within_range()
+    {
+        $tariff = Tariff::create(TariffId::fromString('xxx'), ShippingProfileId::fromString('yyy'), Cash::make(100), Cash::make(10), Cash::make(1000));
+        $this->assertTrue($tariff->withinRange(Cash::make(10)));
+        $this->assertTrue($tariff->withinRange(Cash::make(1000)));
+        $this->assertFalse($tariff->withinRange(Cash::make(1001)));
+
+        $tariff = Tariff::create(TariffId::fromString('xxx'), ShippingProfileId::fromString('yyy'), Cash::make(100), Cash::make(10), null);
+        $this->assertTrue($tariff->withinRange(Cash::make(1001)));
+        $this->assertTrue($tariff->withinRange(Cash::make(100001)));
+    }
+
     private function createdShippingProfile(): ShippingProfile
     {
         return ShippingProfile::fromMappedData([
             'shipping_profile_id' => 'yyy',
+            'requires_address' => true,
             'state' => ShippingProfileState::offline->value,
             'data' => json_encode(['foo' => 'bar']),
         ], [

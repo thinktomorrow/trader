@@ -34,7 +34,7 @@ final class Tariff implements ChildEntity
 
     public function withinRange(Money $amount): bool
     {
-        return $this->from->lessThanOrEqual($amount) && $this->to->greaterThanOrEqual($amount);
+        return $this->from->lessThanOrEqual($amount) && (is_null($this->to) || $this->to->greaterThanOrEqual($amount));
     }
 
     public function getRate(): Money
