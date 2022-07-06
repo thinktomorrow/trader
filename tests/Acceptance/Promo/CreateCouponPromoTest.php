@@ -4,7 +4,6 @@ declare(strict_types=1);
 namespace Tests\Acceptance\Promo;
 
 use Thinktomorrow\Trader\Domain\Model\Promo\PromoId;
-use Thinktomorrow\Trader\Application\Promo\CUD\UpdateDiscounts;
 use Thinktomorrow\Trader\Application\Promo\CUD\CreateCouponPromo;
 
 class CreateCouponPromoTest extends PromoContext

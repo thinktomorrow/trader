@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace Thinktomorrow\Trader\Infrastructure\Test\Repositories;
 
+use Thinktomorrow\Trader\Domain\Model\ShippingProfile\TariffId;
 use Thinktomorrow\Trader\Application\Cart\RefreshCart\Adjusters\FindSuitableShippingProfile;
 use Thinktomorrow\Trader\Application\Country\ShippingCountryRepository;
 use Thinktomorrow\Trader\Domain\Common\Price\ConvertsToMoney;
@@ -18,6 +19,7 @@ final class InMemoryShippingProfileRepository implements ShippingProfileReposito
     private static array $shippingProfiles = [];
 
     private string $nextReference = 'sss-123';
+    private $nextTariffReference = 'ttt-123';
 
     public function save(ShippingProfile $shippingProfile): void
     {
@@ -79,5 +81,10 @@ final class InMemoryShippingProfileRepository implements ShippingProfileReposito
         }
 
         return $result;
+    }
+
+    public function nextTariffReference(): TariffId
+    {
+        return TariffId::fromString($this->nextTariffReference);
     }
 }

@@ -11,6 +11,7 @@ use Thinktomorrow\Trader\Domain\Common\Price\Price;
 use Thinktomorrow\Trader\Domain\Common\Price\PriceTotal;
 use Thinktomorrow\Trader\Domain\Model\Country\CountryId;
 use Thinktomorrow\Trader\Domain\Model\Country\HasCountries;
+use Thinktomorrow\Trader\Domain\Model\ShippingProfile\Events\TariffDeleted;
 
 final class ShippingProfile implements Aggregate
 {
@@ -19,6 +20,8 @@ final class ShippingProfile implements Aggregate
     use HasData;
 
     public readonly ShippingProfileId $shippingProfileId;
+
+    /** @var Tariff[] */
     private array $tariffs = [];
 
     public static function create(ShippingProfileId $shippingProfileId): static
@@ -29,11 +32,15 @@ final class ShippingProfile implements Aggregate
         return $shipping;
     }
 
+    public function getTariffs(): array
+    {
+        return $this->tariffs;
+    }
+
     public function findTariffByPrice(Price|PriceTotal $price, bool $tariff_amounts_include_tax): ?Tariff
     {
         $normalizedAmount = $tariff_amounts_include_tax ? $price->getIncludingVat() : $price->getExcludingVat();
 
-        /** @var Tariff $tariff */
         foreach ($this->tariffs as $tariff) {
             if ($tariff->withinRange($normalizedAmount)) {
                 return $tariff;
@@ -43,16 +50,30 @@ final class ShippingProfile implements Aggregate
         return null;
     }
 
+    public function findTariff(TariffId $tariffId): Tariff
+    {
+        foreach ($this->tariffs as $tariff) {
+            if ($tariff->tariffId->equals($tariffId)) {
+                return $tariff;
+            }
+        }
+
+        throw new \InvalidArgumentException('No Tariff found by id ' . $tariffId->get());
+    }
+
     public function addTariff(Tariff $tariff): void
     {
         $this->tariffs[] = $tariff;
     }
 
-    public function updateTariffs(array $tariffs): void
+    public function deleteTariff(TariffId $tariffId): void
     {
-        Assertion::allIsInstanceOf($tariffs, Tariff::class);
-
-        $this->tariffs = $tariffs;
+        foreach ($this->tariffs as $i => $tariff) {
+            if ($tariff->tariffId->equals($tariffId)) {
+                unset($this->tariffs[$i]);
+                $this->recordEvent(new TariffDeleted($this->shippingProfileId, $tariffId));
+            }
+        }
     }
 
     public function getMappedData(): array

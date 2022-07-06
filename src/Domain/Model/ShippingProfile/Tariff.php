@@ -4,23 +4,26 @@ declare(strict_types=1);
 namespace Thinktomorrow\Trader\Domain\Model\ShippingProfile;
 
 use Money\Money;
+use Thinktomorrow\Trader\Domain\Common\Cash\Cash;
 use Thinktomorrow\Trader\Domain\Common\Entity\ChildEntity;
 
 final class Tariff implements ChildEntity
 {
+    public readonly TariffId $tariffId;
     public readonly ShippingProfileId $shippingProfileId;
     private Money $rate;
     private Money $from;
-    private Money $to;
+    private ?Money $to;
 
     private function __construct()
     {
     }
 
-    public static function create(ShippingProfileId $shippingProfileId, Money $rate, Money $from, Money $to): static
+    public static function create(TariffId $tariffId, ShippingProfileId $shippingProfileId, Money $rate, Money $from, ?Money $to): static
     {
         $object = new static();
 
+        $object->tariffId = $tariffId;
         $object->shippingProfileId = $shippingProfileId;
         $object->rate = $rate;
         $object->from = $from;
@@ -39,7 +42,7 @@ final class Tariff implements ChildEntity
         return $this->rate;
     }
 
-    public function update(Money $rate, Money $from, Money $to): void
+    public function update(Money $rate, Money $from, ?Money $to): void
     {
         $this->rate = $rate;
         $this->from = $from;
@@ -49,10 +52,11 @@ final class Tariff implements ChildEntity
     public function getMappedData(): array
     {
         return [
+            'tariff_id' => $this->tariffId->get(),
             'shipping_profile_id' => $this->shippingProfileId->get(),
             'rate' => $this->rate->getAmount(),
             'from' => $this->from->getAmount(),
-            'to' => $this->to->getAmount(),
+            'to' => $this->to ? $this->to->getAmount() : null,
         ];
     }
 
@@ -60,10 +64,11 @@ final class Tariff implements ChildEntity
     {
         $tariff = new static();
 
+        $tariff->tariffId = TariffId::fromString($state['tariff_id']);
         $tariff->shippingProfileId = ShippingProfileId::fromString($aggregateState['shipping_profile_id']);
-        $tariff->rate = Money::EUR($state['rate']);
-        $tariff->from = Money::EUR($state['from']);
-        $tariff->to = Money::EUR($state['to']);
+        $tariff->rate = Cash::make($state['rate']);
+        $tariff->from = Cash::make($state['from']);
+        $tariff->to = $state['to'] ? Cash::make($state['to']) : null;
 
         return $tariff;
     }
@@ -71,9 +76,6 @@ final class Tariff implements ChildEntity
     public function equals($other): bool
     {
         return get_class($other) === get_class($this)
-            && $this->shippingProfileId === $other->shippingProfileId
-            && $this->rate->equals($other->rate)
-            && $this->from->equals($other->from)
-            && $this->to->equals($other->to);
+            && $this->tariffId === $other->tariffId;
     }
 }

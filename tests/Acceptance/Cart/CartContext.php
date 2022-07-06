@@ -202,6 +202,7 @@ abstract class CartContext extends TestCase
 
         $shippingProfile->addTariff(
             Tariff::create(
+                $this->shippingProfileRepository->nextTariffReference(),
                 $shippingProfile->shippingProfileId,
                 Cash::make($shippingCost * 100),
                 Cash::make($from * 100),

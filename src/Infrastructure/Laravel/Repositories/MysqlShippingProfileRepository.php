@@ -5,6 +5,7 @@ namespace Thinktomorrow\Trader\Infrastructure\Laravel\Repositories;
 
 use Illuminate\Support\Facades\DB;
 use Ramsey\Uuid\Uuid;
+use Thinktomorrow\Trader\Domain\Model\ShippingProfile\TariffId;
 use Thinktomorrow\Trader\Application\Country\ShippingCountryRepository;
 use Thinktomorrow\Trader\Domain\Model\Country\CountryId;
 use Thinktomorrow\Trader\Domain\Model\ShippingProfile\Exceptions\CouldNotFindShippingProfile;
@@ -101,6 +102,11 @@ class MysqlShippingProfileRepository implements ShippingProfileRepository, Shipp
     public function nextReference(): ShippingProfileId
     {
         return ShippingProfileId::fromString((string)Uuid::uuid4());
+    }
+
+    public function nextTariffReference(): TariffId
+    {
+        return TariffId::fromString((string)Uuid::uuid4());
     }
 
     public function getAvailableShippingCountries(): iterable

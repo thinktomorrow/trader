@@ -6,6 +6,7 @@ namespace Tests\Unit\Model;
 use Money\Money;
 use PHPUnit\Framework\TestCase;
 use Thinktomorrow\Trader\Domain\Model\Country\CountryId;
+use Thinktomorrow\Trader\Domain\Model\ShippingProfile\TariffId;
 use Thinktomorrow\Trader\Domain\Model\ShippingProfile\ShippingProfile;
 use Thinktomorrow\Trader\Domain\Model\ShippingProfile\ShippingProfileId;
 use Thinktomorrow\Trader\Domain\Model\ShippingProfile\Tariff;
@@ -40,6 +41,7 @@ class ShippingProfileTest extends TestCase
         $this->assertCount(2, $shippingProfile->getChildEntities()[Tariff::class]);
         $this->assertEquals([
             'shipping_profile_id' => 'yyy',
+            'tariff_id' => 'xxx',
             'rate' => '500',
             'from' => '0',
             'to' => '1000',
@@ -55,6 +57,7 @@ class ShippingProfileTest extends TestCase
 
         $shippingProfile->addTariff(
             Tariff::create(
+                TariffId::fromString('xxx'),
                 $shippingProfile->shippingProfileId,
                 Money::EUR(30),
                 Money::EUR(3001),
@@ -63,30 +66,6 @@ class ShippingProfileTest extends TestCase
         );
 
         $this->assertCount(3, $shippingProfile->getChildEntities()[Tariff::class]);
-    }
-
-    /** @test */
-    public function it_can_update_a_tariff()
-    {
-        $shippingProfile = $this->createdShippingProfile();
-
-        $shippingProfile->updateTariffs([
-            Tariff::create(
-                $shippingProfile->shippingProfileId,
-                Money::EUR(30),
-                Money::EUR(3001),
-                Money::EUR(4000)
-            ),
-        ]);
-
-        $this->assertCount(1, $shippingProfile->getChildEntities()[Tariff::class]);
-
-        $this->assertEquals([
-            'shipping_profile_id' => 'yyy',
-            'rate' => '30',
-            'from' => '3001',
-            'to' => '4000',
-        ], $shippingProfile->getChildEntities()[Tariff::class][0]);
     }
 
     /** @test */
@@ -142,11 +121,13 @@ class ShippingProfileTest extends TestCase
         ], [
             Tariff::class => [
                 [
+                    'tariff_id' => 'xxx',
                     'rate' => '500',
                     'from' => '0',
                     'to' => '1000',
                 ],
                 [
+                    'tariff_id' => 'yyy',
                     'rate' => '0',
                     'from' => '1001',
                     'to' => '2000',

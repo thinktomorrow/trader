@@ -134,12 +134,11 @@ class CreateBasicTraderTables extends Migration
         });
 
         Schema::create(static::PREFIX.'shipping_profile_tariffs', function (Blueprint $table) {
-            $table->id('tariff_id');
+            $table->char('tariff_id', 36)->primary();
             $table->char('shipping_profile_id', 36);
             $table->integer('rate')->unsigned();
             $table->integer('from')->unsigned();
             $table->integer('to')->unsigned();
-            $table->unsignedInteger('order_column')->default(0);
 
             $table->index('shipping_profile_id');
             $table->foreign('shipping_profile_id')->references('shipping_profile_id')->on(static::PREFIX.'shipping_profiles')->onDelete('cascade');

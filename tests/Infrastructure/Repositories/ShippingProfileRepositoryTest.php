@@ -7,6 +7,7 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 use Money\Money;
 use Tests\Infrastructure\TestCase;
 use Thinktomorrow\Trader\Domain\Model\Country\CountryId;
+use Thinktomorrow\Trader\Domain\Model\ShippingProfile\TariffId;
 use Thinktomorrow\Trader\Domain\Model\ShippingProfile\Exceptions\CouldNotFindShippingProfile;
 use Thinktomorrow\Trader\Domain\Model\ShippingProfile\ShippingProfile;
 use Thinktomorrow\Trader\Domain\Model\ShippingProfile\ShippingProfileId;
@@ -114,7 +115,7 @@ class ShippingProfileRepositoryTest extends TestCase
 
         $profile = $this->createShippingProfile();
         $profile->addCountry(CountryId::fromString('BE'));
-        $profile->addTariff(Tariff::create($profile->shippingProfileId, Money::EUR(10), Money::EUR(20), Money::EUR(30)));
+        $profile->addTariff(Tariff::create(TariffId::fromString('xxx'), $profile->shippingProfileId, Money::EUR(10), Money::EUR(20), Money::EUR(30)));
 
         yield [$profile];
     }

@@ -12,4 +12,6 @@ interface ShippingProfileRepository
     public function delete(ShippingProfileId $shippingProfileId): void;
 
     public function nextReference(): ShippingProfileId;
+
+    public function nextTariffReference(): TariffId;
 }
