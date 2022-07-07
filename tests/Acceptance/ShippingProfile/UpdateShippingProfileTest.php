@@ -23,6 +23,7 @@ class UpdateShippingProfileTest extends ShippingProfileContext
 
         $this->shippingProfileApplication->updateShippingProfile(new UpdateShippingProfile(
             $shippingProfileId->get(),
+            false,
             ['BE'],
             ['foo' => 'baz']
         ));
@@ -30,6 +31,7 @@ class UpdateShippingProfileTest extends ShippingProfileContext
         $this->assertEquals([
             CountryId::fromString('BE'),
         ], $this->shippingProfileRepository->find($shippingProfileId)->getCountryIds());
+        $this->assertFalse($this->shippingProfileRepository->find($shippingProfileId)->requiresAddress());
         $this->assertEquals(['foo' => 'baz'], $this->shippingProfileRepository->find($shippingProfileId)->getData());
     }
 

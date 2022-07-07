@@ -50,6 +50,11 @@ final class ShippingProfile implements Aggregate
         return $this->requiresAddress;
     }
 
+    public function updateRequiresAddress(bool $requiresAddress): void
+    {
+        $this->requiresAddress = $requiresAddress;
+    }
+
     public function getTariffs(): array
     {
         return $this->tariffs;

@@ -42,6 +42,7 @@ class ShippingProfileApplication
     {
         $shippingProfile = $this->shippingProfileRepository->find($command->getShippingProfileId());
 
+        $shippingProfile->updateRequiresAddress($command->requiresAddress());
         $shippingProfile->updateCountries($command->getCountryIds());
         $shippingProfile->addData($command->getData());
 

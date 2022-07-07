@@ -10,7 +10,6 @@ use Thinktomorrow\Trader\Domain\Common\Taxes\TaxRate;
 use Thinktomorrow\Trader\Domain\Model\Order\OrderRepository;
 use Thinktomorrow\Trader\Domain\Model\Order\Shipping\Shipping;
 use Thinktomorrow\Trader\Domain\Model\Order\Shipping\ShippingCost;
-use Thinktomorrow\Trader\Domain\Model\ShippingProfile\ShippingProfile;
 use Thinktomorrow\Trader\Domain\Model\ShippingProfile\ShippingProfileId;
 use Thinktomorrow\Trader\Domain\Model\ShippingProfile\ShippingProfileState;
 use Thinktomorrow\Trader\Domain\Model\ShippingProfile\ShippingProfileRepository;
@@ -33,26 +32,19 @@ class UpdateShippingProfileOnOrder
         $shippingProfile = $this->shippingProfileRepository->find($shippingProfileId);
 
         if(!in_array($shippingProfile->getState(), ShippingProfileState::onlineStates())) {
-            $this->removeShippingProfileFromOrder($order, $shippingProfile);
+            $this->removeAllShippingsFromOrder($order);
             return;
         }
-
-//        // Country of shipment is needed when shipping profile requires address.
-//        if (! $shippingCountryId = $order->getShippingAddress()?->getAddress()->countryId) {
-//            throw new CouldNotSelectShippingProfileDueToMissingShippingCountry(
-//                'Order [' . $order->orderId->get() . '] missing a shipping country that is required when selecting a shipping profile ' . $shippingProfile->shippingProfileId->get()
-//            );
-//        }
 
         if($shippingProfile->requiresAddress()) {
             // Country of shipment is needed when shipping profile requires address.
             if (! $shippingCountryId = $order->getShippingAddress()?->getAddress()->countryId) {
-                $this->removeShippingProfileFromOrder($order, $shippingProfile);
+                $this->removeAllShippingsFromOrder($order);
                 return;
             }
 
             if (! $shippingProfile->hasCountry($shippingCountryId)) {
-                $this->removeShippingProfileFromOrder($order, $shippingProfile);
+                $this->removeAllShippingsFromOrder($order);
                 return;
             }
         }
@@ -88,12 +80,10 @@ class UpdateShippingProfileOnOrder
         }
     }
 
-    private function removeShippingProfileFromOrder(Order $order, ShippingProfile $shippingProfile)
+    private function removeAllShippingsFromOrder(Order $order)
     {
         foreach($order->getShippings() as $shipping) {
-            if($shipping->getShippingProfileId()->equals($shippingProfile->shippingProfileId)) {
-                $order->deleteShipping($shipping->shippingId);
-            }
+            $order->deleteShipping($shipping->shippingId);
         }
     }
 }
