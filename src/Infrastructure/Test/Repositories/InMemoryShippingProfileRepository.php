@@ -3,12 +3,12 @@ declare(strict_types=1);
 
 namespace Thinktomorrow\Trader\Infrastructure\Test\Repositories;
 
-use Thinktomorrow\Trader\Domain\Model\Country\CountryId;
 use Thinktomorrow\Trader\Application\Cart\RefreshCart\Adjusters\FindSuitableShippingProfile;
 use Thinktomorrow\Trader\Application\Cart\ShippingProfile\ShippingProfileForCartRepository;
 use Thinktomorrow\Trader\Application\Country\ShippingCountryRepository;
 use Thinktomorrow\Trader\Domain\Common\Price\ConvertsToMoney;
 use Thinktomorrow\Trader\Domain\Model\Country\Country;
+use Thinktomorrow\Trader\Domain\Model\Country\CountryId;
 use Thinktomorrow\Trader\Domain\Model\Order\Shipping\ShippingId;
 use Thinktomorrow\Trader\Domain\Model\ShippingProfile\Exceptions\CouldNotFindShippingProfile;
 use Thinktomorrow\Trader\Domain\Model\ShippingProfile\ShippingProfile;
@@ -98,7 +98,7 @@ final class InMemoryShippingProfileRepository implements ShippingProfileReposito
         $activeProfiles = [];
 
         foreach (static::$shippingProfiles as $shippingProfile) {
-            if ($shippingProfile->getState() == ShippingProfileState::online && (!$countryId || $shippingProfile->hasCountry(CountryId::fromString($countryId)))) {
+            if ($shippingProfile->getState() == ShippingProfileState::online && (! $countryId || $shippingProfile->hasCountry(CountryId::fromString($countryId)))) {
                 $activeProfiles[] = $shippingProfile;
             }
         }

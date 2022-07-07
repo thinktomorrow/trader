@@ -67,7 +67,9 @@ abstract class Address
 
     public function equalsAddress($otherAddress): bool
     {
-        if(!$otherAddress || !$otherAddress instanceof Address) return false;
+        if (! $otherAddress || ! $otherAddress instanceof Address) {
+            return false;
+        }
 
         return $this->countryId == $otherAddress->countryId
             && $this->postalCode == $otherAddress->postalCode

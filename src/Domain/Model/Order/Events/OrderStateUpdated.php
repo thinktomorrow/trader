@@ -10,6 +10,5 @@ class OrderStateUpdated
 {
     public function __construct(public readonly OrderId $orderId, public readonly OrderState $oldState, public readonly OrderState $newState)
     {
-
     }
 }

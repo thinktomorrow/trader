@@ -5,8 +5,6 @@ namespace Thinktomorrow\Trader\Application\Cart;
 
 use Psr\Container\ContainerInterface;
 use Thinktomorrow\Trader\Application\Cart\Line\AddLine;
-use Thinktomorrow\Trader\Domain\Model\Order\OrderState;
-use Thinktomorrow\Trader\Domain\Model\Order\OrderStateMachine;
 use Thinktomorrow\Trader\Application\Cart\Line\AddLineToNewOrder;
 use Thinktomorrow\Trader\Application\Cart\Line\ChangeLineQuantity;
 use Thinktomorrow\Trader\Application\Cart\Line\RemoveLine;
@@ -27,6 +25,7 @@ use Thinktomorrow\Trader\Domain\Model\Order\Line\LinePrice;
 use Thinktomorrow\Trader\Domain\Model\Order\Order;
 use Thinktomorrow\Trader\Domain\Model\Order\OrderId;
 use Thinktomorrow\Trader\Domain\Model\Order\OrderRepository;
+use Thinktomorrow\Trader\Domain\Model\Order\OrderStateMachine;
 use Thinktomorrow\Trader\Domain\Model\Order\Payment\Payment;
 use Thinktomorrow\Trader\Domain\Model\Order\Payment\PaymentCost;
 use Thinktomorrow\Trader\Domain\Model\Order\Shipping\Shipping;

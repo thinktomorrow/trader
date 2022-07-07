@@ -5,5 +5,4 @@ namespace Thinktomorrow\Trader\Domain\Model\Order\Exceptions;
 
 class OrderAlreadyInMerchantHands extends \DomainException
 {
-
 }

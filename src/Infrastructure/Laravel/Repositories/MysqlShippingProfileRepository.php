@@ -145,9 +145,9 @@ class MysqlShippingProfileRepository implements ShippingProfileRepository, Shipp
             ->whereIn('state', ShippingProfileState::onlineStates())
             ->orderBy('order_column', 'ASC');
 
-        if($countryId) {
+        if ($countryId) {
             $builder->leftJoin(static::$shippingProfileCountryTable, static::$shippingProfileTable.'.shipping_profile_id', '=', static::$shippingProfileCountryTable.'.shipping_profile_id')
-                ->where(function($query) use($countryId){
+                ->where(function ($query) use ($countryId) {
                     $query->where(static::$shippingProfileTable.'.requires_address', 0)
                         ->orWhere(static::$shippingProfileCountryTable . '.country_id', $countryId);
                 })
