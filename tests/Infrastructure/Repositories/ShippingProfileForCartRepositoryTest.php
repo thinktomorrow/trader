@@ -3,22 +3,15 @@ declare(strict_types=1);
 
 namespace Tests\Infrastructure\Repositories;
 
-use Money\Money;
-use Tests\Infrastructure\TestCase;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Thinktomorrow\Trader\Domain\Model\Country\CountryId;
-use Thinktomorrow\Trader\Infrastructure\Test\TestContainer;
-use Thinktomorrow\Trader\Domain\Model\ShippingProfile\Tariff;
-use Thinktomorrow\Trader\Domain\Model\ShippingProfile\TariffId;
-use Thinktomorrow\Trader\Domain\Model\ShippingProfile\ShippingProfile;
-use Thinktomorrow\Trader\Domain\Model\ShippingProfile\ShippingProfileId;
+use Tests\Infrastructure\TestCase;
 use Thinktomorrow\Trader\Application\Cart\ShippingProfile\ShippingProfileForCart;
-use Thinktomorrow\Trader\Infrastructure\Test\Repositories\InMemoryCountryRepository;
-use Thinktomorrow\Trader\Infrastructure\Laravel\Repositories\MysqlCountryRepository;
 use Thinktomorrow\Trader\Infrastructure\Laravel\Models\DefaultShippingProfileForCart;
-use Thinktomorrow\Trader\Infrastructure\Test\Repositories\InMemoryShippingProfileRepository;
+use Thinktomorrow\Trader\Infrastructure\Laravel\Repositories\MysqlCountryRepository;
 use Thinktomorrow\Trader\Infrastructure\Laravel\Repositories\MysqlShippingProfileRepository;
-use Thinktomorrow\Trader\Domain\Model\ShippingProfile\Exceptions\CouldNotFindShippingProfile;
+use Thinktomorrow\Trader\Infrastructure\Test\Repositories\InMemoryCountryRepository;
+use Thinktomorrow\Trader\Infrastructure\Test\Repositories\InMemoryShippingProfileRepository;
+use Thinktomorrow\Trader\Infrastructure\Test\TestContainer;
 
 class ShippingProfileForCartRepositoryTest extends TestCase
 {
@@ -59,7 +52,7 @@ class ShippingProfileForCartRepositoryTest extends TestCase
     {
         return [
             new InMemoryShippingProfileRepository(),
-            new MysqlShippingProfileRepository(new TestContainer())
+            new MysqlShippingProfileRepository(new TestContainer()),
         ];
     }
 

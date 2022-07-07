@@ -43,7 +43,7 @@ class ShippingProfileTest extends TestCase
 
         $this->assertEquals(ShippingProfileId::fromString('yyy'), $shippingProfile->shippingProfileId);
         $this->assertEquals(ShippingProfileState::offline, $shippingProfile->getState());
-        $this->assertTrue( $shippingProfile->requiresAddress());
+        $this->assertTrue($shippingProfile->requiresAddress());
         $this->assertEquals('bar', $shippingProfile->getData('foo'));
         $this->assertCount(2, $shippingProfile->getChildEntities()[Tariff::class]);
         $this->assertEquals([

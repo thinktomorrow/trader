@@ -16,7 +16,7 @@ class UpdateShippingProfileTest extends ShippingProfileContext
     public function it_can_update_a_profile()
     {
         $shippingProfileId = $this->shippingProfileApplication->createShippingProfile(new CreateShippingProfile(
-           true,
+            true,
             ['BE','NL'],
             ['foo' => 'bar']
         ));
