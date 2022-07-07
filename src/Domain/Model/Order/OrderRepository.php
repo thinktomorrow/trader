@@ -6,12 +6,21 @@ namespace Thinktomorrow\Trader\Domain\Model\Order;
 use Thinktomorrow\Trader\Domain\Model\Order\Discount\DiscountId;
 use Thinktomorrow\Trader\Domain\Model\Order\Payment\PaymentId;
 use Thinktomorrow\Trader\Domain\Model\Order\Shipping\ShippingId;
+use Thinktomorrow\Trader\Domain\Model\Order\Exceptions\OrderAlreadyInMerchantHands;
 
 interface OrderRepository
 {
     public function save(Order $order): void;
 
     public function find(OrderId $orderId): Order;
+
+    /**
+     * Same as find() but with assertion that the order is still in customer hands and valid for cart manipulation.
+     * When the order is already in merchant hands, this method will throw a halting exception.
+     *
+     * @throws OrderAlreadyInMerchantHands
+     */
+    public function findForCart(OrderId $orderId): Order;
 
     public function delete(OrderId $orderId): void;
 

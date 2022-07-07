@@ -12,4 +12,6 @@ interface MerchantOrderBillingAddress
     public function getCity(): ?string;
     public function getLine1(): ?string;
     public function getLine2(): ?string;
+
+    public function equalsAddress($otherAddress): bool;
 }

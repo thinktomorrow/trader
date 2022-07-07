@@ -15,4 +15,5 @@ interface CartBillingAddress
 
     public function getTitle(): ?string;
     public function getDescription(): ?string;
+    public function equalsAddress($otherAddress): bool;
 }

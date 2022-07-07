@@ -15,6 +15,7 @@ interface CartShipping
     /** @return CartDiscount[] */
     public function getDiscounts(): iterable;
 
+    public function requiresAddress(): bool;
     public function getTitle(): ?string;
     public function getDescription(): ?string;
 }

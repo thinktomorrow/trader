@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace Thinktomorrow\Trader\Infrastructure\Test\Repositories;
 
+use Thinktomorrow\Trader\Domain\Model\Country\CountryId;
 use Thinktomorrow\Trader\Application\Cart\RefreshCart\Adjusters\FindSuitableShippingProfile;
 use Thinktomorrow\Trader\Application\Cart\ShippingProfile\ShippingProfileForCartRepository;
 use Thinktomorrow\Trader\Application\Country\ShippingCountryRepository;
@@ -92,12 +93,12 @@ final class InMemoryShippingProfileRepository implements ShippingProfileReposito
         return TariffId::fromString($this->nextTariffReference);
     }
 
-    public function findAllShippingProfilesForCart(): array
+    public function findAllShippingProfilesForCart(?string $countryId = null): array
     {
         $activeProfiles = [];
 
         foreach (static::$shippingProfiles as $shippingProfile) {
-            if ($shippingProfile->getState() == ShippingProfileState::online) {
+            if ($shippingProfile->getState() == ShippingProfileState::online && (!$countryId || $shippingProfile->hasCountry(CountryId::fromString($countryId)))) {
                 $activeProfiles[] = $shippingProfile;
             }
         }

@@ -19,6 +19,7 @@ use Thinktomorrow\Trader\Domain\Model\Order\OrderId;
 use Thinktomorrow\Trader\Domain\Model\Order\OrderRepository;
 use Thinktomorrow\Trader\Domain\Model\Order\OrderState;
 use Thinktomorrow\Trader\Domain\Model\Order\Shipping\Shipping;
+use Thinktomorrow\Trader\Domain\Model\Order\Exceptions\OrderAlreadyInMerchantHands;
 
 final class MysqlCartRepository implements CartRepository
 {
@@ -38,7 +39,7 @@ final class MysqlCartRepository implements CartRepository
         $order = $this->orderRepository->find($orderId);
 
         if (! $order->inCustomerHands()) {
-            throw new \DomainException('Cannot fetch cart. Order is no longer in customer hands and has already the following state: ' . $order->getOrderState()->value);
+            throw new OrderAlreadyInMerchantHands('Cannot fetch cart. Order is no longer in customer hands and has already the following state: ' . $order->getOrderState()->value);
         }
 
         $orderState = array_merge($order->getMappedData(), [

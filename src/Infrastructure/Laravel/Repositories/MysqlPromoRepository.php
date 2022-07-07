@@ -110,6 +110,8 @@ final class MysqlPromoRepository implements PromoRepository, OrderPromoRepositor
 
     private function upsertDiscounts(Promo $promo): void
     {
+        $discountIds = array_map(fn ($discount) => $discount->discountId->get(), $promo->getDiscounts());
+
         $existingDiscountIds = DB::table(static::$promoDiscountTable)
             ->where('promo_id', $promo->promoId)
             ->select('discount_id')
@@ -119,6 +121,7 @@ final class MysqlPromoRepository implements PromoRepository, OrderPromoRepositor
 
         DB::table(static::$promoDiscountTable)
             ->where('promo_id', $promo->promoId)
+            ->whereNotIn('discount_id', $discountIds)
             ->delete();
 
         DB::table(static::$promoConditionTable)
@@ -127,7 +130,9 @@ final class MysqlPromoRepository implements PromoRepository, OrderPromoRepositor
 
         foreach ($promo->getDiscounts() as $discount) {
             DB::table(static::$promoDiscountTable)
-                ->insert($discount->getMappedData());
+                ->updateOrInsert([
+                    'discount_id' => $discount->discountId->get(),
+                ], $discount->getMappedData());
 
             DB::table(static::$promoConditionTable)->insert(
                 array_map(fn ($conditionState) => array_merge($conditionState, [

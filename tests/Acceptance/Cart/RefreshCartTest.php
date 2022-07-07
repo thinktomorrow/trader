@@ -10,6 +10,7 @@ use Thinktomorrow\Trader\Domain\Model\Order\OrderState;
 use Thinktomorrow\Trader\Domain\Model\Product\ProductId;
 use Thinktomorrow\Trader\Domain\Model\Product\Variant\VariantState;
 use Thinktomorrow\Trader\Domain\Model\Product\Variant\VariantUnitPrice;
+use Thinktomorrow\Trader\Domain\Model\Order\Exceptions\OrderAlreadyInMerchantHands;
 
 class RefreshCartTest extends CartContext
 {
@@ -33,8 +34,6 @@ class RefreshCartTest extends CartContext
     /** @test */
     public function it_cannot_refresh_cart_when_order_is_no_longer_is_shopper_hands()
     {
-        $this->expectException(CannotRefreshCart::class);
-
         $this->givenThereIsAProductWhichCostsEur('aaa', 5);
         $this->whenIAddTheVariantToTheCart('aaa-123', 2);
 
@@ -45,6 +44,7 @@ class RefreshCartTest extends CartContext
 
         $this->updateVariant();
 
+        $this->expectException(OrderAlreadyInMerchantHands::class);
         $this->cartApplication->refresh(new RefreshCart('xxx'));
 
         $cart = $this->cartRepository->findCart(OrderId::fromString('xxx'));

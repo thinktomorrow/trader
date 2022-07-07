@@ -23,6 +23,7 @@ use Thinktomorrow\Trader\Domain\Model\Order\Shipping\Shipping;
 use Thinktomorrow\Trader\Domain\Model\Order\Shipping\ShippingId;
 use Thinktomorrow\Trader\Domain\Model\Order\Shopper;
 use Thinktomorrow\Trader\Domain\Model\Order\ShopperId;
+use Thinktomorrow\Trader\Domain\Model\Order\Exceptions\OrderAlreadyInMerchantHands;
 
 final class MysqlOrderRepository implements OrderRepository
 {
@@ -275,6 +276,17 @@ final class MysqlOrderRepository implements OrderRepository
         ];
 
         return Order::fromMappedData((array)$orderState, $childEntities);
+    }
+
+    public function findForCart(OrderId $orderId): Order
+    {
+        $order = $this->find($orderId);
+
+        if (! $order->inCustomerHands()) {
+            throw new OrderAlreadyInMerchantHands('Cannot fetch order for cart. Order is no longer in customer hands and has already the following state: ' . $order->getOrderState()->value);
+        }
+
+        return $order;
     }
 
     public function delete(OrderId $orderId): void

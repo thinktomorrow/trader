@@ -15,6 +15,7 @@ use Thinktomorrow\Trader\Domain\Model\Order\Discount\Discount;
 use Thinktomorrow\Trader\Domain\Model\Order\Exceptions\CouldNotFindOrder;
 use Thinktomorrow\Trader\Domain\Model\Order\OrderId;
 use Thinktomorrow\Trader\Infrastructure\Laravel\Models\Cart\DefaultCart;
+use Thinktomorrow\Trader\Domain\Model\Order\Exceptions\OrderAlreadyInMerchantHands;
 use Thinktomorrow\Trader\Infrastructure\Laravel\Models\Cart\DefaultCartBillingAddress;
 use Thinktomorrow\Trader\Infrastructure\Laravel\Models\Cart\DefaultCartDiscount;
 use Thinktomorrow\Trader\Infrastructure\Laravel\Models\Cart\DefaultCartLine;
@@ -34,7 +35,7 @@ final class InMemoryCartRepository implements CartRepository
         $order = InMemoryOrderRepository::$orders[$orderId->get()];
 
         if (! $order->inCustomerHands()) {
-            throw new \DomainException('Cannot fetch cart. Order is no longer in customer hands and has already the following state: ' . $order->getOrderState()->value);
+            throw new OrderAlreadyInMerchantHands('Cannot fetch cart. Order is no longer in customer hands and has already the following state: ' . $order->getOrderState()->value);
         }
 
         $orderState = array_merge(InMemoryOrderRepository::$orders[$orderId->get()]->getMappedData(), [

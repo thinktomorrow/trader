@@ -5,6 +5,8 @@ namespace Thinktomorrow\Trader\Application\Cart;
 
 use Psr\Container\ContainerInterface;
 use Thinktomorrow\Trader\Application\Cart\Line\AddLine;
+use Thinktomorrow\Trader\Domain\Model\Order\OrderState;
+use Thinktomorrow\Trader\Domain\Model\Order\OrderStateMachine;
 use Thinktomorrow\Trader\Application\Cart\Line\AddLineToNewOrder;
 use Thinktomorrow\Trader\Application\Cart\Line\ChangeLineQuantity;
 use Thinktomorrow\Trader\Application\Cart\Line\RemoveLine;
@@ -45,12 +47,14 @@ final class CartApplication
     private RefreshCartAction $refreshCartAction;
     private ContainerInterface $container;
     private UpdateShippingProfileOnOrder $updateShippingProfileOnOrder;
+    private OrderStateMachine $orderStateMachine;
 
     public function __construct(
         TraderConfig              $config,
         ContainerInterface $container,
         VariantForCartRepository  $findVariantDetailsForCart,
         OrderRepository           $orderRepository,
+        OrderStateMachine $orderStateMachine,
         RefreshCartAction         $refreshCartAction,
         ShippingProfileRepository $shippingProfileRepository,
         UpdateShippingProfileOnOrder $updateShippingProfileOnOrder,
@@ -68,11 +72,12 @@ final class CartApplication
         $this->config = $config;
         $this->refreshCartAction = $refreshCartAction;
         $this->container = $container;
+        $this->orderStateMachine = $orderStateMachine;
     }
 
     public function refresh(RefreshCart $refreshCart): void
     {
-        $order = $this->orderRepository->find($refreshCart->getOrderId());
+        $order = $this->orderRepository->findForCart($refreshCart->getOrderId());
 
         $this->refreshCartAction->handle($order, [
             $this->container->get(AdjustLines::class),
@@ -109,7 +114,7 @@ final class CartApplication
     public function addLine(AddLine $addLine): OrderId
     {
         $orderId = $addLine->getOrderId();
-        $order = $this->orderRepository->find($orderId);
+        $order = $this->orderRepository->findForCart($orderId);
 
         $variant = $this->findVariantDetailsForCart->findVariantForCart($addLine->getVariantId());
 
@@ -138,7 +143,7 @@ final class CartApplication
 
     public function changeLineQuantity(ChangeLineQuantity $changeLineQuantity): void
     {
-        $order = $this->orderRepository->find($changeLineQuantity->getOrderId());
+        $order = $this->orderRepository->findForCart($changeLineQuantity->getOrderId());
 
         $order->updateLineQuantity(
             $changeLineQuantity->getLineId(),
@@ -152,7 +157,7 @@ final class CartApplication
 
     public function removeLine(RemoveLine $removeLine): void
     {
-        $order = $this->orderRepository->find($removeLine->getOrderId());
+        $order = $this->orderRepository->findForCart($removeLine->getOrderId());
 
         $order->deleteLine(
             $removeLine->getLineId(),
@@ -165,7 +170,7 @@ final class CartApplication
 
     public function updateShippingAddress(UpdateShippingAddress $updateShippingAddress): void
     {
-        $order = $this->orderRepository->find($updateShippingAddress->getOrderId());
+        $order = $this->orderRepository->findForCart($updateShippingAddress->getOrderId());
 
         // Get existing address_id, if not we create one here
         $order->updateShippingAddress(ShippingAddress::create(
@@ -180,7 +185,7 @@ final class CartApplication
 
     public function updateBillingAddress(UpdateBillingAddress $updateBillingAddress): void
     {
-        $order = $this->orderRepository->find($updateBillingAddress->getOrderId());
+        $order = $this->orderRepository->findForCart($updateBillingAddress->getOrderId());
 
         // Get existing address_id, if not we create one here
         $order->updateBillingAddress(BillingAddress::create(
@@ -196,7 +201,7 @@ final class CartApplication
     // TODO...
     public function chooseCustomerShippingAddress(ChooseCustomerShippingAddress $chooseCustomerShippingAddress): void
     {
-        $order = $this->orderRepository->find($chooseCustomerShippingAddress->getOrderId());
+        $order = $this->orderRepository->findForCart($chooseCustomerShippingAddress->getOrderId());
 
         $order->updateShippingAddress($chooseCustomerShippingAddress->getAddress());
 
@@ -210,7 +215,7 @@ final class CartApplication
     // TODO...
     public function chooseCustomerBillingAddress(ChooseCustomerBillingAddress $chooseCustomerBillingAddress): void
     {
-        $order = $this->orderRepository->find($chooseCustomerBillingAddress->getOrderId());
+        $order = $this->orderRepository->findForCart($chooseCustomerBillingAddress->getOrderId());
 
         $order->updateBillingAddress($chooseCustomerBillingAddress->getBillingAddress());
 
@@ -223,7 +228,7 @@ final class CartApplication
 
     public function chooseShippingProfile(ChooseShippingProfile $chooseShippingProfile): void
     {
-        $order = $this->orderRepository->find($chooseShippingProfile->getOrderId());
+        $order = $this->orderRepository->findForCart($chooseShippingProfile->getOrderId());
 
         $this->updateShippingProfileOnOrder->handle($order, $chooseShippingProfile->getShippingProfileId());
 
@@ -235,7 +240,7 @@ final class CartApplication
     public function choosePaymentMethod(ChoosePaymentMethod $choosePaymentMethod): void
     {
         $paymentMethod = $this->paymentMethodRepository->find($choosePaymentMethod->getPaymentMethodId());
-        $order = $this->orderRepository->find($choosePaymentMethod->getOrderId());
+        $order = $this->orderRepository->findForCart($choosePaymentMethod->getOrderId());
 
         $paymentCost = PaymentCost::fromMoney(
             $paymentMethod->getRate(),
@@ -269,7 +274,7 @@ final class CartApplication
 
     public function updateShopper(UpdateShopper $updateShopper): void
     {
-        $order = $this->orderRepository->find($updateShopper->getOrderId());
+        $order = $this->orderRepository->findForCart($updateShopper->getOrderId());
 
         if ($shopper = $order->getShopper()) {
             $shopper->updateEmail($updateShopper->getEmail());
@@ -294,7 +299,7 @@ final class CartApplication
 
     public function chooseCustomer(ChooseCustomer $chooseCustomer): void
     {
-        $order = $this->orderRepository->find($chooseCustomer->getOrderId());
+        $order = $this->orderRepository->findForCart($chooseCustomer->getOrderId());
         $customer = $this->customerRepository->find($chooseCustomer->getCustomerId());
 
         if ($shopper = $order->getShopper()) {
@@ -317,6 +322,18 @@ final class CartApplication
         // TODO:: update shipping / billing address if not already filled
         // TODO: update shipping profile and payment method if not already filled
         // Proceed in checkout should be done based on filled data no?
+
+        $this->orderRepository->save($order);
+
+        $this->eventDispatcher->dispatchAll($order->releaseEvents());
+    }
+
+    public function confirmCart(ConfirmCart $command): void
+    {
+        $order = $this->orderRepository->findForCart($command->getOrderId());
+
+        // TODO: make sure event is recorded!!!
+        $this->orderStateMachine->apply($order, 'confirm');
 
         $this->orderRepository->save($order);
 

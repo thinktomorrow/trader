@@ -12,6 +12,7 @@ use Thinktomorrow\Trader\Domain\Model\Order\OrderRepository;
 use Thinktomorrow\Trader\Domain\Model\Order\Payment\PaymentId;
 use Thinktomorrow\Trader\Domain\Model\Order\Shipping\ShippingId;
 use Thinktomorrow\Trader\Domain\Model\Order\ShopperId;
+use Thinktomorrow\Trader\Domain\Model\Order\Exceptions\OrderAlreadyInMerchantHands;
 
 final class InMemoryOrderRepository implements OrderRepository
 {
@@ -36,6 +37,17 @@ final class InMemoryOrderRepository implements OrderRepository
         }
 
         return static::$orders[$orderId->get()];
+    }
+
+    public function findForCart(OrderId $orderId): Order
+    {
+        $order = $this->find($orderId);
+
+        if (! $order->inCustomerHands()) {
+            throw new OrderAlreadyInMerchantHands('Cannot fetch order for cart. Order is no longer in customer hands and has already the following state: ' . $order->getOrderState()->value);
+        }
+
+        return $order;
     }
 
     public function delete(OrderId $orderId): void

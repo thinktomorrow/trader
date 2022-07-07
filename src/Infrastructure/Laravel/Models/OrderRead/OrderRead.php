@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace Thinktomorrow\Trader\Infrastructure\Laravel\Models\OrderRead;
 
 use Money\Money;
+use Thinktomorrow\Trader\Domain\Model\Order\OrderState;
 use Thinktomorrow\Trader\Application\Common\RendersData;
 use Thinktomorrow\Trader\Application\Common\RendersMoney;
 use Thinktomorrow\Trader\Application\Order\MerchantOrder\MerchantOrderBillingAddress;
@@ -22,6 +23,7 @@ abstract class OrderRead
 
     protected string $orderId;
     protected string $orderReference;
+    protected OrderState $state;
     protected iterable $lines;
     protected ?MerchantOrderShippingAddress $shippingAddress;
     protected ?MerchantOrderBillingAddress $billingAddress;
@@ -47,6 +49,7 @@ abstract class OrderRead
         $order = new static();
 
         $order->orderId = $state['order_id'];
+        $order->state = OrderState::from($state['order_state']);
         $order->orderReference = $state['order_ref'];
 
         $order->total = $state['total'];

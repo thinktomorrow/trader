@@ -115,6 +115,23 @@ class CartReadTest extends CartContext
     }
 
     /** @test */
+    public function it_can_check_if_address_equals_other_address()
+    {
+        $this->givenThereIsAProductWhichCostsEur('lightsaber', 5);
+        $this->whenIAddTheVariantToTheCart('lightsaber-123', 2);
+        $this->whenIAddShippingAddress('BE', 'molenstraat 146', null, '3000', 'Antwerp');
+        $this->whenIAddBillingAddress('BE', 'molenstraat 146', null, '3000', 'Antwerp');
+
+        $cart = $this->cartRepository->findCart(OrderId::fromString('xxx'));
+        $this->assertTrue($cart->getShippingAddress()->equalsAddress($cart->getBillingAddress()));
+
+        $this->whenIAddBillingAddress('BE', 'molenstraat 22', null, '3000', 'Antwerp');
+
+        $cart = $this->cartRepository->findCart(OrderId::fromString('xxx'));
+        $this->assertFalse($cart->getShippingAddress()->equalsAddress($cart->getBillingAddress()));
+    }
+
+    /** @test */
     public function it_can_see_shipping()
     {
         $this->givenOrderHasAShippingCountry('BE');
@@ -127,6 +144,7 @@ class CartReadTest extends CartContext
 
         $this->assertInstanceOf(CartShipping::class, $cart->getShipping());
         $this->assertEquals('shipping-123', $cart->getShipping()->getShippingId());
+        $this->assertTrue($cart->getShipping()->requiresAddress());
         $this->assertEquals('bpost_home', $cart->getShipping()->getShippingProfileId());
         $this->assertEquals('€ 30', $cart->getShipping()->getCostPrice());
         $this->assertEquals('Bpost Home', $cart->getShipping()->getTitle());

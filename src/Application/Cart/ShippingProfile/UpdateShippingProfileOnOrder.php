@@ -63,7 +63,7 @@ class UpdateShippingProfileOnOrder
             $existingShipping = $order->getShippings()[0];
             $existingShipping->updateShippingProfile($shippingProfile->shippingProfileId);
             $existingShipping->updateCost($shippingCost);
-            $existingShipping->addData($shippingProfile->getData());
+            $existingShipping->addData(array_merge($shippingProfile->getData(), ['requires_address' => $shippingProfile->requiresAddress()]));
 
             $order->updateShipping($existingShipping);
         } else {
@@ -74,7 +74,7 @@ class UpdateShippingProfileOnOrder
                 $shippingCost
             );
 
-            $shipping->addData($shippingProfile->getData());
+            $shipping->addData(array_merge($shippingProfile->getData(), ['requires_address' => $shippingProfile->requiresAddress()]));
 
             $order->addShipping($shipping);
         }

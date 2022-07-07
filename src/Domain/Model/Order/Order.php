@@ -14,6 +14,7 @@ use Thinktomorrow\Trader\Domain\Model\Order\Address\ShippingAddress;
 use Thinktomorrow\Trader\Domain\Model\Order\Discount\Discount;
 use Thinktomorrow\Trader\Domain\Model\Order\Discount\Discountable;
 use Thinktomorrow\Trader\Domain\Model\Order\Discount\DiscountableId;
+use Thinktomorrow\Trader\Domain\Model\Order\Events\OrderStateUpdated;
 use Thinktomorrow\Trader\Domain\Model\Order\Discount\DiscountableType;
 use Thinktomorrow\Trader\Domain\Model\Order\Events\OrderCreated;
 use Thinktomorrow\Trader\Domain\Model\Order\Events\OrderUpdated;
@@ -100,7 +101,11 @@ final class Order implements Aggregate, Discountable
 
     public function updateState(OrderState $orderState): void
     {
+        $oldState = $this->getOrderState();
+
         $this->update('orderState', $orderState);
+
+        $this->recordEvent(new OrderStateUpdated($this->orderId, $oldState, $orderState));
     }
 
     public function updateShopper(Shopper $shopper): void

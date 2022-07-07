@@ -3,7 +3,9 @@ declare(strict_types=1);
 
 namespace Thinktomorrow\Trader\Domain\Model\Order;
 
-enum OrderState: string
+use Thinktomorrow\Trader\Domain\Common\State\State;
+
+enum OrderState: string implements State
 {
     /**
      * ------------------------------------------------
@@ -52,5 +54,10 @@ enum OrderState: string
             self::cart_abandoned,
             self::cart_revived,
         ];
+    }
+
+    public function getValueAsString(): string
+    {
+        return $this->value;
     }
 }

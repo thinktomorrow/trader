@@ -63,6 +63,11 @@ abstract class OrderReadShipping
         return $this->discounts;
     }
 
+    public function requiresAddress(): bool
+    {
+        return $this->data('requires_address');
+    }
+
     public function getTitle(): ?string
     {
         return $this->data('title');

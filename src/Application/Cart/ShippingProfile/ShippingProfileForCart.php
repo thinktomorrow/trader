@@ -10,4 +10,5 @@ interface ShippingProfileForCart
     public function getShippingProfileId(): string;
     public function getTitle(): string;
     public function getDescription(): ?string;
+    public function requiresAddress(): bool;
 }

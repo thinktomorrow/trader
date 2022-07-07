@@ -5,6 +5,7 @@ namespace Tests\Infrastructure\Repositories;
 
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\Infrastructure\TestCase;
+use Thinktomorrow\Trader\Domain\Model\Country\CountryId;
 use Thinktomorrow\Trader\Application\Cart\ShippingProfile\ShippingProfileForCart;
 use Thinktomorrow\Trader\Infrastructure\Laravel\Models\DefaultShippingProfileForCart;
 use Thinktomorrow\Trader\Infrastructure\Laravel\Repositories\MysqlCountryRepository;
@@ -39,6 +40,22 @@ class ShippingProfileForCartRepositoryTest extends TestCase
             $this->shippingProfileRepositories()[$i]->save($shippingProfile);
 
             $this->assertCount(1, $repository->findAllShippingProfilesForCart());
+        }
+    }
+
+    /** @test */
+    public function it_can_find_profiles_for_cart_with_matching_countries()
+    {
+        $shippingProfile = $this->createShippingProfile();
+        $shippingProfile->addCountry(CountryId::fromString('BE'));
+
+        foreach ($this->repositories() as $i => $repository) {
+            $this->countryRepositories()[$i]->save($this->country);
+
+            $this->shippingProfileRepositories()[$i]->save($shippingProfile);
+
+            $this->assertCount(1, $repository->findAllShippingProfilesForCart('BE'));
+            $this->assertCount(0, $repository->findAllShippingProfilesForCart('NL'));
         }
     }
 

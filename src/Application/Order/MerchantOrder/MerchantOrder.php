@@ -44,4 +44,6 @@ interface MerchantOrder
      * @return MerchantOrderDiscount[]
      */
     public function getAllDiscounts(): iterable;
+
+    public function inCustomerHands(): bool;
 }

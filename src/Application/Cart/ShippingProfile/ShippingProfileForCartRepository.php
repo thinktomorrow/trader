@@ -6,5 +6,5 @@ namespace Thinktomorrow\Trader\Application\Cart\ShippingProfile;
 interface ShippingProfileForCartRepository
 {
     /** @return ShippingProfileForCart[] */
-    public function findAllShippingProfilesForCart(): array;
+    public function findAllShippingProfilesForCart(?string $countryId = null): array;
 }

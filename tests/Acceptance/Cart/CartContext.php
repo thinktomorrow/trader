@@ -8,9 +8,11 @@ use Money\Money;
 use PHPUnit\Framework\Assert;
 use Tests\Acceptance\TestCase;
 use Tests\TestHelpers;
+use Thinktomorrow\Trader\Domain\Model\Order\OrderState;
 use Thinktomorrow\Trader\Application\Cart\CartApplication;
 use Thinktomorrow\Trader\Application\Cart\ChooseCustomer;
 use Thinktomorrow\Trader\Application\Cart\ChoosePaymentMethod;
+use Thinktomorrow\Trader\Domain\Model\Order\OrderStateMachine;
 use Thinktomorrow\Trader\Application\Cart\ChooseShippingProfile;
 use Thinktomorrow\Trader\Application\Cart\Line\AddLine;
 use Thinktomorrow\Trader\Application\Cart\Line\AddLineToNewOrder;
@@ -86,6 +88,7 @@ abstract class CartContext extends TestCase
     protected InMemoryCustomerRepository $customerRepository;
     protected InMemoryPromoRepository $promoRepository;
     protected UpdateShippingProfileOnOrder $updateShippingProfileOnOrder;
+    protected EventDispatcherSpy $eventDispatcher;
 
     protected function setUp(): void
     {
@@ -115,18 +118,28 @@ abstract class CartContext extends TestCase
         (new TestContainer())->add(ApplyPromoToOrder::class, new ApplyPromoToOrder($this->orderRepository));
         (new TestContainer())->add(AdjustLines::class, new AdjustLines(new InMemoryVariantRepository()));
         (new TestContainer())->add(AdjustDiscounts::class, new AdjustDiscounts($this->promoRepository, (new TestContainer())->get(ApplyPromoToOrder::class)));
+        (new TestContainer())->add(OrderStateMachine::class, new OrderStateMachine([
+            OrderState::cart_pending,
+            OrderState::confirmed,
+        ], [
+            'confirm' => [
+                'from' => [OrderState::cart_pending, OrderState::confirmed],
+                'to' => OrderState::confirmed,
+            ],
+        ]));
 
         $this->cartApplication = new CartApplication(
             new TestTraderConfig(),
             new TestContainer(),
             $this->variantRepository = new InMemoryVariantRepository(),
             $this->orderRepository,
+            (new TestContainer())->get(OrderStateMachine::class),
             new RefreshCartAction(),
             $this->shippingProfileRepository = new InMemoryShippingProfileRepository(),
             $this->updateShippingProfileOnOrder = new UpdateShippingProfileOnOrder(new TestTraderConfig(), $this->orderRepository, $this->shippingProfileRepository),
             $this->paymentMethodRepository = new InMemoryPaymentMethodRepository(),
             $this->customerRepository = new InMemoryCustomerRepository(),
-            new EventDispatcherSpy(),
+            $this->eventDispatcher = new EventDispatcherSpy(),
         );
 
         $this->promoApplication = new CouponPromoApplication(

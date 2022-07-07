@@ -14,6 +14,8 @@ use Thinktomorrow\Trader\Application\Cart\Read\CartRepository;
 use Thinktomorrow\Trader\Application\Cart\Read\CartShipping;
 use Thinktomorrow\Trader\Application\Cart\Read\CartShippingAddress;
 use Thinktomorrow\Trader\Application\Cart\Read\CartShopper;
+use Thinktomorrow\Trader\Application\Order\MerchantOrder\MerchantOrderPayment;
+use Thinktomorrow\Trader\Application\Order\MerchantOrder\MerchantOrderShipping;
 use Thinktomorrow\Trader\Application\Cart\ShippingProfile\ShippingProfileForCart;
 use Thinktomorrow\Trader\Application\Cart\ShippingProfile\ShippingProfileForCartRepository;
 use Thinktomorrow\Trader\Application\Cart\VariantForCart\VariantForCart;
@@ -37,6 +39,8 @@ use Thinktomorrow\Trader\Application\Product\OptionLinks\OptionLink;
 use Thinktomorrow\Trader\Application\Product\ProductDetail\ProductDetail;
 use Thinktomorrow\Trader\Application\Product\ProductDetail\ProductDetailRepository;
 use Thinktomorrow\Trader\Application\Promo\OrderPromo\Conditions\MinimumAmountOrderCondition;
+use Thinktomorrow\Trader\Infrastructure\Laravel\Models\MerchantOrder\DefaultMerchantOrderPayment;
+use Thinktomorrow\Trader\Infrastructure\Laravel\Models\MerchantOrder\DefaultMerchantOrderShipping;
 use Thinktomorrow\Trader\Application\Promo\OrderPromo\Conditions\MinimumLinesQuantityOrderCondition;
 use Thinktomorrow\Trader\Application\Promo\OrderPromo\Discounts\FixedAmountOrderDiscount;
 use Thinktomorrow\Trader\Application\Promo\OrderPromo\Discounts\PercentageOffOrderDiscount;
@@ -184,6 +188,8 @@ class TraderServiceProvider extends ServiceProvider
         $this->app->bind(MerchantOrderShippingAddress::class, DefaultMerchantOrderShippingAddress::class);
         $this->app->bind(MerchantOrderBillingAddress::class, DefaultMerchantOrderBillingAddress::class);
         $this->app->bind(MerchantOrderShopper::class, DefaultMerchantOrderShopper::class);
+        $this->app->bind(MerchantOrderShipping::class, DefaultMerchantOrderShipping::class);
+        $this->app->bind(MerchantOrderPayment::class, DefaultMerchantOrderPayment::class);
 
         $this->app->bind(PromoRepository::class, MysqlPromoRepository::class);
         $this->app->bind(OrderPromoRepository::class, MysqlPromoRepository::class);

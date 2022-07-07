@@ -139,12 +139,26 @@ class MysqlShippingProfileRepository implements ShippingProfileRepository, Shipp
         return array_map(fn ($countryState) => \Thinktomorrow\Trader\Application\Country\Country::fromMappedData($countryState), $countryStates);
     }
 
-    public function findAllShippingProfilesForCart(): array
+    public function findAllShippingProfilesForCart(?string $countryId = null): array
     {
-        return DB::table(static::$shippingProfileTable)
+        $builder = DB::table(static::$shippingProfileTable)
             ->whereIn('state', ShippingProfileState::onlineStates())
+            ->orderBy('order_column', 'ASC');
+
+        if($countryId) {
+            $builder->leftJoin(static::$shippingProfileCountryTable, static::$shippingProfileTable.'.shipping_profile_id', '=', static::$shippingProfileCountryTable.'.shipping_profile_id')
+                ->where(function($query) use($countryId){
+                    $query->where(static::$shippingProfileTable.'.requires_address', 0)
+                        ->orWhere(static::$shippingProfileCountryTable . '.country_id', $countryId);
+                })
+                ->select(static::$shippingProfileTable.'.*');
+        }
+
+        return $builder
             ->get()
-            ->map(fn ($shippingProfileState) => $this->container->get(ShippingProfileForCart::class)::fromMappedData((array) $shippingProfileState))
+            ->map(fn ($shippingProfileState) => $this->container->get(ShippingProfileForCart::class)::fromMappedData(array_merge((array)$shippingProfileState, [
+                'requires_address' => (bool) $shippingProfileState->requires_address,
+            ])))
             ->toArray();
     }
 }

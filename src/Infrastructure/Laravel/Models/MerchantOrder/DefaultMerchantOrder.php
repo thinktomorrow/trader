@@ -37,4 +37,9 @@ class DefaultMerchantOrder extends OrderRead implements MerchantOrder
     {
         return parent::getBillingAddress();
     }
+
+    public function inCustomerHands(): bool
+    {
+        return $this->state->inCustomerHands();
+    }
 }

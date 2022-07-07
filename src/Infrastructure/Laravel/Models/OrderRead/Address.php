@@ -64,4 +64,15 @@ abstract class Address
     {
         return $this->data('description');
     }
+
+    public function equalsAddress($otherAddress): bool
+    {
+        if(!$otherAddress || !$otherAddress instanceof Address) return false;
+
+        return $this->countryId == $otherAddress->countryId
+            && $this->postalCode == $otherAddress->postalCode
+            && $this->city == $otherAddress->city
+            && $this->line1 == $otherAddress->line1
+            && $this->line2 == $otherAddress->line2;
+    }
 }
