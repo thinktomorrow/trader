@@ -3,16 +3,16 @@ declare(strict_types=1);
 
 namespace Thinktomorrow\Trader\Application\Cart\ShippingProfile;
 
-use Thinktomorrow\Trader\TraderConfig;
 use Thinktomorrow\Trader\Domain\Common\Cash\Cash;
-use Thinktomorrow\Trader\Domain\Model\Order\Order;
 use Thinktomorrow\Trader\Domain\Common\Taxes\TaxRate;
+use Thinktomorrow\Trader\Domain\Model\Order\Order;
 use Thinktomorrow\Trader\Domain\Model\Order\OrderRepository;
 use Thinktomorrow\Trader\Domain\Model\Order\Shipping\Shipping;
 use Thinktomorrow\Trader\Domain\Model\Order\Shipping\ShippingCost;
 use Thinktomorrow\Trader\Domain\Model\ShippingProfile\ShippingProfileId;
-use Thinktomorrow\Trader\Domain\Model\ShippingProfile\ShippingProfileState;
 use Thinktomorrow\Trader\Domain\Model\ShippingProfile\ShippingProfileRepository;
+use Thinktomorrow\Trader\Domain\Model\ShippingProfile\ShippingProfileState;
+use Thinktomorrow\Trader\TraderConfig;
 
 class UpdateShippingProfileOnOrder
 {
@@ -31,20 +31,23 @@ class UpdateShippingProfileOnOrder
     {
         $shippingProfile = $this->shippingProfileRepository->find($shippingProfileId);
 
-        if(!in_array($shippingProfile->getState(), ShippingProfileState::onlineStates())) {
+        if (! in_array($shippingProfile->getState(), ShippingProfileState::onlineStates())) {
             $this->removeAllShippingsFromOrder($order);
+
             return;
         }
 
-        if($shippingProfile->requiresAddress()) {
+        if ($shippingProfile->requiresAddress()) {
             // Country of shipment is needed when shipping profile requires address.
             if (! $shippingCountryId = $order->getShippingAddress()?->getAddress()->countryId) {
                 $this->removeAllShippingsFromOrder($order);
+
                 return;
             }
 
             if (! $shippingProfile->hasCountry($shippingCountryId)) {
                 $this->removeAllShippingsFromOrder($order);
+
                 return;
             }
         }
@@ -82,7 +85,7 @@ class UpdateShippingProfileOnOrder
 
     private function removeAllShippingsFromOrder(Order $order)
     {
-        foreach($order->getShippings() as $shipping) {
+        foreach ($order->getShippings() as $shipping) {
             $order->deleteShipping($shipping->shippingId);
         }
     }
