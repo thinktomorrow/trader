@@ -27,8 +27,12 @@ abstract class OrderRead
     protected iterable $lines;
     protected ?MerchantOrderShippingAddress $shippingAddress;
     protected ?MerchantOrderBillingAddress $billingAddress;
-    protected ?MerchantOrderShipping $shipping;
-    protected ?MerchantOrderPayment $payment;
+    /** @var MerchantOrderShipping[] */
+    protected array $shippings;
+
+    /** @var MerchantOrderPayment[] */
+    protected array $payments;
+
     protected ?MerchantOrderShopper $shopper;
     protected array $discounts;
     protected array $data;
@@ -62,8 +66,8 @@ abstract class OrderRead
         $order->lines = $childObjects[MerchantOrderLine::class];
         $order->shippingAddress = $childObjects[MerchantOrderShippingAddress::class];
         $order->billingAddress = $childObjects[MerchantOrderBillingAddress::class];
-        $order->shipping = $childObjects[MerchantOrderShipping::class];
-        $order->payment = $childObjects[MerchantOrderPayment::class];
+        $order->shippings = $childObjects[MerchantOrderShipping::class];
+        $order->payments = $childObjects[MerchantOrderPayment::class];
         $order->shopper = $childObjects[MerchantOrderShopper::class];
 
         $order->data = json_decode($state['data'], true);
@@ -172,14 +176,14 @@ abstract class OrderRead
         return $this->shopper;
     }
 
-    public function getShipping(): ?MerchantOrderShipping
+    public function getShippings(): array
     {
-        return $this->shipping;
+        return $this->shippings;
     }
 
-    public function getPayment(): ?MerchantOrderPayment
+    public function getPayments(): array
     {
-        return $this->payment;
+        return $this->payments;
     }
 
     public function getShippingAddress(): ?MerchantOrderShippingAddress
@@ -206,12 +210,12 @@ abstract class OrderRead
     {
         $allDiscounts = $this->getDiscounts();
 
-        if ($this->getShipping()) {
-            $allDiscounts = array_merge($allDiscounts, $this->getShipping()->getDiscounts());
+        foreach($this->getShippings() as $shipping) {
+            $allDiscounts = array_merge($allDiscounts, $shipping->getDiscounts());
         }
 
-        if ($this->getPayment()) {
-            $allDiscounts = array_merge($allDiscounts, $this->getPayment()->getDiscounts());
+        foreach($this->getPayments() as $payment) {
+            $allDiscounts = array_merge($allDiscounts, $payment->getDiscounts());
         }
 
         foreach ($this->getLines() as $line) {

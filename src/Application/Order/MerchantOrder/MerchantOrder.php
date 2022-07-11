@@ -28,8 +28,13 @@ interface MerchantOrder
     public function includeTax(bool $includeTax = true): void;
 
     public function getShopper(): MerchantOrderShopper;
-    public function getShipping(): MerchantOrderShipping;
-    public function getPayment(): MerchantOrderPayment;
+
+    /** @return MerchantOrderShipping[] */
+    public function getShippings(): array;
+
+    /** @return MerchantOrderPayment[] */
+    public function getPayments(): array;
+
     public function getShippingAddress(): MerchantOrderShippingAddress;
     public function getBillingAddress(): MerchantOrderBillingAddress;
 

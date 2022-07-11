@@ -5,6 +5,7 @@ namespace Thinktomorrow\Trader\Domain\Model\Order;
 
 use Thinktomorrow\Trader\Domain\Common\Entity\Aggregate;
 use Thinktomorrow\Trader\Domain\Common\Entity\HasData;
+use Thinktomorrow\Trader\Domain\Model\Order\Payment\PaymentId;
 use Thinktomorrow\Trader\Domain\Common\Entity\RecordsChangelog;
 use Thinktomorrow\Trader\Domain\Common\Event\RecordsEvents;
 use Thinktomorrow\Trader\Domain\Common\Price\Price;
@@ -35,16 +36,16 @@ final class Order implements Aggregate, Discountable
     use HasTotals;
     use HasLines;
     use HasShippings;
+    use HasPayments;
     use HasDiscounts;
     use HasData;
 
     public readonly OrderId $orderId;
     public readonly OrderReference $orderReference;
     private OrderState $orderState;
-    private ?Shopper $shopper = null;
-    private ?Payment $payment = null;
     private ?ShippingAddress $shippingAddress = null;
     private ?BillingAddress $billingAddress = null;
+    private ?Shopper $shopper = null;
 
     private function __construct()
     {
@@ -84,9 +85,10 @@ final class Order implements Aggregate, Discountable
         return $this->shippings;
     }
 
-    public function getPayment(): ?Payment
+    /** @return Payment[] */
+    public function getPayments(): array
     {
-        return $this->payment;
+        return $this->payments;
     }
 
     public function getBillingAddress(): ?BillingAddress
@@ -113,18 +115,13 @@ final class Order implements Aggregate, Discountable
         $this->update('shopper', $shopper);
     }
 
-    public function updatePayment(Payment $payment): void
+    public function updatePaymentState(PaymentId $paymentId, PaymentState $paymentState): void
     {
-        $this->update('payment', $payment);
-    }
+        $formerPaymentState = $this->findPayment($paymentId)->getPaymentState();
 
-    public function updatePaymentState(PaymentState $paymentState): void
-    {
-        $formerPaymentState = $this->getPayment()->getPaymentState();
+        $this->findPayment($paymentId)->updateState($paymentState);
 
-        $this->getPayment()->updateState($paymentState);
-
-        $this->recordEvent(new PaymentStateUpdated($this->orderId, $formerPaymentState, $paymentState));
+        $this->recordEvent(new PaymentStateUpdated($this->orderId, $paymentId, $formerPaymentState, $paymentState));
     }
 
     public function updateShippingState(ShippingId $shippingId, ShippingState $shippingState): void
@@ -204,9 +201,9 @@ final class Order implements Aggregate, Discountable
             Line::class => array_map(fn ($line) => $line->getMappedData(), $this->lines),
             Discount::class => array_map(fn ($discount) => $discount->getMappedData(), $this->discounts),
             Shipping::class => array_map(fn ($shipping) => $shipping->getMappedData(), $this->shippings),
+            Payment::class => array_map(fn ($payment) => $payment->getMappedData(), $this->payments),
             ShippingAddress::class => $this->shippingAddress?->getMappedData(),
             BillingAddress::class => $this->billingAddress?->getMappedData(),
-            Payment::class => $this->payment?->getMappedData(),
             Shopper::class => $this->shopper?->getMappedData(),
         ];
     }
@@ -222,9 +219,9 @@ final class Order implements Aggregate, Discountable
         $order->discounts = array_map(fn ($discountState) => Discount::fromMappedData($discountState, $state), $childEntities[Discount::class]);
         $order->lines = array_map(fn ($lineState) => Line::fromMappedData($lineState, $state, [Discount::class => $lineState[Discount::class]]), $childEntities[Line::class]);
         $order->shippings = array_map(fn ($shippingState) => Shipping::fromMappedData($shippingState, $state, [Discount::class => $shippingState[Discount::class]]), $childEntities[Shipping::class]);
+        $order->payments = array_map(fn ($paymentState) => Payment::fromMappedData($paymentState, $state, [Discount::class => $paymentState[Discount::class]]), $childEntities[Payment::class]);
         $order->shippingAddress = $childEntities[ShippingAddress::class] ? ShippingAddress::fromMappedData($childEntities[ShippingAddress::class], $state) : null;
         $order->billingAddress = $childEntities[BillingAddress::class] ? BillingAddress::fromMappedData($childEntities[BillingAddress::class], $state) : null;
-        $order->payment = $childEntities[Payment::class] ? Payment::fromMappedData($childEntities[Payment::class], $state, [Discount::class => $childEntities[Payment::class][Discount::class]]) : null;
         $order->shopper = $childEntities[Shopper::class] ? Shopper::fromMappedData($childEntities[Shopper::class], $state) : null;
 
         $order->data = json_decode($state['data'], true);

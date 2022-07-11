@@ -200,6 +200,11 @@ class CreateBasicTraderTables extends Migration
             $table->integer('discount_total')->unsigned();
             $table->integer('shipping_cost')->unsigned();
             $table->integer('payment_cost')->unsigned();
+            $table->timestamp('created_at');
+            $table->timestamp('updated_at');
+            $table->timestamp('confirmed_at')->nullable();
+            $table->timestamp('paid_at')->nullable();
+            $table->timestamp('fulfilled_at')->nullable();
             $table->json('data')->nullable();
         });
 

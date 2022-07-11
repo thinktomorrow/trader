@@ -18,14 +18,16 @@ class DefaultMerchantOrder extends OrderRead implements MerchantOrder
         return parent::getShopper();
     }
 
-    public function getShipping(): MerchantOrderShipping
+    /** @return MerchantOrderShipping[] */
+    public function getShippings(): array
     {
-        return parent::getShipping();
+        return parent::getShippings();
     }
 
-    public function getPayment(): MerchantOrderPayment
+    /** @return MerchantOrderPayment[] */
+    public function getPayments(): array
     {
-        return parent::getPayment();
+        return parent::getPayments();
     }
 
     public function getShippingAddress(): MerchantOrderShippingAddress

@@ -24,10 +24,11 @@ class MerchantOrderRepositoryTest extends TestCase
 
     /**
      * @test
-     * @dataProvider orders
      */
-    public function it_can_find_a_merchantorder(Order $order)
+    public function it_can_find_a_merchantorder()
     {
+        $order = $this->createDefaultOrder();
+
         foreach ($this->orderRepositories() as $i => $orderRepository) {
             $orderRepository->save($order);
 
@@ -71,10 +72,5 @@ class MerchantOrderRepositoryTest extends TestCase
     {
         yield new InMemoryProductRepository();
         yield new MysqlProductRepository(new MysqlVariantRepository(new TestContainer()));
-    }
-
-    public function orders(): \Generator
-    {
-        yield [$this->createdOrder()];
     }
 }

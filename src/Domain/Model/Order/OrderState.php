@@ -33,14 +33,15 @@ enum OrderState: string implements State
      * ------------------------------------------------
      * the order has been successfully paid and the cart can be considered an 'order'.
      */
-    case paid = 'paid'; // payment received by merchant or acquirer
     case cancelled = 'cancelled'; // customer cancelled order after payment
-    case halted_for_packing = 'halted_for_packing'; // something is wrong with the order (e.g. outdated order,  out of stock, ...)
-    case ready_for_packing = 'ready_for_packing'; // ready to be picked
-    case packed = 'packed'; // ready for pickup by the logistic partner
-    case shipped = 'shipped'; // in hands of logistic partner
-    case fulfilled = 'fulfilled'; // delivered to customer
-    case returned = 'returned'; // order is returned to merchant
+    case cancelled_by_merchant = 'cancelled_by_merchant'; // admin cancelled order after payment
+    case unpaid = 'unpaid'; // not yet fully paid or one of the payments has failed
+    case paid = 'paid'; // fully paid so order can be processed
+    case processed = 'processed'; // internally processed the order
+    case undelivered = 'undelivered'; // not yet fully delivered or one of the shippings has failed
+    case delivered = 'delivered'; // fully delivered so order can be processed
+    case unfulfilled = 'unfulfilled'; // order is not fulfilled yet or something happened that caused the failure.
+    case fulfilled = 'fulfilled'; // order is fulfilled and finished
 
     public function inCustomerHands(): bool
     {

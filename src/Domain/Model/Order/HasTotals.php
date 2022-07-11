@@ -5,6 +5,7 @@ namespace Thinktomorrow\Trader\Domain\Model\Order;
 
 use Money\Money;
 use Thinktomorrow\Trader\Domain\Common\Price\PriceTotal;
+use Thinktomorrow\Trader\Domain\Model\Order\Payment\Payment;
 use Thinktomorrow\Trader\Domain\Model\Order\Discount\DiscountTotal;
 use Thinktomorrow\Trader\Domain\Model\Order\Line\Line;
 use Thinktomorrow\Trader\Domain\Model\Order\Payment\PaymentCost;
@@ -64,6 +65,14 @@ trait HasTotals
 
     public function getPaymentCost(): PaymentCost
     {
-        return $this->payment ? $this->payment->getPaymentCost() : PaymentCost::zero();
+        if (count($this->payments) < 1) {
+            return PaymentCost::zero();
+        }
+
+        return array_reduce($this->payments, function (?PriceTotal $carry, Payment $payment) {
+            return $carry === null
+                ? $payment->getPaymentCost()
+                : $carry->add($payment->getPaymentCost());
+        }, null);
     }
 }

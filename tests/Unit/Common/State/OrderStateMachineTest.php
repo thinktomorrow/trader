@@ -19,7 +19,7 @@ class OrderStateMachineTest extends TestCase
     {
         parent::setUp();
 
-        $this->order = $this->createdOrder();
+        $this->order = $this->createDefaultOrder();
         $this->order->updateState(OrderState::cart_pending);
 
         $this->machine = new OrderStateMachine([

@@ -126,11 +126,11 @@ class MerchantOrderTest extends CartContext
 
         $merchantOrder = $this->merchantOrderRepository->findMerchantOrder(OrderId::fromString('xxx'));
 
-        $this->assertInstanceOf(MerchantOrderShipping::class, $merchantOrder->getShipping());
-        $this->assertEquals('shipping-123', $merchantOrder->getShipping()->getShippingId());
-        $this->assertEquals('bpost_home', $merchantOrder->getShipping()->getShippingProfileId());
-        $this->assertEquals('€ 30', $merchantOrder->getShipping()->getCostPrice());
-        $this->assertEquals('Bpost Home', $merchantOrder->getShipping()->getTitle());
+        $this->assertInstanceOf(MerchantOrderShipping::class, $merchantOrder->getShippings()[0]);
+        $this->assertEquals('shipping-123', $merchantOrder->getShippings()[0]->getShippingId());
+        $this->assertEquals('bpost_home', $merchantOrder->getShippings()[0]->getShippingProfileId());
+        $this->assertEquals('€ 30', $merchantOrder->getShippings()[0]->getCostPrice());
+        $this->assertEquals('Bpost Home', $merchantOrder->getShippings()[0]->getTitle());
     }
 
     /** @test */
@@ -143,10 +143,10 @@ class MerchantOrderTest extends CartContext
 
         $merchantOrder = $this->merchantOrderRepository->findMerchantOrder(OrderId::fromString('xxx'));
 
-        $this->assertInstanceOf(MerchantOrderPayment::class, $merchantOrder->getPayment());
-        $this->assertEquals('payment-123', $merchantOrder->getPayment()->getPaymentId());
-        $this->assertEquals('bancontact', $merchantOrder->getPayment()->getPaymentMethodId());
-        $this->assertEquals('€ 30', $merchantOrder->getPayment()->getCostPrice());
+        $this->assertInstanceOf(MerchantOrderPayment::class, $merchantOrder->getPayments()[0]);
+        $this->assertEquals('payment-123', $merchantOrder->getPayments()[0]->getPaymentId());
+        $this->assertEquals('bancontact', $merchantOrder->getPayments()[0]->getPaymentMethodId());
+        $this->assertEquals('€ 30', $merchantOrder->getPayments()[0]->getCostPrice());
     }
 
     /** @test */

@@ -25,10 +25,11 @@ final class CartRepositoryTest extends TestCase
 
     /**
      * @test
-     * @dataProvider orders
      */
-    public function it_can_find_a_cart(Order $order)
+    public function it_can_find_a_cart()
     {
+        $order = $this->createDefaultOrder();
+
         foreach ($this->orderRepositories() as $i => $orderRepository) {
             $orderRepository->save($order);
 
@@ -53,7 +54,7 @@ final class CartRepositoryTest extends TestCase
     /** @test */
     public function it_can_check_if_cart_exists()
     {
-        $order = $this->createdOrder();
+        $order = $this->createDefaultOrder();
         $order->updateState(OrderState::cart_pending);
 
         foreach ($this->orderRepositories() as $i => $orderRepository) {
@@ -68,7 +69,7 @@ final class CartRepositoryTest extends TestCase
     /** @test */
     public function it_checks_if_cart_is_in_customer_hands()
     {
-        $order = $this->createdOrder();
+        $order = $this->createDefaultOrder();
         $order->updateState(OrderState::confirmed);
 
         foreach ($this->orderRepositories() as $i => $orderRepository) {
@@ -85,7 +86,7 @@ final class CartRepositoryTest extends TestCase
     {
         $calls = 0;
 
-        $order = $this->createdOrder();
+        $order = $this->createDefaultOrder();
         $order->updateState(OrderState::confirmed);
 
         foreach ($this->orderRepositories() as $i => $orderRepository) {
@@ -125,10 +126,5 @@ final class CartRepositoryTest extends TestCase
     {
         yield new InMemoryProductRepository();
         yield new MysqlProductRepository(new MysqlVariantRepository(new TestContainer()));
-    }
-
-    public function orders(): \Generator
-    {
-        yield [$this->createdOrder()];
     }
 }

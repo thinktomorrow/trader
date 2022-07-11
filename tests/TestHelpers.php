@@ -83,96 +83,175 @@ trait TestHelpers
         });
     }
 
-    protected function createdOrder(): Order
+    protected function createOrder(array $orderValues = [], array $lines = [], array $discounts = [], array $shippings = [], array $payments = [], ?ShippingAddress $shippingAddress = null, ?BillingAddress $billingAddress = null, ?Shopper $shopper = null): Order
     {
-        return Order::fromMappedData([
+        return Order::fromMappedData(array_merge([
             'order_id' => 'xxx',
             'order_ref' => 'xx-ref',
             'order_state' => OrderState::cart_revived->value,
             'data' => "[]",
-        ], [
-            Line::class => [
-                [
-                    'order_id' => 'xxx',
-                    'line_id' => 'abc',
-                    'variant_id' => 'yyy',
-                    'line_price' => 200,
-                    'tax_rate' => '10',
-                    'includes_vat' => true,
-                    'quantity' => 2,
-                    'data' => json_encode(['product_id' => 'aab', 'unit_price' => '1000', 'foo' => 'bar']),
-                    Discount::class => [$this->createOrderDiscount(OrderId::fromString('xxx'), ['discount_id' => 'line-abc', 'discountable_type' => DiscountableType::line->value, 'discountable_id' => 'abc'])->getMappedData()],
-                ],
-            ],
-            ShippingAddress::class => [
-                'country_id' => 'BE',
-                'line_1' => 'Lierseweg 81',
-                'line_2' => null,
-                'postal_code' => '2200',
-                'city' => 'Herentals',
-                'data' => "[]",
-            ],
-            BillingAddress::class => [
-                'country_id' => 'NL',
-                'line_1' => 'example 12',
-                'line_2' => 'bus 2',
-                'postal_code' => '1000',
-                'city' => 'Amsterdam',
-                'data' => "[]",
-            ],
-            Discount::class => [
-                $this->createOrderDiscount(OrderId::fromString('xxx'))->getMappedData(),
-            ],
-            Shipping::class => [
-                [
-                    'order_id' => 'xxx',
-                    'shipping_id' => 'sss',
-                    'shipping_profile_id' => 'ppp',
-                    'shipping_state' => ShippingState::initialized->value,
-                    'cost' => '30',
-                    'tax_rate' => '10',
-                    'includes_vat' => true,
-                    'data' => "[]",
-                    Discount::class => [$this->createOrderDiscount(OrderId::fromString('xxx'), ['discount_id' => 'shipping-uuu', 'discountable_type' => DiscountableType::shipping->value, 'discountable_id' => 'sss'])->getMappedData()],
-                ],
-            ],
-            Payment::class => [
-                'payment_id' => 'ppppp',
-                'payment_method_id' => 'mmm',
-                'payment_state' => PaymentState::initialized->value,
-                'cost' => '20',
-                'tax_rate' => '10',
-                'includes_vat' => true,
-                'data' => "[]",
-                Discount::class => [],
-            ],
-            Shopper::class => [
-                'shopper_id' => 'abcdef',
-                'email' => 'ben@thinktomorrow.be',
-                'is_business' => false,
-                'register_after_checkout' => true,
-                'customer_id' => null,
-                'locale' => 'en_GB',
-                'data' => "[]",
-            ],
+        ], $orderValues), [
+            Line::class => array_map(fn(Line $line) => [...$line->getMappedData(), Discount::class => array_map(fn(Discount $discount) => $discount->getMappedData(), $line->getDiscounts())], $lines),
+            Shipping::class => array_map(fn(Shipping $shipping) => [...$shipping->getMappedData(), Discount::class => array_map(fn(Discount $discount) => $discount->getMappedData(), $shipping->getDiscounts())], $shippings),
+            Payment::class => array_map(fn(Payment $payment) => [...$payment->getMappedData(), Discount::class => array_map(fn(Discount $discount) => $discount->getMappedData(), $payment->getDiscounts())], $payments),
+            ShippingAddress::class => $shippingAddress?->getMappedData(),
+            BillingAddress::class => $billingAddress?->getMappedData(),
+            Shopper::class => $shopper?->getMappedData(),
+            Discount::class => array_map(fn(Discount $discount) => $discount->getMappedData(), $discounts),
         ]);
     }
 
-    protected function createOrderDiscount(OrderId $orderId, array $data = []): Discount
+    protected function createDefaultOrder(array $orderValues = []): Order
+    {
+        return $this->createOrder(
+            $orderValues,
+            [$this->createLine()],
+            [$this->createOrderDiscount()],
+            [$this->createOrderShipping()],
+            [$this->createOrderPayment()],
+            $this->createOrderShippingAddress(),
+            $this->createOrderBillingAddress(),
+            $this->createOrderShopper(),
+        );
+    }
+
+    protected function createLine(array $values = [], array $aggregateState = [], array $discounts = []): Line
+    {
+        return Line::fromMappedData(array_merge([
+            'line_id' => 'abc',
+            'variant_id' => 'yyy',
+            'line_price' => 200,
+            'tax_rate' => '10',
+            'includes_vat' => true,
+            'quantity' => 2,
+            'data' => json_encode(['product_id' => 'aab', 'unit_price' => '1000', 'foo' => 'bar']),
+        ], $values), array_merge([
+            'order_id' => 'xxx',
+        ], $aggregateState), [
+            Discount::class => array_map(fn(Discount $discount) => $discount->getMappedData(), $discounts),
+        ]);
+    }
+
+    protected function createOrderShipping(array $values = [], array $aggregateState = [], array $discounts = []): Shipping
+    {
+        return Shipping::fromMappedData(array_merge([
+            'order_id' => 'xxx',
+            'shipping_id' => 'sss',
+            'shipping_profile_id' => 'ppp',
+            'shipping_state' => ShippingState::none->value,
+            'cost' => '30',
+            'tax_rate' => '10',
+            'includes_vat' => true,
+            'data' => "[]",
+        ], $values), array_merge([
+            'order_id' => 'xxx',
+        ], $aggregateState), [
+            Discount::class => array_map(fn(Discount $discount) => $discount->getMappedData(), $discounts),
+        ]);
+    }
+
+    protected function createOrderPayment(array $values = [], array $aggregateState = [], array $discounts = []): Payment
+    {
+        return Payment::fromMappedData(array_merge([
+            'payment_id' => 'ppppp',
+            'payment_method_id' => 'mmm',
+            'payment_state' => PaymentState::initialized->value,
+            'cost' => '20',
+            'tax_rate' => '10',
+            'includes_vat' => true,
+            'data' => "[]",
+        ], $values), array_merge([
+            'order_id' => 'xxx',
+        ], $aggregateState), [
+            Discount::class => array_map(fn(Discount $discount) => $discount->getMappedData(), $discounts),
+        ]);
+    }
+
+    protected function createOrderShippingAddress(array $values = [], array $aggregateState = []): ShippingAddress
+    {
+        return ShippingAddress::fromMappedData(array_merge([
+            'country_id' => 'BE',
+            'line_1' => 'Lierseweg 81',
+            'line_2' => null,
+            'postal_code' => '2200',
+            'city' => 'Herentals',
+            'data' => "[]",
+        ], $values), array_merge([
+            'order_id' => 'xxx',
+        ], $aggregateState));
+    }
+
+    protected function createOrderBillingAddress(array $values = [], array $aggregateState = []): BillingAddress
+    {
+        return BillingAddress::fromMappedData(array_merge([
+            'country_id' => 'NL',
+            'line_1' => 'example 12',
+            'line_2' => 'bus 2',
+            'postal_code' => '1000',
+            'city' => 'Amsterdam',
+            'data' => "[]",
+        ], $values), array_merge([
+            'order_id' => 'xxx',
+        ], $aggregateState));
+    }
+
+    protected function createOrderShopper(array $values = [], array $aggregateState = []): Shopper
+    {
+        return Shopper::fromMappedData(array_merge([
+            'shopper_id' => 'abcdef',
+            'email' => 'ben@thinktomorrow.be',
+            'is_business' => false,
+            'register_after_checkout' => true,
+            'customer_id' => 'ccc-123',
+            'locale' => 'en_GB',
+            'data' => "[]",
+        ], $values), array_merge([
+            'order_id' => 'xxx',
+        ], $aggregateState));
+    }
+
+    protected function createOrderDiscount(array $data = [], array $aggregateState = []): Discount
     {
         return Discount::fromMappedData(array_merge([
             'discount_id' => 'ababab',
             'discountable_type' => DiscountableType::order->value,
-            'discountable_id' => $orderId->get(),
+            'discountable_id' => 'xxx',
             'promo_id' => 'def',
             'promo_discount_id' => 'abc',
             'total' => '30',
             'tax_rate' => '9',
             'includes_vat' => true,
             'data' => json_encode(['foo' => 'bar']),
-        ], $data), [
-            'order_id' => $orderId->get(),
-        ]);
+        ], $data), array_merge([
+            'order_id' => 'xxx',
+        ], $aggregateState));
+    }
+
+    protected function createOrderLineDiscount(array $data = [], array $aggregateState = []): Discount
+    {
+        return $this->createOrderDiscount(array_merge([
+            'discount_id' => 'line-abc',
+            'discountable_type' => DiscountableType::line->value,
+            'discountable_id' => 'abc',
+        ], $data));
+    }
+
+    protected function createOrderShippingDiscount(array $data = [], array $aggregateState = []): Discount
+    {
+        return $this->createOrderDiscount(array_merge([
+            'discount_id' => 'shipping-uuu',
+            'discountable_type' => DiscountableType::shipping->value,
+            'discountable_id' => 'sss',
+        ], $data));
+    }
+
+    protected function createOrderPaymentDiscount(array $data = [], array $aggregateState = []): Discount
+    {
+        return $this->createOrderDiscount(array_merge([
+            'discount_id' => 'shipping-mmm',
+            'discountable_type' => DiscountableType::payment->value,
+            'discountable_id' => 'ppppp',
+        ], $data));
     }
 
     protected function createdCustomer(): Customer

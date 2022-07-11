@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace Thinktomorrow\Trader\Infrastructure\Laravel\Repositories;
 
 use Psr\Container\ContainerInterface;
+use Thinktomorrow\Trader\Domain\Model\Order\Payment\Payment;
 use Thinktomorrow\Trader\Application\Order\MerchantOrder\MerchantOrder;
 use Thinktomorrow\Trader\Application\Order\MerchantOrder\MerchantOrderBillingAddress;
 use Thinktomorrow\Trader\Application\Order\MerchantOrder\MerchantOrderDiscount;
@@ -78,19 +79,19 @@ class MysqlMerchantOrderRepository implements MerchantOrderRepository
             array_map(fn (Discount $discount) => $this->container->get(MerchantOrderDiscount::class)::fromMappedData(array_merge($discount->getMappedData(), [
                 'total' => $discount->getTotal(),
                 'percentage' => $discount->getPercentage($shipping->getShippingCost()),
-            ]), $orderState), $shipping->getDiscounts())// TODO: cart shipping discounts
+            ]), $orderState), $shipping->getDiscounts())
         ), $order->getShippings());
 
-        $payment = $order->getPayment() ? $this->container->get(MerchantOrderPayment::class)::fromMappedData(
-            array_merge($order->getPayment()->getMappedData(), [
-                'cost' => $order->getPayment()->getPaymentCost(),
+        $payments = array_map(fn (Payment $payment) => $this->container->get(MerchantOrderPayment::class)::fromMappedData(
+            array_merge($payment->getMappedData(), [
+                'cost' => $payment->getPaymentCost(),
             ]),
             $orderState,
             array_map(fn (Discount $discount) => $this->container->get(MerchantOrderDiscount::class)::fromMappedData(array_merge($discount->getMappedData(), [
                 'total' => $discount->getTotal(),
-                'percentage' => $discount->getPercentage($order->getPayment()->getPaymentCost()),
-            ]), $orderState), $order->getPayment()->getDiscounts()), // TODO: cart payment discounts
-        ) : null;
+                'percentage' => $discount->getPercentage($payment->getPaymentCost()),
+            ]), $orderState), $payment->getDiscounts())
+        ), $order->getPayments());
 
         $shopper = $order->getShopper() ? $this->container->get(MerchantOrderShopper::class)::fromMappedData(
             $order->getShopper()->getMappedData(),
@@ -103,8 +104,8 @@ class MysqlMerchantOrderRepository implements MerchantOrderRepository
                 MerchantOrderLine::class => $lines,
                 MerchantOrderShippingAddress::class => $shippingAddress,
                 MerchantOrderBillingAddress::class => $billingAddress,
-                MerchantOrderShipping::class => count($shippings) ? reset($shippings) : null, // In the cart we expect one shipping
-                MerchantOrderPayment::class => $payment,
+                MerchantOrderShipping::class => $shippings,
+                MerchantOrderPayment::class => $payments,
                 MerchantOrderShopper::class => $shopper,
             ],
             array_map(fn (Discount $discount) => $this->container->get(MerchantOrderDiscount::class)::fromMappedData(array_merge($discount->getMappedData(), [

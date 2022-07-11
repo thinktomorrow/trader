@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace Thinktomorrow\Trader\Infrastructure\Laravel\Repositories;
 
+use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 use Ramsey\Uuid\Uuid;
 use Thinktomorrow\Trader\Domain\Common\Address\AddressType;
@@ -40,15 +41,20 @@ final class MysqlOrderRepository implements OrderRepository
         $state = $order->getMappedData();
 
         if (! $this->exists($order->orderId)) {
-            DB::table(static::$orderTable)->insert($state);
+            DB::table(static::$orderTable)->insert(array_merge($state,[
+                'created_at' => Carbon::now(),
+                'updated_at' => Carbon::now(),
+            ]));
         } else {
-            DB::table(static::$orderTable)->where('order_id', $order->orderId->get())->update($state);
+            DB::table(static::$orderTable)->where('order_id', $order->orderId->get())->update(array_merge($state,[
+                'updated_at' => Carbon::now(),
+            ]));
         }
 
         $this->upsertLines($order);
         $this->upsertDiscounts($order);
         $this->upsertShippings($order);
-        $this->upsertPayment($order);
+        $this->upsertPayments($order);
         $this->upsertAddresses($order);
         $this->upsertShopper($order);
     }
@@ -87,7 +93,9 @@ final class MysqlOrderRepository implements OrderRepository
             $discountStates = array_merge($discountStates, $shipping->getChildEntities()[Discount::class]);
         }
 
-        $discountStates = array_merge($discountStates, $order->getPayment() ? $order->getPayment()->getChildEntities()[Discount::class] : []);
+        foreach ($order->getPayments() as $payment) {
+            $discountStates = array_merge($discountStates, $payment->getChildEntities()[Discount::class]);
+        }
 
         DB::table(static::$orderDiscountsTable)
             ->where('order_id', $order->orderId->get())
@@ -125,21 +133,22 @@ final class MysqlOrderRepository implements OrderRepository
         }
     }
 
-    private function upsertPayment(Order $order): void
+    private function upsertPayments(Order $order): void
     {
-        $paymentState = $order->getChildEntities()[Payment::class];
-
-        if (is_null($paymentState)) {
-            DB::table(static::$orderPaymentTable)->where('order_id', $order->orderId->get())->delete();
-
-            return;
-        }
+        $paymentIds = array_map(fn ($paymentState) => $paymentState['payment_id'], $order->getChildEntities()[Payment::class]);
 
         DB::table(static::$orderPaymentTable)
-            ->updateOrInsert([
-                'order_id' => $order->orderId->get(),
-                'payment_id' => $paymentState['payment_id'],
-            ], $paymentState);
+            ->where('order_id', $order->orderId->get())
+            ->whereNotIn('payment_id', $paymentIds)
+            ->delete();
+
+        foreach ($order->getChildEntities()[Payment::class] as $paymentState) {
+            DB::table(static::$orderPaymentTable)
+                ->updateOrInsert([
+                    'order_id'   => $order->orderId->get(),
+                    'payment_id' => $paymentState['payment_id'],
+                ], $paymentState);
+        }
     }
 
     private function upsertAddresses(Order $order): void
@@ -234,17 +243,15 @@ final class MysqlOrderRepository implements OrderRepository
             ]))
             ->toArray();
 
-        $paymentState = DB::table(static::$orderPaymentTable)
+        $paymentStates = DB::table(static::$orderPaymentTable)
             ->where(static::$orderPaymentTable . '.order_id', $orderId->get())
-            ->first();
-
-        if (! is_null($paymentState)) {
-            $paymentState = (array)$paymentState;
-            $paymentState = array_merge($paymentState, [
-                'includes_vat' => (bool)$paymentState['includes_vat'],
-                Discount::class => $allDiscountStates->filter(fn ($discountState) => $discountState['discountable_type'] == DiscountableType::payment->value && $discountState['discountable_id'] == $paymentState['payment_id'])->values()->toArray(),
-            ]);
-        }
+            ->get()
+            ->map(fn ($item) => (array)$item)
+            ->map(fn ($item) => array_merge($item, [
+                'includes_vat' => (bool)$item['includes_vat'],
+                Discount::class => $allDiscountStates->filter(fn ($discountState) => $discountState['discountable_type'] == DiscountableType::payment->value && $discountState['discountable_id'] == $item['payment_id'])->values()->toArray(),
+            ]))
+            ->toArray();
 
         $addressStates = DB::table(static::$orderAddressTable)
             ->where(static::$orderAddressTable . '.order_id', $orderId->get())
@@ -269,7 +276,7 @@ final class MysqlOrderRepository implements OrderRepository
             Line::class => $lineStates,
             Discount::class => $allDiscountStates->filter(fn ($discountState) => $discountState['discountable_type'] == DiscountableType::order->value && $discountState['discountable_id'] == $orderState->order_id)->values()->toArray(),
             Shipping::class => $shippingStates,
-            Payment::class => $paymentState,
+            Payment::class => $paymentStates,
             Shopper::class => $shopperState,
             ShippingAddress::class => $shippingAddressState ? (array)$shippingAddressState : null,
             BillingAddress::class => $billingAddressState ? (array)$billingAddressState : null,
@@ -291,6 +298,12 @@ final class MysqlOrderRepository implements OrderRepository
 
     public function delete(OrderId $orderId): void
     {
+        DB::table(static::$orderShopperTable)->where('order_id', $orderId->get())->delete();
+        DB::table(static::$orderShippingTable)->where('order_id', $orderId->get())->delete();
+        DB::table(static::$orderPaymentTable)->where('order_id', $orderId->get())->delete();
+        DB::table(static::$orderLinesTable)->where('order_id', $orderId->get())->delete();
+        DB::table(static::$orderAddressTable)->where('order_id', $orderId->get())->delete();
+        DB::table(static::$orderDiscountsTable)->where('order_id', $orderId->get())->delete();
         DB::table(static::$orderTable)->where('order_id', $orderId->get())->delete();
     }
 

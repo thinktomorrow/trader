@@ -430,7 +430,7 @@ abstract class CartContext extends TestCase
             $paymentMethodId
         ));
 
-        $this->assertEquals($paymentMethodId, $this->getOrder()->getPayment()->getPaymentMethodId()->get());
+        $this->assertEquals($paymentMethodId, $this->getOrder()->getPayments()[0]->getPaymentMethodId()->get());
     }
 
     protected function thenTheOverallCartPriceShouldBeEur($total)

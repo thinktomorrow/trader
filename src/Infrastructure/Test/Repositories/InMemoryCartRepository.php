@@ -82,16 +82,16 @@ final class InMemoryCartRepository implements CartRepository
             ]), $orderState), $shipping->getDiscounts())// TODO: cart shipping discounts
         ), $order->getShippings());
 
-        $payment = $order->getPayment() ? DefaultCartPayment::fromMappedData(
-            array_merge($order->getPayment()->getMappedData(), [
-                'cost' => $order->getPayment()->getPaymentCost(),
+        $payments = array_map(fn ($payment) => DefaultCartPayment::fromMappedData(
+            array_merge($payment->getMappedData(), [
+                'cost' => $payment->getPaymentCost(),
             ]),
             $orderState,
             array_map(fn (Discount $discount) => DefaultCartDiscount::fromMappedData(array_merge($discount->getMappedData(), [
                 'total' => $discount->getTotal(),
-                'percentage' => $discount->getPercentage($order->getPayment()->getPaymentCost()),
-            ]), $orderState), $order->getPayment()->getDiscounts()), // TODO: cart payment discounts
-        ) : null;
+                'percentage' => $discount->getPercentage($payment->getPaymentCost()),
+            ]), $orderState), $payment->getDiscounts())// TODO: cart payment discounts
+        ), $order->getPayments());
 
         $shopper = $order->getShopper() ? DefaultCartShopper::fromMappedData(
             $order->getShopper()->getMappedData(),
@@ -105,7 +105,7 @@ final class InMemoryCartRepository implements CartRepository
                 CartShippingAddress::class => $shippingAddress,
                 CartBillingAddress::class => $billingAddress,
                 CartShipping::class => count($shippings) ? reset($shippings) : null, // In the cart we expect one shipping
-                CartPayment::class => $payment,
+                CartPayment::class => count($payments) ? reset($payments) : null, // In the cart we expect one payment
                 CartShopper::class => $shopper,
             ],
             array_map(fn (Discount $discount) => DefaultCartDiscount::fromMappedData(array_merge($discount->getMappedData(), [

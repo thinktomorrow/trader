@@ -6,6 +6,7 @@ namespace Thinktomorrow\Trader\Infrastructure\Laravel\Repositories;
 use Illuminate\Support\Facades\DB;
 use Psr\Container\ContainerInterface;
 use Thinktomorrow\Trader\Application\Cart\Read\Cart;
+use Thinktomorrow\Trader\Domain\Model\Order\Payment\Payment;
 use Thinktomorrow\Trader\Application\Cart\Read\CartBillingAddress;
 use Thinktomorrow\Trader\Application\Cart\Read\CartDiscount;
 use Thinktomorrow\Trader\Application\Cart\Read\CartLine;
@@ -85,19 +86,19 @@ final class MysqlCartRepository implements CartRepository
             array_map(fn (Discount $discount) => $this->container->get(CartDiscount::class)::fromMappedData(array_merge($discount->getMappedData(), [
                 'total' => $discount->getTotal(),
                 'percentage' => $discount->getPercentage($shipping->getShippingCost()),
-            ]), $orderState), $shipping->getDiscounts())// TODO: cart shipping discounts
+            ]), $orderState), $shipping->getDiscounts())
         ), $order->getShippings());
 
-        $payment = $order->getPayment() ? $this->container->get(CartPayment::class)::fromMappedData(
-            array_merge($order->getPayment()->getMappedData(), [
-                'cost' => $order->getPayment()->getPaymentCost(),
+        $payments = array_map(fn (Payment $payment) => $this->container->get(CartPayment::class)::fromMappedData(
+            array_merge($payment->getMappedData(), [
+                'cost' => $payment->getPaymentCost(),
             ]),
             $orderState,
             array_map(fn (Discount $discount) => $this->container->get(CartDiscount::class)::fromMappedData(array_merge($discount->getMappedData(), [
                 'total' => $discount->getTotal(),
-                'percentage' => $discount->getPercentage($order->getPayment()->getPaymentCost()),
-            ]), $orderState), $order->getPayment()->getDiscounts()), // TODO: cart payment discounts
-        ) : null;
+                'percentage' => $discount->getPercentage($payment->getPaymentCost()),
+            ]), $orderState), $payment->getDiscounts())
+        ), $order->getPayments());
 
         $shopper = $order->getShopper() ? $this->container->get(CartShopper::class)::fromMappedData(
             $order->getShopper()->getMappedData(),
@@ -111,7 +112,7 @@ final class MysqlCartRepository implements CartRepository
                 CartShippingAddress::class => $shippingAddress,
                 CartBillingAddress::class => $billingAddress,
                 CartShipping::class => count($shippings) ? reset($shippings) : null, // In the cart we expect one shipping
-                CartPayment::class => $payment,
+                CartPayment::class => count($payments) ? reset($payments) : null, // In the cart we expect one payment
                 CartShopper::class => $shopper,
             ],
             array_map(fn (Discount $discount) => $this->container->get(CartDiscount::class)::fromMappedData(array_merge($discount->getMappedData(), [

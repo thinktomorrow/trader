@@ -77,16 +77,16 @@ class InMemoryMerchantOrderRepository implements MerchantOrderRepository
             ]), $orderState), $shipping->getDiscounts())// TODO: cart shipping discounts
         ), $order->getShippings());
 
-        $payment = $order->getPayment() ? DefaultMerchantOrderPayment::fromMappedData(
-            array_merge($order->getPayment()->getMappedData(), [
-                'cost' => $order->getPayment()->getPaymentCost(),
+        $payments = array_map(fn ($payment) => DefaultMerchantOrderPayment::fromMappedData(
+            array_merge($payment->getMappedData(), [
+                'cost' => $payment->getPaymentCost(),
             ]),
             $orderState,
             array_map(fn (Discount $discount) => DefaultMerchantOrderDiscount::fromMappedData(array_merge($discount->getMappedData(), [
                 'total' => $discount->getTotal(),
-                'percentage' => $discount->getPercentage($order->getPayment()->getPaymentCost()),
-            ]), $orderState), $order->getPayment()->getDiscounts()), // TODO: cart payment discounts
-        ) : null;
+                'percentage' => $discount->getPercentage($payment->getPaymentCost()),
+            ]), $orderState), $payment->getDiscounts())// TODO: cart payment discounts
+        ), $order->getPayments());
 
         $shopper = $order->getShopper() ? DefaultMerchantOrderShopper::fromMappedData(
             $order->getShopper()->getMappedData(),
@@ -99,8 +99,8 @@ class InMemoryMerchantOrderRepository implements MerchantOrderRepository
                 MerchantOrderLine::class => $lines,
                 MerchantOrderShippingAddress::class => $shippingAddress,
                 MerchantOrderBillingAddress::class => $billingAddress,
-                MerchantOrderShipping::class => count($shippings) ? reset($shippings) : null, // In the cart we expect one shipping
-                MerchantOrderPayment::class => $payment,
+                MerchantOrderShipping::class => $shippings,
+                MerchantOrderPayment::class => $payments,
                 MerchantOrderShopper::class => $shopper,
             ],
             array_map(fn (Discount $discount) => DefaultMerchantOrderDiscount::fromMappedData(array_merge($discount->getMappedData(), [

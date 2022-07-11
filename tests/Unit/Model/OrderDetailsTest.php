@@ -17,10 +17,10 @@ class OrderDetailsTest extends TestCase
     /** @test */
     public function it_can_get_prices()
     {
-        $order = $this->createdOrder();
+        $order = $this->createDefaultOrder();
 
         $this->assertEquals(
-            Total::zero()->add(VariantSalePrice::fromScalars(370, '10', true)),
+            Total::zero()->add(VariantSalePrice::fromScalars(400, '10', true)),
             $order->getSubTotal()
         );
 
@@ -41,7 +41,7 @@ class OrderDetailsTest extends TestCase
 
         $this->assertEquals(
             Total::zero()
-                ->add(VariantSalePrice::fromScalars(370, '10', true))
+                ->add(VariantSalePrice::fromScalars(400, '10', true))
                 ->add(ShippingCost::fromScalars(30, '10', true))
                 ->add(PaymentCost::fromScalars(20, '10', true))
                 ->subtract(DiscountTotal::fromScalars(30, '21', true)),
@@ -52,10 +52,10 @@ class OrderDetailsTest extends TestCase
     /** @test */
     public function it_can_get_shipping_details()
     {
-        $order = $this->createdOrder();
+        $order = $this->createDefaultOrder();
 
         $this->assertCount(1, $order->getShippings());
-        $this->assertEquals(ShippingState::initialized, $order->getShippings()[0]->getShippingState());
+        $this->assertEquals(ShippingState::none, $order->getShippings()[0]->getShippingState());
 
         $this->assertEquals([
             'order_id' => 'xxx',
@@ -72,7 +72,7 @@ class OrderDetailsTest extends TestCase
     /** @test */
     public function it_can_get_payment_details()
     {
-        $order = $this->createdOrder();
+        $order = $this->createDefaultOrder();
 
         $this->assertEquals([
             'order_id' => 'xxx',

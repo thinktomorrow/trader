@@ -249,9 +249,13 @@ final class CartApplication
 
         // Currently no restrictions on payment selection... if any, this should be checked here.
 
-        if ($payment = $order->getPayment()) {
+        if (count($order->getPayments())) {
+            $payment = $order->getPayments()[0];
             $payment->updatePaymentMethod($paymentMethod->paymentMethodId);
             $payment->updateCost($paymentCost);
+            $payment->addData($paymentMethod->getData());
+
+            $order->updatePayment($payment);
         } else {
             $payment = Payment::create(
                 $order->orderId,
@@ -259,10 +263,13 @@ final class CartApplication
                 $paymentMethod->paymentMethodId,
                 $paymentCost
             );
+            $payment->addData($paymentMethod->getData());
+
+            $order->addPayment($payment);
         }
 
-        $payment->addData($paymentMethod->getData());
-        $order->updatePayment($payment);
+
+
 
         // TODO: Maybe do the refresh-cart here? before the save.
 

@@ -13,9 +13,9 @@ class OrderDiscountTest extends TestCase
     /** @test */
     public function it_can_add_a_discount()
     {
-        $order = $this->createdOrder();
+        $order = $this->createDefaultOrder();
 
-        $order->addDiscount($this->createOrderDiscount($order->orderId, ['promo_discount_id' => 'qqq', 'discount_id' => 'defgh']));
+        $order->addDiscount($this->createOrderDiscount(['promo_discount_id' => 'qqq', 'discount_id' => 'defgh'], $order->getMappedData()));
 
         $this->assertCount(2, $order->getChildEntities()[Discount::class]);
     }
@@ -25,9 +25,9 @@ class OrderDiscountTest extends TestCase
     {
         $this->expectException(\InvalidArgumentException::class);
 
-        $order = $this->createdOrder();
+        $order = $this->createDefaultOrder();
 
-        $order->addDiscount($this->createOrderDiscount($order->orderId, ['promo_discount_id' => 'qqq'])); // discount_id is the same as the default which implies  a duplicate
+        $order->addDiscount($this->createOrderDiscount(['promo_discount_id' => 'qqq'], $order->getMappedData())); // discount_id is the same as the default which implies  a duplicate
 
         $this->assertCount(1, $order->getChildEntities()[Discount::class]);
     }
@@ -37,9 +37,9 @@ class OrderDiscountTest extends TestCase
     {
         $this->expectException(\InvalidArgumentException::class);
 
-        $order = $this->createdOrder();
+        $order = $this->createDefaultOrder();
 
-        $order->addDiscount($this->createOrderDiscount($order->orderId, ['discount_id' => 'defgh'])); // promo_discount_id is same as already set on createdOrder
+        $order->addDiscount($this->createOrderDiscount(['discount_id' => 'defgh'], $order->getMappedData())); // promo_discount_id is same as already set on createdOrder
 
         $this->assertCount(1, $order->getChildEntities()[Discount::class]);
     }
@@ -49,9 +49,9 @@ class OrderDiscountTest extends TestCase
     {
         $this->expectException(\InvalidArgumentException::class);
 
-        $order = $this->createdOrder();
+        $order = $this->createDefaultOrder();
 
-        $order->addDiscount($this->createOrderDiscount($order->orderId, ['promo_discount_id' => 'qqq', 'discount_id' => 'defgh', 'discountable_type' => DiscountableType::line->value]));
+        $order->addDiscount($this->createOrderDiscount(['promo_discount_id' => 'qqq', 'discount_id' => 'defgh', 'discountable_type' => DiscountableType::line->value], $order->getMappedData()));
 
         $this->assertCount(1, $order->getChildEntities()[Discount::class]);
     }
@@ -61,9 +61,9 @@ class OrderDiscountTest extends TestCase
     {
         $this->expectException(\InvalidArgumentException::class);
 
-        $order = $this->createdOrder();
+        $order = $this->createDefaultOrder();
 
-        $order->addDiscount($this->createOrderDiscount($order->orderId, ['promo_discount_id' => 'qqq', 'discount_id' => 'defgh', 'discountable_id' => 'foobar']));
+        $order->addDiscount($this->createOrderDiscount(['promo_discount_id' => 'qqq', 'discount_id' => 'defgh', 'discountable_id' => 'foobar'], $order->getMappedData()));
 
         $this->assertCount(1, $order->getChildEntities()[Discount::class]);
     }
@@ -71,7 +71,7 @@ class OrderDiscountTest extends TestCase
     /** @test */
     public function it_can_delete_a_discount()
     {
-        $order = $this->createdOrder();
+        $order = $this->createDefaultOrder();
 
         $this->assertCount(1, $order->getChildEntities()[Discount::class]);
 

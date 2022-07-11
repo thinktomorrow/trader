@@ -20,38 +20,44 @@ final class OrderRepositoryTest extends TestCase
 
     /**
      * @test
-     * @dataProvider orders
      */
-    public function it_can_save_and_find_an_order(Order $order)
+    public function it_can_save_and_find_an_order()
     {
-        foreach ($this->orderRepositories() as $orderRepository) {
-            $orderRepository->save($order);
-            $order->releaseEvents();
+        foreach($this->orders() as $order) {
+            foreach ($this->orderRepositories() as $orderRepository) {
+                $orderRepository->save($order);
+                $order->releaseEvents();
 
-            $this->assertEquals($order, $orderRepository->find($order->orderId));
+                $this->assertEquals($order, $orderRepository->find($order->orderId));
+
+                // Cleanup
+                $orderRepository->delete($order->orderId);
+            }
         }
+
     }
 
     /**
      * @test
-     * @dataProvider orders
      */
-    public function it_can_delete_an_order(Order $order)
+    public function it_can_delete_an_order()
     {
-        $ordersNotFound = 0;
+        foreach($this->orders() as $order) {
+            $ordersNotFound = 0;
 
-        foreach ($this->orderRepositories() as $orderRepository) {
-            $orderRepository->save($order);
-            $orderRepository->delete($order->orderId);
+            foreach ($this->orderRepositories() as $orderRepository) {
+                $orderRepository->save($order);
+                $orderRepository->delete($order->orderId);
 
-            try {
-                $orderRepository->find($order->orderId);
-            } catch (CouldNotFindOrder $e) {
-                $ordersNotFound++;
+                try {
+                    $orderRepository->find($order->orderId);
+                } catch (CouldNotFindOrder $e) {
+                    $ordersNotFound++;
+                }
             }
-        }
 
-        $this->assertEquals(count(iterator_to_array($this->orderRepositories())), $ordersNotFound);
+            $this->assertEquals(count(iterator_to_array($this->orderRepositories())), $ordersNotFound);
+        }
     }
 
     /** @test */
@@ -78,35 +84,33 @@ final class OrderRepositoryTest extends TestCase
 
     public function orders(): \Generator
     {
-        yield [$this->createdOrder()];
+        yield $this->createDefaultOrder();
 
-        $orderWithDiscount = $this->createdOrder();
-        $orderWithDiscount->addDiscount($this->createOrderDiscount($orderWithDiscount->orderId, ['discount_id' => 'def', 'promo_discount_id' => 'ghi']));
-        yield [$orderWithDiscount];
+        $orderWithDiscount = $this->createDefaultOrder();
+        $orderWithDiscount->addDiscount($this->createOrderDiscount(['discount_id' => 'def', 'promo_discount_id' => 'ghi'], $orderWithDiscount->getMappedData()));
+        yield $orderWithDiscount;
 
-        $orderWithLineDiscount = $this->createdOrder();
-        $orderWithLineDiscount->getLines()[0]->addDiscount($this->createOrderDiscount($orderWithLineDiscount->orderId, [
+        $orderWithLineDiscount = $this->createDefaultOrder();
+        $orderWithLineDiscount->getLines()[0]->addDiscount($this->createOrderDiscount([
             'discount_id' => 'def',
             'promo_discount_id' => 'ghi',
             'discountable_id' => $orderWithLineDiscount->getLines()[0]->lineId->get(),
             'discountable_type' => DiscountableType::line->value,
-        ]));
-        yield [$orderWithLineDiscount];
+        ], $orderWithLineDiscount->getMappedData()));
+        yield $orderWithLineDiscount;
 
-        $orderWithShippingDiscount = $this->createdOrder();
-        $orderWithShippingDiscount->getShippings()[0]->addDiscount($this->createOrderDiscount($orderWithShippingDiscount->orderId, [
+        $orderWithShippingDiscount = $this->createDefaultOrder();
+        $orderWithShippingDiscount->getShippings()[0]->addDiscount($this->createOrderDiscount([
             'discount_id' => 'def',
             'promo_discount_id' => 'ghi',
             'discountable_id' => $orderWithShippingDiscount->getShippings()[0]->shippingId->get(),
             'discountable_type' => DiscountableType::shipping->value,
-        ]));
-        yield [$orderWithShippingDiscount];
+        ], $orderWithShippingDiscount->getMappedData()));
+        yield $orderWithShippingDiscount;
 
-        yield [
-            Order::create(
+        yield Order::create(
                 OrderId::fromString('xxx'),
                 OrderReference::fromString('xx-ref')
-            ),
-        ];
+            );
     }
 }

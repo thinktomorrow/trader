@@ -6,6 +6,7 @@ namespace Tests\Unit\Model;
 use Tests\Unit\TestCase;
 use Thinktomorrow\Trader\Domain\Common\Email;
 use Thinktomorrow\Trader\Domain\Model\Customer\CustomerId;
+use Thinktomorrow\Trader\Domain\Model\Order\Events\PaymentUpdated;
 use Thinktomorrow\Trader\Domain\Model\Order\Address\BillingAddress;
 use Thinktomorrow\Trader\Domain\Model\Order\Address\ShippingAddress;
 use Thinktomorrow\Trader\Domain\Model\Order\Events\LineAdded;
@@ -65,7 +66,7 @@ class OrderTest extends TestCase
     /** @test */
     public function it_can_update_shopper()
     {
-        $order = $this->createdOrder();
+        $order = $this->createDefaultOrder();
 
         $shopper = $order->getShopper();
         $shopper->updateCustomerId(CustomerId::fromString('zzz'));
@@ -84,7 +85,7 @@ class OrderTest extends TestCase
     /** @test */
     public function it_can_add_shipping()
     {
-        $order = $this->createdOrder();
+        $order = $this->createDefaultOrder();
 
         $order->addShipping(Shipping::create(
             $order->orderId, // TODO: avoid this here or assert it is the same...
@@ -104,7 +105,7 @@ class OrderTest extends TestCase
     /** @test */
     public function it_can_update_shipping()
     {
-        $order = $this->createdOrder();
+        $order = $this->createDefaultOrder();
 
         /** @var \Thinktomorrow\Trader\Domain\Model\Order\Shipping\Shipping $shipping */
         $shipping = $order->getShippings()[0];
@@ -123,27 +124,25 @@ class OrderTest extends TestCase
     /** @test */
     public function it_can_update_payment()
     {
-        $order = $this->createdOrder();
+        $order = $this->createDefaultOrder();
 
-        $order->updatePayment(Payment::create(
-            $order->orderId,
-            $paymentId = PaymentId::fromString('ppp'),
-            $paymentMethodId = PaymentMethodId::fromString('uuu'),
-            PaymentCost::zero()
-        ));
+        $payment = $order->getPayments()[0];
+        $payment->updateCost($cost = PaymentCost::fromScalars('23', '1', false));
 
-        $this->assertEquals($paymentId, $order->getPayment()->paymentId);
-        $this->assertEquals($paymentMethodId, $order->getPayment()->getPaymentMethodId());
+        $order->updatePayment($payment);
+
+        $this->assertCount(1, $order->getPayments());
+        $this->assertEquals($cost, $order->getPayments()[0]->getPaymentCost());
 
         $this->assertEquals([
-            new OrderUpdated($order->orderId),
+            new PaymentUpdated($order->orderId, $payment->paymentId),
         ], $order->releaseEvents());
     }
 
     /** @test */
     public function it_can_update_shipping_address()
     {
-        $order = $this->createdOrder();
+        $order = $this->createDefaultOrder();
 
         $addressPayload = [
             'address_id' => 'abc',
@@ -163,7 +162,7 @@ class OrderTest extends TestCase
     /** @test */
     public function it_can_update_billing_address()
     {
-        $order = $this->createdOrder();
+        $order = $this->createDefaultOrder();
 
         $addressPayload = [
             'address_id' => 'def',
@@ -183,7 +182,7 @@ class OrderTest extends TestCase
     /** @test */
     public function it_can_add_a_line()
     {
-        $order = $this->createdOrder();
+        $order = $this->createDefaultOrder();
 
         $order->addOrUpdateLine(
             LineId::fromString('abcdef'),
@@ -207,7 +206,7 @@ class OrderTest extends TestCase
     /** @test */
     public function it_can_update_a_line()
     {
-        $order = $this->createdOrder();
+        $order = $this->createDefaultOrder();
 
         $order->addOrUpdateLine(
             LineId::fromString('abc'),
@@ -236,7 +235,7 @@ class OrderTest extends TestCase
     /** @test */
     public function it_can_delete_a_line()
     {
-        $order = $this->createdOrder();
+        $order = $this->createDefaultOrder();
 
         $this->assertCount(1, $order->getChildEntities()[Line::class]);
 
@@ -258,7 +257,7 @@ class OrderTest extends TestCase
     /** @test */
     public function adding_data_merges_with_existing_data()
     {
-        $order = $this->createdOrder();
+        $order = $this->createDefaultOrder();
 
         $order->addData(['bar' => 'baz']);
         $order->addData(['foo' => 'bar', 'bar' => 'boo']);
@@ -269,7 +268,7 @@ class OrderTest extends TestCase
     /** @test */
     public function it_can_delete_data()
     {
-        $order = $this->createdOrder();
+        $order = $this->createDefaultOrder();
 
         $order->addData(['foo' => 'bar', 'bar' => 'boo']);
         $order->deleteData('bar');
