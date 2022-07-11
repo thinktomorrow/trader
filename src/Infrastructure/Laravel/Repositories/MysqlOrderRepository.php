@@ -41,12 +41,12 @@ final class MysqlOrderRepository implements OrderRepository
         $state = $order->getMappedData();
 
         if (! $this->exists($order->orderId)) {
-            DB::table(static::$orderTable)->insert(array_merge($state,[
+            DB::table(static::$orderTable)->insert(array_merge($state, [
                 'created_at' => Carbon::now(),
                 'updated_at' => Carbon::now(),
             ]));
         } else {
-            DB::table(static::$orderTable)->where('order_id', $order->orderId->get())->update(array_merge($state,[
+            DB::table(static::$orderTable)->where('order_id', $order->orderId->get())->update(array_merge($state, [
                 'updated_at' => Carbon::now(),
             ]));
         }
@@ -145,7 +145,7 @@ final class MysqlOrderRepository implements OrderRepository
         foreach ($order->getChildEntities()[Payment::class] as $paymentState) {
             DB::table(static::$orderPaymentTable)
                 ->updateOrInsert([
-                    'order_id'   => $order->orderId->get(),
+                    'order_id' => $order->orderId->get(),
                     'payment_id' => $paymentState['payment_id'],
                 ], $paymentState);
         }

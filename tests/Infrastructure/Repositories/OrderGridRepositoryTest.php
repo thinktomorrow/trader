@@ -3,19 +3,17 @@ declare(strict_types=1);
 
 namespace Tests\Infrastructure\Repositories;
 
-use Money\Money;
+use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use Tests\Infrastructure\TestCase;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Foundation\Testing\RefreshDatabase;
-use Thinktomorrow\Trader\Domain\Model\Order\OrderState;
-use Illuminate\Contracts\Pagination\LengthAwarePaginator;
-use Thinktomorrow\Trader\Infrastructure\Test\TestContainer;
 use Thinktomorrow\Trader\Application\Order\Grid\GridItem;
-use Thinktomorrow\Trader\Infrastructure\Test\TestTraderConfig;
+use Thinktomorrow\Trader\Domain\Model\Order\OrderState;
 use Thinktomorrow\Trader\Infrastructure\Laravel\Models\DefaultOrderGridItem;
-use Thinktomorrow\Trader\Infrastructure\Laravel\Repositories\MysqlOrderRepository;
 use Thinktomorrow\Trader\Infrastructure\Laravel\Repositories\MysqlOrderGridRepository;
+use Thinktomorrow\Trader\Infrastructure\Laravel\Repositories\MysqlOrderRepository;
+use Thinktomorrow\Trader\Infrastructure\Test\TestContainer;
+use Thinktomorrow\Trader\Infrastructure\Test\TestTraderConfig;
 
 class OrderGridRepositoryTest extends TestCase
 {
@@ -123,9 +121,9 @@ class OrderGridRepositoryTest extends TestCase
         $this->testSortingByDate('fulfilled_at', 'sortByFulfilledAtDesc', 'getFulfilledAt');
     }
 
-    private function testSortingByDate(string $column, string $sortingMethod, string $modelMethod)
+    private function test_sorting_by_date(string $column, string $sortingMethod, string $modelMethod)
     {
-        $order = $this->createOrder(['order_id' => 'yyy', 'order_ref' => 'yy-ref'],[], [], [], [], null, null, $this->createOrderShopper(['shopper_id' => 'sss']));
+        $order = $this->createOrder(['order_id' => 'yyy', 'order_ref' => 'yy-ref'], [], [], [], [], null, null, $this->createOrderShopper(['shopper_id' => 'sss']));
         (new MysqlOrderRepository())->save($order);
 
         $this->updateRow('xxx', [$column => now()->addHour()->toDateTimeString()]);
@@ -140,7 +138,7 @@ class OrderGridRepositoryTest extends TestCase
             $dateTime = $gridItem->{$modelMethod}();
 
             if ($previousDatetime) {
-                if(Str::endsWith($sortingMethod,'Desc')) {
+                if (Str::endsWith($sortingMethod, 'Desc')) {
                     $this->assertLessThan($previousDatetime, $dateTime);
                 } else {
                     $this->assertGreaterThan($previousDatetime, $dateTime);
@@ -164,7 +162,5 @@ class OrderGridRepositoryTest extends TestCase
     private function updateRow(string $orderId, array $values)
     {
         DB::table('trader_orders')->where('order_id', $orderId)->update($values);
-
     }
 }
-

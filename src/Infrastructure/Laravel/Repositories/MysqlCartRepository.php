@@ -6,7 +6,6 @@ namespace Thinktomorrow\Trader\Infrastructure\Laravel\Repositories;
 use Illuminate\Support\Facades\DB;
 use Psr\Container\ContainerInterface;
 use Thinktomorrow\Trader\Application\Cart\Read\Cart;
-use Thinktomorrow\Trader\Domain\Model\Order\Payment\Payment;
 use Thinktomorrow\Trader\Application\Cart\Read\CartBillingAddress;
 use Thinktomorrow\Trader\Application\Cart\Read\CartDiscount;
 use Thinktomorrow\Trader\Application\Cart\Read\CartLine;
@@ -20,6 +19,7 @@ use Thinktomorrow\Trader\Domain\Model\Order\Exceptions\OrderAlreadyInMerchantHan
 use Thinktomorrow\Trader\Domain\Model\Order\OrderId;
 use Thinktomorrow\Trader\Domain\Model\Order\OrderRepository;
 use Thinktomorrow\Trader\Domain\Model\Order\OrderState;
+use Thinktomorrow\Trader\Domain\Model\Order\Payment\Payment;
 use Thinktomorrow\Trader\Domain\Model\Order\Shipping\Shipping;
 
 final class MysqlCartRepository implements CartRepository

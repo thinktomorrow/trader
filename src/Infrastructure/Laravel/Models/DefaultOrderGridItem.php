@@ -4,10 +4,10 @@ declare(strict_types=1);
 namespace Thinktomorrow\Trader\Infrastructure\Laravel\Models;
 
 use Money\Money;
-use Thinktomorrow\Trader\Domain\Common\Cash\Cash;
 use Thinktomorrow\Trader\Application\Common\HasLocale;
-use Thinktomorrow\Trader\Application\Order\Grid\GridItem;
 use Thinktomorrow\Trader\Application\Common\RendersMoney;
+use Thinktomorrow\Trader\Application\Order\Grid\GridItem;
+use Thinktomorrow\Trader\Domain\Common\Cash\Cash;
 
 class DefaultOrderGridItem implements GridItem
 {
@@ -103,12 +103,14 @@ class DefaultOrderGridItem implements GridItem
 
     public function hasCustomer(): bool
     {
-        return !is_null($this->customer_id);
+        return ! is_null($this->customer_id);
     }
 
     public function getCustomerUrl(): ?string
     {
-        if(!$this->customer_id) return null;
+        if (! $this->customer_id) {
+            return null;
+        }
 
         return '/admin/customers/' . $this->customer_id;
     }

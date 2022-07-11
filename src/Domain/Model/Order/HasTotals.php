@@ -5,9 +5,9 @@ namespace Thinktomorrow\Trader\Domain\Model\Order;
 
 use Money\Money;
 use Thinktomorrow\Trader\Domain\Common\Price\PriceTotal;
-use Thinktomorrow\Trader\Domain\Model\Order\Payment\Payment;
 use Thinktomorrow\Trader\Domain\Model\Order\Discount\DiscountTotal;
 use Thinktomorrow\Trader\Domain\Model\Order\Line\Line;
+use Thinktomorrow\Trader\Domain\Model\Order\Payment\Payment;
 use Thinktomorrow\Trader\Domain\Model\Order\Payment\PaymentCost;
 use Thinktomorrow\Trader\Domain\Model\Order\Price\Total;
 use Thinktomorrow\Trader\Domain\Model\Order\Shipping\Shipping;

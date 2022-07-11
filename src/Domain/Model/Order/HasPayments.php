@@ -3,13 +3,13 @@ declare(strict_types=1);
 
 namespace Thinktomorrow\Trader\Domain\Model\Order;
 
+use Thinktomorrow\Trader\Domain\Model\Order\Events\PaymentAdded;
+use Thinktomorrow\Trader\Domain\Model\Order\Events\PaymentDeleted;
+use Thinktomorrow\Trader\Domain\Model\Order\Events\PaymentUpdated;
+use Thinktomorrow\Trader\Domain\Model\Order\Exceptions\CouldNotFindPaymentOnOrder;
+use Thinktomorrow\Trader\Domain\Model\Order\Exceptions\PaymentAlreadyOnOrder;
 use Thinktomorrow\Trader\Domain\Model\Order\Payment\Payment;
 use Thinktomorrow\Trader\Domain\Model\Order\Payment\PaymentId;
-use Thinktomorrow\Trader\Domain\Model\Order\Events\PaymentAdded;
-use Thinktomorrow\Trader\Domain\Model\Order\Events\PaymentUpdated;
-use Thinktomorrow\Trader\Domain\Model\Order\Events\PaymentDeleted;
-use Thinktomorrow\Trader\Domain\Model\Order\Exceptions\PaymentAlreadyOnOrder;
-use Thinktomorrow\Trader\Domain\Model\Order\Exceptions\CouldNotFindPaymentOnOrder;
 
 trait HasPayments
 {

@@ -210,11 +210,11 @@ abstract class OrderRead
     {
         $allDiscounts = $this->getDiscounts();
 
-        foreach($this->getShippings() as $shipping) {
+        foreach ($this->getShippings() as $shipping) {
             $allDiscounts = array_merge($allDiscounts, $shipping->getDiscounts());
         }
 
-        foreach($this->getPayments() as $payment) {
+        foreach ($this->getPayments() as $payment) {
             $allDiscounts = array_merge($allDiscounts, $payment->getDiscounts());
         }
 

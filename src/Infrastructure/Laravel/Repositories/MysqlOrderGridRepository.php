@@ -4,14 +4,14 @@ declare(strict_types=1);
 namespace Thinktomorrow\Trader\Infrastructure\Laravel\Repositories;
 
 use Carbon\Carbon;
+use Illuminate\Contracts\Pagination\LengthAwarePaginator;
+use Illuminate\Database\Query\Builder;
 use Illuminate\Support\Facades\DB;
 use Psr\Container\ContainerInterface;
-use Thinktomorrow\Trader\TraderConfig;
-use Illuminate\Database\Query\Builder;
-use Thinktomorrow\Trader\Domain\Common\Locale;
-use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Thinktomorrow\Trader\Application\Order\Grid\GridItem;
 use Thinktomorrow\Trader\Application\Order\Grid\GridRepository;
+use Thinktomorrow\Trader\Domain\Common\Locale;
+use Thinktomorrow\Trader\TraderConfig;
 
 final class MysqlOrderGridRepository implements GridRepository
 {
@@ -166,5 +166,4 @@ final class MysqlOrderGridRepository implements GridRepository
     {
         $this->builder->orderBy(static::$orderTable . '.created_at', 'ASC');
     }
-
 }

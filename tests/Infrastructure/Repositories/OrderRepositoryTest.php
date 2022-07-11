@@ -23,7 +23,7 @@ final class OrderRepositoryTest extends TestCase
      */
     public function it_can_save_and_find_an_order()
     {
-        foreach($this->orders() as $order) {
+        foreach ($this->orders() as $order) {
             foreach ($this->orderRepositories() as $orderRepository) {
                 $orderRepository->save($order);
                 $order->releaseEvents();
@@ -34,7 +34,6 @@ final class OrderRepositoryTest extends TestCase
                 $orderRepository->delete($order->orderId);
             }
         }
-
     }
 
     /**
@@ -42,7 +41,7 @@ final class OrderRepositoryTest extends TestCase
      */
     public function it_can_delete_an_order()
     {
-        foreach($this->orders() as $order) {
+        foreach ($this->orders() as $order) {
             $ordersNotFound = 0;
 
             foreach ($this->orderRepositories() as $orderRepository) {
@@ -109,8 +108,8 @@ final class OrderRepositoryTest extends TestCase
         yield $orderWithShippingDiscount;
 
         yield Order::create(
-                OrderId::fromString('xxx'),
-                OrderReference::fromString('xx-ref')
-            );
+            OrderId::fromString('xxx'),
+            OrderReference::fromString('xx-ref')
+        );
     }
 }
