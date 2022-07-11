@@ -149,9 +149,9 @@ class OrderGridRepositoryTest extends TestCase
         }
     }
 
-    private function testSortingByDate(string $column, string $sortingMethod, string $modelMethod)
+    private function test_sorting_by_date(string $column, string $sortingMethod, string $modelMethod)
     {
-        $order = $this->createOrder(['order_id' => 'yyy', 'order_ref' => 'yy-ref'],[], [], [], [], null, null, $this->createOrderShopper(['shopper_id' => 'sss']));
+        $order = $this->createOrder(['order_id' => 'yyy', 'order_ref' => 'yy-ref'], [], [], [], [], null, null, $this->createOrderShopper(['shopper_id' => 'sss']));
         (new MysqlOrderRepository())->save($order);
 
         $this->updateRow('xxx', [$column => now()->addHour()->toDateTimeString()]);
@@ -166,7 +166,7 @@ class OrderGridRepositoryTest extends TestCase
             $dateTime = $gridItem->{$modelMethod}();
 
             if ($previousDatetime) {
-                if(Str::endsWith($sortingMethod,'Desc')) {
+                if (Str::endsWith($sortingMethod, 'Desc')) {
                     $this->assertLessThan($previousDatetime, $dateTime);
                 } else {
                     $this->assertGreaterThan($previousDatetime, $dateTime);
