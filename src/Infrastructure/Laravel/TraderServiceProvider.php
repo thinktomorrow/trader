@@ -14,9 +14,7 @@ use Thinktomorrow\Trader\Application\Cart\Read\CartRepository;
 use Thinktomorrow\Trader\Application\Cart\Read\CartShipping;
 use Thinktomorrow\Trader\Application\Cart\Read\CartShippingAddress;
 use Thinktomorrow\Trader\Application\Cart\Read\CartShopper;
-use Thinktomorrow\Trader\Infrastructure\Laravel\Models\DefaultOrderGridItem;
 use Thinktomorrow\Trader\Application\Cart\ShippingProfile\ShippingProfileForCart;
-use Thinktomorrow\Trader\Infrastructure\Laravel\Repositories\MysqlOrderGridRepository;
 use Thinktomorrow\Trader\Application\Cart\ShippingProfile\ShippingProfileForCartRepository;
 use Thinktomorrow\Trader\Application\Cart\VariantForCart\VariantForCart;
 use Thinktomorrow\Trader\Application\Cart\VariantForCart\VariantForCartRepository;
@@ -81,6 +79,7 @@ use Thinktomorrow\Trader\Infrastructure\Laravel\Models\Cart\DefaultCartShippingA
 use Thinktomorrow\Trader\Infrastructure\Laravel\Models\Cart\DefaultCartShopper;
 use Thinktomorrow\Trader\Infrastructure\Laravel\Models\DefaultGridItem;
 use Thinktomorrow\Trader\Infrastructure\Laravel\Models\DefaultOptionLink;
+use Thinktomorrow\Trader\Infrastructure\Laravel\Models\DefaultOrderGridItem;
 use Thinktomorrow\Trader\Infrastructure\Laravel\Models\DefaultProductDetail;
 use Thinktomorrow\Trader\Infrastructure\Laravel\Models\DefaultShippingProfileForCart;
 use Thinktomorrow\Trader\Infrastructure\Laravel\Models\DefaultTaxonNode;
@@ -100,6 +99,7 @@ use Thinktomorrow\Trader\Infrastructure\Laravel\Repositories\MysqlCustomerLoginR
 use Thinktomorrow\Trader\Infrastructure\Laravel\Repositories\MysqlCustomerRepository;
 use Thinktomorrow\Trader\Infrastructure\Laravel\Repositories\MysqlGridRepository;
 use Thinktomorrow\Trader\Infrastructure\Laravel\Repositories\MysqlMerchantOrderRepository;
+use Thinktomorrow\Trader\Infrastructure\Laravel\Repositories\MysqlOrderGridRepository;
 use Thinktomorrow\Trader\Infrastructure\Laravel\Repositories\MysqlOrderRepository;
 use Thinktomorrow\Trader\Infrastructure\Laravel\Repositories\MysqlPaymentMethodRepository;
 use Thinktomorrow\Trader\Infrastructure\Laravel\Repositories\MysqlProductDetailRepository;

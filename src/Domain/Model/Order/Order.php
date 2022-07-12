@@ -14,14 +14,37 @@ use Thinktomorrow\Trader\Domain\Model\Order\Address\ShippingAddress;
 use Thinktomorrow\Trader\Domain\Model\Order\Discount\Discount;
 use Thinktomorrow\Trader\Domain\Model\Order\Discount\Discountable;
 use Thinktomorrow\Trader\Domain\Model\Order\Discount\DiscountableId;
-use Thinktomorrow\Trader\Domain\Model\Order\Events\OrderStates\OrderPaid;
 use Thinktomorrow\Trader\Domain\Model\Order\Discount\DiscountableType;
 use Thinktomorrow\Trader\Domain\Model\Order\Events\OrderCreated;
+use Thinktomorrow\Trader\Domain\Model\Order\Events\OrderStates\CartAbandoned;
+use Thinktomorrow\Trader\Domain\Model\Order\Events\OrderStates\CartQueuedForDeletion;
+use Thinktomorrow\Trader\Domain\Model\Order\Events\OrderStates\CartRevived;
+use Thinktomorrow\Trader\Domain\Model\Order\Events\OrderStates\OrderCancelled;
+use Thinktomorrow\Trader\Domain\Model\Order\Events\OrderStates\OrderCancelledByMerchant;
+use Thinktomorrow\Trader\Domain\Model\Order\Events\OrderStates\OrderConfirmed;
+use Thinktomorrow\Trader\Domain\Model\Order\Events\OrderStates\OrderDelivered;
+use Thinktomorrow\Trader\Domain\Model\Order\Events\OrderStates\OrderFulfilled;
+use Thinktomorrow\Trader\Domain\Model\Order\Events\OrderStates\OrderMarkedUnfulfilled;
+use Thinktomorrow\Trader\Domain\Model\Order\Events\OrderStates\OrderPacked;
+use Thinktomorrow\Trader\Domain\Model\Order\Events\OrderStates\OrderPaid;
+use Thinktomorrow\Trader\Domain\Model\Order\Events\OrderStates\OrderPartiallyDelivered;
+use Thinktomorrow\Trader\Domain\Model\Order\Events\OrderStates\OrderPartiallyPacked;
+use Thinktomorrow\Trader\Domain\Model\Order\Events\OrderStates\OrderPartiallyPaid;
 use Thinktomorrow\Trader\Domain\Model\Order\Events\OrderStateUpdated;
 use Thinktomorrow\Trader\Domain\Model\Order\Events\OrderUpdated;
-use Thinktomorrow\Trader\Domain\Model\Order\Events\OrderStates\OrderPacked;
-use Thinktomorrow\Trader\Domain\Model\Order\Events\OrderStates\CartRevived;
+use Thinktomorrow\Trader\Domain\Model\Order\Events\PaymentStates\PaymentFailed;
+use Thinktomorrow\Trader\Domain\Model\Order\Events\PaymentStates\PaymentInitialized;
+use Thinktomorrow\Trader\Domain\Model\Order\Events\PaymentStates\PaymentMarkedPaidByMerchant;
+use Thinktomorrow\Trader\Domain\Model\Order\Events\PaymentStates\PaymentPaid;
+use Thinktomorrow\Trader\Domain\Model\Order\Events\PaymentStates\PaymentRefunded;
 use Thinktomorrow\Trader\Domain\Model\Order\Events\PaymentStateUpdated;
+use Thinktomorrow\Trader\Domain\Model\Order\Events\ShippingStates\ShipmentDelivered;
+use Thinktomorrow\Trader\Domain\Model\Order\Events\ShippingStates\ShipmentHaltedForPacking;
+use Thinktomorrow\Trader\Domain\Model\Order\Events\ShippingStates\ShipmentInTransit;
+use Thinktomorrow\Trader\Domain\Model\Order\Events\ShippingStates\ShipmentMarkedReadyForPacking;
+use Thinktomorrow\Trader\Domain\Model\Order\Events\ShippingStates\ShipmentPacked;
+use Thinktomorrow\Trader\Domain\Model\Order\Events\ShippingStates\ShipmentReturned;
+use Thinktomorrow\Trader\Domain\Model\Order\Events\ShippingStates\ShippingFailed;
 use Thinktomorrow\Trader\Domain\Model\Order\Events\ShippingStateUpdated;
 use Thinktomorrow\Trader\Domain\Model\Order\Line\Line;
 use Thinktomorrow\Trader\Domain\Model\Order\Line\Quantity;
@@ -31,29 +54,6 @@ use Thinktomorrow\Trader\Domain\Model\Order\Payment\PaymentState;
 use Thinktomorrow\Trader\Domain\Model\Order\Shipping\Shipping;
 use Thinktomorrow\Trader\Domain\Model\Order\Shipping\ShippingId;
 use Thinktomorrow\Trader\Domain\Model\Order\Shipping\ShippingState;
-use Thinktomorrow\Trader\Domain\Model\Order\Events\OrderStates\CartAbandoned;
-use Thinktomorrow\Trader\Domain\Model\Order\Events\PaymentStates\PaymentPaid;
-use Thinktomorrow\Trader\Domain\Model\Order\Events\OrderStates\OrderConfirmed;
-use Thinktomorrow\Trader\Domain\Model\Order\Events\OrderStates\OrderCancelled;
-use Thinktomorrow\Trader\Domain\Model\Order\Events\OrderStates\OrderDelivered;
-use Thinktomorrow\Trader\Domain\Model\Order\Events\OrderStates\OrderFulfilled;
-use Thinktomorrow\Trader\Domain\Model\Order\Events\PaymentStates\PaymentFailed;
-use Thinktomorrow\Trader\Domain\Model\Order\Events\PaymentStates\PaymentRefunded;
-use Thinktomorrow\Trader\Domain\Model\Order\Events\ShippingStates\ShippingFailed;
-use Thinktomorrow\Trader\Domain\Model\Order\Events\ShippingStates\ShipmentPacked;
-use Thinktomorrow\Trader\Domain\Model\Order\Events\OrderStates\OrderPartiallyPaid;
-use Thinktomorrow\Trader\Domain\Model\Order\Events\ShippingStates\ShipmentReturned;
-use Thinktomorrow\Trader\Domain\Model\Order\Events\OrderStates\OrderPartiallyPacked;
-use Thinktomorrow\Trader\Domain\Model\Order\Events\PaymentStates\PaymentInitialized;
-use Thinktomorrow\Trader\Domain\Model\Order\Events\ShippingStates\ShipmentInTransit;
-use Thinktomorrow\Trader\Domain\Model\Order\Events\ShippingStates\ShipmentDelivered;
-use Thinktomorrow\Trader\Domain\Model\Order\Events\OrderStates\CartQueuedForDeletion;
-use Thinktomorrow\Trader\Domain\Model\Order\Events\OrderStates\OrderMarkedUnfulfilled;
-use Thinktomorrow\Trader\Domain\Model\Order\Events\OrderStates\OrderPartiallyDelivered;
-use Thinktomorrow\Trader\Domain\Model\Order\Events\OrderStates\OrderCancelledByMerchant;
-use Thinktomorrow\Trader\Domain\Model\Order\Events\ShippingStates\ShipmentHaltedForPacking;
-use Thinktomorrow\Trader\Domain\Model\Order\Events\PaymentStates\PaymentMarkedPaidByMerchant;
-use Thinktomorrow\Trader\Domain\Model\Order\Events\ShippingStates\ShipmentMarkedReadyForPacking;
 
 final class Order implements Aggregate, Discountable
 {
@@ -140,20 +140,20 @@ final class Order implements Aggregate, Discountable
     private function recordOrderStateEvent(OrderState $oldState, OrderState $newState): void
     {
         $map = [
-            OrderState::cart_abandoned->value           => CartAbandoned::class,
-            OrderState::cart_revived->value             => CartRevived::class,
+            OrderState::cart_abandoned->value => CartAbandoned::class,
+            OrderState::cart_revived->value => CartRevived::class,
             OrderState::cart_queued_for_deletion->value => CartQueuedForDeletion::class,
-            OrderState::confirmed->value                => OrderConfirmed::class,
-            OrderState::cancelled->value                => OrderCancelled::class,
-            OrderState::cancelled_by_merchant->value    => OrderCancelledByMerchant::class,
-            OrderState::paid->value                     => OrderPaid::class,
-            OrderState::partially_paid->value           => OrderPartiallyPaid::class,
-            OrderState::packed->value                   => OrderPacked::class,
-            OrderState::partially_packed->value         => OrderPartiallyPacked::class,
-            OrderState::delivered->value                => OrderDelivered::class,
-            OrderState::partially_delivered->value      => OrderPartiallyDelivered::class,
-            OrderState::fulfilled->value                => OrderFulfilled::class,
-            OrderState::unfulfilled->value              => OrderMarkedUnfulfilled::class,
+            OrderState::confirmed->value => OrderConfirmed::class,
+            OrderState::cancelled->value => OrderCancelled::class,
+            OrderState::cancelled_by_merchant->value => OrderCancelledByMerchant::class,
+            OrderState::paid->value => OrderPaid::class,
+            OrderState::partially_paid->value => OrderPartiallyPaid::class,
+            OrderState::packed->value => OrderPacked::class,
+            OrderState::partially_packed->value => OrderPartiallyPacked::class,
+            OrderState::delivered->value => OrderDelivered::class,
+            OrderState::partially_delivered->value => OrderPartiallyDelivered::class,
+            OrderState::fulfilled->value => OrderFulfilled::class,
+            OrderState::unfulfilled->value => OrderMarkedUnfulfilled::class,
         ];
 
         if (isset($map[$newState->value])) {
@@ -180,14 +180,14 @@ final class Order implements Aggregate, Discountable
     private function recordPaymentStateEvent(PaymentId $paymentId, PaymentState $oldState, PaymentState $newState): void
     {
         $map = [
-            PaymentState::initialized->value      => PaymentInitialized::class,
-            PaymentState::paid->value             => PaymentPaid::class,
+            PaymentState::initialized->value => PaymentInitialized::class,
+            PaymentState::paid->value => PaymentPaid::class,
             PaymentState::paid_by_merchant->value => PaymentMarkedPaidByMerchant::class,
-            PaymentState::canceled->value         => PaymentFailed::class,
-            PaymentState::failed->value           => PaymentFailed::class,
-            PaymentState::expired->value          => PaymentFailed::class,
-            PaymentState::refunded->value         => PaymentRefunded::class,
-            PaymentState::charged_back->value     => PaymentRefunded::class,
+            PaymentState::canceled->value => PaymentFailed::class,
+            PaymentState::failed->value => PaymentFailed::class,
+            PaymentState::expired->value => PaymentFailed::class,
+            PaymentState::refunded->value => PaymentRefunded::class,
+            PaymentState::charged_back->value => PaymentRefunded::class,
         ];
 
         if (isset($map[$newState->value])) {
@@ -209,13 +209,13 @@ final class Order implements Aggregate, Discountable
     private function recordShippingStateEvent(ShippingId $shippingId, ShippingState $oldState, ShippingState $newState): void
     {
         $map = [
-            ShippingState::ready_for_packing->value  => ShipmentMarkedReadyForPacking::class,
+            ShippingState::ready_for_packing->value => ShipmentMarkedReadyForPacking::class,
             ShippingState::halted_for_packing->value => ShipmentHaltedForPacking::class,
-            ShippingState::packed->value             => ShipmentPacked::class,
-            ShippingState::in_transit->value         => ShipmentInTransit::class,
-            ShippingState::delivered->value          => ShipmentDelivered::class,
-            ShippingState::returned->value           => ShipmentReturned::class,
-            ShippingState::failed->value             => ShippingFailed::class,
+            ShippingState::packed->value => ShipmentPacked::class,
+            ShippingState::in_transit->value => ShipmentInTransit::class,
+            ShippingState::delivered->value => ShipmentDelivered::class,
+            ShippingState::returned->value => ShipmentReturned::class,
+            ShippingState::failed->value => ShippingFailed::class,
         ];
 
         if (isset($map[$newState->value])) {
@@ -261,23 +261,23 @@ final class Order implements Aggregate, Discountable
     public function getMappedData(): array
     {
         return [
-            'order_id'    => $this->orderId->get(),
-            'order_ref'   => $this->orderReference->get(),
+            'order_id' => $this->orderId->get(),
+            'order_ref' => $this->orderReference->get(),
             'order_state' => $this->orderState->value,
 
-            'total'          => $this->getTotal()->getMoney()->getAmount(),
-            'tax_total'      => $this->getTaxTotal()->getAmount(),
-            'includes_vat'   => $this->getTotal()->includesVat(),
-            'subtotal'       => $this->getTotal()->includesVat()
+            'total' => $this->getTotal()->getMoney()->getAmount(),
+            'tax_total' => $this->getTaxTotal()->getAmount(),
+            'includes_vat' => $this->getTotal()->includesVat(),
+            'subtotal' => $this->getTotal()->includesVat()
                 ? $this->getSubTotal()->getIncludingVat()->getAmount()
                 : $this->getSubTotal()->getExcludingVat()->getAmount(),
             'discount_total' => $this->getTotal()->includesVat()
                 ? $this->getDiscountTotal()->getIncludingVat()->getAmount()
                 : $this->getDiscountTotal()->getExcludingVat()->getAmount(),
-            'shipping_cost'  => $this->getTotal()->includesVat()
+            'shipping_cost' => $this->getTotal()->includesVat()
                 ? $this->getShippingCost()->getIncludingVat()->getAmount()
                 : $this->getShippingCost()->getExcludingVat()->getAmount(),
-            'payment_cost'   => $this->getTotal()->includesVat()
+            'payment_cost' => $this->getTotal()->includesVat()
                 ? $this->getPaymentCost()->getIncludingVat()->getAmount()
                 : $this->getPaymentCost()->getExcludingVat()->getAmount(),
 
@@ -288,13 +288,13 @@ final class Order implements Aggregate, Discountable
     public function getChildEntities(): array
     {
         return [
-            Line::class            => array_map(fn($line) => $line->getMappedData(), $this->lines),
-            Discount::class        => array_map(fn($discount) => $discount->getMappedData(), $this->discounts),
-            Shipping::class        => array_map(fn($shipping) => $shipping->getMappedData(), $this->shippings),
-            Payment::class         => array_map(fn($payment) => $payment->getMappedData(), $this->payments),
+            Line::class => array_map(fn ($line) => $line->getMappedData(), $this->lines),
+            Discount::class => array_map(fn ($discount) => $discount->getMappedData(), $this->discounts),
+            Shipping::class => array_map(fn ($shipping) => $shipping->getMappedData(), $this->shippings),
+            Payment::class => array_map(fn ($payment) => $payment->getMappedData(), $this->payments),
             ShippingAddress::class => $this->shippingAddress?->getMappedData(),
-            BillingAddress::class  => $this->billingAddress?->getMappedData(),
-            Shopper::class         => $this->shopper?->getMappedData(),
+            BillingAddress::class => $this->billingAddress?->getMappedData(),
+            Shopper::class => $this->shopper?->getMappedData(),
         ];
     }
 
@@ -306,10 +306,10 @@ final class Order implements Aggregate, Discountable
         $order->orderReference = OrderReference::fromString($state['order_ref']);
         $order->orderState = OrderState::from($state['order_state']);
 
-        $order->discounts = array_map(fn($discountState) => Discount::fromMappedData($discountState, $state), $childEntities[Discount::class]);
-        $order->lines = array_map(fn($lineState) => Line::fromMappedData($lineState, $state, [Discount::class => $lineState[Discount::class]]), $childEntities[Line::class]);
-        $order->shippings = array_map(fn($shippingState) => Shipping::fromMappedData($shippingState, $state, [Discount::class => $shippingState[Discount::class]]), $childEntities[Shipping::class]);
-        $order->payments = array_map(fn($paymentState) => Payment::fromMappedData($paymentState, $state, [Discount::class => $paymentState[Discount::class]]), $childEntities[Payment::class]);
+        $order->discounts = array_map(fn ($discountState) => Discount::fromMappedData($discountState, $state), $childEntities[Discount::class]);
+        $order->lines = array_map(fn ($lineState) => Line::fromMappedData($lineState, $state, [Discount::class => $lineState[Discount::class]]), $childEntities[Line::class]);
+        $order->shippings = array_map(fn ($shippingState) => Shipping::fromMappedData($shippingState, $state, [Discount::class => $shippingState[Discount::class]]), $childEntities[Shipping::class]);
+        $order->payments = array_map(fn ($paymentState) => Payment::fromMappedData($paymentState, $state, [Discount::class => $paymentState[Discount::class]]), $childEntities[Payment::class]);
         $order->shippingAddress = $childEntities[ShippingAddress::class] ? ShippingAddress::fromMappedData($childEntities[ShippingAddress::class], $state) : null;
         $order->billingAddress = $childEntities[BillingAddress::class] ? BillingAddress::fromMappedData($childEntities[BillingAddress::class], $state) : null;
         $order->shopper = $childEntities[Shopper::class] ? Shopper::fromMappedData($childEntities[Shopper::class], $state) : null;

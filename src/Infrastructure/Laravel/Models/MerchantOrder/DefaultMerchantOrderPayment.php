@@ -12,5 +12,4 @@ class DefaultMerchantOrderPayment extends OrderReadPayment implements MerchantOr
     {
         return $this->state->getValueAsString();
     }
-
 }
