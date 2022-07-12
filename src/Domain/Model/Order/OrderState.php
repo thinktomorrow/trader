@@ -38,15 +38,12 @@ enum OrderState: string implements State
 
     case partially_paid = 'partially_paid'; // one or more of many payments are delivered
     case paid = 'paid'; // fully paid so order can be processed
-//    case unpaid = 'unpaid'; // not yet fully paid or one of the payments has failed
 
     case partially_packed = 'partially_packed'; // one or more of many shipments are packed
     case packed = 'packed'; // internally processed the order so order can be shipped
-//    case unpacked = 'unpacked'; // something in the packaging process has failed
 
     case partially_delivered = 'partially_delivered'; // one or more of many shipments are delivered
     case delivered = 'delivered'; // fully delivered so order can be processed
-//    case undelivered = 'undelivered'; // not yet delivered or one of the shipments has failed
 
     case fulfilled = 'fulfilled'; // order is fulfilled and finished
     case unfulfilled = 'unfulfilled'; // order is finished but not fulfilled: something happened that caused the failure (e.g. order return).
@@ -68,5 +65,55 @@ enum OrderState: string implements State
     public function getValueAsString(): string
     {
         return $this->value;
+    }
+
+    public static function getDefaultTransitions(): array
+    {
+        return [
+            'abandon' => [
+                'from' => [self::cart_pending, self::cart_revived],
+                'to' => self::cart_abandoned,
+            ],
+            'revive' => [
+                'from' => [self::cart_abandoned],
+                'to' => self::cart_revived,
+            ],
+            'remove_cart' => [
+                'from' => [self::cart_abandoned],
+                'to' => self::cart_queued_for_deletion,
+            ],
+            'confirm' => [
+                'from' => [self::cart_pending, self::cart_revived],
+                'to' => self::confirmed,
+            ],
+            'partially_pay' => [
+                'from' => [self::confirmed],
+                'to' => self::partially_paid,
+            ],
+            'pay' => [
+                'from' => [self::confirmed, self::partially_paid],
+                'to' => self::paid,
+            ],
+            'partially_pack' => [
+                'from' => [self::paid, self::partially_paid],
+                'to' => self::partially_packed,
+            ],
+            'pack' => [
+                'from' => [self::paid, self::partially_paid, self::partially_packed],
+                'to' => self::packed,
+            ],
+            'partially_deliver' => [
+                'from' => [self::packed, self::partially_packed],
+                'to' => self::partially_delivered,
+            ],
+            'deliver' => [
+                'from' => [self::packed, self::partially_packed, self::partially_delivered],
+                'to' => self::delivered,
+            ],
+            'fulfill' => [
+                'from' => [self::delivered],
+                'to' => self::fulfilled,
+            ],
+        ];
     }
 }

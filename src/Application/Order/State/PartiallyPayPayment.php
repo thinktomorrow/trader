@@ -1,12 +1,12 @@
 <?php
 declare(strict_types=1);
 
-namespace Thinktomorrow\Trader\Application\Order;
+namespace Thinktomorrow\Trader\Application\Order\State;
 
 use Thinktomorrow\Trader\Domain\Model\Order\OrderId;
 use Thinktomorrow\Trader\Domain\Model\Order\Payment\PaymentId;
 
-final class PayOrder
+final class PartiallyPayPayment
 {
     private string $orderId;
     private string $paymentId;

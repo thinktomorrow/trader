@@ -1,25 +1,24 @@
 <?php
-
 declare(strict_types=1);
 
-namespace Thinktomorrow\Trader\Domain\Model\Order;
+namespace Thinktomorrow\Trader\Domain\Model\Order\Shipping;
 
 use Assert\Assertion;
 use Thinktomorrow\Trader\Domain\Common\State\State;
 use Thinktomorrow\Trader\Domain\Common\State\AbstractStateMachine;
 
-class OrderStateMachine extends AbstractStateMachine
+final class ShippingStateMachine extends AbstractStateMachine
 {
     protected function getState($model): State
     {
-        Assertion::isInstanceOf($model, Order::class);
+        Assertion::isInstanceOf($model, Shipping::class);
 
-        return $model->getOrderState();
+        return $model->getShippingState();
     }
 
     protected function updateState($model, State $state): void
     {
-        Assertion::isInstanceOf($model, Order::class);
+        Assertion::isInstanceOf($model, Shipping::class);
 
         $model->updateState($state);
     }

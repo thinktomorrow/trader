@@ -3,17 +3,17 @@ declare(strict_types=1);
 
 namespace Tests\Infrastructure\Repositories;
 
-use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
+use Illuminate\Support\Facades\DB;
 use Tests\Infrastructure\TestCase;
-use Thinktomorrow\Trader\Application\Order\Grid\GridItem;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 use Thinktomorrow\Trader\Domain\Model\Order\OrderState;
-use Thinktomorrow\Trader\Infrastructure\Laravel\Models\DefaultOrderGridItem;
-use Thinktomorrow\Trader\Infrastructure\Laravel\Repositories\MysqlOrderGridRepository;
-use Thinktomorrow\Trader\Infrastructure\Laravel\Repositories\MysqlOrderRepository;
+use Thinktomorrow\Trader\Application\Order\Grid\GridItem;
 use Thinktomorrow\Trader\Infrastructure\Test\TestContainer;
 use Thinktomorrow\Trader\Infrastructure\Test\TestTraderConfig;
+use Thinktomorrow\Trader\Infrastructure\Laravel\Models\DefaultOrderGridItem;
+use Thinktomorrow\Trader\Infrastructure\Laravel\Repositories\MysqlOrderRepository;
+use Thinktomorrow\Trader\Infrastructure\Laravel\Repositories\MysqlOrderGridRepository;
 
 class OrderGridRepositoryTest extends TestCase
 {
@@ -100,56 +100,28 @@ class OrderGridRepositoryTest extends TestCase
     /** @test */
     public function it_can_sort_by_confirmed_at()
     {
-        $this->testSortingByDate('confirmed_at', 'sortByConfirmedAt', 'getConfirmedAt');
+        $this->runTestSortingByDate('confirmed_at', 'sortByConfirmedAt', 'getConfirmedAt');
     }
 
     /** @test */
     public function it_can_sort_descending_by_confirmed_at()
     {
-        $this->testSortingByDate('confirmed_at', 'sortByConfirmedAtDesc', 'getConfirmedAt');
+        $this->runTestSortingByDate('confirmed_at', 'sortByConfirmedAtDesc', 'getConfirmedAt');
     }
 
     /** @test */
     public function it_can_sort_by_fulfilled_at()
     {
-        $this->testSortingByDate('fulfilled_at', 'sortByFulfilledAt', 'getFulfilledAt');
+        $this->runTestSortingByDate('fulfilled_at', 'sortByFulfilledAt', 'getFulfilledAt');
     }
 
     /** @test */
     public function it_can_sort_descending_by_fulfilled_at()
     {
-        $this->testSortingByDate('fulfilled_at', 'sortByFulfilledAtDesc', 'getFulfilledAt');
+        $this->runTestSortingByDate('fulfilled_at', 'sortByFulfilledAtDesc', 'getFulfilledAt');
     }
 
-    private function test_sorting_by_date(string $column, string $sortingMethod, string $modelMethod)
-    {
-        $order = $this->createOrder(['order_id' => 'yyy', 'order_ref' => 'yy-ref'], [], [], [], [], null, null, $this->createOrderShopper(['shopper_id' => 'sss']));
-        (new MysqlOrderRepository())->save($order);
-
-        $this->updateRow('xxx', [$column => now()->addHour()->toDateTimeString()]);
-        $this->updateRow('yyy', [$column => now()->toDateTimeString()]);
-
-        $gridItems = $this->getMysqlGridRepository()->{$sortingMethod}()->getResults();
-
-        $this->assertCount(2, $gridItems);
-
-        $previousDatetime = null;
-        foreach ($gridItems as $gridItem) {
-            $dateTime = $gridItem->{$modelMethod}();
-
-            if ($previousDatetime) {
-                if (Str::endsWith($sortingMethod, 'Desc')) {
-                    $this->assertLessThan($previousDatetime, $dateTime);
-                } else {
-                    $this->assertGreaterThan($previousDatetime, $dateTime);
-                }
-            }
-
-            $previousDatetime = $dateTime;
-        }
-    }
-
-    private function test_sorting_by_date(string $column, string $sortingMethod, string $modelMethod)
+    private function runTestSortingByDate(string $column, string $sortingMethod, string $modelMethod)
     {
         $order = $this->createOrder(['order_id' => 'yyy', 'order_ref' => 'yy-ref'], [], [], [], [], null, null, $this->createOrderShopper(['shopper_id' => 'sss']));
         (new MysqlOrderRepository())->save($order);

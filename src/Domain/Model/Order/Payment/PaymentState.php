@@ -23,4 +23,38 @@ enum PaymentState: string implements State
     {
         return $this->value;
     }
+
+    public static function getDefaultTransitions(): array
+    {
+        return [
+            'initialize' => [
+                'from' => [self::none],
+                'to' => self::initialized,
+            ],
+            'pay' => [
+                'from' => [self::initialized],
+                'to' => self::paid,
+            ],
+            'pay_by_merchant' => [
+                'from' => [self::initialized],
+                'to' => self::paid_by_merchant,
+            ],
+            'cancel' => [
+                'from' => [self::initialized],
+                'to' => self::canceled,
+            ],
+            'expire' => [
+                'from' => [self::initialized],
+                'to' => self::expired,
+            ],
+            'refund' => [
+                'from' => [self::paid],
+                'to' => self::refunded,
+            ],
+            'charge_back' => [
+                'from' => [self::paid],
+                'to' => self::charged_back,
+            ],
+        ];
+    }
 }

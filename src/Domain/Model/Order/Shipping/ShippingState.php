@@ -13,7 +13,6 @@ enum ShippingState: string implements State
     case halted_for_packing = 'halted_for_packing'; // something is wrong with the order (e.g. outdated order,  out of stock, ...)
     case packed = 'packed'; // ready for pickup by the logistic partner
 
-//    case label_created = "label_created"; // The label is created but before the package is dropped off or picked up by the carrier.
     case in_transit = "in_transit"; // The package has been scanned by the carrier and is in transit.
     case delivered = "delivered"; // The package has been successfully delivered.
     case returned = "returned"; // The package is en route to be returned to the sender, or has been returned successfully.
@@ -23,5 +22,35 @@ enum ShippingState: string implements State
     public function getValueAsString(): string
     {
         return $this->value;
+    }
+
+    public static function getDefaultTransitions(): array
+    {
+        return [
+            'allow_packing' => [
+                'from' => [self::none],
+                'to' => self::ready_for_packing,
+            ],
+            'halt_packing' => [
+                'from' => [self::none],
+                'to' => self::halted_for_packing,
+            ],
+            'pack' => [
+                'from' => [self::ready_for_packing],
+                'to' => self::packed,
+            ],
+            'ship' => [
+                'from' => [self::packed],
+                'to' => self::in_transit,
+            ],
+            'deliver' => [
+                'from' => [self::in_transit],
+                'to' => self::delivered,
+            ],
+            'return' => [
+                'from' => [self::delivered],
+                'to' => self::returned,
+            ],
+        ];
     }
 }
