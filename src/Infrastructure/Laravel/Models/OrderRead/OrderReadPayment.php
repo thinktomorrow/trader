@@ -6,6 +6,7 @@ namespace Thinktomorrow\Trader\Infrastructure\Laravel\Models\OrderRead;
 use Thinktomorrow\Trader\Application\Common\RendersData;
 use Thinktomorrow\Trader\Application\Common\RendersMoney;
 use Thinktomorrow\Trader\Domain\Common\Price\Price;
+use Thinktomorrow\Trader\Domain\Model\Order\Payment\PaymentState;
 
 abstract class OrderReadPayment
 {
@@ -15,6 +16,7 @@ abstract class OrderReadPayment
     protected Price $cost;
     protected string $payment_id;
     protected string $payment_method_id;
+    protected PaymentState $state;
     protected iterable $discounts;
     protected array $data;
 
@@ -27,6 +29,7 @@ abstract class OrderReadPayment
 
         $payment->payment_id = $state['payment_id'];
         $payment->payment_method_id = $state['payment_method_id'];
+        $payment->state = PaymentState::from($state['payment_state']);
         $payment->cost = $state['cost'];
         $payment->data = json_decode($state['data'], true);
         $payment->discounts = $discounts;

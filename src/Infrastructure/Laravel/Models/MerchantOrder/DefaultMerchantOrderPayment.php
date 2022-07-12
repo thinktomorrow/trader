@@ -8,4 +8,9 @@ use Thinktomorrow\Trader\Infrastructure\Laravel\Models\OrderRead\OrderReadPaymen
 
 class DefaultMerchantOrderPayment extends OrderReadPayment implements MerchantOrderPayment
 {
+    public function getState(): string
+    {
+        return $this->state->getValueAsString();
+    }
+
 }

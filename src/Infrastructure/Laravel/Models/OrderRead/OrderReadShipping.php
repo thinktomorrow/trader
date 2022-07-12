@@ -6,6 +6,7 @@ namespace Thinktomorrow\Trader\Infrastructure\Laravel\Models\OrderRead;
 use Thinktomorrow\Trader\Application\Common\RendersData;
 use Thinktomorrow\Trader\Application\Common\RendersMoney;
 use Thinktomorrow\Trader\Domain\Common\Price\Price;
+use Thinktomorrow\Trader\Domain\Model\Order\Shipping\ShippingState;
 
 abstract class OrderReadShipping
 {
@@ -15,6 +16,7 @@ abstract class OrderReadShipping
     protected Price $cost;
     protected string $shipping_id;
     protected string $shipping_profile_id;
+    protected ShippingState $state;
     protected iterable $discounts;
     protected array $data;
 
@@ -27,6 +29,7 @@ abstract class OrderReadShipping
 
         $shipping->shipping_id = $state['shipping_id'];
         $shipping->shipping_profile_id = $state['shipping_profile_id'];
+        $shipping->state = ShippingState::from($state['shipping_state']);
         $shipping->cost = $state['cost'];
         $shipping->data = json_decode($state['data'], true);
         $shipping->discounts = $discounts;

@@ -16,7 +16,7 @@ enum OrderState: string implements State
     case cart_pending = 'cart_pending'; // order still in cart
     case cart_abandoned = 'cart_abandoned'; // cart has been stale for too long and is considered abandoned by customer
     case cart_revived = 'cart_revived'; // abandoned cart has been revived by customer
-    case cart_removed = 'cart_removed'; // cart is soft deleted and ready for garbage collection
+    case cart_queued_for_deletion = 'cart_queued_for_deletion'; // cart is soft deleted and ready for garbage collection
 
     /**
      * ------------------------------------------------
@@ -35,13 +35,21 @@ enum OrderState: string implements State
      */
     case cancelled = 'cancelled'; // customer cancelled order after payment
     case cancelled_by_merchant = 'cancelled_by_merchant'; // admin cancelled order after payment
-    case unpaid = 'unpaid'; // not yet fully paid or one of the payments has failed
+
+    case partially_paid = 'partially_paid'; // one or more of many payments are delivered
     case paid = 'paid'; // fully paid so order can be processed
-    case processed = 'processed'; // internally processed the order
-    case undelivered = 'undelivered'; // not yet fully delivered or one of the shippings has failed
+//    case unpaid = 'unpaid'; // not yet fully paid or one of the payments has failed
+
+    case partially_packed = 'partially_packed'; // one or more of many shipments are packed
+    case packed = 'packed'; // internally processed the order so order can be shipped
+//    case unpacked = 'unpacked'; // something in the packaging process has failed
+
+    case partially_delivered = 'partially_delivered'; // one or more of many shipments are delivered
     case delivered = 'delivered'; // fully delivered so order can be processed
-    case unfulfilled = 'unfulfilled'; // order is not fulfilled yet or something happened that caused the failure.
+//    case undelivered = 'undelivered'; // not yet delivered or one of the shipments has failed
+
     case fulfilled = 'fulfilled'; // order is fulfilled and finished
+    case unfulfilled = 'unfulfilled'; // order is finished but not fulfilled: something happened that caused the failure (e.g. order return).
 
     public function inCustomerHands(): bool
     {

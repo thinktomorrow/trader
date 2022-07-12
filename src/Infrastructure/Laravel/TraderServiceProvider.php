@@ -14,7 +14,9 @@ use Thinktomorrow\Trader\Application\Cart\Read\CartRepository;
 use Thinktomorrow\Trader\Application\Cart\Read\CartShipping;
 use Thinktomorrow\Trader\Application\Cart\Read\CartShippingAddress;
 use Thinktomorrow\Trader\Application\Cart\Read\CartShopper;
+use Thinktomorrow\Trader\Infrastructure\Laravel\Models\DefaultOrderGridItem;
 use Thinktomorrow\Trader\Application\Cart\ShippingProfile\ShippingProfileForCart;
+use Thinktomorrow\Trader\Infrastructure\Laravel\Repositories\MysqlOrderGridRepository;
 use Thinktomorrow\Trader\Application\Cart\ShippingProfile\ShippingProfileForCartRepository;
 use Thinktomorrow\Trader\Application\Cart\VariantForCart\VariantForCart;
 use Thinktomorrow\Trader\Application\Cart\VariantForCart\VariantForCartRepository;
@@ -190,6 +192,9 @@ class TraderServiceProvider extends ServiceProvider
         $this->app->bind(MerchantOrderShopper::class, DefaultMerchantOrderShopper::class);
         $this->app->bind(MerchantOrderShipping::class, DefaultMerchantOrderShipping::class);
         $this->app->bind(MerchantOrderPayment::class, DefaultMerchantOrderPayment::class);
+
+        $this->app->bind(\Thinktomorrow\Trader\Application\Order\Grid\GridRepository::class, MysqlOrderGridRepository::class);
+        $this->app->bind(\Thinktomorrow\Trader\Application\Order\Grid\GridItem::class, DefaultOrderGridItem::class);
 
         $this->app->bind(PromoRepository::class, MysqlPromoRepository::class);
         $this->app->bind(OrderPromoRepository::class, MysqlPromoRepository::class);

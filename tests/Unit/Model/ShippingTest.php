@@ -46,7 +46,7 @@ class ShippingTest extends TestCase
             'order_id' => 'aaa',
             'shipping_id' => 'yyy',
             'shipping_profile_id' => 'zzz',
-            'shipping_state' => ShippingState::transit->value,
+            'shipping_state' => ShippingState::in_transit->value,
             'cost' => '200',
             'tax_rate' => '9',
             'includes_vat' => true,
@@ -59,7 +59,7 @@ class ShippingTest extends TestCase
         return Shipping::fromMappedData([
             'shipping_id' => 'yyy',
             'shipping_profile_id' => 'zzz',
-            'shipping_state' => ShippingState::transit->value,
+            'shipping_state' => ShippingState::in_transit->value,
             'cost' => '200',
             'tax_rate' => '9',
             'includes_vat' => true,

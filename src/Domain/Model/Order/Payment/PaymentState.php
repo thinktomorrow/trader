@@ -3,7 +3,9 @@ declare(strict_types=1);
 
 namespace Thinktomorrow\Trader\Domain\Model\Order\Payment;
 
-enum PaymentState: string
+use Thinktomorrow\Trader\Domain\Common\State\State;
+
+enum PaymentState: string implements State
 {
     case none = "none"; // The order is still in customer hands (incomplete) and a payment is not initialized yet.
 
@@ -16,4 +18,9 @@ enum PaymentState: string
     case refunded = "refunded"; // the merchant has refunded the payment to the customer
     case charged_back = "charged_back"; // the customer has done a chargeback via the issuer or acquirer.
     case unknown = "unknown"; // unknown status
+
+    public function getValueAsString(): string
+    {
+        return $this->value;
+    }
 }
