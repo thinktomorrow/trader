@@ -31,21 +31,21 @@ class PaymentStateTest extends StateContext
 
     public function test_it_can_cancel_a_payment()
     {
-        $this->assertPaymentStateTransition('cancelPayment',PaymentState::initialized, PaymentState::canceled);
+        $this->assertPaymentStateTransition('cancelPayment', PaymentState::initialized, PaymentState::canceled);
     }
 
     public function test_it_can_expire_a_payment()
     {
-        $this->assertPaymentStateTransition('expirePayment',PaymentState::initialized, PaymentState::expired);
+        $this->assertPaymentStateTransition('expirePayment', PaymentState::initialized, PaymentState::expired);
     }
 
     public function test_it_can_refund_a_payment()
     {
-        $this->assertPaymentStateTransition('refundPayment',PaymentState::paid, PaymentState::refunded);
+        $this->assertPaymentStateTransition('refundPayment', PaymentState::paid, PaymentState::refunded);
     }
 
     public function test_it_can_charge_back_a_payment()
     {
-        $this->assertPaymentStateTransition('chargeBackPayment',PaymentState::paid, PaymentState::charged_back);
+        $this->assertPaymentStateTransition('chargeBackPayment', PaymentState::paid, PaymentState::charged_back);
     }
 }

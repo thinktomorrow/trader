@@ -3,8 +3,8 @@ declare(strict_types=1);
 
 namespace Tests\Acceptance\Order;
 
-use Thinktomorrow\Trader\Domain\Model\Order\OrderState;
 use Thinktomorrow\Trader\Domain\Common\State\StateException;
+use Thinktomorrow\Trader\Domain\Model\Order\OrderState;
 
 final class OrderStateTest extends StateContext
 {

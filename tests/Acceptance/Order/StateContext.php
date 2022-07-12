@@ -3,16 +3,16 @@ declare(strict_types=1);
 
 namespace Tests\Acceptance\Order;
 
-use Tests\TestHelpers;
 use Tests\Acceptance\TestCase;
+use Tests\TestHelpers;
+use Thinktomorrow\Trader\Application\Order\State\OrderStateApplication;
 use Thinktomorrow\Trader\Domain\Model\Order\OrderState;
 use Thinktomorrow\Trader\Domain\Model\Order\OrderStateMachine;
-use Thinktomorrow\Trader\Infrastructure\Test\EventDispatcherSpy;
 use Thinktomorrow\Trader\Domain\Model\Order\Payment\PaymentState;
-use Thinktomorrow\Trader\Domain\Model\Order\Shipping\ShippingState;
-use Thinktomorrow\Trader\Application\Order\State\OrderStateApplication;
 use Thinktomorrow\Trader\Domain\Model\Order\Payment\PaymentStateMachine;
+use Thinktomorrow\Trader\Domain\Model\Order\Shipping\ShippingState;
 use Thinktomorrow\Trader\Domain\Model\Order\Shipping\ShippingStateMachine;
+use Thinktomorrow\Trader\Infrastructure\Test\EventDispatcherSpy;
 use Thinktomorrow\Trader\Infrastructure\Test\Repositories\InMemoryOrderRepository;
 
 abstract class StateContext extends TestCase
@@ -56,12 +56,12 @@ abstract class StateContext extends TestCase
 
     protected function assertPaymentStateTransition(string $transitionMethod, PaymentState $currentState, PaymentState $newState, ?OrderState $orderState = null, ?OrderState $newOrderState = null)
     {
-        if(!$orderState) {
+        if (! $orderState) {
             $orderState = OrderState::confirmed;
         }
 
         $order = $this->createOrder(['order_id' => 'xxx', 'order_state' => $orderState->value], [], [], [], [
-            $payment = $this->createOrderPayment(['payment_state' => $currentState->value])
+            $payment = $this->createOrderPayment(['payment_state' => $currentState->value]),
         ]);
         $this->orderRepository->save($order);
 
@@ -71,19 +71,19 @@ abstract class StateContext extends TestCase
         $order = $this->orderRepository->find($order->orderId);
         $this->assertEquals($newState, $order->getPayments()[0]->getPaymentState());
 
-        if($newOrderState) {
+        if ($newOrderState) {
             $this->assertEquals($newOrderState, $order->getOrderState());
         }
     }
 
     protected function assertShippingStateTransition(string $transitionMethod, ShippingState $currentState, ShippingState $newState, ?OrderState $orderState = null, ?OrderState $newOrderState = null)
     {
-        if(!$orderState) {
+        if (! $orderState) {
             $orderState = OrderState::confirmed;
         }
 
         $order = $this->createOrder(['order_id' => 'xxx', 'order_state' => $orderState->value], [], [], [
-            $shipping = $this->createOrderShipping(['shipping_state' => $currentState->value])
+            $shipping = $this->createOrderShipping(['shipping_state' => $currentState->value]),
         ]);
         $this->orderRepository->save($order);
 
@@ -93,7 +93,7 @@ abstract class StateContext extends TestCase
         $order = $this->orderRepository->find($order->orderId);
         $this->assertEquals($newState, $order->getShippings()[0]->getShippingState());
 
-        if($newOrderState) {
+        if ($newOrderState) {
             $this->assertEquals($newOrderState, $order->getOrderState());
         }
     }
