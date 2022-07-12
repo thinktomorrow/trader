@@ -1,11 +1,11 @@
 <?php
 declare(strict_types=1);
 
-namespace Thinktomorrow\Trader\Application\Order\State;
+namespace Thinktomorrow\Trader\Application\Order\State\Order;
 
 use Thinktomorrow\Trader\Domain\Model\Order\OrderId;
 
-final class DeliverOrder
+trait HasDefaultOrderStateValues
 {
     private string $orderId;
 

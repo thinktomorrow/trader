@@ -27,12 +27,12 @@ enum ShippingState: string implements State
     public static function getDefaultTransitions(): array
     {
         return [
-            'allow_packing' => [
+            'start_packing' => [
                 'from' => [self::none],
                 'to' => self::ready_for_packing,
             ],
             'halt_packing' => [
-                'from' => [self::none],
+                'from' => [self::none, self::ready_for_packing],
                 'to' => self::halted_for_packing,
             ],
             'pack' => [
@@ -48,7 +48,7 @@ enum ShippingState: string implements State
                 'to' => self::delivered,
             ],
             'return' => [
-                'from' => [self::delivered],
+                'from' => [self::delivered, self::in_transit],
                 'to' => self::returned,
             ],
         ];

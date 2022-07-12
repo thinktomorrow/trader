@@ -9,8 +9,28 @@ use Thinktomorrow\Trader\Domain\Common\Event\EventDispatcher;
 use Thinktomorrow\Trader\Domain\Model\Order\OrderStateMachine;
 use Thinktomorrow\Trader\Domain\Model\Order\Payment\PaymentId;
 use Thinktomorrow\Trader\Domain\Model\Order\Shipping\ShippingId;
+use Thinktomorrow\Trader\Application\Order\State\Order\PayOrder;
+use Thinktomorrow\Trader\Application\Order\State\Order\PackOrder;
+use Thinktomorrow\Trader\Application\Order\State\Order\DeliverOrder;
+use Thinktomorrow\Trader\Application\Order\State\Order\FulfillOrder;
+use Thinktomorrow\Trader\Application\Order\State\Payment\PayPayment;
+use Thinktomorrow\Trader\Application\Order\State\Payment\CancelPayment;
+use Thinktomorrow\Trader\Application\Order\State\Payment\ExpirePayment;
+use Thinktomorrow\Trader\Application\Order\State\Payment\RefundPayment;
+use Thinktomorrow\Trader\Application\Order\State\Shipping\PackShipment;
+use Thinktomorrow\Trader\Application\Order\State\Shipping\ShipShipment;
 use Thinktomorrow\Trader\Domain\Model\Order\Payment\PaymentStateMachine;
+use Thinktomorrow\Trader\Application\Order\State\Order\PartiallyPayOrder;
+use Thinktomorrow\Trader\Application\Order\State\Shipping\ReturnShipment;
 use Thinktomorrow\Trader\Domain\Model\Order\Shipping\ShippingStateMachine;
+use Thinktomorrow\Trader\Application\Order\State\Order\PartiallyPackOrder;
+use Thinktomorrow\Trader\Application\Order\State\Shipping\DeliverShipment;
+use Thinktomorrow\Trader\Application\Order\State\Payment\InitializePayment;
+use Thinktomorrow\Trader\Application\Order\State\Payment\ChargeBackPayment;
+use Thinktomorrow\Trader\Application\Order\State\Order\PartiallyDeliverOrder;
+use Thinktomorrow\Trader\Application\Order\State\Payment\PayPaymentByMerchant;
+use Thinktomorrow\Trader\Application\Order\State\Shipping\HaltPackingShipment;
+use Thinktomorrow\Trader\Application\Order\State\Shipping\StartPackingShipment;
 
 final class OrderStateApplication
 {
@@ -64,9 +84,69 @@ final class OrderStateApplication
         $this->handleOrderStateEvent($command->getOrderId(), 'fulfill');
     }
 
-    public function partiallyPayPayment(PartiallyPayPayment $command): void
+    public function initializePayment(InitializePayment $command): void
     {
-        $this->handleOrderStateEvent($command->getOrderId(), 'partially_pay');
+        $this->handlePaymentStateEvent($command->getOrderId(), $command->getPaymentId(), 'initialize');
+    }
+
+    public function payPayment(PayPayment $command): void
+    {
+        $this->handlePaymentStateEvent($command->getOrderId(), $command->getPaymentId(), 'pay');
+    }
+
+    public function payPaymentByMerchant(PayPaymentByMerchant $command): void
+    {
+        $this->handlePaymentStateEvent($command->getOrderId(), $command->getPaymentId(), 'pay_by_merchant');
+    }
+
+    public function cancelPayment(CancelPayment $command): void
+    {
+        $this->handlePaymentStateEvent($command->getOrderId(), $command->getPaymentId(), 'cancel');
+    }
+
+    public function expirePayment(ExpirePayment $command): void
+    {
+        $this->handlePaymentStateEvent($command->getOrderId(), $command->getPaymentId(), 'expire');
+    }
+
+    public function refundPayment(RefundPayment $command): void
+    {
+        $this->handlePaymentStateEvent($command->getOrderId(), $command->getPaymentId(), 'refund');
+    }
+
+    public function chargeBackPayment(ChargeBackPayment $command): void
+    {
+        $this->handlePaymentStateEvent($command->getOrderId(), $command->getPaymentId(), 'charge_back');
+    }
+
+    public function startPackingShipment(StartPackingShipment $command): void
+    {
+        $this->handleShippingStateEvent($command->getOrderId(), $command->getShippingId(), 'start_packing');
+    }
+
+    public function haltPackingShipment(HaltPackingShipment $command): void
+    {
+        $this->handleShippingStateEvent($command->getOrderId(), $command->getShippingId(), 'halt_packing');
+    }
+
+    public function packShipment(PackShipment $command): void
+    {
+        $this->handleShippingStateEvent($command->getOrderId(), $command->getShippingId(), 'pack');
+    }
+
+    public function shipShipment(ShipShipment $command): void
+    {
+        $this->handleShippingStateEvent($command->getOrderId(), $command->getShippingId(), 'ship');
+    }
+
+    public function deliverShipment(DeliverShipment $command): void
+    {
+        $this->handleShippingStateEvent($command->getOrderId(), $command->getShippingId(), 'deliver');
+    }
+
+    public function returnShipment(ReturnShipment $command): void
+    {
+        $this->handleShippingStateEvent($command->getOrderId(), $command->getShippingId(), 'return');
     }
 
     private function handleOrderStateEvent(OrderId $orderId, string $transition): void
