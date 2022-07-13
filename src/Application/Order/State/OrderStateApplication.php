@@ -4,8 +4,8 @@ declare(strict_types=1);
 namespace Thinktomorrow\Trader\Application\Order\State;
 
 use Thinktomorrow\Trader\Application\Order\State\Order\CancelOrder;
+use Thinktomorrow\Trader\Application\Order\State\Order\CancelOrderByMerchant;
 use Thinktomorrow\Trader\Application\Order\State\Order\DeliverOrder;
-use Thinktomorrow\Trader\Application\Order\State\Order\FulfillOrder;
 use Thinktomorrow\Trader\Application\Order\State\Order\PackOrder;
 use Thinktomorrow\Trader\Application\Order\State\Order\PartiallyDeliverOrder;
 use Thinktomorrow\Trader\Application\Order\State\Order\PartiallyPackOrder;
@@ -16,9 +16,9 @@ use Thinktomorrow\Trader\Application\Order\State\Payment\ChargeBackPayment;
 use Thinktomorrow\Trader\Application\Order\State\Payment\ExpirePayment;
 use Thinktomorrow\Trader\Application\Order\State\Payment\InitializePayment;
 use Thinktomorrow\Trader\Application\Order\State\Payment\PayPayment;
-use Thinktomorrow\Trader\Application\Order\State\Order\CancelOrderByMerchant;
 use Thinktomorrow\Trader\Application\Order\State\Payment\PayPaymentByMerchant;
 use Thinktomorrow\Trader\Application\Order\State\Payment\RefundPayment;
+use Thinktomorrow\Trader\Application\Order\State\Payment\RefundPaymentByMerchant;
 use Thinktomorrow\Trader\Application\Order\State\Shipping\DeliverShipment;
 use Thinktomorrow\Trader\Application\Order\State\Shipping\HaltPackingShipment;
 use Thinktomorrow\Trader\Application\Order\State\Shipping\PackShipment;
@@ -33,7 +33,6 @@ use Thinktomorrow\Trader\Domain\Model\Order\Payment\PaymentId;
 use Thinktomorrow\Trader\Domain\Model\Order\Payment\PaymentStateMachine;
 use Thinktomorrow\Trader\Domain\Model\Order\Shipping\ShippingId;
 use Thinktomorrow\Trader\Domain\Model\Order\Shipping\ShippingStateMachine;
-use Thinktomorrow\Trader\Application\Order\State\Payment\RefundPaymentByMerchant;
 
 final class OrderStateApplication
 {

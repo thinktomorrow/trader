@@ -6,9 +6,6 @@ namespace Thinktomorrow\Trader\Infrastructure\Laravel;
 use Illuminate\Support\Arr;
 use Illuminate\Support\ServiceProvider;
 use Thinktomorrow\Trader\Application\Cart\Read\Cart;
-use Thinktomorrow\Trader\Domain\Model\Order\OrderState;
-use Thinktomorrow\Trader\Domain\Model\Order\OrderStateMachine;
-use Thinktomorrow\Trader\Domain\Model\Order\Payment\PaymentState;
 use Thinktomorrow\Trader\Application\Cart\Read\CartBillingAddress;
 use Thinktomorrow\Trader\Application\Cart\Read\CartDiscount;
 use Thinktomorrow\Trader\Application\Cart\Read\CartLine;
@@ -17,9 +14,6 @@ use Thinktomorrow\Trader\Application\Cart\Read\CartRepository;
 use Thinktomorrow\Trader\Application\Cart\Read\CartShipping;
 use Thinktomorrow\Trader\Application\Cart\Read\CartShippingAddress;
 use Thinktomorrow\Trader\Application\Cart\Read\CartShopper;
-use Thinktomorrow\Trader\Domain\Model\Order\Shipping\ShippingState;
-use Thinktomorrow\Trader\Domain\Model\Order\Payment\PaymentStateMachine;
-use Thinktomorrow\Trader\Domain\Model\Order\Shipping\ShippingStateMachine;
 use Thinktomorrow\Trader\Application\Cart\ShippingProfile\ShippingProfileForCart;
 use Thinktomorrow\Trader\Application\Cart\ShippingProfile\ShippingProfileForCartRepository;
 use Thinktomorrow\Trader\Application\Cart\VariantForCart\VariantForCart;
@@ -63,6 +57,12 @@ use Thinktomorrow\Trader\Domain\Model\Customer\CustomerRepository;
 use Thinktomorrow\Trader\Domain\Model\CustomerLogin\CustomerLoginRepository;
 use Thinktomorrow\Trader\Domain\Model\Order\Discount\DiscountTotal;
 use Thinktomorrow\Trader\Domain\Model\Order\OrderRepository;
+use Thinktomorrow\Trader\Domain\Model\Order\OrderState;
+use Thinktomorrow\Trader\Domain\Model\Order\OrderStateMachine;
+use Thinktomorrow\Trader\Domain\Model\Order\Payment\PaymentState;
+use Thinktomorrow\Trader\Domain\Model\Order\Payment\PaymentStateMachine;
+use Thinktomorrow\Trader\Domain\Model\Order\Shipping\ShippingState;
+use Thinktomorrow\Trader\Domain\Model\Order\Shipping\ShippingStateMachine;
 use Thinktomorrow\Trader\Domain\Model\PaymentMethod\PaymentMethodRepository;
 use Thinktomorrow\Trader\Domain\Model\Product\ProductRepository;
 use Thinktomorrow\Trader\Domain\Model\Product\VariantRepository;
@@ -239,15 +239,15 @@ class TraderServiceProvider extends ServiceProvider
             );
         });
 
-        $this->app->bind(OrderStateMachine::class, function(){
+        $this->app->bind(OrderStateMachine::class, function () {
             return new OrderStateMachine(OrderState::cases(), OrderState::getDefaultTransitions());
         });
 
-        $this->app->bind(PaymentStateMachine::class, function(){
+        $this->app->bind(PaymentStateMachine::class, function () {
             return new PaymentStateMachine(PaymentState::cases(), PaymentState::getDefaultTransitions());
         });
 
-        $this->app->bind(ShippingStateMachine::class, function(){
+        $this->app->bind(ShippingStateMachine::class, function () {
             return new ShippingStateMachine(ShippingState::cases(), ShippingState::getDefaultTransitions());
         });
     }
