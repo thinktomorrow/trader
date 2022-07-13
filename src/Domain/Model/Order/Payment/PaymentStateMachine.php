@@ -4,13 +4,21 @@ declare(strict_types=1);
 namespace Thinktomorrow\Trader\Domain\Model\Order\Payment;
 
 use Assert\Assertion;
+use Thinktomorrow\Trader\Domain\Model\Order\Order;
 use Thinktomorrow\Trader\Domain\Common\State\AbstractStateMachine;
 use Thinktomorrow\Trader\Domain\Common\State\State;
+use Thinktomorrow\Trader\Application\Order\MerchantOrder\MerchantOrderPayment;
 
 final class PaymentStateMachine extends AbstractStateMachine
 {
+    private Order $order;
+
     protected function getState($model): State
     {
+        if($model instanceof MerchantOrderPayment) {
+            return PaymentState::from($model->getPaymentState());
+        }
+
         Assertion::isInstanceOf($model, Payment::class);
 
         return $model->getPaymentState();
@@ -19,7 +27,13 @@ final class PaymentStateMachine extends AbstractStateMachine
     protected function updateState($model, State $state): void
     {
         Assertion::isInstanceOf($model, Payment::class);
+        Assertion::isInstanceOf($state, PaymentState::class);
 
-        $model->updateState($state);
+        $this->order->updatePaymentState($model->paymentId, $state);
+    }
+
+    public function setOrder(Order $order): void
+    {
+        $this->order = $order;
     }
 }

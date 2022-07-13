@@ -84,17 +84,17 @@ class OrderGridRepositoryTest extends TestCase
     }
 
     /** @test */
-    public function it_can_filter_by_fulfilled_at()
+    public function it_can_filter_by_delivered_at()
     {
-        $this->assertCount(0, $this->getMysqlGridRepository()->filterByFulfilledAt(now()->subDay()->toDateString(), now()->addDay()->toDateString())->getResults());
+        $this->assertCount(0, $this->getMysqlGridRepository()->filterByDeliveredAt(now()->subDay()->toDateString(), now()->addDay()->toDateString())->getResults());
 
         // Force timestamp
-        $this->updateRow('xxx', ['fulfilled_at' => now()->toDateTimeString()]);
+        $this->updateRow('xxx', ['delivered_at' => now()->toDateTimeString()]);
 
-        $this->assertCount(1, $this->getMysqlGridRepository()->filterByFulfilledAt(now()->subDay()->toDateTimeString(), now()->addDay()->toDateTimeString())->getResults());
-        $this->assertCount(1, $this->getMysqlGridRepository()->filterByFulfilledAt(now()->subDay()->toDateString(), now()->addDay()->toDateString())->getResults());
-        $this->assertCount(0, $this->getMysqlGridRepository()->filterByFulfilledAt(now()->addDay()->toDateTimeString())->getResults());
-        $this->assertCount(0, $this->getMysqlGridRepository()->filterByFulfilledAt(null, now()->subDay()->toDateTimeString())->getResults());
+        $this->assertCount(1, $this->getMysqlGridRepository()->filterByDeliveredAt(now()->subDay()->toDateTimeString(), now()->addDay()->toDateTimeString())->getResults());
+        $this->assertCount(1, $this->getMysqlGridRepository()->filterByDeliveredAt(now()->subDay()->toDateString(), now()->addDay()->toDateString())->getResults());
+        $this->assertCount(0, $this->getMysqlGridRepository()->filterByDeliveredAt(now()->addDay()->toDateTimeString())->getResults());
+        $this->assertCount(0, $this->getMysqlGridRepository()->filterByDeliveredAt(null, now()->subDay()->toDateTimeString())->getResults());
     }
 
     /** @test */
@@ -110,15 +110,15 @@ class OrderGridRepositoryTest extends TestCase
     }
 
     /** @test */
-    public function it_can_sort_by_fulfilled_at()
+    public function it_can_sort_by_delivered_at()
     {
-        $this->runTestSortingByDate('fulfilled_at', 'sortByFulfilledAt', 'getFulfilledAt');
+        $this->runTestSortingByDate('delivered_at', 'sortByDeliveredAt', 'getDeliveredAt');
     }
 
     /** @test */
-    public function it_can_sort_descending_by_fulfilled_at()
+    public function it_can_sort_descending_by_delivered_at()
     {
-        $this->runTestSortingByDate('fulfilled_at', 'sortByFulfilledAtDesc', 'getFulfilledAt');
+        $this->runTestSortingByDate('delivered_at', 'sortByDeliveredAtDesc', 'getDeliveredAt');
     }
 
     private function runTestSortingByDate(string $column, string $sortingMethod, string $modelMethod)

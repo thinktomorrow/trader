@@ -75,9 +75,9 @@ final class MysqlOrderGridRepository implements GridRepository
         return $this->filterByDate('confirmed_at', $startAt, $endAt);
     }
 
-    public function filterByFulfilledAt(string $startAt = null, string $endAt = null): static
+    public function filterByDeliveredAt(string $startAt = null, string $endAt = null): static
     {
-        return $this->filterByDate('fulfilled_at', $startAt, $endAt);
+        return $this->filterByDate('delivered_at', $startAt, $endAt);
     }
 
     private function filterByDate(string $column, string $startAt = null, string $endAt = null): static
@@ -107,16 +107,16 @@ final class MysqlOrderGridRepository implements GridRepository
         return $this;
     }
 
-    public function sortByFulfilledAt(): static
+    public function sortByDeliveredAt(): static
     {
-        $this->builder->orderBy('fulfilled_at', 'ASC');
+        $this->builder->orderBy('delivered_at', 'ASC');
 
         return $this;
     }
 
-    public function sortByFulfilledAtDesc(): static
+    public function sortByDeliveredAtDesc(): static
     {
-        $this->builder->orderBy('fulfilled_at', 'DESC');
+        $this->builder->orderBy('delivered_at', 'DESC');
 
         return $this;
     }

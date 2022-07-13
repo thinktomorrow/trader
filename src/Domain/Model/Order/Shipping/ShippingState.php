@@ -28,7 +28,7 @@ enum ShippingState: string implements State
     {
         return [
             'start_packing' => [
-                'from' => [self::none],
+                'from' => [self::none, self::halted_for_packing],
                 'to' => self::ready_for_packing,
             ],
             'halt_packing' => [

@@ -16,11 +16,11 @@ interface GridRepository
 
     public function filterByStates(array $states): static;
     public function filterByConfirmedAt(string $startAt = null, string $endAt = null): static;
-    public function filterByFulfilledAt(string $startAt = null, string $endAt = null): static;
+    public function filterByDeliveredAt(string $startAt = null, string $endAt = null): static;
     public function sortByConfirmedAt(): static;
     public function sortByConfirmedAtDesc(): static;
-    public function sortByFulfilledAt(): static;
-    public function sortByFulfilledAtDesc(): static;
+    public function sortByDeliveredAt(): static;
+    public function sortByDeliveredAtDesc(): static;
 
     public function paginate(int $perPage): static;
 

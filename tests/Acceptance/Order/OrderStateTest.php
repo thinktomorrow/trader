@@ -8,6 +8,16 @@ use Thinktomorrow\Trader\Domain\Model\Order\OrderState;
 
 final class OrderStateTest extends StateContext
 {
+    public function test_it_can_cancel_order()
+    {
+        $this->assertOrderStateTransition('cancelOrder', OrderState::confirmed, OrderState::cancelled);
+    }
+
+    public function test_merchant_can_cancel_order()
+    {
+        $this->assertOrderStateTransition('cancelOrderByMerchant', OrderState::confirmed, OrderState::cancelled_by_merchant);
+    }
+
     public function test_it_can_pay_confirmed_order()
     {
         $this->assertOrderStateTransition('payOrder', OrderState::confirmed, OrderState::paid);
@@ -46,10 +56,5 @@ final class OrderStateTest extends StateContext
     {
         $this->assertOrderStateTransition('partiallyDeliverOrder', OrderState::packed, OrderState::partially_delivered);
         $this->assertOrderStateTransition('partiallyDeliverOrder', OrderState::partially_packed, OrderState::partially_delivered);
-    }
-
-    public function test_it_can_fulfill_order()
-    {
-        $this->assertOrderStateTransition('fulfillOrder', OrderState::delivered, OrderState::fulfilled);
     }
 }

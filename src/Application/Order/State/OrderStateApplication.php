@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace Thinktomorrow\Trader\Application\Order\State;
 
+use Thinktomorrow\Trader\Application\Order\State\Order\CancelOrder;
 use Thinktomorrow\Trader\Application\Order\State\Order\DeliverOrder;
 use Thinktomorrow\Trader\Application\Order\State\Order\FulfillOrder;
 use Thinktomorrow\Trader\Application\Order\State\Order\PackOrder;
@@ -15,6 +16,7 @@ use Thinktomorrow\Trader\Application\Order\State\Payment\ChargeBackPayment;
 use Thinktomorrow\Trader\Application\Order\State\Payment\ExpirePayment;
 use Thinktomorrow\Trader\Application\Order\State\Payment\InitializePayment;
 use Thinktomorrow\Trader\Application\Order\State\Payment\PayPayment;
+use Thinktomorrow\Trader\Application\Order\State\Order\CancelOrderByMerchant;
 use Thinktomorrow\Trader\Application\Order\State\Payment\PayPaymentByMerchant;
 use Thinktomorrow\Trader\Application\Order\State\Payment\RefundPayment;
 use Thinktomorrow\Trader\Application\Order\State\Shipping\DeliverShipment;
@@ -31,6 +33,7 @@ use Thinktomorrow\Trader\Domain\Model\Order\Payment\PaymentId;
 use Thinktomorrow\Trader\Domain\Model\Order\Payment\PaymentStateMachine;
 use Thinktomorrow\Trader\Domain\Model\Order\Shipping\ShippingId;
 use Thinktomorrow\Trader\Domain\Model\Order\Shipping\ShippingStateMachine;
+use Thinktomorrow\Trader\Application\Order\State\Payment\RefundPaymentByMerchant;
 
 final class OrderStateApplication
 {
@@ -47,6 +50,16 @@ final class OrderStateApplication
         $this->eventDispatcher = $eventDispatcher;
         $this->paymentStateMachine = $paymentStateMachine;
         $this->shippingStateMachine = $shippingStateMachine;
+    }
+
+    public function cancelOrder(CancelOrder $command): void
+    {
+        $this->handleOrderStateEvent($command->getOrderId(), 'cancel');
+    }
+
+    public function cancelOrderByMerchant(CancelOrderByMerchant $command): void
+    {
+        $this->handleOrderStateEvent($command->getOrderId(), 'cancel_by_merchant');
     }
 
     public function payOrder(PayOrder $command): void
@@ -79,11 +92,6 @@ final class OrderStateApplication
         $this->handleOrderStateEvent($command->getOrderId(), 'partially_deliver');
     }
 
-    public function fulfillOrder(FulfillOrder $command): void
-    {
-        $this->handleOrderStateEvent($command->getOrderId(), 'fulfill');
-    }
-
     public function initializePayment(InitializePayment $command): void
     {
         $this->handlePaymentStateEvent($command->getOrderId(), $command->getPaymentId(), 'initialize');
@@ -112,6 +120,11 @@ final class OrderStateApplication
     public function refundPayment(RefundPayment $command): void
     {
         $this->handlePaymentStateEvent($command->getOrderId(), $command->getPaymentId(), 'refund');
+    }
+
+    public function refundPaymentByMerchant(RefundPaymentByMerchant $command): void
+    {
+        $this->handlePaymentStateEvent($command->getOrderId(), $command->getPaymentId(), 'refund_by_merchant');
     }
 
     public function chargeBackPayment(ChargeBackPayment $command): void
@@ -166,10 +179,8 @@ final class OrderStateApplication
 
         $payment = $order->findPayment($paymentId);
 
+        $this->paymentStateMachine->setOrder($order);
         $this->paymentStateMachine->apply($payment, $transition);
-
-        // Is this necessary???
-        $order->updatePayment($payment);
 
         $this->orderRepository->save($order);
 
@@ -182,10 +193,8 @@ final class OrderStateApplication
 
         $shipping = $order->findShipping($shippingId);
 
+        $this->shippingStateMachine->setOrder($order);
         $this->shippingStateMachine->apply($shipping, $transition);
-
-        // Is this necessary???
-        $order->updateShipping($shipping);
 
         $this->orderRepository->save($order);
 

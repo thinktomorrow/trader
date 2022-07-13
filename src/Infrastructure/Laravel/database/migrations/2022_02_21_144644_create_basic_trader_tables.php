@@ -204,7 +204,7 @@ class CreateBasicTraderTables extends Migration
             $table->timestamp('updated_at');
             $table->timestamp('confirmed_at')->nullable();
             $table->timestamp('paid_at')->nullable();
-            $table->timestamp('fulfilled_at')->nullable();
+            $table->timestamp('delivered_at')->nullable();
             $table->json('data')->nullable();
         });
 

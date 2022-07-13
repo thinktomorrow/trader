@@ -8,7 +8,7 @@ interface MerchantOrderPayment
 
     public function getPaymentId(): string;
     public function getPaymentMethodId(): string;
-    public function getState(): string;
+    public function getPaymentState(): string;
     public function getCostPrice(): string;
     public function includeTax(bool $includeTax = true): void;
 

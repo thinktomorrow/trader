@@ -15,7 +15,8 @@ enum PaymentState: string implements State
     case canceled = "canceled"; // the merchant or the customer has canceled the transaction.
     case expired = "expired"; // the payment has expired, e.g. your customer has abandoned the payment.
     case failed = "failed"; // the payment has failed and cannot be completed. this could be that the issuer or acquirer has declined the transaction.
-    case refunded = "refunded"; // the merchant has refunded the payment to the customer
+    case refunded = "refunded"; // the merchant has refunded the payment to the customer via the payment provider.
+    case refunded_by_merchant = "refunded_by_merchant"; // the merchant has manually refunded the payment to the customer
     case charged_back = "charged_back"; // the customer has done a chargeback via the issuer or acquirer.
     case unknown = "unknown"; // unknown status
 
@@ -36,7 +37,7 @@ enum PaymentState: string implements State
                 'to' => self::paid,
             ],
             'pay_by_merchant' => [
-                'from' => [self::initialized],
+                'from' => [self::initialized, self::none],
                 'to' => self::paid_by_merchant,
             ],
             'cancel' => [
@@ -50,6 +51,10 @@ enum PaymentState: string implements State
             'refund' => [
                 'from' => [self::paid],
                 'to' => self::refunded,
+            ],
+            'refund_by_merchant' => [
+                'from' => [self::paid],
+                'to' => self::refunded_by_merchant,
             ],
             'charge_back' => [
                 'from' => [self::paid],

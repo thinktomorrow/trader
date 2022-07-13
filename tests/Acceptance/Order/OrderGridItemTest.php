@@ -34,12 +34,12 @@ class OrderGridItemTest extends TestCase
         $gridItem = DefaultOrderGridItem::fromMappedData(array_merge($this->createDefaultOrder()->getMappedData(), [
             'confirmed_at' => $confirmed_at = '2022-02-02 10:10:10',
             'paid_at' => $paid_at = '2022-02-03 10:10:10',
-            'fulfilled_at' => $fulfilled_at = '2022-02-04 10:10:10',
+            'delivered_at' => $delivered_at = '2022-02-04 10:10:10',
         ]), []);
 
         $this->assertEquals($confirmed_at, $gridItem->getConfirmedAt());
         $this->assertEquals($paid_at, $gridItem->getPaidAt());
-        $this->assertEquals($fulfilled_at, $gridItem->getFulfilledAt());
+        $this->assertEquals($delivered_at, $gridItem->getDeliveredAt());
     }
 
     /** @test */

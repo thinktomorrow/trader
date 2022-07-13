@@ -9,7 +9,7 @@ interface MerchantOrderShipping
 
     public function getShippingId(): string;
     public function getShippingProfileId(): string;
-    public function getState(): string;
+    public function getShippingState(): string;
     public function getCostPrice(): string;
     public function includeTax(bool $includeTax = true): void;
 

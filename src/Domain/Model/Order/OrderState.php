@@ -45,9 +45,6 @@ enum OrderState: string implements State
     case partially_delivered = 'partially_delivered'; // one or more of many shipments are delivered
     case delivered = 'delivered'; // fully delivered so order can be processed
 
-    case fulfilled = 'fulfilled'; // order is fulfilled and finished
-    case unfulfilled = 'unfulfilled'; // order is finished but not fulfilled: something happened that caused the failure (e.g. order return).
-
     public function inCustomerHands(): bool
     {
         return in_array($this, static::customerStates());
@@ -86,6 +83,14 @@ enum OrderState: string implements State
                 'from' => [self::cart_pending, self::cart_revived],
                 'to' => self::confirmed,
             ],
+            'cancel' => [
+                'from' => [self::confirmed],
+                'to' => self::cancelled,
+            ],
+            'cancel_by_merchant' => [
+                'from' => [self::confirmed],
+                'to' => self::cancelled_by_merchant,
+            ],
             'partially_pay' => [
                 'from' => [self::confirmed],
                 'to' => self::partially_paid,
@@ -109,10 +114,6 @@ enum OrderState: string implements State
             'deliver' => [
                 'from' => [self::packed, self::partially_packed, self::partially_delivered],
                 'to' => self::delivered,
-            ],
-            'fulfill' => [
-                'from' => [self::delivered],
-                'to' => self::fulfilled,
             ],
         ];
     }

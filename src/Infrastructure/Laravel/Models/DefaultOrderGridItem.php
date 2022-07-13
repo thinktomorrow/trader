@@ -19,7 +19,7 @@ class DefaultOrderGridItem implements GridItem
     protected string $state;
     protected ?string $confirmed_at;
     protected ?string $paid_at;
-    protected ?string $fulfilled_at;
+    protected ?string $delivered_at;
     protected Money $totalAsMoney;
     protected ?string $shopperEmail;
     protected ?string $customer_id;
@@ -33,7 +33,7 @@ class DefaultOrderGridItem implements GridItem
         $gridItem->state = $state['order_state'];
         $gridItem->confirmed_at = $state['confirmed_at'] ?? null;
         $gridItem->paid_at = $state['paid_at'] ?? null;
-        $gridItem->fulfilled_at = $state['fulfilled_at'] ?? null;
+        $gridItem->delivered_at = $state['delivered_at'] ?? null;
 
         $gridItem->totalAsMoney = Cash::make($state['total']);
         $gridItem->shopperEmail = $shopperState['email'] ?? null;
@@ -68,9 +68,9 @@ class DefaultOrderGridItem implements GridItem
         return $this->paid_at;
     }
 
-    public function getFulfilledAt(): ?string
+    public function getDeliveredAt(): ?string
     {
-        return $this->fulfilled_at;
+        return $this->delivered_at;
     }
 
     public function getTotalPrice(): string

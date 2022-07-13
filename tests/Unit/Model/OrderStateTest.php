@@ -11,8 +11,6 @@ use Thinktomorrow\Trader\Domain\Model\Order\Events\OrderStates\OrderCancelled;
 use Thinktomorrow\Trader\Domain\Model\Order\Events\OrderStates\OrderCancelledByMerchant;
 use Thinktomorrow\Trader\Domain\Model\Order\Events\OrderStates\OrderConfirmed;
 use Thinktomorrow\Trader\Domain\Model\Order\Events\OrderStates\OrderDelivered;
-use Thinktomorrow\Trader\Domain\Model\Order\Events\OrderStates\OrderFulfilled;
-use Thinktomorrow\Trader\Domain\Model\Order\Events\OrderStates\OrderMarkedUnfulfilled;
 use Thinktomorrow\Trader\Domain\Model\Order\Events\OrderStates\OrderPacked;
 use Thinktomorrow\Trader\Domain\Model\Order\Events\OrderStates\OrderPaid;
 use Thinktomorrow\Trader\Domain\Model\Order\Events\OrderStates\OrderPartiallyDelivered;
@@ -64,8 +62,6 @@ class OrderStateTest extends TestCase
         $this->assertOrderStateEvent(OrderPartiallyPacked::class, OrderState::partially_packed);
         $this->assertOrderStateEvent(OrderDelivered::class, OrderState::delivered);
         $this->assertOrderStateEvent(OrderPartiallyDelivered::class, OrderState::partially_delivered);
-        $this->assertOrderStateEvent(OrderFulfilled::class, OrderState::fulfilled);
-        $this->assertOrderStateEvent(OrderMarkedUnfulfilled::class, OrderState::unfulfilled);
     }
 
     /** @test */

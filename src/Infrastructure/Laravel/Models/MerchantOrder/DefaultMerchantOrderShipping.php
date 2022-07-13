@@ -8,7 +8,7 @@ use Thinktomorrow\Trader\Infrastructure\Laravel\Models\OrderRead\OrderReadShippi
 
 class DefaultMerchantOrderShipping extends OrderReadShipping implements MerchantOrderShipping
 {
-    public function getState(): string
+    public function getShippingState(): string
     {
         return $this->state->getValueAsString();
     }

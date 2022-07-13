@@ -12,7 +12,7 @@ interface GridItem
     public function getOrderState(): string;
     public function getConfirmedAt(): ?string;
     public function getPaidAt(): ?string;
-    public function getFulfilledAt(): ?string;
+    public function getDeliveredAt(): ?string;
     public function getTotalPrice(): string;
 
     public function getTitle(): string;

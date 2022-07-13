@@ -23,8 +23,6 @@ use Thinktomorrow\Trader\Domain\Model\Order\Events\OrderStates\OrderCancelled;
 use Thinktomorrow\Trader\Domain\Model\Order\Events\OrderStates\OrderCancelledByMerchant;
 use Thinktomorrow\Trader\Domain\Model\Order\Events\OrderStates\OrderConfirmed;
 use Thinktomorrow\Trader\Domain\Model\Order\Events\OrderStates\OrderDelivered;
-use Thinktomorrow\Trader\Domain\Model\Order\Events\OrderStates\OrderFulfilled;
-use Thinktomorrow\Trader\Domain\Model\Order\Events\OrderStates\OrderMarkedUnfulfilled;
 use Thinktomorrow\Trader\Domain\Model\Order\Events\OrderStates\OrderPacked;
 use Thinktomorrow\Trader\Domain\Model\Order\Events\OrderStates\OrderPaid;
 use Thinktomorrow\Trader\Domain\Model\Order\Events\OrderStates\OrderPartiallyDelivered;
@@ -152,8 +150,6 @@ final class Order implements Aggregate, Discountable
             OrderState::partially_packed->value => OrderPartiallyPacked::class,
             OrderState::delivered->value => OrderDelivered::class,
             OrderState::partially_delivered->value => OrderPartiallyDelivered::class,
-            OrderState::fulfilled->value => OrderFulfilled::class,
-            OrderState::unfulfilled->value => OrderMarkedUnfulfilled::class,
         ];
 
         if (isset($map[$newState->value])) {
