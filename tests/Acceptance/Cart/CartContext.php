@@ -237,7 +237,7 @@ abstract class CartContext extends TestCase
         $this->paymentMethodRepository->save($paymentMethod);
     }
 
-    public function givenACustomerExists(string $email, bool $is_business = false, string $locale = 'nl_BE')
+    public function givenACustomerExists(string $email, bool $is_business = false, string $locale = 'nl_BE'): Customer
     {
         $customer = Customer::create(
             $this->customerRepository->nextReference(),
@@ -247,6 +247,8 @@ abstract class CartContext extends TestCase
         );
 
         $this->customerRepository->save($customer);
+
+        return $customer;
     }
 
     public function givenThereIsAPromo(array $mappedData = [], array $discounts = [])

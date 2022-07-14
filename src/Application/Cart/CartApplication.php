@@ -196,34 +196,6 @@ final class CartApplication
         $this->eventDispatcher->dispatchAll($order->releaseEvents());
     }
 
-    // TODO...
-    public function chooseCustomerShippingAddress(ChooseCustomerShippingAddress $chooseCustomerShippingAddress): void
-    {
-        $order = $this->orderRepository->findForCart($chooseCustomerShippingAddress->getOrderId());
-
-        $order->updateShippingAddress($chooseCustomerShippingAddress->getAddress());
-
-        // TODO: do the refresh-cart here? before the save.
-
-        $this->orderRepository->save($order);
-
-        $this->eventDispatcher->dispatchAll($order->releaseEvents());
-    }
-
-    // TODO...
-    public function chooseCustomerBillingAddress(ChooseCustomerBillingAddress $chooseCustomerBillingAddress): void
-    {
-        $order = $this->orderRepository->findForCart($chooseCustomerBillingAddress->getOrderId());
-
-        $order->updateBillingAddress($chooseCustomerBillingAddress->getBillingAddress());
-
-        // TODO: do the refresh-cart here? before the save.
-
-        $this->orderRepository->save($order);
-
-        $this->eventDispatcher->dispatchAll($order->releaseEvents());
-    }
-
     public function chooseShippingProfile(ChooseShippingProfile $chooseShippingProfile): void
     {
         $order = $this->orderRepository->findForCart($chooseShippingProfile->getOrderId());
@@ -325,12 +297,23 @@ final class CartApplication
         $order->updateShopper($shopper);
 
         // TODO:: update shipping / billing address if not already filled
+
         // TODO: update shipping profile and payment method if not already filled
         // Proceed in checkout should be done based on filled data no?
 
         $this->orderRepository->save($order);
 
         $this->eventDispatcher->dispatchAll($order->releaseEvents());
+    }
+
+    private function chooseCustomerShippingAddress(Order $order, ChooseCustomerShippingAddress $chooseCustomerShippingAddress): void
+    {
+        $order->updateShippingAddress($chooseCustomerShippingAddress->getAddress());
+    }
+
+    private function chooseCustomerBillingAddress(Order $order, ChooseCustomerBillingAddress $chooseCustomerBillingAddress): void
+    {
+        $order->updateBillingAddress($chooseCustomerBillingAddress->getBillingAddress());
     }
 
     public function confirmCart(ConfirmCart $command): void

@@ -8,6 +8,8 @@ use Thinktomorrow\Trader\Domain\Common\Entity\Aggregate;
 use Thinktomorrow\Trader\Domain\Common\Entity\HasData;
 use Thinktomorrow\Trader\Domain\Common\Event\RecordsEvents;
 use Thinktomorrow\Trader\Domain\Common\Locale;
+use Thinktomorrow\Trader\Domain\Model\Customer\Address\BillingAddress;
+use Thinktomorrow\Trader\Domain\Model\Customer\Address\ShippingAddress;
 
 class Customer implements Aggregate
 {
@@ -18,6 +20,8 @@ class Customer implements Aggregate
     private Email $email;
     private bool $isBusiness;
     private Locale $locale;
+    private ?BillingAddress $billingAddress = null;
+    private ?ShippingAddress $shippingAddress = null;
 
     private function __construct()
     {
@@ -64,6 +68,26 @@ class Customer implements Aggregate
         return $this->isBusiness;
     }
 
+    public function getBillingAddress(): ?BillingAddress
+    {
+        return $this->billingAddress;
+    }
+
+    public function getShippingAddress(): ?ShippingAddress
+    {
+        return $this->shippingAddress;
+    }
+
+    public function updateBillingAddress(BillingAddress $billingAddress): void
+    {
+        $this->billingAddress = $billingAddress;
+    }
+
+    public function updateShippingAddress(ShippingAddress $shippingAddress): void
+    {
+        $this->shippingAddress = $shippingAddress;
+    }
+
     public function getMappedData(): array
     {
         return [
@@ -77,7 +101,10 @@ class Customer implements Aggregate
 
     public function getChildEntities(): array
     {
-        return [];
+        return [
+            BillingAddress::class => $this->billingAddress?->getMappedData(),
+            ShippingAddress::class => $this->shippingAddress?->getMappedData(),
+        ];
     }
 
     public static function fromMappedData(array $state, array $childEntities = []): static

@@ -57,6 +57,17 @@ class MysqlCustomerRepository implements CustomerRepository
         return Customer::fromMappedData((array) $customerState, []);
     }
 
+    public function existsByEmail(Email $email, ?CustomerId $ignoredCustomerId = null): bool
+    {
+        $builder = DB::table(static::$customerTable)->where('email', $email->get());
+
+        if($ignoredCustomerId) {
+            $builder->where('customer_id', '<>', $ignoredCustomerId->get());
+        }
+
+        return $builder->exists();
+    }
+
     public function delete(CustomerId $customerId): void
     {
         DB::table(static::$customerTable)->where('customer_id', $customerId->get())->delete();

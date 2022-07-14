@@ -13,6 +13,8 @@ interface CustomerRepository
 
     public function findByEmail(Email $email): Customer;
 
+    public function existsByEmail(Email $email, ?CustomerId $ignoredCustomerId = null): bool;
+
     public function delete(CustomerId $customerId): void;
 
     public function nextReference(): CustomerId;

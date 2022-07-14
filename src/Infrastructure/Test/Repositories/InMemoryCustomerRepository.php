@@ -14,6 +14,7 @@ final class InMemoryCustomerRepository implements CustomerRepository
     /** @var Customer[] */
     public static array $customers = [];
 
+    private bool $autoGenerateNextReference = false;
     private string $nextReference = 'ccc-123';
 
     public function save(Customer $customer): void
@@ -41,6 +42,22 @@ final class InMemoryCustomerRepository implements CustomerRepository
         throw new CouldNotFindCustomer('No customer found by email ' . $email->get());
     }
 
+    public function existsByEmail(Email $email, ?CustomerId $ignoredCustomerId = null): bool
+    {
+        foreach (static::$customers as $customer) {
+            if ($customer->getEmail()->equals($email)) {
+                if($ignoredCustomerId && $customer->customerId->equals($ignoredCustomerId)) {
+                    trap('sisi');
+                    continue;
+                }
+
+                return true;
+            }
+        }
+
+        return false;
+    }
+
     public function delete(CustomerId $customerId): void
     {
         if (! isset(static::$customers[$customerId->get()])) {
@@ -52,6 +69,10 @@ final class InMemoryCustomerRepository implements CustomerRepository
 
     public function nextReference(): CustomerId
     {
+        if($this->autoGenerateNextReference) {
+            return CustomerId::fromString('customer-id-' . mt_rand(111,999));
+        }
+
         return CustomerId::fromString($this->nextReference);
     }
 
@@ -59,6 +80,11 @@ final class InMemoryCustomerRepository implements CustomerRepository
     public function setNextReference(string $nextReference): void
     {
         $this->nextReference = $nextReference;
+    }
+
+    public function autoGenerateNextReference(): void
+    {
+        $this->autoGenerateNextReference = true;
     }
 
     public static function clear()
