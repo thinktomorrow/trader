@@ -61,7 +61,7 @@ class MysqlCustomerRepository implements CustomerRepository
     {
         $builder = DB::table(static::$customerTable)->where('email', $email->get());
 
-        if($ignoredCustomerId) {
+        if ($ignoredCustomerId) {
             $builder->where('customer_id', '<>', $ignoredCustomerId->get());
         }
 

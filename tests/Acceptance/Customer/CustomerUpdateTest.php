@@ -3,13 +3,13 @@ declare(strict_types=1);
 
 namespace Tests\Acceptance\Customer;
 
-use Thinktomorrow\Trader\Domain\Common\Locale;
-use Thinktomorrow\Trader\Domain\Common\Address\Address;
-use Thinktomorrow\Trader\Domain\Model\Country\CountryId;
+use Thinktomorrow\Trader\Application\Customer\UpdateBillingAddress;
 use Thinktomorrow\Trader\Application\Customer\UpdateData;
 use Thinktomorrow\Trader\Application\Customer\UpdateLocale;
-use Thinktomorrow\Trader\Application\Customer\UpdateBillingAddress;
 use Thinktomorrow\Trader\Application\Customer\UpdateShippingAddress;
+use Thinktomorrow\Trader\Domain\Common\Address\Address;
+use Thinktomorrow\Trader\Domain\Common\Locale;
+use Thinktomorrow\Trader\Domain\Model\Country\CountryId;
 
 class CustomerUpdateTest extends CustomerContext
 {
@@ -38,11 +38,13 @@ class CustomerUpdateTest extends CustomerContext
         $customer = $this->givenACustomerExists('ben@tt.be');
 
         $this->customerApplication->updateData(new UpdateData(
-            $customer->customerId->get(), ['firstname' => 'Ben', 'lastname' => 'Cavens']
+            $customer->customerId->get(),
+            ['firstname' => 'Ben', 'lastname' => 'Cavens']
         ));
 
         $this->customerApplication->updateData(new UpdateData(
-            $customer->customerId->get(), ['firstname' => 'Benjamin']
+            $customer->customerId->get(),
+            ['firstname' => 'Benjamin']
         ));
 
         $customer = $this->customerRepository->find($customer->customerId);
@@ -58,7 +60,8 @@ class CustomerUpdateTest extends CustomerContext
         $customer = $this->givenACustomerExists('ben@tt.be');
 
         $this->customerApplication->updateLocale(new UpdateLocale(
-            $customer->customerId->get(), 'fr-be'
+            $customer->customerId->get(),
+            'fr-be'
         ));
 
         $customer = $this->customerRepository->find($customer->customerId);
@@ -72,7 +75,7 @@ class CustomerUpdateTest extends CustomerContext
 
         $this->assertNull($customer->getBillingAddress());
 
-        $address = (new Address(CountryId::fromString('BE'), 'street 123','bus 456','2200','Herentals',));
+        $address = (new Address(CountryId::fromString('BE'), 'street 123', 'bus 456', '2200', 'Herentals', ));
         $this->customerApplication->updateBillingAddress(new UpdateBillingAddress(
             $customer->customerId->get(),
             ...array_values($address->toArray())
@@ -89,7 +92,7 @@ class CustomerUpdateTest extends CustomerContext
 
         $this->assertNull($customer->getShippingAddress());
 
-        $address = (new Address(CountryId::fromString('BE'), 'street 123','bus 456','2200','Herentals',));
+        $address = (new Address(CountryId::fromString('BE'), 'street 123', 'bus 456', '2200', 'Herentals', ));
         $this->customerApplication->updateShippingAddress(new UpdateShippingAddress(
             $customer->customerId->get(),
             ...array_values($address->toArray())

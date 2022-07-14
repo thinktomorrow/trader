@@ -3,13 +3,13 @@ declare(strict_types=1);
 
 namespace Thinktomorrow\Trader\Application\Customer;
 
+use Thinktomorrow\Trader\Domain\Common\Event\EventDispatcher;
+use Thinktomorrow\Trader\Domain\Model\Customer\Address\BillingAddress;
+use Thinktomorrow\Trader\Domain\Model\Customer\Address\ShippingAddress;
 use Thinktomorrow\Trader\Domain\Model\Customer\Customer;
 use Thinktomorrow\Trader\Domain\Model\Customer\CustomerId;
-use Thinktomorrow\Trader\Domain\Common\Event\EventDispatcher;
 use Thinktomorrow\Trader\Domain\Model\Customer\CustomerRepository;
-use Thinktomorrow\Trader\Domain\Model\Customer\Address\BillingAddress;
 use Thinktomorrow\Trader\Domain\Model\Customer\Events\CustomerDeleted;
-use Thinktomorrow\Trader\Domain\Model\Customer\Address\ShippingAddress;
 
 class CustomerApplication
 {
@@ -24,7 +24,7 @@ class CustomerApplication
 
     public function registerCustomer(RegisterCustomer $command): CustomerId
     {
-        if($this->customerRepository->existsByEmail($command->getEmail())) {
+        if ($this->customerRepository->existsByEmail($command->getEmail())) {
             throw new \InvalidArgumentException('Registration failed. A customer with email ' . $command->getEmail()->get() . ' already exists.');
         }
 
@@ -57,13 +57,13 @@ class CustomerApplication
 
     public function updateEmail(UpdateEmail $command): void
     {
-        if($this->customerRepository->existsByEmail($command->getNewEmail(), $command->getCustomerId())) {
+        if ($this->customerRepository->existsByEmail($command->getNewEmail(), $command->getCustomerId())) {
             throw new \InvalidArgumentException('Email update failed. A customer with email ' . $command->getNewEmail()->get() . ' already exists.');
         }
 
         $customer = $this->customerRepository->find($command->getCustomerId());
 
-        if(!$customer->getEmail()->equals($command->getOldEmail())) {
+        if (! $customer->getEmail()->equals($command->getOldEmail())) {
             throw new \InvalidArgumentException('Email update constraint: Email [' . $command->getOldEmail()->get() . '] does not belong to customer with id [' . $customer->customerId->get() . '].');
         }
 
@@ -89,8 +89,11 @@ class CustomerApplication
     {
         $customer = $this->customerRepository->find($command->getCustomerId());
 
-        $customer->updateBillingAddress(BillingAddress::create(
-            $customer->customerId, $command->getAddress())
+        $customer->updateBillingAddress(
+            BillingAddress::create(
+            $customer->customerId,
+            $command->getAddress()
+        )
         );
 
         $this->customerRepository->save($customer);
@@ -102,8 +105,11 @@ class CustomerApplication
     {
         $customer = $this->customerRepository->find($command->getCustomerId());
 
-        $customer->updateShippingAddress(ShippingAddress::create(
-            $customer->customerId, $command->getAddress())
+        $customer->updateShippingAddress(
+            ShippingAddress::create(
+            $customer->customerId,
+            $command->getAddress()
+        )
         );
 
         $this->customerRepository->save($customer);

@@ -224,6 +224,5 @@ class CartReadTest extends CartContext
     /** @test */
     public function it_should_not_use_customer_address_when_cart_address_is_already_filled_in()
     {
-
     }
 }

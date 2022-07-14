@@ -6,10 +6,10 @@ namespace Tests\Unit\Model;
 use PHPUnit\Framework\TestCase;
 use Thinktomorrow\Trader\Domain\Common\Email;
 use Thinktomorrow\Trader\Domain\Common\Locale;
-use Thinktomorrow\Trader\Domain\Model\Customer\Customer;
-use Thinktomorrow\Trader\Domain\Model\Customer\CustomerId;
 use Thinktomorrow\Trader\Domain\Model\Customer\Address\BillingAddress;
 use Thinktomorrow\Trader\Domain\Model\Customer\Address\ShippingAddress;
+use Thinktomorrow\Trader\Domain\Model\Customer\Customer;
+use Thinktomorrow\Trader\Domain\Model\Customer\CustomerId;
 
 class CustomerTest extends TestCase
 {
