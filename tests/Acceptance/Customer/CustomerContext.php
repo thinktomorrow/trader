@@ -4,12 +4,10 @@ declare(strict_types=1);
 namespace Tests\Acceptance\Customer;
 
 use Tests\Acceptance\TestCase;
-use Thinktomorrow\Trader\Domain\Common\Email;
-use Thinktomorrow\Trader\Domain\Common\Locale;
-use Thinktomorrow\Trader\Domain\Model\Customer\Customer;
-use Thinktomorrow\Trader\Application\Customer\RegisterCustomer;
-use Thinktomorrow\Trader\Infrastructure\Test\EventDispatcherSpy;
 use Thinktomorrow\Trader\Application\Customer\CustomerApplication;
+use Thinktomorrow\Trader\Application\Customer\RegisterCustomer;
+use Thinktomorrow\Trader\Domain\Model\Customer\Customer;
+use Thinktomorrow\Trader\Infrastructure\Test\EventDispatcherSpy;
 use Thinktomorrow\Trader\Infrastructure\Test\Repositories\InMemoryCustomerRepository;
 
 abstract class CustomerContext extends TestCase

@@ -46,8 +46,9 @@ final class InMemoryCustomerRepository implements CustomerRepository
     {
         foreach (static::$customers as $customer) {
             if ($customer->getEmail()->equals($email)) {
-                if($ignoredCustomerId && $customer->customerId->equals($ignoredCustomerId)) {
+                if ($ignoredCustomerId && $customer->customerId->equals($ignoredCustomerId)) {
                     trap('sisi');
+
                     continue;
                 }
 
@@ -69,8 +70,8 @@ final class InMemoryCustomerRepository implements CustomerRepository
 
     public function nextReference(): CustomerId
     {
-        if($this->autoGenerateNextReference) {
-            return CustomerId::fromString('customer-id-' . mt_rand(111,999));
+        if ($this->autoGenerateNextReference) {
+            return CustomerId::fromString('customer-id-' . mt_rand(111, 999));
         }
 
         return CustomerId::fromString($this->nextReference);

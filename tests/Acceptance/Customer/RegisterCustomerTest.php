@@ -3,10 +3,9 @@ declare(strict_types=1);
 
 namespace Tests\Acceptance\Customer;
 
+use Thinktomorrow\Trader\Application\Customer\RegisterCustomer;
 use Thinktomorrow\Trader\Domain\Common\Email;
 use Thinktomorrow\Trader\Domain\Common\Locale;
-use Illuminate\Foundation\Testing\RefreshDatabase;
-use Thinktomorrow\Trader\Application\Customer\RegisterCustomer;
 
 class RegisterCustomerTest extends CustomerContext
 {

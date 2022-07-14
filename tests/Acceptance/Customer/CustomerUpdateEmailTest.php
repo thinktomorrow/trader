@@ -3,9 +3,8 @@ declare(strict_types=1);
 
 namespace Tests\Acceptance\Customer;
 
-use Thinktomorrow\Trader\Domain\Common\Email;
-use Thinktomorrow\Trader\Application\Customer\UpdateData;
 use Thinktomorrow\Trader\Application\Customer\UpdateEmail;
+use Thinktomorrow\Trader\Domain\Common\Email;
 
 class CustomerUpdateEmailTest extends CustomerContext
 {

@@ -10,6 +10,5 @@ class CustomerDeleted
 {
     public function __construct(public readonly CustomerId $customerId, public readonly Email $email)
     {
-
     }
 }
