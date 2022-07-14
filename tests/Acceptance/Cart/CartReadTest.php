@@ -6,7 +6,6 @@ namespace Tests\Acceptance\Cart;
 use Thinktomorrow\Trader\Application\Cart\Read\Cart;
 use Thinktomorrow\Trader\Application\Cart\Read\CartPayment;
 use Thinktomorrow\Trader\Application\Cart\Read\CartShipping;
-use Thinktomorrow\Trader\Application\Cart\Read\CartShopper;
 use Thinktomorrow\Trader\Domain\Model\Order\OrderId;
 
 class CartReadTest extends CartContext

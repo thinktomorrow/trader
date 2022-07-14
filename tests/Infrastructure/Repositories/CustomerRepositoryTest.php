@@ -5,14 +5,14 @@ namespace Tests\Infrastructure\Repositories;
 
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\Infrastructure\TestCase;
+use Thinktomorrow\Trader\Domain\Common\Address\Address;
 use Thinktomorrow\Trader\Domain\Common\Email;
 use Thinktomorrow\Trader\Domain\Common\Locale;
-use Thinktomorrow\Trader\Domain\Common\Address\Address;
-use Thinktomorrow\Trader\Domain\Model\Customer\Customer;
 use Thinktomorrow\Trader\Domain\Model\Country\CountryId;
-use Thinktomorrow\Trader\Domain\Model\Customer\CustomerId;
 use Thinktomorrow\Trader\Domain\Model\Customer\Address\BillingAddress;
 use Thinktomorrow\Trader\Domain\Model\Customer\Address\ShippingAddress;
+use Thinktomorrow\Trader\Domain\Model\Customer\Customer;
+use Thinktomorrow\Trader\Domain\Model\Customer\CustomerId;
 use Thinktomorrow\Trader\Domain\Model\Customer\Exceptions\CouldNotFindCustomer;
 use Thinktomorrow\Trader\Infrastructure\Laravel\Repositories\MysqlCustomerRepository;
 use Thinktomorrow\Trader\Infrastructure\Test\Repositories\InMemoryCustomerRepository;
@@ -97,11 +97,11 @@ final class CustomerRepositoryTest extends TestCase
         );
 
         $customerWithAddress->updateBillingAddress(
-            BillingAddress::create(CustomerId::fromString('xxx'), new Address(CountryId::fromString('BE'), 'street 123','bus 456','2200','Herentals'))
+            BillingAddress::create(CustomerId::fromString('xxx'), new Address(CountryId::fromString('BE'), 'street 123', 'bus 456', '2200', 'Herentals'))
         );
 
         $customerWithAddress->updateShippingAddress(
-            ShippingAddress::create(CustomerId::fromString('xxx'), new Address(CountryId::fromString('BE'), 'street 123','bus 456','2200','Herentals'))
+            ShippingAddress::create(CustomerId::fromString('xxx'), new Address(CountryId::fromString('BE'), 'street 123', 'bus 456', '2200', 'Herentals'))
         );
 
         yield [$customerWithAddress];

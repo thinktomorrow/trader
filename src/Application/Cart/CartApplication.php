@@ -296,11 +296,11 @@ final class CartApplication
         $shopper->addData($customer->getData());
         $order->updateShopper($shopper);
 
-        if(!$order->getBillingAddress() && $billingAddress = $customer->getBillingAddress()) {
+        if (! $order->getBillingAddress() && $billingAddress = $customer->getBillingAddress()) {
             $this->chooseCustomerBillingAddress($order, $billingAddress);
         }
 
-        if(!$order->getShippingAddress() && $shippingAddress = $customer->getShippingAddress()) {
+        if (! $order->getShippingAddress() && $shippingAddress = $customer->getShippingAddress()) {
             $this->chooseCustomerShippingAddress($order, $shippingAddress);
         }
 

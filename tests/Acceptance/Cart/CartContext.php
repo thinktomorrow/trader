@@ -16,7 +16,6 @@ use Thinktomorrow\Trader\Application\Cart\Line\AddLine;
 use Thinktomorrow\Trader\Application\Cart\Line\AddLineToNewOrder;
 use Thinktomorrow\Trader\Application\Cart\Line\ChangeLineQuantity;
 use Thinktomorrow\Trader\Application\Cart\Line\RemoveLine;
-use Thinktomorrow\Trader\Application\Customer\CustomerApplication;
 use Thinktomorrow\Trader\Application\Cart\RefreshCart\Adjusters\AdjustDiscounts;
 use Thinktomorrow\Trader\Application\Cart\RefreshCart\Adjusters\AdjustLines;
 use Thinktomorrow\Trader\Application\Cart\RefreshCart\Adjusters\AdjustShipping;
@@ -25,6 +24,7 @@ use Thinktomorrow\Trader\Application\Cart\ShippingProfile\UpdateShippingProfileO
 use Thinktomorrow\Trader\Application\Cart\UpdateBillingAddress;
 use Thinktomorrow\Trader\Application\Cart\UpdateShippingAddress;
 use Thinktomorrow\Trader\Application\Cart\UpdateShopper;
+use Thinktomorrow\Trader\Application\Customer\CustomerApplication;
 use Thinktomorrow\Trader\Application\Promo\Coupon\CouponPromoApplication;
 use Thinktomorrow\Trader\Application\Promo\OrderPromo\ApplyPromoToOrder;
 use Thinktomorrow\Trader\Application\Promo\OrderPromo\Discounts\FixedAmountOrderDiscount;
