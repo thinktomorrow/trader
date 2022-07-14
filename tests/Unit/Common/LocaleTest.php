@@ -28,7 +28,7 @@ final class LocaleTest extends TestCase
         $this->assertEquals('nl', $locale->toIso639());
     }
 
-    public function test_it_can_create_locale_from_Iso639_string()
+    public function test_it_can_create_locale_from__iso639_string()
     {
         $locale = Locale::fromString('nl-be');
 
