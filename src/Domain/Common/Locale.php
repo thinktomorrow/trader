@@ -3,6 +3,8 @@ declare(strict_types=1);
 
 namespace Thinktomorrow\Trader\Domain\Common;
 
+use Assert\Assertion;
+
 final class Locale
 {
     private string $language;
@@ -10,6 +12,9 @@ final class Locale
 
     private function __construct(string $language, string $region)
     {
+        Assertion::minLength($language, 2);
+        Assertion::minLength($region, 2);
+
         $this->language = $language;
         $this->region = strtolower($region);
     }
@@ -76,7 +81,7 @@ final class Locale
 
     public function __toString(): string
     {
-        return $this->language;
+        return $this->toIso15897();
     }
 
     public function equals($other): bool

@@ -28,4 +28,9 @@ class CustomerModel extends Model implements AuthenticatableContract, CanResetPa
     {
         $this->notify(new ResetCustomerPasswordNotification($token));
     }
+
+    public function getCustomerId(): string
+    {
+        return $this->customer_id;
+    }
 }
