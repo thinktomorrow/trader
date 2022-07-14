@@ -296,7 +296,13 @@ final class CartApplication
         $shopper->addData($customer->getData());
         $order->updateShopper($shopper);
 
-        // TODO:: update shipping / billing address if not already filled
+        if(!$order->getBillingAddress() && $billingAddress = $customer->getBillingAddress()) {
+            $this->chooseCustomerBillingAddress($order, $billingAddress);
+        }
+
+        if(!$order->getShippingAddress() && $shippingAddress = $customer->getShippingAddress()) {
+            $this->chooseCustomerShippingAddress($order, $shippingAddress);
+        }
 
         // TODO: update shipping profile and payment method if not already filled
         // Proceed in checkout should be done based on filled data no?
@@ -306,14 +312,20 @@ final class CartApplication
         $this->eventDispatcher->dispatchAll($order->releaseEvents());
     }
 
-    private function chooseCustomerShippingAddress(Order $order, ChooseCustomerShippingAddress $chooseCustomerShippingAddress): void
+    private function chooseCustomerBillingAddress(Order $order, \Thinktomorrow\Trader\Domain\Model\Customer\Address\BillingAddress $billingAddress): void
     {
-        $order->updateShippingAddress($chooseCustomerShippingAddress->getAddress());
+        $order->updateBillingAddress(BillingAddress::create(
+            $order->orderId,
+            $billingAddress->getAddress()
+        ));
     }
 
-    private function chooseCustomerBillingAddress(Order $order, ChooseCustomerBillingAddress $chooseCustomerBillingAddress): void
+    private function chooseCustomerShippingAddress(Order $order, \Thinktomorrow\Trader\Domain\Model\Customer\Address\ShippingAddress $shippingAddress): void
     {
-        $order->updateBillingAddress($chooseCustomerBillingAddress->getBillingAddress());
+        $order->updateShippingAddress(ShippingAddress::create(
+            $order->orderId,
+            $shippingAddress->getAddress()
+        ));
     }
 
     public function confirmCart(ConfirmCart $command): void

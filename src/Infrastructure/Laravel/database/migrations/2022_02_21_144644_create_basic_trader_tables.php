@@ -184,6 +184,21 @@ class CreateBasicTraderTables extends Migration
             $table->string('token');
             $table->timestamp('created_at')->nullable();
         });
+
+        Schema::create(static::PREFIX.'customer_addresses', function (Blueprint $table) {
+            $table->id('address_id');
+            $table->char('type');
+            $table->char('customer_id', 36)->index();
+            $table->string('line_1')->nullable();
+            $table->string('line_2')->nullable();
+            $table->string('postal_code')->nullable();
+            $table->string('city')->nullable();
+            $table->string('country_id')->nullable();
+            $table->json('data')->nullable();
+
+            $table->foreign('customer_id')->references('customer_id')->on(static::PREFIX.'customers')->onDelete('cascade');
+            $table->foreign('country_id')->references('country_id')->on(static::PREFIX.'countries');
+        });
     }
 
     private function upOrders()

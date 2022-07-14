@@ -16,6 +16,7 @@ use Thinktomorrow\Trader\Application\Cart\Line\AddLine;
 use Thinktomorrow\Trader\Application\Cart\Line\AddLineToNewOrder;
 use Thinktomorrow\Trader\Application\Cart\Line\ChangeLineQuantity;
 use Thinktomorrow\Trader\Application\Cart\Line\RemoveLine;
+use Thinktomorrow\Trader\Application\Customer\CustomerApplication;
 use Thinktomorrow\Trader\Application\Cart\RefreshCart\Adjusters\AdjustDiscounts;
 use Thinktomorrow\Trader\Application\Cart\RefreshCart\Adjusters\AdjustLines;
 use Thinktomorrow\Trader\Application\Cart\RefreshCart\Adjusters\AdjustShipping;
@@ -89,6 +90,7 @@ abstract class CartContext extends TestCase
     protected InMemoryPromoRepository $promoRepository;
     protected UpdateShippingProfileOnOrder $updateShippingProfileOnOrder;
     protected EventDispatcherSpy $eventDispatcher;
+    protected CustomerApplication $customerApplication;
 
     protected function setUp(): void
     {
@@ -148,6 +150,11 @@ abstract class CartContext extends TestCase
             $this->orderRepository,
             $this->promoRepository,
             (new TestContainer())->get(ApplyPromoToOrder::class),
+            new EventDispatcherSpy(),
+        );
+
+        $this->customerApplication = new CustomerApplication(
+            $this->customerRepository,
             new EventDispatcherSpy(),
         );
 

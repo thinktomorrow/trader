@@ -8,12 +8,16 @@ use Ramsey\Uuid\Uuid;
 use Thinktomorrow\Trader\Domain\Common\Email;
 use Thinktomorrow\Trader\Domain\Model\Customer\Customer;
 use Thinktomorrow\Trader\Domain\Model\Customer\CustomerId;
+use Thinktomorrow\Trader\Domain\Common\Address\AddressType;
 use Thinktomorrow\Trader\Domain\Model\Customer\CustomerRepository;
+use Thinktomorrow\Trader\Domain\Model\Customer\Address\BillingAddress;
+use Thinktomorrow\Trader\Domain\Model\Customer\Address\ShippingAddress;
 use Thinktomorrow\Trader\Domain\Model\Customer\Exceptions\CouldNotFindCustomer;
 
 class MysqlCustomerRepository implements CustomerRepository
 {
     private static $customerTable = 'trader_customers';
+    private static $customerAddressTable = 'trader_customer_addresses';
 
     public function save(Customer $customer): void
     {
@@ -23,6 +27,37 @@ class MysqlCustomerRepository implements CustomerRepository
             DB::table(static::$customerTable)->insert($state);
         } else {
             DB::table(static::$customerTable)->where('customer_id', $customer->customerId->get())->update($state);
+        }
+
+        $this->upsertAddresses($customer);
+    }
+
+    private function upsertAddresses(Customer $customer): void
+    {
+        if ($shippingAddressState = $customer->getChildEntities()[ShippingAddress::class]) {
+            DB::table(static::$customerAddressTable)
+                ->updateOrInsert([
+                    'customer_id' => $customer->customerId->get(),
+                    'type' => AddressType::shipping->value,
+                ], $shippingAddressState);
+        } else {
+            DB::table(static::$customerAddressTable)
+                ->where('customer_id', $customer->customerId->get())
+                ->where('type', AddressType::shipping->value)
+                ->delete();
+        }
+
+        if ($billingAddressState = $customer->getChildEntities()[BillingAddress::class]) {
+            DB::table(static::$customerAddressTable)
+                ->updateOrInsert([
+                    'customer_id' => $customer->customerId->get(),
+                    'type' => AddressType::billing->value,
+                ], $billingAddressState);
+        } else {
+            DB::table(static::$customerAddressTable)
+                ->where('customer_id', $customer->customerId->get())
+                ->where('type', AddressType::billing->value)
+                ->delete();
         }
     }
 
@@ -41,7 +76,17 @@ class MysqlCustomerRepository implements CustomerRepository
             throw new CouldNotFindCustomer('No customer found by id [' . $customerId->get() . ']');
         }
 
-        return Customer::fromMappedData((array) $customerState, []);
+        $addressStates = DB::table(static::$customerAddressTable)
+            ->where(static::$customerAddressTable . '.customer_id', $customerId->get())
+            ->get();
+
+        $shippingAddressState = $addressStates->first(fn ($address) => $address->type == AddressType::shipping->value);
+        $billingAddressState = $addressStates->first(fn ($address) => $address->type == AddressType::billing->value);
+
+        return Customer::fromMappedData((array) $customerState, [
+            ShippingAddress::class => $shippingAddressState ? (array)$shippingAddressState : null,
+            BillingAddress::class => $billingAddressState ? (array)$billingAddressState : null,
+        ]);
     }
 
     public function findByEmail(Email $email): Customer

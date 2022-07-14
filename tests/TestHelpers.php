@@ -261,6 +261,9 @@ trait TestHelpers
             'is_business' => false,
             'locale' => 'fr_BE',
             'data' => json_encode(['foo' => 'bar']),
+        ], [
+            \Thinktomorrow\Trader\Domain\Model\Customer\Address\ShippingAddress::class => null,
+            \Thinktomorrow\Trader\Domain\Model\Customer\Address\BillingAddress::class => null,
         ]);
     }
 

@@ -116,6 +116,10 @@ class Customer implements Aggregate
         $customer->locale = Locale::fromString($state['locale']);
         $customer->data = json_decode($state['data'], true);
 
+        $customer->shippingAddress = $childEntities[ShippingAddress::class] ? ShippingAddress::fromMappedData($childEntities[ShippingAddress::class], $state) : null;
+        $customer->billingAddress = $childEntities[BillingAddress::class] ? BillingAddress::fromMappedData($childEntities[BillingAddress::class], $state) : null;
+
+
         return $customer;
     }
 }
