@@ -347,10 +347,10 @@ final class CartApplication
         $order->deleteShopper();
         $order->deleteBillingAddress();
         $order->deleteShippingAddress();
-        foreach($order->getShippings() as $shipping) {
+        foreach ($order->getShippings() as $shipping) {
             $order->deleteShipping($shipping->shippingId);
         }
-        foreach($order->getPayments() as $payment) {
+        foreach ($order->getPayments() as $payment) {
             $order->deletePayment($payment->paymentId);
         }
 

@@ -7,11 +7,11 @@ use Illuminate\Foundation\Validation\ValidatesRequests;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
 use Illuminate\Support\Facades\Auth;
+use function redirect;
+use function route;
 use Thinktomorrow\Trader\Domain\Model\Customer\CustomerId;
 use Thinktomorrow\Trader\Domain\Model\Customer\Events\CustomerHasLoggedIn;
 use Thinktomorrow\Trader\Domain\Model\Customer\Events\CustomerHasLoggedOut;
-use function redirect;
-use function route;
 
 class CustomerAuthController extends Controller
 {
@@ -34,12 +34,13 @@ class CustomerAuthController extends Controller
         ]);
 
         if (Auth::guard('customer')->attempt(['email' => $request->email, 'password' => $request->password], $request->remember)) {
-
             event(new CustomerHasLoggedIn(
                 CustomerId::fromString(Auth::guard('customer')->user()->getCustomerId())
             ));
 
-            if($redirectAfterLogin) return redirect()->to($redirectAfterLogin);
+            if ($redirectAfterLogin) {
+                return redirect()->to($redirectAfterLogin);
+            }
 
             return redirect()->intended(route('customer.index'));
         }

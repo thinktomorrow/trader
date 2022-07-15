@@ -3,8 +3,8 @@
 use Illuminate\Support\Facades\Route;
 use Thinktomorrow\Trader\Infrastructure\Shop\Controllers\CustomerController;
 use Thinktomorrow\Trader\Infrastructure\Shop\CustomerAuth\Controllers\CustomerAuthController;
-use Thinktomorrow\Trader\Infrastructure\Shop\CustomerAuth\Controllers\CustomerResetPasswordController;
 use Thinktomorrow\Trader\Infrastructure\Shop\CustomerAuth\Controllers\CustomerForgotPasswordController;
+use Thinktomorrow\Trader\Infrastructure\Shop\CustomerAuth\Controllers\CustomerResetPasswordController;
 
 Route::group(['prefix' => 'you', 'middleware' => ['web']], function () {
 
@@ -23,5 +23,3 @@ Route::group(['prefix' => 'you', 'middleware' => ['web']], function () {
     Route::get('orders', [CustomerController::class, 'indexOrders'])->name('customer.orders')->middleware('customer-auth');
     Route::get('/', [CustomerController::class, 'index'])->name('customer.index')->middleware('customer-auth');
 });
-
-

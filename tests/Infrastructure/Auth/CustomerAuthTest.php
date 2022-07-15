@@ -3,15 +3,15 @@ declare(strict_types=1);
 
 namespace Tests\Infrastructure\Auth;
 
-use Tests\Infrastructure\TestCase;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Event;
-use Illuminate\Foundation\Testing\RefreshDatabase;
-use Thinktomorrow\Trader\Infrastructure\Shop\CustomerAuth\CustomerModel;
-use Thinktomorrow\Trader\Domain\Model\Customer\Events\CustomerHasLoggedIn;
-use Thinktomorrow\Trader\Domain\Model\Customer\Events\CustomerHasLoggedOut;
 use function route;
 use function session;
+use Tests\Infrastructure\TestCase;
+use Thinktomorrow\Trader\Domain\Model\Customer\Events\CustomerHasLoggedIn;
+use Thinktomorrow\Trader\Domain\Model\Customer\Events\CustomerHasLoggedOut;
+use Thinktomorrow\Trader\Infrastructure\Shop\CustomerAuth\CustomerModel;
 
 class CustomerAuthTest extends TestCase
 {
