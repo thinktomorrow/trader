@@ -9,7 +9,8 @@ class CustomerController
     {
     }
 
-    public function dashboard()
+    public function index()
     {
+        return view('shop.customer.index');
     }
 }

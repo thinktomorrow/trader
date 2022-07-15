@@ -339,4 +339,23 @@ final class CartApplication
 
         $this->eventDispatcher->dispatchAll($order->releaseEvents());
     }
+
+    public function clearCheckoutData(ClearCheckoutData $command): void
+    {
+        $order = $this->orderRepository->findForCart($command->getOrderId());
+
+        $order->deleteShopper();
+        $order->deleteBillingAddress();
+        $order->deleteShippingAddress();
+        foreach($order->getShippings() as $shipping) {
+            $order->deleteShipping($shipping->shippingId);
+        }
+        foreach($order->getPayments() as $payment) {
+            $order->deletePayment($payment->paymentId);
+        }
+
+        $this->orderRepository->save($order);
+
+        $this->eventDispatcher->dispatchAll($order->releaseEvents());
+    }
 }

@@ -162,6 +162,11 @@ final class Order implements Aggregate, Discountable
         $this->update('shopper', $shopper);
     }
 
+    public function deleteShopper(): void
+    {
+        $this->update('shopper', null);
+    }
+
     public function updatePaymentState(PaymentId $paymentId, PaymentState $paymentState): void
     {
         $oldPaymentState = $this->findPayment($paymentId)->getPaymentState();
@@ -224,9 +229,19 @@ final class Order implements Aggregate, Discountable
         $this->update('shippingAddress', $shippingAddress);
     }
 
+    public function deleteShippingAddress(): void
+    {
+        $this->update('shippingAddress', null);
+    }
+
     public function updateBillingAddress(BillingAddress $billingAddress): void
     {
         $this->update('billingAddress', $billingAddress);
+    }
+
+    public function deleteBillingAddress(): void
+    {
+        $this->update('billingAddress', null);
     }
 
     // addresses, methods, state,

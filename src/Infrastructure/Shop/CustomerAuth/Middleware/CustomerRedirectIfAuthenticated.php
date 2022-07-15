@@ -11,7 +11,7 @@ class CustomerRedirectIfAuthenticated
     public function handle($request, Closure $next)
     {
         if (Auth::guard('customer')->check()) {
-            return redirect(route('customer.home'));
+            return redirect(route('customer.index'));
         }
 
         return $next($request);

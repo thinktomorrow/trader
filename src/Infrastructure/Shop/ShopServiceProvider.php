@@ -17,8 +17,8 @@ class ShopServiceProvider extends ServiceProvider
 
     public function boot()
     {
-        // Default setup for frontend routes: this should be set up per project.
-        $this->loadRoutesFrom(__DIR__.'/routes.php');
+        // Default setup for customer auth routes: this should be set up per project.
+        $this->loadRoutesFrom(__DIR__.'/CustomerAuth/routes.php');
 
         $this->bootCustomerGuard();
     }

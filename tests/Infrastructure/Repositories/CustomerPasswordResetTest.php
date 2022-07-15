@@ -80,7 +80,7 @@ class CustomerPasswordResetTest extends TestCase
             'password_confirmation' => "new-password",
         ]);
 
-        $response->assertRedirect(route('customer.home'));
+        $response->assertRedirect(route('customer.index'));
 
 
         Auth::guard('customer')->logout();
@@ -91,7 +91,7 @@ class CustomerPasswordResetTest extends TestCase
         ]);
 
         $response->assertSessionHasNoErrors();
-        $response->assertRedirect(route('customer.home'));
+        $response->assertRedirect(route('customer.index'));
 
         $this->assertTrue(Auth::guard('customer')->check());
     }

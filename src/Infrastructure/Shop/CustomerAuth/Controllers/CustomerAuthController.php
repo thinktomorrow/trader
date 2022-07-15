@@ -7,6 +7,9 @@ use Illuminate\Foundation\Validation\ValidatesRequests;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
 use Illuminate\Support\Facades\Auth;
+use Thinktomorrow\Trader\Domain\Model\Customer\CustomerId;
+use Thinktomorrow\Trader\Domain\Model\Customer\Events\CustomerHasLoggedIn;
+use Thinktomorrow\Trader\Domain\Model\Customer\Events\CustomerHasLoggedOut;
 use function redirect;
 use function route;
 
@@ -20,10 +23,10 @@ class CustomerAuthController extends Controller
 
     public function showLoginForm()
     {
-        // TODO/ return view;
+        return view('shop.customer.auth.login');
     }
 
-    public function login(Request $request)
+    public function login(Request $request, ?string $redirectAfterLogin = null)
     {
         $this->validate($request, [
             'email' => 'required|email',
@@ -31,12 +34,19 @@ class CustomerAuthController extends Controller
         ]);
 
         if (Auth::guard('customer')->attempt(['email' => $request->email, 'password' => $request->password], $request->remember)) {
-            return redirect()->intended(route('customer.home'));
+
+            event(new CustomerHasLoggedIn(
+                CustomerId::fromString(Auth::guard('customer')->user()->getCustomerId())
+            ));
+
+            if($redirectAfterLogin) return redirect()->to($redirectAfterLogin);
+
+            return redirect()->intended(route('customer.index'));
         }
 
-        $failedAttempt = 'Jouw gegevens zijn onjuist of jouw account is niet actief.';
-
-        return redirect()->back()->withInput($request->only('email', 'remember'))->withErrors($failedAttempt);
+        return redirect()->back()
+            ->withInput($request->only('email', 'remember_me'))
+            ->withErrors(['email' => trans('customer.login_form.failed')]);
     }
 
     /**
@@ -48,9 +58,11 @@ class CustomerAuthController extends Controller
      */
     public function logout(Request $request)
     {
+        $customerId = CustomerId::fromString(Auth::guard('customer')->user()->getCustomerId());
+
         Auth::guard('customer')->logout();
 
-//        $request->session()->forget('chief_password_hash');
+        event(new CustomerHasLoggedOut($customerId));
 
         return redirect('/');
     }

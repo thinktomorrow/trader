@@ -30,6 +30,6 @@ class CustomerResetPasswordController extends Controller
 
     public function redirectPath()
     {
-        return route('customer.home');
+        return route('customer.index');
     }
 }

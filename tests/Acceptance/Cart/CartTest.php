@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace Tests\Acceptance\Cart;
 
+use Thinktomorrow\Trader\Application\Cart\ClearCheckoutData;
 use Thinktomorrow\Trader\Application\Cart\UpdateBillingAddress;
 
 class CartTest extends CartContext
@@ -107,5 +108,43 @@ class CartTest extends CartContext
         ));
 
         $this->assertEquals($address, array_values($this->getOrder()->getBillingAddress()->getAddress()->toArray()));
+    }
+
+    public function test_it_can_remove_cart_details()
+    {
+        // Product selection
+        $this->givenThereIsAProductWhichCostsEur('lightsaber', 5);
+        $this->whenIAddTheVariantToTheCart('lightsaber-123', 2);
+
+        // Fill in an entire cart
+        $this->givenOrderHasAShippingCountry('BE');
+        $this->givenShippingCostsForAPurchaseOfEur(2, 0, 10);
+        $this->givenPaymentMethod(10);
+        $this->whenIChooseShipping('bpost_home');
+
+        $this->whenIAddShippingAddress('NL', 'example 12', 'bus 2', '1000', 'Amsterdam');
+        $this->whenIAddBillingAddress('BE', 'example 13', 'bus 2', '1200', 'Brussel');
+        $this->whenIChoosePayment('visa');
+        $this->whenIEnterShopperDetails('ben@tt.be');
+
+        // Assert all is present
+        $cart = $this->cartRepository->findCart($this->getOrder()->orderId);
+        $this->assertCount(1, $cart->getLines());
+        $this->assertNotNull($cart->getBillingAddress());
+        $this->assertNotNull($cart->getShippingAddress());
+        $this->assertNotNull($cart->getShopper());
+        $this->assertNotNull($cart->getShipping());
+        $this->assertNotNull($cart->getPayment());
+
+        // Now clear it - Everything but the products should be removed
+        $this->cartApplication->clearCheckoutData(new ClearCheckoutData($this->getOrder()->orderId->get()));
+
+        $cart = $this->cartRepository->findCart($this->getOrder()->orderId);
+        $this->assertCount(1, $cart->getLines());
+        $this->assertNull($cart->getBillingAddress());
+        $this->assertNull($cart->getShippingAddress());
+        $this->assertNull($cart->getShopper());
+        $this->assertNull($cart->getShipping());
+        $this->assertNull($cart->getPayment());
     }
 }

@@ -1,20 +1,33 @@
 <?php
 declare(strict_types=1);
 
-namespace Tests\Infrastructure;
+namespace Tests\Infrastructure\Auth;
 
-use Illuminate\Foundation\Testing\RefreshDatabase;
+use Tests\Infrastructure\TestCase;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Event;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 use Thinktomorrow\Trader\Infrastructure\Shop\CustomerAuth\CustomerModel;
+use Thinktomorrow\Trader\Domain\Model\Customer\Events\CustomerHasLoggedIn;
+use Thinktomorrow\Trader\Domain\Model\Customer\Events\CustomerHasLoggedOut;
+use function route;
+use function session;
 
 class CustomerAuthTest extends TestCase
 {
     use RefreshDatabase;
 
+    protected function setUp(): void
+    {
+        parent::setUp();
+
+        $this->app['view']->addLocation(__DIR__ . '/views');
+    }
+
     /** @test */
     public function non_authenticated_are_kept_out()
     {
-        $response = $this->get(route('customer.home'));
+        $response = $this->get(route('customer.index'));
         $response->assertRedirect(route('customer.login'));
     }
 
@@ -22,7 +35,7 @@ class CustomerAuthTest extends TestCase
     /** @test */
     public function it_returns_a_json_error_if_unauthenticated_request_expects_json_response()
     {
-        $response = $this->get(route('customer.home'), [
+        $response = $this->get(route('customer.index'), [
             'Accept' => 'application/json',
         ]);
 
@@ -42,8 +55,23 @@ class CustomerAuthTest extends TestCase
         $this->assertTrue(Auth::guard('customer')->check());
         $this->assertEquals($customer->customerId->get(), Auth::guard('customer')->user()->customer_id);
 
-        $response->assertRedirect(route('customer.home'));
+        $response->assertRedirect(route('customer.index'));
         $this->assertFalse(session()->has('errors'));
+    }
+
+    /** @test */
+    public function when_logging_in_an_event_is_published()
+    {
+        Event::fake();
+
+        $this->createACustomerLogin();
+
+        $this->post(route('customer.login.store'), [
+            'email' => 'ben@thinktomorrow.be',
+            'password' => '123456',
+        ]);
+
+        Event::assertDispatched(CustomerHasLoggedIn::class);
     }
 
     /** @test */
@@ -68,7 +96,7 @@ class CustomerAuthTest extends TestCase
         $customer = $this->createACustomerLogin();
 
         $response = $this->actingAs(CustomerModel::first(), 'customer')
-            ->get(route('customer.home'));
+            ->get(route('customer.index'));
 
         $response->assertStatus(200);
         $this->assertFalse(session()->has('errors'));
@@ -112,6 +140,21 @@ class CustomerAuthTest extends TestCase
     }
 
     /** @test */
+    public function when_logging_out_an_event_is_published()
+    {
+        Event::fake();
+
+        $customer = $this->createACustomerLogin();
+
+        Auth::guard('customer')->login(CustomerModel::first());
+        $this->assertEquals($customer->customerId->get(), Auth::guard('customer')->user()->customer_id);
+
+        $response = $this->get(route('customer.logout'));
+
+        Event::assertDispatched(CustomerHasLoggedOut::class);
+    }
+
+    /** @test */
     public function it_will_redirect_if_logged_in_when_trying_to_log_in()
     {
         $customer = $this->createACustomerLogin();
@@ -125,6 +168,6 @@ class CustomerAuthTest extends TestCase
             'password' => '123456',
         ]);
 
-        $response->assertRedirect(route('customer.home'));
+        $response->assertRedirect(route('customer.index'));
     }
 }
