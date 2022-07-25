@@ -174,16 +174,16 @@ class GridRepositoryTest extends TestCase
     {
         $this->createCatalog(
             new TaxonApplication(
-            new TestTraderConfig(),
-            new EventDispatcherSpy(),
-            new MysqlTaxonRepository(),
-        ),
+                new TestTraderConfig(),
+                new EventDispatcherSpy(),
+                new MysqlTaxonRepository(),
+            ),
             new ProductApplication(
-            new TestTraderConfig(),
-            new EventDispatcherSpy(),
-            new MysqlProductRepository(new MysqlVariantRepository(new TestContainer())),
-            new MysqlVariantRepository(new TestContainer()),
-        ),
+                new TestTraderConfig(),
+                new EventDispatcherSpy(),
+                new MysqlProductRepository(new MysqlVariantRepository(new TestContainer())),
+                new MysqlVariantRepository(new TestContainer()),
+            ),
             new MysqlProductRepository(new MysqlVariantRepository(new TestContainer()))
         );
     }

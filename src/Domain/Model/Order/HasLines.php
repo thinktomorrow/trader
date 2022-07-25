@@ -25,10 +25,10 @@ trait HasLines
     {
         return Quantity::fromInt(
             array_reduce(
-            $this->lines,
-            fn ($carry, Line $line) => $carry + $line->getQuantity()->asInt(),
-            0
-        ),
+                $this->lines,
+                fn ($carry, Line $line) => $carry + $line->getQuantity()->asInt(),
+                0
+            ),
         );
     }
 

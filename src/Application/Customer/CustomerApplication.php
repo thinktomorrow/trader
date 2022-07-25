@@ -91,9 +91,9 @@ class CustomerApplication
 
         $customer->updateBillingAddress(
             BillingAddress::create(
-            $customer->customerId,
-            $command->getAddress()
-        )
+                $customer->customerId,
+                $command->getAddress()
+            )
         );
 
         $this->customerRepository->save($customer);
@@ -107,9 +107,9 @@ class CustomerApplication
 
         $customer->updateShippingAddress(
             ShippingAddress::create(
-            $customer->customerId,
-            $command->getAddress()
-        )
+                $customer->customerId,
+                $command->getAddress()
+            )
         );
 
         $this->customerRepository->save($customer);

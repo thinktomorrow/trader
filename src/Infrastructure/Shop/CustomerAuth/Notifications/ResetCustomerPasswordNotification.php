@@ -4,11 +4,11 @@ declare(strict_types=1);
 namespace Thinktomorrow\Trader\Infrastructure\Shop\CustomerAuth\Notifications;
 
 use Illuminate\Bus\Queueable;
-use Thinktomorrow\Trader\TraderConfig;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
 use Illuminate\Queue\SerializesModels;
+use Thinktomorrow\Trader\TraderConfig;
 
 class ResetCustomerPasswordNotification extends Notification implements ShouldQueue
 {
