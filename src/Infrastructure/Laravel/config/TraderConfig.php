@@ -43,4 +43,14 @@ class TraderConfig implements \Thinktomorrow\Trader\TraderConfig
     {
         return config('trader.classmap', []);
     }
+
+    public function getWebmasterEmail(): string
+    {
+        return config('trader.webmaster_email');
+    }
+
+    public function getWebmasterName(): string
+    {
+        return config('trader.webmaster_name');
+    }
 }

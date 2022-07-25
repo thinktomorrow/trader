@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace Thinktomorrow\Trader\Infrastructure\Shop\CustomerAuth;
 
 use Illuminate\Auth\Authenticatable;
+use Thinktomorrow\Trader\TraderConfig;
 use Illuminate\Auth\Passwords\CanResetPassword;
 use Illuminate\Contracts\Auth\Authenticatable as AuthenticatableContract;
 use Illuminate\Contracts\Auth\CanResetPassword as CanResetPasswordContract;
@@ -26,7 +27,7 @@ class CustomerModel extends Model implements AuthenticatableContract, CanResetPa
 
     public function sendPasswordResetNotification($token)
     {
-        $this->notify(new ResetCustomerPasswordNotification($token));
+        $this->notify(new ResetCustomerPasswordNotification($token, app(TraderConfig::class)));
     }
 
     public function getCustomerId(): string

@@ -49,4 +49,14 @@ class TestTraderConfig implements TraderConfig
     {
         return [];
     }
+
+    public function getWebmasterEmail(): string
+    {
+        return 'dev@trader.be';
+    }
+
+    public function getWebmasterName(): string
+    {
+        return 'ben';
+    }
 }

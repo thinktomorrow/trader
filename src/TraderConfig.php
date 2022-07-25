@@ -20,4 +20,8 @@ interface TraderConfig
     public function getCategoryRootId(): ?string;
 
     public function getClassMap(): array;
+
+    public function getWebmasterEmail(): string;
+
+    public function getWebmasterName(): string;
 }

@@ -50,4 +50,16 @@ return [
      * If left blank, by default the first taxon subtree found will be used.
      */
     'category_root_id' => null,
+
+    /**
+     * The mail address that will be used to send
+     * the customer password reset mail
+     */
+    'webmaster_email' => env('MAIL_FROM_ADDRESS'),
+
+    /**
+     * The name that recipients will see as the sender
+     * when receiving the password reset mail
+     */
+    'webmaster_name' => env('MAIL_FROM_NAME'),
 ];

@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace Thinktomorrow\Trader\Infrastructure\Shop\CustomerAuth\Notifications;
 
 use Illuminate\Bus\Queueable;
+use Thinktomorrow\Trader\TraderConfig;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
@@ -15,10 +16,12 @@ class ResetCustomerPasswordNotification extends Notification implements ShouldQu
     use SerializesModels;
 
     public $token;
+    private TraderConfig $traderConfig;
 
-    public function __construct($token)
+    public function __construct($token, TraderConfig $traderConfig)
     {
         $this->token = $token;
+        $this->traderConfig = $traderConfig;
     }
 
     public function via()
@@ -35,10 +38,10 @@ class ResetCustomerPasswordNotification extends Notification implements ShouldQu
     public function toMail($notifiable)
     {
         return (new MailMessage())
-            ->subject('Herstel jouw wachtwoord.')
-            ->from('webmaster-email', 'webmaster-name')
-            ->view('chief::mails.password-reset', [
-                'reset_url' => route('chief.back.password.reset', $this->token),
+            ->subject(trans('customer.mails.reset_password.subject'))
+            ->from($this->traderConfig->getWebmasterEmail(), $this->traderConfig->getWebmasterName())
+            ->view('shop.customer.auth.password.reset-mail', [
+                'reset_url' => route('customer.password.reset', $this->token),
             ]);
     }
 }
