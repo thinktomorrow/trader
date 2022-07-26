@@ -7,5 +7,4 @@ use Thinktomorrow\Trader\Application\Customer\Read\CustomerBillingAddress;
 
 final class DefaultCustomerBillingAddress extends Address implements CustomerBillingAddress
 {
-
 }

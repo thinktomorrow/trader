@@ -3,11 +3,11 @@ declare(strict_types=1);
 
 namespace Thinktomorrow\Trader\Infrastructure\Laravel\Models\CustomerRead;
 
-use Thinktomorrow\Trader\Domain\Common\Locale;
 use Thinktomorrow\Trader\Application\Common\RendersData;
-use Thinktomorrow\Trader\Application\Customer\Read\CustomerRead;
 use Thinktomorrow\Trader\Application\Customer\Read\CustomerBillingAddress;
+use Thinktomorrow\Trader\Application\Customer\Read\CustomerRead;
 use Thinktomorrow\Trader\Application\Customer\Read\CustomerShippingAddress;
+use Thinktomorrow\Trader\Domain\Common\Locale;
 
 final class DefaultCustomerReadRead implements CustomerRead
 {

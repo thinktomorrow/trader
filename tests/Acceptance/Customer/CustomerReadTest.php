@@ -7,6 +7,5 @@ final class CustomerReadTest extends CustomerContext
 {
     public function test_it_can_find_customer_read()
     {
-
     }
 }
