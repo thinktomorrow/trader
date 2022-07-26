@@ -22,6 +22,8 @@ abstract class CustomerContext extends TestCase
         $this->customerRepository = new InMemoryCustomerRepository();
         $this->customerRepository->autoGenerateNextReference();
 
+        $this->customerReadRepository = new InMemoryCustomerReadRepository();
+
         $this->customerApplication = new CustomerApplication(
             $this->customerRepository,
             new EventDispatcherSpy(),

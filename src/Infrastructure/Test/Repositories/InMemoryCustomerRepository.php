@@ -7,9 +7,10 @@ use Thinktomorrow\Trader\Domain\Common\Email;
 use Thinktomorrow\Trader\Domain\Model\Customer\Customer;
 use Thinktomorrow\Trader\Domain\Model\Customer\CustomerId;
 use Thinktomorrow\Trader\Domain\Model\Customer\CustomerRepository;
+use Thinktomorrow\Trader\Application\Customer\Read\CustomerReadRepository;
 use Thinktomorrow\Trader\Domain\Model\Customer\Exceptions\CouldNotFindCustomer;
 
-final class InMemoryCustomerRepository implements CustomerRepository
+final class InMemoryCustomerRepository implements CustomerRepository, CustomerReadRepository
 {
     /** @var Customer[] */
     public static array $customers = [];
@@ -91,5 +92,20 @@ final class InMemoryCustomerRepository implements CustomerRepository
     public static function clear()
     {
         static::$customers = [];
+    }
+
+    public function findCustomer(CustomerId $customerId): \Thinktomorrow\Trader\Application\Customer\Read\CustomerRead
+    {
+        $customer = $this->find($customerId);
+
+        $shippingAddress = $order->getShippingAddress() ? DefaultCartShippingAddress::fromMappedData(
+            $order->getShippingAddress()->getMappedData(),
+            $orderState
+        ) : null;
+
+        $billingAddress = $order->getBillingAddress() ? DefaultCartBillingAddress::fromMappedData(
+            $order->getBillingAddress()->getMappedData(),
+            $orderState
+        ) : null;
     }
 }
