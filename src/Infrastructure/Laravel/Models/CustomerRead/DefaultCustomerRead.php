@@ -9,15 +9,14 @@ use Thinktomorrow\Trader\Application\Customer\Read\CustomerRead;
 use Thinktomorrow\Trader\Application\Customer\Read\CustomerShippingAddress;
 use Thinktomorrow\Trader\Domain\Common\Locale;
 
-final class DefaultCustomerReadRead implements CustomerRead
+final class DefaultCustomerRead implements CustomerRead
 {
     use RendersData;
 
     private string $customerId;
-    private CustomerShippingAddress $shippingAddress;
-    private CustomerBillingAddress $billingAddress;
+    private ?CustomerShippingAddress $shippingAddress;
+    private ?CustomerBillingAddress $billingAddress;
     private string $email;
-    private Locale $locale;
     private bool $is_business;
     private array $data;
 
@@ -48,7 +47,7 @@ final class DefaultCustomerReadRead implements CustomerRead
         return $this->email;
     }
 
-    public function geLocale(): Locale
+    public function getCustomerLocale(): Locale
     {
         return $this->locale;
     }

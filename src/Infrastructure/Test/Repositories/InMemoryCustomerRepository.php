@@ -8,7 +8,12 @@ use Thinktomorrow\Trader\Domain\Common\Email;
 use Thinktomorrow\Trader\Domain\Model\Customer\Customer;
 use Thinktomorrow\Trader\Domain\Model\Customer\CustomerId;
 use Thinktomorrow\Trader\Domain\Model\Customer\CustomerRepository;
+use Thinktomorrow\Trader\Application\Customer\Read\CustomerBillingAddress;
+use Thinktomorrow\Trader\Application\Customer\Read\CustomerShippingAddress;
 use Thinktomorrow\Trader\Domain\Model\Customer\Exceptions\CouldNotFindCustomer;
+use Thinktomorrow\Trader\Infrastructure\Laravel\Models\CustomerRead\DefaultCustomerRead;
+use Thinktomorrow\Trader\Infrastructure\Laravel\Models\CustomerRead\DefaultCustomerBillingAddress;
+use Thinktomorrow\Trader\Infrastructure\Laravel\Models\CustomerRead\DefaultCustomerShippingAddress;
 
 final class InMemoryCustomerRepository implements CustomerRepository, CustomerReadRepository
 {
@@ -98,14 +103,19 @@ final class InMemoryCustomerRepository implements CustomerRepository, CustomerRe
     {
         $customer = $this->find($customerId);
 
-        $shippingAddress = $order->getShippingAddress() ? DefaultCartShippingAddress::fromMappedData(
-            $order->getShippingAddress()->getMappedData(),
-            $orderState
+        $shippingAddress = $customer->getShippingAddress() ? DefaultCustomerShippingAddress::fromMappedData(
+            $customer->getShippingAddress()->getMappedData(),
+            $customer->getMappedData()
         ) : null;
 
-        $billingAddress = $order->getBillingAddress() ? DefaultCartBillingAddress::fromMappedData(
-            $order->getBillingAddress()->getMappedData(),
-            $orderState
+        $billingAddress = $customer->getBillingAddress() ? DefaultCustomerBillingAddress::fromMappedData(
+            $customer->getBillingAddress()->getMappedData(),
+            $customer->getMappedData()
         ) : null;
+
+        return DefaultCustomerRead::fromMappedData($customer->getMappedData(), [
+            CustomerBillingAddress::class => $billingAddress,
+            CustomerShippingAddress::class => $shippingAddress,
+        ]);
     }
 }

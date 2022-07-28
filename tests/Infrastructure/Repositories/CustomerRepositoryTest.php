@@ -9,6 +9,8 @@ use Thinktomorrow\Trader\Domain\Common\Address\Address;
 use Thinktomorrow\Trader\Domain\Common\Email;
 use Thinktomorrow\Trader\Domain\Common\Locale;
 use Thinktomorrow\Trader\Domain\Model\Country\CountryId;
+use Thinktomorrow\Trader\Infrastructure\Test\TestContainer;
+use Thinktomorrow\Trader\Application\Customer\Read\CustomerRead;
 use Thinktomorrow\Trader\Domain\Model\Customer\Address\BillingAddress;
 use Thinktomorrow\Trader\Domain\Model\Customer\Address\ShippingAddress;
 use Thinktomorrow\Trader\Domain\Model\Customer\Customer;
@@ -65,10 +67,23 @@ final class CustomerRepositoryTest extends TestCase
         }
     }
 
+    /**
+     * @dataProvider customers
+     */
+    public function test_it_can_get_customer_read(Customer $customer)
+    {
+        foreach ($this->repositories() as $repository) {
+            $repository->save($customer);
+            $customer->releaseEvents();
+
+            $this->assertInstanceOf(CustomerRead::class, $repository->findCustomer($customer->customerId));
+        }
+    }
+
     private function repositories(): \Generator
     {
         yield new InMemoryCustomerRepository();
-        yield new MysqlCustomerRepository();
+        yield new MysqlCustomerRepository(new TestContainer());
     }
 
     public function customers(): \Generator

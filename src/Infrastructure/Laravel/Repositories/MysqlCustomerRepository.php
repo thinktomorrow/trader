@@ -5,19 +5,31 @@ namespace Thinktomorrow\Trader\Infrastructure\Laravel\Repositories;
 
 use Illuminate\Support\Facades\DB;
 use Ramsey\Uuid\Uuid;
+use Psr\Container\ContainerInterface;
 use Thinktomorrow\Trader\Domain\Common\Address\AddressType;
 use Thinktomorrow\Trader\Domain\Common\Email;
+use Thinktomorrow\Trader\Application\Customer\Read\CustomerRead;
 use Thinktomorrow\Trader\Domain\Model\Customer\Address\BillingAddress;
 use Thinktomorrow\Trader\Domain\Model\Customer\Address\ShippingAddress;
 use Thinktomorrow\Trader\Domain\Model\Customer\Customer;
 use Thinktomorrow\Trader\Domain\Model\Customer\CustomerId;
 use Thinktomorrow\Trader\Domain\Model\Customer\CustomerRepository;
+use Thinktomorrow\Trader\Application\Customer\Read\CustomerReadRepository;
+use Thinktomorrow\Trader\Application\Customer\Read\CustomerBillingAddress;
+use Thinktomorrow\Trader\Application\Customer\Read\CustomerShippingAddress;
 use Thinktomorrow\Trader\Domain\Model\Customer\Exceptions\CouldNotFindCustomer;
 
-class MysqlCustomerRepository implements CustomerRepository
+class MysqlCustomerRepository implements CustomerRepository, CustomerReadRepository
 {
+    private ContainerInterface $container;
+
     private static $customerTable = 'trader_customers';
     private static $customerAddressTable = 'trader_customer_addresses';
+
+    public function __construct(ContainerInterface $container)
+    {
+        $this->container = $container;
+    }
 
     public function save(Customer $customer): void
     {
@@ -121,5 +133,25 @@ class MysqlCustomerRepository implements CustomerRepository
     public function nextReference(): CustomerId
     {
         return CustomerId::fromString((string) Uuid::uuid4());
+    }
+
+    public function findCustomer(CustomerId $customerId): \Thinktomorrow\Trader\Application\Customer\Read\CustomerRead
+    {
+        $customer = $this->find($customerId);
+
+        $shippingAddress = $customer->getShippingAddress() ? $this->container->get(CustomerShippingAddress::class)::fromMappedData(
+            $customer->getShippingAddress()->getMappedData(),
+            $customer->getMappedData()
+        ) : null;
+
+        $billingAddress = $customer->getBillingAddress() ? $this->container->get(CustomerBillingAddress::class)::fromMappedData(
+            $customer->getBillingAddress()->getMappedData(),
+            $customer->getMappedData()
+        ) : null;
+
+        return $this->container->get(CustomerRead::class)::fromMappedData($customer->getMappedData(), [
+            CustomerBillingAddress::class => $billingAddress,
+            CustomerShippingAddress::class => $shippingAddress,
+        ]);
     }
 }

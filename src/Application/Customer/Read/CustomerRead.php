@@ -13,7 +13,7 @@ interface CustomerRead
 
     public function getEmail(): string;
 
-    public function geLocale(): Locale;
+    public function getCustomerLocale(): Locale;
 
     /** Does the shopper have a business profile */
     public function isBusiness(): bool;

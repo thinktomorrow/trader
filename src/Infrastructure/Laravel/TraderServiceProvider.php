@@ -6,6 +6,7 @@ namespace Thinktomorrow\Trader\Infrastructure\Laravel;
 use Illuminate\Support\Arr;
 use Illuminate\Support\ServiceProvider;
 use Thinktomorrow\Trader\Application\Cart\Read\Cart;
+use Thinktomorrow\Trader\Application\Customer\Read\CustomerRead;
 use Thinktomorrow\Trader\Application\Cart\Read\CartBillingAddress;
 use Thinktomorrow\Trader\Application\Cart\Read\CartDiscount;
 use Thinktomorrow\Trader\Application\Cart\Read\CartLine;
@@ -15,6 +16,7 @@ use Thinktomorrow\Trader\Application\Cart\Read\CartShipping;
 use Thinktomorrow\Trader\Application\Cart\Read\CartShippingAddress;
 use Thinktomorrow\Trader\Application\Cart\Read\CartShopper;
 use Thinktomorrow\Trader\Application\Cart\ShippingProfile\ShippingProfileForCart;
+use Thinktomorrow\Trader\Infrastructure\Laravel\Models\CustomerRead\DefaultCustomerRead;
 use Thinktomorrow\Trader\Application\Cart\ShippingProfile\ShippingProfileForCartRepository;
 use Thinktomorrow\Trader\Application\Cart\VariantForCart\VariantForCart;
 use Thinktomorrow\Trader\Application\Cart\VariantForCart\VariantForCartRepository;
@@ -129,36 +131,13 @@ class TraderServiceProvider extends ServiceProvider
         $this->app->bind(TraderConfig::class, \Thinktomorrow\Trader\Infrastructure\Laravel\config\TraderConfig::class);
         $this->app->bind(EventDispatcher::class, \Thinktomorrow\Trader\Infrastructure\Laravel\Services\EventDispatcher::class);
 
-        // Product
+        // Catalog Repositories
         $this->app->bind(GridRepository::class, MysqlGridRepository::class);
         $this->app->bind(ProductRepository::class, MysqlProductRepository::class);
         $this->app->bind(ProductDetailRepository::class, MysqlProductDetailRepository::class);
         $this->app->bind(VariantRepository::class, MysqlVariantRepository::class);
         $this->app->bind(VariantForCartRepository::class, MysqlVariantRepository::class);
         $this->app->bind(CheckProductOptionsRepository::class, MysqlCheckProductOptionsRepository::class);
-
-        // Default models
-        $this->app->bind(GridItem::class, function () {
-            return DefaultGridItem::class;
-        });
-        $this->app->bind(ProductDetail::class, function () {
-            return DefaultProductDetail::class;
-        });
-        $this->app->bind(OptionLink::class, function () {
-            return DefaultOptionLink::class;
-        });
-        $this->app->bind(TaxonNode::class, function () {
-            return DefaultTaxonNode::class;
-        });
-        $this->app->bind(VariantForCart::class, function () {
-            return DefaultVariantForCart::class;
-        });
-
-        $this->app->bind(ShippingProfileForCart::class, function () {
-            return DefaultShippingProfileForCart::class;
-        });
-
-        // Taxon
         $this->app->bind(TaxonRepository::class, MysqlTaxonRepository::class);
         $this->app->bind(TaxonTreeRepository::class, MysqlTaxonTreeRepository::class);
         $this->app->bind(CategoryRepository::class, MysqlTaxonTreeRepository::class);
@@ -167,7 +146,11 @@ class TraderServiceProvider extends ServiceProvider
         $this->app->bind(FlattenedTaxonIdsComposer::class, VineFlattenedTaxonIdsComposer::class);
         $this->app->bind(RedirectRepository::class, MysqlRedirectRepository::class);
 
-        // Order
+        // Order repositories
+        $this->app->bind(CartRepository::class, MysqlCartRepository::class);
+        $this->app->bind(ShippingProfileForCartRepository::class, MysqlShippingProfileRepository::class);
+        $this->app->bind(PromoRepository::class, MysqlPromoRepository::class);
+        $this->app->bind(OrderPromoRepository::class, MysqlPromoRepository::class);
         $this->app->bind(OrderRepository::class, MysqlOrderRepository::class);
         $this->app->bind(ShippingProfileRepository::class, MysqlShippingProfileRepository::class);
         $this->app->bind(PaymentMethodRepository::class, MysqlPaymentMethodRepository::class);
@@ -175,10 +158,18 @@ class TraderServiceProvider extends ServiceProvider
         $this->app->bind(CustomerLoginRepository::class, MysqlCustomerLoginRepository::class);
         $this->app->bind(ShippingCountryRepository::class, MysqlShippingProfileRepository::class);
         $this->app->bind(BillingCountryRepository::class, MysqlCountryRepository::class);
+        $this->app->bind(MerchantOrderRepository::class, MysqlMerchantOrderRepository::class);
+        $this->app->bind(\Thinktomorrow\Trader\Application\Order\Grid\GridRepository::class, MysqlOrderGridRepository::class);
 
-        // Cart
-        $this->app->bind(CartRepository::class, MysqlCartRepository::class);
-        $this->app->bind(ShippingProfileForCartRepository::class, MysqlShippingProfileRepository::class);
+        // Product models
+        $this->app->bind(GridItem::class, DefaultGridItem::class);
+        $this->app->bind(ProductDetail::class, DefaultProductDetail::class);
+        $this->app->bind(OptionLink::class, DefaultOptionLink::class);
+        $this->app->bind(TaxonNode::class, DefaultTaxonNode::class);
+        $this->app->bind(VariantForCart::class, DefaultVariantForCart::class);
+
+        // Order models
+        $this->app->bind(\Thinktomorrow\Trader\Application\Order\Grid\GridItem::class, DefaultOrderGridItem::class);
         $this->app->bind(Cart::class, DefaultCart::class);
         $this->app->bind(CartLine::class, DefaultCartLine::class);
         $this->app->bind(CartDiscount::class, DefaultCartDiscount::class);
@@ -187,9 +178,9 @@ class TraderServiceProvider extends ServiceProvider
         $this->app->bind(CartShopper::class, DefaultCartShopper::class);
         $this->app->bind(CartPayment::class, DefaultCartPayment::class);
         $this->app->bind(CartShipping::class, DefaultCartShipping::class);
+        $this->app->bind(ShippingProfileForCart::class, DefaultShippingProfileForCart::class);
 
-        // MerchantOrder
-        $this->app->bind(MerchantOrderRepository::class, MysqlMerchantOrderRepository::class);
+        // MerchantOrder models
         $this->app->bind(MerchantOrder::class, DefaultMerchantOrder::class);
         $this->app->bind(MerchantOrderLine::class, DefaultMerchantOrderLine::class);
         $this->app->bind(MerchantOrderDiscount::class, DefaultMerchantOrderDiscount::class);
@@ -199,57 +190,11 @@ class TraderServiceProvider extends ServiceProvider
         $this->app->bind(MerchantOrderShipping::class, DefaultMerchantOrderShipping::class);
         $this->app->bind(MerchantOrderPayment::class, DefaultMerchantOrderPayment::class);
 
-        $this->app->bind(\Thinktomorrow\Trader\Application\Order\Grid\GridRepository::class, MysqlOrderGridRepository::class);
-        $this->app->bind(\Thinktomorrow\Trader\Application\Order\Grid\GridItem::class, DefaultOrderGridItem::class);
+        // Customer models
+        $this->app->bind(CustomerRead::class, DefaultCustomerRead::class);
 
-        $this->app->bind(PromoRepository::class, MysqlPromoRepository::class);
-        $this->app->bind(OrderPromoRepository::class, MysqlPromoRepository::class);
-
-        $this->app->bind(ConditionFactory::class, function () {
-            return new ConditionFactory([
-                MinimumLinesQuantity::class,
-                MinimumAmount::class,
-            ]);
-        });
-
-        $this->app->bind(DiscountFactory::class, function ($app) {
-            return new DiscountFactory(
-                [
-                    PercentageOffDiscount::class,
-                    FixedAmountDiscount::class,
-                ],
-                $app->get(ConditionFactory::class)
-            );
-        });
-
-        $this->app->bind(OrderConditionFactory::class, function () {
-            return new OrderConditionFactory([
-                MinimumLinesQuantityOrderCondition::class,
-                MinimumAmountOrderCondition::class,
-            ]);
-        });
-
-        $this->app->bind(OrderDiscountFactory::class, function ($app) {
-            return new OrderDiscountFactory(
-                [
-                    PercentageOffOrderDiscount::class,
-                    FixedAmountOrderDiscount::class,
-                ],
-                $app->get(OrderConditionFactory::class)
-            );
-        });
-
-        $this->app->bind(OrderStateMachine::class, function () {
-            return new OrderStateMachine(OrderState::cases(), OrderState::getDefaultTransitions());
-        });
-
-        $this->app->bind(PaymentStateMachine::class, function () {
-            return new PaymentStateMachine(PaymentState::cases(), PaymentState::getDefaultTransitions());
-        });
-
-        $this->app->bind(ShippingStateMachine::class, function () {
-            return new ShippingStateMachine(ShippingState::cases(), ShippingState::getDefaultTransitions());
-        });
+        $this->registerPromoConditionsAndDiscounts();
+        $this->registerStateMachines();
     }
 
     public function boot()
@@ -288,6 +233,58 @@ class TraderServiceProvider extends ServiceProvider
             );
 
             return $value === null ? $default :$value;
+        });
+    }
+
+    private function registerPromoConditionsAndDiscounts()
+    {
+        $this->app->bind(ConditionFactory::class, function () {
+            return new ConditionFactory([
+                MinimumLinesQuantity::class,
+                MinimumAmount::class,
+            ]);
+        });
+
+        $this->app->bind(DiscountFactory::class, function ($app) {
+            return new DiscountFactory(
+                [
+                    PercentageOffDiscount::class,
+                    FixedAmountDiscount::class,
+                ],
+                $app->get(ConditionFactory::class)
+            );
+        });
+
+        $this->app->bind(OrderConditionFactory::class, function () {
+            return new OrderConditionFactory([
+                MinimumLinesQuantityOrderCondition::class,
+                MinimumAmountOrderCondition::class,
+            ]);
+        });
+
+        $this->app->bind(OrderDiscountFactory::class, function ($app) {
+            return new OrderDiscountFactory(
+                [
+                    PercentageOffOrderDiscount::class,
+                    FixedAmountOrderDiscount::class,
+                ],
+                $app->get(OrderConditionFactory::class)
+            );
+        });
+    }
+
+    private function registerStateMachines()
+    {
+        $this->app->bind(OrderStateMachine::class, function () {
+            return new OrderStateMachine(OrderState::cases(), OrderState::getDefaultTransitions());
+        });
+
+        $this->app->bind(PaymentStateMachine::class, function () {
+            return new PaymentStateMachine(PaymentState::cases(), PaymentState::getDefaultTransitions());
+        });
+
+        $this->app->bind(ShippingStateMachine::class, function () {
+            return new ShippingStateMachine(ShippingState::cases(), ShippingState::getDefaultTransitions());
         });
     }
 }

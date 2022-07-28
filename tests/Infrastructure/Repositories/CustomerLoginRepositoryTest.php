@@ -7,6 +7,7 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\Infrastructure\TestCase;
 use Thinktomorrow\Trader\Domain\Common\Email;
 use Thinktomorrow\Trader\Domain\Model\Customer\CustomerId;
+use Thinktomorrow\Trader\Infrastructure\Test\TestContainer;
 use Thinktomorrow\Trader\Domain\Model\CustomerLogin\CustomerLogin;
 use Thinktomorrow\Trader\Infrastructure\Laravel\Repositories\MysqlCustomerLoginRepository;
 use Thinktomorrow\Trader\Infrastructure\Laravel\Repositories\MysqlCustomerRepository;
@@ -65,6 +66,6 @@ final class CustomerLoginRepositoryTest extends TestCase
 
     private function createCustomer()
     {
-        (new MysqlCustomerRepository())->save($this->createdCustomer());
+        (new MysqlCustomerRepository(new TestContainer()))->save($this->createdCustomer());
     }
 }
