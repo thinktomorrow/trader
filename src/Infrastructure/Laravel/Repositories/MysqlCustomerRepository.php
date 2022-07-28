@@ -4,19 +4,19 @@ declare(strict_types=1);
 namespace Thinktomorrow\Trader\Infrastructure\Laravel\Repositories;
 
 use Illuminate\Support\Facades\DB;
-use Ramsey\Uuid\Uuid;
 use Psr\Container\ContainerInterface;
+use Ramsey\Uuid\Uuid;
+use Thinktomorrow\Trader\Application\Customer\Read\CustomerBillingAddress;
+use Thinktomorrow\Trader\Application\Customer\Read\CustomerRead;
+use Thinktomorrow\Trader\Application\Customer\Read\CustomerReadRepository;
+use Thinktomorrow\Trader\Application\Customer\Read\CustomerShippingAddress;
 use Thinktomorrow\Trader\Domain\Common\Address\AddressType;
 use Thinktomorrow\Trader\Domain\Common\Email;
-use Thinktomorrow\Trader\Application\Customer\Read\CustomerRead;
 use Thinktomorrow\Trader\Domain\Model\Customer\Address\BillingAddress;
 use Thinktomorrow\Trader\Domain\Model\Customer\Address\ShippingAddress;
 use Thinktomorrow\Trader\Domain\Model\Customer\Customer;
 use Thinktomorrow\Trader\Domain\Model\Customer\CustomerId;
 use Thinktomorrow\Trader\Domain\Model\Customer\CustomerRepository;
-use Thinktomorrow\Trader\Application\Customer\Read\CustomerReadRepository;
-use Thinktomorrow\Trader\Application\Customer\Read\CustomerBillingAddress;
-use Thinktomorrow\Trader\Application\Customer\Read\CustomerShippingAddress;
 use Thinktomorrow\Trader\Domain\Model\Customer\Exceptions\CouldNotFindCustomer;
 
 class MysqlCustomerRepository implements CustomerRepository, CustomerReadRepository

@@ -5,14 +5,13 @@ namespace Tests\Acceptance\Customer;
 
 use Tests\Acceptance\TestCase;
 use Thinktomorrow\Trader\Application\Customer\CustomerApplication;
+use Thinktomorrow\Trader\Application\Customer\Read\CustomerReadRepository;
 use Thinktomorrow\Trader\Application\Customer\RegisterCustomer;
-use Thinktomorrow\Trader\Domain\Model\Customer\Customer;
-use Thinktomorrow\Trader\Infrastructure\Test\EventDispatcherSpy;
-use Thinktomorrow\Trader\Domain\Model\Customer\CustomerRepository;
 use Thinktomorrow\Trader\Application\Customer\UpdateBillingAddress;
 use Thinktomorrow\Trader\Application\Customer\UpdateShippingAddress;
-use Thinktomorrow\Trader\Domain\Model\Customer\Address\BillingAddress;
-use Thinktomorrow\Trader\Application\Customer\Read\CustomerReadRepository;
+use Thinktomorrow\Trader\Domain\Model\Customer\Customer;
+use Thinktomorrow\Trader\Domain\Model\Customer\CustomerRepository;
+use Thinktomorrow\Trader\Infrastructure\Test\EventDispatcherSpy;
 use Thinktomorrow\Trader\Infrastructure\Test\Repositories\InMemoryCustomerRepository;
 
 abstract class CustomerContext extends TestCase
