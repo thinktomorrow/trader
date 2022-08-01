@@ -6,6 +6,7 @@ namespace Thinktomorrow\Trader\Infrastructure\Laravel;
 use Illuminate\Support\Arr;
 use Illuminate\Support\ServiceProvider;
 use Thinktomorrow\Trader\Application\Cart\Read\Cart;
+use Thinktomorrow\Trader\Domain\Model\Country\CountryRepository;
 use Thinktomorrow\Trader\Application\Cart\Read\CartBillingAddress;
 use Thinktomorrow\Trader\Application\Cart\Read\CartDiscount;
 use Thinktomorrow\Trader\Application\Cart\Read\CartLine;
@@ -14,6 +15,9 @@ use Thinktomorrow\Trader\Application\Cart\Read\CartRepository;
 use Thinktomorrow\Trader\Application\Cart\Read\CartShipping;
 use Thinktomorrow\Trader\Application\Cart\Read\CartShippingAddress;
 use Thinktomorrow\Trader\Application\Cart\Read\CartShopper;
+use Thinktomorrow\Trader\Application\Customer\Read\CustomerReadRepository;
+use Thinktomorrow\Trader\Application\Customer\Read\CustomerBillingAddress;
+use Thinktomorrow\Trader\Application\Customer\Read\CustomerShippingAddress;
 use Thinktomorrow\Trader\Application\Cart\ShippingProfile\ShippingProfileForCart;
 use Thinktomorrow\Trader\Application\Cart\ShippingProfile\ShippingProfileForCartRepository;
 use Thinktomorrow\Trader\Application\Cart\VariantForCart\VariantForCart;
@@ -40,6 +44,8 @@ use Thinktomorrow\Trader\Application\Product\OptionLinks\OptionLink;
 use Thinktomorrow\Trader\Application\Product\ProductDetail\ProductDetail;
 use Thinktomorrow\Trader\Application\Product\ProductDetail\ProductDetailRepository;
 use Thinktomorrow\Trader\Application\Promo\OrderPromo\Conditions\MinimumAmountOrderCondition;
+use Thinktomorrow\Trader\Infrastructure\Laravel\Models\CustomerRead\DefaultCustomerBillingAddress;
+use Thinktomorrow\Trader\Infrastructure\Laravel\Models\CustomerRead\DefaultCustomerShippingAddress;
 use Thinktomorrow\Trader\Application\Promo\OrderPromo\Conditions\MinimumLinesQuantityOrderCondition;
 use Thinktomorrow\Trader\Application\Promo\OrderPromo\Discounts\FixedAmountOrderDiscount;
 use Thinktomorrow\Trader\Application\Promo\OrderPromo\Discounts\PercentageOffOrderDiscount;
@@ -147,6 +153,9 @@ class TraderServiceProvider extends ServiceProvider
         $this->app->bind(RedirectRepository::class, MysqlRedirectRepository::class);
 
         // Order repositories
+        $this->app->bind(ShippingCountryRepository::class, MysqlShippingProfileRepository::class);
+        $this->app->bind(BillingCountryRepository::class, MysqlCountryRepository::class);
+        $this->app->bind(CountryRepository::class, MysqlCountryRepository::class);
         $this->app->bind(CartRepository::class, MysqlCartRepository::class);
         $this->app->bind(ShippingProfileForCartRepository::class, MysqlShippingProfileRepository::class);
         $this->app->bind(PromoRepository::class, MysqlPromoRepository::class);
@@ -154,12 +163,13 @@ class TraderServiceProvider extends ServiceProvider
         $this->app->bind(OrderRepository::class, MysqlOrderRepository::class);
         $this->app->bind(ShippingProfileRepository::class, MysqlShippingProfileRepository::class);
         $this->app->bind(PaymentMethodRepository::class, MysqlPaymentMethodRepository::class);
-        $this->app->bind(CustomerRepository::class, MysqlCustomerRepository::class);
-        $this->app->bind(CustomerLoginRepository::class, MysqlCustomerLoginRepository::class);
-        $this->app->bind(ShippingCountryRepository::class, MysqlShippingProfileRepository::class);
-        $this->app->bind(BillingCountryRepository::class, MysqlCountryRepository::class);
         $this->app->bind(MerchantOrderRepository::class, MysqlMerchantOrderRepository::class);
         $this->app->bind(\Thinktomorrow\Trader\Application\Order\Grid\GridRepository::class, MysqlOrderGridRepository::class);
+
+        // Customer repositories
+        $this->app->bind(CustomerRepository::class, MysqlCustomerRepository::class);
+        $this->app->bind(CustomerLoginRepository::class, MysqlCustomerLoginRepository::class);
+        $this->app->bind(CustomerReadRepository::class, MysqlCustomerRepository::class);
 
         // Product models
         $this->app->bind(GridItem::class, DefaultGridItem::class);
@@ -191,7 +201,9 @@ class TraderServiceProvider extends ServiceProvider
         $this->app->bind(MerchantOrderPayment::class, DefaultMerchantOrderPayment::class);
 
         // Customer models
-        $this->app->bind(CustomerRead::class, DefaultCustomerRead::class);
+        $this->app->bind(CustomerRead::class, fn() => DefaultCustomerRead::class);
+        $this->app->bind(CustomerBillingAddress::class, fn() => DefaultCustomerBillingAddress::class);
+        $this->app->bind(CustomerShippingAddress::class, fn() => DefaultCustomerShippingAddress::class);
 
         $this->registerPromoConditionsAndDiscounts();
         $this->registerStateMachines();

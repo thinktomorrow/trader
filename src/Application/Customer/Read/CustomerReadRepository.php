@@ -7,5 +7,5 @@ use Thinktomorrow\Trader\Domain\Model\Customer\CustomerId;
 
 interface CustomerReadRepository
 {
-    public function findCustomer(CustomerId $orderId): CustomerRead;
+    public function findCustomer(CustomerId $customerId): CustomerRead;
 }
