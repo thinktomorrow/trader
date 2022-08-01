@@ -41,7 +41,9 @@ class DefaultCart implements Cart
     // General flag for all line prices to render with or without tax.
     protected bool $include_tax = true;
 
-    final private function __construct(){}
+    final private function __construct()
+    {
+    }
 
     public static function fromMappedData(array $state, array $childObjects, array $discounts): static
     {

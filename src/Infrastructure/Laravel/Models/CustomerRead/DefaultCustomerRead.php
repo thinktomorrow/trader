@@ -20,7 +20,9 @@ final class DefaultCustomerRead implements CustomerRead
     private bool $is_business;
     private array $data;
 
-    final private function __construct(){}
+    final private function __construct()
+    {
+    }
 
     public static function fromMappedData(array $state, array $childObjects): static
     {

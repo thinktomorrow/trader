@@ -25,7 +25,9 @@ class DefaultGridItem implements GridItem
     private array $data;
     private iterable $images;
 
-    final private function __construct(){}
+    final private function __construct()
+    {
+    }
 
     public static function fromMappedData(array $state): static
     {

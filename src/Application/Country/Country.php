@@ -12,7 +12,9 @@ class Country
 
     public readonly CountryId $countryId;
 
-    final private function __construct(){}
+    final private function __construct()
+    {
+    }
 
     public function getLabel(): string
     {

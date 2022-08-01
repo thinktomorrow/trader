@@ -12,6 +12,6 @@ trait RendersData
             $language = $this->getLocale()->getLanguage();
         }
 
-        return DataRenderer::get($data ?? ($this->data ?? [] ), $key, $language, $default);
+        return DataRenderer::get($data ?? ($this->data ?? []), $key, $language, $default);
     }
 }
