@@ -9,7 +9,7 @@ use Thinktomorrow\Trader\Application\Customer\Read\CustomerRead;
 use Thinktomorrow\Trader\Application\Customer\Read\CustomerShippingAddress;
 use Thinktomorrow\Trader\Domain\Common\Locale;
 
-final class DefaultCustomerRead implements CustomerRead
+class DefaultCustomerRead implements CustomerRead
 {
     use RendersData;
 
