@@ -36,6 +36,9 @@ use Thinktomorrow\Trader\Domain\Model\Product\Option\Option;
 use Thinktomorrow\Trader\Domain\Model\Product\Option\OptionId;
 use Thinktomorrow\Trader\Domain\Model\Product\Option\OptionValue;
 use Thinktomorrow\Trader\Domain\Model\Product\Option\OptionValueId;
+use Thinktomorrow\Trader\Domain\Model\Product\Personalisation\Personalisation;
+use Thinktomorrow\Trader\Domain\Model\Product\Personalisation\PersonalisationId;
+use Thinktomorrow\Trader\Domain\Model\Product\Personalisation\PersonalisationType;
 use Thinktomorrow\Trader\Domain\Model\Product\Product;
 use Thinktomorrow\Trader\Domain\Model\Product\ProductId;
 use Thinktomorrow\Trader\Domain\Model\Product\ProductRepository;
@@ -53,9 +56,6 @@ use Thinktomorrow\Trader\Domain\Model\ShippingProfile\ShippingProfile;
 use Thinktomorrow\Trader\Domain\Model\ShippingProfile\ShippingProfileState;
 use Thinktomorrow\Trader\Domain\Model\ShippingProfile\Tariff;
 use Throwable;
-use Thinktomorrow\Trader\Domain\Model\Product\Personalisation\Personalisation;
-use Thinktomorrow\Trader\Domain\Model\Product\Personalisation\PersonalisationId;
-use Thinktomorrow\Trader\Domain\Model\Product\Personalisation\PersonalisationType;
 
 trait TestHelpers
 {

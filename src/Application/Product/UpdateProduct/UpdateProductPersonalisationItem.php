@@ -3,7 +3,6 @@ declare(strict_types=1);
 
 namespace Thinktomorrow\Trader\Application\Product\UpdateProduct;
 
-use Assert\Assertion;
 use Thinktomorrow\Trader\Domain\Model\Product\Personalisation\PersonalisationId;
 use Thinktomorrow\Trader\Domain\Model\Product\Personalisation\PersonalisationType;
 

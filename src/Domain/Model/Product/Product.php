@@ -10,9 +10,9 @@ use Thinktomorrow\Trader\Domain\Model\Product\Events\ProductCreated;
 use Thinktomorrow\Trader\Domain\Model\Product\Events\ProductDataUpdated;
 use Thinktomorrow\Trader\Domain\Model\Product\Option\Option;
 use Thinktomorrow\Trader\Domain\Model\Product\Option\OptionValue;
+use Thinktomorrow\Trader\Domain\Model\Product\Personalisation\Personalisation;
 use Thinktomorrow\Trader\Domain\Model\Product\Variant\Variant;
 use Thinktomorrow\Trader\Domain\Model\Taxon\TaxonId;
-use Thinktomorrow\Trader\Domain\Model\Product\Personalisation\Personalisation;
 
 class Product implements Aggregate
 {

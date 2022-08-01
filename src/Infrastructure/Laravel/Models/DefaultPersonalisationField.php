@@ -5,8 +5,8 @@ namespace Thinktomorrow\Trader\Infrastructure\Laravel\Models;
 
 use Thinktomorrow\Trader\Application\Common\HasLocale;
 use Thinktomorrow\Trader\Application\Common\RendersData;
-use Thinktomorrow\Trader\Domain\Model\Product\Personalisation\Personalisation;
 use Thinktomorrow\Trader\Application\Product\Personalisations\PersonalisationField;
+use Thinktomorrow\Trader\Domain\Model\Product\Personalisation\Personalisation;
 
 class DefaultPersonalisationField implements PersonalisationField
 {

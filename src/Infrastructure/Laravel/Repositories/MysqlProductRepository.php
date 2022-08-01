@@ -9,12 +9,12 @@ use Ramsey\Uuid\Uuid;
 use Thinktomorrow\Trader\Application\Common\TraderHelpers;
 use Thinktomorrow\Trader\Domain\Model\Product\Exceptions\CouldNotFindProduct;
 use Thinktomorrow\Trader\Domain\Model\Product\Option\Option;
+use Thinktomorrow\Trader\Domain\Model\Product\Personalisation\Personalisation;
 use Thinktomorrow\Trader\Domain\Model\Product\Product;
 use Thinktomorrow\Trader\Domain\Model\Product\ProductId;
 use Thinktomorrow\Trader\Domain\Model\Product\ProductRepository;
 use Thinktomorrow\Trader\Domain\Model\Product\Variant\Variant;
 use Thinktomorrow\Trader\Domain\Model\Product\VariantRepository;
-use Thinktomorrow\Trader\Domain\Model\Product\Personalisation\Personalisation;
 
 class MysqlProductRepository implements ProductRepository
 {
@@ -95,7 +95,6 @@ class MysqlProductRepository implements ProductRepository
             ->delete();
 
         foreach ($product->getChildEntities()[Personalisation::class] as $i => $personalisationState) {
-
             DB::table(static::$personalisationTable)
                 ->updateOrInsert([
                     'product_id' => $product->productId->get(),
@@ -210,12 +209,12 @@ class MysqlProductRepository implements ProductRepository
             ->orderBy(static::$personalisationTable . '.order_column')
             ->orderBy('order_column')
             ->get()
-            ->map(fn($item) => (array) $item)
+            ->map(fn ($item) => (array) $item)
             ->toArray();
 
         return Product::fromMappedData($productState, [
             Variant::class => $variantStates,
-            Option::class  => $optionStates,
+            Option::class => $optionStates,
             Personalisation::class => $personalisationStates,
         ]);
     }

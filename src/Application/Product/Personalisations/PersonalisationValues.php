@@ -3,9 +3,9 @@ declare(strict_types=1);
 
 namespace Thinktomorrow\Trader\Application\Product\Personalisations;
 
+use Thinktomorrow\Trader\Domain\Model\Product\Personalisation\Personalisation;
 use Thinktomorrow\Trader\Domain\Model\Product\ProductId;
 use Thinktomorrow\Trader\Domain\Model\Product\ProductRepository;
-use Thinktomorrow\Trader\Domain\Model\Product\Personalisation\Personalisation;
 
 class PersonalisationValues
 {

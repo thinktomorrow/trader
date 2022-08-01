@@ -4,9 +4,9 @@ declare(strict_types=1);
 namespace Tests\Acceptance\Product;
 
 use Tests\TestHelpers;
-use Thinktomorrow\Trader\Domain\Model\Product\Personalisation\PersonalisationType;
 use Thinktomorrow\Trader\Application\Product\UpdateProduct\UpdateProductPersonalisations;
 use Thinktomorrow\Trader\Domain\Model\Product\Personalisation\Personalisation;
+use Thinktomorrow\Trader\Domain\Model\Product\Personalisation\PersonalisationType;
 
 class UpdateProductPersonalisationsTest extends ProductContext
 {
