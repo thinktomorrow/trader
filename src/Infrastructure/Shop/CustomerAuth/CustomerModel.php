@@ -12,6 +12,9 @@ use Illuminate\Notifications\Notifiable;
 use Thinktomorrow\Trader\Infrastructure\Shop\CustomerAuth\Notifications\ResetCustomerPasswordNotification;
 use Thinktomorrow\Trader\TraderConfig;
 
+/**
+ * @property string $customer_id
+ */
 class CustomerModel extends Model implements AuthenticatableContract, CanResetPasswordContract
 {
     use Authenticatable;

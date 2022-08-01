@@ -21,9 +21,7 @@ class DefaultVariantForCart implements VariantForCart
     private VariantUnitPrice $variantUnitPrice;
     private VariantSalePrice $variantSalePrice;
 
-    private function __construct()
-    {
-    }
+    final private function __construct(){}
 
     public static function fromMappedData(array $state): static
     {

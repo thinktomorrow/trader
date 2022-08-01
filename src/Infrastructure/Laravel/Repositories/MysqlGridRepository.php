@@ -33,7 +33,6 @@ class MysqlGridRepository implements GridRepository
     public function __construct(ContainerInterface $container, TraderConfig $traderConfig, FlattenedTaxonIdsComposer $flattenedTaxonIds)
     {
         $this->container = $container;
-        $this->traderConfig = $traderConfig;
         $this->flattenedTaxonIds = $flattenedTaxonIds;
         $this->locale = $traderConfig->getDefaultLocale();
 

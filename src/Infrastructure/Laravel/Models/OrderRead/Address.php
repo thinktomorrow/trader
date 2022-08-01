@@ -16,6 +16,8 @@ abstract class Address
     protected ?string $postalCode;
     protected ?string $city;
 
+    final public function __construct(){}
+
     public static function fromMappedData(array $state, array $orderState): static
     {
         $address = new static();

@@ -24,6 +24,8 @@ class DefaultOrderGridItem implements GridItem
     protected ?string $shopperEmail;
     protected ?string $customer_id;
 
+    final private function __construct(){}
+
     public static function fromMappedData(array $state, array $shopperState): static
     {
         $gridItem = new static();

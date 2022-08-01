@@ -47,6 +47,7 @@ abstract class OrderRead
     // General flag for all line prices to render with or without tax.
     protected bool $include_tax = true;
 
+    final public function __construct(){}
 
     public static function fromMappedData(array $state, array $childObjects, array $discounts): static
     {

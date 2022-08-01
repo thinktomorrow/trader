@@ -3,13 +3,9 @@ declare(strict_types=1);
 
 namespace Thinktomorrow\Trader\Infrastructure\Test\Repositories;
 
-use Thinktomorrow\Trader\Application\Cart\RefreshCart\Adjusters\FindSuitableShippingProfile;
 use Thinktomorrow\Trader\Application\Cart\ShippingProfile\ShippingProfileForCartRepository;
 use Thinktomorrow\Trader\Application\Country\ShippingCountryRepository;
-use Thinktomorrow\Trader\Domain\Common\Price\ConvertsToMoney;
-use Thinktomorrow\Trader\Domain\Model\Country\Country;
 use Thinktomorrow\Trader\Domain\Model\Country\CountryId;
-use Thinktomorrow\Trader\Domain\Model\Order\Shipping\ShippingId;
 use Thinktomorrow\Trader\Domain\Model\ShippingProfile\Exceptions\CouldNotFindShippingProfile;
 use Thinktomorrow\Trader\Domain\Model\ShippingProfile\ShippingProfile;
 use Thinktomorrow\Trader\Domain\Model\ShippingProfile\ShippingProfileId;
@@ -18,7 +14,7 @@ use Thinktomorrow\Trader\Domain\Model\ShippingProfile\ShippingProfileState;
 use Thinktomorrow\Trader\Domain\Model\ShippingProfile\TariffId;
 use Thinktomorrow\Trader\Infrastructure\Laravel\Models\DefaultShippingProfileForCart;
 
-final class InMemoryShippingProfileRepository implements ShippingProfileRepository, ShippingProfileForCartRepository, ShippingCountryRepository, FindSuitableShippingProfile
+final class InMemoryShippingProfileRepository implements ShippingProfileRepository, ShippingProfileForCartRepository, ShippingCountryRepository
 {
     /** @var ShippingProfile[] */
     private static array $shippingProfiles = [];
@@ -63,11 +59,6 @@ final class InMemoryShippingProfileRepository implements ShippingProfileReposito
     public static function clear()
     {
         static::$shippingProfiles = [];
-    }
-
-    public function findMatch(ShippingId $shippingId, ConvertsToMoney $subTotal, Country $country, \DateTimeImmutable $date): ShippingProfile
-    {
-        // TODO: Implement findMatch() method.
     }
 
     public function getAvailableShippingCountries(): iterable

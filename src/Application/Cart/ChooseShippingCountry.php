@@ -3,18 +3,18 @@ declare(strict_types=1);
 
 namespace Thinktomorrow\Trader\Application\Cart;
 
-use Thinktomorrow\Trader\Domain\Model\Order\Address\ShippingCountry;
 use Thinktomorrow\Trader\Domain\Model\Order\OrderId;
+use Thinktomorrow\Trader\Domain\Model\Country\CountryId;
 
 final class ChooseShippingCountry
 {
     private string $orderId;
-    private string $country;
+    private string $countryId;
 
-    public function __construct(string $orderId, string $country)
+    public function __construct(string $orderId, string $countryId)
     {
         $this->orderId = $orderId;
-        $this->country = $country;
+        $this->countryId = $countryId;
     }
 
     public function getOrderId(): OrderId
@@ -22,8 +22,8 @@ final class ChooseShippingCountry
         return OrderId::fromString($this->orderId);
     }
 
-    public function getShippingCountry(): ShippingCountry
+    public function getCountryId(): CountryId
     {
-        return ShippingCountry::fromString($this->country);
+        return CountryId::fromString($this->countryId);
     }
 }

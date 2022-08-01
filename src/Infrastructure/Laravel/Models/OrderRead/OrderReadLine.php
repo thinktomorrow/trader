@@ -33,6 +33,8 @@ abstract class OrderReadLine
     protected bool $include_tax = true;
     protected iterable $images;
 
+    final public function __construct(){}
+
     public static function fromMappedData(array $state, array $orderState, iterable $discounts): static
     {
         $line = new static();

@@ -17,6 +17,8 @@ abstract class OrderReadShopper
     protected Locale $shopperLocale;
     protected array $data;
 
+    final public function __construct(){}
+
     public static function fromMappedData(array $state, array $orderState): static
     {
         $shopper = new static();
