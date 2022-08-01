@@ -72,5 +72,6 @@ final class ProductRepositoryTest extends TestCase
         yield [$this->createdProduct()];
         yield [$this->createdProductWithVariant()];
         yield [$this->createdProductWithOption()];
+        yield [$this->createdProductWithPersonalisations()];
     }
 }

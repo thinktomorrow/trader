@@ -53,6 +53,9 @@ use Thinktomorrow\Trader\Domain\Model\ShippingProfile\ShippingProfile;
 use Thinktomorrow\Trader\Domain\Model\ShippingProfile\ShippingProfileState;
 use Thinktomorrow\Trader\Domain\Model\ShippingProfile\Tariff;
 use Throwable;
+use Thinktomorrow\Trader\Domain\Model\Product\Personalisation\Personalisation;
+use Thinktomorrow\Trader\Domain\Model\Product\Personalisation\PersonalisationId;
+use Thinktomorrow\Trader\Domain\Model\Product\Personalisation\PersonalisationType;
 
 trait TestHelpers
 {
@@ -354,6 +357,25 @@ trait TestHelpers
                 'en' => 'option value en',
             ],
         ])]);
+
+        $variant = $this->createdVariantWithOption();
+        $product->createVariant($variant);
+
+        return $product;
+    }
+
+    protected function createdProductWithPersonalisations(): Product
+    {
+        $product = $this->createdProduct();
+
+        $product->updatePersonalisations([
+            Personalisation::create(
+                $product->productId,
+                PersonalisationId::fromString('ooo'),
+                PersonalisationType::fromString(PersonalisationType::TEXT),
+                ['foo' => 'bar']
+            ),
+        ]);
 
         $variant = $this->createdVariantWithOption();
         $product->createVariant($variant);

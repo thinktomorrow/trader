@@ -5,6 +5,7 @@ namespace Thinktomorrow\Trader\Application\Cart;
 
 use Psr\Container\ContainerInterface;
 use Thinktomorrow\Trader\Application\Cart\Line\AddLine;
+use Thinktomorrow\Trader\Application\Cart\Line\ChangeLineData;
 use Thinktomorrow\Trader\Application\Cart\Line\AddLineToNewOrder;
 use Thinktomorrow\Trader\Application\Cart\Line\ChangeLineQuantity;
 use Thinktomorrow\Trader\Application\Cart\Line\RemoveLine;
@@ -147,6 +148,18 @@ final class CartApplication
             $changeLineQuantity->getLineId(),
             $changeLineQuantity->getQuantity()
         );
+
+        $this->orderRepository->save($order);
+
+        $this->eventDispatcher->dispatchAll($order->releaseEvents());
+    }
+
+    public function changeLineData(ChangeLineData $changeLineData): void
+    {
+        $order = $this->orderRepository->findForCart($changeLineData->getOrderId());
+
+        $line = $order->findLine($changeLineData->getLineId());
+        $line->addData($changeLineData->getData());
 
         $this->orderRepository->save($order);
 

@@ -80,6 +80,16 @@ class CreateBasicTraderTables extends Migration
             $table->foreign('option_value_id')->references('option_value_id')->on('trader_product_option_values')->onDelete('cascade');
         });
 
+        Schema::create(static::PREFIX.'product_personalisations', function (Blueprint $table) {
+            $table->char('personalisation_id', 36)->primary();
+            $table->char('product_id', 36);
+            $table->string('personalisation_type');
+            $table->json('data')->nullable();
+            $table->unsignedInteger('order_column')->default(0);
+
+            $table->foreign('product_id')->references('product_id')->on('trader_products')->onDelete('cascade');
+        });
+
         Schema::create(static::PREFIX.'taxa', function (Blueprint $table) {
             $table->char('taxon_id', 36)->primary();
             $table->char('parent_id', 36)->nullable()->index();

@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace Thinktomorrow\Trader\Application\Product;
 
 use Thinktomorrow\Trader\Application\Product\UpdateProduct\UpdateProductData;
+use Thinktomorrow\Trader\Domain\Model\Product\Personalisation\Personalisation;
 use Thinktomorrow\Trader\Application\Product\UpdateProduct\UpdateProductOptions;
 use Thinktomorrow\Trader\Application\Product\UpdateProduct\UpdateProductTaxa;
 use Thinktomorrow\Trader\Application\Product\UpdateVariant\UpdateVariantOptionValues;
@@ -18,6 +19,7 @@ use Thinktomorrow\Trader\Domain\Model\Product\Variant\Variant;
 use Thinktomorrow\Trader\Domain\Model\Product\Variant\VariantId;
 use Thinktomorrow\Trader\Domain\Model\Product\VariantRepository;
 use Thinktomorrow\Trader\TraderConfig;
+use Thinktomorrow\Trader\Application\Product\UpdateProduct\UpdateProductPersonalisations;
 
 class ProductApplication
 {
@@ -136,6 +138,29 @@ class ProductApplication
         $variant = $product->findVariant($updateVariantOptionValues->getVariantId());
         $variant->updateOptionValueIds($updateVariantOptionValues->getOptionValueIds());
         $product->updateVariant($variant);
+
+        $this->productRepository->save($product);
+
+        $this->eventDispatcher->dispatchAll($product->releaseEvents());
+    }
+
+    public function updateProductPersonalisations(UpdateProductPersonalisations $updateProductPersonalisations): void
+    {
+        $product = $this->productRepository->find($updateProductPersonalisations->getProductId());
+        $personalisations = [];
+
+        foreach ($updateProductPersonalisations->getPersonalisations() as $personalisationItem) {
+            $personalisation = Personalisation::create(
+                $product->productId,
+                $personalisationItem->getPersonalisationId() ?: $product->getNextPersonalisationId(),
+                $personalisationItem->getPersonalisationType(),
+                $personalisationItem->getData()
+            );
+
+            $personalisations[] = $personalisation;
+        }
+
+        $product->updatePersonalisations($personalisations);
 
         $this->productRepository->save($product);
 

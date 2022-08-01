@@ -12,11 +12,13 @@ use Thinktomorrow\Trader\Domain\Model\Product\Option\Option;
 use Thinktomorrow\Trader\Domain\Model\Product\Option\OptionValue;
 use Thinktomorrow\Trader\Domain\Model\Product\Variant\Variant;
 use Thinktomorrow\Trader\Domain\Model\Taxon\TaxonId;
+use Thinktomorrow\Trader\Domain\Model\Product\Personalisation\Personalisation;
 
 class Product implements Aggregate
 {
     use RecordsEvents;
     use HasOptions;
+    use HasPersonalisations;
     use HasVariants;
     use BelongsToTaxa;
     use HasData{
@@ -78,6 +80,10 @@ class Product implements Aggregate
                 array_merge($option->getMappedData(), ['values' => $option->getChildEntities()[OptionValue::class]]),
                 array_values($this->options)
             ),
+            Personalisation::class => array_map(
+                fn (Personalisation $personalisation) => $personalisation->getMappedData(),
+                array_values($this->personalisations)
+            ),
         ];
     }
 
@@ -94,6 +100,12 @@ class Product implements Aggregate
         if (array_key_exists(Option::class, $childEntities)) {
             foreach ($childEntities[Option::class] as $optionState) {
                 $product->options[] = Option::fromMappedData($optionState, $state, [OptionValue::class => $optionState['values']]);
+            }
+        }
+
+        if (array_key_exists(Personalisation::class, $childEntities)) {
+            foreach ($childEntities[Personalisation::class] as $personalisationState) {
+                $product->personalisations[] = Personalisation::fromMappedData($personalisationState, $state);
             }
         }
 

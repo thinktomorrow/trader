@@ -14,6 +14,7 @@ use Thinktomorrow\Trader\Domain\Model\Product\ProductId;
 use Thinktomorrow\Trader\Domain\Model\Product\ProductRepository;
 use Thinktomorrow\Trader\Domain\Model\Product\Variant\Variant;
 use Thinktomorrow\Trader\Domain\Model\Product\VariantRepository;
+use Thinktomorrow\Trader\Domain\Model\Product\Personalisation\Personalisation;
 
 class MysqlProductRepository implements ProductRepository
 {
@@ -25,7 +26,7 @@ class MysqlProductRepository implements ProductRepository
 
     private static string $optionTable = 'trader_product_options';
     private static string $optionValueTable = 'trader_product_option_values';
-    private static string $variantOptionValueLookupTable = 'trader_variant_option_values';
+    private static string $personalisationTable = 'trader_product_personalisations';
 
     public function __construct(VariantRepository $variantRepository)
     {
@@ -48,11 +49,10 @@ class MysqlProductRepository implements ProductRepository
             DB::table(static::$productTable)->where('product_id', $product->productId->get())->update($state);
         }
 
-        // TODO: upsertOptions and option values
-
         $this->upsertOptions($product);
         $this->syncTaxonIds($product->productId, $taxon_ids);
         $this->upsertVariants($product);
+        $this->upsertPersonalisations($product);
     }
 
     private function upsertOptions(Product $product): void
@@ -82,6 +82,25 @@ class MysqlProductRepository implements ProductRepository
                         'option_value_id' => $option_value['option_value_id'],
                     ], array_merge($option_value, ['order_column' => $j]));
             }
+        }
+    }
+
+    private function upsertPersonalisations(Product $product): void
+    {
+        $personalisation_ids = array_map(fn ($personalisationState) => $personalisationState['personalisation_id'], $product->getChildEntities()[Personalisation::class]);
+
+        DB::table(static::$personalisationTable)
+            ->where('product_id', $product->productId)
+            ->whereNotIn('personalisation_id', $personalisation_ids)
+            ->delete();
+
+        foreach ($product->getChildEntities()[Personalisation::class] as $i => $personalisationState) {
+
+            DB::table(static::$personalisationTable)
+                ->updateOrInsert([
+                    'product_id' => $product->productId->get(),
+                    'personalisation_id' => $personalisationState['personalisation_id'],
+                ], array_merge($personalisationState, ['order_column' => $i]));
         }
     }
 
@@ -186,9 +205,18 @@ class MysqlProductRepository implements ProductRepository
             })
             ->toArray();
 
+        $personalisationStates = DB::table(static::$personalisationTable)
+            ->where(static::$personalisationTable . '.product_id', $productId->get())
+            ->orderBy(static::$personalisationTable . '.order_column')
+            ->orderBy('order_column')
+            ->get()
+            ->map(fn($item) => (array) $item)
+            ->toArray();
+
         return Product::fromMappedData($productState, [
             Variant::class => $variantStates,
-            Option::class => $optionStates,
+            Option::class  => $optionStates,
+            Personalisation::class => $personalisationStates,
         ]);
     }
 

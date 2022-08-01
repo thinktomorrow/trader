@@ -15,6 +15,8 @@ use Thinktomorrow\Trader\Application\Cart\Read\CartShipping;
 use Thinktomorrow\Trader\Application\Cart\Read\CartShippingAddress;
 use Thinktomorrow\Trader\Application\Cart\Read\CartShopper;
 use Thinktomorrow\Trader\Application\Cart\ShippingProfile\ShippingProfileForCart;
+use Thinktomorrow\Trader\Application\Product\Personalisations\PersonalisationField;
+use Thinktomorrow\Trader\Infrastructure\Laravel\Models\DefaultPersonalisationField;
 use Thinktomorrow\Trader\Application\Cart\ShippingProfile\ShippingProfileForCartRepository;
 use Thinktomorrow\Trader\Application\Cart\VariantForCart\VariantForCart;
 use Thinktomorrow\Trader\Application\Cart\VariantForCart\VariantForCartRepository;
@@ -172,33 +174,34 @@ class TraderServiceProvider extends ServiceProvider
         $this->app->bind(CustomerReadRepository::class, MysqlCustomerRepository::class);
 
         // Product models
-        $this->app->bind(GridItem::class, DefaultGridItem::class);
-        $this->app->bind(ProductDetail::class, DefaultProductDetail::class);
-        $this->app->bind(OptionLink::class, DefaultOptionLink::class);
-        $this->app->bind(TaxonNode::class, DefaultTaxonNode::class);
-        $this->app->bind(VariantForCart::class, DefaultVariantForCart::class);
+        $this->app->bind(GridItem::class, fn() => DefaultGridItem::class);
+        $this->app->bind(ProductDetail::class, fn() => DefaultProductDetail::class);
+        $this->app->bind(OptionLink::class, fn() => DefaultOptionLink::class);
+        $this->app->bind(PersonalisationField::class, fn() => DefaultPersonalisationField::class);
+        $this->app->bind(TaxonNode::class, fn() => DefaultTaxonNode::class);
+        $this->app->bind(VariantForCart::class, fn() => DefaultVariantForCart::class);
 
         // Order models
-        $this->app->bind(\Thinktomorrow\Trader\Application\Order\Grid\GridItem::class, DefaultOrderGridItem::class);
-        $this->app->bind(Cart::class, DefaultCart::class);
-        $this->app->bind(CartLine::class, DefaultCartLine::class);
-        $this->app->bind(CartDiscount::class, DefaultCartDiscount::class);
-        $this->app->bind(CartShippingAddress::class, DefaultCartShippingAddress::class);
-        $this->app->bind(CartBillingAddress::class, DefaultCartBillingAddress::class);
-        $this->app->bind(CartShopper::class, DefaultCartShopper::class);
-        $this->app->bind(CartPayment::class, DefaultCartPayment::class);
-        $this->app->bind(CartShipping::class, DefaultCartShipping::class);
-        $this->app->bind(ShippingProfileForCart::class, DefaultShippingProfileForCart::class);
+        $this->app->bind(\Thinktomorrow\Trader\Application\Order\Grid\GridItem::class, fn() => DefaultOrderGridItem::class);
+        $this->app->bind(Cart::class, fn() => DefaultCart::class);
+        $this->app->bind(CartLine::class, fn() => DefaultCartLine::class);
+        $this->app->bind(CartDiscount::class, fn() => DefaultCartDiscount::class);
+        $this->app->bind(CartShippingAddress::class, fn() => DefaultCartShippingAddress::class);
+        $this->app->bind(CartBillingAddress::class, fn() => DefaultCartBillingAddress::class);
+        $this->app->bind(CartShopper::class, fn() => DefaultCartShopper::class);
+        $this->app->bind(CartPayment::class, fn() => DefaultCartPayment::class);
+        $this->app->bind(CartShipping::class, fn() => DefaultCartShipping::class);
+        $this->app->bind(ShippingProfileForCart::class, fn() => DefaultShippingProfileForCart::class);
 
         // MerchantOrder models
-        $this->app->bind(MerchantOrder::class, DefaultMerchantOrder::class);
-        $this->app->bind(MerchantOrderLine::class, DefaultMerchantOrderLine::class);
-        $this->app->bind(MerchantOrderDiscount::class, DefaultMerchantOrderDiscount::class);
-        $this->app->bind(MerchantOrderShippingAddress::class, DefaultMerchantOrderShippingAddress::class);
-        $this->app->bind(MerchantOrderBillingAddress::class, DefaultMerchantOrderBillingAddress::class);
-        $this->app->bind(MerchantOrderShopper::class, DefaultMerchantOrderShopper::class);
-        $this->app->bind(MerchantOrderShipping::class, DefaultMerchantOrderShipping::class);
-        $this->app->bind(MerchantOrderPayment::class, DefaultMerchantOrderPayment::class);
+        $this->app->bind(MerchantOrder::class, fn() => DefaultMerchantOrder::class);
+        $this->app->bind(MerchantOrderLine::class, fn() => DefaultMerchantOrderLine::class);
+        $this->app->bind(MerchantOrderDiscount::class, fn() => DefaultMerchantOrderDiscount::class);
+        $this->app->bind(MerchantOrderShippingAddress::class, fn() => DefaultMerchantOrderShippingAddress::class);
+        $this->app->bind(MerchantOrderBillingAddress::class, fn() => DefaultMerchantOrderBillingAddress::class);
+        $this->app->bind(MerchantOrderShopper::class, fn() => DefaultMerchantOrderShopper::class);
+        $this->app->bind(MerchantOrderShipping::class, fn() => DefaultMerchantOrderShipping::class);
+        $this->app->bind(MerchantOrderPayment::class, fn() => DefaultMerchantOrderPayment::class);
 
         // Customer models
         $this->app->bind(CustomerRead::class, fn () => DefaultCustomerRead::class);
