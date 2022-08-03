@@ -105,6 +105,7 @@ class ProductTest extends TestCase
             VariantId::fromString('yyy'),
             VariantUnitPrice::zero(),
             VariantSalePrice::zero(),
+            'sku',
         ));
     }
 
@@ -144,6 +145,7 @@ class ProductTest extends TestCase
             VariantId::fromString('zzz'),
             VariantUnitPrice::fromMoney(Money::EUR(10), TaxRate::fromString('20'), false),
             VariantSalePrice::fromMoney(Money::EUR(8), TaxRate::fromString('20'), false),
+            'sku',
         ));
 
         $product->deleteVariant(VariantId::fromString('zzz'));

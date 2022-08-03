@@ -45,6 +45,19 @@ class MysqlTaxonRepository implements TaxonRepository
         return Taxon::fromMappedData((array) $taxonState, []);
     }
 
+    public function findByKey(TaxonKey $taxonKey): Taxon
+    {
+        $taxonState = DB::table(static::$taxonTable)
+            ->where(static::$taxonTable . '.key', $taxonKey->get())
+            ->first();
+
+        if (! $taxonState) {
+            throw new CouldNotFindTaxon('No taxon found by key [' . $taxonKey->get() . ']');
+        }
+
+        return Taxon::fromMappedData((array) $taxonState, []);
+    }
+
     public function getByParentId(TaxonId $taxonId): array
     {
         $taxonStates = DB::table(static::$taxonTable)

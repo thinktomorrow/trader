@@ -50,8 +50,10 @@ class ProductApplication
             $this->variantRepository->nextReference(),
             $createProduct->getUnitPrice($this->traderConfig->doesPriceInputIncludesVat(), $this->traderConfig->getDefaultCurrency()),
             $createProduct->getSalePrice($this->traderConfig->doesPriceInputIncludesVat(), $this->traderConfig->getDefaultCurrency()),
+            $createProduct->getSku()
         );
 
+        $variant->addData($createProduct->getVariantData());
         $variant->showInGrid();
 
         $product->createVariant($variant);
@@ -72,6 +74,7 @@ class ProductApplication
             $this->variantRepository->nextReference(),
             $createVariant->getUnitPrice($this->traderConfig->doesPriceInputIncludesVat(), $this->traderConfig->getDefaultCurrency()),
             $createVariant->getSalePrice($this->traderConfig->doesPriceInputIncludesVat(), $this->traderConfig->getDefaultCurrency()),
+            $createVariant->getSku(),
         ));
 
         $variant->addData($createVariant->getData());

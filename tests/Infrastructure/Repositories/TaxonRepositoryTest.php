@@ -35,6 +35,20 @@ final class TaxonRepositoryTest extends TestCase
      * @test
      * @dataProvider taxons
      */
+    public function it_can_save_and_find_a_taxon_by_key(Taxon $taxon)
+    {
+        foreach ($this->taxonRepositories() as $taxonRepository) {
+            $taxonRepository->save($taxon);
+            $taxon->releaseEvents();
+
+            $this->assertEquals($taxon, $taxonRepository->findByKey($taxon->taxonKey));
+        }
+    }
+
+    /**
+     * @test
+     * @dataProvider taxons
+     */
     public function it_can_delete_a_taxon(Taxon $taxon)
     {
         $taxonsNotFound = 0;

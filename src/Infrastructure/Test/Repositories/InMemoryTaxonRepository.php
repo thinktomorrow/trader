@@ -33,6 +33,17 @@ final class InMemoryTaxonRepository implements TaxonRepository
         return static::$taxons[$taxonId->get()];
     }
 
+    public function findByKey(TaxonKey $taxonKey): Taxon
+    {
+        foreach (static::$taxons as $taxon) {
+            if ($taxon->taxonKey->equals($taxonKey)) {
+                return $taxon;
+            }
+        }
+
+        throw new CouldNotFindTaxon('No taxon found by key ' . $taxonKey->get());
+    }
+
     public function getByParentId(TaxonId $taxonId): array
     {
         $output = [];

@@ -74,7 +74,7 @@ class GridRepositoryTest extends TestCase
         $gridItems = $this->getMysqlGridRepository()->filterByTerm('product one')->getResults();
 
         $this->assertCount(1, $gridItems);
-        $this->assertEquals('product one', $gridItems->first()->getTitle());
+        $this->assertEquals('variant title one', $gridItems->first()->getTitle());
     }
 
     /** @test */
@@ -83,7 +83,7 @@ class GridRepositoryTest extends TestCase
         $gridItems = $this->getMysqlGridRepository()->filterByTerm('one')->getResults();
 
         $this->assertCount(1, $gridItems);
-        $this->assertEquals('product one', $gridItems->first()->getTitle());
+        $this->assertEquals('variant title one', $gridItems->first()->getTitle());
     }
 
     /** @test */

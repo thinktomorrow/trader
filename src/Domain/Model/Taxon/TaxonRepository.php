@@ -9,6 +9,8 @@ interface TaxonRepository
 
     public function find(TaxonId $taxonId): Taxon;
 
+    public function findByKey(TaxonKey $taxonKey): Taxon;
+
     /** @return Taxon[] */
     public function getByParentId(TaxonId $taxonId): array;
 

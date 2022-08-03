@@ -15,7 +15,7 @@ class UpdateProductOptionsTest extends ProductContext
     /** @test */
     public function it_can_add_options()
     {
-        $productId = $this->createAProduct('50', ['1','2'], ['title' => ['nl' => 'foobar nl']]);
+        $productId = $this->createAProduct('50', ['1','2'], 'sku', ['title' => ['nl' => 'foobar nl']]);
 
         $dataPayload = [
             'label' => ['nl' => 'label nl'],
@@ -59,7 +59,7 @@ class UpdateProductOptionsTest extends ProductContext
     /** @test */
     public function it_can_update_existing_options()
     {
-        $productId = $this->createAProduct('50', ['1','2'], ['title' => ['nl' => 'foobar nl']]);
+        $productId = $this->createAProduct('50', ['1','2'], 'sku', ['title' => ['nl' => 'foobar nl']]);
 
         $dataPayload = [
             'label' => ['nl' => 'label nl'],
@@ -145,7 +145,7 @@ class UpdateProductOptionsTest extends ProductContext
     /** @test */
     public function it_can_remove_existing_option_values()
     {
-        $productId = $this->createAProduct('50', ['1','2'], ['title' => ['nl' => 'foobar nl']]);
+        $productId = $this->createAProduct('50', ['1','2'], 'sku', ['title' => ['nl' => 'foobar nl']]);
 
         $dataPayload = [
             'label' => ['nl' => 'label nl'],

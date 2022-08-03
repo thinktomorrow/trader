@@ -15,7 +15,7 @@ class UpdateProductPersonalisationsTest extends ProductContext
     /** @test */
     public function it_can_add_personalisations()
     {
-        $productId = $this->createAProduct('50', ['1','2'], ['title' => ['nl' => 'foobar nl']]);
+        $productId = $this->createAProduct('50', ['1','2'], 'sku', ['title' => ['nl' => 'foobar nl']]);
 
         $dataPayload = [
             'label' => ['nl' => 'label nl'],
@@ -43,7 +43,7 @@ class UpdateProductPersonalisationsTest extends ProductContext
     /** @test */
     public function it_can_update_existing_personalisations()
     {
-        $productId = $this->createAProduct('50', ['1','2'], ['title' => ['nl' => 'foobar nl']]);
+        $productId = $this->createAProduct('50', ['1','2'], 'sku', ['title' => ['nl' => 'foobar nl']]);
 
         $dataPayload = [
             'label' => ['nl' => 'label nl'],

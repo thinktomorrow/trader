@@ -35,6 +35,7 @@ class CreateBasicTraderTables extends Migration
         Schema::create(static::PREFIX.'product_variants', function (Blueprint $table) {
             $table->char('variant_id', 36)->primary();
             $table->char('product_id', 36);
+            $table->string('sku')->unique();
             $table->boolean('show_in_grid')->default(0);
             $table->string('state')->default(\Thinktomorrow\Trader\Domain\Model\Product\Variant\VariantState::available->value);
             $table->integer('sale_price')->unsigned();

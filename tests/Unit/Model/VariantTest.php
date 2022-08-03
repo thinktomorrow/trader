@@ -27,6 +27,7 @@ class VariantTest extends TestCase
                 false
             ),
             $productSalePrice = VariantSalePrice::fromMoney(Money::EUR(8), TaxRate::fromString('20'), false),
+            $sku = 'sku',
         );
 
         $this->assertEquals([
@@ -38,6 +39,7 @@ class VariantTest extends TestCase
             'tax_rate' => $productUnitPrice->getTaxRate()->toPercentage()->get(),
             'option_value_ids' => [],
             'includes_vat' => false,
+            'sku' => $sku,
             'show_in_grid' => false,
             'data' => json_encode([]),
         ], $variant->getMappedData());
@@ -99,6 +101,7 @@ class VariantTest extends TestCase
             'tax_rate' => '20',
             'option_value_ids' => ['option-value-id'],
             'includes_vat' => false,
+            'sku' => 'sku',
             'data' => json_encode(['foo' => 'bar']),
             'show_in_grid' => true,
         ], [
@@ -112,6 +115,7 @@ class VariantTest extends TestCase
         $this->assertEquals(80, $variant->getMappedData()['sale_price']);
         $this->assertEquals('20', $variant->getMappedData()['tax_rate']);
         $this->assertEquals(false, $variant->getMappedData()['includes_vat']);
+        $this->assertEquals('sku', $variant->getMappedData()['sku']);
         $this->assertEquals(['option-value-id'], $variant->getMappedData()['option_value_ids']);
         $this->assertEquals(json_encode(['foo' => 'bar']), $variant->getMappedData()['data']);
         $this->assertEquals(true, $variant->getMappedData()['show_in_grid']);
@@ -128,6 +132,7 @@ class VariantTest extends TestCase
                 false
             ),
             VariantSalePrice::fromMoney(Money::EUR(8), TaxRate::fromString('20'), false),
+            'sku',
         );
     }
 }

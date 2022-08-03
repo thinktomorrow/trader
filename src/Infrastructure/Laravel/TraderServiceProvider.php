@@ -235,16 +235,21 @@ class TraderServiceProvider extends ServiceProvider
          * first try to find localized content before fetching the defaults.
          */
         DataRenderer::setDataResolver(function (array $data, string $key, string $language = null, $default = null) {
+
+            $defaultLanguage = $this->app->make(TraderConfig::class)
+                ->getDefaultLocale()
+                ->getLanguage();
+
             if (! $language) {
-                $language = $this->app->make(TraderConfig::class)
-                    ->getDefaultLocale()
-                    ->getLanguage();
+                $language = $defaultLanguage;
             }
 
             $value = Arr::get(
                 $data,
                 $key . '.' . $language,
-                Arr::get($data, $key, $default)
+                Arr::get($data, $key . '.' . $defaultLanguage,
+                    Arr::get($data, $key, $default)
+                )
             );
 
             return $value === null ? $default :$value;

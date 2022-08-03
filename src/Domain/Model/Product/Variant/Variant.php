@@ -23,6 +23,7 @@ final class Variant implements ChildEntity
     /** @var DefaultOptionLink[] */
     private array $optionValueIds = [];
     private array $personalisations = [];
+    private string $sku;
     private bool $show_in_grid = false;
 
     private function __construct()
@@ -33,13 +34,13 @@ final class Variant implements ChildEntity
     {
         return $this->salePrice;
     }
-    
+
     public function getUnitPrice(): VariantUnitPrice
     {
         return $this->unitPrice;
     }
 
-    public static function create(ProductId $productId, VariantId $variantId, VariantUnitPrice $unitPrice, VariantSalePrice $salePrice): static
+    public static function create(ProductId $productId, VariantId $variantId, VariantUnitPrice $unitPrice, VariantSalePrice $salePrice, string $sku): static
     {
         $variant = new static();
         $variant->state = VariantState::available;
@@ -47,6 +48,7 @@ final class Variant implements ChildEntity
         $variant->variantId = $variantId;
         $variant->unitPrice = $unitPrice;
         $variant->salePrice = $salePrice;
+        $variant->sku = $sku;
 
         return $variant;
     }
@@ -94,6 +96,7 @@ final class Variant implements ChildEntity
             'sale_price' => $this->salePrice->getMoney()->getAmount(),
             'tax_rate' => $this->unitPrice->getTaxRate()->toPercentage()->get(),
             'includes_vat' => $this->unitPrice->includesVat(),
+            'sku' => $this->sku,
             'option_value_ids' => array_map(fn ($optionValueId) => $optionValueId->get(), $this->optionValueIds),
             'show_in_grid' => $this->show_in_grid,
             'data' => json_encode($this->data),
@@ -109,6 +112,7 @@ final class Variant implements ChildEntity
         $variant->state = VariantState::from($state['state']);
         $variant->unitPrice = VariantUnitPrice::fromScalars($state['unit_price'], $state['tax_rate'], $state['includes_vat']);
         $variant->salePrice = VariantSalePrice::fromScalars($state['sale_price'], $state['tax_rate'], $state['includes_vat']);
+        $variant->sku = $state['sku'];
         $variant->show_in_grid = $state['show_in_grid'] ? (bool) $state['show_in_grid'] : false;
         $variant->data = json_decode($state['data'], true);
 

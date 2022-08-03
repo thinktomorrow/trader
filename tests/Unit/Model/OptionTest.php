@@ -27,6 +27,7 @@ class OptionTest extends TestCase
                 false
             ),
             $productSalePrice = VariantSalePrice::fromMoney(Money::EUR(8), TaxRate::fromString('20'), false),
+            'sku',
         );
 
         $variant->updateOptionValueIds([

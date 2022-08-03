@@ -66,13 +66,15 @@ abstract class ProductContext extends TestCase
         $this->variantRepository->clear();
     }
 
-    protected function createAProduct(string $unitPrice, array $taxonIds, array $data = []): ProductId
+    protected function createAProduct(string $unitPrice, array $taxonIds, string $sku = 'sku', array $data = [], array $variantData = []): ProductId
     {
         $productId = $this->productApplication->createProduct(new CreateProduct(
             $taxonIds,
             $unitPrice,
             '12',
-            $data
+            $sku,
+            $data,
+            $variantData
         ));
 
         Assert::assertNotNull($product = $this->productRepository->find($productId));
@@ -87,7 +89,7 @@ abstract class ProductContext extends TestCase
         return $productId;
     }
 
-    protected function createAVariant(string $productId, string $unitPrice, string $taxRate, array $data = [], string $variantId = 'xxx-123'): VariantId
+    protected function createAVariant(string $productId, string $unitPrice, string $taxRate, array $data = [], string $variantId = 'xxx-123', string $sku = 'sku'): VariantId
     {
         InMemoryVariantRepository::setNextReference($variantId);
 
@@ -95,6 +97,7 @@ abstract class ProductContext extends TestCase
             $productId,
             $unitPrice,
             $taxRate,
+            $sku,
             $data
         ));
 

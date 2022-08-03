@@ -14,7 +14,7 @@ class UpdateProductDataTest extends ProductContext
     /** @test */
     public function it_can_add_data()
     {
-        $productId = $this->createAProduct('50', [], []);
+        $productId = $this->createAProduct('50', []);
         $dataPayload = ['foo' => 'bar'];
 
         $this->productApplication->updateProductData(new UpdateProductData($productId->get(), $dataPayload));
@@ -31,7 +31,7 @@ class UpdateProductDataTest extends ProductContext
     /** @test */
     public function it_overwrites_data_by_payload()
     {
-        $productId = $this->createAProduct('50', [], ['foo' => 'bar']);
+        $productId = $this->createAProduct('50', [], 'sku', ['foo' => 'bar']);
 
         $this->productApplication->updateProductData(new UpdateProductData($productId->get(), ['foo' => ['nl' => 'baz']]));
 
@@ -43,7 +43,7 @@ class UpdateProductDataTest extends ProductContext
     /** @test */
     public function it_does_not_remove_data_not_in_payload()
     {
-        $productId = $this->createAProduct('50', [], ['foo' => 'bar']);
+        $productId = $this->createAProduct('50', [], 'sku', ['foo' => 'bar']);
 
         $this->productApplication->updateProductData(new UpdateProductData($productId->get(), ['label' => ['nl' => 'baz']]));
 

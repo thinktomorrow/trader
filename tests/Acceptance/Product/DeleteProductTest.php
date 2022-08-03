@@ -15,7 +15,7 @@ class DeleteProductTest extends ProductContext
     /** @test */
     public function it_can_delete_product()
     {
-        $productId = $this->createAProduct('50', ['1','2'], ['title' => ['nl' => 'foobar nl']]);
+        $productId = $this->createAProduct('50', ['1','2'], 'sku', ['title' => ['nl' => 'foobar nl']]);
 
         $this->productApplication->deleteProduct(new DeleteProduct($productId->get()));
 

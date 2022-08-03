@@ -477,6 +477,7 @@ trait TestHelpers
                 false
             ),
             VariantSalePrice::fromMoney(Money::EUR(8), TaxRate::fromString('20'), false),
+            'sku',
         );
 
         $variant->updateOptionValueIds([
@@ -491,9 +492,9 @@ trait TestHelpers
         $taxonId = $taxonApplication->createTaxon(new CreateTaxon('foobar', ['title' => ['nl' => 'foobar nl']]));
         $taxonChildId = $taxonApplication->createTaxon(new CreateTaxon('foobar-child', ['title' => ['nl' => 'foobar child nl']], $taxonId->get()));
 
-        $productId = $productApplication->createProduct(new CreateProduct([$taxonId->get()], "100", "6", ['title' => ['nl' => 'product one']]));
-        $product2Id = $productApplication->createProduct(new CreateProduct([$taxonChildId->get()], "250", "12", ['title' => ['nl' => 'product two']]));
-        $product3Id = $productApplication->createProduct(new CreateProduct([], "500", "21", ['title' => ['nl' => 'product three']]));
+        $productId = $productApplication->createProduct(new CreateProduct([$taxonId->get()], "100", "6", 'sku', ['title' => ['nl' => 'product one']], [ 'title' =>  ['nl' => 'variant title one'] ]));
+        $product2Id = $productApplication->createProduct(new CreateProduct([$taxonChildId->get()], "250", "12", 'sku-2', ['title' => ['nl' => 'product two']], [ 'title' =>  ['nl' => 'variant title two'] ]));
+        $product3Id = $productApplication->createProduct(new CreateProduct([], "500", "21", 'sku-3', ['title' => ['nl' => 'product three']], [ 'title' =>  ['nl' => 'variant title three'] ]));
 
         // Set every product online
         foreach ([$productId, $product2Id, $product3Id] as $prodId) {
@@ -503,7 +504,7 @@ trait TestHelpers
             $productRepository->save($product);
         }
 
-        $productApplication->createVariant(new CreateVariant($productId->get(), "120", "6", ['title' => ['nl' => 'product one - variant two']]));
+        $productApplication->createVariant(new CreateVariant($productId->get(), "120", "6", 'sku-4', ['title' => ['nl' => 'product one - variant two']], []));
     }
 
     protected function createPromo(array $mappedData = [], array $discounts = []): Promo

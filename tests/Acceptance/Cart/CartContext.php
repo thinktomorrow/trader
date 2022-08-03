@@ -196,6 +196,7 @@ abstract class CartContext extends TestCase
                 true
             ),
             VariantSalePrice::fromMoney(Money::EUR($price * 100), TaxRate::fromString('20'), true),
+            'sku',
         );
 
         $variant->addData(['title' => ['nl' => $productTitle . ' variant']]);

@@ -12,14 +12,18 @@ class CreateProduct
     private array $taxonIds;
     private string $unitPrice;
     private string $taxRate;
+    private string $sku;
     private array $data;
+    private array $variantData;
 
-    public function __construct(array $taxonIds, string $unitPrice, string $taxRate, array $data)
+    public function __construct(array $taxonIds, string $unitPrice, string $taxRate, string $sku, array $data, array $variantData)
     {
         $this->taxonIds = $taxonIds;
         $this->unitPrice = $unitPrice;
         $this->taxRate = $taxRate;
+        $this->sku = $sku;
         $this->data = $data;
+        $this->variantData = $variantData;
     }
 
     public function getTaxonIds(): array
@@ -37,8 +41,18 @@ class CreateProduct
         return VariantSalePrice::fromScalars($this->unitPrice, $this->taxRate, $doesPriceInputIncludesVat);
     }
 
+    public function getSku(): string
+    {
+        return $this->sku;
+    }
+
     public function getData(): array
     {
         return $this->data;
+    }
+
+    public function getVariantData(): array
+    {
+        return $this->variantData;
     }
 }

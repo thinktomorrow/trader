@@ -8,7 +8,7 @@ class CreateProductTest extends ProductContext
     /** @test */
     public function it_can_create_a_product()
     {
-        $productId = $this->createAProduct('50', ['1','2'], ['title' => ['nl' => 'foobar nl']]);
+        $productId = $this->createAProduct('50', ['1','2'], 'sku', ['title' => ['nl' => 'foobar nl']]);
 
         $product = $this->productRepository->find($productId);
 
