@@ -71,7 +71,7 @@ class DefaultProductDetail implements ProductDetail
 
     public function getTitle(): string
     {
-        if(is_array($this->data('title'))) {
+        if (is_array($this->data('title'))) {
             trap($this->data);
         }
 
