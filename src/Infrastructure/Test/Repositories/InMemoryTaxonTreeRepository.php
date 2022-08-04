@@ -29,6 +29,11 @@ final class InMemoryTaxonTreeRepository implements TaxonTreeRepository, Category
         )->all());
     }
 
+    public function findTaxonById(string $id): TaxonNode
+    {
+        return $this->getTree()->find(fn (TaxonNode $taxonNode) => $taxonNode->getId() == $id);
+    }
+
     public function findTaxonByKey(string $key): TaxonNode
     {
         return $this->getTree()->find(fn (TaxonNode $taxonNode) => $taxonNode->getKey() == $key);
