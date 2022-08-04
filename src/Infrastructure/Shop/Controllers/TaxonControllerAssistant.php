@@ -25,7 +25,7 @@ trait TaxonControllerAssistant
         try {
             $taxonNode = $this->categoryRepository->findTaxonByKey($taxonKey);
 
-            if(!$taxonNode->showOnline()) {
+            if (! $taxonNode->showOnline()) {
                 throw new CouldNotFindTaxon('Taxon ' . $taxonKey . ' is offline.');
             }
 
