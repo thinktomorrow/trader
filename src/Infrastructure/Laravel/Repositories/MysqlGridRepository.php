@@ -82,7 +82,7 @@ class MysqlGridRepository implements GridRepository
 
     public function filterByProductIds(array $product_ids): static
     {
-        $this->builder->whereIn(static::$productTable.'.id', $product_ids);
+        $this->builder->whereIn(static::$productTable.'.product_id', $product_ids);
 
         return $this;
     }
