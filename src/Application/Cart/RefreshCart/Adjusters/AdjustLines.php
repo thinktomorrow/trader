@@ -38,6 +38,7 @@ class AdjustLines implements Adjuster
             // Variant can be no longer available due to stock or whatever...
             if (! in_array($variant->getState(), VariantState::availableStates())) {
                 $order->deleteLine($line->lineId);
+
                 continue;
             }
 
