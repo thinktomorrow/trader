@@ -23,7 +23,13 @@ trait TaxonControllerAssistant
         $taxonKey = urldecode($taxonKeys[count($taxonKeys) - 1]);
 
         try {
-            return $this->categoryRepository->findTaxonByKey($taxonKey);
+            $taxonNode = $this->categoryRepository->findTaxonByKey($taxonKey);
+
+            if(!$taxonNode->showOnline()) {
+                throw new CouldNotFindTaxon('Taxon ' . $taxonKey . ' is offline.');
+            }
+
+            return $taxonNode;
         } catch (CouldNotFindTaxon $e) {
             if ($redirect = $this->redirectRepository->find($taxonKey)) {
                 throw (new FoundRouteAsRedirect($this->getTaxonUrl($redirect->getFrom())))->setRedirect($this->getTaxonUrl($redirect->getTo()));
