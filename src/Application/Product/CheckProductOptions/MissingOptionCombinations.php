@@ -3,7 +3,7 @@ declare(strict_types=1);
 
 namespace Thinktomorrow\Trader\Application\Product\CheckProductOptions;
 
-use Thinktomorrow\Trader\Application\Product\OptionLinks\ProductOptionValues;
+use Thinktomorrow\Trader\Application\Product\VariantLinks\ProductOptionValues;
 use Thinktomorrow\Trader\Domain\Model\Product\Product;
 use Thinktomorrow\Trader\Domain\Model\Product\Variant\Variant;
 

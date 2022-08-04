@@ -39,7 +39,7 @@ use Thinktomorrow\Trader\Application\Product\CheckProductOptions\CheckProductOpt
 use Thinktomorrow\Trader\Application\Product\Grid\FlattenedTaxonIdsComposer;
 use Thinktomorrow\Trader\Application\Product\Grid\GridItem;
 use Thinktomorrow\Trader\Application\Product\Grid\GridRepository;
-use Thinktomorrow\Trader\Application\Product\OptionLinks\OptionLink;
+use Thinktomorrow\Trader\Application\Product\VariantLinks\VariantLink;
 use Thinktomorrow\Trader\Application\Product\Personalisations\PersonalisationField;
 use Thinktomorrow\Trader\Application\Product\ProductDetail\ProductDetail;
 use Thinktomorrow\Trader\Application\Product\ProductDetail\ProductDetailRepository;
@@ -93,7 +93,7 @@ use Thinktomorrow\Trader\Infrastructure\Laravel\Models\CustomerRead\DefaultCusto
 use Thinktomorrow\Trader\Infrastructure\Laravel\Models\CustomerRead\DefaultCustomerRead;
 use Thinktomorrow\Trader\Infrastructure\Laravel\Models\CustomerRead\DefaultCustomerShippingAddress;
 use Thinktomorrow\Trader\Infrastructure\Laravel\Models\DefaultGridItem;
-use Thinktomorrow\Trader\Infrastructure\Laravel\Models\DefaultOptionLink;
+use Thinktomorrow\Trader\Infrastructure\Laravel\Models\DefaultVariantLink;
 use Thinktomorrow\Trader\Infrastructure\Laravel\Models\DefaultOrderGridItem;
 use Thinktomorrow\Trader\Infrastructure\Laravel\Models\DefaultPersonalisationField;
 use Thinktomorrow\Trader\Infrastructure\Laravel\Models\DefaultProductDetail;
@@ -176,7 +176,7 @@ class TraderServiceProvider extends ServiceProvider
         // Product models
         $this->app->bind(GridItem::class, fn () => DefaultGridItem::class);
         $this->app->bind(ProductDetail::class, fn () => DefaultProductDetail::class);
-        $this->app->bind(OptionLink::class, fn () => DefaultOptionLink::class);
+        $this->app->bind(VariantLink::class, fn () => DefaultVariantLink::class);
         $this->app->bind(PersonalisationField::class, fn () => DefaultPersonalisationField::class);
         $this->app->bind(TaxonNode::class, fn () => DefaultTaxonNode::class);
         $this->app->bind(VariantForCart::class, fn () => DefaultVariantForCart::class);

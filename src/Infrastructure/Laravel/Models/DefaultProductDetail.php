@@ -42,7 +42,7 @@ class DefaultProductDetail implements ProductDetail
         $item->salePrice = VariantSalePrice::fromScalars($state['sale_price'], $state['tax_rate'], $state['includes_vat']);
         $item->unitPrice = VariantUnitPrice::fromScalars($state['unit_price'], $state['tax_rate'], $state['includes_vat']);
         $item->data = array_merge(
-            json_decode($state['product_data'], true),
+            ['product_data' => json_decode($state['product_data'], true)],
             json_decode($state['data'], true),
         );
 
@@ -71,15 +71,13 @@ class DefaultProductDetail implements ProductDetail
 
     public function getTitle(): string
     {
-        if(is_array($this->data('title'))) {
-            trap($this->data);
-        }
+        $productTitle = $this->data('product_data.title', null, '');
+        $variantTitle = $this->data('title');
 
-        return $this->data(
-            'title',
-            null,
-            $this->data('product_title', null, '')
-        );
+        if(!$variantTitle || $productTitle == $variantTitle) return $productTitle;
+        if(!$productTitle) return $variantTitle;
+
+        return $productTitle.' '.$variantTitle;
     }
 
     public function getIntro(): string
@@ -89,7 +87,7 @@ class DefaultProductDetail implements ProductDetail
 
     public function getContent(): string
     {
-        return $this->data('content', null, '');
+        return $this->data('product_data.content', null, '');
     }
 
     public function getSku(): string

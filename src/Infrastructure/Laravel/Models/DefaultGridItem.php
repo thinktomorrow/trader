@@ -39,7 +39,7 @@ class DefaultGridItem implements GridItem
         $item->salePrice = VariantSalePrice::fromScalars($state['sale_price'], $state['tax_rate'], $state['includes_vat']);
         $item->unitPrice = VariantUnitPrice::fromScalars($state['unit_price'], $state['tax_rate'], $state['includes_vat']);
         $item->data = array_merge(
-            json_decode($state['product_data'], true),
+            ['product_data' => json_decode($state['product_data'], true)],
             json_decode($state['data'], true),
         );
 
@@ -63,11 +63,7 @@ class DefaultGridItem implements GridItem
 
     public function getTitle(): string
     {
-        return $this->data(
-            'title',
-            null,
-            $this->data('product_title', null, '')
-        );
+        return $this->data('product_data.title', null, '');
     }
 
     public function getUrl(): string

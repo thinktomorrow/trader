@@ -8,9 +8,9 @@ use Tests\Acceptance\TestCase;
 use Thinktomorrow\Trader\Application\Product\CheckProductOptions\MissingOptionCombinations;
 use Thinktomorrow\Trader\Application\Product\CreateProduct;
 use Thinktomorrow\Trader\Application\Product\CreateVariant;
-use Thinktomorrow\Trader\Application\Product\OptionLinks\OptionLink;
-use Thinktomorrow\Trader\Application\Product\OptionLinks\OptionLinksComposer;
-use Thinktomorrow\Trader\Application\Product\OptionLinks\ProductOptionValues;
+use Thinktomorrow\Trader\Application\Product\VariantLinks\VariantLink;
+use Thinktomorrow\Trader\Application\Product\VariantLinks\VariantLinksComposer;
+use Thinktomorrow\Trader\Application\Product\VariantLinks\ProductOptionValues;
 use Thinktomorrow\Trader\Application\Product\ProductApplication;
 use Thinktomorrow\Trader\Domain\Model\Product\Events\ProductCreated;
 use Thinktomorrow\Trader\Domain\Model\Product\Events\ProductDataUpdated;
@@ -18,7 +18,7 @@ use Thinktomorrow\Trader\Domain\Model\Product\Events\ProductTaxaUpdated;
 use Thinktomorrow\Trader\Domain\Model\Product\Events\VariantCreated;
 use Thinktomorrow\Trader\Domain\Model\Product\ProductId;
 use Thinktomorrow\Trader\Domain\Model\Product\Variant\VariantId;
-use Thinktomorrow\Trader\Infrastructure\Laravel\Models\DefaultOptionLink;
+use Thinktomorrow\Trader\Infrastructure\Laravel\Models\DefaultVariantLink;
 use Thinktomorrow\Trader\Infrastructure\Test\EventDispatcherSpy;
 use Thinktomorrow\Trader\Infrastructure\Test\Repositories\InMemoryProductDetailRepository;
 use Thinktomorrow\Trader\Infrastructure\Test\Repositories\InMemoryProductRepository;
@@ -32,7 +32,7 @@ abstract class ProductContext extends TestCase
     protected InMemoryProductRepository $productRepository;
     protected InMemoryVariantRepository $variantRepository;
     protected EventDispatcherSpy $eventDispatcher;
-    protected OptionLinksComposer $productOptionsComposer;
+    protected VariantLinksComposer $productOptionsComposer;
     protected InMemoryProductDetailRepository $productDetailRepository;
 
     protected function setUp(): void
@@ -46,9 +46,9 @@ abstract class ProductContext extends TestCase
             $this->variantRepository = new InMemoryVariantRepository($this->productRepository),
         );
 
-        (new TestContainer())->add(OptionLink::class, DefaultOptionLink::class);
+        (new TestContainer())->add(VariantLink::class, DefaultVariantLink::class);
 
-        $this->productOptionsComposer = new OptionLinksComposer(
+        $this->productOptionsComposer = new VariantLinksComposer(
             $this->productRepository,
             new TestContainer(),
         );

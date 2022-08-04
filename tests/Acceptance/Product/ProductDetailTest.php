@@ -43,7 +43,7 @@ class ProductDetailTest extends ProductContext
         $this->assertEquals('€ 0,10', $productDetail->getUnitPrice(false));
         $this->assertEquals('€ 0,10', $productDetail->getSalePrice(true));
         $this->assertEquals('€ 0,08', $productDetail->getSalePrice(false));
-        $this->assertEquals('variant title nl', $productDetail->getTitle());
+        $this->assertEquals('product title nl variant title nl', $productDetail->getTitle());
         $this->assertEquals(['1','2'], $productDetail->getTaxonIds());
 
         // Taxon ids

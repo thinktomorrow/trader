@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 
-namespace Thinktomorrow\Trader\Application\Product\OptionLinks;
+namespace Thinktomorrow\Trader\Application\Product\VariantLinks;
 
 use Psr\Container\ContainerInterface;
 use Thinktomorrow\Trader\Domain\Common\Locale;
@@ -9,7 +9,7 @@ use Thinktomorrow\Trader\Domain\Model\Product\ProductId;
 use Thinktomorrow\Trader\Domain\Model\Product\ProductRepository;
 use Thinktomorrow\Trader\Domain\Model\Product\Variant\VariantId;
 
-class OptionLinksComposer
+class VariantLinksComposer
 {
     private ProductRepository $productRepository;
     private ContainerInterface $container;
@@ -24,10 +24,29 @@ class OptionLinksComposer
      * Compose all possible option combinations relative to the passed product variant. This is the action
      * used to determine the links behind each option on the product page, so we include an url as well.
      */
-    public function get(ProductId $productId, VariantId $variantId, Locale $locale): OptionLinks
+    public function get(ProductId $productId, VariantId $variantId, Locale $locale): VariantLinks
     {
         $product = $this->productRepository->find($productId);
         $variant = $product->findVariant($variantId);
+
+        $results = VariantLinks::empty();
+
+        // When there are no options set on the product, but there are multiple variants, the variants are used as links instead.
+        if(count($product->getOptions()) < 1 && count($product->getVariants()) > 1) {
+            foreach($product->getVariants() as $variant)
+            {
+                $variantLink = $this->container->get(VariantLink::class)::fromVariant($variant);
+                $variantLink->setLocale($locale);
+
+                if ($variant->variantId->equals($variantId)) {
+                    $variantLink->markActive();
+                }
+
+                $results = $results->add($variantLink);
+            }
+
+            return $results;
+        }
 
         $variantOptions = [];
         foreach ($product->getOptions() as $option) {
@@ -38,8 +57,6 @@ class OptionLinksComposer
             }
         }
 
-        $results = OptionLinks::empty();
-
         foreach ($product->getOptions() as $option) {
             foreach ($option->getOptionValues() as $optionValue) {
 
@@ -47,20 +64,20 @@ class OptionLinksComposer
                 $mergedVariantOptions = $this->addtoVariantOptions($variantOptions, $optionValue);
 
                 // Create the option link - Find a variant for this combination?
-                $optionLink = $this->container->get(OptionLink::class)::from(
+                $variantLink = $this->container->get(VariantLink::class)::fromOption(
                     $option,
                     $optionValue,
                     $this->findVariantByOptionValues($product, $mergedVariantOptions)
                 );
 
-                $optionLink->setLocale($locale);
+                $variantLink->setLocale($locale);
 
                 // If this option value also belongs to this current variant, we'll mark it as active
                 if (in_array($optionValue->optionValueId, $variant->getOptionValueIds())) {
-                    $optionLink->markActive();
+                    $variantLink->markActive();
                 }
 
-                $results = $results->add($optionLink);
+                $results = $results->add($variantLink);
             }
         }
 

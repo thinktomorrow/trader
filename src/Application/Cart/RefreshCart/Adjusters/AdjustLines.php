@@ -32,11 +32,13 @@ class AdjustLines implements Adjuster
             if (! $variant = $this->findVariant($variants, $line->getVariantId())) {
                 $order->deleteLine($line->lineId);
                 // TODO: event + note
+                continue;
             }
 
             // Variant can be no longer available due to stock or whatever...
             if (! in_array($variant->getState(), VariantState::availableStates())) {
                 $order->deleteLine($line->lineId);
+                continue;
             }
 
             // Price can be changed in the meanwhile

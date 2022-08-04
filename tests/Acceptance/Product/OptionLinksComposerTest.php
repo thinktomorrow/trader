@@ -4,8 +4,8 @@ declare(strict_types=1);
 namespace Tests\Acceptance\Product;
 
 use Tests\TestHelpers;
-use Thinktomorrow\Trader\Application\Product\OptionLinks\OptionLinks;
-use Thinktomorrow\Trader\Application\Product\OptionLinks\OptionLinksComposer;
+use Thinktomorrow\Trader\Application\Product\VariantLinks\VariantLinks;
+use Thinktomorrow\Trader\Application\Product\VariantLinks\VariantLinksComposer;
 use Thinktomorrow\Trader\Domain\Common\Locale;
 use Thinktomorrow\Trader\Infrastructure\Test\Repositories\InMemoryProductRepository;
 use Thinktomorrow\Trader\Infrastructure\Test\TestContainer;
@@ -22,13 +22,13 @@ class OptionLinksComposerTest extends ProductContext
         $product = $this->createdProductWithOptions();
         $repo->save($product);
 
-        $optionLinks = (new OptionLinksComposer($repo, new TestContainer()))->get(
+        $optionLinks = (new VariantLinksComposer($repo, new TestContainer()))->get(
             $product->productId,
             $product->getVariants()[0]->variantId,
             Locale::make('nl', 'BE')
         );
 
         $this->assertCount(3, $optionLinks);
-        $this->assertInstanceOf(OptionLinks::class, $optionLinks);
+        $this->assertInstanceOf(VariantLinks::class, $optionLinks);
     }
 }

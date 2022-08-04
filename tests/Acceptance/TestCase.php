@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace Tests\Acceptance;
 
+use Illuminate\Support\Arr;
 use Thinktomorrow\Trader\Application\Common\DataRenderer;
 use Thinktomorrow\Trader\Application\Common\DefaultLocale;
 use Thinktomorrow\Trader\Domain\Common\Locale;
@@ -18,19 +19,17 @@ class TestCase extends \PHPUnit\Framework\TestCase
         DefaultLocale::set(Locale::make('nl', 'BE'));
 
         DataRenderer::setDataResolver(function (array $data, string $key, string $language = null, string $default = null) {
-            if (! isset($data[$key])) {
-                return $default;
-            }
-
             if (! $language) {
                 $language = 'nl';
             }
 
-            if (isset($data[$key][$language])) {
-                return $data[$key][$language];
-            }
+            $value = Arr::get(
+                $data,
+                $key . '.' . $language,
+                Arr::get($data, $key, $default)
+            );
 
-            return $data[$key];
+            return $value === null ? $default :$value;
         });
     }
 }
