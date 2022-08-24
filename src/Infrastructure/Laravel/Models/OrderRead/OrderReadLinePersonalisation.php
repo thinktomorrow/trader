@@ -10,6 +10,7 @@ abstract class OrderReadLinePersonalisation
     use RendersData;
 
     protected string $line_id;
+    protected string $line_personalisation_id;
     protected string $personalisation_id;
     protected string $personalisation_type;
     protected $value;
@@ -24,6 +25,7 @@ abstract class OrderReadLinePersonalisation
         $personalisation = new static();
 
         $personalisation->line_id = $lineState['line_id'];
+        $personalisation->line_personalisation_id = $state['line_personalisation_id'];
         $personalisation->personalisation_id = $state['personalisation_id'];
         $personalisation->personalisation_type = $state['personalisation_type'];
         $personalisation->value = $state['value'];
