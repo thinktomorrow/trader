@@ -39,7 +39,7 @@ abstract class OrderReadLinePersonalisation
 
     public function getLabel(): string
     {
-        return $this->data('title', null, '');
+        return $this->data('label', null, '');
     }
 
     public function getType(): string

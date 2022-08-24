@@ -32,7 +32,7 @@ class CartTest extends CartContext
         $this->whenIAddTheVariantToTheCart('lightsaber-123', 1, ['foo' => 'bar']);
         $this->whenIAddTheVariantToTheCart('lightsaber-123', 1, ['fez' => 'bes']);
 
-        $this->thenIShouldHaveProductInTheCart(1, 1);
+        $this->thenIShouldHaveProductInTheCart(2, 1);
     }
 
     /** @test */

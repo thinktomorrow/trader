@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace Thinktomorrow\Trader\Infrastructure\Test\Repositories;
 
+use Thinktomorrow\Trader\Domain\Model\Order\Line\LineId;
 use Thinktomorrow\Trader\Domain\Model\Order\Discount\DiscountId;
 use Thinktomorrow\Trader\Domain\Model\Order\Exceptions\CouldNotFindOrder;
 use Thinktomorrow\Trader\Domain\Model\Order\Exceptions\OrderAlreadyInMerchantHands;
@@ -13,6 +14,7 @@ use Thinktomorrow\Trader\Domain\Model\Order\OrderRepository;
 use Thinktomorrow\Trader\Domain\Model\Order\Payment\PaymentId;
 use Thinktomorrow\Trader\Domain\Model\Order\Shipping\ShippingId;
 use Thinktomorrow\Trader\Domain\Model\Order\ShopperId;
+use Thinktomorrow\Trader\Domain\Model\Order\Line\Personalisations\LinePersonalisationId;
 
 final class InMemoryOrderRepository implements OrderRepository
 {
@@ -24,6 +26,7 @@ final class InMemoryOrderRepository implements OrderRepository
     private string $nextPaymentReference = 'payment-123';
     private string $nextShopperReference = 'shopper-123';
     private string $nextDiscountReference = 'discount-123';
+    private string $nextLineReference = 'line';
 
     public function save(Order $order): void
     {
@@ -82,6 +85,21 @@ final class InMemoryOrderRepository implements OrderRepository
     public function nextDiscountReference(): DiscountId
     {
         return DiscountId::fromString($this->nextDiscountReference . '-' . mt_rand(1, 999));
+    }
+
+    public function nextLineReference(): LineId
+    {
+        return LineId::fromString($this->nextLineReference . '-' . mt_rand(1, 999));
+    }
+
+    public function setNextLineReference(string $nextLineReference): void
+    {
+        $this->nextLineReference = $nextLineReference;
+    }
+
+    public function nextLinePersonalisationReference(): LinePersonalisationId
+    {
+        return LinePersonalisationId::fromString(''.mt_rand(1, 999));
     }
 
     // For testing purposes only

@@ -120,8 +120,7 @@ final class CartApplication
 
         $variant = $this->findVariantDetailsForCart->findVariantForCart($addLine->getVariantId());
 
-        // Lines are unique per variant.
-        $lineId = LineId::fromString($addLine->getVariantId()->get());
+        $lineId = $this->orderRepository->nextLineReference();
 
         $order->addOrUpdateLine(
             $lineId,
@@ -152,7 +151,7 @@ final class CartApplication
 
             $linePersonalisations[] = LinePersonalisation::create(
                 $lineId,
-                LinePersonalisationId::fromString($lineId->get().'_'.$personalisation_id),
+                $this->orderRepository->nextLinePersonalisationReference(),
                 $originalPersonalisation->personalisationId,
                 $originalPersonalisation->personalisationType,
                 $personalisation_value,

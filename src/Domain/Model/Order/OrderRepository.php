@@ -3,10 +3,12 @@ declare(strict_types=1);
 
 namespace Thinktomorrow\Trader\Domain\Model\Order;
 
+use Thinktomorrow\Trader\Domain\Model\Order\Line\LineId;
 use Thinktomorrow\Trader\Domain\Model\Order\Discount\DiscountId;
 use Thinktomorrow\Trader\Domain\Model\Order\Exceptions\OrderAlreadyInMerchantHands;
 use Thinktomorrow\Trader\Domain\Model\Order\Payment\PaymentId;
 use Thinktomorrow\Trader\Domain\Model\Order\Shipping\ShippingId;
+use Thinktomorrow\Trader\Domain\Model\Order\Line\Personalisations\LinePersonalisationId;
 
 interface OrderRepository
 {
@@ -35,4 +37,8 @@ interface OrderRepository
     public function nextShopperReference(): ShopperId;
 
     public function nextDiscountReference(): DiscountId;
+
+    public function nextLineReference(): LineId;
+
+    public function nextLinePersonalisationReference(): LinePersonalisationId;
 }

@@ -6,6 +6,7 @@ namespace Thinktomorrow\Trader\Infrastructure\Laravel\Repositories;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 use Ramsey\Uuid\Uuid;
+use Thinktomorrow\Trader\Domain\Model\Order\Line\LineId;
 use Thinktomorrow\Trader\Domain\Common\Address\AddressType;
 use Thinktomorrow\Trader\Domain\Model\Order\Address\BillingAddress;
 use Thinktomorrow\Trader\Domain\Model\Order\Address\ShippingAddress;
@@ -26,6 +27,7 @@ use Thinktomorrow\Trader\Domain\Model\Order\Shipping\Shipping;
 use Thinktomorrow\Trader\Domain\Model\Order\Shipping\ShippingId;
 use Thinktomorrow\Trader\Domain\Model\Order\Shopper;
 use Thinktomorrow\Trader\Domain\Model\Order\ShopperId;
+use Thinktomorrow\Trader\Domain\Model\Order\Line\Personalisations\LinePersonalisationId;
 
 final class MysqlOrderRepository implements OrderRepository
 {
@@ -375,5 +377,15 @@ final class MysqlOrderRepository implements OrderRepository
     public function nextDiscountReference(): DiscountId
     {
         return DiscountId::fromString((string)Uuid::uuid4());
+    }
+
+    public function nextLineReference(): LineId
+    {
+        return LineId::fromString((string) UUid::uuid4());
+    }
+
+    public function nextLinePersonalisationReference(): LinePersonalisationId
+    {
+        return LinePersonalisationId::fromString((string)Uuid::uuid4());
     }
 }

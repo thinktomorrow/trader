@@ -33,6 +33,8 @@ class CartReadTest extends CartContext
     /** @test */
     public function in_order_to_confirm_my_product_choice_as_a_visitor__i_need_to_be_able_to_see_each_line_of_my_cart()
     {
+        $this->orderRepository->setNextLineReference('foobar');
+
         $this->givenThereIsAProductWhichCostsEur('lightsaber', 5);
         $this->whenIAddTheVariantToTheCart('lightsaber-123', 2);
 
@@ -43,7 +45,7 @@ class CartReadTest extends CartContext
         $this->assertCount(1, $cart->getLines());
         $line = $cart->getLines()[0];
 
-        $this->assertEquals('lightsaber-123', $line->getLineId());
+        $this->assertStringStartsWith('foobar', $line->getLineId());
         $this->assertEquals('€ 5', $line->getLinePrice());
         $this->assertEquals('€ 10', $line->getTotalPrice());
         $this->assertEquals('€ 10', $line->getSubtotalPrice());
@@ -174,7 +176,7 @@ class CartReadTest extends CartContext
             [
                 'personalisation_id' => 'xxx',
                 'personalisation_type' => PersonalisationType::TEXT,
-                'data' => ['title' => 'label'],
+                'data' => ['label' => 'label'],
             ],
         ]);
         $this->whenIAddTheVariantToTheCart('lightsaber-123', 1, ['foo' => 'bar'], ['xxx' => 'foobar']);

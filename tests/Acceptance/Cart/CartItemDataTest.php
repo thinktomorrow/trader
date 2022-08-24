@@ -19,11 +19,9 @@ class CartItemDataTest extends CartContext
     {
         $this->givenThereIsAProductWhichCostsEur('lightsaber', 5);
         $this->whenIAddTheVariantToTheCart('lightsaber-123', 1, ['foo' => 'bar']);
-        $this->whenIAddTheVariantToTheCart('lightsaber-123', 1, ['fez' => 'bes']);
 
         $this->thenIShouldHaveProductInTheCart(1, 1);
 
         $this->thenTheCartItemShouldContainData('lightsaber-123', 'foo', 'bar');
-        $this->thenTheCartItemShouldContainData('lightsaber-123', 'fez', 'bes');
     }
 }
