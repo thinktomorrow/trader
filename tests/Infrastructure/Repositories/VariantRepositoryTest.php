@@ -125,7 +125,5 @@ final class VariantRepositoryTest extends TestCase
             $product,
             $product->getVariants()[0],
         ];
-
-
     }
 }

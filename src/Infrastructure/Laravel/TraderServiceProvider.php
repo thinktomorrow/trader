@@ -16,7 +16,6 @@ use Thinktomorrow\Trader\Application\Cart\Read\CartShipping;
 use Thinktomorrow\Trader\Application\Cart\Read\CartShippingAddress;
 use Thinktomorrow\Trader\Application\Cart\Read\CartShopper;
 use Thinktomorrow\Trader\Application\Cart\ShippingProfile\ShippingProfileForCart;
-use Thinktomorrow\Trader\Application\Order\MerchantOrder\MerchantOrderLinePersonalisation;
 use Thinktomorrow\Trader\Application\Cart\ShippingProfile\ShippingProfileForCartRepository;
 use Thinktomorrow\Trader\Application\Cart\VariantForCart\VariantForCart;
 use Thinktomorrow\Trader\Application\Cart\VariantForCart\VariantForCartRepository;
@@ -32,6 +31,7 @@ use Thinktomorrow\Trader\Application\Order\MerchantOrder\MerchantOrder;
 use Thinktomorrow\Trader\Application\Order\MerchantOrder\MerchantOrderBillingAddress;
 use Thinktomorrow\Trader\Application\Order\MerchantOrder\MerchantOrderDiscount;
 use Thinktomorrow\Trader\Application\Order\MerchantOrder\MerchantOrderLine;
+use Thinktomorrow\Trader\Application\Order\MerchantOrder\MerchantOrderLinePersonalisation;
 use Thinktomorrow\Trader\Application\Order\MerchantOrder\MerchantOrderPayment;
 use Thinktomorrow\Trader\Application\Order\MerchantOrder\MerchantOrderRepository;
 use Thinktomorrow\Trader\Application\Order\MerchantOrder\MerchantOrderShipping;
@@ -107,6 +107,7 @@ use Thinktomorrow\Trader\Infrastructure\Laravel\Models\MerchantOrder\DefaultMerc
 use Thinktomorrow\Trader\Infrastructure\Laravel\Models\MerchantOrder\DefaultMerchantOrderBillingAddress;
 use Thinktomorrow\Trader\Infrastructure\Laravel\Models\MerchantOrder\DefaultMerchantOrderDiscount;
 use Thinktomorrow\Trader\Infrastructure\Laravel\Models\MerchantOrder\DefaultMerchantOrderLine;
+use Thinktomorrow\Trader\Infrastructure\Laravel\Models\MerchantOrder\DefaultMerchantOrderLinePersonalisation;
 use Thinktomorrow\Trader\Infrastructure\Laravel\Models\MerchantOrder\DefaultMerchantOrderPayment;
 use Thinktomorrow\Trader\Infrastructure\Laravel\Models\MerchantOrder\DefaultMerchantOrderShipping;
 use Thinktomorrow\Trader\Infrastructure\Laravel\Models\MerchantOrder\DefaultMerchantOrderShippingAddress;
@@ -133,7 +134,6 @@ use Thinktomorrow\Trader\Infrastructure\Vine\VineFlattenedTaxonIdsComposer;
 use Thinktomorrow\Trader\Infrastructure\Vine\VineTaxonFilterTreeComposer;
 use Thinktomorrow\Trader\Infrastructure\Vine\VineTaxonIdOptionsComposer;
 use Thinktomorrow\Trader\TraderConfig;
-use Thinktomorrow\Trader\Infrastructure\Laravel\Models\MerchantOrder\DefaultMerchantOrderLinePersonalisation;
 
 class TraderServiceProvider extends ServiceProvider
 {

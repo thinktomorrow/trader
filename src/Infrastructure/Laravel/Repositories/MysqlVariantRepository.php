@@ -7,9 +7,9 @@ use Illuminate\Support\Facades\DB;
 use Psr\Container\ContainerInterface;
 use Ramsey\Uuid\Uuid;
 use Thinktomorrow\Trader\Application\Cart\VariantForCart\VariantForCart;
-use Thinktomorrow\Trader\Domain\Model\Product\Personalisation\Personalisation;
 use Thinktomorrow\Trader\Application\Cart\VariantForCart\VariantForCartRepository;
 use Thinktomorrow\Trader\Application\Common\TraderHelpers;
+use Thinktomorrow\Trader\Domain\Model\Product\Personalisation\Personalisation;
 use Thinktomorrow\Trader\Domain\Model\Product\ProductId;
 use Thinktomorrow\Trader\Domain\Model\Product\ProductState;
 use Thinktomorrow\Trader\Domain\Model\Product\Variant\Variant;
@@ -141,7 +141,7 @@ class MysqlVariantRepository implements VariantRepository, VariantForCartReposit
             ->get()
             ->map(fn ($item) => (array)$item);
 
-        $personalisations = $personalisationStates->map(fn($personalisationState) => Personalisation::fromMappedData($personalisationState, $state))->all();
+        $personalisations = $personalisationStates->map(fn ($personalisationState) => Personalisation::fromMappedData($personalisationState, $state))->all();
 
         return $this->composeVariantForCart($state, $personalisations);
     }
@@ -165,7 +165,7 @@ class MysqlVariantRepository implements VariantRepository, VariantForCartReposit
 
         return $states
             ->map(fn ($state) => (array) $state)
-            ->map(fn ($state) => $this->composeVariantForCart( $state, $allPersonalisationStates->filter(fn ($personalisationState) => $personalisationState['product_id'] == $state['product_id'])->map(fn($personalisationState) => Personalisation::fromMappedData($personalisationState, $state))->all() ))->toArray();
+            ->map(fn ($state) => $this->composeVariantForCart($state, $allPersonalisationStates->filter(fn ($personalisationState) => $personalisationState['product_id'] == $state['product_id'])->map(fn ($personalisationState) => Personalisation::fromMappedData($personalisationState, $state))->all()))->toArray();
     }
 
     private function composeVariantForCart(array $state, array $personalisations): VariantForCart

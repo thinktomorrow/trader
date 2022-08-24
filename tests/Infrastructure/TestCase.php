@@ -21,6 +21,7 @@ use Thinktomorrow\Trader\Application\Order\MerchantOrder\MerchantOrder;
 use Thinktomorrow\Trader\Application\Order\MerchantOrder\MerchantOrderBillingAddress;
 use Thinktomorrow\Trader\Application\Order\MerchantOrder\MerchantOrderDiscount;
 use Thinktomorrow\Trader\Application\Order\MerchantOrder\MerchantOrderLine;
+use Thinktomorrow\Trader\Application\Order\MerchantOrder\MerchantOrderLinePersonalisation;
 use Thinktomorrow\Trader\Application\Order\MerchantOrder\MerchantOrderPayment;
 use Thinktomorrow\Trader\Application\Order\MerchantOrder\MerchantOrderShipping;
 use Thinktomorrow\Trader\Application\Order\MerchantOrder\MerchantOrderShippingAddress;
@@ -32,7 +33,6 @@ use Thinktomorrow\Trader\Infrastructure\Laravel\Models\Cart\DefaultCart;
 use Thinktomorrow\Trader\Infrastructure\Laravel\Models\Cart\DefaultCartBillingAddress;
 use Thinktomorrow\Trader\Infrastructure\Laravel\Models\Cart\DefaultCartDiscount;
 use Thinktomorrow\Trader\Infrastructure\Laravel\Models\Cart\DefaultCartLine;
-use Thinktomorrow\Trader\Application\Order\MerchantOrder\MerchantOrderLinePersonalisation;
 use Thinktomorrow\Trader\Infrastructure\Laravel\Models\Cart\DefaultCartLinePersonalisation;
 use Thinktomorrow\Trader\Infrastructure\Laravel\Models\Cart\DefaultCartPayment;
 use Thinktomorrow\Trader\Infrastructure\Laravel\Models\Cart\DefaultCartShipping;
@@ -47,6 +47,7 @@ use Thinktomorrow\Trader\Infrastructure\Laravel\Models\MerchantOrder\DefaultMerc
 use Thinktomorrow\Trader\Infrastructure\Laravel\Models\MerchantOrder\DefaultMerchantOrderBillingAddress;
 use Thinktomorrow\Trader\Infrastructure\Laravel\Models\MerchantOrder\DefaultMerchantOrderDiscount;
 use Thinktomorrow\Trader\Infrastructure\Laravel\Models\MerchantOrder\DefaultMerchantOrderLine;
+use Thinktomorrow\Trader\Infrastructure\Laravel\Models\MerchantOrder\DefaultMerchantOrderLinePersonalisation;
 use Thinktomorrow\Trader\Infrastructure\Laravel\Models\MerchantOrder\DefaultMerchantOrderPayment;
 use Thinktomorrow\Trader\Infrastructure\Laravel\Models\MerchantOrder\DefaultMerchantOrderShipping;
 use Thinktomorrow\Trader\Infrastructure\Laravel\Models\MerchantOrder\DefaultMerchantOrderShippingAddress;
@@ -59,7 +60,6 @@ use Thinktomorrow\Trader\Infrastructure\Test\Repositories\InMemoryPromoRepositor
 use Thinktomorrow\Trader\Infrastructure\Test\Repositories\InMemoryTaxonRepository;
 use Thinktomorrow\Trader\Infrastructure\Test\Repositories\InMemoryVariantRepository;
 use Thinktomorrow\Trader\Infrastructure\Test\TestContainer;
-use Thinktomorrow\Trader\Infrastructure\Laravel\Models\MerchantOrder\DefaultMerchantOrderLinePersonalisation;
 
 abstract class TestCase extends \Orchestra\Testbench\TestCase
 {

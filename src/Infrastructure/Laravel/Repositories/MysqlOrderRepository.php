@@ -6,7 +6,6 @@ namespace Thinktomorrow\Trader\Infrastructure\Laravel\Repositories;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 use Ramsey\Uuid\Uuid;
-use Thinktomorrow\Trader\Domain\Model\Order\Line\LineId;
 use Thinktomorrow\Trader\Domain\Common\Address\AddressType;
 use Thinktomorrow\Trader\Domain\Model\Order\Address\BillingAddress;
 use Thinktomorrow\Trader\Domain\Model\Order\Address\ShippingAddress;
@@ -16,7 +15,9 @@ use Thinktomorrow\Trader\Domain\Model\Order\Discount\DiscountId;
 use Thinktomorrow\Trader\Domain\Model\Order\Exceptions\CouldNotFindOrder;
 use Thinktomorrow\Trader\Domain\Model\Order\Exceptions\OrderAlreadyInMerchantHands;
 use Thinktomorrow\Trader\Domain\Model\Order\Line\Line;
+use Thinktomorrow\Trader\Domain\Model\Order\Line\LineId;
 use Thinktomorrow\Trader\Domain\Model\Order\Line\Personalisations\LinePersonalisation;
+use Thinktomorrow\Trader\Domain\Model\Order\Line\Personalisations\LinePersonalisationId;
 use Thinktomorrow\Trader\Domain\Model\Order\Order;
 use Thinktomorrow\Trader\Domain\Model\Order\OrderId;
 use Thinktomorrow\Trader\Domain\Model\Order\OrderReference;
@@ -27,7 +28,6 @@ use Thinktomorrow\Trader\Domain\Model\Order\Shipping\Shipping;
 use Thinktomorrow\Trader\Domain\Model\Order\Shipping\ShippingId;
 use Thinktomorrow\Trader\Domain\Model\Order\Shopper;
 use Thinktomorrow\Trader\Domain\Model\Order\ShopperId;
-use Thinktomorrow\Trader\Domain\Model\Order\Line\Personalisations\LinePersonalisationId;
 
 final class MysqlOrderRepository implements OrderRepository
 {
