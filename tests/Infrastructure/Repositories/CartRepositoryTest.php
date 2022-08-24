@@ -9,14 +9,18 @@ use Thinktomorrow\Trader\Application\Cart\Read\Cart;
 use Thinktomorrow\Trader\Domain\Common\Cash\Cash;
 use Thinktomorrow\Trader\Domain\Common\Locale;
 use Thinktomorrow\Trader\Domain\Model\Order\OrderState;
+use Thinktomorrow\Trader\Domain\Model\Product\Personalisation\PersonalisationId;
 use Thinktomorrow\Trader\Infrastructure\Laravel\Repositories\MysqlCartRepository;
 use Thinktomorrow\Trader\Infrastructure\Laravel\Repositories\MysqlOrderRepository;
+use Thinktomorrow\Trader\Domain\Model\Product\Personalisation\PersonalisationType;
 use Thinktomorrow\Trader\Infrastructure\Laravel\Repositories\MysqlProductRepository;
 use Thinktomorrow\Trader\Infrastructure\Laravel\Repositories\MysqlVariantRepository;
 use Thinktomorrow\Trader\Infrastructure\Test\Repositories\InMemoryCartRepository;
 use Thinktomorrow\Trader\Infrastructure\Test\Repositories\InMemoryOrderRepository;
 use Thinktomorrow\Trader\Infrastructure\Test\Repositories\InMemoryProductRepository;
 use Thinktomorrow\Trader\Infrastructure\Test\TestContainer;
+use Thinktomorrow\Trader\Domain\Model\Order\Line\Personalisations\LinePersonalisation;
+use Thinktomorrow\Trader\Domain\Model\Order\Line\Personalisations\LinePersonalisationId;
 
 final class CartRepositoryTest extends TestCase
 {
@@ -62,6 +66,33 @@ final class CartRepositoryTest extends TestCase
             $cartRepository = iterator_to_array($this->cartRepositories())[$i];
 
             $this->assertTrue($cartRepository->existsCart($order->orderId));
+        }
+    }
+
+    /** @test */
+    public function it_can_save_line_personalisations()
+    {
+        $order = $this->createDefaultOrder();
+
+        $line = $order->getLines()[0];
+        $order->updateLinePersonalisations($line->lineId, [
+            LinePersonalisation::create(
+                $line->lineId,
+                LinePersonalisationId::fromString('xxx'),
+                PersonalisationId::fromString('abc'),
+                PersonalisationType::fromString('text'),
+                'foobar',
+                ['foo' => 'bar']
+            )
+        ]);
+
+        foreach ($this->orderRepositories() as $i => $orderRepository) {
+            $orderRepository->save($order);
+
+            $cartRepository = iterator_to_array($this->cartRepositories())[$i];
+
+            $cartLine = $cartRepository->findCart($order->orderId)->getLines()[0];
+            $this->assertCount(1, $cartLine->getPersonalisations());
         }
     }
 

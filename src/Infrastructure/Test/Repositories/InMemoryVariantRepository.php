@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace Thinktomorrow\Trader\Infrastructure\Test\Repositories;
 
+use Thinktomorrow\Trader\Domain\Model\Product\Product;
 use Thinktomorrow\Trader\Application\Cart\VariantForCart\VariantForCart;
 use Thinktomorrow\Trader\Application\Cart\VariantForCart\VariantForCartRepository;
 use Thinktomorrow\Trader\Domain\Model\Product\Exceptions\CouldNotFindVariant;
@@ -66,7 +67,7 @@ final class InMemoryVariantRepository implements VariantRepository, VariantForCa
     {
         foreach (static::$variants as $variant) {
             if ($variant->variantId->equals($variantId)) {
-                return DefaultVariantForCart::fromMappedData($variant->getMappedData());
+                return DefaultVariantForCart::fromMappedData($variant->getMappedData(), $personalisations = $this->getPersonalisationsForVariant($variant));
             }
         }
 
@@ -79,10 +80,28 @@ final class InMemoryVariantRepository implements VariantRepository, VariantForCa
 
         foreach (static::$variants as $variant) {
             if (in_array($variant->variantId, $variantIds)) {
-                $result[] = DefaultVariantForCart::fromMappedData($variant->getMappedData());
+                $result[] = DefaultVariantForCart::fromMappedData($variant->getMappedData(), $this->getPersonalisationsForVariant($variant));
             }
         }
 
         return $result;
+    }
+
+    /**
+     * @param Variant $variant
+     * @return array|\Thinktomorrow\Trader\Domain\Model\Product\Personalisation\Personalisation[]
+     */
+    private function getPersonalisationsForVariant(Variant $variant): array
+    {
+        $personalisations = [];
+
+        /** @var Product $product */
+        foreach (InMemoryProductRepository::$products as $product) {
+            if ($product->productId->equals($variant->productId)) {
+                $personalisations = $product->getPersonalisations();
+            }
+        }
+
+        return $personalisations;
     }
 }

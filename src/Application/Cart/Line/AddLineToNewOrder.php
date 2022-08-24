@@ -10,12 +10,14 @@ class AddLineToNewOrder
 {
     private string $variantId;
     private int $quantity;
+    private array $personalisations;
     private array $data;
 
-    public function __construct(string $variantId, int $quantity, array $data)
+    public function __construct(string $variantId, int $quantity, array $personalisations, array $data)
     {
         $this->variantId = $variantId;
         $this->quantity = $quantity;
+        $this->personalisations = $personalisations;
         $this->data = $data;
     }
 
@@ -27,6 +29,11 @@ class AddLineToNewOrder
     public function getQuantity(): Quantity
     {
         return Quantity::fromInt($this->quantity);
+    }
+
+    public function getPersonalisations(): array
+    {
+        return $this->personalisations;
     }
 
     public function getData(): array

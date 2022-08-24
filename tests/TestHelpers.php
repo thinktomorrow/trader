@@ -56,6 +56,7 @@ use Thinktomorrow\Trader\Domain\Model\ShippingProfile\ShippingProfile;
 use Thinktomorrow\Trader\Domain\Model\ShippingProfile\ShippingProfileState;
 use Thinktomorrow\Trader\Domain\Model\ShippingProfile\Tariff;
 use Throwable;
+use Thinktomorrow\Trader\Domain\Model\Order\Line\Personalisations\LinePersonalisation;
 
 trait TestHelpers
 {
@@ -93,7 +94,11 @@ trait TestHelpers
             'order_state' => OrderState::cart_revived->value,
             'data' => "[]",
         ], $orderValues), [
-            Line::class => array_map(fn (Line $line) => [...$line->getMappedData(), Discount::class => array_map(fn (Discount $discount) => $discount->getMappedData(), $line->getDiscounts())], $lines),
+            Line::class => array_map(fn (Line $line) => [
+                ...$line->getMappedData(),
+                Discount::class => array_map(fn (Discount $discount) => $discount->getMappedData(), $line->getDiscounts()),
+                LinePersonalisation::class => array_map(fn(LinePersonalisation $linePersonalisation) => $linePersonalisation->getMappedData(), $line->getPersonalisations())
+            ], $lines),
             Shipping::class => array_map(fn (Shipping $shipping) => [...$shipping->getMappedData(), Discount::class => array_map(fn (Discount $discount) => $discount->getMappedData(), $shipping->getDiscounts())], $shippings),
             Payment::class => array_map(fn (Payment $payment) => [...$payment->getMappedData(), Discount::class => array_map(fn (Discount $discount) => $discount->getMappedData(), $payment->getDiscounts())], $payments),
             ShippingAddress::class => $shippingAddress?->getMappedData(),
@@ -117,7 +122,7 @@ trait TestHelpers
         );
     }
 
-    protected function createLine(array $values = [], array $aggregateState = [], array $discounts = []): Line
+    protected function createLine(array $values = [], array $aggregateState = [], array $discounts = [], array $personalisations = []): Line
     {
         return Line::fromMappedData(array_merge([
             'line_id' => 'abc',
@@ -131,6 +136,7 @@ trait TestHelpers
             'order_id' => 'xxx',
         ], $aggregateState), [
             Discount::class => array_map(fn (Discount $discount) => $discount->getMappedData(), $discounts),
+            LinePersonalisation::class => array_map(fn(LinePersonalisation $linePersonalisation) => $linePersonalisation->getMappedData(), $personalisations)
         ]);
     }
 

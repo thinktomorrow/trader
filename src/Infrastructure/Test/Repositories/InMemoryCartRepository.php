@@ -21,8 +21,10 @@ use Thinktomorrow\Trader\Infrastructure\Laravel\Models\Cart\DefaultCartDiscount;
 use Thinktomorrow\Trader\Infrastructure\Laravel\Models\Cart\DefaultCartLine;
 use Thinktomorrow\Trader\Infrastructure\Laravel\Models\Cart\DefaultCartPayment;
 use Thinktomorrow\Trader\Infrastructure\Laravel\Models\Cart\DefaultCartShipping;
+use Thinktomorrow\Trader\Domain\Model\Order\Line\Personalisations\LinePersonalisation;
 use Thinktomorrow\Trader\Infrastructure\Laravel\Models\Cart\DefaultCartShippingAddress;
 use Thinktomorrow\Trader\Infrastructure\Laravel\Models\Cart\DefaultCartShopper;
+use Thinktomorrow\Trader\Infrastructure\Laravel\Models\Cart\DefaultCartLinePersonalisation;
 
 final class InMemoryCartRepository implements CartRepository
 {
@@ -58,7 +60,10 @@ final class InMemoryCartRepository implements CartRepository
             array_map(fn (Discount $discount) => DefaultCartDiscount::fromMappedData(array_merge($discount->getMappedData(), [
                 'total' => $discount->getTotal(),
                 'percentage' => $discount->getPercentage($line->getSubTotal()),
-            ]), $orderState), $line->getDiscounts()) // TODO: cartline discounts...
+            ]), $orderState), $line->getDiscounts()),
+            array_map(fn (LinePersonalisation $linePersonalisation) => DefaultCartLinePersonalisation::fromMappedData(array_merge($linePersonalisation->getMappedData(), [
+                //
+            ]), $line->getMappedData()), $line->getPersonalisations())
         ), $order->getLines());
 
         $shippingAddress = $order->getShippingAddress() ? DefaultCartShippingAddress::fromMappedData(

@@ -25,11 +25,13 @@ use Thinktomorrow\Trader\Domain\Model\Order\Shipping\Shipping;
 use Thinktomorrow\Trader\Domain\Model\Order\Shipping\ShippingId;
 use Thinktomorrow\Trader\Domain\Model\Order\Shopper;
 use Thinktomorrow\Trader\Domain\Model\Order\ShopperId;
+use Thinktomorrow\Trader\Domain\Model\Order\Line\Personalisations\LinePersonalisation;
 
 final class MysqlOrderRepository implements OrderRepository
 {
     private static $orderTable = 'trader_orders';
     private static $orderLinesTable = 'trader_order_lines';
+    private static $orderLinePersonalisationsTable = 'trader_order_line_personalisations';
     private static $orderDiscountsTable = 'trader_order_discounts';
     private static $orderShippingTable = 'trader_order_shipping';
     private static $orderPaymentTable = 'trader_order_payment';
@@ -52,6 +54,7 @@ final class MysqlOrderRepository implements OrderRepository
         }
 
         $this->upsertLines($order);
+        $this->upsertLinePersonalisations($order);
         $this->upsertDiscounts($order);
         $this->upsertShippings($order);
         $this->upsertPayments($order);
@@ -110,6 +113,30 @@ final class MysqlOrderRepository implements OrderRepository
                     'discountable_type' => $discountState['discountable_type'],
                     'discountable_id' => $discountState['discountable_id'],
                 ], $discountState);
+        }
+    }
+
+    private function upsertLinePersonalisations(Order $order): void
+    {
+        $personalisationStates = [];
+
+        foreach ($order->getLines() as $line) {
+            $personalisationStates = array_merge($personalisationStates, $line->getChildEntities()[LinePersonalisation::class]);
+        }
+
+        DB::table(static::$orderLinePersonalisationsTable)
+            ->where('order_id', $order->orderId->get())
+            ->whereNotIn('line_personalisation_id', array_map(fn ($personalisationsState) => $personalisationsState['line_personalisation_id'], $personalisationStates))
+            ->delete();
+
+        foreach ($personalisationStates as $personalisationsState) {
+            DB::table(static::$orderLinePersonalisationsTable)
+                ->updateOrInsert([
+                    'order_id' => $order->orderId->get(),
+                    'line_personalisation_id' => $personalisationsState['line_personalisation_id'],
+                    'personalisation_type' => $personalisationsState['personalisation_type'],
+                    'personalisation_id' => $personalisationsState['personalisation_id'],
+                ], $personalisationsState);
         }
     }
 
@@ -223,6 +250,11 @@ final class MysqlOrderRepository implements OrderRepository
             ->map(fn ($item) => (array)$item)
             ->map(fn ($item) => array_merge($item, ['includes_vat' => (bool)$item['includes_vat']]));
 
+        $allPersonalisationStates = DB::table(static::$orderLinePersonalisationsTable)
+            ->where(static::$orderLinePersonalisationsTable . '.order_id', $orderId->get())
+            ->get()
+            ->map(fn ($item) => (array)$item);
+
         $lineStates = DB::table(static::$orderLinesTable)
             ->where(static::$orderLinesTable . '.order_id', $orderId->get())
             ->get()
@@ -230,6 +262,7 @@ final class MysqlOrderRepository implements OrderRepository
             ->map(fn ($item) => array_merge($item, [
                 'includes_vat' => (bool)$item['includes_vat'],
                 Discount::class => $allDiscountStates->filter(fn ($discountState) => $discountState['discountable_type'] == DiscountableType::line->value && $discountState['discountable_id'] == $item['line_id'])->values()->toArray(),
+                LinePersonalisation::class => $allPersonalisationStates->filter(fn($personalisationState) => $personalisationState['line_id'] == $item['line_id'])->values()->toArray(),
             ]))
             ->toArray();
 
@@ -302,6 +335,7 @@ final class MysqlOrderRepository implements OrderRepository
         DB::table(static::$orderShippingTable)->where('order_id', $orderId->get())->delete();
         DB::table(static::$orderPaymentTable)->where('order_id', $orderId->get())->delete();
         DB::table(static::$orderLinesTable)->where('order_id', $orderId->get())->delete();
+        DB::table(static::$orderLinePersonalisationsTable)->where('order_id', $orderId->get())->delete();
         DB::table(static::$orderAddressTable)->where('order_id', $orderId->get())->delete();
         DB::table(static::$orderDiscountsTable)->where('order_id', $orderId->get())->delete();
         DB::table(static::$orderTable)->where('order_id', $orderId->get())->delete();

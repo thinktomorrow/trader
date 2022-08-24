@@ -14,6 +14,8 @@ use Thinktomorrow\Trader\Application\Cart\RefreshCart\Adjusters\AdjustLines;
 use Thinktomorrow\Trader\Application\Cart\RefreshCart\Adjusters\AdjustShipping;
 use Thinktomorrow\Trader\Application\Cart\RefreshCart\RefreshCart;
 use Thinktomorrow\Trader\Application\Cart\RefreshCart\RefreshCartAction;
+use Thinktomorrow\Trader\Domain\Model\Product\Personalisation\PersonalisationId;
+use Thinktomorrow\Trader\Domain\Model\Order\Line\Personalisations\LinePersonalisation;
 use Thinktomorrow\Trader\Application\Cart\ShippingProfile\UpdateShippingProfileOnOrder;
 use Thinktomorrow\Trader\Application\Cart\VariantForCart\VariantForCartRepository;
 use Thinktomorrow\Trader\Domain\Common\Event\EventDispatcher;
@@ -33,6 +35,7 @@ use Thinktomorrow\Trader\Domain\Model\Order\Shopper;
 use Thinktomorrow\Trader\Domain\Model\PaymentMethod\PaymentMethodRepository;
 use Thinktomorrow\Trader\Domain\Model\ShippingProfile\ShippingProfileRepository;
 use Thinktomorrow\Trader\TraderConfig;
+use Thinktomorrow\Trader\Domain\Model\Order\Line\Personalisations\LinePersonalisationId;
 
 final class CartApplication
 {
@@ -126,12 +129,39 @@ final class CartApplication
             LinePrice::fromPrice($variant->getSalePrice()),
             $addLine->getQuantity(),
             array_merge($addLine->getData(), [
-                // TODO: this should be done on refresh as well...
                 'title' => $variant->getTitle(),
                 'product_id' => $variant->getProductId()->get(),
                 'unit_price' => $variant->getUnitPrice()->getMoney()->getAmount(),
             ])
         );
+
+        $linePersonalisations = [];
+
+        foreach($addLine->getPersonalisations() as $personalisation_id => $personalisation_value)
+        {
+            $originalPersonalisation = null;
+
+            foreach($variant->getPersonalisations() as $personalisation) {
+                if($personalisation->personalisationId->equals(PersonalisationId::fromString($personalisation_id))){
+                    $originalPersonalisation = $personalisation;
+                }
+            }
+
+            if(!$originalPersonalisation) {
+                throw new \InvalidArgumentException('No personalisation found for variant ['.$addLine->getVariantId()->get().'] by personalisation id [' . $personalisation_id.'].');
+            }
+
+             $linePersonalisations[] = LinePersonalisation::create(
+                 $lineId,
+                 LinePersonalisationId::fromString($lineId->get().'_'.$personalisation_id),
+                 $originalPersonalisation->personalisationId,
+                 $originalPersonalisation->personalisationType,
+                 $personalisation_value,
+                 $originalPersonalisation->getData()
+             );
+        }
+
+        $order->updateLinePersonalisations($lineId, $linePersonalisations);
 
         $this->orderRepository->save($order);
 
@@ -158,8 +188,7 @@ final class CartApplication
     {
         $order = $this->orderRepository->findForCart($changeLineData->getOrderId());
 
-        $line = $order->findLine($changeLineData->getLineId());
-        $line->addData($changeLineData->getData());
+        $order->updateLineData($changeLineData->getLineId(), $changeLineData->getData());
 
         $this->orderRepository->save($order);
 

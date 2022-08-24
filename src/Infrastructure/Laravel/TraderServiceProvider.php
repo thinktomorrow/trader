@@ -14,6 +14,7 @@ use Thinktomorrow\Trader\Application\Cart\Read\CartRepository;
 use Thinktomorrow\Trader\Application\Cart\Read\CartShipping;
 use Thinktomorrow\Trader\Application\Cart\Read\CartShippingAddress;
 use Thinktomorrow\Trader\Application\Cart\Read\CartShopper;
+use Thinktomorrow\Trader\Application\Cart\Read\CartLinePersonalisation;
 use Thinktomorrow\Trader\Application\Cart\ShippingProfile\ShippingProfileForCart;
 use Thinktomorrow\Trader\Application\Cart\ShippingProfile\ShippingProfileForCartRepository;
 use Thinktomorrow\Trader\Application\Cart\VariantForCart\VariantForCart;
@@ -35,6 +36,7 @@ use Thinktomorrow\Trader\Application\Order\MerchantOrder\MerchantOrderRepository
 use Thinktomorrow\Trader\Application\Order\MerchantOrder\MerchantOrderShipping;
 use Thinktomorrow\Trader\Application\Order\MerchantOrder\MerchantOrderShippingAddress;
 use Thinktomorrow\Trader\Application\Order\MerchantOrder\MerchantOrderShopper;
+use Thinktomorrow\Trader\Infrastructure\Laravel\Models\Cart\DefaultCartLinePersonalisation;
 use Thinktomorrow\Trader\Application\Product\CheckProductOptions\CheckProductOptionsRepository;
 use Thinktomorrow\Trader\Application\Product\Grid\FlattenedTaxonIdsComposer;
 use Thinktomorrow\Trader\Application\Product\Grid\GridItem;
@@ -185,6 +187,7 @@ class TraderServiceProvider extends ServiceProvider
         $this->app->bind(\Thinktomorrow\Trader\Application\Order\Grid\GridItem::class, fn () => DefaultOrderGridItem::class);
         $this->app->bind(Cart::class, fn () => DefaultCart::class);
         $this->app->bind(CartLine::class, fn () => DefaultCartLine::class);
+        $this->app->bind(CartLinePersonalisation::class, fn () => DefaultCartLinePersonalisation::class);
         $this->app->bind(CartDiscount::class, fn () => DefaultCartDiscount::class);
         $this->app->bind(CartShippingAddress::class, fn () => DefaultCartShippingAddress::class);
         $this->app->bind(CartBillingAddress::class, fn () => DefaultCartBillingAddress::class);

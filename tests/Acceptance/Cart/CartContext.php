@@ -13,6 +13,7 @@ use Thinktomorrow\Trader\Application\Cart\ChooseCustomer;
 use Thinktomorrow\Trader\Application\Cart\ChoosePaymentMethod;
 use Thinktomorrow\Trader\Application\Cart\ChooseShippingProfile;
 use Thinktomorrow\Trader\Application\Cart\Line\AddLine;
+use Thinktomorrow\Trader\Application\Product\ProductApplication;
 use Thinktomorrow\Trader\Application\Cart\Line\AddLineToNewOrder;
 use Thinktomorrow\Trader\Application\Cart\Line\ChangeLineQuantity;
 use Thinktomorrow\Trader\Application\Cart\Line\RemoveLine;
@@ -28,6 +29,7 @@ use Thinktomorrow\Trader\Application\Customer\CustomerApplication;
 use Thinktomorrow\Trader\Application\Promo\Coupon\CouponPromoApplication;
 use Thinktomorrow\Trader\Application\Promo\OrderPromo\ApplyPromoToOrder;
 use Thinktomorrow\Trader\Application\Promo\OrderPromo\Discounts\FixedAmountOrderDiscount;
+use Thinktomorrow\Trader\Application\Product\UpdateProduct\UpdateProductPersonalisations;
 use Thinktomorrow\Trader\Application\Promo\OrderPromo\Discounts\PercentageOffOrderDiscount;
 use Thinktomorrow\Trader\Application\Promo\OrderPromo\OrderConditionFactory;
 use Thinktomorrow\Trader\Application\Promo\OrderPromo\OrderDiscountFactory;
@@ -91,6 +93,7 @@ abstract class CartContext extends TestCase
     protected UpdateShippingProfileOnOrder $updateShippingProfileOnOrder;
     protected EventDispatcherSpy $eventDispatcher;
     protected CustomerApplication $customerApplication;
+    protected ProductApplication $productApplication;
 
     protected function setUp(): void
     {
@@ -142,6 +145,13 @@ abstract class CartContext extends TestCase
             $this->paymentMethodRepository = new InMemoryPaymentMethodRepository(),
             $this->customerRepository = new InMemoryCustomerRepository(),
             $this->eventDispatcher = new EventDispatcherSpy(),
+        );
+
+        $this->productApplication = new ProductApplication(
+            new TestTraderConfig(),
+            $this->eventDispatcher,
+            $this->productRepository,
+            $this->variantRepository,
         );
 
         $this->promoApplication = new CouponPromoApplication(
@@ -208,6 +218,15 @@ abstract class CartContext extends TestCase
         Assert::assertNotNull($this->variantRepository->findVariantForCart(VariantId::fromString($productTitle . '-123')));
     }
 
+    protected function givenThereIsAProductPersonalisation($productTitle, array $personalisations)
+    {
+        $product = $this->productRepository->find(ProductId::fromString($productTitle));
+
+        $this->productApplication->updateProductPersonalisations(new UpdateProductPersonalisations($product->productId->get(), $personalisations));
+
+        Assert::assertCount(count($personalisations), $this->productRepository->find(ProductId::fromString($productTitle))->getPersonalisations());
+    }
+
     public function givenOrderHasAShippingCountry(string $country)
     {
         $order = $this->getOrder();
@@ -266,7 +285,7 @@ abstract class CartContext extends TestCase
         $this->promoRepository->save($promo);
     }
 
-    protected function whenIAddTheVariantToTheCart($productVariantId, $quantity = 1, array $data = [])
+    protected function whenIAddTheVariantToTheCart($productVariantId, $quantity = 1, array $data = [], array $personalisations = [])
     {
         $order = $this->getOrder();
 
@@ -277,6 +296,7 @@ abstract class CartContext extends TestCase
             $order->orderId->get(),
             VariantId::fromString($productVariantId)->get(),
             Quantity::fromInt((int)$quantity)->asInt(),
+            $personalisations,
             $data
         ));
 
@@ -293,12 +313,13 @@ abstract class CartContext extends TestCase
         }
     }
 
-    protected function whenIAddTheFirstVariantToTheCart($productVariantId, $quantity = 1, array $data = [])
+    protected function whenIAddTheFirstVariantToTheCart($productVariantId, $quantity = 1, array $data = [], array $personalisations = [])
     {
         // Add product to a new order
         $orderId = $this->cartApplication->addLineToNewOrder(new AddLineToNewOrder(
             VariantId::fromString($productVariantId)->get(),
             Quantity::fromInt((int)$quantity)->asInt(),
+            $personalisations,
             $data
         ));
 

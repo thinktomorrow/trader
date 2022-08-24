@@ -20,12 +20,13 @@ class DefaultVariantForCart implements VariantForCart
     private VariantState $state;
     private VariantUnitPrice $variantUnitPrice;
     private VariantSalePrice $variantSalePrice;
+    private array $personalisations;
 
     final private function __construct()
     {
     }
 
-    public static function fromMappedData(array $state): static
+    public static function fromMappedData(array $state, array $personalisations): static
     {
         $object = new static();
 
@@ -34,6 +35,7 @@ class DefaultVariantForCart implements VariantForCart
         $object->state = VariantState::from($state['state']);
         $object->variantUnitPrice = VariantUnitPrice::fromScalars($state['unit_price'], $state['tax_rate'], $state['includes_vat']);
         $object->variantSalePrice = VariantSalePrice::fromScalars($state['sale_price'], $state['tax_rate'], $state['includes_vat']);
+        $object->personalisations = $personalisations;
         $object->data = json_decode($state['data'], true);
 
         return $object;
@@ -67,5 +69,10 @@ class DefaultVariantForCart implements VariantForCart
     public function getTitle(): string
     {
         return $this->data('title', null, '');
+    }
+
+    public function getPersonalisations(): array
+    {
+        return $this->personalisations;
     }
 }

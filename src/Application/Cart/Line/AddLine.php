@@ -12,13 +12,15 @@ final class AddLine
     private string $orderId;
     private string $variantId;
     private int $quantity;
+    private array $personalisations;
     private array $data;
 
-    public function __construct(string $orderId, string $variantId, int $quantity, array $data)
+    public function __construct(string $orderId, string $variantId, int $quantity, array $personalisations, array $data)
     {
         $this->orderId = $orderId;
         $this->variantId = $variantId;
         $this->quantity = $quantity;
+        $this->personalisations = $personalisations;
         $this->data = $data;
     }
 
@@ -37,6 +39,11 @@ final class AddLine
         return Quantity::fromInt($this->quantity);
     }
 
+    public function getPersonalisations(): array
+    {
+        return $this->personalisations;
+    }
+
     public function getData(): array
     {
         return $this->data;
@@ -48,6 +55,7 @@ final class AddLine
             $orderId->get(),
             $addLineToNewOrder->getVariantId()->get(),
             $addLineToNewOrder->getQuantity()->asInt(),
+            $addLineToNewOrder->getPersonalisations(),
             $addLineToNewOrder->getData()
         );
     }

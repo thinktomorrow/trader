@@ -20,6 +20,7 @@ use Thinktomorrow\Trader\Domain\Model\Order\Events\OrderStates\CartAbandoned;
 use Thinktomorrow\Trader\Domain\Model\Order\Events\OrderStates\CartQueuedForDeletion;
 use Thinktomorrow\Trader\Domain\Model\Order\Events\OrderStates\CartRevived;
 use Thinktomorrow\Trader\Domain\Model\Order\Events\OrderStates\OrderCancelled;
+use Thinktomorrow\Trader\Domain\Model\Order\Line\Personalisations\LinePersonalisation;
 use Thinktomorrow\Trader\Domain\Model\Order\Events\OrderStates\OrderCancelledByMerchant;
 use Thinktomorrow\Trader\Domain\Model\Order\Events\OrderStates\OrderConfirmed;
 use Thinktomorrow\Trader\Domain\Model\Order\Events\OrderStates\OrderDelivered;
@@ -316,9 +317,12 @@ final class Order implements Aggregate, Discountable
         $order->orderId = OrderId::fromString($state['order_id']);
         $order->orderReference = OrderReference::fromString($state['order_ref']);
         $order->orderState = OrderState::from($state['order_state']);
-
         $order->discounts = array_map(fn ($discountState) => Discount::fromMappedData($discountState, $state), $childEntities[Discount::class]);
-        $order->lines = array_map(fn ($lineState) => Line::fromMappedData($lineState, $state, [Discount::class => $lineState[Discount::class]]), $childEntities[Line::class]);
+
+        $order->lines = array_map(fn ($lineState) => Line::fromMappedData($lineState, $state, [
+            Discount::class => $lineState[Discount::class],
+            LinePersonalisation::class => $lineState[LinePersonalisation::class],
+        ]), $childEntities[Line::class]);
         $order->shippings = array_map(fn ($shippingState) => Shipping::fromMappedData($shippingState, $state, [Discount::class => $shippingState[Discount::class]]), $childEntities[Shipping::class]);
         $order->payments = array_map(fn ($paymentState) => Payment::fromMappedData($paymentState, $state, [Discount::class => $paymentState[Discount::class]]), $childEntities[Payment::class]);
         $order->shippingAddress = $childEntities[ShippingAddress::class] ? ShippingAddress::fromMappedData($childEntities[ShippingAddress::class], $state) : null;

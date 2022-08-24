@@ -12,6 +12,7 @@ use Thinktomorrow\Trader\Application\Cart\Read\CartPayment;
 use Thinktomorrow\Trader\Application\Cart\Read\CartShipping;
 use Thinktomorrow\Trader\Application\Cart\Read\CartShippingAddress;
 use Thinktomorrow\Trader\Application\Cart\Read\CartShopper;
+use Thinktomorrow\Trader\Application\Cart\Read\CartLinePersonalisation;
 use Thinktomorrow\Trader\Application\Cart\VariantForCart\VariantForCart;
 use Thinktomorrow\Trader\Application\Customer\Read\CustomerBillingAddress;
 use Thinktomorrow\Trader\Application\Customer\Read\CustomerRead;
@@ -35,6 +36,7 @@ use Thinktomorrow\Trader\Infrastructure\Laravel\Models\Cart\DefaultCartPayment;
 use Thinktomorrow\Trader\Infrastructure\Laravel\Models\Cart\DefaultCartShipping;
 use Thinktomorrow\Trader\Infrastructure\Laravel\Models\Cart\DefaultCartShippingAddress;
 use Thinktomorrow\Trader\Infrastructure\Laravel\Models\Cart\DefaultCartShopper;
+use Thinktomorrow\Trader\Infrastructure\Laravel\Models\Cart\DefaultCartLinePersonalisation;
 use Thinktomorrow\Trader\Infrastructure\Laravel\Models\CustomerRead\DefaultCustomerBillingAddress;
 use Thinktomorrow\Trader\Infrastructure\Laravel\Models\CustomerRead\DefaultCustomerRead;
 use Thinktomorrow\Trader\Infrastructure\Laravel\Models\CustomerRead\DefaultCustomerShippingAddress;
@@ -73,6 +75,7 @@ abstract class TestCase extends \Orchestra\Testbench\TestCase
         // Cart
         (new TestContainer())->add(Cart::class, DefaultCart::class);
         (new TestContainer())->add(CartLine::class, DefaultCartLine::class);
+        (new TestContainer())->add(CartLinePersonalisation::class, DefaultCartLinePersonalisation::class);
         (new TestContainer())->add(CartShippingAddress::class, DefaultCartShippingAddress::class);
         (new TestContainer())->add(CartBillingAddress::class, DefaultCartBillingAddress::class);
         (new TestContainer())->add(CartShipping::class, DefaultCartShipping::class);

@@ -43,7 +43,7 @@ enum OrderState: string implements State
     case packed = 'packed'; // internally processed the order so order can be shipped
 
     case partially_delivered = 'partially_delivered'; // one or more of many shipments are delivered
-    case delivered = 'delivered'; // fully delivered so order can be processed
+    case delivered = 'delivered'; // fully delivered
 
     public function inCustomerHands(): bool
     {

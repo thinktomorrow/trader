@@ -10,9 +10,11 @@ use Thinktomorrow\Trader\Domain\Model\Order\Line\LineId;
 use Thinktomorrow\Trader\Domain\Model\Order\Line\LinePrice;
 use Thinktomorrow\Trader\Domain\Model\Order\Line\Quantity;
 use Thinktomorrow\Trader\Domain\Model\Product\Variant\VariantId;
+use Thinktomorrow\Trader\Domain\Model\Order\Line\Personalisations\LinePersonalisation;
 
 trait HasLines
 {
+    /** @var Line[] */
     private array $lines = [];
 
     /** @return Line[] */
@@ -74,6 +76,32 @@ trait HasLines
     {
         if (null !== $lineIndexToBeUpdated = $this->findLineIndex($lineId)) {
             $this->lines[$lineIndexToBeUpdated]->updateQuantity($quantity);
+
+            $this->recordEvent(new LineUpdated($this->orderId, $lineId));
+        }
+    }
+
+    public function updateLinePersonalisations(LineId $lineId, array $personalisations): void
+    {
+        if (null === $lineIndexToBeUpdated = $this->findLineIndex($lineId)) {
+            return;
+        }
+
+        $line = $this->lines[$lineIndexToBeUpdated];
+
+        /** @var LinePersonalisation $personalisation */
+        foreach($personalisations as $personalisation) {
+            $line->deletePersonalisation($personalisation->linePersonalisationId);
+            $line->addPersonalisation($personalisation);
+        }
+
+        $this->recordEvent(new LineUpdated($this->orderId, $lineId));
+    }
+
+    public function updateLineData(LineId $lineId, array $data): void
+    {
+        if (null !== $lineIndexToBeUpdated = $this->findLineIndex($lineId)) {
+            $this->lines[$lineIndexToBeUpdated]->addData($data);
 
             $this->recordEvent(new LineUpdated($this->orderId, $lineId));
         }

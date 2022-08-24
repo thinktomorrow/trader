@@ -32,12 +32,13 @@ abstract class OrderReadLine
     // General flag for all line prices to render with or without tax.
     protected bool $include_tax = true;
     protected iterable $images;
+    protected iterable $personalisations;
 
     final public function __construct()
     {
     }
 
-    public static function fromMappedData(array $state, array $orderState, iterable $discounts): static
+    public static function fromMappedData(array $state, array $orderState, iterable $discounts, iterable $personalisations): static
     {
         $line = new static();
 
@@ -50,7 +51,9 @@ abstract class OrderReadLine
 
         $line->quantity = $state['quantity'];
         $line->discounts = $discounts;
+        $line->personalisations = $personalisations;
         $line->images = [];
+
 
         $line->data = json_decode($state['data'], true);
 
@@ -163,5 +166,10 @@ abstract class OrderReadLine
     public function getDiscounts(): iterable
     {
         return $this->discounts;
+    }
+
+    public function getPersonalisations(): iterable
+    {
+        return $this->personalisations;
     }
 }

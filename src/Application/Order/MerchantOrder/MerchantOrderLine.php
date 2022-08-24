@@ -4,7 +4,7 @@ namespace Thinktomorrow\Trader\Application\Order\MerchantOrder;
 
 interface MerchantOrderLine
 {
-    public static function fromMappedData(array $state, array $orderState, iterable $discounts): static;
+    public static function fromMappedData(array $state, array $orderState, iterable $discounts, iterable $personalisations): static;
 
     public function getLineId(): string;
     public function getVariantId(): string;
@@ -27,4 +27,7 @@ interface MerchantOrderLine
 
     /** @return MerchantOrderDiscount[] */
     public function getDiscounts(): iterable;
+
+    /** @return MerchantOrderLinePersonalisation[] */
+    public function getPersonalisations(): iterable;
 }

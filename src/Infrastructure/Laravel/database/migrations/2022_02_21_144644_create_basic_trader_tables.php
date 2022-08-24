@@ -337,6 +337,20 @@ class CreateBasicTraderTables extends Migration
             $table->foreign('promo_id')->references('promo_id')->on(static::PREFIX.'promos')->nullOnDelete();
             $table->foreign('promo_discount_id')->references('discount_id')->on(static::PREFIX.'promo_discounts')->nullOnDelete();
         });
+
+        Schema::create(static::PREFIX.'order_line_personalisations', function (Blueprint $table) {
+            $table->char('line_personalisation_id', 36)->primary();
+            $table->char('order_id', 36)->index();
+            $table->char('line_id', 36)->index();
+            $table->string('personalisation_type', 72);
+            $table->string('value', 255);
+            $table->char('personalisation_id', 36);
+            $table->json('data')->nullable();
+
+            $table->foreign('order_id')->references('order_id')->on(static::PREFIX.'orders')->onDelete('cascade');
+            $table->foreign('line_id')->references('line_id')->on(static::PREFIX.'order_lines')->onDelete('cascade');
+            $table->foreign('personalisation_id')->references('personalisation_id')->on(static::PREFIX.'product_personalisations')->nullOnDelete();
+        });
     }
 
     private function upPromos()

@@ -4,7 +4,7 @@ namespace Thinktomorrow\Trader\Application\Cart\Read;
 
 interface CartLine
 {
-    public static function fromMappedData(array $state, array $orderState, iterable $discounts): static;
+    public static function fromMappedData(array $state, array $orderState, iterable $discounts, iterable $personalisations): static;
 
     public function getLineId(): string;
     public function getProductId(): string;
@@ -28,4 +28,7 @@ interface CartLine
 
     /** @return CartDiscount[] */
     public function getDiscounts(): iterable;
+
+    /** @return CartLinePersonalisation[] */
+    public function getPersonalisations(): iterable;
 }

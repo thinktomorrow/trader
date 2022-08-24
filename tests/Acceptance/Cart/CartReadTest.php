@@ -7,6 +7,7 @@ use Thinktomorrow\Trader\Application\Cart\Read\Cart;
 use Thinktomorrow\Trader\Application\Cart\Read\CartPayment;
 use Thinktomorrow\Trader\Application\Cart\Read\CartShipping;
 use Thinktomorrow\Trader\Domain\Model\Order\OrderId;
+use Thinktomorrow\Trader\Domain\Model\Product\Personalisation\PersonalisationType;
 
 class CartReadTest extends CartContext
 {
@@ -163,5 +164,32 @@ class CartReadTest extends CartContext
         $this->assertEquals('payment-123', $cart->getPayment()->getPaymentId());
         $this->assertEquals('bancontact', $cart->getPayment()->getPaymentMethodId());
         $this->assertEquals('€ 30', $cart->getPayment()->getCostPrice());
+    }
+
+    /** @test */
+    public function it_can_see_personalisations()
+    {
+        $this->givenThereIsAProductWhichCostsEur('lightsaber', 5);
+        $this->givenThereIsAProductPersonalisation('lightsaber', [
+            [
+                'personalisation_id' => 'xxx',
+                'personalisation_type' => PersonalisationType::TEXT,
+                'data' => ['title' => 'label']
+            ],
+        ]);
+        $this->whenIAddTheVariantToTheCart('lightsaber-123', 1, ['foo' => 'bar'], ['xxx' => 'foobar']);
+        $this->thenIShouldHaveProductInTheCart(1, 1);
+
+        $cart = $this->cartRepository->findCart(OrderId::fromString('xxx'));
+
+        $line = $cart->getLines()[0];
+
+        $this->assertCount(1, $line->getPersonalisations());
+
+        $personalisation = $line->getPersonalisations()[0];
+        $this->assertEquals('label', $personalisation->getLabel());
+        $this->assertEquals('foobar', $personalisation->getValue());
+        $this->assertEquals(PersonalisationType::TEXT, $personalisation->getType());
+
     }
 }

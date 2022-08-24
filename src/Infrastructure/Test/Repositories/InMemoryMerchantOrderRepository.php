@@ -14,7 +14,9 @@ use Thinktomorrow\Trader\Application\Order\MerchantOrder\MerchantOrderShopper;
 use Thinktomorrow\Trader\Domain\Model\Order\Discount\Discount;
 use Thinktomorrow\Trader\Domain\Model\Order\Exceptions\CouldNotFindOrder;
 use Thinktomorrow\Trader\Domain\Model\Order\OrderId;
+use Thinktomorrow\Trader\Domain\Model\Order\Line\Personalisations\LinePersonalisation;
 use Thinktomorrow\Trader\Infrastructure\Laravel\Models\MerchantOrder\DefaultMerchantOrder;
+use Thinktomorrow\Trader\Infrastructure\Laravel\Models\Cart\DefaultCartLinePersonalisation;
 use Thinktomorrow\Trader\Infrastructure\Laravel\Models\MerchantOrder\DefaultMerchantOrderBillingAddress;
 use Thinktomorrow\Trader\Infrastructure\Laravel\Models\MerchantOrder\DefaultMerchantOrderDiscount;
 use Thinktomorrow\Trader\Infrastructure\Laravel\Models\MerchantOrder\DefaultMerchantOrderLine;
@@ -22,6 +24,7 @@ use Thinktomorrow\Trader\Infrastructure\Laravel\Models\MerchantOrder\DefaultMerc
 use Thinktomorrow\Trader\Infrastructure\Laravel\Models\MerchantOrder\DefaultMerchantOrderShipping;
 use Thinktomorrow\Trader\Infrastructure\Laravel\Models\MerchantOrder\DefaultMerchantOrderShippingAddress;
 use Thinktomorrow\Trader\Infrastructure\Laravel\Models\MerchantOrder\DefaultMerchantOrderShopper;
+use Thinktomorrow\Trader\Infrastructure\Laravel\Models\MerchantOrder\DefaultMerchantOrderLinePersonalisation;
 
 class InMemoryMerchantOrderRepository implements MerchantOrderRepository
 {
@@ -53,7 +56,10 @@ class InMemoryMerchantOrderRepository implements MerchantOrderRepository
             array_map(fn (Discount $discount) => DefaultMerchantOrderDiscount::fromMappedData(array_merge($discount->getMappedData(), [
                 'total' => $discount->getTotal(),
                 'percentage' => $discount->getPercentage($line->getSubTotal()),
-            ]), $orderState), $line->getDiscounts()) // TODO: cartline discounts...
+            ]), $orderState), $line->getDiscounts()),
+            array_map(fn (LinePersonalisation $linePersonalisation) => DefaultMerchantOrderLinePersonalisation::fromMappedData(array_merge($linePersonalisation->getMappedData(), [
+                //
+            ]), $line->getMappedData()), $line->getPersonalisations())
         ), $order->getLines());
 
         $shippingAddress = $order->getShippingAddress() ? DefaultMerchantOrderShippingAddress::fromMappedData(

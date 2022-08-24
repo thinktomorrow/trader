@@ -4,23 +4,26 @@ declare(strict_types=1);
 namespace Thinktomorrow\Trader\Domain\Model\Order\Line;
 
 use Money\Money;
-use Thinktomorrow\Trader\Domain\Common\Entity\ChildAggregate;
-use Thinktomorrow\Trader\Domain\Common\Entity\HasData;
 use Thinktomorrow\Trader\Domain\Common\Price\Price;
+use Thinktomorrow\Trader\Domain\Model\Order\OrderId;
+use Thinktomorrow\Trader\Domain\Common\Entity\HasData;
 use Thinktomorrow\Trader\Domain\Common\Price\PriceTotal;
+use Thinktomorrow\Trader\Domain\Model\Order\HasDiscounts;
+use Thinktomorrow\Trader\Domain\Common\Entity\ChildAggregate;
 use Thinktomorrow\Trader\Domain\Model\Order\Discount\Discount;
+use Thinktomorrow\Trader\Domain\Model\Product\Variant\VariantId;
 use Thinktomorrow\Trader\Domain\Model\Order\Discount\Discountable;
+use Thinktomorrow\Trader\Domain\Model\Order\Discount\DiscountTotal;
 use Thinktomorrow\Trader\Domain\Model\Order\Discount\DiscountableId;
 use Thinktomorrow\Trader\Domain\Model\Order\Discount\DiscountableType;
-use Thinktomorrow\Trader\Domain\Model\Order\Discount\DiscountTotal;
-use Thinktomorrow\Trader\Domain\Model\Order\HasDiscounts;
-use Thinktomorrow\Trader\Domain\Model\Order\OrderId;
-use Thinktomorrow\Trader\Domain\Model\Product\Variant\VariantId;
+use Thinktomorrow\Trader\Domain\Model\Order\Line\Personalisations\LinePersonalisation;
+use Thinktomorrow\Trader\Domain\Model\Order\Line\Personalisations\HasPersonalisations;
 
 final class Line implements ChildAggregate, Discountable
 {
     use HasData;
     use HasDiscounts;
+    use HasPersonalisations;
 
     public readonly OrderId $orderId;
     public readonly LineId $lineId;
@@ -117,7 +120,8 @@ final class Line implements ChildAggregate, Discountable
     public function getChildEntities(): array
     {
         return [
-            Discount::class => array_map(fn ($discount) => $discount->getMappedData(), $this->discounts),
+            LinePersonalisation::class => array_map(fn ($personalisation) => $personalisation->getMappedData(), $this->personalisations),
+            Discount::class            => array_map(fn ($discount) => $discount->getMappedData(), $this->discounts),
         ];
     }
 
@@ -131,6 +135,7 @@ final class Line implements ChildAggregate, Discountable
         $line->linePrice = LinePrice::fromScalars($state['line_price'], $state['tax_rate'], $state['includes_vat']);
         $line->quantity = Quantity::fromInt($state['quantity']);
         $line->discounts = array_map(fn ($discountState) => Discount::fromMappedData($discountState, $state), $childEntities[Discount::class]);
+        $line->personalisations = array_map(fn ($personalisationState) => LinePersonalisation::fromMappedData($personalisationState, $state), $childEntities[LinePersonalisation::class]);
         $line->data = json_decode($state['data'], true);
 
         return $line;
@@ -154,10 +159,5 @@ final class Line implements ChildAggregate, Discountable
     public function getDiscountableType(): DiscountableType
     {
         return DiscountableType::line;
-    }
-
-    public function deleteDiscounts(): void
-    {
-        $this->discounts = [];
     }
 }
