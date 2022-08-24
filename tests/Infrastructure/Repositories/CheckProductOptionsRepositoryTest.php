@@ -23,7 +23,6 @@ final class CheckProductOptionsRepositoryTest extends TestCase
         $variant = $product->getVariants()[0];
 
         foreach ($this->repositories() as $repository) {
-
             // Check if combo already exists
             $this->assertTrue($repository->exists($variant->getMappedData()['option_value_ids']));
 

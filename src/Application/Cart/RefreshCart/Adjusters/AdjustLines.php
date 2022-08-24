@@ -27,7 +27,6 @@ class AdjustLines implements Adjuster
         $variants = $this->variantForCartRepository->findAllVariantsForCart($variantIds);
 
         foreach ($order->getLines() as $line) {
-
             // No longer there? Maybe deleted.
             if (! $variant = $this->findVariant($variants, $line->getVariantId())) {
                 $order->deleteLine($line->lineId);

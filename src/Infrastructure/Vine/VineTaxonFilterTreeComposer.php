@@ -41,7 +41,6 @@ class VineTaxonFilterTreeComposer implements TaxonFilterTreeComposer
         // Therefor we exclude all ancestors from the given taxon which allows to only show the
         // nested taxa. This is purely a visual improvement for the filter.
         if (! $mainTaxonNode->isRootNode() && ($ancestorIds = $mainTaxonNode->pluckAncestorNodes('id'))) {
-
             // Keep the root node in the filter in order to keep our structure intact
             array_pop($ancestorIds);
 

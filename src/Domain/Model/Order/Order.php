@@ -20,7 +20,6 @@ use Thinktomorrow\Trader\Domain\Model\Order\Events\OrderStates\CartAbandoned;
 use Thinktomorrow\Trader\Domain\Model\Order\Events\OrderStates\CartQueuedForDeletion;
 use Thinktomorrow\Trader\Domain\Model\Order\Events\OrderStates\CartRevived;
 use Thinktomorrow\Trader\Domain\Model\Order\Events\OrderStates\OrderCancelled;
-use Thinktomorrow\Trader\Domain\Model\Order\Line\Personalisations\LinePersonalisation;
 use Thinktomorrow\Trader\Domain\Model\Order\Events\OrderStates\OrderCancelledByMerchant;
 use Thinktomorrow\Trader\Domain\Model\Order\Events\OrderStates\OrderConfirmed;
 use Thinktomorrow\Trader\Domain\Model\Order\Events\OrderStates\OrderDelivered;
@@ -46,6 +45,7 @@ use Thinktomorrow\Trader\Domain\Model\Order\Events\ShippingStates\ShipmentReturn
 use Thinktomorrow\Trader\Domain\Model\Order\Events\ShippingStates\ShippingFailed;
 use Thinktomorrow\Trader\Domain\Model\Order\Events\ShippingStateUpdated;
 use Thinktomorrow\Trader\Domain\Model\Order\Line\Line;
+use Thinktomorrow\Trader\Domain\Model\Order\Line\Personalisations\LinePersonalisation;
 use Thinktomorrow\Trader\Domain\Model\Order\Line\Quantity;
 use Thinktomorrow\Trader\Domain\Model\Order\Payment\Payment;
 use Thinktomorrow\Trader\Domain\Model\Order\Payment\PaymentId;

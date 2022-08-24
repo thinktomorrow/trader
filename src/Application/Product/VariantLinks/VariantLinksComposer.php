@@ -58,7 +58,6 @@ class VariantLinksComposer
 
         foreach ($product->getOptions() as $option) {
             foreach ($option->getOptionValues() as $optionValue) {
-
                 // Merge this one with the current variant options
                 $mergedVariantOptions = $this->addtoVariantOptions($variantOptions, $optionValue);
 

@@ -14,8 +14,6 @@ use Thinktomorrow\Trader\Application\Cart\RefreshCart\Adjusters\AdjustLines;
 use Thinktomorrow\Trader\Application\Cart\RefreshCart\Adjusters\AdjustShipping;
 use Thinktomorrow\Trader\Application\Cart\RefreshCart\RefreshCart;
 use Thinktomorrow\Trader\Application\Cart\RefreshCart\RefreshCartAction;
-use Thinktomorrow\Trader\Domain\Model\Product\Personalisation\PersonalisationId;
-use Thinktomorrow\Trader\Domain\Model\Order\Line\Personalisations\LinePersonalisation;
 use Thinktomorrow\Trader\Application\Cart\ShippingProfile\UpdateShippingProfileOnOrder;
 use Thinktomorrow\Trader\Application\Cart\VariantForCart\VariantForCartRepository;
 use Thinktomorrow\Trader\Domain\Common\Event\EventDispatcher;
@@ -25,6 +23,8 @@ use Thinktomorrow\Trader\Domain\Model\Order\Address\BillingAddress;
 use Thinktomorrow\Trader\Domain\Model\Order\Address\ShippingAddress;
 use Thinktomorrow\Trader\Domain\Model\Order\Line\LineId;
 use Thinktomorrow\Trader\Domain\Model\Order\Line\LinePrice;
+use Thinktomorrow\Trader\Domain\Model\Order\Line\Personalisations\LinePersonalisation;
+use Thinktomorrow\Trader\Domain\Model\Order\Line\Personalisations\LinePersonalisationId;
 use Thinktomorrow\Trader\Domain\Model\Order\Order;
 use Thinktomorrow\Trader\Domain\Model\Order\OrderId;
 use Thinktomorrow\Trader\Domain\Model\Order\OrderRepository;
@@ -33,9 +33,9 @@ use Thinktomorrow\Trader\Domain\Model\Order\Payment\Payment;
 use Thinktomorrow\Trader\Domain\Model\Order\Payment\PaymentCost;
 use Thinktomorrow\Trader\Domain\Model\Order\Shopper;
 use Thinktomorrow\Trader\Domain\Model\PaymentMethod\PaymentMethodRepository;
+use Thinktomorrow\Trader\Domain\Model\Product\Personalisation\PersonalisationId;
 use Thinktomorrow\Trader\Domain\Model\ShippingProfile\ShippingProfileRepository;
 use Thinktomorrow\Trader\TraderConfig;
-use Thinktomorrow\Trader\Domain\Model\Order\Line\Personalisations\LinePersonalisationId;
 
 final class CartApplication
 {
@@ -137,28 +137,27 @@ final class CartApplication
 
         $linePersonalisations = [];
 
-        foreach($addLine->getPersonalisations() as $personalisation_id => $personalisation_value)
-        {
+        foreach ($addLine->getPersonalisations() as $personalisation_id => $personalisation_value) {
             $originalPersonalisation = null;
 
-            foreach($variant->getPersonalisations() as $personalisation) {
-                if($personalisation->personalisationId->equals(PersonalisationId::fromString($personalisation_id))){
+            foreach ($variant->getPersonalisations() as $personalisation) {
+                if ($personalisation->personalisationId->equals(PersonalisationId::fromString($personalisation_id))) {
                     $originalPersonalisation = $personalisation;
                 }
             }
 
-            if(!$originalPersonalisation) {
+            if (! $originalPersonalisation) {
                 throw new \InvalidArgumentException('No personalisation found for variant ['.$addLine->getVariantId()->get().'] by personalisation id [' . $personalisation_id.'].');
             }
 
-             $linePersonalisations[] = LinePersonalisation::create(
-                 $lineId,
-                 LinePersonalisationId::fromString($lineId->get().'_'.$personalisation_id),
-                 $originalPersonalisation->personalisationId,
-                 $originalPersonalisation->personalisationType,
-                 $personalisation_value,
-                 $originalPersonalisation->getData()
-             );
+            $linePersonalisations[] = LinePersonalisation::create(
+                $lineId,
+                LinePersonalisationId::fromString($lineId->get().'_'.$personalisation_id),
+                $originalPersonalisation->personalisationId,
+                $originalPersonalisation->personalisationType,
+                $personalisation_value,
+                $originalPersonalisation->getData()
+            );
         }
 
         $order->updateLinePersonalisations($lineId, $linePersonalisations);

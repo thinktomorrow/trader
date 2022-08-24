@@ -3,12 +3,12 @@ declare(strict_types=1);
 
 namespace Thinktomorrow\Trader\Domain\Model\Order\Line\Personalisations;
 
+use Thinktomorrow\Trader\Domain\Common\Entity\ChildEntity;
 use Thinktomorrow\Trader\Domain\Common\Entity\HasData;
 use Thinktomorrow\Trader\Domain\Model\Order\Line\LineId;
-use Thinktomorrow\Trader\Domain\Common\Entity\ChildEntity;
 use Thinktomorrow\Trader\Domain\Model\Product\Personalisation\PersonalisationId;
-use Thinktomorrow\Trader\Domain\Model\Product\Personalisation\PersonalisationType;
 use Thinktomorrow\Trader\Domain\Model\Product\Personalisation\PersonalisationId as OriginalPersonalisationId;
+use Thinktomorrow\Trader\Domain\Model\Product\Personalisation\PersonalisationType;
 
 final class LinePersonalisation implements ChildEntity
 {

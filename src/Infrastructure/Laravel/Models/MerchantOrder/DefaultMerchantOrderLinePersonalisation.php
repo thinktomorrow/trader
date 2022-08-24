@@ -8,5 +8,4 @@ use Thinktomorrow\Trader\Infrastructure\Laravel\Models\OrderRead\OrderReadLinePe
 
 final class DefaultMerchantOrderLinePersonalisation extends OrderReadLinePersonalisation implements MerchantOrderLinePersonalisation
 {
-
 }

@@ -40,7 +40,6 @@ class MysqlRedirectRepository implements RedirectRepository
          * we'll update those as well to reflect the new target
          */
         foreach ($this->getAllTo($from) as $existingRedirect) {
-
             // If the from and to are the same, we'll remove the record
             if ($existingRedirect->getFrom() == $to) {
                 $this->delete($existingRedirect);

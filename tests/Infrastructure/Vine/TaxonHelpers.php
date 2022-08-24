@@ -47,7 +47,6 @@ trait TaxonHelpers
     private function createTaxon(Taxon $taxon, array $productIds = [])
     {
         foreach ($this->entityRepositories() as $taxonRepository) {
-
             // In memory
             if ($taxonRepository instanceof InMemoryTaxonRepository) {
                 $taxonRepository->setProductIds($taxon->taxonId, $productIds);

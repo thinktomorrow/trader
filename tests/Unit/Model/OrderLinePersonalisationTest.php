@@ -5,11 +5,10 @@ namespace Tests\Unit\Model;
 
 use Tests\Unit\TestCase;
 use Thinktomorrow\Trader\Domain\Model\Order\Line\LineId;
-use Thinktomorrow\Trader\Domain\Model\Product\Personalisation\Personalisation;
-use Thinktomorrow\Trader\Domain\Model\Product\Personalisation\PersonalisationId;
-use Thinktomorrow\Trader\Domain\Model\Product\Personalisation\PersonalisationType;
 use Thinktomorrow\Trader\Domain\Model\Order\Line\Personalisations\LinePersonalisation;
 use Thinktomorrow\Trader\Domain\Model\Order\Line\Personalisations\LinePersonalisationId;
+use Thinktomorrow\Trader\Domain\Model\Product\Personalisation\PersonalisationId;
+use Thinktomorrow\Trader\Domain\Model\Product\Personalisation\PersonalisationType;
 
 final class OrderLinePersonalisationTest extends TestCase
 {
@@ -105,7 +104,8 @@ final class OrderLinePersonalisationTest extends TestCase
                 'personalisation_type' => 'text',
                 'value' => 'value',
                 'data' => json_encode(['foo' => 'bar']),
-            ], $values), ['line_id' => 'xxx']
+            ], $values),
+            ['line_id' => 'xxx']
         );
     }
 }

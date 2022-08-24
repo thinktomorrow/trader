@@ -174,7 +174,7 @@ class CartReadTest extends CartContext
             [
                 'personalisation_id' => 'xxx',
                 'personalisation_type' => PersonalisationType::TEXT,
-                'data' => ['title' => 'label']
+                'data' => ['title' => 'label'],
             ],
         ]);
         $this->whenIAddTheVariantToTheCart('lightsaber-123', 1, ['foo' => 'bar'], ['xxx' => 'foobar']);
@@ -190,6 +190,5 @@ class CartReadTest extends CartContext
         $this->assertEquals('label', $personalisation->getLabel());
         $this->assertEquals('foobar', $personalisation->getValue());
         $this->assertEquals(PersonalisationType::TEXT, $personalisation->getType());
-
     }
 }

@@ -15,6 +15,7 @@ use Thinktomorrow\Trader\Domain\Model\Order\Discount\DiscountId;
 use Thinktomorrow\Trader\Domain\Model\Order\Exceptions\CouldNotFindOrder;
 use Thinktomorrow\Trader\Domain\Model\Order\Exceptions\OrderAlreadyInMerchantHands;
 use Thinktomorrow\Trader\Domain\Model\Order\Line\Line;
+use Thinktomorrow\Trader\Domain\Model\Order\Line\Personalisations\LinePersonalisation;
 use Thinktomorrow\Trader\Domain\Model\Order\Order;
 use Thinktomorrow\Trader\Domain\Model\Order\OrderId;
 use Thinktomorrow\Trader\Domain\Model\Order\OrderReference;
@@ -25,7 +26,6 @@ use Thinktomorrow\Trader\Domain\Model\Order\Shipping\Shipping;
 use Thinktomorrow\Trader\Domain\Model\Order\Shipping\ShippingId;
 use Thinktomorrow\Trader\Domain\Model\Order\Shopper;
 use Thinktomorrow\Trader\Domain\Model\Order\ShopperId;
-use Thinktomorrow\Trader\Domain\Model\Order\Line\Personalisations\LinePersonalisation;
 
 final class MysqlOrderRepository implements OrderRepository
 {
@@ -262,7 +262,7 @@ final class MysqlOrderRepository implements OrderRepository
             ->map(fn ($item) => array_merge($item, [
                 'includes_vat' => (bool)$item['includes_vat'],
                 Discount::class => $allDiscountStates->filter(fn ($discountState) => $discountState['discountable_type'] == DiscountableType::line->value && $discountState['discountable_id'] == $item['line_id'])->values()->toArray(),
-                LinePersonalisation::class => $allPersonalisationStates->filter(fn($personalisationState) => $personalisationState['line_id'] == $item['line_id'])->values()->toArray(),
+                LinePersonalisation::class => $allPersonalisationStates->filter(fn ($personalisationState) => $personalisationState['line_id'] == $item['line_id'])->values()->toArray(),
             ]))
             ->toArray();
 

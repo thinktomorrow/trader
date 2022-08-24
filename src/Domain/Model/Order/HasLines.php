@@ -8,9 +8,9 @@ use Thinktomorrow\Trader\Domain\Model\Order\Events\LineUpdated;
 use Thinktomorrow\Trader\Domain\Model\Order\Line\Line;
 use Thinktomorrow\Trader\Domain\Model\Order\Line\LineId;
 use Thinktomorrow\Trader\Domain\Model\Order\Line\LinePrice;
+use Thinktomorrow\Trader\Domain\Model\Order\Line\Personalisations\LinePersonalisation;
 use Thinktomorrow\Trader\Domain\Model\Order\Line\Quantity;
 use Thinktomorrow\Trader\Domain\Model\Product\Variant\VariantId;
-use Thinktomorrow\Trader\Domain\Model\Order\Line\Personalisations\LinePersonalisation;
 
 trait HasLines
 {
@@ -90,7 +90,7 @@ trait HasLines
         $line = $this->lines[$lineIndexToBeUpdated];
 
         /** @var LinePersonalisation $personalisation */
-        foreach($personalisations as $personalisation) {
+        foreach ($personalisations as $personalisation) {
             $line->deletePersonalisation($personalisation->linePersonalisationId);
             $line->addPersonalisation($personalisation);
         }

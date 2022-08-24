@@ -8,5 +8,4 @@ use Thinktomorrow\Trader\Infrastructure\Laravel\Models\OrderRead\OrderReadLinePe
 
 class DefaultCartLinePersonalisation extends OrderReadLinePersonalisation implements CartLinePersonalisation
 {
-
 }
