@@ -118,5 +118,14 @@ final class VariantRepositoryTest extends TestCase
             $product,
             $product->getVariants()[0],
         ];
+
+        $product = $this->createdProductWithPersonalisations();
+
+        yield [
+            $product,
+            $product->getVariants()[0],
+        ];
+
+
     }
 }

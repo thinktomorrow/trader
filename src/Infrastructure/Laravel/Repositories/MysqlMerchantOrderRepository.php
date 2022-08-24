@@ -18,6 +18,8 @@ use Thinktomorrow\Trader\Domain\Model\Order\OrderId;
 use Thinktomorrow\Trader\Domain\Model\Order\OrderRepository;
 use Thinktomorrow\Trader\Domain\Model\Order\Payment\Payment;
 use Thinktomorrow\Trader\Domain\Model\Order\Shipping\Shipping;
+use Thinktomorrow\Trader\Domain\Model\Order\Line\Personalisations\LinePersonalisation;
+use Thinktomorrow\Trader\Application\Order\MerchantOrder\MerchantOrderLinePersonalisation;
 
 class MysqlMerchantOrderRepository implements MerchantOrderRepository
 {
@@ -58,7 +60,10 @@ class MysqlMerchantOrderRepository implements MerchantOrderRepository
             array_map(fn (Discount $discount) => $this->container->get(MerchantOrderDiscount::class)::fromMappedData(array_merge($discount->getMappedData(), [
                 'total' => $discount->getTotal(),
                 'percentage' => $discount->getPercentage($line->getSubTotal()),
-            ]), $orderState), $line->getDiscounts()) // TODO: cartline discounts...
+            ]), $orderState), $line->getDiscounts()),
+            array_map(fn (LinePersonalisation $linePersonalisation) => $this->container->get(MerchantOrderLinePersonalisation::class)::fromMappedData(array_merge($linePersonalisation->getMappedData(), [
+                //
+            ]), $line->getMappedData()), $line->getPersonalisations())
         ), $order->getLines());
 
         $shippingAddress = $order->getShippingAddress() ? $this->container->get(MerchantOrderShippingAddress::class)::fromMappedData(

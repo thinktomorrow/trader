@@ -27,8 +27,9 @@ final class OrderLinePersonalisationTest extends TestCase
             $lineId = LineId::fromString('xxx'),
             $linePersonalisationId = LinePersonalisationId::fromString('aaa'),
             $personalisationId = PersonalisationId::fromString('bbb'),
-            $type = PersonalisationType::TEXT,
+            $type = PersonalisationType::fromString(PersonalisationType::TEXT),
             $value = 'value',
+            []
         );
 
         $this->assertEquals($lineId, $personalisation->lineId);
@@ -49,6 +50,7 @@ final class OrderLinePersonalisationTest extends TestCase
         ], ['line_id' => 'xxx']);
 
         $this->assertEquals([
+            'line_id' => 'xxx',
             'line_personalisation_id' => 'aaa',
             'personalisation_id' => 'bbb',
             'personalisation_type' => 'text',

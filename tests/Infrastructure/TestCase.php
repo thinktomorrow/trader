@@ -32,6 +32,7 @@ use Thinktomorrow\Trader\Infrastructure\Laravel\Models\Cart\DefaultCart;
 use Thinktomorrow\Trader\Infrastructure\Laravel\Models\Cart\DefaultCartBillingAddress;
 use Thinktomorrow\Trader\Infrastructure\Laravel\Models\Cart\DefaultCartDiscount;
 use Thinktomorrow\Trader\Infrastructure\Laravel\Models\Cart\DefaultCartLine;
+use Thinktomorrow\Trader\Application\Order\MerchantOrder\MerchantOrderLinePersonalisation;
 use Thinktomorrow\Trader\Infrastructure\Laravel\Models\Cart\DefaultCartLinePersonalisation;
 use Thinktomorrow\Trader\Infrastructure\Laravel\Models\Cart\DefaultCartPayment;
 use Thinktomorrow\Trader\Infrastructure\Laravel\Models\Cart\DefaultCartShipping;
@@ -58,6 +59,7 @@ use Thinktomorrow\Trader\Infrastructure\Test\Repositories\InMemoryPromoRepositor
 use Thinktomorrow\Trader\Infrastructure\Test\Repositories\InMemoryTaxonRepository;
 use Thinktomorrow\Trader\Infrastructure\Test\Repositories\InMemoryVariantRepository;
 use Thinktomorrow\Trader\Infrastructure\Test\TestContainer;
+use Thinktomorrow\Trader\Infrastructure\Laravel\Models\MerchantOrder\DefaultMerchantOrderLinePersonalisation;
 
 abstract class TestCase extends \Orchestra\Testbench\TestCase
 {
@@ -86,6 +88,7 @@ abstract class TestCase extends \Orchestra\Testbench\TestCase
         // MerchantOrder
         (new TestContainer())->add(MerchantOrder::class, DefaultMerchantOrder::class);
         (new TestContainer())->add(MerchantOrderLine::class, DefaultMerchantOrderLine::class);
+        (new TestContainer())->add(MerchantOrderLinePersonalisation::class, DefaultMerchantOrderLinePersonalisation::class);
         (new TestContainer())->add(MerchantOrderShippingAddress::class, DefaultMerchantOrderShippingAddress::class);
         (new TestContainer())->add(MerchantOrderBillingAddress::class, DefaultMerchantOrderBillingAddress::class);
         (new TestContainer())->add(MerchantOrderShipping::class, DefaultMerchantOrderShipping::class);

@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\DB;
 use Psr\Container\ContainerInterface;
 use Ramsey\Uuid\Uuid;
 use Thinktomorrow\Trader\Application\Cart\VariantForCart\VariantForCart;
+use Thinktomorrow\Trader\Domain\Model\Product\Personalisation\Personalisation;
 use Thinktomorrow\Trader\Application\Cart\VariantForCart\VariantForCartRepository;
 use Thinktomorrow\Trader\Application\Common\TraderHelpers;
 use Thinktomorrow\Trader\Domain\Model\Product\ProductId;
@@ -22,6 +23,7 @@ class MysqlVariantRepository implements VariantRepository, VariantForCartReposit
     private static string $optionTable = 'trader_product_options';
     private static string $optionValueTable = 'trader_product_option_values';
     private static string $variantOptionValueLookupTable = 'trader_variant_option_values';
+    private static $productPersonalisationsTable = 'trader_product_personalisations';
 
     private ContainerInterface $container;
 
@@ -132,7 +134,16 @@ class MysqlVariantRepository implements VariantRepository, VariantForCartReposit
             throw new \RuntimeException('No online/available variant found by id [' . $variantId->get(). ']');
         }
 
-        return $this->composeVariantForCart((array) $state);
+        $state = (array) $state;
+
+        $personalisationStates = DB::table(static::$productPersonalisationsTable)
+            ->where(static::$productPersonalisationsTable . '.product_id', $state['product_id'])
+            ->get()
+            ->map(fn ($item) => (array)$item);
+
+        $personalisations = $personalisationStates->map(fn($personalisationState) => Personalisation::fromMappedData($personalisationState, $state))->all();
+
+        return $this->composeVariantForCart($state, $personalisations);
     }
 
     public function findAllVariantsForCart(array $variantIds): array
@@ -147,13 +158,20 @@ class MysqlVariantRepository implements VariantRepository, VariantForCartReposit
             ])
             ->get();
 
-        return $states->map(fn ($state) => $this->composeVariantForCart((array) $state))->toArray();
+        $allPersonalisationStates = DB::table(static::$productPersonalisationsTable)
+            ->where(static::$productPersonalisationsTable . '.product_id', $states->pluck('product_id')->unique()->toArray())
+            ->get()
+            ->map(fn ($item) => (array)$item);
+
+        return $states
+            ->map(fn ($state) => (array) $state)
+            ->map(fn ($state) => $this->composeVariantForCart( $state, $allPersonalisationStates->filter(fn ($personalisationState) => $personalisationState['product_id'] == $state['product_id'])->map(fn($personalisationState) => Personalisation::fromMappedData($personalisationState, $state))->all() ))->toArray();
     }
 
-    private function composeVariantForCart(array $state): VariantForCart
+    private function composeVariantForCart(array $state, array $personalisations): VariantForCart
     {
         return $this->container->get(VariantForCart::class)::fromMappedData(array_merge($state, [
             'includes_vat' => (bool) $state['includes_vat'],
-        ]));
+        ]), $personalisations);
     }
 }

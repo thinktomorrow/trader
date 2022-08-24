@@ -16,6 +16,7 @@ use Thinktomorrow\Trader\Application\Cart\Read\CartShipping;
 use Thinktomorrow\Trader\Application\Cart\Read\CartShippingAddress;
 use Thinktomorrow\Trader\Application\Cart\Read\CartShopper;
 use Thinktomorrow\Trader\Application\Cart\ShippingProfile\ShippingProfileForCart;
+use Thinktomorrow\Trader\Application\Order\MerchantOrder\MerchantOrderLinePersonalisation;
 use Thinktomorrow\Trader\Application\Cart\ShippingProfile\ShippingProfileForCartRepository;
 use Thinktomorrow\Trader\Application\Cart\VariantForCart\VariantForCart;
 use Thinktomorrow\Trader\Application\Cart\VariantForCart\VariantForCartRepository;
@@ -132,6 +133,7 @@ use Thinktomorrow\Trader\Infrastructure\Vine\VineFlattenedTaxonIdsComposer;
 use Thinktomorrow\Trader\Infrastructure\Vine\VineTaxonFilterTreeComposer;
 use Thinktomorrow\Trader\Infrastructure\Vine\VineTaxonIdOptionsComposer;
 use Thinktomorrow\Trader\TraderConfig;
+use Thinktomorrow\Trader\Infrastructure\Laravel\Models\MerchantOrder\DefaultMerchantOrderLinePersonalisation;
 
 class TraderServiceProvider extends ServiceProvider
 {
@@ -199,6 +201,7 @@ class TraderServiceProvider extends ServiceProvider
         // MerchantOrder models
         $this->app->bind(MerchantOrder::class, fn () => DefaultMerchantOrder::class);
         $this->app->bind(MerchantOrderLine::class, fn () => DefaultMerchantOrderLine::class);
+        $this->app->bind(MerchantOrderLinePersonalisation::class, fn () => DefaultMerchantOrderLinePersonalisation::class);
         $this->app->bind(MerchantOrderDiscount::class, fn () => DefaultMerchantOrderDiscount::class);
         $this->app->bind(MerchantOrderShippingAddress::class, fn () => DefaultMerchantOrderShippingAddress::class);
         $this->app->bind(MerchantOrderBillingAddress::class, fn () => DefaultMerchantOrderBillingAddress::class);

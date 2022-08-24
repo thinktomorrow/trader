@@ -12,6 +12,7 @@ use Thinktomorrow\Trader\Domain\Model\Order\OrderId;
 use Thinktomorrow\Trader\Domain\Model\Order\OrderState;
 use Thinktomorrow\Trader\Domain\Model\Order\Payment\PaymentState;
 use Thinktomorrow\Trader\Domain\Model\Order\Shipping\ShippingState;
+use Thinktomorrow\Trader\Domain\Model\Product\Personalisation\PersonalisationType;
 
 class MerchantOrderTest extends CartContext
 {
@@ -193,5 +194,31 @@ class MerchantOrderTest extends CartContext
         $merchantOrder = $this->merchantOrderRepository->findMerchantOrder(OrderId::fromString('xxx'));
 
         $this->assertTrue($merchantOrder->getShopper()->isBusiness());
+    }
+
+    /** @test */
+    public function as_a_merchant_i_need_to_be_able_to_see_a_line_personalisation()
+    {
+        $this->givenThereIsAProductWhichCostsEur('lightsaber', 5);
+        $this->givenThereIsAProductPersonalisation('lightsaber', [
+            [
+                'personalisation_id' => 'xxx',
+                'personalisation_type' => PersonalisationType::TEXT,
+                'data' => ['title' => 'label'],
+            ],
+        ]);
+        $this->whenIAddTheVariantToTheCart('lightsaber-123', 1, ['foo' => 'bar'], ['xxx' => 'foobar']);
+        $this->thenIShouldHaveProductInTheCart(1, 1);
+
+        $merchantOrder = $this->merchantOrderRepository->findMerchantOrder(OrderId::fromString('xxx'));
+
+        $line = $merchantOrder->getLines()[0];
+
+        $this->assertCount(1, $line->getPersonalisations());
+
+        $personalisation = $line->getPersonalisations()[0];
+        $this->assertEquals('label', $personalisation->getLabel());
+        $this->assertEquals('foobar', $personalisation->getValue());
+        $this->assertEquals(PersonalisationType::TEXT, $personalisation->getType());
     }
 }

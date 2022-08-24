@@ -41,7 +41,7 @@ class Personalisation implements ChildEntity
         ];
     }
 
-    public static function fromMappedData(array $state, array $aggregateState, array $childEntities = []): static
+    public static function fromMappedData(array $state, array $aggregateState): static
     {
         $personalisation = new static();
 
