@@ -29,4 +29,5 @@ interface GridRepository
     public function setLocale(Locale $locale): static;
 
     public function getResults(): LengthAwarePaginator;
+    public function getOrderIds(): array;
 }

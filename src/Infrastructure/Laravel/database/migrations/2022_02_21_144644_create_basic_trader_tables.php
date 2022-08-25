@@ -395,6 +395,7 @@ class CreateBasicTraderTables extends Migration
         Schema::dropIfExists(static::PREFIX.'order_events');
         Schema::dropIfExists(static::PREFIX.'order_payment');
         Schema::dropIfExists(static::PREFIX.'order_shipping');
+        Schema::dropIfExists(static::PREFIX.'order_addresses');
         Schema::dropIfExists(static::PREFIX.'order_customer');
         Schema::dropIfExists(static::PREFIX.'order_lines');
         Schema::dropIfExists(static::PREFIX.'orders');

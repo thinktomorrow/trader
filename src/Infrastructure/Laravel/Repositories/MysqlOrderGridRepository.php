@@ -162,6 +162,16 @@ final class MysqlOrderGridRepository implements GridRepository
         );
     }
 
+    public function getOrderIds(): array
+    {
+        // Default ordering if no ordering has been applied yet.
+        if (! $this->builder->orders || count($this->builder->orders) < 1) {
+            $this->sortByDefault();
+        }
+
+        return $this->builder->select(static::$orderTable. '.order_id')->get()->pluck('order_id')->toArray();
+    }
+
     private function sortByDefault(): void
     {
         $this->builder->orderBy(static::$orderTable . '.created_at', 'ASC');

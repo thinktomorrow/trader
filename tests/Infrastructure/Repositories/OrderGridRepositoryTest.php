@@ -38,6 +38,14 @@ class OrderGridRepositoryTest extends TestCase
     }
 
     /** @test */
+    public function it_can_return_ids()
+    {
+        $gridItems = $this->getMysqlGridRepository()->getOrderIds();
+
+        $this->assertCount(1, $gridItems);
+    }
+
+    /** @test */
     public function it_can_filter_by_order_reference()
     {
         $gridItems = $this->getMysqlGridRepository()->filterByOrderReference('xx')->getResults();
