@@ -45,6 +45,14 @@ return [
     'does_price_input_includes_vat' => true,
 
     /**
+     * Prices on the shop will be calculated including or excluding vat. This makes sure that calculations are correct
+     * and don't cause any rounding errors - which could occur when calculating excluding vat and including the vat
+     * afterwards. This can be set according to the visitor demands (b2b or b2c). This also determines how the
+     * catalog prices are displayed.
+     */
+    'include_vat_in_prices' => true,
+
+    /**
      * Which taxon subtree represents the main category of the catalog. The main category taxon
      * determines which of the products taxa to use for the breadcrumb tree and structure.
      * If left blank, by default the first taxon subtree found will be used.

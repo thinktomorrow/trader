@@ -58,13 +58,17 @@ abstract class OrderReadLine
         $line->data = json_decode($state['data'], true);
 
         Assertion::keyIsset($line->data, 'product_id');
-        Assertion::keyIsset($line->data, 'unit_price');
+        Assertion::keyIsset($line->data, 'unit_price_excluding_vat');
+        Assertion::keyIsset($line->data, 'unit_price_including_vat');
 
         $line->product_id = $line->data('product_id');
-        $line->unitPrice = VariantUnitPrice::fromMoney(Cash::make($line->data('unit_price')), $line->linePrice->getTaxRate(), $line->linePrice->includesVat());
+        $line->unitPrice = VariantUnitPrice::fromMoney(
+            Cash::make($line->linePrice->includesVat() ? $line->data('unit_price_including_vat') : $line->data('unit_price_excluding_vat')),
+            $line->linePrice->getTaxRate(),
+            $line->linePrice->includesVat()
+        );
 
-        // TODO: this should be set according to
-        $line->include_tax = true;
+        $line->include_tax = $line->linePrice->includesVat();
 
         return $line;
     }

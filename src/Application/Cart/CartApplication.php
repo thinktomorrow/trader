@@ -123,12 +123,17 @@ final class CartApplication
         $order->addOrUpdateLine(
             $lineId,
             $addLine->getVariantId(),
-            LinePrice::fromPrice($variant->getSalePrice()),
+            LinePrice::fromMoney(
+                $this->config->includeVatInPrices() ? $variant->getSalePrice()->getIncludingVat() : $variant->getSalePrice()->getExcludingVat(),
+                $variant->getSalePrice()->getTaxRate(),
+                $this->config->includeVatInPrices()
+            ),
             $addLine->getQuantity(),
             array_merge($addLine->getData(), [
                 'title' => $variant->getTitle(),
                 'product_id' => $variant->getProductId()->get(),
-                'unit_price' => $variant->getUnitPrice()->getMoney()->getAmount(),
+                'unit_price_excluding_vat' => $variant->getUnitPrice()->getExcludingVat()->getAmount(),
+                'unit_price_including_vat' => $variant->getUnitPrice()->getIncludingVat()->getAmount(),
             ])
         );
 

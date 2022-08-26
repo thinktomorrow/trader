@@ -34,6 +34,11 @@ class TraderConfig implements \Thinktomorrow\Trader\TraderConfig
         return config('trader.does_price_input_includes_vat');
     }
 
+    public function includeVatInPrices(): bool
+    {
+        return config('trader.include_vat_in_prices');
+    }
+
     public function getCategoryRootId(): ?string
     {
         return config('trader.category_root_id');

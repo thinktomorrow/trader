@@ -131,7 +131,7 @@ trait TestHelpers
             'tax_rate' => '10',
             'includes_vat' => true,
             'quantity' => 2,
-            'data' => json_encode(['product_id' => 'aab', 'unit_price' => '1000', 'foo' => 'bar']),
+            'data' => json_encode(['product_id' => 'aab', 'unit_price_including_vat' => '1000', 'unit_price_excluding_vat' => '900', 'foo' => 'bar']),
         ], $values), array_merge([
             'order_id' => 'xxx',
         ], $aggregateState), [
