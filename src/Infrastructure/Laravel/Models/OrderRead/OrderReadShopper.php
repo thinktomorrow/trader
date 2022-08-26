@@ -40,6 +40,11 @@ abstract class OrderReadShopper
         return $this->shopper_id;
     }
 
+    public function getCustomerId(): ?string
+    {
+        return $this->customer_id;
+    }
+
     public function getEmail(): string
     {
         return $this->email;

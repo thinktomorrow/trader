@@ -30,7 +30,7 @@ abstract class OrderReadLine
     protected array $data;
 
     // General flag for all line prices to render with or without tax.
-    protected bool $include_tax = true;
+    protected bool $include_tax;
     protected iterable $images;
     protected iterable $personalisations;
 
@@ -63,6 +63,9 @@ abstract class OrderReadLine
         $line->product_id = $line->data('product_id');
         $line->unitPrice = VariantUnitPrice::fromMoney(Cash::make($line->data('unit_price')), $line->linePrice->getTaxRate(), $line->linePrice->includesVat());
 
+        // TODO: this should be set according to
+        $line->include_tax = true;
+
         return $line;
     }
 
@@ -81,9 +84,9 @@ abstract class OrderReadLine
         return $this->product_id;
     }
 
-    public function includeTax(bool $includeTax = true): void
+    public function includeTax(bool $include_tax = true): void
     {
-        $this->include_tax = $includeTax;
+        $this->include_tax = $include_tax;
     }
 
     public function getUnitPrice(): string

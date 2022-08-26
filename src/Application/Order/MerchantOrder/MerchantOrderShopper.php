@@ -11,6 +11,8 @@ interface MerchantOrderShopper
 
     public function getShopperId(): string;
 
+    public function getCustomerId(): ?string;
+
     public function getEmail(): string;
 
     /** Shopper refers to a customer account */
