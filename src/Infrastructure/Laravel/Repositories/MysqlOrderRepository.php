@@ -347,7 +347,7 @@ final class MysqlOrderRepository implements OrderRepository
     {
         $order_id = DB::table(static::$orderTable)->select('order_id')->where('order_ref', $orderReference->get())->first()?->order_id;
 
-        if(!$order_id) {
+        if (! $order_id) {
             throw new CouldNotFindOrder('No order found by order reference ' . $orderReference->get());
         }
 
