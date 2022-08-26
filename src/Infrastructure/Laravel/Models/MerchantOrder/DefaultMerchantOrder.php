@@ -13,9 +13,39 @@ use Thinktomorrow\Trader\Infrastructure\Laravel\Models\OrderRead\OrderRead;
 
 class DefaultMerchantOrder extends OrderRead implements MerchantOrder
 {
+    protected ?string $confirmed_at;
+    protected ?string $paid_at;
+    protected ?string $delivered_at;
+
+    public static function fromMappedData(array $state, array $childObjects, array $discounts): static
+    {
+        $order = parent::fromMappedData($state, $childObjects, $discounts);
+
+        $order->confirmed_at = $state['confirmed_at'] ?? null;
+        $order->paid_at = $state['paid_at'] ?? null;
+        $order->delivered_at = $state['delivered_at'] ?? null;
+
+        return $order;
+    }
+
     public function getState(): string
     {
         return $this->state->getValueAsString();
+    }
+
+    public function getConfirmedAt(): ?string
+    {
+        return $this->confirmed_at;
+    }
+
+    public function getPaidAt(): ?string
+    {
+        return $this->paid_at;
+    }
+
+    public function getDeliveredAt(): ?string
+    {
+        return $this->delivered_at;
     }
 
     public function getShopper(): MerchantOrderShopper

@@ -10,6 +10,9 @@ interface MerchantOrder
 
     public function getOrderReference(): string;
     public function getState(): string;
+    public function getConfirmedAt(): ?string;
+    public function getPaidAt(): ?string;
+    public function getDeliveredAt(): ?string;
 
     /** @return MerchantOrderLine[] */
     public function getLines(): iterable;

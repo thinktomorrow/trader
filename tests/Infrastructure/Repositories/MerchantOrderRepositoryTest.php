@@ -8,7 +8,6 @@ use Tests\Infrastructure\TestCase;
 use Thinktomorrow\Trader\Application\Order\MerchantOrder\MerchantOrder;
 use Thinktomorrow\Trader\Domain\Common\Cash\Cash;
 use Thinktomorrow\Trader\Domain\Common\Locale;
-use Thinktomorrow\Trader\Domain\Model\Order\Order;
 use Thinktomorrow\Trader\Infrastructure\Laravel\Repositories\MysqlMerchantOrderRepository;
 use Thinktomorrow\Trader\Infrastructure\Laravel\Repositories\MysqlOrderRepository;
 use Thinktomorrow\Trader\Infrastructure\Laravel\Repositories\MysqlProductRepository;
@@ -22,10 +21,7 @@ class MerchantOrderRepositoryTest extends TestCase
 {
     use RefreshDatabase;
 
-    /**
-     * @test
-     */
-    public function it_can_find_a_merchantorder()
+    public function test_it_can_find_a_merchantorder()
     {
         $order = $this->createDefaultOrder();
 
@@ -47,6 +43,20 @@ class MerchantOrderRepositoryTest extends TestCase
                 Cash::from($order->getTotal()->getIncludingVat())->toLocalizedFormat(Locale::make('nl', 'BE')),
                 $merchantOrder->getTotalPrice()
             );
+        }
+    }
+
+    public function test_it_can_find_a_merchantorder_by_reference()
+    {
+        $order = $this->createDefaultOrder();
+
+        foreach ($this->orderRepositories() as $i => $orderRepository) {
+            $orderRepository->save($order);
+
+            $merchantOrderRepository = iterator_to_array($this->merchantOrderRepositories())[$i];
+            $merchantOrder = $merchantOrderRepository->findMerchantOrderByReference($order->orderReference);
+
+            $this->assertInstanceOf(MerchantOrder::class, $merchantOrder);
         }
     }
 

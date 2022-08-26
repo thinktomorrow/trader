@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace Thinktomorrow\Trader\Infrastructure\Test\Repositories;
 
+use Thinktomorrow\Trader\Domain\Model\Order\OrderReference;
 use Thinktomorrow\Trader\Application\Order\MerchantOrder\MerchantOrder;
 use Thinktomorrow\Trader\Application\Order\MerchantOrder\MerchantOrderBillingAddress;
 use Thinktomorrow\Trader\Application\Order\MerchantOrder\MerchantOrderLine;
@@ -113,6 +114,15 @@ class InMemoryMerchantOrderRepository implements MerchantOrderRepository
                 'percentage' => $discount->getPercentage($order->getSubTotal()),
             ]), $orderState), $order->getDiscounts()), // TODO: cart discounts
         );
+    }
+
+    public function findMerchantOrderByReference(OrderReference $orderReference): MerchantOrder
+    {
+        foreach (InMemoryOrderRepository::$orders as $order) {
+            if ($order->orderReference->equals($orderReference)) {
+                return $this->findMerchantOrder($order->orderId);
+            }
+        }
     }
 
     public function existsCart(OrderId $orderId): bool

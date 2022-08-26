@@ -343,6 +343,17 @@ final class MysqlOrderRepository implements OrderRepository
         DB::table(static::$orderTable)->where('order_id', $orderId->get())->delete();
     }
 
+    public function findIdByReference(OrderReference $orderReference): OrderId
+    {
+        $order_id = DB::table(static::$orderTable)->select('order_id')->where('order_ref', $orderReference->get())->first()?->order_id;
+
+        if(!$order_id) {
+            throw new CouldNotFindOrder('No order found by order reference ' . $orderReference->get());
+        }
+
+        return OrderId::fromString($order_id);
+    }
+
     public function nextReference(): OrderId
     {
         return OrderId::fromString((string)Uuid::uuid4());

@@ -26,6 +26,8 @@ interface OrderRepository
 
     public function delete(OrderId $orderId): void;
 
+    public function findIdByReference(OrderReference $orderReference): OrderId;
+
     public function nextReference(): OrderId;
 
     public function nextExternalReference(): OrderReference;

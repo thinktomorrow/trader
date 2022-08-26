@@ -62,6 +62,15 @@ final class InMemoryOrderRepository implements OrderRepository
         unset(static::$orders[$orderId->get()]);
     }
 
+    public function findIdByReference(OrderReference $orderReference): OrderId
+    {
+        foreach(static::$orders as $order){
+            if($order->orderReference->equals($orderReference)) {
+                return $order->orderId;
+            }
+        }
+    }
+
     public function nextReference(): OrderId
     {
         return OrderId::fromString($this->nextReference);

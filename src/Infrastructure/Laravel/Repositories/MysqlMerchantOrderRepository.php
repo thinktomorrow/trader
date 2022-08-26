@@ -4,6 +4,8 @@ declare(strict_types=1);
 namespace Thinktomorrow\Trader\Infrastructure\Laravel\Repositories;
 
 use Psr\Container\ContainerInterface;
+use Thinktomorrow\Trader\Domain\Model\Order\Order;
+use Thinktomorrow\Trader\Domain\Model\Order\OrderReference;
 use Thinktomorrow\Trader\Application\Order\MerchantOrder\MerchantOrder;
 use Thinktomorrow\Trader\Application\Order\MerchantOrder\MerchantOrderBillingAddress;
 use Thinktomorrow\Trader\Application\Order\MerchantOrder\MerchantOrderDiscount;
@@ -38,6 +40,16 @@ class MysqlMerchantOrderRepository implements MerchantOrderRepository
     {
         $order = $this->orderRepository->find($orderId);
 
+        return $this->composeOrder($order);
+    }
+
+    public function findMerchantOrderByReference(OrderReference $orderReference): MerchantOrder
+    {
+        return $this->findMerchantOrder($this->orderRepository->findIdByReference($orderReference));
+    }
+
+    private function composeOrder(Order $order): MerchantOrder
+    {
         $orderState = array_merge($order->getMappedData(), [
             'total' => $order->getTotal(),
             'taxTotal' => $order->getTaxTotal(),
