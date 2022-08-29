@@ -3,7 +3,7 @@ declare(strict_types=1);
 
 namespace Thinktomorrow\Trader\Application\Order\Grid;
 
-interface GridItem
+interface OrderGridItem
 {
     public static function fromMappedData(array $state, array $shopperState): static;
 

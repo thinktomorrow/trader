@@ -6,10 +6,10 @@ namespace Thinktomorrow\Trader\Infrastructure\Laravel\Models;
 use Money\Money;
 use Thinktomorrow\Trader\Application\Common\HasLocale;
 use Thinktomorrow\Trader\Application\Common\RendersMoney;
-use Thinktomorrow\Trader\Application\Order\Grid\GridItem;
+use Thinktomorrow\Trader\Application\Order\Grid\OrderGridItem;
 use Thinktomorrow\Trader\Domain\Common\Cash\Cash;
 
-class DefaultOrderGridItem implements GridItem
+class DefaultOrderGridItem implements OrderGridItem
 {
     use RendersMoney;
     use HasLocale;

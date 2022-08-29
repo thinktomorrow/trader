@@ -7,7 +7,7 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use Tests\Infrastructure\TestCase;
-use Thinktomorrow\Trader\Application\Order\Grid\GridItem;
+use Thinktomorrow\Trader\Application\Order\Grid\OrderGridItem;
 use Thinktomorrow\Trader\Domain\Model\Order\OrderState;
 use Thinktomorrow\Trader\Infrastructure\Laravel\Models\DefaultOrderGridItem;
 use Thinktomorrow\Trader\Infrastructure\Laravel\Repositories\MysqlOrderGridRepository;
@@ -159,7 +159,7 @@ class OrderGridRepositoryTest extends TestCase
 
     private function getMysqlGridRepository()
     {
-        (new TestContainer())->add(GridItem::class, DefaultOrderGridItem::class);
+        (new TestContainer())->add(OrderGridItem::class, DefaultOrderGridItem::class);
 
         return new MysqlOrderGridRepository(
             new TestContainer(),

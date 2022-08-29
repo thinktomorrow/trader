@@ -38,7 +38,7 @@ return [
     ],
 
     /**
-     * When this value is true, all entered prices as given by the merchant are considered to have
+     * When this value is true, all catalog prices as given by the merchant are considered to have
      * tax already included. Set this value to false if all entered prices are always without
      * tax included. Keep in mind that this does not alter already entered price values.
      */

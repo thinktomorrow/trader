@@ -6,7 +6,7 @@ namespace Thinktomorrow\Trader\Application\Order\Grid;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Thinktomorrow\Trader\Domain\Common\Locale;
 
-interface GridRepository
+interface OrderGridRepository
 {
     public function filterByOrderReference(string $orderReference): static;
 

@@ -8,12 +8,12 @@ use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Query\Builder;
 use Illuminate\Support\Facades\DB;
 use Psr\Container\ContainerInterface;
-use Thinktomorrow\Trader\Application\Order\Grid\GridItem;
-use Thinktomorrow\Trader\Application\Order\Grid\GridRepository;
+use Thinktomorrow\Trader\Application\Order\Grid\OrderGridItem;
+use Thinktomorrow\Trader\Application\Order\Grid\OrderGridRepository;
 use Thinktomorrow\Trader\Domain\Common\Locale;
 use Thinktomorrow\Trader\TraderConfig;
 
-final class MysqlOrderGridRepository implements GridRepository
+final class MysqlOrderGridRepository implements OrderGridRepository
 {
     private ContainerInterface $container;
     private TraderConfig $traderConfig;
@@ -154,7 +154,7 @@ final class MysqlOrderGridRepository implements GridRepository
         return $results->setCollection(
             $results->getCollection()
                 ->map(fn ($state) => get_object_vars($state))
-                ->map(fn ($state) => $this->container->get(GridItem::class)::fromMappedData($state, [
+                ->map(fn ($state) => $this->container->get(OrderGridItem::class)::fromMappedData($state, [
                     'email' => $state['shopper_email'],
                     'data' => $state['shopper_data'],
                     'customer_id' => $state['shopper_customer_id'],

@@ -170,7 +170,7 @@ class TraderServiceProvider extends ServiceProvider
         $this->app->bind(ShippingProfileRepository::class, MysqlShippingProfileRepository::class);
         $this->app->bind(PaymentMethodRepository::class, MysqlPaymentMethodRepository::class);
         $this->app->bind(MerchantOrderRepository::class, MysqlMerchantOrderRepository::class);
-        $this->app->bind(\Thinktomorrow\Trader\Application\Order\Grid\GridRepository::class, MysqlOrderGridRepository::class);
+        $this->app->bind(\Thinktomorrow\Trader\Application\Order\Grid\OrderGridRepository::class, MysqlOrderGridRepository::class);
 
         // Customer repositories
         $this->app->bind(CustomerRepository::class, MysqlCustomerRepository::class);
@@ -186,7 +186,7 @@ class TraderServiceProvider extends ServiceProvider
         $this->app->bind(VariantForCart::class, fn () => DefaultVariantForCart::class);
 
         // Order models
-        $this->app->bind(\Thinktomorrow\Trader\Application\Order\Grid\GridItem::class, fn () => DefaultOrderGridItem::class);
+        $this->app->bind(\Thinktomorrow\Trader\Application\Order\Grid\OrderGridItem::class, fn () => DefaultOrderGridItem::class);
         $this->app->bind(Cart::class, fn () => DefaultCart::class);
         $this->app->bind(CartLine::class, fn () => DefaultCartLine::class);
         $this->app->bind(CartLinePersonalisation::class, fn () => DefaultCartLinePersonalisation::class);
