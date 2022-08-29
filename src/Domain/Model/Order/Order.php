@@ -14,6 +14,7 @@ use Thinktomorrow\Trader\Domain\Model\Order\Address\ShippingAddress;
 use Thinktomorrow\Trader\Domain\Model\Order\Discount\Discount;
 use Thinktomorrow\Trader\Domain\Model\Order\Discount\Discountable;
 use Thinktomorrow\Trader\Domain\Model\Order\Discount\DiscountableId;
+use Thinktomorrow\Trader\Domain\Model\Order\Invoice\InvoiceReference;
 use Thinktomorrow\Trader\Domain\Model\Order\Discount\DiscountableType;
 use Thinktomorrow\Trader\Domain\Model\Order\Events\OrderCreated;
 use Thinktomorrow\Trader\Domain\Model\Order\Events\OrderStates\CartAbandoned;
@@ -66,8 +67,10 @@ final class Order implements Aggregate, Discountable
     use HasData;
 
     public readonly OrderId $orderId;
-    public readonly OrderReference $orderReference;
     private OrderState $orderState;
+    public readonly OrderReference $orderReference;
+    private ?InvoiceReference $invoiceReference = null;
+
     private ?ShippingAddress $shippingAddress = null;
     private ?BillingAddress $billingAddress = null;
     private ?Shopper $shopper = null;
@@ -245,6 +248,16 @@ final class Order implements Aggregate, Discountable
         $this->update('billingAddress', null);
     }
 
+    public function setInvoiceReference(InvoiceReference $invoiceReference): void
+    {
+        $this->invoiceReference = $invoiceReference;
+    }
+
+    public function getInvoiceReference(): ?InvoiceReference
+    {
+        return $this->invoiceReference;
+    }
+
     // addresses, methods, state,
     private function update($property, $value): void
     {
@@ -275,6 +288,7 @@ final class Order implements Aggregate, Discountable
         return [
             'order_id' => $this->orderId->get(),
             'order_ref' => $this->orderReference->get(),
+            'invoice_ref' => $this->invoiceReference?->get(),
             'order_state' => $this->orderState->value,
 
             'total' => $this->getTotal()->getMoney()->getAmount(),
@@ -316,6 +330,7 @@ final class Order implements Aggregate, Discountable
 
         $order->orderId = OrderId::fromString($state['order_id']);
         $order->orderReference = OrderReference::fromString($state['order_ref']);
+        $order->invoiceReference = $state['invoice_ref'] ? InvoiceReference::fromString($state['invoice_ref']) : null;
         $order->orderState = OrderState::from($state['order_state']);
         $order->discounts = array_map(fn ($discountState) => Discount::fromMappedData($discountState, $state), $childEntities[Discount::class]);
 

@@ -9,6 +9,7 @@ interface OrderGridItem
 
     public function getOrderId(): string;
     public function getOrderReference(): string;
+    public function getInvoiceReference(): ?string;
     public function getOrderState(): string;
     public function getConfirmedAt(): ?string;
     public function getPaidAt(): ?string;

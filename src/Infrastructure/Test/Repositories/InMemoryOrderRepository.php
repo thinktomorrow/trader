@@ -3,7 +3,9 @@ declare(strict_types=1);
 
 namespace Thinktomorrow\Trader\Infrastructure\Test\Repositories;
 
+use Thinktomorrow\Trader\Domain\Model\Order\Invoice\InvoiceReference;
 use Thinktomorrow\Trader\Domain\Model\Order\Discount\DiscountId;
+use Thinktomorrow\Trader\Domain\Model\Order\Invoice\InvoiceRepository;
 use Thinktomorrow\Trader\Domain\Model\Order\Exceptions\CouldNotFindOrder;
 use Thinktomorrow\Trader\Domain\Model\Order\Exceptions\OrderAlreadyInMerchantHands;
 use Thinktomorrow\Trader\Domain\Model\Order\Line\LineId;
@@ -16,7 +18,7 @@ use Thinktomorrow\Trader\Domain\Model\Order\Payment\PaymentId;
 use Thinktomorrow\Trader\Domain\Model\Order\Shipping\ShippingId;
 use Thinktomorrow\Trader\Domain\Model\Order\ShopperId;
 
-final class InMemoryOrderRepository implements OrderRepository
+final class InMemoryOrderRepository implements OrderRepository, InvoiceRepository
 {
     /** @var Order[] */
     public static array $orders = [];
@@ -74,6 +76,27 @@ final class InMemoryOrderRepository implements OrderRepository
     public function nextReference(): OrderId
     {
         return OrderId::fromString($this->nextReference);
+    }
+
+    public function nextExternalReference(): OrderReference
+    {
+        return OrderReference::fromString(
+            date('ymdHis') . str_pad((string) mt_rand(1, 999), 3, "0")
+        );
+    }
+
+    public function nextInvoiceReference(): InvoiceReference
+    {
+        return InvoiceReference::fromString('invoice- ' . $this->nextReference);
+    }
+
+    public function lastInvoiceReference(): ?InvoiceReference
+    {
+        foreach(static::$orders as $order){
+            return $order->getInvoiceReference();
+        }
+
+        return null;
     }
 
     public function nextShippingReference(): ShippingId
@@ -135,13 +158,6 @@ final class InMemoryOrderRepository implements OrderRepository
     public function setNextDiscountReference(string $nextDiscountReference): void
     {
         $this->nextDiscountReference = $nextDiscountReference;
-    }
-
-    public function nextExternalReference(): OrderReference
-    {
-        return OrderReference::fromString(
-            date('ymdHis') . str_pad((string) mt_rand(1, 999), 3, "0")
-        );
     }
 
     public static function clear()

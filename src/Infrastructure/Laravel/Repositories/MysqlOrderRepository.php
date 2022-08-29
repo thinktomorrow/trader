@@ -7,12 +7,15 @@ use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 use Ramsey\Uuid\Uuid;
 use Thinktomorrow\Trader\Domain\Common\Address\AddressType;
+use Thinktomorrow\Trader\Domain\Model\Order\Invoice\InvoiceReference;
 use Thinktomorrow\Trader\Domain\Model\Order\Address\BillingAddress;
 use Thinktomorrow\Trader\Domain\Model\Order\Address\ShippingAddress;
 use Thinktomorrow\Trader\Domain\Model\Order\Discount\Discount;
 use Thinktomorrow\Trader\Domain\Model\Order\Discount\DiscountableType;
 use Thinktomorrow\Trader\Domain\Model\Order\Discount\DiscountId;
+use Thinktomorrow\Trader\Domain\Model\Order\Invoice\InvoiceRepository;
 use Thinktomorrow\Trader\Domain\Model\Order\Exceptions\CouldNotFindOrder;
+use Thinktomorrow\Trader\Application\Order\Invoice\CreateInvoiceReference;
 use Thinktomorrow\Trader\Domain\Model\Order\Exceptions\OrderAlreadyInMerchantHands;
 use Thinktomorrow\Trader\Domain\Model\Order\Line\Line;
 use Thinktomorrow\Trader\Domain\Model\Order\Line\LineId;
@@ -29,7 +32,7 @@ use Thinktomorrow\Trader\Domain\Model\Order\Shipping\ShippingId;
 use Thinktomorrow\Trader\Domain\Model\Order\Shopper;
 use Thinktomorrow\Trader\Domain\Model\Order\ShopperId;
 
-final class MysqlOrderRepository implements OrderRepository
+final class MysqlOrderRepository implements OrderRepository, InvoiceRepository
 {
     private static $orderTable = 'trader_orders';
     private static $orderLinesTable = 'trader_order_lines';
@@ -236,6 +239,11 @@ final class MysqlOrderRepository implements OrderRepository
         return DB::table(static::$orderTable)->where('order_ref', $orderReference->get())->exists();
     }
 
+    private function existsInvoiceReference(InvoiceReference $invoiceReference): bool
+    {
+        return DB::table(static::$orderTable)->where('invoice_ref', $invoiceReference->get())->exists();
+    }
+
     public function find(OrderId $orderId): Order
     {
         $orderState = DB::table(static::$orderTable)
@@ -368,6 +376,30 @@ final class MysqlOrderRepository implements OrderRepository
         }
 
         return $orderReference;
+    }
+
+    public function nextInvoiceReference(): InvoiceReference
+    {
+        $createInvoiceReference = new CreateInvoiceReference($this);
+
+        $invoiceReference = null;
+        $append = '';
+
+        while (! $invoiceReference || $this->existsInvoiceReference($invoiceReference)) {
+            $invoiceReference = InvoiceReference::fromString($createInvoiceReference->create()->get() . $append);
+            $append = '_' . mt_rand(0,999);
+        }
+
+        return $invoiceReference;
+    }
+
+    public function lastInvoiceReference(): ?InvoiceReference
+    {
+        $lastInvoiceRef = DB::table(static::$orderTable)->orderBy('invoice_ref','DESC')->select('invoice_ref')->first()?->invoice_ref;
+
+        if(!$lastInvoiceRef) return null;
+
+        return InvoiceReference::fromString($lastInvoiceRef);
     }
 
     public function nextShippingReference(): ShippingId

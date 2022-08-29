@@ -23,6 +23,7 @@ abstract class OrderRead
 
     protected string $orderId;
     protected string $orderReference;
+    protected ?string $invoiceReference;
     protected OrderState $state;
     protected iterable $lines;
     protected ?MerchantOrderShippingAddress $shippingAddress;
@@ -58,6 +59,7 @@ abstract class OrderRead
         $order->orderId = $state['order_id'];
         $order->state = OrderState::from($state['order_state']);
         $order->orderReference = $state['order_ref'];
+        $order->invoiceReference = $state['invoice_ref'];
 
         $order->total = $state['total'];
         $order->taxTotal = $state['taxTotal'];
@@ -87,6 +89,11 @@ abstract class OrderRead
     public function getOrderReference(): string
     {
         return $this->orderReference;
+    }
+
+    public function getInvoiceReference(): ?string
+    {
+        return $this->invoiceReference;
     }
 
     public function getLines(): iterable

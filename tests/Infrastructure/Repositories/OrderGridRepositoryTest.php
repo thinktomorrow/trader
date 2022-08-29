@@ -131,7 +131,7 @@ class OrderGridRepositoryTest extends TestCase
 
     private function runTestSortingByDate(string $column, string $sortingMethod, string $modelMethod)
     {
-        $order = $this->createOrder(['order_id' => 'yyy', 'order_ref' => 'yy-ref'], [], [], [], [], null, null, $this->createOrderShopper(['shopper_id' => 'sss']));
+        $order = $this->createOrder(['order_id' => 'yyy', 'order_ref' => 'yy-ref', 'invoice_ref' => 'yy-invoice-ref'], [], [], [], [], null, null, $this->createOrderShopper(['shopper_id' => 'sss']));
         (new MysqlOrderRepository())->save($order);
 
         $this->updateRow('xxx', [$column => now()->addHour()->toDateTimeString()]);

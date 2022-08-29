@@ -29,6 +29,7 @@ use Thinktomorrow\Trader\Domain\Model\Order\Shipping\Shipping;
 use Thinktomorrow\Trader\Domain\Model\Order\Shipping\ShippingCost;
 use Thinktomorrow\Trader\Domain\Model\Order\Shipping\ShippingId;
 use Thinktomorrow\Trader\Domain\Model\Product\Variant\VariantId;
+use Thinktomorrow\Trader\Domain\Model\Order\Invoice\InvoiceReference;
 use Thinktomorrow\Trader\Domain\Model\ShippingProfile\ShippingProfileId;
 
 class OrderTest extends TestCase
@@ -45,6 +46,7 @@ class OrderTest extends TestCase
             'order_id' => $orderId->get(),
             'order_ref' => $orderReference->get(),
             'order_state' => OrderState::cart_pending->value,
+            'invoice_ref' => null,
             'total' => '0',
             'tax_total' => '0',
             'subtotal' => '0',
@@ -174,6 +176,18 @@ class OrderTest extends TestCase
         $order->updateBillingAddress(BillingAddress::fromMappedData($addressPayload, $order->getMappedData()));
 
         $this->assertEquals(BillingAddress::fromMappedData($addressPayload, $order->getMappedData())->getMappedData(), $order->getChildEntities()[BillingAddress::class]);
+    }
+
+    /** @test */
+    public function it_can_set_invoice_ref()
+    {
+        $order = $this->createDefaultOrder();
+
+        $order->setInvoiceReference(
+            $invoiceReference = InvoiceReference::fromString('invoice-ref')
+        );
+
+        $this->assertEquals($invoiceReference, $order->getInvoiceReference());
     }
 
     /** @test */

@@ -9,6 +9,7 @@ interface MerchantOrder
     public function getOrderId(): string;
 
     public function getOrderReference(): string;
+    public function getInvoiceReference(): ?string;
     public function getState(): string;
     public function getConfirmedAt(): ?string;
     public function getPaidAt(): ?string;

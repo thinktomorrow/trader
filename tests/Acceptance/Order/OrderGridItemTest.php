@@ -20,6 +20,7 @@ class OrderGridItemTest extends TestCase
 
         $this->assertEquals('xxx', $gridItem->getOrderId());
         $this->assertEquals('xx-ref', $gridItem->getOrderReference());
+        $this->assertEquals('xx-invoice-ref', $gridItem->getInvoiceReference());
         $this->assertEquals(OrderState::cart_revived->value, $gridItem->getOrderState());
 
         $this->assertEquals('€ 4,20', $gridItem->getTotalPrice());

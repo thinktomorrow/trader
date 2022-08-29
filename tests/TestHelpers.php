@@ -91,6 +91,7 @@ trait TestHelpers
         return Order::fromMappedData(array_merge([
             'order_id' => 'xxx',
             'order_ref' => 'xx-ref',
+            'invoice_ref' => 'xx-invoice-ref',
             'order_state' => OrderState::cart_revived->value,
             'data' => "[]",
         ], $orderValues), [

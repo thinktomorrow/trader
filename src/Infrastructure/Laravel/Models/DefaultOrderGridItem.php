@@ -16,6 +16,7 @@ class DefaultOrderGridItem implements OrderGridItem
 
     protected string $order_id;
     protected string $order_reference;
+    protected ?string $invoice_reference;
     protected string $state;
     protected ?string $confirmed_at;
     protected ?string $paid_at;
@@ -34,6 +35,7 @@ class DefaultOrderGridItem implements OrderGridItem
 
         $gridItem->order_id = $state['order_id'];
         $gridItem->order_reference = $state['order_ref'];
+        $gridItem->invoice_reference = $state['invoice_ref'];
         $gridItem->state = $state['order_state'];
         $gridItem->confirmed_at = $state['confirmed_at'] ?? null;
         $gridItem->paid_at = $state['paid_at'] ?? null;
@@ -55,6 +57,11 @@ class DefaultOrderGridItem implements OrderGridItem
     public function getOrderReference(): string
     {
         return $this->order_reference;
+    }
+
+    public function getInvoiceReference(): ?string
+    {
+        return $this->invoice_reference;
     }
 
     public function getOrderState(): string

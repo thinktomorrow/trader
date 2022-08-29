@@ -217,6 +217,7 @@ class CreateBasicTraderTables extends Migration
         Schema::create(static::PREFIX.'orders', function (Blueprint $table) {
             $table->char('order_id', 36)->primary();
             $table->char('order_ref', 16)->unique(); // For customer / external communication
+            $table->string('invoice_ref', 60)->nullable()->unique();
             $table->string('order_state', 32);
 
             $table->integer('total')->unsigned();
