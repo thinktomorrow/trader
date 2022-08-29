@@ -53,12 +53,12 @@ class UpdateShippingProfileOnOrder
         }
 
         // Apply matching tariff - if no tariff is found, no rate will be applied
-        $tariff = $shippingProfile->findTariffByPrice($order->getSubtotal(), $this->config->doesPriceInputIncludesVat());
+        $tariff = $shippingProfile->findTariffByPrice($order->getSubtotal(), $this->config->doesTariffInputIncludesVat());
 
         $shippingCost = ShippingCost::fromMoney(
             $tariff ? $tariff->getRate() : Cash::zero(),
             TaxRate::fromString($this->config->getDefaultTaxRate()),
-            $this->config->doesPriceInputIncludesVat()
+            $this->config->doesTariffInputIncludesVat()
         );
 
         if (count($order->getShippings()) > 0) {

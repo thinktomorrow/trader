@@ -45,6 +45,12 @@ return [
     'does_price_input_includes_vat' => true,
 
     /**
+     * Do the tariffs set in the admin include vat or not?
+     * This is mainly for the shipping tariffs.
+     */
+    'does_tariff_input_includes_vat' => true,
+
+    /**
      * Prices on the shop will be calculated including or excluding vat. This makes sure that calculations are correct
      * and don't cause any rounding errors - which could occur when calculating excluding vat and including the vat
      * afterwards. This can be set according to the visitor demands (b2b or b2c). This also determines how the

@@ -15,7 +15,20 @@ interface TraderConfig
 
     public function getAvailableTaxRates(): array;
 
+    /**
+     * When this value is true, all catalog prices as given by the merchant are considered to have
+     * tax already included. Set this value to false if all entered prices are always without
+     * tax included. Keep in mind that this does not alter already entered price values.
+     */
     public function doesPriceInputIncludesVat(): bool;
+
+    /**
+     * Do the tariffs set in the admin include vat or not?
+     * This is mainly for the shipping tariffs.
+     *
+     * @return bool
+     */
+    public function doesTariffInputIncludesVat(): bool;
 
     /**
      * Prices will be calculated including or excluding vat. This makes sure that calculations are correct

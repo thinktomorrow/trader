@@ -258,7 +258,7 @@ final class CartApplication
         $paymentCost = PaymentCost::fromMoney(
             $paymentMethod->getRate(),
             TaxRate::fromString($this->config->getDefaultTaxRate()),
-            $this->config->doesPriceInputIncludesVat()
+            $this->config->doesTariffInputIncludesVat()
         );
 
         // Currently no restrictions on payment selection... if any, this should be checked here.

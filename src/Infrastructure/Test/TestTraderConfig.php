@@ -40,6 +40,11 @@ class TestTraderConfig implements TraderConfig
         return true;
     }
 
+    public function doesTariffInputIncludesVat(): bool
+    {
+        return true;
+    }
+
     public function includeVatInPrices(): bool
     {
         return true;
