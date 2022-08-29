@@ -6,17 +6,17 @@ namespace Thinktomorrow\Trader\Infrastructure\Laravel\Repositories;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 use Ramsey\Uuid\Uuid;
+use Thinktomorrow\Trader\Application\Order\Invoice\CreateInvoiceReference;
 use Thinktomorrow\Trader\Domain\Common\Address\AddressType;
-use Thinktomorrow\Trader\Domain\Model\Order\Invoice\InvoiceReference;
 use Thinktomorrow\Trader\Domain\Model\Order\Address\BillingAddress;
 use Thinktomorrow\Trader\Domain\Model\Order\Address\ShippingAddress;
 use Thinktomorrow\Trader\Domain\Model\Order\Discount\Discount;
 use Thinktomorrow\Trader\Domain\Model\Order\Discount\DiscountableType;
 use Thinktomorrow\Trader\Domain\Model\Order\Discount\DiscountId;
-use Thinktomorrow\Trader\Domain\Model\Order\Invoice\InvoiceRepository;
 use Thinktomorrow\Trader\Domain\Model\Order\Exceptions\CouldNotFindOrder;
-use Thinktomorrow\Trader\Application\Order\Invoice\CreateInvoiceReference;
 use Thinktomorrow\Trader\Domain\Model\Order\Exceptions\OrderAlreadyInMerchantHands;
+use Thinktomorrow\Trader\Domain\Model\Order\Invoice\InvoiceReference;
+use Thinktomorrow\Trader\Domain\Model\Order\Invoice\InvoiceRepository;
 use Thinktomorrow\Trader\Domain\Model\Order\Line\Line;
 use Thinktomorrow\Trader\Domain\Model\Order\Line\LineId;
 use Thinktomorrow\Trader\Domain\Model\Order\Line\Personalisations\LinePersonalisation;
@@ -387,7 +387,7 @@ final class MysqlOrderRepository implements OrderRepository, InvoiceRepository
 
         while (! $invoiceReference || $this->existsInvoiceReference($invoiceReference)) {
             $invoiceReference = InvoiceReference::fromString($createInvoiceReference->create()->get() . $append);
-            $append = '_' . mt_rand(0,999);
+            $append = '_' . mt_rand(0, 999);
         }
 
         return $invoiceReference;
@@ -395,9 +395,11 @@ final class MysqlOrderRepository implements OrderRepository, InvoiceRepository
 
     public function lastInvoiceReference(): ?InvoiceReference
     {
-        $lastInvoiceRef = DB::table(static::$orderTable)->orderBy('invoice_ref','DESC')->select('invoice_ref')->first()?->invoice_ref;
+        $lastInvoiceRef = DB::table(static::$orderTable)->orderBy('invoice_ref', 'DESC')->select('invoice_ref')->first()?->invoice_ref;
 
-        if(!$lastInvoiceRef) return null;
+        if (! $lastInvoiceRef) {
+            return null;
+        }
 
         return InvoiceReference::fromString($lastInvoiceRef);
     }

@@ -16,6 +16,7 @@ use Thinktomorrow\Trader\Domain\Model\Order\Events\OrderUpdated;
 use Thinktomorrow\Trader\Domain\Model\Order\Events\PaymentUpdated;
 use Thinktomorrow\Trader\Domain\Model\Order\Events\ShippingAdded;
 use Thinktomorrow\Trader\Domain\Model\Order\Events\ShippingUpdated;
+use Thinktomorrow\Trader\Domain\Model\Order\Invoice\InvoiceReference;
 use Thinktomorrow\Trader\Domain\Model\Order\Line\Line;
 use Thinktomorrow\Trader\Domain\Model\Order\Line\LineId;
 use Thinktomorrow\Trader\Domain\Model\Order\Line\LinePrice;
@@ -29,7 +30,6 @@ use Thinktomorrow\Trader\Domain\Model\Order\Shipping\Shipping;
 use Thinktomorrow\Trader\Domain\Model\Order\Shipping\ShippingCost;
 use Thinktomorrow\Trader\Domain\Model\Order\Shipping\ShippingId;
 use Thinktomorrow\Trader\Domain\Model\Product\Variant\VariantId;
-use Thinktomorrow\Trader\Domain\Model\Order\Invoice\InvoiceReference;
 use Thinktomorrow\Trader\Domain\Model\ShippingProfile\ShippingProfileId;
 
 class OrderTest extends TestCase

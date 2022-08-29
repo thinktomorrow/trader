@@ -14,7 +14,6 @@ use Thinktomorrow\Trader\Domain\Model\Order\Address\ShippingAddress;
 use Thinktomorrow\Trader\Domain\Model\Order\Discount\Discount;
 use Thinktomorrow\Trader\Domain\Model\Order\Discount\Discountable;
 use Thinktomorrow\Trader\Domain\Model\Order\Discount\DiscountableId;
-use Thinktomorrow\Trader\Domain\Model\Order\Invoice\InvoiceReference;
 use Thinktomorrow\Trader\Domain\Model\Order\Discount\DiscountableType;
 use Thinktomorrow\Trader\Domain\Model\Order\Events\OrderCreated;
 use Thinktomorrow\Trader\Domain\Model\Order\Events\OrderStates\CartAbandoned;
@@ -45,6 +44,7 @@ use Thinktomorrow\Trader\Domain\Model\Order\Events\ShippingStates\ShipmentPacked
 use Thinktomorrow\Trader\Domain\Model\Order\Events\ShippingStates\ShipmentReturned;
 use Thinktomorrow\Trader\Domain\Model\Order\Events\ShippingStates\ShippingFailed;
 use Thinktomorrow\Trader\Domain\Model\Order\Events\ShippingStateUpdated;
+use Thinktomorrow\Trader\Domain\Model\Order\Invoice\InvoiceReference;
 use Thinktomorrow\Trader\Domain\Model\Order\Line\Line;
 use Thinktomorrow\Trader\Domain\Model\Order\Line\Personalisations\LinePersonalisation;
 use Thinktomorrow\Trader\Domain\Model\Order\Line\Quantity;

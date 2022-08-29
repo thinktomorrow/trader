@@ -3,11 +3,11 @@ declare(strict_types=1);
 
 namespace Thinktomorrow\Trader\Infrastructure\Test\Repositories;
 
-use Thinktomorrow\Trader\Domain\Model\Order\Invoice\InvoiceReference;
 use Thinktomorrow\Trader\Domain\Model\Order\Discount\DiscountId;
-use Thinktomorrow\Trader\Domain\Model\Order\Invoice\InvoiceRepository;
 use Thinktomorrow\Trader\Domain\Model\Order\Exceptions\CouldNotFindOrder;
 use Thinktomorrow\Trader\Domain\Model\Order\Exceptions\OrderAlreadyInMerchantHands;
+use Thinktomorrow\Trader\Domain\Model\Order\Invoice\InvoiceReference;
+use Thinktomorrow\Trader\Domain\Model\Order\Invoice\InvoiceRepository;
 use Thinktomorrow\Trader\Domain\Model\Order\Line\LineId;
 use Thinktomorrow\Trader\Domain\Model\Order\Line\Personalisations\LinePersonalisationId;
 use Thinktomorrow\Trader\Domain\Model\Order\Order;
@@ -92,7 +92,7 @@ final class InMemoryOrderRepository implements OrderRepository, InvoiceRepositor
 
     public function lastInvoiceReference(): ?InvoiceReference
     {
-        foreach(static::$orders as $order){
+        foreach (static::$orders as $order) {
             return $order->getInvoiceReference();
         }
 

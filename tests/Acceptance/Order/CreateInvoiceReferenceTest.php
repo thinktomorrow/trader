@@ -4,9 +4,9 @@ declare(strict_types=1);
 namespace Tests\Acceptance\Order;
 
 use Tests\Acceptance\Cart\CartContext;
-use Thinktomorrow\Trader\Infrastructure\Test\TestContainer;
 use Thinktomorrow\Trader\Domain\Model\Order\Invoice\InvoiceReference;
 use Thinktomorrow\Trader\Domain\Model\Order\Invoice\InvoiceRepository;
+use Thinktomorrow\Trader\Infrastructure\Test\TestContainer;
 
 class CreateInvoiceReferenceTest extends CartContext
 {

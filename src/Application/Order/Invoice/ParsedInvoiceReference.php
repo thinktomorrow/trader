@@ -20,9 +20,9 @@ class ParsedInvoiceReference
 
     public static function fromInvoiceReference(InvoiceReference $invoiceReference): static
     {
-        $year = substr($invoiceReference->get(),0, 2);
-        $month = substr($invoiceReference->get(),2, 2);
-        $number = substr($invoiceReference->get(),4);
+        $year = substr($invoiceReference->get(), 0, 2);
+        $month = substr($invoiceReference->get(), 2, 2);
+        $number = substr($invoiceReference->get(), 4);
 
         return new static($year, $month, $number);
     }

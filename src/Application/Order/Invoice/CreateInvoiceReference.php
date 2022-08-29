@@ -19,18 +19,16 @@ class CreateInvoiceReference
     {
         $lastInvoiceReference = $this->invoiceRepository->lastInvoiceReference();
 
-        if(!$lastInvoiceReference) {
+        if (! $lastInvoiceReference) {
             return InvoiceReference::fromString(date('ym'). str_pad((string) 1, 4, "0", STR_PAD_LEFT));
         }
 
         $parsed = ParsedInvoiceReference::fromInvoiceReference($lastInvoiceReference);
 
-        if($parsed->year != date('y') || $parsed->month != date('m')) {
+        if ($parsed->year != date('y') || $parsed->month != date('m')) {
             return InvoiceReference::fromString(date('ym'). str_pad((string) 1, 4, "0", STR_PAD_LEFT));
         }
 
         return InvoiceReference::fromString(date('ym'). str_pad((string) ($parsed->getNumberAsInt() + 1), 4, "0", STR_PAD_LEFT));
     }
-
-
 }
