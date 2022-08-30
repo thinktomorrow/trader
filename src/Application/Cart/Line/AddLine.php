@@ -48,15 +48,4 @@ final class AddLine
     {
         return $this->data;
     }
-
-    public static function fromAddLineToNewOrder(AddLineToNewOrder $addLineToNewOrder, OrderId $orderId): static
-    {
-        return new static(
-            $orderId->get(),
-            $addLineToNewOrder->getVariantId()->get(),
-            $addLineToNewOrder->getQuantity()->asInt(),
-            $addLineToNewOrder->getPersonalisations(),
-            $addLineToNewOrder->getData()
-        );
-    }
 }

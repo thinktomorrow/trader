@@ -13,7 +13,6 @@ use Thinktomorrow\Trader\Application\Cart\ChooseCustomer;
 use Thinktomorrow\Trader\Application\Cart\ChoosePaymentMethod;
 use Thinktomorrow\Trader\Application\Cart\ChooseShippingProfile;
 use Thinktomorrow\Trader\Application\Cart\Line\AddLine;
-use Thinktomorrow\Trader\Application\Cart\Line\AddLineToNewOrder;
 use Thinktomorrow\Trader\Application\Cart\Line\ChangeLineQuantity;
 use Thinktomorrow\Trader\Application\Cart\Line\RemoveLine;
 use Thinktomorrow\Trader\Application\Cart\RefreshCart\Adjusters\AdjustDiscounts;
@@ -317,8 +316,11 @@ abstract class CartContext extends TestCase
 
     protected function whenIAddTheFirstVariantToTheCart($productVariantId, $quantity = 1, array $data = [], array $personalisations = [])
     {
+        $orderId = $this->cartApplication->createNewOrder();
+
         // Add product to a new order
-        $orderId = $this->cartApplication->addLineToNewOrder(new AddLineToNewOrder(
+        $this->cartApplication->addLine(new AddLine(
+            $orderId->get(),
             VariantId::fromString($productVariantId)->get(),
             Quantity::fromInt((int)$quantity)->asInt(),
             $personalisations,

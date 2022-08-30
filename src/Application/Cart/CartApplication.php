@@ -5,7 +5,6 @@ namespace Thinktomorrow\Trader\Application\Cart;
 
 use Psr\Container\ContainerInterface;
 use Thinktomorrow\Trader\Application\Cart\Line\AddLine;
-use Thinktomorrow\Trader\Application\Cart\Line\AddLineToNewOrder;
 use Thinktomorrow\Trader\Application\Cart\Line\ChangeLineData;
 use Thinktomorrow\Trader\Application\Cart\Line\ChangeLineQuantity;
 use Thinktomorrow\Trader\Application\Cart\Line\RemoveLine;
@@ -90,14 +89,7 @@ final class CartApplication
         $this->eventDispatcher->dispatchAll($order->releaseEvents());
     }
 
-    public function addLineToNewOrder(AddLineToNewOrder $addLineToNewOrder): OrderId
-    {
-        $orderId = $this->createNewOrder();
-
-        return $this->addLine(AddLine::fromAddLineToNewOrder($addLineToNewOrder, $orderId));
-    }
-
-    private function createNewOrder(): OrderId
+    public function createNewOrder(): OrderId
     {
         $order = Order::create(
             $this->orderRepository->nextReference(),
