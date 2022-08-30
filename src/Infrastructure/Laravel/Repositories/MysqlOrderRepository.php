@@ -372,7 +372,7 @@ final class MysqlOrderRepository implements OrderRepository, InvoiceRepository
         $orderReference = null;
 
         while (! $orderReference || $this->existsReference($orderReference)) {
-            $orderReference = OrderReference::fromString(date('ymdHis').'-'. str_pad((string) mt_rand(1, 999), 3, "0"));
+            $orderReference = OrderReference::fromString(date('ymd').'-'. str_pad((string) mt_rand(1, 999), 3, "0"));
         }
 
         return $orderReference;
