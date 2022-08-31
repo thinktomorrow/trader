@@ -11,6 +11,7 @@ use Thinktomorrow\Trader\Application\Order\State\Order\PayOrder;
 use Thinktomorrow\Trader\Domain\Model\Order\Shipping\ShippingId;
 use Thinktomorrow\Trader\Application\Order\State\Order\PackOrder;
 use Thinktomorrow\Trader\Application\Order\State\Order\CancelOrder;
+use Thinktomorrow\Trader\Application\Order\State\Order\DeleteOrder;
 use Thinktomorrow\Trader\Application\Order\State\Order\DeliverOrder;
 use Thinktomorrow\Trader\Application\Order\State\Payment\PayPayment;
 use Thinktomorrow\Trader\Domain\Model\Order\State\OrderStateMachine;
@@ -49,6 +50,11 @@ final class OrderStateApplication
         $this->eventDispatcher = $eventDispatcher;
         $this->paymentStateMachine = $paymentStateMachine;
         $this->shippingStateMachine = $shippingStateMachine;
+    }
+
+    public function deleteOrder(DeleteOrder $command): void
+    {
+        $this->handleOrderStateEvent($command->getOrderId(), 'delete');
     }
 
     public function cancelOrder(CancelOrder $command): void

@@ -75,8 +75,8 @@ enum OrderState: string implements State
                 'from' => [self::cart_abandoned],
                 'to' => self::cart_revived,
             ],
-            'remove_cart' => [
-                'from' => [self::cart_abandoned],
+            'delete' => [
+                'from' => [self::cart_abandoned, self::cart_pending, self::cart_revived],
                 'to' => self::cart_queued_for_deletion,
             ],
             'confirm' => [

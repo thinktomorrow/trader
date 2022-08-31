@@ -8,6 +8,15 @@ use Thinktomorrow\Trader\Domain\Model\Order\State\OrderState;
 
 final class OrderStateTest extends StateContext
 {
+    public function test_it_can_delete_order()
+    {
+        $this->assertOrderStateTransition('deleteOrder', OrderState::cart_pending, OrderState::cart_queued_for_deletion);
+
+        // Cannot delete already confirmed order
+        $this->expectException(StateException::class);
+        $this->assertOrderStateTransition('deleteOrder', OrderState::confirmed, OrderState::confirmed);
+    }
+
     public function test_it_can_cancel_order()
     {
         $this->assertOrderStateTransition('cancelOrder', OrderState::confirmed, OrderState::cancelled);
