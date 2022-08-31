@@ -5,11 +5,9 @@ namespace Thinktomorrow\Trader\Domain\Model\Order;
 
 use Thinktomorrow\Trader\Domain\Common\Entity\Aggregate;
 use Thinktomorrow\Trader\Domain\Common\Entity\HasData;
-use Thinktomorrow\Trader\Domain\Model\Order\Log\LogEntry;
 use Thinktomorrow\Trader\Domain\Common\Event\RecordsEvents;
 use Thinktomorrow\Trader\Domain\Common\Price\Price;
 use Thinktomorrow\Trader\Domain\Common\Price\PriceTotal;
-use Thinktomorrow\Trader\Domain\Model\Order\Log\HasLogEntries;
 use Thinktomorrow\Trader\Domain\Model\Order\Address\BillingAddress;
 use Thinktomorrow\Trader\Domain\Model\Order\Address\ShippingAddress;
 use Thinktomorrow\Trader\Domain\Model\Order\Discount\Discount;
@@ -25,6 +23,8 @@ use Thinktomorrow\Trader\Domain\Model\Order\Invoice\InvoiceReference;
 use Thinktomorrow\Trader\Domain\Model\Order\Line\Line;
 use Thinktomorrow\Trader\Domain\Model\Order\Line\Personalisations\LinePersonalisation;
 use Thinktomorrow\Trader\Domain\Model\Order\Line\Quantity;
+use Thinktomorrow\Trader\Domain\Model\Order\Log\HasLogEntries;
+use Thinktomorrow\Trader\Domain\Model\Order\Log\LogEntry;
 use Thinktomorrow\Trader\Domain\Model\Order\Payment\Payment;
 use Thinktomorrow\Trader\Domain\Model\Order\Payment\PaymentId;
 use Thinktomorrow\Trader\Domain\Model\Order\Payment\PaymentState;
@@ -272,7 +272,7 @@ final class Order implements Aggregate, Discountable
             ShippingAddress::class => $this->shippingAddress?->getMappedData(),
             BillingAddress::class => $this->billingAddress?->getMappedData(),
             Shopper::class => $this->shopper?->getMappedData(),
-            LogEntry::class => array_map(fn($logEntry) => $logEntry->getMappedData(), $this->logEntries),
+            LogEntry::class => array_map(fn ($logEntry) => $logEntry->getMappedData(), $this->logEntries),
         ];
     }
 

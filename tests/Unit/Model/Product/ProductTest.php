@@ -5,20 +5,20 @@ namespace Tests\Unit\Model\Product;
 
 use Money\Money;
 use Tests\Unit\TestCase;
-use Thinktomorrow\Trader\Domain\Model\Taxon\TaxonId;
 use Thinktomorrow\Trader\Domain\Common\Taxes\TaxRate;
+use Thinktomorrow\Trader\Domain\Model\Product\Events\ProductCreated;
+use Thinktomorrow\Trader\Domain\Model\Product\Events\ProductTaxaUpdated;
+use Thinktomorrow\Trader\Domain\Model\Product\Events\VariantCreated;
+use Thinktomorrow\Trader\Domain\Model\Product\Events\VariantDeleted;
+use Thinktomorrow\Trader\Domain\Model\Product\Exceptions\CouldNotDeleteVariant;
 use Thinktomorrow\Trader\Domain\Model\Product\Product;
 use Thinktomorrow\Trader\Domain\Model\Product\ProductId;
 use Thinktomorrow\Trader\Domain\Model\Product\ProductState;
 use Thinktomorrow\Trader\Domain\Model\Product\Variant\Variant;
 use Thinktomorrow\Trader\Domain\Model\Product\Variant\VariantId;
-use Thinktomorrow\Trader\Domain\Model\Product\Events\ProductCreated;
-use Thinktomorrow\Trader\Domain\Model\Product\Events\VariantCreated;
-use Thinktomorrow\Trader\Domain\Model\Product\Events\VariantDeleted;
 use Thinktomorrow\Trader\Domain\Model\Product\Variant\VariantSalePrice;
 use Thinktomorrow\Trader\Domain\Model\Product\Variant\VariantUnitPrice;
-use Thinktomorrow\Trader\Domain\Model\Product\Events\ProductTaxaUpdated;
-use Thinktomorrow\Trader\Domain\Model\Product\Exceptions\CouldNotDeleteVariant;
+use Thinktomorrow\Trader\Domain\Model\Taxon\TaxonId;
 
 class ProductTest extends TestCase
 {

@@ -3,7 +3,6 @@ declare(strict_types=1);
 
 namespace Thinktomorrow\Trader\Infrastructure\Test\Repositories;
 
-use Thinktomorrow\Trader\Domain\Model\Order\Log\LogEntryId;
 use Thinktomorrow\Trader\Domain\Model\Order\Discount\DiscountId;
 use Thinktomorrow\Trader\Domain\Model\Order\Exceptions\CouldNotFindOrder;
 use Thinktomorrow\Trader\Domain\Model\Order\Exceptions\OrderAlreadyInMerchantHands;
@@ -11,6 +10,7 @@ use Thinktomorrow\Trader\Domain\Model\Order\Invoice\InvoiceReference;
 use Thinktomorrow\Trader\Domain\Model\Order\Invoice\InvoiceRepository;
 use Thinktomorrow\Trader\Domain\Model\Order\Line\LineId;
 use Thinktomorrow\Trader\Domain\Model\Order\Line\Personalisations\LinePersonalisationId;
+use Thinktomorrow\Trader\Domain\Model\Order\Log\LogEntryId;
 use Thinktomorrow\Trader\Domain\Model\Order\Order;
 use Thinktomorrow\Trader\Domain\Model\Order\OrderId;
 use Thinktomorrow\Trader\Domain\Model\Order\OrderReference;
@@ -137,7 +137,7 @@ final class InMemoryOrderRepository implements OrderRepository, InvoiceRepositor
 
     public function nextLogEntryReference(): LogEntryId
     {
-        return LogEntryId::fromString('entry_id_'.mt_rand(1,999));
+        return LogEntryId::fromString('entry_id_'.mt_rand(1, 999));
     }
 
     // For testing purposes only

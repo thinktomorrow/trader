@@ -5,10 +5,10 @@ namespace Tests\Infrastructure\Repositories;
 
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\Infrastructure\TestCase;
-use Thinktomorrow\Trader\Domain\Model\Order\Log\LogEntry;
-use Thinktomorrow\Trader\Domain\Model\Order\Log\LogEntryId;
 use Thinktomorrow\Trader\Domain\Model\Order\Discount\DiscountableType;
 use Thinktomorrow\Trader\Domain\Model\Order\Exceptions\CouldNotFindOrder;
+use Thinktomorrow\Trader\Domain\Model\Order\Log\LogEntry;
+use Thinktomorrow\Trader\Domain\Model\Order\Log\LogEntryId;
 use Thinktomorrow\Trader\Domain\Model\Order\Order;
 use Thinktomorrow\Trader\Domain\Model\Order\OrderId;
 use Thinktomorrow\Trader\Domain\Model\Order\OrderReference;
@@ -123,7 +123,7 @@ final class OrderRepositoryTest extends TestCase
         );
 
         $orderWithLogEntries = $this->createDefaultOrder();
-        $orderWithLogEntries->addLogEntry(LogEntry::create(LogEntryId::fromString('def'),'yyy', new \DateTime('2022-03-01 19:19:00'), ['foo' => 'baz']));
+        $orderWithLogEntries->addLogEntry(LogEntry::create(LogEntryId::fromString('def'), 'yyy', new \DateTime('2022-03-01 19:19:00'), ['foo' => 'baz']));
         yield $orderWithLogEntries;
     }
 }

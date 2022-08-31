@@ -4,10 +4,9 @@ declare(strict_types=1);
 namespace Tests\Acceptance\Order;
 
 use Tests\Acceptance\Cart\CartContext;
-use Thinktomorrow\Trader\Infrastructure\Test\EventDispatcherSpy;
 use Thinktomorrow\Trader\Application\Order\Merchant\AddLogEntry;
-use Thinktomorrow\Trader\Application\Order\Merchant\ChangeShippingData;
 use Thinktomorrow\Trader\Application\Order\Merchant\MerchantOrderApplication;
+use Thinktomorrow\Trader\Infrastructure\Test\EventDispatcherSpy;
 use Thinktomorrow\Trader\Infrastructure\Test\Repositories\InMemoryOrderRepository;
 
 class AddLogEntryTest extends CartContext

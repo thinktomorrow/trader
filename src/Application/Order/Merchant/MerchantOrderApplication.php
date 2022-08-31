@@ -3,9 +3,8 @@ declare(strict_types=1);
 
 namespace Thinktomorrow\Trader\Application\Order\Merchant;
 
-use Thinktomorrow\Trader\Domain\Model\Order\Log\LogEntry;
-use Thinktomorrow\Trader\Domain\Model\Order\Log\LogEntryId;
 use Thinktomorrow\Trader\Domain\Common\Event\EventDispatcher;
+use Thinktomorrow\Trader\Domain\Model\Order\Log\LogEntry;
 use Thinktomorrow\Trader\Domain\Model\Order\OrderRepository;
 
 class MerchantOrderApplication

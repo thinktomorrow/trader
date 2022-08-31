@@ -32,6 +32,4 @@ class AddLogEntry
     {
         return $this->data;
     }
-
-
 }

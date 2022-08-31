@@ -4,13 +4,13 @@ declare(strict_types=1);
 namespace Tests\Unit\Model\Product;
 
 use Tests\Unit\TestCase;
-use Thinktomorrow\Trader\Domain\Model\Product\ProductId;
+use Thinktomorrow\Trader\Domain\Model\Product\Events\OptionsUpdated;
+use Thinktomorrow\Trader\Domain\Model\Product\Events\ProductCreated;
 use Thinktomorrow\Trader\Domain\Model\Product\Option\Option;
 use Thinktomorrow\Trader\Domain\Model\Product\Option\OptionId;
 use Thinktomorrow\Trader\Domain\Model\Product\Option\OptionValue;
 use Thinktomorrow\Trader\Domain\Model\Product\Option\OptionValueId;
-use Thinktomorrow\Trader\Domain\Model\Product\Events\ProductCreated;
-use Thinktomorrow\Trader\Domain\Model\Product\Events\OptionsUpdated;
+use Thinktomorrow\Trader\Domain\Model\Product\ProductId;
 
 class ProductOptionTest extends TestCase
 {
