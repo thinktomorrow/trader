@@ -3,17 +3,17 @@ declare(strict_types=1);
 
 namespace Tests\Infrastructure\Repositories;
 
-use Illuminate\Support\Str;
-use Illuminate\Support\Facades\DB;
-use Tests\Infrastructure\TestCase;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Thinktomorrow\Trader\Infrastructure\Test\TestContainer;
-use Thinktomorrow\Trader\Domain\Model\Order\State\OrderState;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Str;
+use Tests\Infrastructure\TestCase;
 use Thinktomorrow\Trader\Application\Order\Grid\OrderGridItem;
-use Thinktomorrow\Trader\Infrastructure\Test\TestTraderConfig;
+use Thinktomorrow\Trader\Domain\Model\Order\State\OrderState;
 use Thinktomorrow\Trader\Infrastructure\Laravel\Models\DefaultOrderGridItem;
-use Thinktomorrow\Trader\Infrastructure\Laravel\Repositories\MysqlOrderRepository;
 use Thinktomorrow\Trader\Infrastructure\Laravel\Repositories\MysqlOrderGridRepository;
+use Thinktomorrow\Trader\Infrastructure\Laravel\Repositories\MysqlOrderRepository;
+use Thinktomorrow\Trader\Infrastructure\Test\TestContainer;
+use Thinktomorrow\Trader\Infrastructure\Test\TestTraderConfig;
 
 class OrderGridRepositoryTest extends TestCase
 {
