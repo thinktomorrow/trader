@@ -5,10 +5,10 @@ declare(strict_types=1);
 namespace Thinktomorrow\Trader\Domain\Model\Order\State;
 
 use Assert\Assertion;
-use Thinktomorrow\Trader\Domain\Model\Order\Order;
-use Thinktomorrow\Trader\Domain\Common\State\State;
-use Thinktomorrow\Trader\Domain\Common\State\AbstractStateMachine;
 use Thinktomorrow\Trader\Application\Order\MerchantOrder\MerchantOrder;
+use Thinktomorrow\Trader\Domain\Common\State\AbstractStateMachine;
+use Thinktomorrow\Trader\Domain\Common\State\State;
+use Thinktomorrow\Trader\Domain\Model\Order\Order;
 
 class OrderStateMachine extends AbstractStateMachine
 {

@@ -3,19 +3,19 @@ declare(strict_types=1);
 
 namespace Tests\Acceptance\Order;
 
-use Tests\TestHelpers;
 use Tests\Acceptance\TestCase;
-use Thinktomorrow\Trader\Domain\Model\Order\State\OrderState;
-use Thinktomorrow\Trader\Infrastructure\Test\EventDispatcherSpy;
-use Thinktomorrow\Trader\Domain\Model\Order\Payment\PaymentState;
-use Thinktomorrow\Trader\Domain\Model\Order\Shipping\ShippingState;
-use Thinktomorrow\Trader\Domain\Model\Order\State\OrderStateMachine;
+use Tests\TestHelpers;
 use Thinktomorrow\Trader\Application\Order\State\OrderStateApplication;
-use Thinktomorrow\Trader\Domain\Model\Order\State\OrderStateToEventMap;
+use Thinktomorrow\Trader\Domain\Model\Order\Payment\PaymentState;
 use Thinktomorrow\Trader\Domain\Model\Order\Payment\PaymentStateMachine;
-use Thinktomorrow\Trader\Domain\Model\Order\Shipping\ShippingStateMachine;
 use Thinktomorrow\Trader\Domain\Model\Order\Payment\PaymentStateToEventMap;
+use Thinktomorrow\Trader\Domain\Model\Order\Shipping\ShippingState;
+use Thinktomorrow\Trader\Domain\Model\Order\Shipping\ShippingStateMachine;
 use Thinktomorrow\Trader\Domain\Model\Order\Shipping\ShippingStateToEventMap;
+use Thinktomorrow\Trader\Domain\Model\Order\State\OrderState;
+use Thinktomorrow\Trader\Domain\Model\Order\State\OrderStateMachine;
+use Thinktomorrow\Trader\Domain\Model\Order\State\OrderStateToEventMap;
+use Thinktomorrow\Trader\Infrastructure\Test\EventDispatcherSpy;
 use Thinktomorrow\Trader\Infrastructure\Test\Repositories\InMemoryOrderRepository;
 
 abstract class StateContext extends TestCase

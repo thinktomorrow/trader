@@ -4,14 +4,14 @@ declare(strict_types=1);
 namespace Tests\Acceptance\Order;
 
 use Tests\Acceptance\Cart\CartContext;
-use Thinktomorrow\Trader\Domain\Model\Order\OrderId;
-use Thinktomorrow\Trader\Domain\Model\Order\State\OrderState;
-use Thinktomorrow\Trader\Domain\Model\Order\Payment\PaymentState;
-use Thinktomorrow\Trader\Domain\Model\Order\Shipping\ShippingState;
 use Thinktomorrow\Trader\Application\Order\MerchantOrder\MerchantOrder;
 use Thinktomorrow\Trader\Application\Order\MerchantOrder\MerchantOrderPayment;
-use Thinktomorrow\Trader\Application\Order\MerchantOrder\MerchantOrderShopper;
 use Thinktomorrow\Trader\Application\Order\MerchantOrder\MerchantOrderShipping;
+use Thinktomorrow\Trader\Application\Order\MerchantOrder\MerchantOrderShopper;
+use Thinktomorrow\Trader\Domain\Model\Order\OrderId;
+use Thinktomorrow\Trader\Domain\Model\Order\Payment\PaymentState;
+use Thinktomorrow\Trader\Domain\Model\Order\Shipping\ShippingState;
+use Thinktomorrow\Trader\Domain\Model\Order\State\OrderState;
 use Thinktomorrow\Trader\Domain\Model\Product\Personalisation\PersonalisationType;
 
 class MerchantOrderTest extends CartContext
