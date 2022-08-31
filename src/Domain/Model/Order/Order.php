@@ -5,10 +5,11 @@ namespace Thinktomorrow\Trader\Domain\Model\Order;
 
 use Thinktomorrow\Trader\Domain\Common\Entity\Aggregate;
 use Thinktomorrow\Trader\Domain\Common\Entity\HasData;
-use Thinktomorrow\Trader\Domain\Common\Entity\RecordsChangelog;
+use Thinktomorrow\Trader\Domain\Model\Order\Log\LogEntry;
 use Thinktomorrow\Trader\Domain\Common\Event\RecordsEvents;
 use Thinktomorrow\Trader\Domain\Common\Price\Price;
 use Thinktomorrow\Trader\Domain\Common\Price\PriceTotal;
+use Thinktomorrow\Trader\Domain\Model\Order\Log\HasLogEntries;
 use Thinktomorrow\Trader\Domain\Model\Order\Address\BillingAddress;
 use Thinktomorrow\Trader\Domain\Model\Order\Address\ShippingAddress;
 use Thinktomorrow\Trader\Domain\Model\Order\Discount\Discount;
@@ -38,12 +39,12 @@ use Thinktomorrow\Trader\Domain\Model\Order\State\OrderStateToEventMap;
 final class Order implements Aggregate, Discountable
 {
     use RecordsEvents;
-    use RecordsChangelog;
     use HasTotals;
     use HasLines;
     use HasShippings;
     use HasPayments;
     use HasDiscounts;
+    use HasLogEntries;
     use HasData;
 
     public readonly OrderId $orderId;
@@ -271,6 +272,7 @@ final class Order implements Aggregate, Discountable
             ShippingAddress::class => $this->shippingAddress?->getMappedData(),
             BillingAddress::class => $this->billingAddress?->getMappedData(),
             Shopper::class => $this->shopper?->getMappedData(),
+            LogEntry::class => array_map(fn($logEntry) => $logEntry->getMappedData(), $this->logEntries),
         ];
     }
 
@@ -295,6 +297,7 @@ final class Order implements Aggregate, Discountable
         $order->shopper = $childEntities[Shopper::class] ? Shopper::fromMappedData($childEntities[Shopper::class], $state) : null;
 
         $order->data = json_decode($state['data'], true);
+        $order->logEntries = array_map(fn ($logEntryState) => LogEntry::fromMappedData($logEntryState, $state), $childEntities[LogEntry::class]);
 
         return $order;
     }

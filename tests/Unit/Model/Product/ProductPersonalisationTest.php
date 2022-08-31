@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 
-namespace Tests\Unit\Model;
+namespace Tests\Unit\Model\Product;
 
 use Tests\Unit\TestCase;
 use Thinktomorrow\Trader\Domain\Model\Product\Personalisation\Personalisation;

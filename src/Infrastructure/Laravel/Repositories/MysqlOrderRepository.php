@@ -6,6 +6,8 @@ namespace Thinktomorrow\Trader\Infrastructure\Laravel\Repositories;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 use Ramsey\Uuid\Uuid;
+use Thinktomorrow\Trader\Domain\Model\Order\Log\LogEntry;
+use Thinktomorrow\Trader\Domain\Model\Order\Log\LogEntryId;
 use Thinktomorrow\Trader\Application\Order\Invoice\CreateInvoiceReference;
 use Thinktomorrow\Trader\Domain\Common\Address\AddressType;
 use Thinktomorrow\Trader\Domain\Model\Order\Address\BillingAddress;
@@ -42,6 +44,7 @@ final class MysqlOrderRepository implements OrderRepository, InvoiceRepository
     private static $orderPaymentTable = 'trader_order_payment';
     private static $orderAddressTable = 'trader_order_addresses';
     private static $orderShopperTable = 'trader_order_shoppers';
+    private static $orderLogEntriesTable = 'trader_order_events';
 
     public function save(Order $order): void
     {
@@ -65,6 +68,7 @@ final class MysqlOrderRepository implements OrderRepository, InvoiceRepository
         $this->upsertPayments($order);
         $this->upsertAddresses($order);
         $this->upsertShopper($order);
+        $this->upsertLogEntries($order);
     }
 
     private function upsertLines(Order $order): void
@@ -212,6 +216,24 @@ final class MysqlOrderRepository implements OrderRepository, InvoiceRepository
         }
     }
 
+    private function upsertLogEntries(Order $order): void
+    {
+        $logEntryIds = array_map(fn ($logEntry) => $logEntry->entryId->get(), $order->getLogEntries());
+
+        DB::table(static::$orderLogEntriesTable)
+            ->where('order_id', $order->orderId->get())
+            ->whereNotIn('entry_id', $logEntryIds)
+            ->delete();
+
+        foreach ($order->getChildEntities()[LogEntry::class] as $logEntryState) {
+            DB::table(static::$orderLogEntriesTable)
+                ->updateOrInsert([
+                    'order_id' => $order->orderId->get(),
+                    'entry_id' => $logEntryState['entry_id'],
+                ], $logEntryState);
+        }
+    }
+
     private function upsertShopper(Order $order): void
     {
         $shopperState = $order->getChildEntities()[Shopper::class];
@@ -315,6 +337,13 @@ final class MysqlOrderRepository implements OrderRepository, InvoiceRepository
             ]);
         }
 
+        $logEntryStates = DB::table(static::$orderLogEntriesTable)
+            ->where(static::$orderLogEntriesTable . '.order_id', $orderId->get())
+            ->orderBy('at', 'ASC')
+            ->get()
+            ->map(fn ($item) => (array)$item)
+            ->toArray();
+
         $childEntities = [
             Line::class => $lineStates,
             Discount::class => $allDiscountStates->filter(fn ($discountState) => $discountState['discountable_type'] == DiscountableType::order->value && $discountState['discountable_id'] == $orderState->order_id)->values()->toArray(),
@@ -323,6 +352,7 @@ final class MysqlOrderRepository implements OrderRepository, InvoiceRepository
             Shopper::class => $shopperState,
             ShippingAddress::class => $shippingAddressState ? (array)$shippingAddressState : null,
             BillingAddress::class => $billingAddressState ? (array)$billingAddressState : null,
+            LogEntry::class => $logEntryStates,
         ];
 
         return Order::fromMappedData((array)$orderState, $childEntities);
@@ -432,5 +462,10 @@ final class MysqlOrderRepository implements OrderRepository, InvoiceRepository
     public function nextLinePersonalisationReference(): LinePersonalisationId
     {
         return LinePersonalisationId::fromString((string)Uuid::uuid4());
+    }
+
+    public function nextLogEntryReference(): LogEntryId
+    {
+        return LogEntryId::fromString((string)Uuid::uuid4());
     }
 }

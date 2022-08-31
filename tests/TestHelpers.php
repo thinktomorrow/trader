@@ -4,6 +4,7 @@ namespace Tests;
 
 use Illuminate\Contracts\Debug\ExceptionHandler;
 use Money\Money;
+use Thinktomorrow\Trader\Domain\Model\Order\Log\LogEntry;
 use Thinktomorrow\Trader\Application\Product\CreateProduct;
 use Thinktomorrow\Trader\Application\Product\CreateVariant;
 use Thinktomorrow\Trader\Application\Product\ProductApplication;
@@ -86,7 +87,7 @@ trait TestHelpers
         });
     }
 
-    protected function createOrder(array $orderValues = [], array $lines = [], array $discounts = [], array $shippings = [], array $payments = [], ?ShippingAddress $shippingAddress = null, ?BillingAddress $billingAddress = null, ?Shopper $shopper = null): Order
+    protected function createOrder(array $orderValues = [], array $lines = [], array $discounts = [], array $shippings = [], array $payments = [], ?ShippingAddress $shippingAddress = null, ?BillingAddress $billingAddress = null, ?Shopper $shopper = null, array $logEntries = []): Order
     {
         return Order::fromMappedData(array_merge([
             'order_id' => 'xxx',
@@ -106,6 +107,7 @@ trait TestHelpers
             BillingAddress::class => $billingAddress?->getMappedData(),
             Shopper::class => $shopper?->getMappedData(),
             Discount::class => array_map(fn (Discount $discount) => $discount->getMappedData(), $discounts),
+            LogEntry::class => array_map(fn (LogEntry $logEntry) => $logEntry->getMappedData(), $logEntries),
         ]);
     }
 
@@ -120,6 +122,7 @@ trait TestHelpers
             $this->createOrderShippingAddress(),
             $this->createOrderBillingAddress(),
             $this->createOrderShopper(),
+            [$this->createLogEntry()],
         );
     }
 
@@ -213,6 +216,18 @@ trait TestHelpers
             'register_after_checkout' => true,
             'customer_id' => 'ccc-123',
             'locale' => 'en_GB',
+            'data' => "[]",
+        ], $values), array_merge([
+            'order_id' => 'xxx',
+        ], $aggregateState));
+    }
+
+    protected function createLogEntry(array $values = [], array $aggregateState = []): LogEntry
+    {
+        return LogEntry::fromMappedData(array_merge([
+            'entry_id' => 'abc',
+            'event' => 'xxx',
+            'at' => '2022-02-02 19:19:19',
             'data' => "[]",
         ], $values), array_merge([
             'order_id' => 'xxx',

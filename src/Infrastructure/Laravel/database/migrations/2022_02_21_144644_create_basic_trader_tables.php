@@ -312,7 +312,7 @@ class CreateBasicTraderTables extends Migration
         });
 
         Schema::create(static::PREFIX.'order_events', function (Blueprint $table) {
-            $table->id();
+            $table->char('entry_id', 36)->primary();
             $table->char('order_id', 36)->index();
             $table->string('event'); // transition.confirmed, transition.paid, notification.delay
             $table->dateTime('at');

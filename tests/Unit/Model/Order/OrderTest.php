@@ -1,35 +1,37 @@
 <?php
 declare(strict_types=1);
 
-namespace Tests\Unit\Model;
+namespace Tests\Unit\Model\Order;
 
 use Tests\Unit\TestCase;
 use Thinktomorrow\Trader\Domain\Common\Email;
+use Thinktomorrow\Trader\Domain\Model\Order\Order;
+use Thinktomorrow\Trader\Domain\Model\Order\OrderId;
+use Thinktomorrow\Trader\Domain\Model\Order\Line\Line;
+use Thinktomorrow\Trader\Domain\Model\Order\Line\LineId;
+use Thinktomorrow\Trader\Domain\Model\Order\Log\LogEntry;
 use Thinktomorrow\Trader\Domain\Model\Customer\CustomerId;
-use Thinktomorrow\Trader\Domain\Model\Order\Address\BillingAddress;
-use Thinktomorrow\Trader\Domain\Model\Order\Address\ShippingAddress;
+use Thinktomorrow\Trader\Domain\Model\Order\Line\Quantity;
+use Thinktomorrow\Trader\Domain\Model\Order\Line\LinePrice;
+use Thinktomorrow\Trader\Domain\Model\Order\OrderReference;
+use Thinktomorrow\Trader\Domain\Model\Order\Log\LogEntryId;
 use Thinktomorrow\Trader\Domain\Model\Order\Events\LineAdded;
+use Thinktomorrow\Trader\Domain\Model\Order\State\OrderState;
+use Thinktomorrow\Trader\Domain\Model\Order\Shipping\Shipping;
 use Thinktomorrow\Trader\Domain\Model\Order\Events\LineDeleted;
 use Thinktomorrow\Trader\Domain\Model\Order\Events\LineUpdated;
 use Thinktomorrow\Trader\Domain\Model\Order\Events\OrderCreated;
 use Thinktomorrow\Trader\Domain\Model\Order\Events\OrderUpdated;
-use Thinktomorrow\Trader\Domain\Model\Order\Events\PaymentUpdated;
-use Thinktomorrow\Trader\Domain\Model\Order\Events\ShippingAdded;
-use Thinktomorrow\Trader\Domain\Model\Order\Events\ShippingUpdated;
-use Thinktomorrow\Trader\Domain\Model\Order\Invoice\InvoiceReference;
-use Thinktomorrow\Trader\Domain\Model\Order\Line\Line;
-use Thinktomorrow\Trader\Domain\Model\Order\Line\LineId;
-use Thinktomorrow\Trader\Domain\Model\Order\Line\LinePrice;
-use Thinktomorrow\Trader\Domain\Model\Order\Line\Quantity;
-use Thinktomorrow\Trader\Domain\Model\Order\Order;
-use Thinktomorrow\Trader\Domain\Model\Order\OrderId;
-use Thinktomorrow\Trader\Domain\Model\Order\OrderReference;
 use Thinktomorrow\Trader\Domain\Model\Order\Payment\PaymentCost;
-use Thinktomorrow\Trader\Domain\Model\Order\Shipping\Shipping;
-use Thinktomorrow\Trader\Domain\Model\Order\Shipping\ShippingCost;
 use Thinktomorrow\Trader\Domain\Model\Order\Shipping\ShippingId;
-use Thinktomorrow\Trader\Domain\Model\Order\State\OrderState;
 use Thinktomorrow\Trader\Domain\Model\Product\Variant\VariantId;
+use Thinktomorrow\Trader\Domain\Model\Order\Events\ShippingAdded;
+use Thinktomorrow\Trader\Domain\Model\Order\Events\PaymentUpdated;
+use Thinktomorrow\Trader\Domain\Model\Order\Shipping\ShippingCost;
+use Thinktomorrow\Trader\Domain\Model\Order\Address\BillingAddress;
+use Thinktomorrow\Trader\Domain\Model\Order\Events\ShippingUpdated;
+use Thinktomorrow\Trader\Domain\Model\Order\Address\ShippingAddress;
+use Thinktomorrow\Trader\Domain\Model\Order\Invoice\InvoiceReference;
 use Thinktomorrow\Trader\Domain\Model\ShippingProfile\ShippingProfileId;
 
 class OrderTest extends TestCase
@@ -285,5 +287,15 @@ class OrderTest extends TestCase
         $order->deleteData('bar');
 
         $this->assertEquals(json_encode(['foo' => 'bar']), $order->getMappedData()['data']);
+    }
+
+    public function test_it_can_add_log_entry()
+    {
+        $order = $this->createDefaultOrder();
+
+        $order->addLogEntry($logEntry = LogEntry::create(LogEntryId::fromString('abc'), 'xxx', new \DateTime(), []));
+
+        $this->assertCount(2, $order->getLogEntries());
+        $this->assertEquals($logEntry->getMappedData(), $order->getChildEntities()[LogEntry::class][1]);
     }
 }

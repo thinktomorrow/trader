@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace Thinktomorrow\Trader\Infrastructure\Test\Repositories;
 
+use Thinktomorrow\Trader\Domain\Model\Order\Log\LogEntryId;
 use Thinktomorrow\Trader\Domain\Model\Order\Discount\DiscountId;
 use Thinktomorrow\Trader\Domain\Model\Order\Exceptions\CouldNotFindOrder;
 use Thinktomorrow\Trader\Domain\Model\Order\Exceptions\OrderAlreadyInMerchantHands;
@@ -132,6 +133,11 @@ final class InMemoryOrderRepository implements OrderRepository, InvoiceRepositor
     public function nextLinePersonalisationReference(): LinePersonalisationId
     {
         return LinePersonalisationId::fromString(''.mt_rand(1, 999));
+    }
+
+    public function nextLogEntryReference(): LogEntryId
+    {
+        return LogEntryId::fromString('entry_id_'.mt_rand(1,999));
     }
 
     // For testing purposes only

@@ -1,12 +1,12 @@
 <?php
 declare(strict_types=1);
 
-namespace Tests\Unit\Model;
+namespace Tests\Unit\Model\Order;
 
 use Tests\Unit\TestCase;
 use Thinktomorrow\Trader\Domain\Model\Order\Discount\Discount;
-use Thinktomorrow\Trader\Domain\Model\Order\Discount\DiscountableType;
 use Thinktomorrow\Trader\Domain\Model\Order\Discount\DiscountId;
+use Thinktomorrow\Trader\Domain\Model\Order\Discount\DiscountableType;
 
 class OrderDiscountTest extends TestCase
 {

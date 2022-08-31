@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace Thinktomorrow\Trader\Domain\Model\Order;
 
+use Thinktomorrow\Trader\Domain\Model\Order\Log\LogEntryId;
 use Thinktomorrow\Trader\Domain\Model\Order\Discount\DiscountId;
 use Thinktomorrow\Trader\Domain\Model\Order\Exceptions\OrderAlreadyInMerchantHands;
 use Thinktomorrow\Trader\Domain\Model\Order\Line\LineId;
@@ -43,4 +44,6 @@ interface OrderRepository
     public function nextLineReference(): LineId;
 
     public function nextLinePersonalisationReference(): LinePersonalisationId;
+
+    public function nextLogEntryReference(): LogEntryId;
 }
