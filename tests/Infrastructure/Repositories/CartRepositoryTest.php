@@ -3,24 +3,24 @@ declare(strict_types=1);
 
 namespace Tests\Infrastructure\Repositories;
 
-use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\Infrastructure\TestCase;
-use Thinktomorrow\Trader\Application\Cart\Read\Cart;
-use Thinktomorrow\Trader\Domain\Common\Cash\Cash;
 use Thinktomorrow\Trader\Domain\Common\Locale;
-use Thinktomorrow\Trader\Domain\Model\Order\Line\Personalisations\LinePersonalisation;
-use Thinktomorrow\Trader\Domain\Model\Order\Line\Personalisations\LinePersonalisationId;
-use Thinktomorrow\Trader\Domain\Model\Order\OrderState;
+use Thinktomorrow\Trader\Domain\Common\Cash\Cash;
+use Illuminate\Foundation\Testing\RefreshDatabase;
+use Thinktomorrow\Trader\Application\Cart\Read\Cart;
+use Thinktomorrow\Trader\Infrastructure\Test\TestContainer;
+use Thinktomorrow\Trader\Domain\Model\Order\State\OrderState;
 use Thinktomorrow\Trader\Domain\Model\Product\Personalisation\PersonalisationId;
-use Thinktomorrow\Trader\Domain\Model\Product\Personalisation\PersonalisationType;
 use Thinktomorrow\Trader\Infrastructure\Laravel\Repositories\MysqlCartRepository;
+use Thinktomorrow\Trader\Infrastructure\Test\Repositories\InMemoryCartRepository;
+use Thinktomorrow\Trader\Domain\Model\Product\Personalisation\PersonalisationType;
 use Thinktomorrow\Trader\Infrastructure\Laravel\Repositories\MysqlOrderRepository;
+use Thinktomorrow\Trader\Infrastructure\Test\Repositories\InMemoryOrderRepository;
 use Thinktomorrow\Trader\Infrastructure\Laravel\Repositories\MysqlProductRepository;
 use Thinktomorrow\Trader\Infrastructure\Laravel\Repositories\MysqlVariantRepository;
-use Thinktomorrow\Trader\Infrastructure\Test\Repositories\InMemoryCartRepository;
-use Thinktomorrow\Trader\Infrastructure\Test\Repositories\InMemoryOrderRepository;
 use Thinktomorrow\Trader\Infrastructure\Test\Repositories\InMemoryProductRepository;
-use Thinktomorrow\Trader\Infrastructure\Test\TestContainer;
+use Thinktomorrow\Trader\Domain\Model\Order\Line\Personalisations\LinePersonalisation;
+use Thinktomorrow\Trader\Domain\Model\Order\Line\Personalisations\LinePersonalisationId;
 
 final class CartRepositoryTest extends TestCase
 {

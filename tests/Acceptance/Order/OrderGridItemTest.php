@@ -3,9 +3,9 @@ declare(strict_types=1);
 
 namespace Tests\Acceptance\Order;
 
-use Tests\Acceptance\TestCase;
 use Tests\TestHelpers;
-use Thinktomorrow\Trader\Domain\Model\Order\OrderState;
+use Tests\Acceptance\TestCase;
+use Thinktomorrow\Trader\Domain\Model\Order\State\OrderState;
 use Thinktomorrow\Trader\Infrastructure\Laravel\Models\DefaultOrderGridItem;
 
 class OrderGridItemTest extends TestCase

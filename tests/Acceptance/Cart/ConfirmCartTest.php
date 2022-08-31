@@ -3,11 +3,11 @@ declare(strict_types=1);
 
 namespace Tests\Acceptance\Cart;
 
+use Thinktomorrow\Trader\Domain\Model\Order\OrderId;
 use Thinktomorrow\Trader\Application\Cart\ConfirmCart;
+use Thinktomorrow\Trader\Domain\Model\Order\State\OrderState;
 use Thinktomorrow\Trader\Domain\Model\Order\Events\OrderStateUpdated;
 use Thinktomorrow\Trader\Domain\Model\Order\Exceptions\OrderAlreadyInMerchantHands;
-use Thinktomorrow\Trader\Domain\Model\Order\OrderId;
-use Thinktomorrow\Trader\Domain\Model\Order\OrderState;
 
 class ConfirmCartTest extends CartContext
 {

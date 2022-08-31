@@ -5,8 +5,8 @@ namespace Tests\Unit\Common\State;
 use Tests\TestHelpers;
 use Tests\Unit\TestCase;
 use Thinktomorrow\Trader\Domain\Common\State\StateException;
-use Thinktomorrow\Trader\Domain\Model\Order\OrderState;
-use Thinktomorrow\Trader\Domain\Model\Order\OrderStateMachine;
+use Thinktomorrow\Trader\Domain\Model\Order\State\OrderState;
+use Thinktomorrow\Trader\Domain\Model\Order\State\OrderStateMachine;
 
 class OrderStateMachineTest extends TestCase
 {
