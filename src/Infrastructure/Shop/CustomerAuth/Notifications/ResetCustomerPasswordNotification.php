@@ -9,6 +9,7 @@ use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
 use Illuminate\Queue\SerializesModels;
 use Thinktomorrow\Trader\TraderConfig;
+use Thinktomorrow\Trader\Application\Customer\Read\CustomerRead;
 
 class ResetCustomerPasswordNotification extends Notification implements ShouldQueue
 {
@@ -17,11 +18,13 @@ class ResetCustomerPasswordNotification extends Notification implements ShouldQu
 
     public $token;
     private TraderConfig $traderConfig;
+    private CustomerRead $customer;
 
-    public function __construct($token, TraderConfig $traderConfig)
+    public function __construct($token, TraderConfig $traderConfig, CustomerRead $customer)
     {
         $this->token = $token;
         $this->traderConfig = $traderConfig;
+        $this->customer = $customer;
     }
 
     public function via()
@@ -42,6 +45,7 @@ class ResetCustomerPasswordNotification extends Notification implements ShouldQu
             ->from($this->traderConfig->getWebmasterEmail(), $this->traderConfig->getWebmasterName())
             ->view('shop.customer.auth.password.reset-mail', [
                 'reset_url' => route('customer.password.reset', $this->token),
+                'customer' => $this->customer,
             ]);
     }
 }
