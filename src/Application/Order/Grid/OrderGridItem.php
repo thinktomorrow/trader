@@ -11,9 +11,9 @@ interface OrderGridItem
     public function getOrderReference(): string;
     public function getInvoiceReference(): ?string;
     public function getOrderState(): string;
-    public function getConfirmedAt(): ?string;
-    public function getPaidAt(): ?string;
-    public function getDeliveredAt(): ?string;
+    public function getConfirmedAt(): ?\DateTime;
+    public function getPaidAt(): ?\DateTime;
+    public function getDeliveredAt(): ?\DateTime;
     public function getTotalPrice(): string;
 
     public function getTitle(): string;

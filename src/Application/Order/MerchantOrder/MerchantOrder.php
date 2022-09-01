@@ -11,9 +11,9 @@ interface MerchantOrder
     public function getOrderReference(): string;
     public function getInvoiceReference(): ?string;
     public function getState(): string;
-    public function getConfirmedAt(): ?string;
-    public function getPaidAt(): ?string;
-    public function getDeliveredAt(): ?string;
+    public function getConfirmedAt(): ?\DateTime;
+    public function getPaidAt(): ?\DateTime;
+    public function getDeliveredAt(): ?\DateTime;
 
     /** @return MerchantOrderLine[] */
     public function getLines(): iterable;

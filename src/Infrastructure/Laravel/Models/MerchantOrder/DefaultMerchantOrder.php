@@ -13,17 +13,17 @@ use Thinktomorrow\Trader\Infrastructure\Laravel\Models\OrderRead\OrderRead;
 
 class DefaultMerchantOrder extends OrderRead implements MerchantOrder
 {
-    protected ?string $confirmed_at;
-    protected ?string $paid_at;
-    protected ?string $delivered_at;
+    protected ?\DateTime $confirmed_at;
+    protected ?\DateTime $paid_at;
+    protected ?\DateTime $delivered_at;
 
     public static function fromMappedData(array $state, array $childObjects, array $discounts): static
     {
         $order = parent::fromMappedData($state, $childObjects, $discounts);
 
-        $order->confirmed_at = $state['confirmed_at'] ?? null;
-        $order->paid_at = $state['paid_at'] ?? null;
-        $order->delivered_at = $state['delivered_at'] ?? null;
+        $order->confirmed_at = isset($state['confirmed_at']) ? new \DateTime($state['confirmed_at']) : null;
+        $order->paid_at = isset($state['paid_at']) ? new \DateTime($state['paid_at']) : null;
+        $order->delivered_at = isset($state['delivered_at']) ? new \DateTime($state['delivered_at']) : null;
 
         return $order;
     }
@@ -31,21 +31,6 @@ class DefaultMerchantOrder extends OrderRead implements MerchantOrder
     public function getState(): string
     {
         return $this->state->getValueAsString();
-    }
-
-    public function getConfirmedAt(): ?string
-    {
-        return $this->confirmed_at;
-    }
-
-    public function getPaidAt(): ?string
-    {
-        return $this->paid_at;
-    }
-
-    public function getDeliveredAt(): ?string
-    {
-        return $this->delivered_at;
     }
 
     public function getShopper(): MerchantOrderShopper
@@ -83,5 +68,20 @@ class DefaultMerchantOrder extends OrderRead implements MerchantOrder
     public function getLogEntries(): iterable
     {
         return $this->logEntries;
+    }
+
+    public function getConfirmedAt(): ?\DateTime
+    {
+        return $this->confirmed_at;
+    }
+
+    public function getPaidAt(): ?\DateTime
+    {
+        return $this->paid_at;
+    }
+
+    public function getDeliveredAt(): ?\DateTime
+    {
+        return $this->delivered_at;
     }
 }

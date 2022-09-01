@@ -18,9 +18,9 @@ class DefaultOrderGridItem implements OrderGridItem
     protected string $order_reference;
     protected ?string $invoice_reference;
     protected string $state;
-    protected ?string $confirmed_at;
-    protected ?string $paid_at;
-    protected ?string $delivered_at;
+    protected ?\DateTime $confirmed_at;
+    protected ?\DateTime $paid_at;
+    protected ?\DateTime $delivered_at;
     protected Money $totalAsMoney;
     protected ?string $shopperEmail;
     protected ?string $customer_id;
@@ -37,9 +37,10 @@ class DefaultOrderGridItem implements OrderGridItem
         $gridItem->order_reference = $state['order_ref'];
         $gridItem->invoice_reference = $state['invoice_ref'];
         $gridItem->state = $state['order_state'];
-        $gridItem->confirmed_at = $state['confirmed_at'] ?? null;
-        $gridItem->paid_at = $state['paid_at'] ?? null;
-        $gridItem->delivered_at = $state['delivered_at'] ?? null;
+
+        $gridItem->confirmed_at = isset($state['confirmed_at']) ? new \DateTime($state['confirmed_at']) : null;
+        $gridItem->paid_at = isset($state['paid_at']) ? new \DateTime($state['paid_at']) : null;
+        $gridItem->delivered_at = isset($state['delivered_at']) ? new \DateTime($state['delivered_at']) : null;
 
         $gridItem->totalAsMoney = Cash::make($state['total']);
         $gridItem->shopperEmail = $shopperState['email'] ?? null;
@@ -69,17 +70,17 @@ class DefaultOrderGridItem implements OrderGridItem
         return $this->state;
     }
 
-    public function getConfirmedAt(): ?string
+    public function getConfirmedAt(): ?\DateTime
     {
         return $this->confirmed_at;
     }
 
-    public function getPaidAt(): ?string
+    public function getPaidAt(): ?\DateTime
     {
         return $this->paid_at;
     }
 
-    public function getDeliveredAt(): ?string
+    public function getDeliveredAt(): ?\DateTime
     {
         return $this->delivered_at;
     }

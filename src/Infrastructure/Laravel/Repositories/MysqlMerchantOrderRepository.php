@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace Thinktomorrow\Trader\Infrastructure\Laravel\Repositories;
 
+use Illuminate\Support\Facades\DB;
 use Psr\Container\ContainerInterface;
 use Thinktomorrow\Trader\Application\Order\MerchantOrder\MerchantOrder;
 use Thinktomorrow\Trader\Application\Order\MerchantOrder\MerchantOrderBillingAddress;
@@ -52,7 +53,13 @@ class MysqlMerchantOrderRepository implements MerchantOrderRepository
 
     private function composeOrder(Order $order): MerchantOrder
     {
-        $orderState = array_merge($order->getMappedData(), [
+        // MerchantOrder can need some extra data that is not available in the order
+        // model instance, therefore we call the state of the order record again
+        $orderState = DB::table(static::$orderTable)
+            ->where(static::$orderTable . '.order_id', $order->orderId->get())
+            ->first();
+
+        $orderState = array_merge((array) $orderState, $order->getMappedData(), [
             'total' => $order->getTotal(),
             'taxTotal' => $order->getTaxTotal(),
             'subtotal' => $order->getSubTotal(),

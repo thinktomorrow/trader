@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace Tests\Acceptance\Order;
 
+use DateTime;
 use Tests\Acceptance\TestCase;
 use Tests\TestHelpers;
 use Thinktomorrow\Trader\Domain\Model\Order\State\OrderState;
@@ -38,9 +39,9 @@ class OrderGridItemTest extends TestCase
             'delivered_at' => $delivered_at = '2022-02-04 10:10:10',
         ]), []);
 
-        $this->assertEquals($confirmed_at, $gridItem->getConfirmedAt());
-        $this->assertEquals($paid_at, $gridItem->getPaidAt());
-        $this->assertEquals($delivered_at, $gridItem->getDeliveredAt());
+        $this->assertEquals(new DateTime($confirmed_at), $gridItem->getConfirmedAt());
+        $this->assertEquals(new DateTime($paid_at), $gridItem->getPaidAt());
+        $this->assertEquals(new DateTime($delivered_at), $gridItem->getDeliveredAt());
     }
 
     /** @test */
