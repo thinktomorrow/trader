@@ -4,7 +4,7 @@ namespace Thinktomorrow\Trader\Application\Order\MerchantOrder;
 
 interface MerchantOrderPayment
 {
-    public static function fromMappedData(array $state, array $cartState, iterable $discounts): static;
+    public static function fromMappedData(array $state, array $orderState, iterable $discounts): static;
 
     public function getPaymentId(): string;
     public function getPaymentMethodId(): string;

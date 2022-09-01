@@ -56,4 +56,6 @@ interface MerchantOrder
     public function getAllDiscounts(): iterable;
 
     public function inCustomerHands(): bool;
+
+    public function getLogEntries(): iterable;
 }

@@ -10,7 +10,7 @@ use Thinktomorrow\Trader\Domain\Model\Order\Events\ShippingStates\ShipmentInTran
 use Thinktomorrow\Trader\Domain\Model\Order\Events\ShippingStates\ShipmentMarkedReadyForPacking;
 use Thinktomorrow\Trader\Domain\Model\Order\Events\ShippingStates\ShipmentPacked;
 use Thinktomorrow\Trader\Domain\Model\Order\Events\ShippingStates\ShipmentReturned;
-use Thinktomorrow\Trader\Domain\Model\Order\Events\ShippingStates\ShippingFailed;
+use Thinktomorrow\Trader\Domain\Model\Order\Events\ShippingStates\ShipmentFailed;
 
 class ShippingStateToEventMap
 {
@@ -25,7 +25,7 @@ class ShippingStateToEventMap
             ShippingState::in_transit->value => ShipmentInTransit::class,
             ShippingState::delivered->value => ShipmentDelivered::class,
             ShippingState::returned->value => ShipmentReturned::class,
-            ShippingState::failed->value => ShippingFailed::class,
+            ShippingState::failed->value => ShipmentFailed::class,
         ];
     }
 }

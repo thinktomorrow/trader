@@ -15,6 +15,7 @@ use Thinktomorrow\Trader\Application\Cart\Read\CartRepository;
 use Thinktomorrow\Trader\Application\Cart\Read\CartShipping;
 use Thinktomorrow\Trader\Application\Cart\Read\CartShippingAddress;
 use Thinktomorrow\Trader\Application\Cart\Read\CartShopper;
+use Thinktomorrow\Trader\Application\Order\MerchantOrder\MerchantOrderLogEntry;
 use Thinktomorrow\Trader\Application\Cart\ShippingProfile\ShippingProfileForCart;
 use Thinktomorrow\Trader\Application\Cart\ShippingProfile\ShippingProfileForCartRepository;
 use Thinktomorrow\Trader\Application\Cart\VariantForCart\VariantForCart;
@@ -46,6 +47,7 @@ use Thinktomorrow\Trader\Application\Product\ProductDetail\ProductDetail;
 use Thinktomorrow\Trader\Application\Product\ProductDetail\ProductDetailRepository;
 use Thinktomorrow\Trader\Application\Product\VariantLinks\VariantLink;
 use Thinktomorrow\Trader\Application\Promo\OrderPromo\Conditions\MinimumAmountOrderCondition;
+use Thinktomorrow\Trader\Infrastructure\Laravel\Models\MerchantOrder\DefaultMerchantOrderLogEntry;
 use Thinktomorrow\Trader\Application\Promo\OrderPromo\Conditions\MinimumLinesQuantityOrderCondition;
 use Thinktomorrow\Trader\Application\Promo\OrderPromo\Discounts\FixedAmountOrderDiscount;
 use Thinktomorrow\Trader\Application\Promo\OrderPromo\Discounts\PercentageOffOrderDiscount;
@@ -211,6 +213,7 @@ class TraderServiceProvider extends ServiceProvider
         $this->app->bind(MerchantOrderShopper::class, fn () => DefaultMerchantOrderShopper::class);
         $this->app->bind(MerchantOrderShipping::class, fn () => DefaultMerchantOrderShipping::class);
         $this->app->bind(MerchantOrderPayment::class, fn () => DefaultMerchantOrderPayment::class);
+        $this->app->bind(MerchantOrderLogEntry::class, fn () => DefaultMerchantOrderLogEntry::class);
 
         // Customer models
         $this->app->bind(CustomerRead::class, fn () => DefaultCustomerRead::class);

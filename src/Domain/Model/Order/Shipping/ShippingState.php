@@ -44,7 +44,7 @@ enum ShippingState: string implements State
                 'to' => self::in_transit,
             ],
             'deliver' => [
-                'from' => [self::in_transit],
+                'from' => [self::packed, self::in_transit],
                 'to' => self::delivered,
             ],
             'return' => [

@@ -6,6 +6,7 @@ namespace Thinktomorrow\Trader\Infrastructure\Laravel\Models\OrderRead;
 use Money\Money;
 use Thinktomorrow\Trader\Application\Common\RendersData;
 use Thinktomorrow\Trader\Application\Common\RendersMoney;
+use Thinktomorrow\Trader\Application\Order\MerchantOrder\MerchantOrderLogEntry;
 use Thinktomorrow\Trader\Application\Order\MerchantOrder\MerchantOrderBillingAddress;
 use Thinktomorrow\Trader\Application\Order\MerchantOrder\MerchantOrderLine;
 use Thinktomorrow\Trader\Application\Order\MerchantOrder\MerchantOrderPayment;
@@ -36,6 +37,9 @@ abstract class OrderRead
 
     protected ?MerchantOrderShopper $shopper;
     protected array $discounts;
+
+    /** @var MerchantOrderLogEntry[] */
+    protected array $logEntries;
     protected array $data;
 
     protected PriceTotal $total;
@@ -74,6 +78,7 @@ abstract class OrderRead
         $order->shippings = $childObjects[MerchantOrderShipping::class];
         $order->payments = $childObjects[MerchantOrderPayment::class];
         $order->shopper = $childObjects[MerchantOrderShopper::class];
+        $order->logEntries = $childObjects[MerchantOrderLogEntry::class];
 
         $order->data = json_decode($state['data'], true);
         $order->discounts = $discounts;

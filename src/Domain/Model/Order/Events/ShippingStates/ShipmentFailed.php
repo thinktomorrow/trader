@@ -7,7 +7,7 @@ use Thinktomorrow\Trader\Domain\Model\Order\OrderId;
 use Thinktomorrow\Trader\Domain\Model\Order\Shipping\ShippingId;
 use Thinktomorrow\Trader\Domain\Model\Order\Shipping\ShippingState;
 
-final class ShippingFailed
+final class ShipmentFailed
 {
     public function __construct(
         public readonly OrderId $orderId,

@@ -20,6 +20,7 @@ use Thinktomorrow\Trader\Domain\Model\Order\Events\OrderStateUpdated;
 use Thinktomorrow\Trader\Domain\Model\Order\Events\OrderUpdated;
 use Thinktomorrow\Trader\Domain\Model\Order\Events\PaymentStates\PaymentFailed;
 use Thinktomorrow\Trader\Domain\Model\Order\Events\PaymentStates\PaymentInitialized;
+use Thinktomorrow\Trader\Domain\Model\Order\Events\PaymentStates\PaymentRefundedByMerchant;
 use Thinktomorrow\Trader\Domain\Model\Order\Events\PaymentStates\PaymentMarkedPaidByMerchant;
 use Thinktomorrow\Trader\Domain\Model\Order\Events\PaymentStates\PaymentPaid;
 use Thinktomorrow\Trader\Domain\Model\Order\Events\PaymentStates\PaymentRefunded;
@@ -30,7 +31,7 @@ use Thinktomorrow\Trader\Domain\Model\Order\Events\ShippingStates\ShipmentInTran
 use Thinktomorrow\Trader\Domain\Model\Order\Events\ShippingStates\ShipmentMarkedReadyForPacking;
 use Thinktomorrow\Trader\Domain\Model\Order\Events\ShippingStates\ShipmentPacked;
 use Thinktomorrow\Trader\Domain\Model\Order\Events\ShippingStates\ShipmentReturned;
-use Thinktomorrow\Trader\Domain\Model\Order\Events\ShippingStates\ShippingFailed;
+use Thinktomorrow\Trader\Domain\Model\Order\Events\ShippingStates\ShipmentFailed;
 use Thinktomorrow\Trader\Domain\Model\Order\Events\ShippingStateUpdated;
 use Thinktomorrow\Trader\Domain\Model\Order\Payment\PaymentState;
 use Thinktomorrow\Trader\Domain\Model\Order\Shipping\ShippingState;
@@ -76,6 +77,7 @@ class OrderStateTest extends TestCase
         $this->assertPaymentStateEvent(PaymentFailed::class, PaymentState::expired);
         $this->assertPaymentStateEvent(PaymentRefunded::class, PaymentState::refunded);
         $this->assertPaymentStateEvent(PaymentRefunded::class, PaymentState::charged_back);
+        $this->assertPaymentStateEvent(PaymentRefundedByMerchant::class, PaymentState::refunded_by_merchant);
     }
 
     /** @test */
@@ -87,7 +89,7 @@ class OrderStateTest extends TestCase
         $this->assertShippingStateEvent(ShipmentInTransit::class, ShippingState::in_transit);
         $this->assertShippingStateEvent(ShipmentDelivered::class, ShippingState::delivered);
         $this->assertShippingStateEvent(ShipmentReturned::class, ShippingState::returned);
-        $this->assertShippingStateEvent(ShippingFailed::class, ShippingState::failed);
+        $this->assertShippingStateEvent(ShipmentFailed::class, ShippingState::failed);
     }
 
     private function assertOrderStateEvent(string $eventClass, $newState, $oldState = null)

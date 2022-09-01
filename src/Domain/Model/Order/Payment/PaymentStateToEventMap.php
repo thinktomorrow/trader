@@ -6,6 +6,7 @@ namespace Thinktomorrow\Trader\Domain\Model\Order\Payment;
 use Thinktomorrow\Trader\Domain\Common\Map\HasSimpleMapping;
 use Thinktomorrow\Trader\Domain\Model\Order\Events\PaymentStates\PaymentFailed;
 use Thinktomorrow\Trader\Domain\Model\Order\Events\PaymentStates\PaymentInitialized;
+use Thinktomorrow\Trader\Domain\Model\Order\Events\PaymentStates\PaymentRefundedByMerchant;
 use Thinktomorrow\Trader\Domain\Model\Order\Events\PaymentStates\PaymentMarkedPaidByMerchant;
 use Thinktomorrow\Trader\Domain\Model\Order\Events\PaymentStates\PaymentPaid;
 use Thinktomorrow\Trader\Domain\Model\Order\Events\PaymentStates\PaymentRefunded;
@@ -24,6 +25,7 @@ class PaymentStateToEventMap
             PaymentState::failed->value => PaymentFailed::class,
             PaymentState::expired->value => PaymentFailed::class,
             PaymentState::refunded->value => PaymentRefunded::class,
+            PaymentState::refunded_by_merchant->value => PaymentRefundedByMerchant::class,
             PaymentState::charged_back->value => PaymentRefunded::class,
         ];
     }

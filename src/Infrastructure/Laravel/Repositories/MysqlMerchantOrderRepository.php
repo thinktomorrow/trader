@@ -4,7 +4,9 @@ declare(strict_types=1);
 namespace Thinktomorrow\Trader\Infrastructure\Laravel\Repositories;
 
 use Psr\Container\ContainerInterface;
+use Thinktomorrow\Trader\Domain\Model\Order\Log\LogEntry;
 use Thinktomorrow\Trader\Application\Order\MerchantOrder\MerchantOrder;
+use Thinktomorrow\Trader\Application\Order\MerchantOrder\MerchantOrderLogEntry;
 use Thinktomorrow\Trader\Application\Order\MerchantOrder\MerchantOrderBillingAddress;
 use Thinktomorrow\Trader\Application\Order\MerchantOrder\MerchantOrderDiscount;
 use Thinktomorrow\Trader\Application\Order\MerchantOrder\MerchantOrderLine;
@@ -115,6 +117,11 @@ class MysqlMerchantOrderRepository implements MerchantOrderRepository
             $orderState,
         ) : null;
 
+        $logEntries = array_map(fn (LogEntry $logEntry) => $this->container->get(MerchantOrderLogEntry::class)::fromMappedData(
+            $logEntry->getMappedData(),
+            $orderState,
+        ), array_reverse($order->getLogEntries()));
+
         return $this->container->get(MerchantOrder::class)::fromMappedData(
             $orderState,
             [
@@ -124,6 +131,7 @@ class MysqlMerchantOrderRepository implements MerchantOrderRepository
                 MerchantOrderShipping::class => $shippings,
                 MerchantOrderPayment::class => $payments,
                 MerchantOrderShopper::class => $shopper,
+                MerchantOrderLogEntry::class => $logEntries,
             ],
             array_map(fn (Discount $discount) => $this->container->get(MerchantOrderDiscount::class)::fromMappedData(array_merge($discount->getMappedData(), [
                 'total' => $discount->getTotal(),

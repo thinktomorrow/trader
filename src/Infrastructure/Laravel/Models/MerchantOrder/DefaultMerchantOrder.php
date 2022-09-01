@@ -79,4 +79,9 @@ class DefaultMerchantOrder extends OrderRead implements MerchantOrder
     {
         return $this->state->inCustomerHands();
     }
+
+    public function getLogEntries(): iterable
+    {
+        return $this->logEntries;
+    }
 }

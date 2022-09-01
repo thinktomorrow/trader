@@ -18,6 +18,7 @@ use Thinktomorrow\Trader\Application\Customer\Read\CustomerBillingAddress;
 use Thinktomorrow\Trader\Application\Customer\Read\CustomerRead;
 use Thinktomorrow\Trader\Application\Customer\Read\CustomerShippingAddress;
 use Thinktomorrow\Trader\Application\Order\MerchantOrder\MerchantOrder;
+use Thinktomorrow\Trader\Application\Order\MerchantOrder\MerchantOrderLogEntry;
 use Thinktomorrow\Trader\Application\Order\MerchantOrder\MerchantOrderBillingAddress;
 use Thinktomorrow\Trader\Application\Order\MerchantOrder\MerchantOrderDiscount;
 use Thinktomorrow\Trader\Application\Order\MerchantOrder\MerchantOrderLine;
@@ -40,6 +41,7 @@ use Thinktomorrow\Trader\Infrastructure\Laravel\Models\Cart\DefaultCartShippingA
 use Thinktomorrow\Trader\Infrastructure\Laravel\Models\Cart\DefaultCartShopper;
 use Thinktomorrow\Trader\Infrastructure\Laravel\Models\CustomerRead\DefaultCustomerBillingAddress;
 use Thinktomorrow\Trader\Infrastructure\Laravel\Models\CustomerRead\DefaultCustomerRead;
+use Thinktomorrow\Trader\Infrastructure\Laravel\Models\MerchantOrder\DefaultMerchantOrderLogEntry;
 use Thinktomorrow\Trader\Infrastructure\Laravel\Models\CustomerRead\DefaultCustomerShippingAddress;
 use Thinktomorrow\Trader\Infrastructure\Laravel\Models\DefaultTaxonNode;
 use Thinktomorrow\Trader\Infrastructure\Laravel\Models\DefaultVariantForCart;
@@ -95,6 +97,7 @@ abstract class TestCase extends \Orchestra\Testbench\TestCase
         (new TestContainer())->add(MerchantOrderPayment::class, DefaultMerchantOrderPayment::class);
         (new TestContainer())->add(MerchantOrderShopper::class, DefaultMerchantOrderShopper::class);
         (new TestContainer())->add(MerchantOrderDiscount::class, DefaultMerchantOrderDiscount::class);
+        (new TestContainer())->add(MerchantOrderLogEntry::class, DefaultMerchantOrderLogEntry::class);
 
         // Customer
         (new TestContainer())->add(CustomerRead::class, DefaultCustomerRead::class);

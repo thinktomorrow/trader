@@ -3,7 +3,9 @@ declare(strict_types=1);
 
 namespace Thinktomorrow\Trader\Infrastructure\Test\Repositories;
 
+use Thinktomorrow\Trader\Domain\Model\Order\Log\LogEntry;
 use Thinktomorrow\Trader\Application\Order\MerchantOrder\MerchantOrder;
+use Thinktomorrow\Trader\Application\Order\MerchantOrder\MerchantOrderLogEntry;
 use Thinktomorrow\Trader\Application\Order\MerchantOrder\MerchantOrderBillingAddress;
 use Thinktomorrow\Trader\Application\Order\MerchantOrder\MerchantOrderLine;
 use Thinktomorrow\Trader\Application\Order\MerchantOrder\MerchantOrderPayment;
@@ -17,6 +19,7 @@ use Thinktomorrow\Trader\Domain\Model\Order\Line\Personalisations\LinePersonalis
 use Thinktomorrow\Trader\Domain\Model\Order\OrderId;
 use Thinktomorrow\Trader\Domain\Model\Order\OrderReference;
 use Thinktomorrow\Trader\Infrastructure\Laravel\Models\MerchantOrder\DefaultMerchantOrder;
+use Thinktomorrow\Trader\Infrastructure\Laravel\Models\MerchantOrder\DefaultMerchantOrderLogEntry;
 use Thinktomorrow\Trader\Infrastructure\Laravel\Models\MerchantOrder\DefaultMerchantOrderBillingAddress;
 use Thinktomorrow\Trader\Infrastructure\Laravel\Models\MerchantOrder\DefaultMerchantOrderDiscount;
 use Thinktomorrow\Trader\Infrastructure\Laravel\Models\MerchantOrder\DefaultMerchantOrderLine;
@@ -99,6 +102,11 @@ class InMemoryMerchantOrderRepository implements MerchantOrderRepository
             $orderState,
         ) : null;
 
+        $logEntries = array_map(fn (LogEntry $logEntry) => DefaultMerchantOrderLogEntry::fromMappedData(
+            $logEntry->getMappedData(),
+            $orderState,
+        ), $order->getLogEntries());
+
         return DefaultMerchantOrder::fromMappedData(
             $orderState,
             [
@@ -108,6 +116,7 @@ class InMemoryMerchantOrderRepository implements MerchantOrderRepository
                 MerchantOrderShipping::class => $shippings,
                 MerchantOrderPayment::class => $payments,
                 MerchantOrderShopper::class => $shopper,
+                MerchantOrderLogEntry::class => $logEntries,
             ],
             array_map(fn (Discount $discount) => DefaultMerchantOrderDiscount::fromMappedData(array_merge($discount->getMappedData(), [
                 'total' => $discount->getTotal(),

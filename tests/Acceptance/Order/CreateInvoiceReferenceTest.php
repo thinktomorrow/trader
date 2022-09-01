@@ -21,12 +21,24 @@ class CreateInvoiceReferenceTest extends CartContext
     public function test_it_can_create_invoice_reference_following_existing_one()
     {
         $order = $this->createDefaultOrder();
-        $order->setInvoiceReference(InvoiceReference::fromString('22080003'));
+        $order->setInvoiceReference(InvoiceReference::fromString(date('y') . date('m') . '0003'));
         $this->orderRepository->save($order);
 
         $handler = (new \Thinktomorrow\Trader\Application\Order\Invoice\CreateInvoiceReference((new TestContainer())->get(InvoiceRepository::class)));
         $reference = $handler->create();
 
         $this->assertEquals(InvoiceReference::fromString(date('y') . date('m') . '0004'), $reference);
+    }
+
+    public function test_it_can_create_invoice_reference_following_existing_one_with_new_date()
+    {
+        $order = $this->createDefaultOrder();
+        $order->setInvoiceReference(InvoiceReference::fromString('22080003'));
+        $this->orderRepository->save($order);
+
+        $handler = (new \Thinktomorrow\Trader\Application\Order\Invoice\CreateInvoiceReference((new TestContainer())->get(InvoiceRepository::class)));
+        $reference = $handler->create();
+
+        $this->assertEquals(InvoiceReference::fromString(date('y') . date('m') . '0001'), $reference);
     }
 }
