@@ -6,10 +6,10 @@ namespace Thinktomorrow\Trader\Domain\Model\Order\Payment;
 use Thinktomorrow\Trader\Domain\Common\Map\HasSimpleMapping;
 use Thinktomorrow\Trader\Domain\Model\Order\Events\PaymentStates\PaymentFailed;
 use Thinktomorrow\Trader\Domain\Model\Order\Events\PaymentStates\PaymentInitialized;
-use Thinktomorrow\Trader\Domain\Model\Order\Events\PaymentStates\PaymentRefundedByMerchant;
 use Thinktomorrow\Trader\Domain\Model\Order\Events\PaymentStates\PaymentMarkedPaidByMerchant;
 use Thinktomorrow\Trader\Domain\Model\Order\Events\PaymentStates\PaymentPaid;
 use Thinktomorrow\Trader\Domain\Model\Order\Events\PaymentStates\PaymentRefunded;
+use Thinktomorrow\Trader\Domain\Model\Order\Events\PaymentStates\PaymentRefundedByMerchant;
 
 class PaymentStateToEventMap
 {

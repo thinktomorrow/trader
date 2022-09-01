@@ -5,12 +5,12 @@ namespace Thinktomorrow\Trader\Domain\Model\Order\Shipping;
 
 use Thinktomorrow\Trader\Domain\Common\Map\HasSimpleMapping;
 use Thinktomorrow\Trader\Domain\Model\Order\Events\ShippingStates\ShipmentDelivered;
+use Thinktomorrow\Trader\Domain\Model\Order\Events\ShippingStates\ShipmentFailed;
 use Thinktomorrow\Trader\Domain\Model\Order\Events\ShippingStates\ShipmentHaltedForPacking;
 use Thinktomorrow\Trader\Domain\Model\Order\Events\ShippingStates\ShipmentInTransit;
 use Thinktomorrow\Trader\Domain\Model\Order\Events\ShippingStates\ShipmentMarkedReadyForPacking;
 use Thinktomorrow\Trader\Domain\Model\Order\Events\ShippingStates\ShipmentPacked;
 use Thinktomorrow\Trader\Domain\Model\Order\Events\ShippingStates\ShipmentReturned;
-use Thinktomorrow\Trader\Domain\Model\Order\Events\ShippingStates\ShipmentFailed;
 
 class ShippingStateToEventMap
 {
