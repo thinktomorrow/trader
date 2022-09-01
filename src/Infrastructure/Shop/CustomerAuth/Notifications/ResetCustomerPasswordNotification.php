@@ -8,8 +8,8 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
 use Illuminate\Queue\SerializesModels;
-use Thinktomorrow\Trader\TraderConfig;
 use Thinktomorrow\Trader\Application\Customer\Read\CustomerRead;
+use Thinktomorrow\Trader\TraderConfig;
 
 class ResetCustomerPasswordNotification extends Notification implements ShouldQueue
 {

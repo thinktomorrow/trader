@@ -5,12 +5,12 @@ namespace Thinktomorrow\Trader\Infrastructure\Shop\CustomerAuth;
 
 use Illuminate\Auth\Authenticatable;
 use Illuminate\Auth\Passwords\CanResetPassword;
-use Thinktomorrow\Trader\Domain\Model\Customer\CustomerId;
 use Illuminate\Contracts\Auth\Authenticatable as AuthenticatableContract;
 use Illuminate\Contracts\Auth\CanResetPassword as CanResetPasswordContract;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Notifications\Notifiable;
 use Thinktomorrow\Trader\Application\Customer\Read\CustomerReadRepository;
+use Thinktomorrow\Trader\Domain\Model\Customer\CustomerId;
 use Thinktomorrow\Trader\Infrastructure\Shop\CustomerAuth\Notifications\ResetCustomerPasswordNotification;
 use Thinktomorrow\Trader\TraderConfig;
 
