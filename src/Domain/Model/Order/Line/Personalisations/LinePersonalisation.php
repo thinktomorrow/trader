@@ -40,7 +40,7 @@ final class LinePersonalisation implements ChildEntity
             'line_id' => $this->lineId->get(),
             'line_personalisation_id' => $this->linePersonalisationId->get(),
             'personalisation_type' => $this->personalisationType->get(),
-            'personalisation_id' => $this->originalPersonalisationId->get(),
+            'personalisation_id' => $this->originalPersonalisationId?->get(),
             'value' => $this->value,
             'data' => json_encode($this->data),
         ];
@@ -52,7 +52,7 @@ final class LinePersonalisation implements ChildEntity
 
         $personalisation->lineId = LineId::fromString($aggregateState['line_id']);
         $personalisation->linePersonalisationId = LinePersonalisationId::fromString($state['line_personalisation_id']);
-        $personalisation->originalPersonalisationId = PersonalisationId::fromString($state['personalisation_id']);
+        $personalisation->originalPersonalisationId = $state['personalisation_id'] ? PersonalisationId::fromString($state['personalisation_id']) : null;
         $personalisation->personalisationType = PersonalisationType::fromString($state['personalisation_type']);
         $personalisation->value = $state['value'];
         $personalisation->data = json_decode($state['data'], true);
