@@ -35,6 +35,7 @@ final class TaxonIdOptionsComposerTest extends TestCase
                 [
                     'group' => 'Taxon first',
                     'values' => [
+                        'first' => 'Taxon first',
                         'second' => 'Taxon second',
                         'third' => 'Taxon third',
                         'fourth' => 'Taxon third > Taxon fourth',
@@ -43,6 +44,7 @@ final class TaxonIdOptionsComposerTest extends TestCase
                 [
                     'group' => 'Taxon fifth',
                     'values' => [
+                        'fifth' => 'Taxon fifth',
                         'sixth' => 'Taxon sixth',
                     ],
                 ],

@@ -12,6 +12,7 @@ class DefaultShippingProfileForCart implements ShippingProfileForCart
 
     private string $shippingProfileId;
     private bool $requiresAddress;
+    private iterable $images;
 
     final private function __construct()
     {
@@ -23,6 +24,7 @@ class DefaultShippingProfileForCart implements ShippingProfileForCart
         $object->shippingProfileId = $state['shipping_profile_id'];
         $object->requiresAddress = $state['requires_address'];
         $object->data = json_decode($state['data'], true);
+        $object->images = [];
 
         return $object;
     }
@@ -45,5 +47,15 @@ class DefaultShippingProfileForCart implements ShippingProfileForCart
     public function requiresAddress(): bool
     {
         return $this->requiresAddress;
+    }
+
+    public function setImages(iterable $images): void
+    {
+        $this->images = $images;
+    }
+
+    public function getImages(): iterable
+    {
+        return $this->images;
     }
 }
