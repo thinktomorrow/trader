@@ -11,7 +11,7 @@ abstract class OrderReadLinePersonalisation
 
     protected string $line_id;
     protected string $line_personalisation_id;
-    protected string $personalisation_id;
+    protected ?string $personalisation_id;
     protected string $personalisation_type;
     protected $value;
     protected array $data;
