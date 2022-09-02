@@ -126,18 +126,22 @@ abstract class OrderRead
         $this->include_tax = $includeTax;
     }
 
-    public function getTotalPrice(): string
+    public function getTotalPrice(?bool $includeTax = null): string
     {
+        $includeTax = $includeTax ?? $this->include_tax;
+
         return $this->renderMoney(
-            $this->include_tax ? $this->total->getIncludingVat() : $this->total->getExcludingVat(),
+            $includeTax ? $this->total->getIncludingVat() : $this->total->getExcludingVat(),
             $this->getLocale()
         );
     }
 
-    public function getSubtotalPrice(): string
+    public function getSubtotalPrice(?bool $includeTax = null): string
     {
+        $includeTax = $includeTax ?? $this->include_tax;
+
         return $this->renderMoney(
-            $this->include_tax ? $this->subtotal->getIncludingVat() : $this->subtotal->getExcludingVat(),
+            $includeTax ? $this->subtotal->getIncludingVat() : $this->subtotal->getExcludingVat(),
             $this->getLocale()
         );
     }

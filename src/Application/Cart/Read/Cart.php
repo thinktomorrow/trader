@@ -19,8 +19,8 @@ interface Cart
     /** The quantity of all items combined */
     public function getQuantity(): int;
 
-    public function getTotalPrice(): string;
-    public function getSubtotalPrice(): string;
+    public function getTotalPrice(?bool $includeTax = null): string;
+    public function getSubtotalPrice(?bool $includeTax = null): string;
     public function getShippingCost(): ?string;
     public function getPaymentCost(): ?string;
     public function getDiscountPrice(): ?string;
