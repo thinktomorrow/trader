@@ -7,8 +7,8 @@ use Assert\Assertion;
 use Thinktomorrow\Trader\Domain\Common\Entity\ChildEntity;
 use Thinktomorrow\Trader\Domain\Common\Entity\HasData;
 use Thinktomorrow\Trader\Domain\Model\Product\Option\OptionValueId;
-use Thinktomorrow\Trader\Domain\Model\Product\ProductId;
 use Thinktomorrow\Trader\Domain\Model\Product\Personalisation\Personalisation;
+use Thinktomorrow\Trader\Domain\Model\Product\ProductId;
 
 final class Variant implements ChildEntity
 {

@@ -467,7 +467,7 @@ trait TestHelpers
         $product = $this->createdProduct();
         $product->updateOptions([Option::create($product->productId, OptionId::fromString('ooo'), ['foo' => 'bar'])]);
         $product->updateOptionValues(OptionId::fromString('ooo'), [
-            OptionValue::create(OptionId::fromString('ooo'), OptionValueId::fromString('ppp'), ['foo' => 'bar'])
+            OptionValue::create(OptionId::fromString('ooo'), OptionValueId::fromString('ppp'), ['foo' => 'bar']),
         ]);
 
         $variant = $this->createdVariantWithOption();
