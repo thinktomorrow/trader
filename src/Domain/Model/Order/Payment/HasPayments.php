@@ -6,8 +6,8 @@ namespace Thinktomorrow\Trader\Domain\Model\Order\Payment;
 use Thinktomorrow\Trader\Domain\Model\Order\Events\PaymentAdded;
 use Thinktomorrow\Trader\Domain\Model\Order\Events\PaymentDeleted;
 use Thinktomorrow\Trader\Domain\Model\Order\Events\PaymentUpdated;
-use Thinktomorrow\Trader\Domain\Model\Order\Exceptions\PaymentAlreadyOnOrder;
 use Thinktomorrow\Trader\Domain\Model\Order\Exceptions\CouldNotFindPaymentOnOrder;
+use Thinktomorrow\Trader\Domain\Model\Order\Exceptions\PaymentAlreadyOnOrder;
 
 trait HasPayments
 {

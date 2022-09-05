@@ -5,19 +5,19 @@ namespace Tests\Unit\Model\Order;
 
 use Money\Money;
 use Tests\Unit\TestCase;
+use Thinktomorrow\Trader\Domain\Model\Order\Discount\Discount;
+use Thinktomorrow\Trader\Domain\Model\Order\Discount\DiscountTotal;
+use Thinktomorrow\Trader\Domain\Model\Order\Events\ShippingAdded;
+use Thinktomorrow\Trader\Domain\Model\Order\Events\ShippingDeleted;
+use Thinktomorrow\Trader\Domain\Model\Order\Events\ShippingUpdated;
+use Thinktomorrow\Trader\Domain\Model\Order\Exceptions\CouldNotFindShippingOnOrder;
+use Thinktomorrow\Trader\Domain\Model\Order\Exceptions\ShippingAlreadyOnOrder;
 use Thinktomorrow\Trader\Domain\Model\Order\OrderId;
 use Thinktomorrow\Trader\Domain\Model\Order\Shipping\Shipping;
-use Thinktomorrow\Trader\Domain\Model\Order\Discount\Discount;
-use Thinktomorrow\Trader\Domain\Model\Order\Shipping\ShippingId;
-use Thinktomorrow\Trader\Domain\Model\Order\Events\ShippingAdded;
 use Thinktomorrow\Trader\Domain\Model\Order\Shipping\ShippingCost;
-use Thinktomorrow\Trader\Domain\Model\Order\Events\ShippingUpdated;
-use Thinktomorrow\Trader\Domain\Model\Order\Events\ShippingDeleted;
+use Thinktomorrow\Trader\Domain\Model\Order\Shipping\ShippingId;
 use Thinktomorrow\Trader\Domain\Model\Order\Shipping\ShippingState;
-use Thinktomorrow\Trader\Domain\Model\Order\Discount\DiscountTotal;
 use Thinktomorrow\Trader\Domain\Model\ShippingProfile\ShippingProfileId;
-use Thinktomorrow\Trader\Domain\Model\Order\Exceptions\ShippingAlreadyOnOrder;
-use Thinktomorrow\Trader\Domain\Model\Order\Exceptions\CouldNotFindShippingOnOrder;
 
 class ShippingTest extends TestCase
 {
@@ -74,7 +74,7 @@ class ShippingTest extends TestCase
         $this->assertEquals(ShippingCost::fromMoney(Money::EUR(0), $shippingCost->getTaxRate(), $shippingCost->includesVat()), $shipping->getShippingCostTotal());
 
         $this->assertEquals([
-            Discount::class => array_map(fn($discount) => $discount->getMappedData(), $shipping->getDiscounts())
+            Discount::class => array_map(fn ($discount) => $discount->getMappedData(), $shipping->getDiscounts()),
         ], $shipping->getChildEntities());
     }
 
@@ -123,7 +123,7 @@ class ShippingTest extends TestCase
         $this->assertCount(2, $order->getShippings());
 
         $this->assertEquals([
-            new ShippingAdded($order->orderId, $addedShipping->shippingId)
+            new ShippingAdded($order->orderId, $addedShipping->shippingId),
         ], $order->releaseEvents());
     }
 

@@ -5,8 +5,8 @@ namespace Tests\Unit;
 
 use Tests\TestHelpers;
 use Thinktomorrow\Trader\Domain\Common\Taxes\TaxRate;
-use Thinktomorrow\Trader\Domain\Model\Order\Payment\PaymentStateToEventMap;
 use Thinktomorrow\Trader\Domain\Model\Order\Discount\DiscountPriceDefaults;
+use Thinktomorrow\Trader\Domain\Model\Order\Payment\PaymentStateToEventMap;
 use Thinktomorrow\Trader\Domain\Model\Order\Shipping\ShippingStateToEventMap;
 use Thinktomorrow\Trader\Domain\Model\Order\State\OrderStateToEventMap;
 

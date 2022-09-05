@@ -6,8 +6,8 @@ namespace Tests\Unit\Model\Order;
 use Money\Money;
 use PHPUnit\Framework\TestCase;
 use Thinktomorrow\Trader\Domain\Common\Taxes\TaxRate;
-use Thinktomorrow\Trader\Domain\Model\Order\Discount\DiscountTotal;
 use Thinktomorrow\Trader\Domain\Model\Order\Discount\DiscountPriceDefaults;
+use Thinktomorrow\Trader\Domain\Model\Order\Discount\DiscountTotal;
 
 class DiscountTotalTest extends TestCase
 {

@@ -5,19 +5,19 @@ namespace Tests\Unit\Model\Order;
 
 use Money\Money;
 use Tests\Unit\TestCase;
+use Thinktomorrow\Trader\Domain\Model\Order\Discount\Discount;
+use Thinktomorrow\Trader\Domain\Model\Order\Discount\DiscountTotal;
+use Thinktomorrow\Trader\Domain\Model\Order\Events\PaymentAdded;
+use Thinktomorrow\Trader\Domain\Model\Order\Events\PaymentDeleted;
+use Thinktomorrow\Trader\Domain\Model\Order\Events\PaymentUpdated;
+use Thinktomorrow\Trader\Domain\Model\Order\Exceptions\CouldNotFindPaymentOnOrder;
+use Thinktomorrow\Trader\Domain\Model\Order\Exceptions\PaymentAlreadyOnOrder;
 use Thinktomorrow\Trader\Domain\Model\Order\OrderId;
 use Thinktomorrow\Trader\Domain\Model\Order\Payment\Payment;
-use Thinktomorrow\Trader\Domain\Model\Order\Discount\Discount;
-use Thinktomorrow\Trader\Domain\Model\Order\Payment\PaymentId;
 use Thinktomorrow\Trader\Domain\Model\Order\Payment\PaymentCost;
-use Thinktomorrow\Trader\Domain\Model\Order\Events\PaymentAdded;
-use Thinktomorrow\Trader\Domain\Model\Order\Events\PaymentUpdated;
-use Thinktomorrow\Trader\Domain\Model\Order\Events\PaymentDeleted;
-use Thinktomorrow\Trader\Domain\Model\Order\Discount\DiscountTotal;
+use Thinktomorrow\Trader\Domain\Model\Order\Payment\PaymentId;
 use Thinktomorrow\Trader\Domain\Model\Order\Payment\PaymentState;
 use Thinktomorrow\Trader\Domain\Model\PaymentMethod\PaymentMethodId;
-use Thinktomorrow\Trader\Domain\Model\Order\Exceptions\PaymentAlreadyOnOrder;
-use Thinktomorrow\Trader\Domain\Model\Order\Exceptions\CouldNotFindPaymentOnOrder;
 
 class PaymentTest extends TestCase
 {
@@ -95,7 +95,7 @@ class PaymentTest extends TestCase
         $this->assertCount(2, $order->getPayments());
 
         $this->assertEquals([
-            new PaymentAdded($order->orderId, $addedPayment->paymentId)
+            new PaymentAdded($order->orderId, $addedPayment->paymentId),
         ], $order->releaseEvents());
     }
 

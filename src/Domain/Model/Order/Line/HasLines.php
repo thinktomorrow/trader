@@ -5,8 +5,8 @@ namespace Thinktomorrow\Trader\Domain\Model\Order\Line;
 use Thinktomorrow\Trader\Domain\Model\Order\Events\LineAdded;
 use Thinktomorrow\Trader\Domain\Model\Order\Events\LineDeleted;
 use Thinktomorrow\Trader\Domain\Model\Order\Events\LineUpdated;
-use Thinktomorrow\Trader\Domain\Model\Product\Variant\VariantId;
 use Thinktomorrow\Trader\Domain\Model\Order\Line\Personalisations\LinePersonalisation;
+use Thinktomorrow\Trader\Domain\Model\Product\Variant\VariantId;
 
 trait HasLines
 {

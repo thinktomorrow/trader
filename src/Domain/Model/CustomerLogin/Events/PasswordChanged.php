@@ -9,6 +9,5 @@ class PasswordChanged
 {
     public function __construct(public readonly CustomerId $customerId)
     {
-
     }
 }

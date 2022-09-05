@@ -5,11 +5,11 @@ namespace Tests\Unit\Model\Customer;
 
 use PHPUnit\Framework\TestCase;
 use Thinktomorrow\Trader\Domain\Common\Address\Address;
-use Thinktomorrow\Trader\Domain\Model\Country\CountryId;
-use Thinktomorrow\Trader\Domain\Model\Customer\CustomerId;
 use Thinktomorrow\Trader\Domain\Common\Address\AddressType;
+use Thinktomorrow\Trader\Domain\Model\Country\CountryId;
 use Thinktomorrow\Trader\Domain\Model\Customer\Address\BillingAddress;
 use Thinktomorrow\Trader\Domain\Model\Customer\Address\ShippingAddress;
+use Thinktomorrow\Trader\Domain\Model\Customer\CustomerId;
 
 class CustomerAddressTest extends TestCase
 {

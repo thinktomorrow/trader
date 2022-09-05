@@ -3,10 +3,6 @@ declare(strict_types=1);
 
 namespace Thinktomorrow\Trader\Domain\Model\Order\Discount;
 
-use Thinktomorrow\Trader\Domain\Common\Price\Price;
-use Thinktomorrow\Trader\Domain\Common\Price\PriceTotal;
-use Thinktomorrow\Trader\Domain\Model\Order\Line\Quantity;
-
 interface Discountable
 {
     public function getDiscountableId(): DiscountableId;

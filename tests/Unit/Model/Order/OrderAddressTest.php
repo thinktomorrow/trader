@@ -5,11 +5,11 @@ namespace Tests\Unit\Model\Order;
 
 use Tests\Unit\TestCase;
 use Thinktomorrow\Trader\Domain\Common\Address\Address;
-use Thinktomorrow\Trader\Domain\Model\Country\CountryId;
-use Thinktomorrow\Trader\Domain\Model\Order\OrderId;
 use Thinktomorrow\Trader\Domain\Common\Address\AddressType;
+use Thinktomorrow\Trader\Domain\Model\Country\CountryId;
 use Thinktomorrow\Trader\Domain\Model\Order\Address\BillingAddress;
 use Thinktomorrow\Trader\Domain\Model\Order\Address\ShippingAddress;
+use Thinktomorrow\Trader\Domain\Model\Order\OrderId;
 
 class OrderAddressTest extends TestCase
 {

@@ -5,8 +5,8 @@ namespace Thinktomorrow\Trader\Domain\Model\Order\Shipping;
 use Thinktomorrow\Trader\Domain\Model\Order\Events\ShippingAdded;
 use Thinktomorrow\Trader\Domain\Model\Order\Events\ShippingDeleted;
 use Thinktomorrow\Trader\Domain\Model\Order\Events\ShippingUpdated;
-use Thinktomorrow\Trader\Domain\Model\Order\Exceptions\ShippingAlreadyOnOrder;
 use Thinktomorrow\Trader\Domain\Model\Order\Exceptions\CouldNotFindShippingOnOrder;
+use Thinktomorrow\Trader\Domain\Model\Order\Exceptions\ShippingAlreadyOnOrder;
 
 trait HasShippings
 {
