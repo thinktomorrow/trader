@@ -15,6 +15,7 @@ use Thinktomorrow\Trader\Application\Cart\Read\CartRepository;
 use Thinktomorrow\Trader\Application\Cart\Read\CartShipping;
 use Thinktomorrow\Trader\Application\Cart\Read\CartShippingAddress;
 use Thinktomorrow\Trader\Application\Cart\Read\CartShopper;
+use Thinktomorrow\Trader\Domain\Model\Order\Discount\DiscountPriceDefaults;
 use Thinktomorrow\Trader\Application\Cart\ShippingProfile\ShippingProfileForCart;
 use Thinktomorrow\Trader\Application\Cart\ShippingProfile\ShippingProfileForCartRepository;
 use Thinktomorrow\Trader\Application\Cart\VariantForCart\VariantForCart;
@@ -235,7 +236,8 @@ class TraderServiceProvider extends ServiceProvider
         $this->loadMigrationsFrom(__DIR__.'/database/migrations');
 
         // Default discount tax rate
-        DiscountTotal::setDiscountTaxRate(TaxRate::fromString($this->app->make(TraderConfig::class)->getDefaultTaxRate()));
+        DiscountPriceDefaults::setDiscountTaxRate(TaxRate::fromString($this->app->make(TraderConfig::class)->getDefaultTaxRate()));
+        DiscountPriceDefaults::setDiscountIncludeTax($this->app->make(TraderConfig::class)->includeVatInPrices());
 
         // Default locale
         DefaultLocale::set($this->app->make(TraderConfig::class)->getDefaultLocale());

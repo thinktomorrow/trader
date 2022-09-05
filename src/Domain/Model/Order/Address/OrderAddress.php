@@ -19,12 +19,13 @@ abstract class OrderAddress
     {
     }
 
-    public static function create(OrderId $orderId, Address $address): static
+    public static function create(OrderId $orderId, Address $address, array $data): static
     {
         $orderAddress = new static();
 
         $orderAddress->orderId = $orderId;
         $orderAddress->address = $address;
+        $orderAddress->data = $data;
 
         return $orderAddress;
     }
@@ -62,10 +63,5 @@ abstract class OrderAddress
     public function getAddress(): Address
     {
         return $this->address;
-    }
-
-    public function replaceAddress(Address $address): void
-    {
-        $this->address = $address;
     }
 }

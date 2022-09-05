@@ -39,7 +39,7 @@ abstract class BaseDiscount
             return;
         }
 
-        $discount = Discount::fromApplicableDiscount(
+        $discount = Discount::create(
             $order->orderId,
             $nextDiscountId,
             $discountable->getDiscountableType(),

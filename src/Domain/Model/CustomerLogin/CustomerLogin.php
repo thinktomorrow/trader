@@ -36,7 +36,7 @@ class CustomerLogin implements Aggregate
     {
         $this->password = $password;
 
-        $this->recordEvent(new PasswordChanged($this->email));
+        $this->recordEvent(new PasswordChanged($this->customerId));
     }
 
     public function getPassword(): string

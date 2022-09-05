@@ -4,11 +4,11 @@ declare(strict_types=1);
 namespace Tests\Unit\Model\Order;
 
 use Tests\Unit\TestCase;
+use Thinktomorrow\Trader\Domain\Model\Order\OrderTotal;
 use Thinktomorrow\Trader\Domain\Common\Address\AddressType;
-use Thinktomorrow\Trader\Domain\Model\Order\Discount\DiscountTotal;
 use Thinktomorrow\Trader\Domain\Model\Order\Payment\PaymentCost;
-use Thinktomorrow\Trader\Domain\Model\Order\Price\Total;
 use Thinktomorrow\Trader\Domain\Model\Order\Shipping\ShippingCost;
+use Thinktomorrow\Trader\Domain\Model\Order\Discount\DiscountTotal;
 use Thinktomorrow\Trader\Domain\Model\Order\Shipping\ShippingState;
 use Thinktomorrow\Trader\Domain\Model\Product\Variant\VariantSalePrice;
 
@@ -20,7 +20,7 @@ class OrderDetailsTest extends TestCase
         $order = $this->createDefaultOrder();
 
         $this->assertEquals(
-            Total::zero()->add(VariantSalePrice::fromScalars(400, '10', true)),
+            OrderTotal::zero()->add(VariantSalePrice::fromScalars(400, '10', true)),
             $order->getSubTotal()
         );
 
@@ -40,7 +40,7 @@ class OrderDetailsTest extends TestCase
         );
 
         $this->assertEquals(
-            Total::zero()
+            OrderTotal::zero()
                 ->add(VariantSalePrice::fromScalars(400, '10', true))
                 ->add(ShippingCost::fromScalars(30, '10', true))
                 ->add(PaymentCost::fromScalars(20, '10', true))

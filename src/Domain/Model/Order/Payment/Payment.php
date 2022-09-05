@@ -3,19 +3,16 @@ declare(strict_types=1);
 
 namespace Thinktomorrow\Trader\Domain\Model\Order\Payment;
 
-use Thinktomorrow\Trader\Domain\Common\Entity\ChildAggregate;
+use Thinktomorrow\Trader\Domain\Model\Order\OrderId;
 use Thinktomorrow\Trader\Domain\Common\Entity\HasData;
-use Thinktomorrow\Trader\Domain\Common\Price\Price;
-use Thinktomorrow\Trader\Domain\Common\Price\PriceTotal;
+use Thinktomorrow\Trader\Domain\Common\Entity\ChildAggregate;
 use Thinktomorrow\Trader\Domain\Model\Order\Discount\Discount;
 use Thinktomorrow\Trader\Domain\Model\Order\Discount\Discountable;
-use Thinktomorrow\Trader\Domain\Model\Order\Discount\DiscountableId;
-use Thinktomorrow\Trader\Domain\Model\Order\Discount\DiscountableType;
+use Thinktomorrow\Trader\Domain\Model\Order\Discount\HasDiscounts;
 use Thinktomorrow\Trader\Domain\Model\Order\Discount\DiscountTotal;
-use Thinktomorrow\Trader\Domain\Model\Order\HasDiscounts;
-use Thinktomorrow\Trader\Domain\Model\Order\Line\Quantity;
-use Thinktomorrow\Trader\Domain\Model\Order\OrderId;
+use Thinktomorrow\Trader\Domain\Model\Order\Discount\DiscountableId;
 use Thinktomorrow\Trader\Domain\Model\PaymentMethod\PaymentMethodId;
+use Thinktomorrow\Trader\Domain\Model\Order\Discount\DiscountableType;
 
 class Payment implements ChildAggregate, Discountable
 {
@@ -75,6 +72,11 @@ class Payment implements ChildAggregate, Discountable
         return $this->paymentCost;
     }
 
+    public function getPaymentCostTotal(): PaymentCost
+    {
+        return $this->paymentCost->subtract($this->getDiscountTotal());
+    }
+
     public function getMappedData(): array
     {
         return [
@@ -113,16 +115,6 @@ class Payment implements ChildAggregate, Discountable
         $payment->data = json_decode($state['data'], true);
 
         return $payment;
-    }
-
-    public function getDiscountableTotal(array $conditions): Price|PriceTotal
-    {
-        return $this->getPaymentCost();
-    }
-
-    public function getDiscountableQuantity(array $conditions): Quantity
-    {
-        return Quantity::fromInt(1);
     }
 
     public function getDiscountTotal(): DiscountTotal

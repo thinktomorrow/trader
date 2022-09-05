@@ -123,41 +123,25 @@ class OrderTest extends TestCase
     }
 
     /** @test */
-    public function it_can_update_payment()
-    {
-        $order = $this->createDefaultOrder();
-
-        $payment = $order->getPayments()[0];
-        $payment->updateCost($cost = PaymentCost::fromScalars('23', '1', false));
-
-        $order->updatePayment($payment);
-
-        $this->assertCount(1, $order->getPayments());
-        $this->assertEquals($cost, $order->getPayments()[0]->getPaymentCost());
-
-        $this->assertEquals([
-            new PaymentUpdated($order->orderId, $payment->paymentId),
-        ], $order->releaseEvents());
-    }
-
-    /** @test */
     public function it_can_update_shipping_address()
     {
         $order = $this->createDefaultOrder();
 
-        $addressPayload = [
+        $shippingAddress = ShippingAddress::fromMappedData([
             'address_id' => 'abc',
             'country_id' => 'NL',
             'line_1' => 'example 12',
             'line_2' => 'bus 2',
             'postal_code' => '1000',
             'city' => 'Amsterdam',
-            'data' => "[]",
-        ];
+            'data' => json_encode(['foo' => 'bar']),
+        ], $order->getMappedData());
 
-        $order->updateShippingAddress(ShippingAddress::fromMappedData($addressPayload, $order->getMappedData()));
+        $order->updateShippingAddress($shippingAddress);
 
-        $this->assertEquals(ShippingAddress::fromMappedData($addressPayload, $order->getMappedData())->getMappedData(), $order->getChildEntities()[ShippingAddress::class]);
+        $this->assertEquals($shippingAddress, $order->getShippingAddress());
+        $this->assertEquals($shippingAddress->getAddress(), $order->getShippingAddress()->getAddress());
+        $this->assertEquals($shippingAddress->getMappedData(), $order->getChildEntities()[ShippingAddress::class]);
     }
 
     /** @test */
@@ -165,19 +149,21 @@ class OrderTest extends TestCase
     {
         $order = $this->createDefaultOrder();
 
-        $addressPayload = [
+        $billingAddress = BillingAddress::fromMappedData([
             'address_id' => 'def',
             'country_id' => 'FR',
             'line_1' => 'rue de napoleon 222',
             'line_2' => 'bus 999',
             'postal_code' => '3000',
             'city' => 'Paris',
-            'data' => "[]",
-        ];
+            'data' => json_encode(['foo' => 'bar']),
+        ], $order->getMappedData());
 
-        $order->updateBillingAddress(BillingAddress::fromMappedData($addressPayload, $order->getMappedData()));
+        $order->updateBillingAddress($billingAddress);
 
-        $this->assertEquals(BillingAddress::fromMappedData($addressPayload, $order->getMappedData())->getMappedData(), $order->getChildEntities()[BillingAddress::class]);
+        $this->assertEquals($billingAddress, $order->getBillingAddress());
+        $this->assertEquals($billingAddress->getAddress(), $order->getBillingAddress()->getAddress());
+        $this->assertEquals($billingAddress->getMappedData(), $order->getChildEntities()[BillingAddress::class]);
     }
 
     /** @test */
@@ -190,81 +176,6 @@ class OrderTest extends TestCase
         );
 
         $this->assertEquals($invoiceReference, $order->getInvoiceReference());
-    }
-
-    /** @test */
-    public function it_can_add_a_line()
-    {
-        $order = $this->createDefaultOrder();
-
-        $order->addOrUpdateLine(
-            LineId::fromString('abcdef'),
-            VariantId::fromString('xxx'),
-            $linePrice = LinePrice::fromScalars('250', '9', true),
-            Quantity::fromInt(2),
-            ['foo' => 'bar']
-        );
-
-        $this->assertCount(2, $order->getChildEntities()[Line::class]);
-
-        $this->assertEquals([
-            new LineAdded(
-                $order->orderId,
-                LineId::fromString('abcdef'),
-                VariantId::fromString('xxx')
-            ),
-        ], $order->releaseEvents());
-    }
-
-    /** @test */
-    public function it_can_update_a_line()
-    {
-        $order = $this->createDefaultOrder();
-
-        $order->addOrUpdateLine(
-            LineId::fromString('abc'),
-            VariantId::fromString('yyy'),
-            $linePrice = LinePrice::fromScalars('200', '10', true),
-            Quantity::fromInt(3),
-            ['foo' => 'bar']
-        );
-
-        $firstLine = $order->getChildEntities()[Line::class][0];
-
-        $this->assertCount(1, $order->getChildEntities()[Line::class]);
-        $this->assertEquals('yyy', $firstLine['variant_id']);
-        $this->assertEquals($linePrice->getMoney()->getAmount(), $firstLine['line_price']);
-        $this->assertEquals(3, $firstLine['quantity']);
-        $this->assertEquals(json_encode(['product_id' => 'aab', 'unit_price_including_vat' => '1000', 'unit_price_excluding_vat' => '900', 'foo' => 'bar']), $firstLine['data']);
-
-        $this->assertEquals([
-            new LineUpdated(
-                $order->orderId,
-                LineId::fromString('abc'),
-            ),
-        ], $order->releaseEvents());
-    }
-
-    /** @test */
-    public function it_can_delete_a_line()
-    {
-        $order = $this->createDefaultOrder();
-
-        $this->assertCount(1, $order->getChildEntities()[Line::class]);
-
-        $order->deleteLine(
-            LineId::fromString('abc'),
-        );
-
-        $this->assertCount(0, $order->getChildEntities()[Line::class]);
-
-        $this->assertEquals([
-            new LineDeleted(
-                $order->orderId,
-                LineId::fromString('abc'),
-                VariantId::fromString('yyy'),
-            ),
-        ], $order->releaseEvents());
     }
 
     /** @test */

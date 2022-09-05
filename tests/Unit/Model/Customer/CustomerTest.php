@@ -1,15 +1,15 @@
 <?php
 declare(strict_types=1);
 
-namespace Tests\Unit\Model;
+namespace Tests\Unit\Model\Customer;
 
 use PHPUnit\Framework\TestCase;
 use Thinktomorrow\Trader\Domain\Common\Email;
 use Thinktomorrow\Trader\Domain\Common\Locale;
-use Thinktomorrow\Trader\Domain\Model\Customer\Address\BillingAddress;
-use Thinktomorrow\Trader\Domain\Model\Customer\Address\ShippingAddress;
 use Thinktomorrow\Trader\Domain\Model\Customer\Customer;
 use Thinktomorrow\Trader\Domain\Model\Customer\CustomerId;
+use Thinktomorrow\Trader\Domain\Model\Customer\Address\BillingAddress;
+use Thinktomorrow\Trader\Domain\Model\Customer\Address\ShippingAddress;
 
 class CustomerTest extends TestCase
 {
@@ -67,7 +67,8 @@ class CustomerTest extends TestCase
             'data' => "[]",
         ];
 
-        $customer->updateShippingAddress(ShippingAddress::fromMappedData($addressPayload, $customer->getMappedData()));
+        $customer->updateShippingAddress($shippingAddress = ShippingAddress::fromMappedData($addressPayload, $customer->getMappedData()));
+        $this->assertEquals($shippingAddress, $customer->getShippingAddress());
 
         $this->assertEquals(ShippingAddress::fromMappedData($addressPayload, $customer->getMappedData())->getMappedData(), $customer->getChildEntities()[ShippingAddress::class]);
     }
@@ -87,9 +88,37 @@ class CustomerTest extends TestCase
             'data' => "[]",
         ];
 
-        $customer->updateBillingAddress(BillingAddress::fromMappedData($addressPayload, $customer->getMappedData()));
+        $customer->updateBillingAddress($billingAddress = BillingAddress::fromMappedData($addressPayload, $customer->getMappedData()));
+        $this->assertEquals($billingAddress, $customer->getBillingAddress());
 
         $this->assertEquals(BillingAddress::fromMappedData($addressPayload, $customer->getMappedData())->getMappedData(), $customer->getChildEntities()[BillingAddress::class]);
+    }
+
+    public function test_it_can_update_email()
+    {
+        $customer = $this->createdCustomer();
+
+        $customer->updateEmail($email = Email::fromString('ben@tt.be'));
+        $this->assertEquals($email, $customer->getEmail());
+    }
+
+    public function test_it_can_update_locale()
+    {
+        $customer = $this->createdCustomer();
+
+        $customer->updateLocale($locale = Locale::fromString('nl_BE'));
+        $this->assertEquals($locale, $customer->getLocale());
+    }
+
+    public function test_it_can_update_business_flag()
+    {
+        $customer = $this->createdCustomer();
+
+        $customer->updateBusiness(true);
+        $this->assertTrue($customer->isBusiness());
+
+        $customer->updateBusiness(false);
+        $this->assertFalse($customer->isBusiness());
     }
 
     private function createdCustomer(): Customer

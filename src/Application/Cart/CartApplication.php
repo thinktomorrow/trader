@@ -209,6 +209,7 @@ final class CartApplication
         $order->updateShippingAddress(ShippingAddress::create(
             $order->orderId,
             $updateShippingAddress->getAddress(),
+            []
         ));
 
         $this->orderRepository->save($order);
@@ -224,6 +225,7 @@ final class CartApplication
         $order->updateBillingAddress(BillingAddress::create(
             $order->orderId,
             $updateBillingAddress->getAddress(),
+            []
         ));
 
         $this->orderRepository->save($order);
@@ -351,7 +353,8 @@ final class CartApplication
     {
         $order->updateBillingAddress(BillingAddress::create(
             $order->orderId,
-            $billingAddress->getAddress()
+            $billingAddress->getAddress(),
+            []
         ));
     }
 
@@ -359,7 +362,8 @@ final class CartApplication
     {
         $order->updateShippingAddress(ShippingAddress::create(
             $order->orderId,
-            $shippingAddress->getAddress()
+            $shippingAddress->getAddress(),
+            []
         ));
     }
 

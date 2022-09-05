@@ -14,24 +14,7 @@ interface Discountable
     public function getDiscountableType(): DiscountableType;
 
     /**
-     * Total amount on which the discounts should be calculated.
-     *
-     * @param array $conditions
-     */
-    public function getDiscountableTotal(array $conditions): Price|PriceTotal;
-
-    /**
-     * Quantity of all whitelisted items. Used by quantity specific
-     * discount conditions such as MinimumItems.
-     *
-     * @param array $conditions
-     */
-    public function getDiscountableQuantity(array $conditions): Quantity;
-
-    /**
      * The total amount of the calculated discount.
-     *
-     * @return DiscountTotal
      */
     public function getDiscountTotal(): DiscountTotal;
 

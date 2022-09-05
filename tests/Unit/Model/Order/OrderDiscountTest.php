@@ -3,13 +3,50 @@ declare(strict_types=1);
 
 namespace Tests\Unit\Model\Order;
 
+use Money\Money;
 use Tests\Unit\TestCase;
+use Thinktomorrow\Trader\Domain\Model\Order\OrderId;
+use Thinktomorrow\Trader\Domain\Model\Promo\PromoId;
+use Thinktomorrow\Trader\Domain\Common\Cash\Percentage;
+use Thinktomorrow\Trader\Domain\Model\Order\OrderTotal;
+use Thinktomorrow\Trader\Domain\Common\Taxes\TaxRateTotals;
 use Thinktomorrow\Trader\Domain\Model\Order\Discount\Discount;
-use Thinktomorrow\Trader\Domain\Model\Order\Discount\DiscountableType;
 use Thinktomorrow\Trader\Domain\Model\Order\Discount\DiscountId;
+use Thinktomorrow\Trader\Domain\Model\Order\Discount\DiscountTotal;
+use Thinktomorrow\Trader\Domain\Model\Order\Discount\DiscountableId;
+use Thinktomorrow\Trader\Domain\Model\Order\Discount\DiscountableType;
 
 class OrderDiscountTest extends TestCase
 {
+    public function test_it_can_create_discount()
+    {
+        $discount = Discount::create(
+            $orderId = OrderId::fromString('aaa'),
+            $discountId = DiscountId::fromString('bbb'),
+            $discountableType = DiscountableType::line,
+            $discountableId = DiscountableId::fromString('ccc'),
+            $promoId = PromoId::fromString('ddd'),
+            $promoDiscountId = \Thinktomorrow\Trader\Domain\Model\Promo\DiscountId::fromString('eee'),
+            $discountTotal = DiscountTotal::fromDefault(Money::EUR(50)),
+            ['foo' => 'bar']
+        );
+
+        $this->assertEquals($discountTotal, $discount->getTotal());
+        $this->assertEquals(Percentage::fromString('50.00'), $discount->getPercentage(OrderTotal::make(Money::EUR(100), TaxRateTotals::zero(), false)));
+        $this->assertEquals([
+            'order_id' => $orderId->get(),
+            'discount_id' => $discountId->get(),
+            'discountable_type' => $discountableType->value,
+            'discountable_id' => $discountableId->get(),
+            'promo_id' => $promoId->get(),
+            'promo_discount_id' => $promoDiscountId->get(),
+            'total' => $discountTotal->getIncludingVat()->getAmount(),
+            'includes_vat' => true,
+            'tax_rate' => '21',
+            'data' => json_encode(['foo' => 'bar']),
+        ], $discount->getMappedData());
+    }
+
     /** @test */
     public function it_can_add_a_discount()
     {
@@ -18,6 +55,15 @@ class OrderDiscountTest extends TestCase
         $order->addDiscount($this->createOrderDiscount(['promo_discount_id' => 'qqq', 'discount_id' => 'defgh'], $order->getMappedData()));
 
         $this->assertCount(2, $order->getChildEntities()[Discount::class]);
+    }
+
+    /** @test */
+    public function it_can_add_a_discount_to_payment()
+    {
+        $order = $this->createDefaultOrder();
+        $order->getPayments()[0]->addDiscount($this->createOrderPaymentDiscount(['promo_discount_id' => 'qqq', 'discount_id' => 'defgh'], $order->getMappedData()));
+
+        $this->assertCount(1, $order->getPayments()[0]->getDiscounts());
     }
 
     /** @test */

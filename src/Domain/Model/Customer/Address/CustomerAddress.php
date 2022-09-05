@@ -19,12 +19,13 @@ abstract class CustomerAddress
     {
     }
 
-    public static function create(CustomerId $customerId, Address $address): static
+    public static function create(CustomerId $customerId, Address $address, array $data): static
     {
         $customerAddress = new static();
 
         $customerAddress->customerId = $customerId;
         $customerAddress->address = $address;
+        $customerAddress->data = $data;
 
         return $customerAddress;
     }

@@ -90,6 +90,10 @@ class ShippingProfileTest extends TestCase
         $this->assertCount(2, $shippingProfile->getCountryIds());
         $this->assertCount(2, $shippingProfile->getChildEntities()[CountryId::class]);
         $this->assertEquals($countries, $shippingProfile->getCountryIds());
+
+        $this->assertTrue($shippingProfile->hasCountry(CountryId::fromString('FR')));
+        $this->assertTrue($shippingProfile->hasCountry(CountryId::fromString('NL')));
+        $this->assertFalse($shippingProfile->hasCountry(CountryId::fromString('BE')));
     }
 
     /** @test */

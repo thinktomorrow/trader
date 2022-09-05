@@ -92,7 +92,8 @@ class CustomerApplication
         $customer->updateBillingAddress(
             BillingAddress::create(
                 $customer->customerId,
-                $command->getAddress()
+                $command->getAddress(),
+                []
             )
         );
 
@@ -108,7 +109,8 @@ class CustomerApplication
         $customer->updateShippingAddress(
             ShippingAddress::create(
                 $customer->customerId,
-                $command->getAddress()
+                $command->getAddress(),
+                []
             )
         );
 

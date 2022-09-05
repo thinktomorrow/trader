@@ -1,20 +1,17 @@
 <?php
 
-namespace Thinktomorrow\Trader\Domain\Model\Order;
+namespace Thinktomorrow\Trader\Domain\Model\Order\Discount;
 
 use Thinktomorrow\Trader\Domain\Common\Cash\Cash;
 use Thinktomorrow\Trader\Domain\Common\Price\Price;
 use Thinktomorrow\Trader\Domain\Common\Price\PriceTotal;
-use Thinktomorrow\Trader\Domain\Model\Order\Discount\Discount;
-use Thinktomorrow\Trader\Domain\Model\Order\Discount\DiscountId;
-use Thinktomorrow\Trader\Domain\Model\Order\Discount\DiscountTotal;
 
 trait HasDiscounts
 {
     private array $discounts = [];
 
     /**
-     * Normally the discount is calculated with the default discount tax rate, as set via the DiscountTotal::setDiscountTaxRate().
+     * Normally the discount is calculated with the default discount tax rate, as set via the DiscountPriceDefaults::setDiscountTaxRate().
      * However, to calculate discounts on specific items of the order, such as lines or shipping, we need to alter this tax
      * rate in order to give the proper discount per line.
      *
@@ -22,7 +19,8 @@ trait HasDiscounts
      */
     protected function calculateDiscountTotal(Price|PriceTotal $basePrice): DiscountTotal
     {
-        $discountTaxRate = DiscountTotal::getDiscountTaxRate();
+        $discountTaxRate = DiscountPriceDefaults::getDiscountTaxRate();
+        $discountIncludesVat = DiscountPriceDefaults::getDiscountIncludeTax();
 
         if ($basePrice instanceof Price) {
             $discountTaxRate = $basePrice->getTaxRate();
@@ -31,25 +29,25 @@ trait HasDiscounts
         $zeroDiscountTotal = DiscountTotal::fromMoney(
             Cash::zero(),
             $discountTaxRate,
-            true
+            $discountIncludesVat
         );
 
         if (count($this->discounts) < 1) {
             return $zeroDiscountTotal;
         }
 
-        $discountTotal = array_reduce($this->discounts, function (?DiscountTotal $carry, Discount $discount) use ($discountTaxRate) {
+        $discountTotal = array_reduce($this->discounts, function (?DiscountTotal $carry, Discount $discount) use ($discountTaxRate, $discountIncludesVat) {
             return $carry === null
                 ? $discount->getTotal()
                 : $carry->add(DiscountTotal::fromMoney(
                     $discount->getTotal()->getIncludingVat(),
                     $discountTaxRate,
-                    true
+                    $discountIncludesVat
                 ));
         }, $zeroDiscountTotal);
 
         if ($discountTotal->getIncludingVat()->greaterThanOrEqual($basePrice->getIncludingVat())) {
-            return DiscountTotal::fromDefault($basePrice->getIncludingVat());
+            return DiscountTotal::fromMoney($discountIncludesVat ? $basePrice->getIncludingVat() : $basePrice->getExcludingVat(), $discountTaxRate, $discountIncludesVat);
         }
 
         return $discountTotal;

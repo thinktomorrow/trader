@@ -55,7 +55,7 @@ final class Discount implements ChildEntity
         ];
     }
 
-    public static function fromApplicableDiscount(OrderId $orderId, DiscountId $discountId, DiscountableType $discountableType, DiscountableId $discountableId, PromoId $promoId, PromoDiscountId $promoDiscountId, DiscountTotal $discountTotal, array $data): static
+    public static function create(OrderId $orderId, DiscountId $discountId, DiscountableType $discountableType, DiscountableId $discountableId, PromoId $promoId, PromoDiscountId $promoDiscountId, DiscountTotal $discountTotal, array $data): static
     {
         $discount = new static();
 

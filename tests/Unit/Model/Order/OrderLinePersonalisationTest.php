@@ -97,6 +97,21 @@ final class OrderLinePersonalisationTest extends TestCase
         $this->assertCount(1, $line->getPersonalisations());
     }
 
+    /** @test */
+    public function it_can_delete_all_personalisations()
+    {
+        $line = $this->order->getLines()[0];
+
+        $line->addPersonalisation($this->createLinePersonalisation(['line_personalisation_id' => 'aaa']));
+        $line->addPersonalisation($this->createLinePersonalisation(['line_personalisation_id' => 'bbb']));
+
+        $this->assertCount(2, $line->getPersonalisations());
+
+        $line->deletePersonalisations();
+
+        $this->assertCount(0, $line->getPersonalisations());
+    }
+
     private function createLinePersonalisation(array $values = []): LinePersonalisation
     {
         return LinePersonalisation::fromMappedData(

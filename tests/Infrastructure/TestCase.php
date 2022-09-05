@@ -18,6 +18,7 @@ use Thinktomorrow\Trader\Application\Customer\Read\CustomerBillingAddress;
 use Thinktomorrow\Trader\Application\Customer\Read\CustomerRead;
 use Thinktomorrow\Trader\Application\Customer\Read\CustomerShippingAddress;
 use Thinktomorrow\Trader\Application\Order\MerchantOrder\MerchantOrder;
+use Thinktomorrow\Trader\Domain\Model\Order\Discount\DiscountPriceDefaults;
 use Thinktomorrow\Trader\Application\Order\MerchantOrder\MerchantOrderBillingAddress;
 use Thinktomorrow\Trader\Application\Order\MerchantOrder\MerchantOrderDiscount;
 use Thinktomorrow\Trader\Application\Order\MerchantOrder\MerchantOrderLine;
@@ -71,7 +72,8 @@ abstract class TestCase extends \Orchestra\Testbench\TestCase
     {
         parent::setUp();
 
-        DiscountTotal::setDiscountTaxRate(TaxRate::fromString('21'));
+        DiscountPriceDefaults::setDiscountTaxRate(TaxRate::fromString('21'));
+        DiscountPriceDefaults::setDiscountIncludeTax(true);
 
         (new TestContainer())->add(TaxonNode::class, DefaultTaxonNode::class);
         (new TestContainer())->add(VariantForCart::class, DefaultVariantForCart::class);

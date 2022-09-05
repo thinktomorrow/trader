@@ -112,11 +112,11 @@ final class CustomerRepositoryTest extends TestCase
         );
 
         $customerWithAddress->updateBillingAddress(
-            BillingAddress::create(CustomerId::fromString('xxx'), new Address(CountryId::fromString('BE'), 'street 123', 'bus 456', '2200', 'Herentals'))
+            BillingAddress::create(CustomerId::fromString('xxx'), new Address(CountryId::fromString('BE'), 'street 123', 'bus 456', '2200', 'Herentals'), [])
         );
 
         $customerWithAddress->updateShippingAddress(
-            ShippingAddress::create(CustomerId::fromString('xxx'), new Address(CountryId::fromString('BE'), 'street 123', 'bus 456', '2200', 'Herentals'))
+            ShippingAddress::create(CustomerId::fromString('xxx'), new Address(CountryId::fromString('BE'), 'street 123', 'bus 456', '2200', 'Herentals'), [])
         );
 
         yield [$customerWithAddress];
