@@ -6,7 +6,7 @@ trait AggregateId
 {
     private string $id;
 
-    private function __construct()
+    final private function __construct()
     {
         //
     }

@@ -24,6 +24,7 @@ class Country
     public static function fromMappedData(array $state): static
     {
         $country = new static();
+
         $country->countryId = CountryId::fromString($state['country_id']);
         $country->data = json_decode($state['data'], true);
 
