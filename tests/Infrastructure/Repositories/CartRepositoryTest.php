@@ -3,7 +3,6 @@ declare(strict_types=1);
 
 namespace Tests\Infrastructure\Repositories;
 
-use Money\Money;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\Infrastructure\TestCase;
 use Thinktomorrow\Trader\Application\Cart\Read\Cart;
