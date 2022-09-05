@@ -8,7 +8,7 @@ use Thinktomorrow\Trader\Domain\Common\Entity\ChildEntity;
 use Thinktomorrow\Trader\Domain\Common\Entity\HasData;
 use Thinktomorrow\Trader\Domain\Model\Product\Option\OptionValueId;
 use Thinktomorrow\Trader\Domain\Model\Product\ProductId;
-use Thinktomorrow\Trader\Infrastructure\Laravel\Models\DefaultVariantLink;
+use Thinktomorrow\Trader\Domain\Model\Product\Personalisation\Personalisation;
 
 final class Variant implements ChildEntity
 {
@@ -20,9 +20,12 @@ final class Variant implements ChildEntity
     private VariantUnitPrice $unitPrice;
     private VariantSalePrice $salePrice; // bedrag, btw perc, bool includes_tax?
 
-    /** @var DefaultVariantLink[] */
+    /** @var OptionValueId[] */
     private array $optionValueIds = [];
+
+    /** @var Personalisation[] */
     private array $personalisations = [];
+
     private string $sku;
     private bool $show_in_grid = false;
 
