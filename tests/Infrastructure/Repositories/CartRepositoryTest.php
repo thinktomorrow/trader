@@ -8,6 +8,8 @@ use Tests\Infrastructure\TestCase;
 use Thinktomorrow\Trader\Application\Cart\Read\Cart;
 use Thinktomorrow\Trader\Domain\Common\Cash\Cash;
 use Thinktomorrow\Trader\Domain\Common\Locale;
+use Thinktomorrow\Trader\Domain\Model\Promo\PromoRepository;
+use Thinktomorrow\Trader\Domain\Model\Product\ProductRepository;
 use Thinktomorrow\Trader\Domain\Model\Order\Line\Personalisations\LinePersonalisation;
 use Thinktomorrow\Trader\Domain\Model\Order\Line\Personalisations\LinePersonalisationId;
 use Thinktomorrow\Trader\Domain\Model\Order\State\OrderState;
@@ -31,6 +33,15 @@ final class CartRepositoryTest extends TestCase
      */
     public function it_can_find_a_cart()
     {
+        // Also add the original variant to avoid mysql db FK failure
+        $product = $this->createdProductWithVariant();
+        app(ProductRepository::class)->save($product);
+
+        $promo = $this->createPromo([], [
+            $this->createDiscount(),
+        ]);
+        app(PromoRepository::class)->save($promo);
+
         $order = $this->createDefaultOrder();
 
         foreach ($this->orderRepositories() as $i => $orderRepository) {

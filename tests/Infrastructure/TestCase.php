@@ -67,6 +67,21 @@ abstract class TestCase extends \Orchestra\Testbench\TestCase
 {
     use TestHelpers;
 
+    protected function getEnvironmentSetUp($app)
+    {
+        # Setup default database to use sqlite :memory:
+        $app['config']->set('database.default', 'mysql');
+        $app['config']->set('database.connections.mysql', [
+            'driver'   => 'mysql',
+            'host' => '127.0.0.1',
+            'port' => '3306',
+            'database' => 'trader-test',
+            'username' => 'root',
+            'password' => null,
+            'prefix'   => '',
+        ]);
+    }
+
     protected function setUp(): void
     {
         parent::setUp();

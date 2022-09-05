@@ -240,7 +240,7 @@ trait TestHelpers
             'discount_id' => 'ababab',
             'discountable_type' => DiscountableType::order->value,
             'discountable_id' => 'xxx',
-            'promo_id' => 'def',
+            'promo_id' => 'xxx',
             'promo_discount_id' => 'abc',
             'total' => '30',
             'tax_rate' => '9',
@@ -465,28 +465,17 @@ trait TestHelpers
     protected function createdProductWithVariant(): Product
     {
         $product = $this->createdProduct();
+        $product->updateOptions([Option::create($product->productId, OptionId::fromString('ooo'), ['foo' => 'bar'])]);
+        $product->updateOptionValues(OptionId::fromString('ooo'), [
+            OptionValue::create(OptionId::fromString('ooo'), OptionValueId::fromString('ppp'), ['foo' => 'bar'])
+        ]);
+
         $variant = $this->createdVariantWithOption();
 
         $product->createVariant($variant);
 
         return $product;
     }
-
-//    protected function createdVariant(): Variant
-//    {
-//        $variant = Variant::create(
-//            ProductId::fromString('xxx'),
-//            VariantId::fromString('yyy'),
-//            VariantUnitPrice::fromMoney(
-//                Money::EUR(10),
-//                TaxRate::fromString('20'),
-//                false
-//            ),
-//            VariantSalePrice::fromMoney(Money::EUR(8), TaxRate::fromString('20'), false),
-//        );
-//
-//        return $variant;
-//    }
 
     protected function createdVariantWithOption(): Variant
     {
@@ -503,7 +492,7 @@ trait TestHelpers
         );
 
         $variant->updateOptionValueIds([
-            OptionValueId::fromString('option-value-id'),
+            OptionValueId::fromString('ppp'),
         ]);
 
         return $variant;

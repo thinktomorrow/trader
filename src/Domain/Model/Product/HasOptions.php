@@ -37,9 +37,6 @@ trait HasOptions
     {
         Assertion::allIsInstanceOf($options, Option::class);
 
-        // Remove current options.
-        $this->options = [];
-
         $this->options = $options;
 
         $this->recordEvent(new OptionsUpdated($this->productId));
