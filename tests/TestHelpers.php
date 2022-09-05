@@ -240,7 +240,7 @@ trait TestHelpers
             'discount_id' => 'ababab',
             'discountable_type' => DiscountableType::order->value,
             'discountable_id' => 'xxx',
-            'promo_id' => 'xxx',
+            'promo_id' => 'def',
             'promo_discount_id' => 'abc',
             'total' => '30',
             'tax_rate' => '9',
@@ -467,9 +467,8 @@ trait TestHelpers
         $product = $this->createdProduct();
         $product->updateOptions([Option::create($product->productId, OptionId::fromString('ooo'), ['foo' => 'bar'])]);
         $product->updateOptionValues(OptionId::fromString('ooo'), [
-            OptionValue::create(OptionId::fromString('ooo'), OptionValueId::fromString('ppp'), ['foo' => 'bar']),
+            OptionValue::create(OptionId::fromString('ooo'), OptionValueId::fromString('ppp'), ['foo' => 'bar'])
         ]);
-
         $variant = $this->createdVariantWithOption();
 
         $product->createVariant($variant);
@@ -492,7 +491,7 @@ trait TestHelpers
         );
 
         $variant->updateOptionValueIds([
-            OptionValueId::fromString('ppp'),
+            OptionValueId::fromString('option-value-id'),
         ]);
 
         return $variant;
