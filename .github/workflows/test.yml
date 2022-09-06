@@ -17,15 +17,7 @@ jobs:
             testbench: ^7.0
 
     name: P${{ matrix.php }} - L${{ matrix.laravel }} - ${{ matrix.dependency-version }}
-    env:
-      DB_DATABASE: test_db
-      DB_USER: root
-      DB_PASSWORD: root
     steps:
-      - name: Set up MySQL
-            run: |
-              sudo /etc/init.d/mysql start
-              mysql -e 'CREATE DATABASE ${{ env.DB_DATABASE }};' -u${{ env.DB_USER }} -p${{ env.DB_PASSWORD }}
       - name: Checkout code
         uses: actions/checkout@v2
 
