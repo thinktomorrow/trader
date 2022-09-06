@@ -5,9 +5,9 @@ namespace Thinktomorrow\Trader\Domain\Model\Country;
 
 interface CountryRepository
 {
-    public function save(Country $customer): void;
+    public function save(Country $country): void;
 
-    public function find(CountryId $customerId): Country;
+    public function find(CountryId $countryId): Country;
 
-    public function delete(CountryId $customerId): void;
+    public function delete(CountryId $countryId): void;
 }
