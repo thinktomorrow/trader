@@ -174,7 +174,7 @@ class MysqlGridRepository implements GridRepository
             $this->builder->orderBy(static::$productTable . '.order_column', 'ASC');
         }
 
-        if(isset($this->limit) && $this->limit < $this->perPage) {
+        if (isset($this->limit) && $this->limit < $this->perPage) {
             $rows = $this->builder->get();
             $results = (new \Illuminate\Pagination\LengthAwarePaginator($rows, count($rows), $this->perPage))
                 ->withQueryString();
