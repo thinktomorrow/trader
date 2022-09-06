@@ -6,7 +6,6 @@ namespace Tests\Infrastructure;
 use Money\Money;
 use Tests\TestHelpers;
 use Thinktomorrow\Trader\Application\Cart\Read\Cart;
-use Thinktomorrow\Trader\Infrastructure\Test\TestTraderConfig;
 use Thinktomorrow\Trader\Application\Cart\Read\CartBillingAddress;
 use Thinktomorrow\Trader\Application\Cart\Read\CartDiscount;
 use Thinktomorrow\Trader\Application\Cart\Read\CartLine;
@@ -20,7 +19,6 @@ use Thinktomorrow\Trader\Application\Customer\Read\CustomerBillingAddress;
 use Thinktomorrow\Trader\Application\Customer\Read\CustomerRead;
 use Thinktomorrow\Trader\Application\Customer\Read\CustomerShippingAddress;
 use Thinktomorrow\Trader\Application\Order\MerchantOrder\MerchantOrder;
-use Thinktomorrow\Trader\Infrastructure\Laravel\Repositories\MysqlOrderRepository;
 use Thinktomorrow\Trader\Application\Order\MerchantOrder\MerchantOrderBillingAddress;
 use Thinktomorrow\Trader\Application\Order\MerchantOrder\MerchantOrderDiscount;
 use Thinktomorrow\Trader\Application\Order\MerchantOrder\MerchantOrderLine;
@@ -73,6 +71,7 @@ use Thinktomorrow\Trader\Infrastructure\Laravel\Models\MerchantOrder\DefaultMerc
 use Thinktomorrow\Trader\Infrastructure\Laravel\Models\MerchantOrder\DefaultMerchantOrderShipping;
 use Thinktomorrow\Trader\Infrastructure\Laravel\Models\MerchantOrder\DefaultMerchantOrderShippingAddress;
 use Thinktomorrow\Trader\Infrastructure\Laravel\Models\MerchantOrder\DefaultMerchantOrderShopper;
+use Thinktomorrow\Trader\Infrastructure\Laravel\Repositories\MysqlOrderRepository;
 use Thinktomorrow\Trader\Infrastructure\Laravel\TraderServiceProvider;
 use Thinktomorrow\Trader\Infrastructure\Shop\ShopServiceProvider;
 use Thinktomorrow\Trader\Infrastructure\Test\Repositories\InMemoryOrderRepository;
@@ -81,6 +80,7 @@ use Thinktomorrow\Trader\Infrastructure\Test\Repositories\InMemoryPromoRepositor
 use Thinktomorrow\Trader\Infrastructure\Test\Repositories\InMemoryTaxonRepository;
 use Thinktomorrow\Trader\Infrastructure\Test\Repositories\InMemoryVariantRepository;
 use Thinktomorrow\Trader\Infrastructure\Test\TestContainer;
+use Thinktomorrow\Trader\Infrastructure\Test\TestTraderConfig;
 
 abstract class TestCase extends \Orchestra\Testbench\TestCase
 {

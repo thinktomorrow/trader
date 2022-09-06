@@ -6,7 +6,6 @@ namespace Thinktomorrow\Trader\Infrastructure\Laravel\Repositories;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 use Ramsey\Uuid\Uuid;
-use Thinktomorrow\Trader\TraderConfig;
 use Thinktomorrow\Trader\Application\Order\Invoice\CreateInvoiceReference;
 use Thinktomorrow\Trader\Domain\Common\Address\AddressType;
 use Thinktomorrow\Trader\Domain\Model\Order\Address\BillingAddress;
@@ -34,6 +33,7 @@ use Thinktomorrow\Trader\Domain\Model\Order\Shipping\Shipping;
 use Thinktomorrow\Trader\Domain\Model\Order\Shipping\ShippingId;
 use Thinktomorrow\Trader\Domain\Model\Order\Shopper;
 use Thinktomorrow\Trader\Domain\Model\Order\ShopperId;
+use Thinktomorrow\Trader\TraderConfig;
 
 final class MysqlOrderRepository implements OrderRepository, InvoiceRepository
 {
