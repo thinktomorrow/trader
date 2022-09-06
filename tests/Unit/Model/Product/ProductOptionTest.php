@@ -17,7 +17,7 @@ class ProductOptionTest extends TestCase
     /** @test */
     public function it_can_add_option()
     {
-        $product = $this->createdProduct();
+        $product = $this->createProduct();
 
         $product->updateOptions([Option::create($product->productId, OptionId::fromString('ooo'), ['foo' => 'bar'])]);
 
@@ -39,7 +39,7 @@ class ProductOptionTest extends TestCase
     /** @test */
     public function it_cannot_add_same_option_twice()
     {
-        $product = $this->createdProduct();
+        $product = $this->createProduct();
 
         $product->updateOptions([Option::create($product->productId, OptionId::fromString('ooo'), [])]);
         $product->updateOptions([Option::create($product->productId, OptionId::fromString('ooo'), [])]);
@@ -50,7 +50,7 @@ class ProductOptionTest extends TestCase
     /** @test */
     public function it_can_update_option_values()
     {
-        $product = $this->createdProduct();
+        $product = $this->createProduct();
 
         $product->updateOptions([$option = Option::create($product->productId, OptionId::fromString('ooo'), [])]);
         $option->updateOptionValues([OptionValue::create($option->optionId, OptionValueId::fromString('xxx'), [

@@ -134,22 +134,16 @@ final class CartRepositoryTest extends TestCase
         $this->assertEquals(2, $calls);
     }
 
-    /** @test */
-    public function it_can_find_cart_without_variant_when_variant_is_no_longer_present()
-    {
-        // TODO: this should be detected by refresh job of the order. Triggered by variant
-    }
-
     private function orderRepositories(): \Generator
     {
         yield new InMemoryOrderRepository();
-        yield new MysqlOrderRepository();
+        yield (new TestContainer())->get(MysqlOrderRepository::class);
     }
 
     private function cartRepositories(): \Generator
     {
         yield new InMemoryCartRepository();
-        yield new MysqlCartRepository(new TestContainer(), new MysqlOrderRepository());
+        yield new MysqlCartRepository(new TestContainer(), (new TestContainer())->get(MysqlOrderRepository::class));
     }
 
     private function productRepositories(): \Generator

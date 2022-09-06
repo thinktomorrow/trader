@@ -7,6 +7,11 @@ use Thinktomorrow\Trader\Domain\Common\Locale;
 
 class TraderConfig implements \Thinktomorrow\Trader\TraderConfig
 {
+    public function getEnvironmentPrefix(): ?string
+    {
+        return config('trader.environment-prefix');
+    }
+
     public function getDefaultLocale(): Locale
     {
         return Locale::fromString(

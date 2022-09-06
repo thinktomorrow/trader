@@ -13,7 +13,7 @@ class ProductPersonalisationTest extends TestCase
     /** @test */
     public function it_can_add_personalisation()
     {
-        $product = $this->createdProduct();
+        $product = $this->createProduct();
 
         $product->updatePersonalisations([Personalisation::create($product->productId, PersonalisationId::fromString('ooo'), PersonalisationType::fromString(PersonalisationType::TEXT), ['foo' => 'bar'])]);
 
@@ -30,7 +30,7 @@ class ProductPersonalisationTest extends TestCase
     /** @test */
     public function it_cannot_add_same_personalisation_twice()
     {
-        $product = $this->createdProduct();
+        $product = $this->createProduct();
 
         $product->updatePersonalisations([Personalisation::create($product->productId, PersonalisationId::fromString('ooo'), PersonalisationType::fromString(PersonalisationType::TEXT), [])]);
         $product->updatePersonalisations([Personalisation::create($product->productId, PersonalisationId::fromString('ooo'), PersonalisationType::fromString(PersonalisationType::TEXT), [])]);
@@ -41,7 +41,7 @@ class ProductPersonalisationTest extends TestCase
     /** @test */
     public function it_can_update_personalisation_values()
     {
-        $product = $this->createdProduct();
+        $product = $this->createProduct();
 
         $product->updatePersonalisations([$personalisation = Personalisation::create($product->productId, PersonalisationId::fromString('ooo'), PersonalisationType::fromString(PersonalisationType::TEXT), [])]);
 

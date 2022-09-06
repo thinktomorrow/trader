@@ -5,6 +5,7 @@ namespace Tests\Infrastructure\Repositories;
 
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\Infrastructure\TestCase;
+use Thinktomorrow\Trader\Infrastructure\Test\TestContainer;
 use Thinktomorrow\Trader\Domain\Model\Order\Discount\DiscountableType;
 use Thinktomorrow\Trader\Domain\Model\Order\Exceptions\CouldNotFindOrder;
 use Thinktomorrow\Trader\Domain\Model\Order\Log\LogEntry;
@@ -88,7 +89,7 @@ final class OrderRepositoryTest extends TestCase
     private function orderRepositories(): \Generator
     {
         yield new InMemoryOrderRepository();
-        yield new MysqlOrderRepository();
+        yield (new TestContainer())->get(MysqlOrderRepository::class);
     }
 
     public function orders(): \Generator

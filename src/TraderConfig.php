@@ -7,6 +7,8 @@ use Thinktomorrow\Trader\Domain\Common\Locale;
 
 interface TraderConfig
 {
+    public function getEnvironmentPrefix(): ?string;
+
     public function getDefaultLocale(): Locale;
 
     public function getDefaultCurrency(): string;

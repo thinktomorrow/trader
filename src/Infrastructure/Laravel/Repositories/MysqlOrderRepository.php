@@ -6,6 +6,7 @@ namespace Thinktomorrow\Trader\Infrastructure\Laravel\Repositories;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 use Ramsey\Uuid\Uuid;
+use Thinktomorrow\Trader\TraderConfig;
 use Thinktomorrow\Trader\Application\Order\Invoice\CreateInvoiceReference;
 use Thinktomorrow\Trader\Domain\Common\Address\AddressType;
 use Thinktomorrow\Trader\Domain\Model\Order\Address\BillingAddress;
@@ -45,6 +46,13 @@ final class MysqlOrderRepository implements OrderRepository, InvoiceRepository
     private static $orderAddressTable = 'trader_order_addresses';
     private static $orderShopperTable = 'trader_order_shoppers';
     private static $orderLogEntriesTable = 'trader_order_events';
+
+    private TraderConfig $traderConfig;
+
+    public function __construct(TraderConfig $traderConfig)
+    {
+        $this->traderConfig = $traderConfig;
+    }
 
     public function save(Order $order): void
     {
@@ -402,7 +410,7 @@ final class MysqlOrderRepository implements OrderRepository, InvoiceRepository
         $orderReference = null;
 
         while (! $orderReference || $this->existsReference($orderReference)) {
-            $orderReference = OrderReference::fromString(date('ymd').'-'. str_pad((string) mt_rand(1, 999), 3, "0"));
+            $orderReference = OrderReference::fromString($this->traderConfig->getEnvironmentPrefix() . date('ymd').'-'. str_pad((string) mt_rand(1, 999), 3, "0"));
         }
 
         return $orderReference;
@@ -416,7 +424,7 @@ final class MysqlOrderRepository implements OrderRepository, InvoiceRepository
         $append = '';
 
         while (! $invoiceReference || $this->existsInvoiceReference($invoiceReference)) {
-            $invoiceReference = InvoiceReference::fromString($createInvoiceReference->create()->get() . $append);
+            $invoiceReference = InvoiceReference::fromString($this->traderConfig->getEnvironmentPrefix() . $createInvoiceReference->create()->get() . $append);
             $append = '_' . mt_rand(0, 999);
         }
 

@@ -6,10 +6,13 @@ namespace Tests\Unit\Model\Product;
 use Money\Money;
 use Tests\Unit\TestCase;
 use Thinktomorrow\Trader\Domain\Common\Taxes\TaxRate;
+use Thinktomorrow\Trader\Domain\Model\Product\Option\OptionId;
 use Thinktomorrow\Trader\Domain\Model\Product\Events\ProductCreated;
+use Thinktomorrow\Trader\Domain\Model\Product\Events\OptionsUpdated;
 use Thinktomorrow\Trader\Domain\Model\Product\Events\ProductTaxaUpdated;
 use Thinktomorrow\Trader\Domain\Model\Product\Events\VariantCreated;
 use Thinktomorrow\Trader\Domain\Model\Product\Events\VariantDeleted;
+use Thinktomorrow\Trader\Domain\Model\Product\Events\OptionValuesUpdated;
 use Thinktomorrow\Trader\Domain\Model\Product\Exceptions\CouldNotDeleteVariant;
 use Thinktomorrow\Trader\Domain\Model\Product\Product;
 use Thinktomorrow\Trader\Domain\Model\Product\ProductId;
@@ -25,7 +28,7 @@ class ProductTest extends TestCase
     /** @test */
     public function it_can_create_a_product()
     {
-        $product = $this->createdProduct();
+        $product = $this->createProduct();
 
         $this->assertEquals([
             'product_id' => 'xxx',
@@ -70,7 +73,7 @@ class ProductTest extends TestCase
     /** @test */
     public function it_can_add_taxon()
     {
-        $product = $this->createdProduct();
+        $product = $this->createProduct();
 
         $product->updateTaxonIds([TaxonId::fromString('zzz')]);
 
@@ -89,6 +92,8 @@ class ProductTest extends TestCase
 
         $this->assertEquals([
             new ProductCreated(ProductId::fromString('xxx')),
+            new OptionsUpdated(ProductId::fromString('xxx')),
+            new OptionValuesUpdated(ProductId::fromString('xxx'), OptionId::fromString('ooo')),
             new VariantCreated(ProductId::fromString('xxx'), VariantId::fromString('yyy')),
         ], $product->releaseEvents());
     }
@@ -98,7 +103,7 @@ class ProductTest extends TestCase
     {
         $this->expectException(\InvalidArgumentException::class);
 
-        $product = $this->createdProduct();
+        $product = $this->createProduct();
 
         $product->createVariant(Variant::create(
             ProductId::fromString('false-product-id'),
@@ -112,7 +117,7 @@ class ProductTest extends TestCase
     /** @test */
     public function it_can_update_state()
     {
-        $product = $this->createdProduct();
+        $product = $this->createProduct();
 
         $product->updateState(ProductState::archived);
 
@@ -152,6 +157,8 @@ class ProductTest extends TestCase
 
         $this->assertEquals([
             new ProductCreated(ProductId::fromString('xxx')),
+            new OptionsUpdated(ProductId::fromString('xxx')),
+            new OptionValuesUpdated(ProductId::fromString('xxx'), OptionId::fromString('ooo')),
             new VariantCreated(ProductId::fromString('xxx'), VariantId::fromString('yyy')),
             new VariantCreated(ProductId::fromString('xxx'), VariantId::fromString('zzz')),
             new VariantDeleted(ProductId::fromString('xxx'), VariantId::fromString('zzz')),

@@ -103,6 +103,12 @@ class RefreshCartTest extends CartContext
     {
     }
 
+    /** @test */
+    public function it_can_find_cart_without_variant_when_variant_is_no_longer_present()
+    {
+        // TODO: this should be detected by refresh job of the order. Triggered by variant
+    }
+
     /**
      * @return void
      */

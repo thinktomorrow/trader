@@ -353,7 +353,7 @@ trait TestHelpers
         return $customer;
     }
 
-    protected function createdProduct(): Product
+    protected function createProduct(): Product
     {
         $product = Product::create(ProductId::fromString('xxx'));
         $product->updateState(ProductState::online);
@@ -363,7 +363,7 @@ trait TestHelpers
 
     protected function createdProductWithOption(): Product
     {
-        $product = $this->createdProduct();
+        $product = $this->createProduct();
 
         $product->updateOptions([
             $option = Option::create($product->productId, OptionId::fromString('ooo'), ['foo' => 'bar']),
@@ -388,7 +388,7 @@ trait TestHelpers
 
     protected function createdProductWithPersonalisations(): Product
     {
-        $product = $this->createdProduct();
+        $product = $this->createProduct();
 
         $product->updatePersonalisations([
             Personalisation::create(
@@ -407,7 +407,7 @@ trait TestHelpers
 
     protected function createdProductWithOptions(): Product
     {
-        $product = $this->createdProduct();
+        $product = $this->createProduct();
 
         $product->updateOptions([
             $option = Option::create($product->productId, OptionId::fromString('ooo'), ['foo' => 'bar']),
@@ -464,7 +464,7 @@ trait TestHelpers
 
     protected function createdProductWithVariant(): Product
     {
-        $product = $this->createdProduct();
+        $product = $this->createProduct();
         $product->updateOptions([Option::create($product->productId, OptionId::fromString('ooo'), ['foo' => 'bar'])]);
         $product->updateOptionValues(OptionId::fromString('ooo'), [
             OptionValue::create(OptionId::fromString('ooo'), OptionValueId::fromString('ppp'), ['foo' => 'bar']),

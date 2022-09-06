@@ -6,6 +6,7 @@ namespace Tests\Infrastructure;
 use Money\Money;
 use Tests\TestHelpers;
 use Thinktomorrow\Trader\Application\Cart\Read\Cart;
+use Thinktomorrow\Trader\Infrastructure\Test\TestTraderConfig;
 use Thinktomorrow\Trader\Application\Cart\Read\CartBillingAddress;
 use Thinktomorrow\Trader\Application\Cart\Read\CartDiscount;
 use Thinktomorrow\Trader\Application\Cart\Read\CartLine;
@@ -19,6 +20,7 @@ use Thinktomorrow\Trader\Application\Customer\Read\CustomerBillingAddress;
 use Thinktomorrow\Trader\Application\Customer\Read\CustomerRead;
 use Thinktomorrow\Trader\Application\Customer\Read\CustomerShippingAddress;
 use Thinktomorrow\Trader\Application\Order\MerchantOrder\MerchantOrder;
+use Thinktomorrow\Trader\Infrastructure\Laravel\Repositories\MysqlOrderRepository;
 use Thinktomorrow\Trader\Application\Order\MerchantOrder\MerchantOrderBillingAddress;
 use Thinktomorrow\Trader\Application\Order\MerchantOrder\MerchantOrderDiscount;
 use Thinktomorrow\Trader\Application\Order\MerchantOrder\MerchantOrderLine;
@@ -136,6 +138,9 @@ abstract class TestCase extends \Orchestra\Testbench\TestCase
         (new TestContainer())->add(CustomerRead::class, DefaultCustomerRead::class);
         (new TestContainer())->add(CustomerShippingAddress::class, DefaultCustomerShippingAddress::class);
         (new TestContainer())->add(CustomerBillingAddress::class, DefaultCustomerBillingAddress::class);
+
+        // Repositories
+        (new TestContainer())->add(MysqlOrderRepository::class, new MysqlOrderRepository(new TestTraderConfig()));
     }
 
     public function getPackageProviders($app)

@@ -69,13 +69,13 @@ class MerchantOrderRepositoryTest extends TestCase
     private function orderRepositories(): \Generator
     {
         yield new InMemoryOrderRepository();
-        yield new MysqlOrderRepository();
+        yield (new TestContainer())->get(MysqlOrderRepository::class);
     }
 
     private function merchantOrderRepositories(): \Generator
     {
         yield new InMemoryMerchantOrderRepository();
-        yield new MysqlMerchantOrderRepository(new TestContainer(), new MysqlOrderRepository());
+        yield new MysqlMerchantOrderRepository(new TestContainer(), (new TestContainer())->get(MysqlOrderRepository::class));
     }
 
     private function productRepositories(): \Generator

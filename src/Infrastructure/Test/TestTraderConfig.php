@@ -15,6 +15,11 @@ class TestTraderConfig implements TraderConfig
         $this->overwrites = $overwrites;
     }
 
+    public function getEnvironmentPrefix(): ?string
+    {
+        return 'test-';
+    }
+
     public function getDefaultLocale(): Locale
     {
         return Locale::make('nl', 'BE');
