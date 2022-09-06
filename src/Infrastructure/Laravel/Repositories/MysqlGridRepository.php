@@ -29,6 +29,7 @@ class MysqlGridRepository implements GridRepository
     private static string $variantTable = 'trader_product_variants';
     private static string $taxonTable = 'trader_taxa';
     private static string $taxonPivotTable = 'trader_taxa_products';
+    private ?int $limit;
 
     public function __construct(ContainerInterface $container, TraderConfig $traderConfig, FlattenedTaxonIdsComposer $flattenedTaxonIds)
     {
@@ -151,6 +152,8 @@ class MysqlGridRepository implements GridRepository
     {
         $this->builder->limit($limit);
 
+        $this->limit = $limit;
+
         return $this;
     }
 
@@ -171,8 +174,14 @@ class MysqlGridRepository implements GridRepository
             $this->builder->orderBy(static::$productTable . '.order_column', 'ASC');
         }
 
-        // TODO: concat all gridProduct ids that match the filters
-        $results = $this->builder->paginate($this->perPage)->withQueryString();
+        if(isset($this->limit) && $this->limit < $this->perPage) {
+            $rows = $this->builder->get();
+            $results = (new \Illuminate\Pagination\LengthAwarePaginator($rows, count($rows), $this->perPage))
+                ->withQueryString();
+        } else {
+            // TODO: concat all gridProduct ids that match the filters
+            $results = $this->builder->paginate($this->perPage)->withQueryString();
+        }
 
         return $results->setCollection(
             $results->getCollection()
