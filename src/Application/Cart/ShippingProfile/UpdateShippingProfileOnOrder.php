@@ -38,7 +38,7 @@ class UpdateShippingProfileOnOrder
         }
 
         if ($shippingProfile->requiresAddress()) {
-            // Country of shipment is needed when shipping profile requires address.
+            // Shipping country is required when shipping profile requires address.
             if (! $shippingCountryId = $order->getShippingAddress()?->getAddress()->countryId) {
                 $this->removeAllShippingsFromOrder($order);
 

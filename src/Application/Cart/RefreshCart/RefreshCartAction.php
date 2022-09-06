@@ -8,21 +8,16 @@ use Thinktomorrow\Trader\Domain\Model\Order\Order;
 
 class RefreshCartAction
 {
-    public function __construct()
-    {
-    }
-
     /**
      * Adjust the order entity so that it is up to date with
      * current prices, availability, discounts, ...
      */
     public function handle(Order $order, array $adjusters): void
     {
-        Assertion::allIsInstanceOf($adjusters, Adjuster::class);
-
         $this->assertCartState($order);
 
-        // Use cart adjusters to update lines, discounts, shipping, payment, shopper, ...
+        Assertion::allIsInstanceOf($adjusters, Adjuster::class);
+
         foreach ($adjusters as $adjuster) {
             $adjuster->adjust($order);
         }
