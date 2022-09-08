@@ -121,62 +121,62 @@ final class Order implements Aggregate, Discountable
         $this->update('shopper', null);
     }
 
-    public function updateState(OrderState $orderState): void
+    public function updateState(OrderState $orderState, array $data = []): void
     {
         $oldState = $this->getOrderState();
 
         $this->update('orderState', $orderState);
 
-        $this->recordOrderStateEvent($oldState, $orderState);
+        $this->recordOrderStateEvent($oldState, $orderState, $data);
         $this->recordEvent(new OrderStateUpdated($this->orderId, $oldState, $orderState));
     }
 
-    private function recordOrderStateEvent(OrderState $oldState, OrderState $newState): void
+    private function recordOrderStateEvent(OrderState $oldState, OrderState $newState, array $data): void
     {
         $map = OrderStateToEventMap::get();
 
         if (isset($map[$newState->value])) {
-            $this->recordEvent(new $map[$newState->value]($this->orderId, $oldState, $newState));
+            $this->recordEvent(new $map[$newState->value]($this->orderId, $oldState, $newState, $data));
         }
     }
 
-    public function updatePaymentState(PaymentId $paymentId, PaymentState $paymentState): void
+    public function updatePaymentState(PaymentId $paymentId, PaymentState $paymentState, array $data = []): void
     {
         $oldPaymentState = $this->findPayment($paymentId)->getPaymentState();
 
         $this->findPayment($paymentId)->updateState($paymentState);
 
-        $this->recordPaymentStateEvent($paymentId, $oldPaymentState, $paymentState);
+        $this->recordPaymentStateEvent($paymentId, $oldPaymentState, $paymentState, $data);
         $this->recordEvent(new PaymentStateUpdated($this->orderId, $paymentId, $oldPaymentState, $paymentState));
         $this->recordEvent(new OrderUpdated($this->orderId));
     }
 
-    private function recordPaymentStateEvent(PaymentId $paymentId, PaymentState $oldState, PaymentState $newState): void
+    private function recordPaymentStateEvent(PaymentId $paymentId, PaymentState $oldState, PaymentState $newState, array $data): void
     {
         $map = PaymentStateToEventMap::get();
 
         if (isset($map[$newState->value])) {
-            $this->recordEvent(new $map[$newState->value]($this->orderId, $paymentId, $oldState, $newState));
+            $this->recordEvent(new $map[$newState->value]($this->orderId, $paymentId, $oldState, $newState, $data));
         }
     }
 
-    public function updateShippingState(ShippingId $shippingId, ShippingState $shippingState): void
+    public function updateShippingState(ShippingId $shippingId, ShippingState $shippingState, array $data = []): void
     {
         $oldShippingState = $this->findShipping($shippingId)->getShippingState();
 
         $this->findShipping($shippingId)->updateState($shippingState);
 
-        $this->recordShippingStateEvent($shippingId, $oldShippingState, $shippingState);
+        $this->recordShippingStateEvent($shippingId, $oldShippingState, $shippingState, $data);
         $this->recordEvent(new ShippingStateUpdated($this->orderId, $shippingId, $oldShippingState, $shippingState));
         $this->recordEvent(new OrderUpdated($this->orderId));
     }
 
-    private function recordShippingStateEvent(ShippingId $shippingId, ShippingState $oldState, ShippingState $newState): void
+    private function recordShippingStateEvent(ShippingId $shippingId, ShippingState $oldState, ShippingState $newState, array $data): void
     {
         $map = ShippingStateToEventMap::get();
 
         if (isset($map[$newState->value])) {
-            $this->recordEvent(new $map[$newState->value]($this->orderId, $shippingId, $oldState, $newState));
+            $this->recordEvent(new $map[$newState->value]($this->orderId, $shippingId, $oldState, $newState, $data));
         }
     }
 

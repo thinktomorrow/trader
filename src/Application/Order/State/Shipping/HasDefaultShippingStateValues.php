@@ -10,11 +10,13 @@ trait HasDefaultShippingStateValues
 {
     private string $orderId;
     private string $shippingId;
+    private array $data;
 
-    public function __construct(string $orderId, string $shippingId)
+    public function __construct(string $orderId, string $shippingId, array $data = [])
     {
         $this->orderId = $orderId;
         $this->shippingId = $shippingId;
+        $this->data = $data;
     }
 
     public function getOrderId(): OrderId
@@ -25,5 +27,10 @@ trait HasDefaultShippingStateValues
     public function getShippingId(): ShippingId
     {
         return ShippingId::fromString($this->shippingId);
+    }
+
+    public function getData(): array
+    {
+        return $this->data;
     }
 }

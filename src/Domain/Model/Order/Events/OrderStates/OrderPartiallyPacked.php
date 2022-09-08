@@ -8,7 +8,11 @@ use Thinktomorrow\Trader\Domain\Model\Order\State\OrderState;
 
 final class OrderPartiallyPacked
 {
-    public function __construct(public readonly OrderId $orderId, public readonly OrderState $oldState, public readonly OrderState $newState)
-    {
+    public function __construct(
+        public readonly OrderId $orderId,
+        public readonly OrderState $oldState,
+        public readonly OrderState $newState,
+        public readonly array $data,
+    ) {
     }
 }

@@ -10,11 +10,13 @@ trait HasDefaultPaymentStateValues
 {
     private string $orderId;
     private string $paymentId;
+    private array $data;
 
-    public function __construct(string $orderId, string $paymentId)
+    public function __construct(string $orderId, string $paymentId, array $data = [])
     {
         $this->orderId = $orderId;
         $this->paymentId = $paymentId;
+        $this->data = $data;
     }
 
     public function getOrderId(): OrderId
@@ -25,5 +27,10 @@ trait HasDefaultPaymentStateValues
     public function getPaymentId(): PaymentId
     {
         return PaymentId::fromString($this->paymentId);
+    }
+
+    public function getData(): array
+    {
+        return $this->data;
     }
 }

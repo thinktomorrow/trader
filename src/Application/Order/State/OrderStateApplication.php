@@ -54,152 +54,152 @@ final class OrderStateApplication
 
     public function deleteOrder(DeleteOrder $command): void
     {
-        $this->handleOrderStateEvent($command->getOrderId(), 'delete');
+        $this->handleOrderStateEvent($command->getOrderId(), 'delete', $command->getData());
     }
 
     public function cancelOrder(CancelOrder $command): void
     {
-        $this->handleOrderStateEvent($command->getOrderId(), 'cancel');
+        $this->handleOrderStateEvent($command->getOrderId(), 'cancel', $command->getData());
     }
 
     public function cancelOrderByMerchant(CancelOrderByMerchant $command): void
     {
-        $this->handleOrderStateEvent($command->getOrderId(), 'cancel_by_merchant');
+        $this->handleOrderStateEvent($command->getOrderId(), 'cancel_by_merchant', $command->getData());
     }
 
     public function payOrder(PayOrder $command): void
     {
-        $this->handleOrderStateEvent($command->getOrderId(), 'pay');
+        $this->handleOrderStateEvent($command->getOrderId(), 'pay', $command->getData());
     }
 
     public function partiallyPayOrder(PartiallyPayOrder $command): void
     {
-        $this->handleOrderStateEvent($command->getOrderId(), 'partially_pay');
+        $this->handleOrderStateEvent($command->getOrderId(), 'partially_pay', $command->getData());
     }
 
     public function packOrder(PackOrder $command): void
     {
-        $this->handleOrderStateEvent($command->getOrderId(), 'pack');
+        $this->handleOrderStateEvent($command->getOrderId(), 'pack', $command->getData());
     }
 
     public function partiallyPackOrder(PartiallyPackOrder $command): void
     {
-        $this->handleOrderStateEvent($command->getOrderId(), 'partially_pack');
+        $this->handleOrderStateEvent($command->getOrderId(), 'partially_pack', $command->getData());
     }
 
     public function deliverOrder(DeliverOrder $command): void
     {
-        $this->handleOrderStateEvent($command->getOrderId(), 'deliver');
+        $this->handleOrderStateEvent($command->getOrderId(), 'deliver', $command->getData());
     }
 
     public function partiallyDeliverOrder(PartiallyDeliverOrder $command): void
     {
-        $this->handleOrderStateEvent($command->getOrderId(), 'partially_deliver');
+        $this->handleOrderStateEvent($command->getOrderId(), 'partially_deliver', $command->getData());
     }
 
     public function initializePayment(InitializePayment $command): void
     {
-        $this->handlePaymentStateEvent($command->getOrderId(), $command->getPaymentId(), 'initialize');
+        $this->handlePaymentStateEvent($command->getOrderId(), $command->getPaymentId(), 'initialize', $command->getData());
     }
 
     public function payPayment(PayPayment $command): void
     {
-        $this->handlePaymentStateEvent($command->getOrderId(), $command->getPaymentId(), 'pay');
+        $this->handlePaymentStateEvent($command->getOrderId(), $command->getPaymentId(), 'pay', $command->getData());
     }
 
     public function payPaymentByMerchant(PayPaymentByMerchant $command): void
     {
-        $this->handlePaymentStateEvent($command->getOrderId(), $command->getPaymentId(), 'pay_by_merchant');
+        $this->handlePaymentStateEvent($command->getOrderId(), $command->getPaymentId(), 'pay_by_merchant', $command->getData());
     }
 
     public function cancelPayment(CancelPayment $command): void
     {
-        $this->handlePaymentStateEvent($command->getOrderId(), $command->getPaymentId(), 'cancel');
+        $this->handlePaymentStateEvent($command->getOrderId(), $command->getPaymentId(), 'cancel', $command->getData());
     }
 
     public function expirePayment(ExpirePayment $command): void
     {
-        $this->handlePaymentStateEvent($command->getOrderId(), $command->getPaymentId(), 'expire');
+        $this->handlePaymentStateEvent($command->getOrderId(), $command->getPaymentId(), 'expire', $command->getData());
     }
 
     public function refundPayment(RefundPayment $command): void
     {
-        $this->handlePaymentStateEvent($command->getOrderId(), $command->getPaymentId(), 'refund');
+        $this->handlePaymentStateEvent($command->getOrderId(), $command->getPaymentId(), 'refund', $command->getData());
     }
 
     public function refundPaymentByMerchant(RefundPaymentByMerchant $command): void
     {
-        $this->handlePaymentStateEvent($command->getOrderId(), $command->getPaymentId(), 'refund_by_merchant');
+        $this->handlePaymentStateEvent($command->getOrderId(), $command->getPaymentId(), 'refund_by_merchant', $command->getData());
     }
 
     public function chargeBackPayment(ChargeBackPayment $command): void
     {
-        $this->handlePaymentStateEvent($command->getOrderId(), $command->getPaymentId(), 'charge_back');
+        $this->handlePaymentStateEvent($command->getOrderId(), $command->getPaymentId(), 'charge_back', $command->getData());
     }
 
     public function startPackingShipment(StartPackingShipment $command): void
     {
-        $this->handleShippingStateEvent($command->getOrderId(), $command->getShippingId(), 'start_packing');
+        $this->handleShippingStateEvent($command->getOrderId(), $command->getShippingId(), 'start_packing', $command->getData());
     }
 
     public function haltPackingShipment(HaltPackingShipment $command): void
     {
-        $this->handleShippingStateEvent($command->getOrderId(), $command->getShippingId(), 'halt_packing');
+        $this->handleShippingStateEvent($command->getOrderId(), $command->getShippingId(), 'halt_packing', $command->getData());
     }
 
     public function packShipment(PackShipment $command): void
     {
-        $this->handleShippingStateEvent($command->getOrderId(), $command->getShippingId(), 'pack');
+        $this->handleShippingStateEvent($command->getOrderId(), $command->getShippingId(), 'pack', $command->getData());
     }
 
     public function shipShipment(ShipShipment $command): void
     {
-        $this->handleShippingStateEvent($command->getOrderId(), $command->getShippingId(), 'ship');
+        $this->handleShippingStateEvent($command->getOrderId(), $command->getShippingId(), 'ship', $command->getData());
     }
 
     public function deliverShipment(DeliverShipment $command): void
     {
-        $this->handleShippingStateEvent($command->getOrderId(), $command->getShippingId(), 'deliver');
+        $this->handleShippingStateEvent($command->getOrderId(), $command->getShippingId(), 'deliver', $command->getData());
     }
 
     public function returnShipment(ReturnShipment $command): void
     {
-        $this->handleShippingStateEvent($command->getOrderId(), $command->getShippingId(), 'return');
+        $this->handleShippingStateEvent($command->getOrderId(), $command->getShippingId(), 'return', $command->getData());
     }
 
-    private function handleOrderStateEvent(OrderId $orderId, string $transition): void
+    private function handleOrderStateEvent(OrderId $orderId, string $transition, array $data): void
     {
         $order = $this->orderRepository->find($orderId);
 
-        $this->orderStateMachine->apply($order, $transition);
+        $this->orderStateMachine->apply($order, $transition, $data);
 
         $this->orderRepository->save($order);
 
         $this->eventDispatcher->dispatchAll($order->releaseEvents());
     }
 
-    private function handlePaymentStateEvent(OrderId $orderId, PaymentId $paymentId, string $transition): void
+    private function handlePaymentStateEvent(OrderId $orderId, PaymentId $paymentId, string $transition, array $data): void
     {
         $order = $this->orderRepository->find($orderId);
 
         $payment = $order->findPayment($paymentId);
 
         $this->paymentStateMachine->setOrder($order);
-        $this->paymentStateMachine->apply($payment, $transition);
+        $this->paymentStateMachine->apply($payment, $transition, $data);
 
         $this->orderRepository->save($order);
 
         $this->eventDispatcher->dispatchAll($order->releaseEvents());
     }
 
-    private function handleShippingStateEvent(OrderId $orderId, ShippingId $shippingId, string $transition): void
+    private function handleShippingStateEvent(OrderId $orderId, ShippingId $shippingId, string $transition, array $data): void
     {
         $order = $this->orderRepository->find($orderId);
 
         $shipping = $order->findShipping($shippingId);
 
         $this->shippingStateMachine->setOrder($order);
-        $this->shippingStateMachine->apply($shipping, $transition);
+        $this->shippingStateMachine->apply($shipping, $transition, $data);
 
         $this->orderRepository->save($order);
 

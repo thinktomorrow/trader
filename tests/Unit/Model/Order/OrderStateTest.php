@@ -96,11 +96,11 @@ class OrderStateTest extends TestCase
     {
         $oldState = $oldState ?: $this->order->getOrderState();
 
-        $this->order->updateState($newState);
+        $this->order->updateState($newState, ['foo' => 'bar']);
 
         $this->assertEquals([
             new OrderUpdated($this->order->orderId),
-            new $eventClass($this->order->orderId, $oldState, $newState),
+            new $eventClass($this->order->orderId, $oldState, $newState, ['foo' => 'bar']),
             new OrderStateUpdated($this->order->orderId, $oldState, $newState),
         ], $this->order->releaseEvents());
     }
@@ -111,10 +111,10 @@ class OrderStateTest extends TestCase
 
         $oldState = $oldState ?: $payment->getPaymentState();
 
-        $this->order->updatePaymentState($payment->paymentId, $newState);
+        $this->order->updatePaymentState($payment->paymentId, $newState, ['foo' => 'bar']);
 
         $this->assertEquals([
-            new $eventClass($this->order->orderId, $payment->paymentId, $oldState, $newState),
+            new $eventClass($this->order->orderId, $payment->paymentId, $oldState, $newState, ['foo' => 'bar']),
             new PaymentStateUpdated($this->order->orderId, $payment->paymentId, $oldState, $newState),
             new OrderUpdated($this->order->orderId),
         ], $this->order->releaseEvents());
@@ -126,10 +126,10 @@ class OrderStateTest extends TestCase
 
         $oldState = $oldState ?: $shipping->getShippingState();
 
-        $this->order->updateShippingState($shipping->shippingId, $newState);
+        $this->order->updateShippingState($shipping->shippingId, $newState, ['foo' => 'bar']);
 
         $this->assertEquals([
-            new $eventClass($this->order->orderId, $shipping->shippingId, $oldState, $newState),
+            new $eventClass($this->order->orderId, $shipping->shippingId, $oldState, $newState, ['foo' => 'bar']),
             new ShippingStateUpdated($this->order->orderId, $shipping->shippingId, $oldState, $newState),
             new OrderUpdated($this->order->orderId),
         ], $this->order->releaseEvents());

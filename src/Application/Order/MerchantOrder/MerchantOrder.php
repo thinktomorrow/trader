@@ -36,9 +36,11 @@ interface MerchantOrder
 
     /** @return MerchantOrderShipping[] */
     public function getShippings(): array;
+    public function findShipping(string $shippingId): ?MerchantOrderShipping;
 
     /** @return MerchantOrderPayment[] */
     public function getPayments(): array;
+    public function findPayment(string $paymentId): ?MerchantOrderPayment;
 
     public function getShippingAddress(): MerchantOrderShippingAddress;
     public function getBillingAddress(): MerchantOrderBillingAddress;

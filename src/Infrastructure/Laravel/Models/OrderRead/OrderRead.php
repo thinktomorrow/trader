@@ -200,9 +200,27 @@ abstract class OrderRead
         return $this->shippings;
     }
 
+    public function findShipping(string $shippingId): ?MerchantOrderShipping
+    {
+        foreach($this->shippings as $shipping) {
+            if($shipping->getShippingId() == $shippingId) return $shipping;
+        }
+
+        return null;
+    }
+
     public function getPayments(): array
     {
         return $this->payments;
+    }
+
+    public function findPayment(string $paymentId): ?MerchantOrderPayment
+    {
+        foreach($this->payments as $payment) {
+            if($payment->getPaymentId() == $paymentId) return $payment;
+        }
+
+        return null;
     }
 
     public function getShippingAddress(): ?MerchantOrderShippingAddress

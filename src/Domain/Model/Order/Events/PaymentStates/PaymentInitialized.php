@@ -13,7 +13,8 @@ final class PaymentInitialized
         public readonly OrderId $orderId,
         public readonly PaymentId $paymentId,
         public readonly PaymentState $formerPaymentState,
-        public readonly PaymentState $newPaymentState
+        public readonly PaymentState $newPaymentState,
+        public readonly array $data,
     ) {
     }
 }

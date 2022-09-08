@@ -23,10 +23,10 @@ class OrderStateMachine extends AbstractStateMachine
         return $model->getOrderState();
     }
 
-    protected function updateState($model, State $state): void
+    protected function updateState($model, State $state, array $data): void
     {
         Assertion::isInstanceOf($model, Order::class);
 
-        $model->updateState($state);
+        $model->updateState($state, $data);
     }
 }

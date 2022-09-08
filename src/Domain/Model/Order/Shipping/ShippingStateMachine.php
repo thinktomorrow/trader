@@ -24,12 +24,12 @@ final class ShippingStateMachine extends AbstractStateMachine
         return $model->getShippingState();
     }
 
-    protected function updateState($model, State $state): void
+    protected function updateState($model, State $state, array $data): void
     {
         Assertion::isInstanceOf($model, Shipping::class);
         Assertion::isInstanceOf($state, ShippingState::class);
 
-        $this->order->updateShippingState($model->shippingId, $state);
+        $this->order->updateShippingState($model->shippingId, $state, $data);
     }
 
     public function setOrder(Order $order): void

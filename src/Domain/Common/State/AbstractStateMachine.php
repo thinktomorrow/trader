@@ -17,7 +17,7 @@ abstract class AbstractStateMachine
     }
 
     abstract protected function getState($model): State;
-    abstract protected function updateState($model, State $state): void;
+    abstract protected function updateState($model, State $state, array $data): void;
 
     public function can($model, $transition): bool
     {
@@ -52,7 +52,7 @@ abstract class AbstractStateMachine
         return $transitions;
     }
 
-    public function apply($model, $transition): void
+    public function apply($model, string $transition, array $data = []): void
     {
         if (! $this->can($model, $transition)) {
             throw StateException::invalidTransition($transition, $this->getState($model)?->getValueAsString());
@@ -60,7 +60,7 @@ abstract class AbstractStateMachine
 
         $state = $this->transitions[$transition]['to'];
 
-        $this->updateState($model, $state);
+        $this->updateState($model, $state, $data);
     }
 
     /**

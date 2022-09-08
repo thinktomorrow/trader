@@ -13,7 +13,8 @@ final class ShipmentReturned
         public readonly OrderId $orderId,
         public readonly ShippingId $shippingId,
         public readonly ShippingState $formerShippingState,
-        public readonly ShippingState $newShippingState
+        public readonly ShippingState $newShippingState,
+        public readonly array $data,
     ) {
     }
 }

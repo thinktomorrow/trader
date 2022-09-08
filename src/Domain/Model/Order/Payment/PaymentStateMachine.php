@@ -24,12 +24,12 @@ final class PaymentStateMachine extends AbstractStateMachine
         return $model->getPaymentState();
     }
 
-    protected function updateState($model, State $state): void
+    protected function updateState($model, State $state, array $data): void
     {
         Assertion::isInstanceOf($model, Payment::class);
         Assertion::isInstanceOf($state, PaymentState::class);
 
-        $this->order->updatePaymentState($model->paymentId, $state);
+        $this->order->updatePaymentState($model->paymentId, $state, $data);
     }
 
     public function setOrder(Order $order): void
