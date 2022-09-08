@@ -18,6 +18,7 @@ class DefaultOrderGridItem implements OrderGridItem
     protected string $order_reference;
     protected ?string $invoice_reference;
     protected string $state;
+    protected ?\DateTime $updated_at;
     protected ?\DateTime $confirmed_at;
     protected ?\DateTime $paid_at;
     protected ?\DateTime $delivered_at;
@@ -38,6 +39,7 @@ class DefaultOrderGridItem implements OrderGridItem
         $gridItem->invoice_reference = $state['invoice_ref'];
         $gridItem->state = $state['order_state'];
 
+        $gridItem->updated_at = isset($state['updated_at']) ? new \DateTime($state['updated_at']) : null;
         $gridItem->confirmed_at = isset($state['confirmed_at']) ? new \DateTime($state['confirmed_at']) : null;
         $gridItem->paid_at = isset($state['paid_at']) ? new \DateTime($state['paid_at']) : null;
         $gridItem->delivered_at = isset($state['delivered_at']) ? new \DateTime($state['delivered_at']) : null;
@@ -68,6 +70,11 @@ class DefaultOrderGridItem implements OrderGridItem
     public function getOrderState(): string
     {
         return $this->state;
+    }
+
+    public function getUpdatedAt(): ?\DateTime
+    {
+        return $this->updated_at;
     }
 
     public function getConfirmedAt(): ?\DateTime

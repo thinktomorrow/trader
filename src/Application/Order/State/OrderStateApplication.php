@@ -4,6 +4,8 @@ declare(strict_types=1);
 namespace Thinktomorrow\Trader\Application\Order\State;
 
 use Thinktomorrow\Trader\Application\Order\State\Order\CancelOrder;
+use Thinktomorrow\Trader\Application\Order\State\Order\ReviveOrder;
+use Thinktomorrow\Trader\Application\Order\State\Order\AbandonOrder;
 use Thinktomorrow\Trader\Application\Order\State\Order\CancelOrderByMerchant;
 use Thinktomorrow\Trader\Application\Order\State\Order\DeleteOrder;
 use Thinktomorrow\Trader\Application\Order\State\Order\DeliverOrder;
@@ -55,6 +57,16 @@ final class OrderStateApplication
     public function deleteOrder(DeleteOrder $command): void
     {
         $this->handleOrderStateEvent($command->getOrderId(), 'delete', $command->getData());
+    }
+
+    public function abandonOrder(AbandonOrder $command): void
+    {
+        $this->handleOrderStateEvent($command->getOrderId(), 'abandon', $command->getData());
+    }
+
+    public function reviveOrder(ReviveOrder $command): void
+    {
+        $this->handleOrderStateEvent($command->getOrderId(), 'revive', $command->getData());
     }
 
     public function cancelOrder(CancelOrder $command): void

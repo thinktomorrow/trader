@@ -11,7 +11,7 @@ interface OrderGridRepository
     public function filterByOrderReference(string $orderReference): static;
 
     public function filterByShopperEmail(string $shopperEmail): static;
-
+    public function filterByShopperTerm(string $shopperTerm): static;
     public function filterByCustomerId(string $customerId): static;
 
     public function filterByStates(array $states): static;

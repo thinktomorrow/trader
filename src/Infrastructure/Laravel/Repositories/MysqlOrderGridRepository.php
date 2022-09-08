@@ -33,7 +33,7 @@ final class MysqlOrderGridRepository implements OrderGridRepository
 
         // Basic builder query
         $this->builder = DB::table(static::$orderTable)
-            ->join(static::$shopperTable, static::$orderTable.'.order_id', '=', static::$shopperTable.'.order_id')
+            ->leftJoin(static::$shopperTable, static::$orderTable.'.order_id', '=', static::$shopperTable.'.order_id')
             ->select([
                 static::$orderTable.'.*',
                 static::$shopperTable.'.email AS shopper_email',
@@ -52,6 +52,14 @@ final class MysqlOrderGridRepository implements OrderGridRepository
     public function filterByShopperEmail(string $shopperEmail): static
     {
         $this->builder->where(static::$shopperTable.'.email', 'LIKE', '%'.$shopperEmail .'%');
+
+        return $this;
+    }
+
+    public function filterByShopperTerm(string $shopperTerm): static
+    {
+        $this->builder->where(static::$shopperTable.'.email', 'LIKE', '%'.$shopperTerm .'%')
+            ->orWhereRaw("JSON_SEARCH(LOWER(`trader_order_shoppers`.`data`), 'all', ?) IS NOT NULL", ["%" . strtolower($shopperTerm) . "%"]);
 
         return $this;
     }
