@@ -202,8 +202,10 @@ abstract class OrderRead
 
     public function findShipping(string $shippingId): ?MerchantOrderShipping
     {
-        foreach($this->shippings as $shipping) {
-            if($shipping->getShippingId() == $shippingId) return $shipping;
+        foreach ($this->shippings as $shipping) {
+            if ($shipping->getShippingId() == $shippingId) {
+                return $shipping;
+            }
         }
 
         return null;
@@ -216,8 +218,10 @@ abstract class OrderRead
 
     public function findPayment(string $paymentId): ?MerchantOrderPayment
     {
-        foreach($this->payments as $payment) {
-            if($payment->getPaymentId() == $paymentId) return $payment;
+        foreach ($this->payments as $payment) {
+            if ($payment->getPaymentId() == $paymentId) {
+                return $payment;
+            }
         }
 
         return null;
