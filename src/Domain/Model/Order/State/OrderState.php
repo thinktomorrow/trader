@@ -29,6 +29,15 @@ enum OrderState: string implements State
 
     /**
      * ------------------------------------------------
+     * Order quotation
+     * ------------------------------------------------
+     * The order is quoted which means that the customer cannot change this order but still needs to explicitly confirm this order.
+     */
+    case quoted = 'quote';
+    case quote_confirmed = 'quote_confirmed';
+
+    /**
+     * ------------------------------------------------
      * Order
      * ------------------------------------------------
      * the order has been successfully paid and the cart can be considered an 'order'.
@@ -67,6 +76,10 @@ enum OrderState: string implements State
     public static function getDefaultTransitions(): array
     {
         return [
+            'quote' => [
+                'from' => [self::cart_pending, self::cart_revived],
+                'to' => self::quoted,
+            ],
             'abandon' => [
                 'from' => [self::cart_pending, self::cart_revived],
                 'to' => self::cart_abandoned,
@@ -83,12 +96,16 @@ enum OrderState: string implements State
                 'from' => [self::cart_pending, self::cart_revived],
                 'to' => self::confirmed,
             ],
+            'confirm_quote' => [
+                'from' => [self::quoted],
+                'to' => self::quote_confirmed,
+            ],
             'cancel' => [
                 'from' => [self::confirmed],
                 'to' => self::cancelled,
             ],
             'cancel_by_merchant' => [
-                'from' => [self::confirmed],
+                'from' => [self::confirmed, self::quote_confirmed],
                 'to' => self::cancelled_by_merchant,
             ],
             'partially_pay' => [
@@ -96,7 +113,7 @@ enum OrderState: string implements State
                 'to' => self::partially_paid,
             ],
             'pay' => [
-                'from' => [self::confirmed, self::partially_paid],
+                'from' => [self::confirmed, self::partially_paid, self::quote_confirmed],
                 'to' => self::paid,
             ],
             'partially_pack' => [

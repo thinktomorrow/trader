@@ -3,8 +3,10 @@ declare(strict_types=1);
 
 namespace Thinktomorrow\Trader\Application\Order\State;
 
+use Thinktomorrow\Trader\Application\Order\State\Order\QuoteOrder;
 use Thinktomorrow\Trader\Application\Order\State\Order\AbandonOrder;
 use Thinktomorrow\Trader\Application\Order\State\Order\CancelOrder;
+use Thinktomorrow\Trader\Application\Order\State\Order\ConfirmQuotedOrder;
 use Thinktomorrow\Trader\Application\Order\State\Order\CancelOrderByMerchant;
 use Thinktomorrow\Trader\Application\Order\State\Order\DeleteOrder;
 use Thinktomorrow\Trader\Application\Order\State\Order\DeliverOrder;
@@ -77,6 +79,16 @@ final class OrderStateApplication
     public function cancelOrderByMerchant(CancelOrderByMerchant $command): void
     {
         $this->handleOrderStateEvent($command->getOrderId(), 'cancel_by_merchant', $command->getData());
+    }
+
+    public function quoteOrder(QuoteOrder $command): void
+    {
+        $this->handleOrderStateEvent($command->getOrderId(), 'quote', $command->getData());
+    }
+
+    public function confirmQuotedOrder(ConfirmQuotedOrder $command): void
+    {
+        $this->handleOrderStateEvent($command->getOrderId(), 'confirm_quote', $command->getData());
     }
 
     public function payOrder(PayOrder $command): void

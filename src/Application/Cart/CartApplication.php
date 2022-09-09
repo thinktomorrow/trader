@@ -177,6 +177,17 @@ final class CartApplication
         $this->eventDispatcher->dispatchAll($order->releaseEvents());
     }
 
+    public function updateOrderData(UpdateOrderData $command): void
+    {
+        $order = $this->orderRepository->findForCart($command->getOrderId());
+
+        $order->addData($command->getData());
+
+        $this->orderRepository->save($order);
+
+        $this->eventDispatcher->dispatchAll($order->releaseEvents());
+    }
+
     public function changeLineData(ChangeLineData $changeLineData): void
     {
         $order = $this->orderRepository->findForCart($changeLineData->getOrderId());

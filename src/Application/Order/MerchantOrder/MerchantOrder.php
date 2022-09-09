@@ -60,4 +60,5 @@ interface MerchantOrder
     public function inCustomerHands(): bool;
 
     public function getLogEntries(): iterable;
+    public function getData(string $key, string $language = null, $default = null);
 }

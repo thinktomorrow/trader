@@ -266,4 +266,9 @@ abstract class OrderRead
         // TODO:: make sure they are unique...
         return $allDiscounts;
     }
+
+    public function getData(string $key, string $language = null, $default = null)
+    {
+        return $this->data($key, $language, $default);
+    }
 }
