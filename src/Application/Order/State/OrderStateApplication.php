@@ -3,11 +3,10 @@ declare(strict_types=1);
 
 namespace Thinktomorrow\Trader\Application\Order\State;
 
-use Thinktomorrow\Trader\Application\Order\State\Order\QuoteOrder;
 use Thinktomorrow\Trader\Application\Order\State\Order\AbandonOrder;
 use Thinktomorrow\Trader\Application\Order\State\Order\CancelOrder;
-use Thinktomorrow\Trader\Application\Order\State\Order\ConfirmQuotedOrder;
 use Thinktomorrow\Trader\Application\Order\State\Order\CancelOrderByMerchant;
+use Thinktomorrow\Trader\Application\Order\State\Order\ConfirmQuotedOrder;
 use Thinktomorrow\Trader\Application\Order\State\Order\DeleteOrder;
 use Thinktomorrow\Trader\Application\Order\State\Order\DeliverOrder;
 use Thinktomorrow\Trader\Application\Order\State\Order\PackOrder;
@@ -15,6 +14,7 @@ use Thinktomorrow\Trader\Application\Order\State\Order\PartiallyDeliverOrder;
 use Thinktomorrow\Trader\Application\Order\State\Order\PartiallyPackOrder;
 use Thinktomorrow\Trader\Application\Order\State\Order\PartiallyPayOrder;
 use Thinktomorrow\Trader\Application\Order\State\Order\PayOrder;
+use Thinktomorrow\Trader\Application\Order\State\Order\QuoteOrder;
 use Thinktomorrow\Trader\Application\Order\State\Order\ReviveOrder;
 use Thinktomorrow\Trader\Application\Order\State\Payment\CancelPayment;
 use Thinktomorrow\Trader\Application\Order\State\Payment\ChargeBackPayment;
