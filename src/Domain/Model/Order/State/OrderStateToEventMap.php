@@ -4,10 +4,7 @@ declare(strict_types=1);
 namespace Thinktomorrow\Trader\Domain\Model\Order\State;
 
 use Thinktomorrow\Trader\Domain\Common\Map\HasSimpleMapping;
-use Thinktomorrow\Trader\Application\Order\State\Order\ConfirmQuotedOrder;
-use Thinktomorrow\Trader\Domain\Model\Order\Events\OrderStates\OrderQuoted;
 use Thinktomorrow\Trader\Domain\Model\Order\Events\OrderStates\CartAbandoned;
-use Thinktomorrow\Trader\Domain\Model\Order\Events\OrderStates\QuotedOrderConfirmed;
 use Thinktomorrow\Trader\Domain\Model\Order\Events\OrderStates\CartQueuedForDeletion;
 use Thinktomorrow\Trader\Domain\Model\Order\Events\OrderStates\CartRevived;
 use Thinktomorrow\Trader\Domain\Model\Order\Events\OrderStates\OrderCancelled;
@@ -19,6 +16,8 @@ use Thinktomorrow\Trader\Domain\Model\Order\Events\OrderStates\OrderPaid;
 use Thinktomorrow\Trader\Domain\Model\Order\Events\OrderStates\OrderPartiallyDelivered;
 use Thinktomorrow\Trader\Domain\Model\Order\Events\OrderStates\OrderPartiallyPacked;
 use Thinktomorrow\Trader\Domain\Model\Order\Events\OrderStates\OrderPartiallyPaid;
+use Thinktomorrow\Trader\Domain\Model\Order\Events\OrderStates\OrderQuoted;
+use Thinktomorrow\Trader\Domain\Model\Order\Events\OrderStates\QuotedOrderConfirmed;
 
 class OrderStateToEventMap
 {

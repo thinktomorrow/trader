@@ -58,11 +58,11 @@ final class MysqlOrderGridRepository implements OrderGridRepository
 
     public function filterByShopperTerm(string $shopperTerm): static
     {
-        $this->builder->where(function($query) use($shopperTerm) {
+        $this->builder->where(function ($query) use ($shopperTerm) {
             $query->where(static::$shopperTable.'.email', 'LIKE', '%'.$shopperTerm .'%')
                 ->orWhereRaw("JSON_SEARCH(LOWER(`trader_order_shoppers`.`data`), 'all', ?) IS NOT NULL", ["%" . strtolower($shopperTerm) . "%"]);
-
         });
+
         return $this;
     }
 
