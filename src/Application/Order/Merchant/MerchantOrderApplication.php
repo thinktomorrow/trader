@@ -3,16 +3,16 @@ declare(strict_types=1);
 
 namespace Thinktomorrow\Trader\Application\Order\Merchant;
 
-use Thinktomorrow\Trader\Domain\Model\Order\Shopper;
 use Thinktomorrow\Trader\Domain\Common\Address\Address;
 use Thinktomorrow\Trader\Domain\Common\Event\EventDispatcher;
-use Thinktomorrow\Trader\Domain\Model\Order\Log\LogEntry;
-use Thinktomorrow\Trader\Domain\Model\Order\OrderRepository;
 use Thinktomorrow\Trader\Domain\Model\Order\Address\BillingAddress;
 use Thinktomorrow\Trader\Domain\Model\Order\Address\ShippingAddress;
-use Thinktomorrow\Trader\Domain\Model\Order\Events\Merchant\ShopperUpdatedByMerchant;
 use Thinktomorrow\Trader\Domain\Model\Order\Events\Merchant\BillingAddressUpdatedByMerchant;
 use Thinktomorrow\Trader\Domain\Model\Order\Events\Merchant\ShippingAddressUpdatedByMerchant;
+use Thinktomorrow\Trader\Domain\Model\Order\Events\Merchant\ShopperUpdatedByMerchant;
+use Thinktomorrow\Trader\Domain\Model\Order\Log\LogEntry;
+use Thinktomorrow\Trader\Domain\Model\Order\OrderRepository;
+use Thinktomorrow\Trader\Domain\Model\Order\Shopper;
 
 class MerchantOrderApplication
 {
@@ -60,7 +60,9 @@ class MerchantOrderApplication
 
         $updatedShopperValues = $this->extractUpdatedShopperValues($command, $shopper);
 
-        if(count($updatedShopperValues) < 1) return;
+        if (count($updatedShopperValues) < 1) {
+            return;
+        }
 
         $shopper->updateEmail($command->getEmail());
         $shopper->updateBusiness($command->isBusiness());
@@ -81,7 +83,9 @@ class MerchantOrderApplication
 
         $updatedAddressValues = $this->extractUpdatedAddressValues($command, $shippingAddress->getAddress());
 
-        if(count($updatedAddressValues) < 1) return;
+        if (count($updatedAddressValues) < 1) {
+            return;
+        }
 
         // Get existing address_id, if not we create one here
         $order->updateShippingAddress(ShippingAddress::create(
@@ -102,7 +106,9 @@ class MerchantOrderApplication
         $billingAddress = $order->getBillingAddress();
 
         $updatedAddressValues = $this->extractUpdatedAddressValues($command, $billingAddress->getAddress());
-        if(count($updatedAddressValues) < 1) return;
+        if (count($updatedAddressValues) < 1) {
+            return;
+        }
 
         // Get existing address_id, if not we create one here
         $order->updateBillingAddress(BillingAddress::create(
@@ -120,14 +126,14 @@ class MerchantOrderApplication
     {
         $updatedValues = [];
 
-        if (!$command->getEmail()->equals($shopper->getEmail())) {
+        if (! $command->getEmail()->equals($shopper->getEmail())) {
             $updatedValues['email'] = [
                 'old' => $shopper->getEmail()->get(),
                 'new' => $command->getEmail()->get(),
             ];
         }
 
-        if (!$command->getLocale()->equals($shopper->getLocale())) {
+        if (! $command->getLocale()->equals($shopper->getLocale())) {
             $updatedValues['locale'] = [
                 'old' => $shopper->getLocale()->toIso639(),
                 'new' => $command->getLocale()->toIso639(),
@@ -150,7 +156,7 @@ class MerchantOrderApplication
     {
         $updatedValues = $command->getAddress()->diff($address);
 
-        foreach($updatedValues as $key => $value) {
+        foreach ($updatedValues as $key => $value) {
             $updatedValues[$key] = [
                 'old' => $address->toArray()[$key],
                 'new' => $command->getAddress()->toArray()[$key],

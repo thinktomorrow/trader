@@ -12,6 +12,5 @@ class BillingAddressUpdatedByMerchant
         public readonly array $updatedValues,
         public readonly array $data
     ) {
-
     }
 }

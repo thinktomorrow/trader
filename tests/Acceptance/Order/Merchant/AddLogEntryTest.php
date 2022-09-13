@@ -5,8 +5,8 @@ namespace Tests\Acceptance\Order\Merchant;
 
 use Tests\Acceptance\Cart\CartContext;
 use Thinktomorrow\Trader\Application\Order\Merchant\AddLogEntry;
-use Thinktomorrow\Trader\Infrastructure\Test\EventDispatcherSpy;
 use Thinktomorrow\Trader\Application\Order\Merchant\MerchantOrderApplication;
+use Thinktomorrow\Trader\Infrastructure\Test\EventDispatcherSpy;
 use Thinktomorrow\Trader\Infrastructure\Test\Repositories\InMemoryOrderRepository;
 
 class AddLogEntryTest extends CartContext
