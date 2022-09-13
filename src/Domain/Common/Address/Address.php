@@ -51,4 +51,9 @@ class Address
             'city' => $this->city,
         ];
     }
+
+    public function diff(self $other): array
+    {
+        return array_diff($other->toArray(), $this->toArray());
+    }
 }

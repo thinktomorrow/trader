@@ -6,7 +6,7 @@ namespace Thinktomorrow\Trader\Application\Order\Merchant;
 use Thinktomorrow\Trader\Domain\Model\Order\OrderId;
 use Thinktomorrow\Trader\Domain\Model\Order\Shipping\ShippingId;
 
-class ChangeShippingData
+class UpdateShippingData
 {
     private string $orderId;
     private string $shippingId;

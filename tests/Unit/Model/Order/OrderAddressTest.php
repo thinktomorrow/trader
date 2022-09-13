@@ -58,4 +58,28 @@ class OrderAddressTest extends TestCase
             'data' => json_encode(['foo' => 'bar']),
         ], $address->getMappedData());
     }
+
+    public function test_it_can_get_diff_between_addresses()
+    {
+        $address = new Address(
+            CountryId::fromString('NL'),
+            'line-1',
+            'line-2',
+            'postal-code',
+            'city',
+        );
+
+        $otherAddress = new Address(
+            CountryId::fromString('BE'),
+            'line-1',
+            'line-2',
+            'postal-code-other',
+            'city',
+        );
+
+        $this->assertEquals([
+            'country_id' => 'BE',
+            'postal_code' => 'postal-code-other',
+        ], $address->diff($otherAddress));
+    }
 }

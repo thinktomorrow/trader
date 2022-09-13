@@ -1,15 +1,15 @@
 <?php
 declare(strict_types=1);
 
-namespace Tests\Acceptance\Order;
+namespace Tests\Acceptance\Order\Merchant;
 
 use Tests\Acceptance\Cart\CartContext;
-use Thinktomorrow\Trader\Application\Order\Merchant\ChangeShippingData;
-use Thinktomorrow\Trader\Application\Order\Merchant\MerchantOrderApplication;
+use Thinktomorrow\Trader\Application\Order\Merchant\AddLogEntry;
 use Thinktomorrow\Trader\Infrastructure\Test\EventDispatcherSpy;
+use Thinktomorrow\Trader\Application\Order\Merchant\MerchantOrderApplication;
 use Thinktomorrow\Trader\Infrastructure\Test\Repositories\InMemoryOrderRepository;
 
-class ChangeShippingDataTest extends CartContext
+class AddLogEntryTest extends CartContext
 {
     private MerchantOrderApplication $merchantOrderApplication;
 
@@ -27,20 +27,18 @@ class ChangeShippingDataTest extends CartContext
 
     public function test_merchant_can_change_shipping_data()
     {
-        $order = $this->createOrder(['order_id' => 'xxx'], [], [], [
-            $shipping = $this->createOrderShipping(),
-        ]);
-
+        $order = $this->createOrder(['order_id' => 'xxx']);
         $this->orderRepository->save($order);
 
-        $this->merchantOrderApplication->changeShippingData(new ChangeShippingData(
+        $this->merchantOrderApplication->addLogEntry(new AddLogEntry(
             $order->orderId->get(),
-            $shipping->shippingId->get(),
+            'transition.confirmed', // transition.confirmed, transition.paid, notification.delay
             ['foo' => 'bar']
         ));
 
         $order = $this->orderRepository->find($order->orderId);
 
-        $this->assertEquals(['foo' => 'bar'], $order->getShippings()[0]->getData());
+        $this->assertCount(1, $order->getLogEntries());
+        $this->assertEquals('transition.confirmed', $order->getLogEntries()[0]->getEvent());
     }
 }
