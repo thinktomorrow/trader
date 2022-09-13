@@ -40,8 +40,6 @@ class MissingOptionCombinations
                     $optionValueLabel = $optionValue->getData($optionValueLabelKey);
 
                     if (! is_string($optionLabel) || ! is_string($optionValueLabel)) {
-                        trap($optionLabel, $optionValueLabel);
-
                         return null;
                     }
 
