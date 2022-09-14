@@ -3,6 +3,8 @@ declare(strict_types=1);
 
 namespace Thinktomorrow\Trader\Infrastructure\Laravel\Repositories;
 
+use Thinktomorrow\Trader\Domain\Common\Cash\Cash;
+use Thinktomorrow\Trader\Domain\Common\Cash\Percentage;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Query\Builder;
 use Illuminate\Database\Query\Expression;
@@ -29,12 +31,14 @@ class MysqlGridRepository implements GridRepository
     private static string $variantTable = 'trader_product_variants';
     private static string $taxonTable = 'trader_taxa';
     private static string $taxonPivotTable = 'trader_taxa_products';
+    private TraderConfig $traderConfig;
     private ?int $limit;
 
     public function __construct(ContainerInterface $container, TraderConfig $traderConfig, FlattenedTaxonIdsComposer $flattenedTaxonIds)
     {
         $this->container = $container;
         $this->flattenedTaxonIds = $flattenedTaxonIds;
+        $this->traderConfig = $traderConfig;
         $this->locale = $traderConfig->getDefaultLocale();
 
         // Basic builder query
@@ -91,10 +95,26 @@ class MysqlGridRepository implements GridRepository
     public function filterByPrice(?string $minimumPriceAmount = null, ?string $maximumPriceAmount = null): static
     {
         if (! is_null($minimumPriceAmount)) {
+
+            // Match input with expected vat inclusion
+            $minimumPriceAmount = ($this->traderConfig->doesPriceInputIncludesVat() && !$this->traderConfig->includeVatInPrices())
+                ? Cash::from($minimumPriceAmount)->addPercentage(Percentage::fromString($this->traderConfig->getDefaultTaxRate()))->getAmount()
+                : ((!$this->traderConfig->doesPriceInputIncludesVat() && $this->traderConfig->includeVatInPrices())
+                    ? Cash::from($minimumPriceAmount)->subtractTaxPercentage(Percentage::fromString($this->traderConfig->getDefaultTaxRate()))->getAmount()
+                    : $minimumPriceAmount);
+
             $this->builder->where(static::$variantTable . '.sale_price', '>=', $minimumPriceAmount);
         }
 
         if (! is_null($maximumPriceAmount)) {
+
+            // Match input with expected vat inclusion
+            $maximumPriceAmount = ($this->traderConfig->doesPriceInputIncludesVat() && !$this->traderConfig->includeVatInPrices())
+                ? Cash::from($maximumPriceAmount)->addPercentage(Percentage::fromString($this->traderConfig->getDefaultTaxRate()))->getAmount()
+                : ((!$this->traderConfig->doesPriceInputIncludesVat() && $this->traderConfig->includeVatInPrices())
+                    ? Cash::from($maximumPriceAmount)->subtractTaxPercentage(Percentage::fromString($this->traderConfig->getDefaultTaxRate()))->getAmount()
+                    : $maximumPriceAmount);
+
             $this->builder->where(static::$variantTable . '.sale_price', '<=', $maximumPriceAmount);
         }
 
