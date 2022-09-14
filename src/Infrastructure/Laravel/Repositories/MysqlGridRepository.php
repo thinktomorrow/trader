@@ -3,8 +3,6 @@ declare(strict_types=1);
 
 namespace Thinktomorrow\Trader\Infrastructure\Laravel\Repositories;
 
-use Thinktomorrow\Trader\Domain\Common\Cash\Cash;
-use Thinktomorrow\Trader\Domain\Common\Cash\Percentage;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Query\Builder;
 use Illuminate\Database\Query\Expression;
@@ -13,6 +11,8 @@ use Psr\Container\ContainerInterface;
 use Thinktomorrow\Trader\Application\Product\Grid\FlattenedTaxonIdsComposer;
 use Thinktomorrow\Trader\Application\Product\Grid\GridItem;
 use Thinktomorrow\Trader\Application\Product\Grid\GridRepository;
+use Thinktomorrow\Trader\Domain\Common\Cash\Cash;
+use Thinktomorrow\Trader\Domain\Common\Cash\Percentage;
 use Thinktomorrow\Trader\Domain\Common\Locale;
 use Thinktomorrow\Trader\Domain\Model\Product\ProductState;
 use Thinktomorrow\Trader\Domain\Model\Product\Variant\VariantState;
@@ -95,11 +95,10 @@ class MysqlGridRepository implements GridRepository
     public function filterByPrice(?string $minimumPriceAmount = null, ?string $maximumPriceAmount = null): static
     {
         if (! is_null($minimumPriceAmount)) {
-
             // Match input with expected vat inclusion
-            $minimumPriceAmount = ($this->traderConfig->doesPriceInputIncludesVat() && !$this->traderConfig->includeVatInPrices())
+            $minimumPriceAmount = ($this->traderConfig->doesPriceInputIncludesVat() && ! $this->traderConfig->includeVatInPrices())
                 ? Cash::from($minimumPriceAmount)->addPercentage(Percentage::fromString($this->traderConfig->getDefaultTaxRate()))->getAmount()
-                : ((!$this->traderConfig->doesPriceInputIncludesVat() && $this->traderConfig->includeVatInPrices())
+                : ((! $this->traderConfig->doesPriceInputIncludesVat() && $this->traderConfig->includeVatInPrices())
                     ? Cash::from($minimumPriceAmount)->subtractTaxPercentage(Percentage::fromString($this->traderConfig->getDefaultTaxRate()))->getAmount()
                     : $minimumPriceAmount);
 
@@ -107,11 +106,10 @@ class MysqlGridRepository implements GridRepository
         }
 
         if (! is_null($maximumPriceAmount)) {
-
             // Match input with expected vat inclusion
-            $maximumPriceAmount = ($this->traderConfig->doesPriceInputIncludesVat() && !$this->traderConfig->includeVatInPrices())
+            $maximumPriceAmount = ($this->traderConfig->doesPriceInputIncludesVat() && ! $this->traderConfig->includeVatInPrices())
                 ? Cash::from($maximumPriceAmount)->addPercentage(Percentage::fromString($this->traderConfig->getDefaultTaxRate()))->getAmount()
-                : ((!$this->traderConfig->doesPriceInputIncludesVat() && $this->traderConfig->includeVatInPrices())
+                : ((! $this->traderConfig->doesPriceInputIncludesVat() && $this->traderConfig->includeVatInPrices())
                     ? Cash::from($maximumPriceAmount)->subtractTaxPercentage(Percentage::fromString($this->traderConfig->getDefaultTaxRate()))->getAmount()
                     : $maximumPriceAmount);
 
