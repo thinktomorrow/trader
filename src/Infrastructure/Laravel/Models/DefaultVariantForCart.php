@@ -21,6 +21,7 @@ class DefaultVariantForCart implements VariantForCart
     private VariantUnitPrice $variantUnitPrice;
     private VariantSalePrice $variantSalePrice;
     private array $personalisations;
+    private array $productData;
 
     final private function __construct()
     {
@@ -37,6 +38,7 @@ class DefaultVariantForCart implements VariantForCart
         $object->variantSalePrice = VariantSalePrice::fromScalars($state['sale_price'], $state['tax_rate'], $state['includes_vat']);
         $object->personalisations = $personalisations;
         $object->data = json_decode($state['data'], true);
+        $object->productData = json_decode($state['product_data'], true);
 
         return $object;
     }
@@ -68,7 +70,7 @@ class DefaultVariantForCart implements VariantForCart
 
     public function getTitle(): string
     {
-        return $this->data('title', null, '');
+        return $this->data('title', null, '', $this->productData) .' '. $this->data('title', null, '');
     }
 
     public function getPersonalisations(): array
