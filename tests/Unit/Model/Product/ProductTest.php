@@ -137,7 +137,7 @@ class ProductTest extends TestCase
         $this->assertEquals('0', $product->getChildEntities()[Variant::class][0]['unit_price']);
         $this->assertEquals('0', $product->getChildEntities()[Variant::class][0]['sale_price']);
         $this->assertEquals([
-            'option-value-id',
+            'ppp',
         ], $product->getVariants()[0]->getMappedData()['option_value_ids']);
     }
 

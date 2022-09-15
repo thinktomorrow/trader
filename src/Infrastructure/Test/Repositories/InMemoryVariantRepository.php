@@ -67,7 +67,7 @@ final class InMemoryVariantRepository implements VariantRepository, VariantForCa
     {
         foreach (static::$variants as $variant) {
             if ($variant->variantId->equals($variantId)) {
-                return DefaultVariantForCart::fromMappedData($variant->getMappedData(), $personalisations = $this->getPersonalisationsForVariant($variant));
+                return DefaultVariantForCart::fromMappedData(array_merge($variant->getMappedData(), ['product_data' => json_encode(InMemoryProductRepository::$products[$variant->productId->get()]->getData())]), $personalisations = $this->getPersonalisationsForVariant($variant));
             }
         }
 
@@ -80,7 +80,7 @@ final class InMemoryVariantRepository implements VariantRepository, VariantForCa
 
         foreach (static::$variants as $variant) {
             if (in_array($variant->variantId, $variantIds)) {
-                $result[] = DefaultVariantForCart::fromMappedData($variant->getMappedData(), $this->getPersonalisationsForVariant($variant));
+                $result[] = DefaultVariantForCart::fromMappedData(array_merge($variant->getMappedData(), ['product_data' => json_encode(InMemoryProductRepository::$products[$variant->productId->get()]->getData())]), $this->getPersonalisationsForVariant($variant));
             }
         }
 

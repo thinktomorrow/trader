@@ -47,6 +47,19 @@ class ProductOptionTest extends TestCase
         $this->assertCount(1, $product->getChildEntities()[Option::class]);
     }
 
+    public function test_when_deleting_option_all_corresponding_variant_option_values_are_removed_as_well()
+    {
+        $product = $this->createdProductWithVariant();
+
+        $this->assertCount(1,$product->getOptions());
+        $this->assertCount(1,$product->getVariants()[0]->getOptionValueIds());
+
+        $product->updateOptions([]);
+
+        $this->assertCount(0,$product->getOptions());
+        $this->assertCount(0,$product->getVariants()[0]->getOptionValueIds());
+    }
+
     /** @test */
     public function it_can_update_option_values()
     {

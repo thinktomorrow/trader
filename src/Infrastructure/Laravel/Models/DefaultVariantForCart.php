@@ -70,7 +70,9 @@ class DefaultVariantForCart implements VariantForCart
 
     public function getTitle(): string
     {
-        return $this->data('title', null, '', $this->productData) .' '. $this->data('title', null, '');
+        $productTitle = $this->data('title', null, '', $this->productData);
+
+        return ($productTitle ? $productTitle .' ' : '') . $this->data('title', null, '');
     }
 
     public function getPersonalisations(): array

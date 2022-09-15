@@ -491,7 +491,7 @@ trait TestHelpers
         );
 
         $variant->updateOptionValueIds([
-            OptionValueId::fromString('option-value-id'),
+            OptionValueId::fromString('ppp'),
         ]);
 
         return $variant;

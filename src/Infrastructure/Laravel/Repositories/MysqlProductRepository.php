@@ -74,7 +74,6 @@ class MysqlProductRepository implements ProductRepository
                 ], array_merge($optionState, ['order_column' => $i]));
 
             // TODO: do this in one query...
-//            trap($option_values);
             foreach ($option_values as $j => $option_value) {
                 DB::table(static::$optionValueTable)
                     ->updateOrInsert([

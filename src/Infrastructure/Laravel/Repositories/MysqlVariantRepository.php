@@ -65,6 +65,7 @@ class MysqlVariantRepository implements VariantRepository, VariantForCartReposit
 
         // Remove the ones that are not in the new list
         $detachOptionValueIds = $existingOptionValueIds->diff($changedOptionValueIds);
+
         if ($detachOptionValueIds->count() > 0) {
             DB::table(static::$variantOptionValueLookupTable)
                 ->where('variant_id', $variantId)
@@ -74,6 +75,8 @@ class MysqlVariantRepository implements VariantRepository, VariantForCartReposit
 
         // Insert the new option_value ids
         $attachOptionValueIds = $changedOptionValueIds->diff($existingOptionValueIds);
+
+        if($attachOptionValueIds->count() < 1) return;
 
         $insertData = $attachOptionValueIds->map(function ($option_value_id) use ($variantId) {
             return ['variant_id' => $variantId->get(), 'option_value_id' => $option_value_id];
