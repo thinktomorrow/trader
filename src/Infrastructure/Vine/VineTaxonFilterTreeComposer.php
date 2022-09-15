@@ -35,7 +35,7 @@ class VineTaxonFilterTreeComposer implements TaxonFilterTreeComposer
          */
         $taxonTree = $this->taxonTreeRepository->getTree()
             ->shake(fn (TaxonNode $node) => array_intersect($node->getProductIds(), $productIds))
-            ->remove(fn (TaxonNode $node) => !$node->showOnline());
+            ->remove(fn (TaxonNode $node) => ! $node->showOnline());
 
         // For a better filter representation, we want to start from the given taxon as the root - and not the 'real' root.
         // Therefor we exclude all ancestors from the given taxon which allows to only show the
