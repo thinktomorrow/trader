@@ -51,13 +51,13 @@ class ProductOptionTest extends TestCase
     {
         $product = $this->createdProductWithVariant();
 
-        $this->assertCount(1,$product->getOptions());
-        $this->assertCount(1,$product->getVariants()[0]->getOptionValueIds());
+        $this->assertCount(1, $product->getOptions());
+        $this->assertCount(1, $product->getVariants()[0]->getOptionValueIds());
 
         $product->updateOptions([]);
 
-        $this->assertCount(0,$product->getOptions());
-        $this->assertCount(0,$product->getVariants()[0]->getOptionValueIds());
+        $this->assertCount(0, $product->getOptions());
+        $this->assertCount(0, $product->getVariants()[0]->getOptionValueIds());
     }
 
     /** @test */

@@ -76,7 +76,9 @@ class MysqlVariantRepository implements VariantRepository, VariantForCartReposit
         // Insert the new option_value ids
         $attachOptionValueIds = $changedOptionValueIds->diff($existingOptionValueIds);
 
-        if($attachOptionValueIds->count() < 1) return;
+        if ($attachOptionValueIds->count() < 1) {
+            return;
+        }
 
         $insertData = $attachOptionValueIds->map(function ($option_value_id) use ($variantId) {
             return ['variant_id' => $variantId->get(), 'option_value_id' => $option_value_id];
