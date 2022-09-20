@@ -32,6 +32,7 @@ class VariantLinksComposer
         $results = VariantLinks::empty();
 
         // When there are no options set on the product, but there are multiple variants, the variants are used as links instead.
+        // Here we use the option_title of the variant if present
         if (count($product->getOptions()) < 1 && count($product->getVariants()) > 1) {
             foreach ($product->getVariants() as $variant) {
                 $variantLink = $this->container->get(VariantLink::class)::fromVariant($variant);

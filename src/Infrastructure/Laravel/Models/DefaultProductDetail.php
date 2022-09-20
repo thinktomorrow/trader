@@ -73,15 +73,18 @@ class DefaultProductDetail implements ProductDetail
     {
         $productTitle = $this->data('product_data.title', null, '');
         $variantTitle = $this->data('title');
+        $variantOptionTitle = $this->data('option_title');
 
-        if (! $variantTitle || $productTitle == $variantTitle) {
+        if($variantTitle) return $variantTitle;
+
+        if (! $variantOptionTitle || $productTitle == $variantOptionTitle) {
             return $productTitle;
         }
         if (! $productTitle) {
-            return $variantTitle;
+            return $variantOptionTitle;
         }
 
-        return $productTitle.' '.$variantTitle;
+        return $productTitle.' '.$variantOptionTitle;
     }
 
     public function getIntro(): string

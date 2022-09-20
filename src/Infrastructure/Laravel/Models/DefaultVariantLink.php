@@ -38,7 +38,7 @@ class DefaultVariantLink implements VariantLink
     {
         return new static('variants', $variant, [
             'group_label' => null,
-            'label' => $variant->getData('title'),
+            'label' => $variant->getData('option_title', $variant->getData('title')),
         ]);
     }
 
