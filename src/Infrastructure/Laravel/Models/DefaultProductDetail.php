@@ -75,7 +75,9 @@ class DefaultProductDetail implements ProductDetail
         $variantTitle = $this->data('title');
         $variantOptionTitle = $this->data('option_title');
 
-        if($variantTitle) return $variantTitle;
+        if ($variantTitle) {
+            return $variantTitle;
+        }
 
         if (! $variantOptionTitle || $productTitle == $variantOptionTitle) {
             return $productTitle;
