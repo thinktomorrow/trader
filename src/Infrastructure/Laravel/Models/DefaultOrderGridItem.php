@@ -23,8 +23,8 @@ class DefaultOrderGridItem implements OrderGridItem
     protected ?\DateTime $paid_at;
     protected ?\DateTime $delivered_at;
     protected Money $totalAsMoney;
-    protected ?string $shopperEmail;
     protected ?string $customer_id;
+    protected array $shopperData;
 
     final private function __construct()
     {
@@ -45,9 +45,12 @@ class DefaultOrderGridItem implements OrderGridItem
         $gridItem->delivered_at = isset($state['delivered_at']) ? new \DateTime($state['delivered_at']) : null;
 
         $gridItem->totalAsMoney = Cash::make($state['total']);
-        $gridItem->shopperEmail = $shopperState['email'] ?? null;
-        $gridItem->customer_id = $shopperState['customer_id'] ?? null;
 
+        $gridItem->shopperData = [
+            'email' => $shopperState['email'],
+            ... json_decode($shopperState['data'], true)
+        ];
+        $gridItem->customer_id = $shopperState['customer_id'] ?? null;
 
         return $gridItem;
     }
@@ -117,7 +120,7 @@ class DefaultOrderGridItem implements OrderGridItem
 
     public function getShopperTitle(): string
     {
-        return $this->shopperEmail;
+        return $this->shopperData['email'];
     }
 
     public function hasCustomer(): bool
