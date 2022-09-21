@@ -65,7 +65,7 @@ class UpdateAddressTest extends CartContext
 
         $this->assertEquals(new ShippingAddressUpdatedByMerchant($order->orderId, [
             'country_id' => ['old' => 'BE', 'new' => 'NL'], 'line1' => ['old' => 'line-1', 'new' => 'line-1 updated'],
-        ], []), $this->eventDispatcherSpy->releaseDispatchedEvents()[1]);
+        ], []), $this->eventDispatcherSpy->releaseDispatchedEvents()[2]);
     }
 
     public function test_merchant_can_change_billing_address()
@@ -103,7 +103,7 @@ class UpdateAddressTest extends CartContext
 
         $this->assertEquals(new BillingAddressUpdatedByMerchant($order->orderId, [
             'country_id' => ['old' => 'BE', 'new' => 'NL'], 'line1' => ['old' => 'line-1', 'new' => 'line-1 updated'],
-        ], []), $this->eventDispatcherSpy->releaseDispatchedEvents()[1]);
+        ], []), $this->eventDispatcherSpy->releaseDispatchedEvents()[2]);
     }
 
     public function test_if_shipping_address_is_not_changed_no_event_is_triggered()

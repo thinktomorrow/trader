@@ -21,6 +21,10 @@ use Thinktomorrow\Trader\Domain\Model\Order\Events\ShippingStateUpdated;
 use Thinktomorrow\Trader\Domain\Model\Order\Invoice\InvoiceReference;
 use Thinktomorrow\Trader\Domain\Model\Order\Line\HasLines;
 use Thinktomorrow\Trader\Domain\Model\Order\Line\Line;
+use Thinktomorrow\Trader\Domain\Model\Order\Events\OrderBillingAddressDeleted;
+use Thinktomorrow\Trader\Domain\Model\Order\Events\OrderBillingAddressUpdated;
+use Thinktomorrow\Trader\Domain\Model\Order\Events\OrderShippingAddressDeleted;
+use Thinktomorrow\Trader\Domain\Model\Order\Events\OrderShippingAddressUpdated;
 use Thinktomorrow\Trader\Domain\Model\Order\Line\Personalisations\LinePersonalisation;
 use Thinktomorrow\Trader\Domain\Model\Order\Log\HasLogEntries;
 use Thinktomorrow\Trader\Domain\Model\Order\Log\LogEntry;
@@ -183,21 +187,29 @@ final class Order implements Aggregate, Discountable
     public function updateShippingAddress(ShippingAddress $shippingAddress): void
     {
         $this->update('shippingAddress', $shippingAddress);
+
+        $this->recordEvent(new OrderShippingAddressUpdated($this->orderId));
     }
 
     public function deleteShippingAddress(): void
     {
         $this->update('shippingAddress', null);
+
+        $this->recordEvent(new OrderShippingAddressDeleted($this->orderId));
     }
 
     public function updateBillingAddress(BillingAddress $billingAddress): void
     {
         $this->update('billingAddress', $billingAddress);
+
+        $this->recordEvent(new OrderBillingAddressUpdated($this->orderId));
     }
 
     public function deleteBillingAddress(): void
     {
         $this->update('billingAddress', null);
+
+        $this->recordEvent(new OrderBillingAddressDeleted($this->orderId));
     }
 
     public function setInvoiceReference(InvoiceReference $invoiceReference): void

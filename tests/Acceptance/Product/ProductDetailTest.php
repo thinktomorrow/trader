@@ -43,11 +43,8 @@ class ProductDetailTest extends ProductContext
         $this->assertEquals('€ 0,10', $productDetail->getUnitPrice(false));
         $this->assertEquals('€ 0,10', $productDetail->getSalePrice(true));
         $this->assertEquals('€ 0,08', $productDetail->getSalePrice(false));
-        $this->assertEquals('product title nl variant title nl', $productDetail->getTitle());
+        $this->assertEquals('variant title nl', $productDetail->getTitle());
         $this->assertEquals(['1','2'], $productDetail->getTaxonIds());
-
-        // Taxon ids
-//        $this->assertEquals(['1','2'], $product->getMappedData()['taxon_ids']);
     }
 
     /** @test */
@@ -65,6 +62,32 @@ class ProductDetailTest extends ProductContext
 
         $productDetail = $this->productDetailRepository->findProductDetail($product->getVariants()[0]->variantId);
         $this->assertEquals('product title nl', $productDetail->getTitle());
+    }
+
+    /** @test */
+    public function if_variant_title_is_empty_it_uses_product_title_and_option_title()
+    {
+        $product = $this->createdProductWithOptions();
+        $product->addData([
+            'title' => [
+                'nl' => 'product title nl',
+                'en' => 'product title en',
+            ],
+        ]);
+
+        $product->getVariants()[0]->addData([
+            'option_title' => [
+                'nl' => 'variant option_title nl',
+                'en' => 'variant option_title en',
+            ],
+        ]);
+
+        $this->productRepository->save($product);
+
+        $this->productRepository->save($product);
+
+        $productDetail = $this->productDetailRepository->findProductDetail($product->getVariants()[0]->variantId);
+        $this->assertEquals('product title nl variant option_title nl', $productDetail->getTitle());
     }
 
     /** @test */

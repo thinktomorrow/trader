@@ -47,8 +47,8 @@ class DefaultOrderGridItem implements OrderGridItem
         $gridItem->totalAsMoney = Cash::make($state['total']);
 
         $gridItem->shopperData = [
-            'email' => $shopperState['email'],
-            ... json_decode($shopperState['data'], true)
+            'email' => $shopperState['email'] ?? null,
+            ... (isset($shopperState['data']) ? json_decode($shopperState['data'], true) : [])
         ];
         $gridItem->customer_id = $shopperState['customer_id'] ?? null;
 
