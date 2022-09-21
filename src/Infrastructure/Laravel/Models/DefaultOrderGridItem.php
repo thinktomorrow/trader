@@ -48,7 +48,7 @@ class DefaultOrderGridItem implements OrderGridItem
 
         $gridItem->shopperData = [
             'email' => $shopperState['email'] ?? null,
-            ... (isset($shopperState['data']) ? json_decode($shopperState['data'], true) : [])
+            ...(isset($shopperState['data']) ? json_decode($shopperState['data'], true) : []),
         ];
         $gridItem->customer_id = $shopperState['customer_id'] ?? null;
 
