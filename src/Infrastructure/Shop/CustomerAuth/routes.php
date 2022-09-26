@@ -8,7 +8,9 @@ use Thinktomorrow\Trader\Infrastructure\Shop\CustomerAuth\Controllers\CustomerRe
 
 Route::group(['prefix' => 'you', 'middleware' => ['web']], function () {
     // Customer login routes
-    Route::post('login', [CustomerAuthController::class, 'login'])->name('customer.login.store');
+    Route::post('login', [CustomerAuthController::class, 'login'])
+        ->middleware('throttle:5,1')
+        ->name('customer.login.store');
     Route::get('login', [CustomerAuthController::class, 'showLoginForm'])->name('customer.login');
 
     // Customer Password Reset routes
