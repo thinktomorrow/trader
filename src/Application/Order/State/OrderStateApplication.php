@@ -198,7 +198,6 @@ final class OrderStateApplication
         $this->orderStateMachine->apply($order, $transition, $data);
 
         $this->orderRepository->save($order);
-
         $this->eventDispatcher->dispatchAll($order->releaseEvents());
     }
 

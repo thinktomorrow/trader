@@ -32,13 +32,13 @@ enum PaymentState: string implements State
                 'from' => [self::none],
                 'to' => self::initialized,
             ],
-            'pay' => [
-                'from' => [self::initialized],
-                'to' => self::paid,
-            ],
             'pay_by_merchant' => [
                 'from' => [self::initialized, self::none],
                 'to' => self::paid_by_merchant,
+            ],
+            'pay' => [
+                'from' => [self::initialized, self::paid_by_merchant],
+                'to' => self::paid,
             ],
             'cancel' => [
                 'from' => [self::initialized],
