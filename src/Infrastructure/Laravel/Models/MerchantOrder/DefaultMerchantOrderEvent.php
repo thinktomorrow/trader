@@ -4,9 +4,9 @@ declare(strict_types=1);
 namespace Thinktomorrow\Trader\Infrastructure\Laravel\Models\MerchantOrder;
 
 use Thinktomorrow\Trader\Application\Common\RendersData;
-use Thinktomorrow\Trader\Application\Order\MerchantOrder\MerchantOrderLogEntry;
+use Thinktomorrow\Trader\Application\Order\MerchantOrder\MerchantOrderEvent;
 
-class DefaultMerchantOrderLogEntry implements MerchantOrderLogEntry
+class DefaultMerchantOrderEvent implements MerchantOrderEvent
 {
     use RendersData;
 
@@ -31,7 +31,7 @@ class DefaultMerchantOrderLogEntry implements MerchantOrderLogEntry
         return $entry;
     }
 
-    public function getLogEntryId(): string
+    public function getOrderEventId(): string
     {
         return $this->entry_id;
     }

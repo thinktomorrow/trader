@@ -229,7 +229,7 @@ class CreateBasicTraderTables extends Migration
             $table->integer('payment_cost')->unsigned();
             $table->timestamp('created_at')->nullable();
             $table->timestamp('updated_at')->nullable();
-            $table->timestamp('confirmed_at')->nullable();
+            $table->timestamp('confirmed_at')->nullable(); // TODO: These should be based on the events?
             $table->timestamp('paid_at')->nullable();
             $table->timestamp('delivered_at')->nullable();
             $table->json('data')->nullable();

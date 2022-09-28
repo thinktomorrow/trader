@@ -65,9 +65,9 @@ class DefaultMerchantOrder extends OrderRead implements MerchantOrder
         return $this->state->inCustomerHands();
     }
 
-    public function getLogEntries(): iterable
+    public function getOrderEvents(): iterable
     {
-        return $this->logEntries;
+        return $this->orderEvents;
     }
 
     public function getConfirmedAt(): ?\DateTime

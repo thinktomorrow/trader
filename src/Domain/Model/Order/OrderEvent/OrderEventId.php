@@ -1,11 +1,11 @@
 <?php
 declare(strict_types=1);
 
-namespace Thinktomorrow\Trader\Domain\Model\Order\Log;
+namespace Thinktomorrow\Trader\Domain\Model\Order\OrderEvent;
 
 use Thinktomorrow\Trader\Domain\Common\Entity\AggregateId;
 
-class LogEntryId
+class OrderEventId
 {
     use AggregateId;
 }

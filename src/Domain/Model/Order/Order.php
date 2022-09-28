@@ -26,8 +26,8 @@ use Thinktomorrow\Trader\Domain\Model\Order\Invoice\InvoiceReference;
 use Thinktomorrow\Trader\Domain\Model\Order\Line\HasLines;
 use Thinktomorrow\Trader\Domain\Model\Order\Line\Line;
 use Thinktomorrow\Trader\Domain\Model\Order\Line\Personalisations\LinePersonalisation;
-use Thinktomorrow\Trader\Domain\Model\Order\Log\HasLogEntries;
-use Thinktomorrow\Trader\Domain\Model\Order\Log\LogEntry;
+use Thinktomorrow\Trader\Domain\Model\Order\OrderEvent\HasOrderEvents;
+use Thinktomorrow\Trader\Domain\Model\Order\OrderEvent\OrderEvent;
 use Thinktomorrow\Trader\Domain\Model\Order\Payment\HasPayments;
 use Thinktomorrow\Trader\Domain\Model\Order\Payment\Payment;
 use Thinktomorrow\Trader\Domain\Model\Order\Payment\PaymentId;
@@ -49,7 +49,7 @@ final class Order implements Aggregate, Discountable
     use HasShippings;
     use HasPayments;
     use HasDiscounts;
-    use HasLogEntries;
+    use HasOrderEvents;
     use HasData;
 
     public readonly OrderId $orderId;
@@ -278,14 +278,14 @@ final class Order implements Aggregate, Discountable
     public function getChildEntities(): array
     {
         return [
-            Line::class => array_map(fn ($line) => $line->getMappedData(), $this->lines),
-            Discount::class => array_map(fn ($discount) => $discount->getMappedData(), $this->discounts),
-            Shipping::class => array_map(fn ($shipping) => $shipping->getMappedData(), $this->shippings),
-            Payment::class => array_map(fn ($payment) => $payment->getMappedData(), $this->payments),
+            Line::class            => array_map(fn ($line) => $line->getMappedData(), $this->lines),
+            Discount::class        => array_map(fn ($discount) => $discount->getMappedData(), $this->discounts),
+            Shipping::class        => array_map(fn ($shipping) => $shipping->getMappedData(), $this->shippings),
+            Payment::class         => array_map(fn ($payment) => $payment->getMappedData(), $this->payments),
             ShippingAddress::class => $this->shippingAddress?->getMappedData(),
-            BillingAddress::class => $this->billingAddress?->getMappedData(),
-            Shopper::class => $this->shopper?->getMappedData(),
-            LogEntry::class => array_map(fn ($logEntry) => $logEntry->getMappedData(), $this->logEntries),
+            BillingAddress::class  => $this->billingAddress?->getMappedData(),
+            Shopper::class         => $this->shopper?->getMappedData(),
+            OrderEvent::class      => array_map(fn ($orderEvent) => $orderEvent->getMappedData(), $this->orderEvents),
         ];
     }
 
@@ -310,7 +310,7 @@ final class Order implements Aggregate, Discountable
         $order->shopper = $childEntities[Shopper::class] ? Shopper::fromMappedData($childEntities[Shopper::class], $state) : null;
 
         $order->data = json_decode($state['data'], true);
-        $order->logEntries = array_map(fn ($logEntryState) => LogEntry::fromMappedData($logEntryState, $state), $childEntities[LogEntry::class]);
+        $order->orderEvents = array_map(fn ($orderEventState) => OrderEvent::fromMappedData($orderEventState, $state), $childEntities[OrderEvent::class]);
 
         return $order;
     }

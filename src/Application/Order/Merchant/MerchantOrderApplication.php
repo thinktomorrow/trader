@@ -10,7 +10,7 @@ use Thinktomorrow\Trader\Domain\Model\Order\Address\ShippingAddress;
 use Thinktomorrow\Trader\Domain\Model\Order\Events\Merchant\BillingAddressUpdatedByMerchant;
 use Thinktomorrow\Trader\Domain\Model\Order\Events\Merchant\ShippingAddressUpdatedByMerchant;
 use Thinktomorrow\Trader\Domain\Model\Order\Events\Merchant\ShopperUpdatedByMerchant;
-use Thinktomorrow\Trader\Domain\Model\Order\Log\LogEntry;
+use Thinktomorrow\Trader\Domain\Model\Order\OrderEvent\OrderEvent;
 use Thinktomorrow\Trader\Domain\Model\Order\OrderRepository;
 use Thinktomorrow\Trader\Domain\Model\Order\Shopper;
 
@@ -29,7 +29,7 @@ class MerchantOrderApplication
     {
         $order = $this->orderRepository->find($command->getOrderId());
 
-        $order->addLogEntry(LogEntry::create(
+        $order->addLogEntry(OrderEvent::create(
             $this->orderRepository->nextLogEntryReference(),
             $command->getEvent(),
             new \DateTime(),

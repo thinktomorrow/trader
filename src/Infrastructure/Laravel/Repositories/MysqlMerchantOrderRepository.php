@@ -10,7 +10,7 @@ use Thinktomorrow\Trader\Application\Order\MerchantOrder\MerchantOrderBillingAdd
 use Thinktomorrow\Trader\Application\Order\MerchantOrder\MerchantOrderDiscount;
 use Thinktomorrow\Trader\Application\Order\MerchantOrder\MerchantOrderLine;
 use Thinktomorrow\Trader\Application\Order\MerchantOrder\MerchantOrderLinePersonalisation;
-use Thinktomorrow\Trader\Application\Order\MerchantOrder\MerchantOrderLogEntry;
+use Thinktomorrow\Trader\Application\Order\MerchantOrder\MerchantOrderEvent;
 use Thinktomorrow\Trader\Application\Order\MerchantOrder\MerchantOrderPayment;
 use Thinktomorrow\Trader\Application\Order\MerchantOrder\MerchantOrderRepository;
 use Thinktomorrow\Trader\Application\Order\MerchantOrder\MerchantOrderShipping;
@@ -18,7 +18,7 @@ use Thinktomorrow\Trader\Application\Order\MerchantOrder\MerchantOrderShippingAd
 use Thinktomorrow\Trader\Application\Order\MerchantOrder\MerchantOrderShopper;
 use Thinktomorrow\Trader\Domain\Model\Order\Discount\Discount;
 use Thinktomorrow\Trader\Domain\Model\Order\Line\Personalisations\LinePersonalisation;
-use Thinktomorrow\Trader\Domain\Model\Order\Log\LogEntry;
+use Thinktomorrow\Trader\Domain\Model\Order\OrderEvent\OrderEvent;
 use Thinktomorrow\Trader\Domain\Model\Order\Order;
 use Thinktomorrow\Trader\Domain\Model\Order\OrderId;
 use Thinktomorrow\Trader\Domain\Model\Order\OrderReference;
@@ -124,21 +124,21 @@ class MysqlMerchantOrderRepository implements MerchantOrderRepository
             $orderState,
         ) : null;
 
-        $logEntries = array_map(fn (LogEntry $logEntry) => $this->container->get(MerchantOrderLogEntry::class)::fromMappedData(
-            $logEntry->getMappedData(),
+        $orderEvents = array_map(fn (OrderEvent $orderEvent) => $this->container->get(MerchantOrderEvent::class)::fromMappedData(
+            $orderEvent->getMappedData(),
             $orderState,
-        ), array_reverse($order->getLogEntries()));
+        ), array_reverse($order->getOrderEvents()));
 
         return $this->container->get(MerchantOrder::class)::fromMappedData(
             $orderState,
             [
-                MerchantOrderLine::class => $lines,
+                MerchantOrderLine::class            => $lines,
                 MerchantOrderShippingAddress::class => $shippingAddress,
-                MerchantOrderBillingAddress::class => $billingAddress,
-                MerchantOrderShipping::class => $shippings,
-                MerchantOrderPayment::class => $payments,
-                MerchantOrderShopper::class => $shopper,
-                MerchantOrderLogEntry::class => $logEntries,
+                MerchantOrderBillingAddress::class  => $billingAddress,
+                MerchantOrderShipping::class        => $shippings,
+                MerchantOrderPayment::class         => $payments,
+                MerchantOrderShopper::class         => $shopper,
+                MerchantOrderEvent::class           => $orderEvents,
             ],
             array_map(fn (Discount $discount) => $this->container->get(MerchantOrderDiscount::class)::fromMappedData(array_merge($discount->getMappedData(), [
                 'total' => $discount->getTotal(),

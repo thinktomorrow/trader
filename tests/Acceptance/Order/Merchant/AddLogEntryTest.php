@@ -38,7 +38,7 @@ class AddLogEntryTest extends CartContext
 
         $order = $this->orderRepository->find($order->orderId);
 
-        $this->assertCount(1, $order->getLogEntries());
-        $this->assertEquals('transition.confirmed', $order->getLogEntries()[0]->getEvent());
+        $this->assertCount(1, $order->getOrderEvents());
+        $this->assertEquals('transition.confirmed', $order->getOrderEvents()[0]->getEvent());
     }
 }

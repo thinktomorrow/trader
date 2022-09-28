@@ -32,7 +32,7 @@ use Thinktomorrow\Trader\Application\Order\MerchantOrder\MerchantOrderBillingAdd
 use Thinktomorrow\Trader\Application\Order\MerchantOrder\MerchantOrderDiscount;
 use Thinktomorrow\Trader\Application\Order\MerchantOrder\MerchantOrderLine;
 use Thinktomorrow\Trader\Application\Order\MerchantOrder\MerchantOrderLinePersonalisation;
-use Thinktomorrow\Trader\Application\Order\MerchantOrder\MerchantOrderLogEntry;
+use Thinktomorrow\Trader\Application\Order\MerchantOrder\MerchantOrderEvent;
 use Thinktomorrow\Trader\Application\Order\MerchantOrder\MerchantOrderPayment;
 use Thinktomorrow\Trader\Application\Order\MerchantOrder\MerchantOrderRepository;
 use Thinktomorrow\Trader\Application\Order\MerchantOrder\MerchantOrderShipping;
@@ -112,7 +112,7 @@ use Thinktomorrow\Trader\Infrastructure\Laravel\Models\MerchantOrder\DefaultMerc
 use Thinktomorrow\Trader\Infrastructure\Laravel\Models\MerchantOrder\DefaultMerchantOrderDiscount;
 use Thinktomorrow\Trader\Infrastructure\Laravel\Models\MerchantOrder\DefaultMerchantOrderLine;
 use Thinktomorrow\Trader\Infrastructure\Laravel\Models\MerchantOrder\DefaultMerchantOrderLinePersonalisation;
-use Thinktomorrow\Trader\Infrastructure\Laravel\Models\MerchantOrder\DefaultMerchantOrderLogEntry;
+use Thinktomorrow\Trader\Infrastructure\Laravel\Models\MerchantOrder\DefaultMerchantOrderEvent;
 use Thinktomorrow\Trader\Infrastructure\Laravel\Models\MerchantOrder\DefaultMerchantOrderPayment;
 use Thinktomorrow\Trader\Infrastructure\Laravel\Models\MerchantOrder\DefaultMerchantOrderShipping;
 use Thinktomorrow\Trader\Infrastructure\Laravel\Models\MerchantOrder\DefaultMerchantOrderShippingAddress;
@@ -213,7 +213,7 @@ class TraderServiceProvider extends ServiceProvider
         $this->app->bind(MerchantOrderShopper::class, fn () => DefaultMerchantOrderShopper::class);
         $this->app->bind(MerchantOrderShipping::class, fn () => DefaultMerchantOrderShipping::class);
         $this->app->bind(MerchantOrderPayment::class, fn () => DefaultMerchantOrderPayment::class);
-        $this->app->bind(MerchantOrderLogEntry::class, fn () => DefaultMerchantOrderLogEntry::class);
+        $this->app->bind(MerchantOrderEvent::class, fn () => DefaultMerchantOrderEvent::class);
 
         // Customer models
         $this->app->bind(CustomerRead::class, fn () => DefaultCustomerRead::class);

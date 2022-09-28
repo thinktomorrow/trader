@@ -13,8 +13,8 @@ use Thinktomorrow\Trader\Domain\Model\Order\Events\OrderUpdated;
 use Thinktomorrow\Trader\Domain\Model\Order\Events\ShippingAdded;
 use Thinktomorrow\Trader\Domain\Model\Order\Events\ShippingUpdated;
 use Thinktomorrow\Trader\Domain\Model\Order\Invoice\InvoiceReference;
-use Thinktomorrow\Trader\Domain\Model\Order\Log\LogEntry;
-use Thinktomorrow\Trader\Domain\Model\Order\Log\LogEntryId;
+use Thinktomorrow\Trader\Domain\Model\Order\OrderEvent\OrderEvent;
+use Thinktomorrow\Trader\Domain\Model\Order\OrderEvent\OrderEventId;
 use Thinktomorrow\Trader\Domain\Model\Order\Order;
 use Thinktomorrow\Trader\Domain\Model\Order\OrderId;
 use Thinktomorrow\Trader\Domain\Model\Order\OrderReference;
@@ -194,9 +194,9 @@ class OrderTest extends TestCase
     {
         $order = $this->createDefaultOrder();
 
-        $order->addLogEntry($logEntry = LogEntry::create(LogEntryId::fromString('abc'), 'xxx', new \DateTime(), []));
+        $order->addLogEntry($logEntry = OrderEvent::create(OrderEventId::fromString('abc'), 'xxx', new \DateTime(), []));
 
-        $this->assertCount(2, $order->getLogEntries());
-        $this->assertEquals($logEntry->getMappedData(), $order->getChildEntities()[LogEntry::class][1]);
+        $this->assertCount(2, $order->getOrderEvents());
+        $this->assertEquals($logEntry->getMappedData(), $order->getChildEntities()[OrderEvent::class][1]);
     }
 }

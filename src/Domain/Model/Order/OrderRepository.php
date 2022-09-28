@@ -7,7 +7,7 @@ use Thinktomorrow\Trader\Domain\Model\Order\Discount\DiscountId;
 use Thinktomorrow\Trader\Domain\Model\Order\Exceptions\OrderAlreadyInMerchantHands;
 use Thinktomorrow\Trader\Domain\Model\Order\Line\LineId;
 use Thinktomorrow\Trader\Domain\Model\Order\Line\Personalisations\LinePersonalisationId;
-use Thinktomorrow\Trader\Domain\Model\Order\Log\LogEntryId;
+use Thinktomorrow\Trader\Domain\Model\Order\OrderEvent\OrderEventId;
 use Thinktomorrow\Trader\Domain\Model\Order\Payment\PaymentId;
 use Thinktomorrow\Trader\Domain\Model\Order\Shipping\ShippingId;
 
@@ -45,5 +45,5 @@ interface OrderRepository
 
     public function nextLinePersonalisationReference(): LinePersonalisationId;
 
-    public function nextLogEntryReference(): LogEntryId;
+    public function nextLogEntryReference(): OrderEventId;
 }

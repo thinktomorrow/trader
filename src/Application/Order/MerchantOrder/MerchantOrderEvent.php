@@ -2,11 +2,11 @@
 
 namespace Thinktomorrow\Trader\Application\Order\MerchantOrder;
 
-interface MerchantOrderLogEntry
+interface MerchantOrderEvent
 {
     public static function fromMappedData(array $state, array $orderState): static;
 
-    public function getLogEntryId(): string;
+    public function getOrderEventId(): string;
     public function getEvent(): string;
     public function getCreatedAt(): \DateTime;
 

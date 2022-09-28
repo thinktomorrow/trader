@@ -21,8 +21,8 @@ use Thinktomorrow\Trader\Domain\Model\Order\Line\Line;
 use Thinktomorrow\Trader\Domain\Model\Order\Line\LineId;
 use Thinktomorrow\Trader\Domain\Model\Order\Line\Personalisations\LinePersonalisation;
 use Thinktomorrow\Trader\Domain\Model\Order\Line\Personalisations\LinePersonalisationId;
-use Thinktomorrow\Trader\Domain\Model\Order\Log\LogEntry;
-use Thinktomorrow\Trader\Domain\Model\Order\Log\LogEntryId;
+use Thinktomorrow\Trader\Domain\Model\Order\OrderEvent\OrderEvent;
+use Thinktomorrow\Trader\Domain\Model\Order\OrderEvent\OrderEventId;
 use Thinktomorrow\Trader\Domain\Model\Order\Order;
 use Thinktomorrow\Trader\Domain\Model\Order\OrderId;
 use Thinktomorrow\Trader\Domain\Model\Order\OrderReference;
@@ -45,7 +45,7 @@ final class MysqlOrderRepository implements OrderRepository, InvoiceRepository
     private static $orderPaymentTable = 'trader_order_payment';
     private static $orderAddressTable = 'trader_order_addresses';
     private static $orderShopperTable = 'trader_order_shoppers';
-    private static $orderLogEntriesTable = 'trader_order_events';
+    private static $orderEventsTable = 'trader_order_events';
 
     private TraderConfig $traderConfig;
 
@@ -76,7 +76,7 @@ final class MysqlOrderRepository implements OrderRepository, InvoiceRepository
         $this->upsertPayments($order);
         $this->upsertAddresses($order);
         $this->upsertShopper($order);
-        $this->upsertLogEntries($order);
+        $this->upsertEvents($order);
     }
 
     private function upsertLines(Order $order): void
@@ -224,21 +224,21 @@ final class MysqlOrderRepository implements OrderRepository, InvoiceRepository
         }
     }
 
-    private function upsertLogEntries(Order $order): void
+    private function upsertEvents(Order $order): void
     {
-        $logEntryIds = array_map(fn ($logEntry) => $logEntry->entryId->get(), $order->getLogEntries());
+        $orderEventIds = array_map(fn ($orderEvent) => $orderEvent->orderEventId->get(), $order->getOrderEvents());
 
-        DB::table(static::$orderLogEntriesTable)
+        DB::table(static::$orderEventsTable)
             ->where('order_id', $order->orderId->get())
-            ->whereNotIn('entry_id', $logEntryIds)
+            ->whereNotIn('entry_id', $orderEventIds)
             ->delete();
 
-        foreach ($order->getChildEntities()[LogEntry::class] as $logEntryState) {
-            DB::table(static::$orderLogEntriesTable)
+        foreach ($order->getChildEntities()[OrderEvent::class] as $orderEventState) {
+            DB::table(static::$orderEventsTable)
                 ->updateOrInsert([
                     'order_id' => $order->orderId->get(),
-                    'entry_id' => $logEntryState['entry_id'],
-                ], $logEntryState);
+                    'entry_id' => $orderEventState['entry_id'],
+                ], $orderEventState);
         }
     }
 
@@ -345,22 +345,22 @@ final class MysqlOrderRepository implements OrderRepository, InvoiceRepository
             ]);
         }
 
-        $logEntryStates = DB::table(static::$orderLogEntriesTable)
-            ->where(static::$orderLogEntriesTable . '.order_id', $orderId->get())
+        $orderEventStates = DB::table(static::$orderEventsTable)
+            ->where(static::$orderEventsTable . '.order_id', $orderId->get())
             ->orderBy('at', 'ASC')
             ->get()
             ->map(fn ($item) => (array)$item)
             ->toArray();
 
         $childEntities = [
-            Line::class => $lineStates,
-            Discount::class => $allDiscountStates->filter(fn ($discountState) => $discountState['discountable_type'] == DiscountableType::order->value && $discountState['discountable_id'] == $orderState->order_id)->values()->toArray(),
-            Shipping::class => $shippingStates,
-            Payment::class => $paymentStates,
-            Shopper::class => $shopperState,
+            Line::class            => $lineStates,
+            Discount::class        => $allDiscountStates->filter(fn ($discountState) => $discountState['discountable_type'] == DiscountableType::order->value && $discountState['discountable_id'] == $orderState->order_id)->values()->toArray(),
+            Shipping::class        => $shippingStates,
+            Payment::class         => $paymentStates,
+            Shopper::class         => $shopperState,
             ShippingAddress::class => $shippingAddressState ? (array)$shippingAddressState : null,
-            BillingAddress::class => $billingAddressState ? (array)$billingAddressState : null,
-            LogEntry::class => $logEntryStates,
+            BillingAddress::class  => $billingAddressState ? (array)$billingAddressState : null,
+            OrderEvent::class      => $orderEventStates,
         ];
 
         return Order::fromMappedData((array)$orderState, $childEntities);
@@ -472,8 +472,8 @@ final class MysqlOrderRepository implements OrderRepository, InvoiceRepository
         return LinePersonalisationId::fromString((string)Uuid::uuid4());
     }
 
-    public function nextLogEntryReference(): LogEntryId
+    public function nextLogEntryReference(): OrderEventId
     {
-        return LogEntryId::fromString((string)Uuid::uuid4());
+        return OrderEventId::fromString((string)Uuid::uuid4());
     }
 }

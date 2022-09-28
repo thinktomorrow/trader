@@ -10,7 +10,7 @@ use Thinktomorrow\Trader\Domain\Model\Order\Invoice\InvoiceReference;
 use Thinktomorrow\Trader\Domain\Model\Order\Invoice\InvoiceRepository;
 use Thinktomorrow\Trader\Domain\Model\Order\Line\LineId;
 use Thinktomorrow\Trader\Domain\Model\Order\Line\Personalisations\LinePersonalisationId;
-use Thinktomorrow\Trader\Domain\Model\Order\Log\LogEntryId;
+use Thinktomorrow\Trader\Domain\Model\Order\OrderEvent\OrderEventId;
 use Thinktomorrow\Trader\Domain\Model\Order\Order;
 use Thinktomorrow\Trader\Domain\Model\Order\OrderId;
 use Thinktomorrow\Trader\Domain\Model\Order\OrderReference;
@@ -135,9 +135,9 @@ final class InMemoryOrderRepository implements OrderRepository, InvoiceRepositor
         return LinePersonalisationId::fromString(''.mt_rand(1, 999));
     }
 
-    public function nextLogEntryReference(): LogEntryId
+    public function nextLogEntryReference(): OrderEventId
     {
-        return LogEntryId::fromString('entry_id_'.mt_rand(1, 999));
+        return OrderEventId::fromString('entry_id_'.mt_rand(1, 999));
     }
 
     // For testing purposes only

@@ -23,7 +23,7 @@ use Thinktomorrow\Trader\Application\Order\MerchantOrder\MerchantOrderBillingAdd
 use Thinktomorrow\Trader\Application\Order\MerchantOrder\MerchantOrderDiscount;
 use Thinktomorrow\Trader\Application\Order\MerchantOrder\MerchantOrderLine;
 use Thinktomorrow\Trader\Application\Order\MerchantOrder\MerchantOrderLinePersonalisation;
-use Thinktomorrow\Trader\Application\Order\MerchantOrder\MerchantOrderLogEntry;
+use Thinktomorrow\Trader\Application\Order\MerchantOrder\MerchantOrderEvent;
 use Thinktomorrow\Trader\Application\Order\MerchantOrder\MerchantOrderPayment;
 use Thinktomorrow\Trader\Application\Order\MerchantOrder\MerchantOrderShipping;
 use Thinktomorrow\Trader\Application\Order\MerchantOrder\MerchantOrderShippingAddress;
@@ -66,7 +66,7 @@ use Thinktomorrow\Trader\Infrastructure\Laravel\Models\MerchantOrder\DefaultMerc
 use Thinktomorrow\Trader\Infrastructure\Laravel\Models\MerchantOrder\DefaultMerchantOrderDiscount;
 use Thinktomorrow\Trader\Infrastructure\Laravel\Models\MerchantOrder\DefaultMerchantOrderLine;
 use Thinktomorrow\Trader\Infrastructure\Laravel\Models\MerchantOrder\DefaultMerchantOrderLinePersonalisation;
-use Thinktomorrow\Trader\Infrastructure\Laravel\Models\MerchantOrder\DefaultMerchantOrderLogEntry;
+use Thinktomorrow\Trader\Infrastructure\Laravel\Models\MerchantOrder\DefaultMerchantOrderEvent;
 use Thinktomorrow\Trader\Infrastructure\Laravel\Models\MerchantOrder\DefaultMerchantOrderPayment;
 use Thinktomorrow\Trader\Infrastructure\Laravel\Models\MerchantOrder\DefaultMerchantOrderShipping;
 use Thinktomorrow\Trader\Infrastructure\Laravel\Models\MerchantOrder\DefaultMerchantOrderShippingAddress;
@@ -132,7 +132,7 @@ abstract class TestCase extends \Orchestra\Testbench\TestCase
         (new TestContainer())->add(MerchantOrderPayment::class, DefaultMerchantOrderPayment::class);
         (new TestContainer())->add(MerchantOrderShopper::class, DefaultMerchantOrderShopper::class);
         (new TestContainer())->add(MerchantOrderDiscount::class, DefaultMerchantOrderDiscount::class);
-        (new TestContainer())->add(MerchantOrderLogEntry::class, DefaultMerchantOrderLogEntry::class);
+        (new TestContainer())->add(MerchantOrderEvent::class, DefaultMerchantOrderEvent::class);
 
         // Customer
         (new TestContainer())->add(CustomerRead::class, DefaultCustomerRead::class);
