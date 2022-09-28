@@ -278,14 +278,14 @@ final class Order implements Aggregate, Discountable
     public function getChildEntities(): array
     {
         return [
-            Line::class            => array_map(fn ($line) => $line->getMappedData(), $this->lines),
-            Discount::class        => array_map(fn ($discount) => $discount->getMappedData(), $this->discounts),
-            Shipping::class        => array_map(fn ($shipping) => $shipping->getMappedData(), $this->shippings),
-            Payment::class         => array_map(fn ($payment) => $payment->getMappedData(), $this->payments),
+            Line::class => array_map(fn ($line) => $line->getMappedData(), $this->lines),
+            Discount::class => array_map(fn ($discount) => $discount->getMappedData(), $this->discounts),
+            Shipping::class => array_map(fn ($shipping) => $shipping->getMappedData(), $this->shippings),
+            Payment::class => array_map(fn ($payment) => $payment->getMappedData(), $this->payments),
             ShippingAddress::class => $this->shippingAddress?->getMappedData(),
-            BillingAddress::class  => $this->billingAddress?->getMappedData(),
-            Shopper::class         => $this->shopper?->getMappedData(),
-            OrderEvent::class      => array_map(fn ($orderEvent) => $orderEvent->getMappedData(), $this->orderEvents),
+            BillingAddress::class => $this->billingAddress?->getMappedData(),
+            Shopper::class => $this->shopper?->getMappedData(),
+            OrderEvent::class => array_map(fn ($orderEvent) => $orderEvent->getMappedData(), $this->orderEvents),
         ];
     }
 

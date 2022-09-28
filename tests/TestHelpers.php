@@ -25,8 +25,8 @@ use Thinktomorrow\Trader\Domain\Model\Order\Discount\Discount;
 use Thinktomorrow\Trader\Domain\Model\Order\Discount\DiscountableType;
 use Thinktomorrow\Trader\Domain\Model\Order\Line\Line;
 use Thinktomorrow\Trader\Domain\Model\Order\Line\Personalisations\LinePersonalisation;
-use Thinktomorrow\Trader\Domain\Model\Order\OrderEvent\OrderEvent;
 use Thinktomorrow\Trader\Domain\Model\Order\Order;
+use Thinktomorrow\Trader\Domain\Model\Order\OrderEvent\OrderEvent;
 use Thinktomorrow\Trader\Domain\Model\Order\Payment\Payment;
 use Thinktomorrow\Trader\Domain\Model\Order\Payment\PaymentState;
 use Thinktomorrow\Trader\Domain\Model\Order\Shipping\Shipping;
@@ -96,18 +96,18 @@ trait TestHelpers
             'order_state' => OrderState::cart_revived->value,
             'data' => "[]",
         ], $orderValues), [
-            Line::class            => array_map(fn (Line $line) => [
+            Line::class => array_map(fn (Line $line) => [
                 ...$line->getMappedData(),
                 Discount::class => array_map(fn (Discount $discount) => $discount->getMappedData(), $line->getDiscounts()),
                 LinePersonalisation::class => array_map(fn (LinePersonalisation $linePersonalisation) => $linePersonalisation->getMappedData(), $line->getPersonalisations()),
             ], $lines),
-            Shipping::class        => array_map(fn (Shipping $shipping) => [...$shipping->getMappedData(), Discount::class => array_map(fn (Discount $discount) => $discount->getMappedData(), $shipping->getDiscounts())], $shippings),
-            Payment::class         => array_map(fn (Payment $payment) => [...$payment->getMappedData(), Discount::class => array_map(fn (Discount $discount) => $discount->getMappedData(), $payment->getDiscounts())], $payments),
+            Shipping::class => array_map(fn (Shipping $shipping) => [...$shipping->getMappedData(), Discount::class => array_map(fn (Discount $discount) => $discount->getMappedData(), $shipping->getDiscounts())], $shippings),
+            Payment::class => array_map(fn (Payment $payment) => [...$payment->getMappedData(), Discount::class => array_map(fn (Discount $discount) => $discount->getMappedData(), $payment->getDiscounts())], $payments),
             ShippingAddress::class => $shippingAddress?->getMappedData(),
-            BillingAddress::class  => $billingAddress?->getMappedData(),
-            Shopper::class         => $shopper?->getMappedData(),
-            Discount::class        => array_map(fn (Discount $discount) => $discount->getMappedData(), $discounts),
-            OrderEvent::class      => array_map(fn (OrderEvent $logEntry) => $logEntry->getMappedData(), $logEntries),
+            BillingAddress::class => $billingAddress?->getMappedData(),
+            Shopper::class => $shopper?->getMappedData(),
+            Discount::class => array_map(fn (Discount $discount) => $discount->getMappedData(), $discounts),
+            OrderEvent::class => array_map(fn (OrderEvent $logEntry) => $logEntry->getMappedData(), $logEntries),
         ]);
     }
 

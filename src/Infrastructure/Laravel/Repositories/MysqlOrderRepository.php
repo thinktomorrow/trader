@@ -21,9 +21,9 @@ use Thinktomorrow\Trader\Domain\Model\Order\Line\Line;
 use Thinktomorrow\Trader\Domain\Model\Order\Line\LineId;
 use Thinktomorrow\Trader\Domain\Model\Order\Line\Personalisations\LinePersonalisation;
 use Thinktomorrow\Trader\Domain\Model\Order\Line\Personalisations\LinePersonalisationId;
+use Thinktomorrow\Trader\Domain\Model\Order\Order;
 use Thinktomorrow\Trader\Domain\Model\Order\OrderEvent\OrderEvent;
 use Thinktomorrow\Trader\Domain\Model\Order\OrderEvent\OrderEventId;
-use Thinktomorrow\Trader\Domain\Model\Order\Order;
 use Thinktomorrow\Trader\Domain\Model\Order\OrderId;
 use Thinktomorrow\Trader\Domain\Model\Order\OrderReference;
 use Thinktomorrow\Trader\Domain\Model\Order\OrderRepository;
@@ -353,14 +353,14 @@ final class MysqlOrderRepository implements OrderRepository, InvoiceRepository
             ->toArray();
 
         $childEntities = [
-            Line::class            => $lineStates,
-            Discount::class        => $allDiscountStates->filter(fn ($discountState) => $discountState['discountable_type'] == DiscountableType::order->value && $discountState['discountable_id'] == $orderState->order_id)->values()->toArray(),
-            Shipping::class        => $shippingStates,
-            Payment::class         => $paymentStates,
-            Shopper::class         => $shopperState,
+            Line::class => $lineStates,
+            Discount::class => $allDiscountStates->filter(fn ($discountState) => $discountState['discountable_type'] == DiscountableType::order->value && $discountState['discountable_id'] == $orderState->order_id)->values()->toArray(),
+            Shipping::class => $shippingStates,
+            Payment::class => $paymentStates,
+            Shopper::class => $shopperState,
             ShippingAddress::class => $shippingAddressState ? (array)$shippingAddressState : null,
-            BillingAddress::class  => $billingAddressState ? (array)$billingAddressState : null,
-            OrderEvent::class      => $orderEventStates,
+            BillingAddress::class => $billingAddressState ? (array)$billingAddressState : null,
+            OrderEvent::class => $orderEventStates,
         ];
 
         return Order::fromMappedData((array)$orderState, $childEntities);

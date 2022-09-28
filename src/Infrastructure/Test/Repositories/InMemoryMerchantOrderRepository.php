@@ -5,8 +5,8 @@ namespace Thinktomorrow\Trader\Infrastructure\Test\Repositories;
 
 use Thinktomorrow\Trader\Application\Order\MerchantOrder\MerchantOrder;
 use Thinktomorrow\Trader\Application\Order\MerchantOrder\MerchantOrderBillingAddress;
-use Thinktomorrow\Trader\Application\Order\MerchantOrder\MerchantOrderLine;
 use Thinktomorrow\Trader\Application\Order\MerchantOrder\MerchantOrderEvent;
+use Thinktomorrow\Trader\Application\Order\MerchantOrder\MerchantOrderLine;
 use Thinktomorrow\Trader\Application\Order\MerchantOrder\MerchantOrderPayment;
 use Thinktomorrow\Trader\Application\Order\MerchantOrder\MerchantOrderRepository;
 use Thinktomorrow\Trader\Application\Order\MerchantOrder\MerchantOrderShipping;
@@ -21,9 +21,9 @@ use Thinktomorrow\Trader\Domain\Model\Order\OrderReference;
 use Thinktomorrow\Trader\Infrastructure\Laravel\Models\MerchantOrder\DefaultMerchantOrder;
 use Thinktomorrow\Trader\Infrastructure\Laravel\Models\MerchantOrder\DefaultMerchantOrderBillingAddress;
 use Thinktomorrow\Trader\Infrastructure\Laravel\Models\MerchantOrder\DefaultMerchantOrderDiscount;
+use Thinktomorrow\Trader\Infrastructure\Laravel\Models\MerchantOrder\DefaultMerchantOrderEvent;
 use Thinktomorrow\Trader\Infrastructure\Laravel\Models\MerchantOrder\DefaultMerchantOrderLine;
 use Thinktomorrow\Trader\Infrastructure\Laravel\Models\MerchantOrder\DefaultMerchantOrderLinePersonalisation;
-use Thinktomorrow\Trader\Infrastructure\Laravel\Models\MerchantOrder\DefaultMerchantOrderEvent;
 use Thinktomorrow\Trader\Infrastructure\Laravel\Models\MerchantOrder\DefaultMerchantOrderPayment;
 use Thinktomorrow\Trader\Infrastructure\Laravel\Models\MerchantOrder\DefaultMerchantOrderShipping;
 use Thinktomorrow\Trader\Infrastructure\Laravel\Models\MerchantOrder\DefaultMerchantOrderShippingAddress;
@@ -110,13 +110,13 @@ class InMemoryMerchantOrderRepository implements MerchantOrderRepository
         return DefaultMerchantOrder::fromMappedData(
             $orderState,
             [
-                MerchantOrderLine::class            => $lines,
+                MerchantOrderLine::class => $lines,
                 MerchantOrderShippingAddress::class => $shippingAddress,
-                MerchantOrderBillingAddress::class  => $billingAddress,
-                MerchantOrderShipping::class        => $shippings,
-                MerchantOrderPayment::class         => $payments,
-                MerchantOrderShopper::class         => $shopper,
-                MerchantOrderEvent::class           => $logEntries,
+                MerchantOrderBillingAddress::class => $billingAddress,
+                MerchantOrderShipping::class => $shippings,
+                MerchantOrderPayment::class => $payments,
+                MerchantOrderShopper::class => $shopper,
+                MerchantOrderEvent::class => $logEntries,
             ],
             array_map(fn (Discount $discount) => DefaultMerchantOrderDiscount::fromMappedData(array_merge($discount->getMappedData(), [
                 'total' => $discount->getTotal(),
