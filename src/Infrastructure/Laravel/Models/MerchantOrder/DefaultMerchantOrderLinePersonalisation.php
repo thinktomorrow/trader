@@ -6,6 +6,6 @@ namespace Thinktomorrow\Trader\Infrastructure\Laravel\Models\MerchantOrder;
 use Thinktomorrow\Trader\Application\Order\MerchantOrder\MerchantOrderLinePersonalisation;
 use Thinktomorrow\Trader\Infrastructure\Laravel\Models\OrderRead\OrderReadLinePersonalisation;
 
-final class DefaultMerchantOrderLinePersonalisation extends OrderReadLinePersonalisation implements MerchantOrderLinePersonalisation
+class DefaultMerchantOrderLinePersonalisation extends OrderReadLinePersonalisation implements MerchantOrderLinePersonalisation
 {
 }
