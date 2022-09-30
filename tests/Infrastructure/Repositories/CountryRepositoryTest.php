@@ -6,6 +6,7 @@ namespace Tests\Infrastructure\Repositories;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\Infrastructure\TestCase;
 use Thinktomorrow\Trader\Domain\Model\Country\Country;
+use Thinktomorrow\Trader\Domain\Model\Country\CountryId;
 use Thinktomorrow\Trader\Domain\Model\Country\Exceptions\CouldNotFindCountry;
 use Thinktomorrow\Trader\Infrastructure\Laravel\Repositories\MysqlCountryRepository;
 use Thinktomorrow\Trader\Infrastructure\Test\Repositories\InMemoryCountryRepository;
@@ -63,6 +64,20 @@ class CountryRepositoryTest extends TestCase
                 \Thinktomorrow\Trader\Application\Country\Country::fromMappedData($country->getMappedData()),
                 \Thinktomorrow\Trader\Application\Country\Country::fromMappedData($country2->getMappedData()),
             ], $repository->getAvailableBillingCountries());
+        }
+    }
+
+    /** @test */
+    public function it_can_find_billing_country()
+    {
+        foreach ($this->repositories() as $i => $repository) {
+            $country = $this->createCountry(['country_id' => 'BE']);
+            $repository->save($country);
+
+            $this->assertEquals(
+                \Thinktomorrow\Trader\Application\Country\Country::fromMappedData($country->getMappedData()),
+                $repository->findBillingCountry(CountryId::fromString('BE'))
+            );
         }
     }
 

@@ -45,4 +45,13 @@ class InMemoryCountryRepository implements CountryRepository, BillingCountryRepo
     {
         return array_values(array_map(fn ($country) => \Thinktomorrow\Trader\Application\Country\Country::fromMappedData($country->getMappedData()), static::$countries));
     }
+
+    public function findBillingCountry(CountryId $countryId): \Thinktomorrow\Trader\Application\Country\Country
+    {
+        foreach(static::$countries as $country) {
+            if($country->countryId->equals($countryId)) {
+                return \Thinktomorrow\Trader\Application\Country\Country::fromMappedData($country->getMappedData());
+            }
+        }
+    }
 }

@@ -59,4 +59,13 @@ class MysqlCountryRepository implements CountryRepository, BillingCountryReposit
 
         return array_map(fn ($countryState) => \Thinktomorrow\Trader\Application\Country\Country::fromMappedData($countryState), $countryStates);
     }
+
+    public function findBillingCountry(CountryId $countryId): \Thinktomorrow\Trader\Application\Country\Country
+    {
+        $countryState = DB::table(static::$countryTable)
+            ->where('country_id', $countryId->get())
+            ->first();
+
+        return \Thinktomorrow\Trader\Application\Country\Country::fromMappedData((array) $countryState);
+    }
 }
