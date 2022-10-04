@@ -88,17 +88,7 @@ class MysqlCustomerRepository implements CustomerRepository, CustomerReadReposit
             throw new CouldNotFindCustomer('No customer found by id [' . $customerId->get() . ']');
         }
 
-        $addressStates = DB::table(static::$customerAddressTable)
-            ->where(static::$customerAddressTable . '.customer_id', $customerId->get())
-            ->get();
-
-        $shippingAddressState = $addressStates->first(fn ($address) => $address->type == AddressType::shipping->value);
-        $billingAddressState = $addressStates->first(fn ($address) => $address->type == AddressType::billing->value);
-
-        return Customer::fromMappedData((array) $customerState, [
-            ShippingAddress::class => $shippingAddressState ? (array)$shippingAddressState : null,
-            BillingAddress::class => $billingAddressState ? (array)$billingAddressState : null,
-        ]);
+        return $this->composeCustomer($customerId->get(), $customerState);
     }
 
     public function findByEmail(Email $email): Customer
@@ -111,7 +101,22 @@ class MysqlCustomerRepository implements CustomerRepository, CustomerReadReposit
             throw new CouldNotFindCustomer('No customer found by email [' . $email->get() . ']');
         }
 
-        return Customer::fromMappedData((array) $customerState, []);
+        return $this->composeCustomer($customerState->customer_id, $customerState);
+    }
+
+    private function composeCustomer(string $customerId, object $customerState)
+    {
+        $addressStates = DB::table(static::$customerAddressTable)
+            ->where(static::$customerAddressTable . '.customer_id', $customerId)
+            ->get();
+
+        $shippingAddressState = $addressStates->first(fn ($address) => $address->type == AddressType::shipping->value);
+        $billingAddressState = $addressStates->first(fn ($address) => $address->type == AddressType::billing->value);
+
+        return Customer::fromMappedData((array) $customerState, [
+            ShippingAddress::class => $shippingAddressState ? (array)$shippingAddressState : null,
+            BillingAddress::class => $billingAddressState ? (array)$billingAddressState : null,
+        ]);
     }
 
     public function existsByEmail(Email $email, ?CustomerId $ignoredCustomerId = null): bool

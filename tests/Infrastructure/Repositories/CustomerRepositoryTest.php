@@ -41,6 +41,20 @@ final class CustomerRepositoryTest extends TestCase
      * @test
      * @dataProvider customers
      */
+    public function it_can_save_and_find_a_customer_by_email(Customer $customer)
+    {
+        foreach ($this->repositories() as $repository) {
+            $repository->save($customer);
+            $customer->releaseEvents();
+
+            $this->assertEquals($customer, $repository->findByEmail($customer->getEmail()));
+        }
+    }
+
+    /**
+     * @test
+     * @dataProvider customers
+     */
     public function it_can_delete_a_customer(Customer $customer)
     {
         $customersNotFound = 0;
@@ -91,32 +105,32 @@ final class CustomerRepositoryTest extends TestCase
         yield [$this->createdCustomer()];
 
         yield [Customer::create(
-            CustomerId::fromString('xxx'),
-            Email::fromString('ben@thinktomorrow.be'),
+            CustomerId::fromString('xxx-1'),
+            Email::fromString('ben+1@thinktomorrow.be'),
             false,
             Locale::fromString('nl-be')
         )];
 
         yield [Customer::create(
-            CustomerId::fromString('xxx'),
-            Email::fromString('ben@thinktomorrow.be'),
+            CustomerId::fromString('xxx-2'),
+            Email::fromString('ben+2@thinktomorrow.be'),
             true,
             Locale::fromString('nl_BE')
         )];
 
         $customerWithAddress = Customer::create(
-            CustomerId::fromString('xxx'),
-            Email::fromString('ben@thinktomorrow.be'),
+            CustomerId::fromString('xxx-3'),
+            Email::fromString('ben+3@thinktomorrow.be'),
             true,
             Locale::fromString('nl_BE')
         );
 
         $customerWithAddress->updateBillingAddress(
-            BillingAddress::create(CustomerId::fromString('xxx'), new Address(CountryId::fromString('BE'), 'street 123', 'bus 456', '2200', 'Herentals'), [])
+            BillingAddress::create(CustomerId::fromString('xxx-3'), new Address(CountryId::fromString('BE'), 'street 123', 'bus 456', '2200', 'Herentals'), [])
         );
 
         $customerWithAddress->updateShippingAddress(
-            ShippingAddress::create(CustomerId::fromString('xxx'), new Address(CountryId::fromString('BE'), 'street 123', 'bus 456', '2200', 'Herentals'), [])
+            ShippingAddress::create(CustomerId::fromString('xxx-3'), new Address(CountryId::fromString('BE'), 'street 123', 'bus 456', '2200', 'Herentals'), [])
         );
 
         yield [$customerWithAddress];
