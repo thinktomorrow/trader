@@ -350,7 +350,6 @@ class MysqlOrderRepository implements OrderRepository, InvoiceRepository
             ->first();
 
         if (! is_null($shopperState)) {
-
             $shopperState = $this->prepareShopperStateForModel((array)$shopperState);
 
             $shopperState = array_merge($shopperState, [
