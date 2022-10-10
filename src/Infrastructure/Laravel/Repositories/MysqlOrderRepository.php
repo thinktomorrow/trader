@@ -35,7 +35,7 @@ use Thinktomorrow\Trader\Domain\Model\Order\Shopper;
 use Thinktomorrow\Trader\Domain\Model\Order\ShopperId;
 use Thinktomorrow\Trader\TraderConfig;
 
-final class MysqlOrderRepository implements OrderRepository, InvoiceRepository
+class MysqlOrderRepository implements OrderRepository, InvoiceRepository
 {
     private static $orderTable = 'trader_orders';
     private static $orderLinesTable = 'trader_order_lines';
@@ -252,11 +252,23 @@ final class MysqlOrderRepository implements OrderRepository, InvoiceRepository
             return;
         }
 
+        $shopperState = $this->prepareShopperStateForStorage($shopperState);
+
         DB::table(static::$orderShopperTable)
             ->updateOrInsert([
                 'order_id' => $order->orderId->get(),
                 'shopper_id' => $shopperState['shopper_id'],
             ], $shopperState);
+    }
+
+    protected function prepareShopperStateForStorage(array $shopperState): array
+    {
+        return $shopperState;
+    }
+
+    protected function prepareShopperStateForModel(array $shopperState): array
+    {
+        return $shopperState;
     }
 
     private function exists(OrderId $orderId): bool
@@ -338,7 +350,9 @@ final class MysqlOrderRepository implements OrderRepository, InvoiceRepository
             ->first();
 
         if (! is_null($shopperState)) {
-            $shopperState = (array)$shopperState;
+
+            $shopperState = $this->prepareShopperStateForModel((array)$shopperState);
+
             $shopperState = array_merge($shopperState, [
                 'register_after_checkout' => (bool)$shopperState['register_after_checkout'],
                 'is_business' => (bool)$shopperState['is_business'],
