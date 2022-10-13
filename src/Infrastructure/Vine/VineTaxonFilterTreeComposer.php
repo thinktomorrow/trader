@@ -70,7 +70,7 @@ class VineTaxonFilterTreeComposer implements TaxonFilterTreeComposer
 
                 // Remove any parents where the child taxon is present in the payload.
                 // We want to filter on the more specific child taxon - and not in combination with its parent.
-                ->remove(function(TaxonNode $node) use($activeKeys) {
+                ->remove(function (TaxonNode $node) use ($activeKeys) {
                     return count(array_intersect($activeKeys, $node->pluckChildNodes('getKey'))) > 0;
                 });
 
