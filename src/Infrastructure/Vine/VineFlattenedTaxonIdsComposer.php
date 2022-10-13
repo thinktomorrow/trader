@@ -49,7 +49,7 @@ class VineFlattenedTaxonIdsComposer implements FlattenedTaxonIdsComposer
                 $taxonIds[$rootId] = [];
             }
 
-            $taxonIds[$rootId] = array_merge($taxonIds[$rootId], $node->pluckChildNodes('id'));
+            $taxonIds[$rootId] = array_merge($taxonIds[$rootId], $node->pluckChildNodes('id', null, true));
         }
 
         foreach ($taxonIds as $rootId => $ids) {
