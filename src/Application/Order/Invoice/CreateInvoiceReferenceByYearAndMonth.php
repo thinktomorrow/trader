@@ -6,7 +6,7 @@ namespace Thinktomorrow\Trader\Application\Order\Invoice;
 use Thinktomorrow\Trader\Domain\Model\Order\Invoice\InvoiceReference;
 use Thinktomorrow\Trader\Domain\Model\Order\Invoice\InvoiceRepository;
 
-class CreateInvoiceReference
+class CreateInvoiceReferenceByYearAndMonth
 {
     private InvoiceRepository $invoiceRepository;
 
@@ -23,7 +23,7 @@ class CreateInvoiceReference
             return InvoiceReference::fromString(date('ym'). str_pad((string) 1, 4, "0", STR_PAD_LEFT));
         }
 
-        $parsed = ParsedInvoiceReference::fromInvoiceReference($lastInvoiceReference);
+        $parsed = ParsedInvoiceReferenceByYearAndMonth::fromInvoiceReference($lastInvoiceReference);
 
         if ($parsed->year != date('y') || $parsed->month != date('m')) {
             return InvoiceReference::fromString(date('ym'). str_pad((string) 1, 4, "0", STR_PAD_LEFT));

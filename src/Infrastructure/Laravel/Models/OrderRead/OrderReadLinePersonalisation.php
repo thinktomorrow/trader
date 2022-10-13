@@ -39,6 +39,11 @@ abstract class OrderReadLinePersonalisation
         return $this->line_id;
     }
 
+    public function getLinePersonalisationId(): string
+    {
+        return $this->line_personalisation_id;
+    }
+
     public function getLabel(): string
     {
         return $this->data('label', null, '');

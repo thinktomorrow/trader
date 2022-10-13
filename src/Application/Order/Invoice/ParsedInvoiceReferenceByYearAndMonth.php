@@ -5,17 +5,10 @@ namespace Thinktomorrow\Trader\Application\Order\Invoice;
 
 use Thinktomorrow\Trader\Domain\Model\Order\Invoice\InvoiceReference;
 
-class ParsedInvoiceReference
+class ParsedInvoiceReferenceByYearAndMonth
 {
-    public readonly string $year;
-    public readonly string $month;
-    public readonly string $number;
-
-    public function __construct(string $year, string $month, string $number)
+    public function __construct(public readonly string $year, public readonly string $month, public readonly string $number)
     {
-        $this->year = $year;
-        $this->month = $month;
-        $this->number = $number;
     }
 
     public static function fromInvoiceReference(InvoiceReference $invoiceReference): static
@@ -29,6 +22,6 @@ class ParsedInvoiceReference
 
     public function getNumberAsInt(): int
     {
-        return (int) $this->number;
+        return (int)$this->number;
     }
 }

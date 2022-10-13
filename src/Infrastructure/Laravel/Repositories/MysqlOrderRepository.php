@@ -6,7 +6,7 @@ namespace Thinktomorrow\Trader\Infrastructure\Laravel\Repositories;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 use Ramsey\Uuid\Uuid;
-use Thinktomorrow\Trader\Application\Order\Invoice\CreateInvoiceReference;
+use Thinktomorrow\Trader\Application\Order\Invoice\CreateInvoiceReferenceByYearAndMonth;
 use Thinktomorrow\Trader\Domain\Common\Address\AddressType;
 use Thinktomorrow\Trader\Domain\Model\Order\Address\BillingAddress;
 use Thinktomorrow\Trader\Domain\Model\Order\Address\ShippingAddress;
@@ -47,7 +47,7 @@ class MysqlOrderRepository implements OrderRepository, InvoiceRepository
     private static $orderShopperTable = 'trader_order_shoppers';
     private static $orderEventsTable = 'trader_order_events';
 
-    private TraderConfig $traderConfig;
+    protected TraderConfig $traderConfig;
 
     public function __construct(TraderConfig $traderConfig)
     {
@@ -281,7 +281,7 @@ class MysqlOrderRepository implements OrderRepository, InvoiceRepository
         return DB::table(static::$orderTable)->where('order_ref', $orderReference->get())->exists();
     }
 
-    private function existsInvoiceReference(InvoiceReference $invoiceReference): bool
+    protected function existsInvoiceReference(InvoiceReference $invoiceReference): bool
     {
         return DB::table(static::$orderTable)->where('invoice_ref', $invoiceReference->get())->exists();
     }
@@ -431,7 +431,7 @@ class MysqlOrderRepository implements OrderRepository, InvoiceRepository
 
     public function nextInvoiceReference(): InvoiceReference
     {
-        $createInvoiceReference = new CreateInvoiceReference($this);
+        $createInvoiceReference = new CreateInvoiceReferenceByYearAndMonth($this);
 
         $invoiceReference = null;
         $append = '';
