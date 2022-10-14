@@ -10,7 +10,7 @@ use Thinktomorrow\Trader\Domain\Common\Cash\PreciseMoney;
 class TaxRateTotal
 {
     // Amount of decimals we will use to calculate the tax. This will ensure a better accuracy.
-    CONST TAX_CALCULATION_PRECISION = 4;
+    const TAX_CALCULATION_PRECISION = 4;
 
     private TaxRate $taxRate;
 

@@ -4,7 +4,6 @@ declare(strict_types=1);
 namespace Tests\Unit\Common\Cash;
 
 use Money\Money;
-use Money\Currency;
 use Tests\Unit\TestCase;
 use Thinktomorrow\Trader\Domain\Common\Cash\PreciseMoney;
 
@@ -54,7 +53,7 @@ class PreciseMoneyTest extends TestCase
         $this->assertEquals(Money::EUR(5000100), $preciseMoney->getPreciseMoney());
         $this->assertEquals(Money::EUR(500), $preciseMoney->getMoney());
 
-        $preciseMoney = PreciseMoney::calculateFromFloat(500.57,4, 'USD');
+        $preciseMoney = PreciseMoney::calculateFromFloat(500.57, 4, 'USD');
 
         $this->assertEquals(Money::USD(5005700), $preciseMoney->getPreciseMoney());
         $this->assertEquals(Money::USD(501), $preciseMoney->getMoney());
