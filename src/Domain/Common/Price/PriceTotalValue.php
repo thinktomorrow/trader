@@ -81,6 +81,9 @@ trait PriceTotalValue
             ? $otherPrice->getIncludingVat()
             : $otherPrice->getExcludingVat();
 
+        
+        // Better precision here????
+dd($otherPrice->getIncludingVat(), $otherPrice->getExcludingVat(), $otherPrice->getIncludingVat()->getAmount() / 1.21, $otherPrice->getTaxRate());
         $taxRateTotals = $this->taxRateTotals->addTaxableTotal($otherPrice->getTaxRate(), $otherPrice->getExcludingVat());
 
         return new static($this->money->add($otherMoney), $taxRateTotals, $this->includesVat);

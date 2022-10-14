@@ -26,6 +26,22 @@ class PriceTotalTest extends TestCase
     }
 
     /** @test */
+    public function it_can_make_price_total_including_tax()
+    {
+        $object = PriceTotalStub::zero();
+        $object = $object->add(PriceStub::fromMoney(
+            Money::EUR(32200),
+            TaxRate::fromString('21'),
+            true
+        ));
+dd($object->getTaxRateTotals());
+        $this->assertEquals(Money::EUR(32200), $object->getIncludingVat());
+        $this->assertEquals(Money::EUR(26611), $object->getExcludingVat());
+        $this->assertEquals(Money::EUR(26611), $object->getTaxRateTotals()->getTaxableTotal());
+        $this->assertEquals(Money::EUR(32200 - 26611), $object->getTaxRateTotals()->getTaxTotal());
+    }
+
+    /** @test */
     public function it_can_make_total_of_multiple_prices()
     {
         $object = PriceTotalStub::zero();
