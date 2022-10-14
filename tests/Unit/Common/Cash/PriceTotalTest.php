@@ -5,6 +5,7 @@ namespace Tests\Unit\Common\Cash;
 
 use Money\Money;
 use PHPUnit\Framework\TestCase;
+use Thinktomorrow\Trader\Domain\Common\Taxes\TaxableTotal;
 use Thinktomorrow\Trader\Domain\Common\Price\PriceCannotBeNegative;
 use Thinktomorrow\Trader\Domain\Common\Taxes\TaxRate;
 
@@ -34,11 +35,11 @@ class PriceTotalTest extends TestCase
             TaxRate::fromString('21'),
             true
         ));
-dd($object->getTaxRateTotals());
+
         $this->assertEquals(Money::EUR(32200), $object->getIncludingVat());
-        $this->assertEquals(Money::EUR(26611), $object->getExcludingVat());
-        $this->assertEquals(Money::EUR(26611), $object->getTaxRateTotals()->getTaxableTotal());
-        $this->assertEquals(Money::EUR(32200 - 26611), $object->getTaxRateTotals()->getTaxTotal());
+        $this->assertEquals(Money::EUR(26612), $object->getExcludingVat());
+        $this->assertEquals(Money::EUR(26612), $object->getTaxRateTotals()->getTaxableTotal());
+        $this->assertEquals(Money::EUR(32200 - 26612), $object->getTaxRateTotals()->getTaxTotal());
     }
 
     /** @test */
@@ -53,9 +54,10 @@ dd($object->getTaxRateTotals());
         $this->assertEquals(Money::EUR(300), $object->getExcludingVat());
         $this->assertEquals(Money::EUR(46), $object->getTaxRateTotals()->getTaxTotal());
 
-        $this->assertEquals(Money::EUR(200), $object->getTaxRateTotals()->find(TaxRate::fromString('20'))->getTaxableTotal());
+        $this->assertEquals(TaxableTotal::calculateFromMoney(Money::EUR(200)), $object->getTaxRateTotals()->find(TaxRate::fromString('20'))->getTaxableTotal());
         $this->assertEquals(Money::EUR(40), $object->getTaxRateTotals()->find(TaxRate::fromString('20'))->getTaxTotal());
-        $this->assertEquals(Money::EUR(100), $object->getTaxRateTotals()->find(TaxRate::fromString('6'))->getTaxableTotal());
+        $this->assertEquals(TaxableTotal::calculateFromMoney(Money::EUR(100)), $object->getTaxRateTotals()->find(TaxRate::fromString('6'))->getTaxableTotal());
+        $this->assertEquals(Money::EUR(100), $object->getTaxRateTotals()->find(TaxRate::fromString('6'))->getTaxableTotal()->getMoney());
         $this->assertEquals(Money::EUR(6), $object->getTaxRateTotals()->find(TaxRate::fromString('6'))->getTaxTotal());
     }
 

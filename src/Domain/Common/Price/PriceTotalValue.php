@@ -5,6 +5,7 @@ namespace Thinktomorrow\Trader\Domain\Common\Price;
 
 use Money\Money;
 use Thinktomorrow\Trader\Domain\Common\Cash\Cash;
+use Thinktomorrow\Trader\Domain\Common\Taxes\TaxableTotal;
 use Thinktomorrow\Trader\Domain\Common\Taxes\TaxRateTotals;
 
 trait PriceTotalValue
@@ -81,10 +82,7 @@ trait PriceTotalValue
             ? $otherPrice->getIncludingVat()
             : $otherPrice->getExcludingVat();
 
-        
-        // Better precision here????
-dd($otherPrice->getIncludingVat(), $otherPrice->getExcludingVat(), $otherPrice->getIncludingVat()->getAmount() / 1.21, $otherPrice->getTaxRate());
-        $taxRateTotals = $this->taxRateTotals->addTaxableTotal($otherPrice->getTaxRate(), $otherPrice->getExcludingVat());
+        $taxRateTotals = $this->taxRateTotals->addTaxableTotal($otherPrice->getTaxRate(), $this->getTaxableTotal($otherPrice));
 
         return new static($this->money->add($otherMoney), $taxRateTotals, $this->includesVat);
     }
@@ -95,8 +93,20 @@ dd($otherPrice->getIncludingVat(), $otherPrice->getExcludingVat(), $otherPrice->
             ? $otherPrice->getIncludingVat()
             : $otherPrice->getExcludingVat();
 
-        $taxRateTotals = $this->taxRateTotals->subtractTaxableTotal($otherPrice->getTaxRate(), $otherPrice->getExcludingVat());
+        $taxRateTotals = $this->taxRateTotals->subtractTaxableTotal($otherPrice->getTaxRate(), $this->getTaxableTotal($otherPrice));
 
         return new static($this->money->subtract($otherMoney), $taxRateTotals, $this->includesVat);
+    }
+
+    /**
+     * Better precision for tax calculations since percentage divisions and multiplication is in effect
+     * @param Price $otherPrice
+     * @return TaxableTotal
+     */
+    protected function getTaxableTotal(Price $otherPrice): TaxableTotal
+    {
+        $exclusiveAmountAsFloat = $otherPrice->getIncludingVat()->getAmount() / ((float)$otherPrice->getTaxRate()->toPercentage()->toDecimal() + 1);
+
+        return TaxableTotal::calculateFromFloat($exclusiveAmountAsFloat);
     }
 }

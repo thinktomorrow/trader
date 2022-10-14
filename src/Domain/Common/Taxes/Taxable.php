@@ -10,5 +10,5 @@ interface Taxable
 {
     public function getTaxRate(): TaxRate;
 
-    public function getTaxableTotal(): Money;
+    public function getTaxableTotal(): TaxableTotal;
 }

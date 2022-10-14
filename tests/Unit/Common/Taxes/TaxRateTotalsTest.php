@@ -6,6 +6,7 @@ use Money\Money;
 use PHPUnit\Framework\TestCase;
 use Thinktomorrow\Trader\Domain\Common\Taxes\Taxable;
 use Thinktomorrow\Trader\Domain\Common\Taxes\TaxRate;
+use Thinktomorrow\Trader\Domain\Common\Taxes\TaxableTotal;
 use Thinktomorrow\Trader\Domain\Common\Taxes\TaxRateTotals;
 
 class TaxRateTotalsTest extends TestCase
@@ -15,17 +16,17 @@ class TaxRateTotalsTest extends TestCase
     {
         $sum = TaxRateTotals::zero();
 
-        $sum = $sum->addTaxableTotal(TaxRate::fromString('6'), Money::EUR(100));
-        $sum = $sum->addTaxableTotal(TaxRate::fromString('6'), Money::EUR(100));
-        $sum = $sum->addTaxableTotal(TaxRate::fromString('20'), Money::EUR(100));
+        $sum = $sum->addTaxableTotal(TaxRate::fromString('6'), TaxableTotal::calculateFromMoney(Money::EUR(100)));
+        $sum = $sum->addTaxableTotal(TaxRate::fromString('6'), TaxableTotal::calculateFromMoney(Money::EUR(100)));
+        $sum = $sum->addTaxableTotal(TaxRate::fromString('20'), TaxableTotal::calculateFromMoney(Money::EUR(100)));
 
         $this->assertCount(2, $sum->get());
         $this->assertEquals(Money::EUR(300), $sum->getTaxableTotal());
         $this->assertEquals(Money::EUR(32), $sum->getTaxTotal());
         $this->assertEquals(TaxRate::fromString('6'), $sum->find(TaxRate::fromString('6'))->getTaxRate());
         $this->assertEquals(TaxRate::fromString('20'), $sum->find(TaxRate::fromString('20'))->getTaxRate());
-        $this->assertEquals(Money::EUR(200), $sum->find(TaxRate::fromString('6'))->getTaxableTotal());
-        $this->assertEquals(Money::EUR(100), $sum->find(TaxRate::fromString('20'))->getTaxableTotal());
+        $this->assertEquals(TaxableTotal::calculateFromMoney(Money::EUR(200)), $sum->find(TaxRate::fromString('6'))->getTaxableTotal());
+        $this->assertEquals(TaxableTotal::calculateFromMoney(Money::EUR(100)), $sum->find(TaxRate::fromString('20'))->getTaxableTotal());
     }
 
     /** @test */
@@ -33,19 +34,19 @@ class TaxRateTotalsTest extends TestCase
     {
         $sum = TaxRateTotals::zero();
 
-        $sum = $sum->addTaxableTotal(TaxRate::fromString('6'), Money::EUR(100));
-        $sum = $sum->addTaxableTotal(TaxRate::fromString('6'), Money::EUR(100));
-        $sum = $sum->addTaxableTotal(TaxRate::fromString('20'), Money::EUR(100));
+        $sum = $sum->addTaxableTotal(TaxRate::fromString('6'), TaxableTotal::calculateFromMoney(Money::EUR(100)));
+        $sum = $sum->addTaxableTotal(TaxRate::fromString('6'), TaxableTotal::calculateFromMoney(Money::EUR(100)));
+        $sum = $sum->addTaxableTotal(TaxRate::fromString('20'), TaxableTotal::calculateFromMoney(Money::EUR(100)));
 
-        $this->assertEquals(Money::EUR(100), $sum->find(TaxRate::fromString('20'))->getTaxableTotal());
+        $this->assertEquals(TaxableTotal::calculateFromMoney(Money::EUR(100)), $sum->find(TaxRate::fromString('20'))->getTaxableTotal());
         $this->assertEquals(Money::EUR(300), $sum->getTaxableTotal());
 
-        $sum = $sum->subtractTaxableTotal(TaxRate::fromString('20'), Money::EUR(60));
-        $this->assertEquals(Money::EUR(40), $sum->find(TaxRate::fromString('20'))->getTaxableTotal());
+        $sum = $sum->subtractTaxableTotal(TaxRate::fromString('20'), TaxableTotal::calculateFromMoney(Money::EUR(60)));
+        $this->assertEquals(TaxableTotal::calculateFromMoney(Money::EUR(40)), $sum->find(TaxRate::fromString('20'))->getTaxableTotal());
         $this->assertEquals(Money::EUR(240), $sum->getTaxableTotal());
 
-        $sum = $sum->subtractTaxableTotal(TaxRate::fromString('6'), Money::EUR(60));
-        $this->assertEquals(Money::EUR(140), $sum->find(TaxRate::fromString('6'))->getTaxableTotal());
+        $sum = $sum->subtractTaxableTotal(TaxRate::fromString('6'), TaxableTotal::calculateFromMoney(Money::EUR(60)));
+        $this->assertEquals(TaxableTotal::calculateFromMoney(Money::EUR(140)), $sum->find(TaxRate::fromString('6'))->getTaxableTotal());
         $this->assertEquals(Money::EUR(180), $sum->getTaxableTotal());
     }
 
@@ -54,9 +55,9 @@ class TaxRateTotalsTest extends TestCase
     {
         $sum = TaxRateTotals::zero();
 
-        $sum = $sum->addTaxableTotal(TaxRate::fromString('6'), Money::EUR(100));
-        $sum = $sum->subtractTaxableTotal(TaxRate::fromString('6'), Money::EUR(200));
-        $this->assertEquals(Money::EUR(0), $sum->find(TaxRate::fromString('6'))->getTaxableTotal());
+        $sum = $sum->addTaxableTotal(TaxRate::fromString('6'), TaxableTotal::calculateFromMoney(Money::EUR(100)));
+        $sum = $sum->subtractTaxableTotal(TaxRate::fromString('6'), TaxableTotal::calculateFromMoney(Money::EUR(200)));
+        $this->assertEquals(TaxableTotal::calculateFromMoney(Money::EUR(0)), $sum->find(TaxRate::fromString('6'))->getTaxableTotal());
         $this->assertEquals(Money::EUR(0), $sum->getTaxableTotal());
         $this->assertEquals(Money::EUR(0), $sum->getTaxTotal());
     }
@@ -70,7 +71,7 @@ class TaxRateTotalsTest extends TestCase
         $this->assertEquals(Money::EUR(200), $sum->getTaxableTotal());
         $this->assertEquals(Money::EUR(12), $sum->getTaxTotal());
         $this->assertEquals(TaxRate::fromString('6'), $sum->find(TaxRate::fromString('6'))->getTaxRate());
-        $this->assertEquals(Money::EUR(200), $sum->find(TaxRate::fromString('6'))->getTaxableTotal());
+        $this->assertEquals(TaxableTotal::calculateFromMoney(Money::EUR(200)), $sum->find(TaxRate::fromString('6'))->getTaxableTotal());
     }
 
     /** @test */
@@ -83,8 +84,8 @@ class TaxRateTotalsTest extends TestCase
         $this->assertEquals(Money::EUR(12 + 12 + 6), $sum->getTaxTotal());
         $this->assertEquals(TaxRate::fromString('6'), $sum->find(TaxRate::fromString('6'))->getTaxRate());
         $this->assertEquals(TaxRate::fromString('12'), $sum->find(TaxRate::fromString('12'))->getTaxRate());
-        $this->assertEquals(Money::EUR(100), $sum->find(TaxRate::fromString('6'))->getTaxableTotal());
-        $this->assertEquals(Money::EUR(200), $sum->find(TaxRate::fromString('12'))->getTaxableTotal());
+        $this->assertEquals(TaxableTotal::calculateFromMoney(Money::EUR(100)), $sum->find(TaxRate::fromString('6'))->getTaxableTotal());
+        $this->assertEquals(TaxableTotal::calculateFromMoney(Money::EUR(200)), $sum->find(TaxRate::fromString('12'))->getTaxableTotal());
     }
 
     /** @test */
@@ -113,9 +114,9 @@ class TaxRateTotalsTest extends TestCase
                     return TaxRate::fromString('6');
                 }
 
-                public function getTaxableTotal(): Money
+                public function getTaxableTotal(): TaxableTotal
                 {
-                    return Money::EUR(100);
+                    return TaxableTotal::calculateFromMoney(Money::EUR(100));
                 }
             },
             new class implements Taxable {
@@ -124,9 +125,9 @@ class TaxRateTotalsTest extends TestCase
                     return TaxRate::fromString('6');
                 }
 
-                public function getTaxableTotal(): Money
+                public function getTaxableTotal(): TaxableTotal
                 {
-                    return Money::EUR(100);
+                    return TaxableTotal::calculateFromMoney(Money::EUR(100));
                 }
             },
         ];
@@ -141,9 +142,9 @@ class TaxRateTotalsTest extends TestCase
                     return TaxRate::fromString('6');
                 }
 
-                public function getTaxableTotal(): Money
+                public function getTaxableTotal(): TaxableTotal
                 {
-                    return Money::EUR(100);
+                    return TaxableTotal::calculateFromMoney(Money::EUR(100));
                 }
             },
             new class implements Taxable {
@@ -152,9 +153,9 @@ class TaxRateTotalsTest extends TestCase
                     return TaxRate::fromString('12');
                 }
 
-                public function getTaxableTotal(): Money
+                public function getTaxableTotal(): TaxableTotal
                 {
-                    return Money::EUR(100);
+                    return TaxableTotal::calculateFromMoney(Money::EUR(100));
                 }
             },
             new class implements Taxable {
@@ -163,9 +164,9 @@ class TaxRateTotalsTest extends TestCase
                     return TaxRate::fromString('12');
                 }
 
-                public function getTaxableTotal(): Money
+                public function getTaxableTotal(): TaxableTotal
                 {
-                    return Money::EUR(100);
+                    return TaxableTotal::calculateFromMoney(Money::EUR(100));
                 }
             },
         ];

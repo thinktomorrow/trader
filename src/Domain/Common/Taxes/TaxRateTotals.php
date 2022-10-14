@@ -7,6 +7,7 @@ namespace Thinktomorrow\Trader\Domain\Common\Taxes;
 use Assert\Assertion;
 use Money\Money;
 use Thinktomorrow\Trader\Domain\Common\Cash\Cash;
+use Thinktomorrow\Trader\Domain\Common\Cash\PreciseMoney;
 
 class TaxRateTotals
 {
@@ -34,7 +35,7 @@ class TaxRateTotals
         return new static([]);
     }
 
-    public function addTaxableTotal(TaxRate $taxRate, Money $taxableTotal): static
+    public function addTaxableTotal(TaxRate $taxRate, TaxableTotal $taxableTotal): static
     {
         $taxRateTotals = $this->taxRateTotals;
 
@@ -53,7 +54,7 @@ class TaxRateTotals
         return new static($taxRateTotals);
     }
 
-    public function subtractTaxableTotal(TaxRate $taxRate, Money $taxableTotal): static
+    public function subtractTaxableTotal(TaxRate $taxRate, TaxableTotal $taxableTotal): static
     {
         $taxRateTotals = $this->taxRateTotals;
 
@@ -90,20 +91,24 @@ class TaxRateTotals
 
     public function getTaxableTotal(): Money
     {
-        return array_reduce(
+        $total = array_reduce(
             $this->taxRateTotals,
-            fn ($carry, $taxRateTotal) => $carry->add($taxRateTotal->getTaxableTotal()),
-            Cash::zero()
+            fn (TaxableTotal $carry, TaxRateTotal $taxRateTotal) => $carry->add($taxRateTotal->getTaxableTotal()),
+            TaxableTotal::zero(TaxRateTotal::TAX_CALCULATION_PRECISION)
         );
+
+        return $total->getMoney();
     }
 
     public function getTaxTotal(): Money
     {
         $total = array_reduce(
             $this->taxRateTotals,
-            fn ($carry, $taxRateTotal) => $carry->add($taxRateTotal->getTaxTotal()),
+            fn ($carry, TaxRateTotal $taxRateTotal) => $carry->add($taxRateTotal->getPreciseTaxTotal()->getPreciseMoney()),
             Cash::zero()
         );
+
+        $total = PreciseMoney::fromMoney($total)->getMoney();
 
         if ($total->isNegative()) {
             return new Money(0, $total->getCurrency());
