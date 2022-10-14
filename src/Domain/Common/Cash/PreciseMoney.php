@@ -3,8 +3,8 @@ declare(strict_types=1);
 
 namespace Thinktomorrow\Trader\Domain\Common\Cash;
 
-use Money\Money;
 use Money\Currency;
+use Money\Money;
 
 /**
  * Money but with a more precise value. This is used in calculations of tax, divisions and so on to
@@ -121,7 +121,8 @@ class PreciseMoney
     public function add(self $other): static
     {
         return new static($this->getPreciseMoney()->add(
-            $this->getOtherMoney($other)->getPreciseMoney()),
+            $this->getOtherMoney($other)->getPreciseMoney()
+        ),
             $this->precisionDecimals
         );
     }
@@ -129,7 +130,8 @@ class PreciseMoney
     public function subtract(self $other): static
     {
         return new static($this->getPreciseMoney()->subtract(
-            $this->getOtherMoney($other)->getPreciseMoney()),
+            $this->getOtherMoney($other)->getPreciseMoney()
+        ),
             $this->precisionDecimals
         );
     }
@@ -140,7 +142,7 @@ class PreciseMoney
      */
     protected function getOtherMoney(PreciseMoney $other): PreciseMoney
     {
-        if($other->precisionDecimals !== $this->precisionDecimals) {
+        if ($other->precisionDecimals !== $this->precisionDecimals) {
             throw new \Exception('Cannot add or subtract PreciseMoney objects. Precision decimals don\'t match. This: ['. $this->precisionDecimals.'], other: ['.$other->precisionDecimals.']');
         }
 

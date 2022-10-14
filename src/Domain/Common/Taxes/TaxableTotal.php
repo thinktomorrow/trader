@@ -7,5 +7,4 @@ use Thinktomorrow\Trader\Domain\Common\Cash\PreciseMoney;
 
 class TaxableTotal extends PreciseMoney
 {
-
 }
