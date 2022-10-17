@@ -214,7 +214,7 @@ final class MysqlPromoRepository implements PromoRepository, OrderPromoRepositor
         $discountIds = DB::table(static::$promoDiscountTable)
             ->where('promo_id', $promoId->get())
             ->get()
-            ->map(fn($discount) => $discount->discount_id)->toArray();
+            ->map(fn ($discount) => $discount->discount_id)->toArray();
 
         DB::table(static::$promoConditionTable)->whereIn('discount_id', $discountIds)->delete();
         DB::table(static::$promoDiscountTable)->whereIn('discount_id', $discountIds)->delete();
