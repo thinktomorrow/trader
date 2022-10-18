@@ -29,7 +29,6 @@ final class OrderRepositoryTest extends TestCase
     {
         foreach ($this->orders() as $order) {
             foreach ($this->orderRepositories() as $i => $orderRepository) {
-
                 $this->prepareWorldForOrder($i);
 
                 $orderRepository->save($order);
@@ -52,7 +51,6 @@ final class OrderRepositoryTest extends TestCase
             $ordersNotFound = 0;
 
             foreach ($this->orderRepositories() as $i => $orderRepository) {
-
                 $this->prepareWorldForOrder($i);
 
                 $orderRepository->save($order);

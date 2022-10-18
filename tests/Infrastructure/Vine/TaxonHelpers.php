@@ -3,19 +3,17 @@
 namespace Tests\Infrastructure\Vine;
 
 use Illuminate\Support\Facades\DB;
+use Thinktomorrow\Trader\Domain\Model\Product\Exceptions\CouldNotFindProduct;
+use Thinktomorrow\Trader\Domain\Model\Product\Product;
+use Thinktomorrow\Trader\Domain\Model\Product\ProductId;
 use Thinktomorrow\Trader\Domain\Model\Taxon\Taxon;
 use Thinktomorrow\Trader\Domain\Model\Taxon\TaxonId;
 use Thinktomorrow\Trader\Domain\Model\Taxon\TaxonKey;
-use Thinktomorrow\Trader\Domain\Model\Product\Product;
-use Thinktomorrow\Trader\Domain\Model\Product\ProductId;
-use Thinktomorrow\Trader\Infrastructure\Test\TestContainer;
-use Thinktomorrow\Trader\Domain\Model\Product\VariantRepository;
-use Thinktomorrow\Trader\Domain\Model\Product\Exceptions\CouldNotFindProduct;
-use Thinktomorrow\Trader\Infrastructure\Laravel\Repositories\MysqlTaxonRepository;
-use Thinktomorrow\Trader\Infrastructure\Test\Repositories\InMemoryTaxonRepository;
 use Thinktomorrow\Trader\Infrastructure\Laravel\Repositories\MysqlProductRepository;
-use Thinktomorrow\Trader\Infrastructure\Test\Repositories\InMemoryProductRepository;
+use Thinktomorrow\Trader\Infrastructure\Laravel\Repositories\MysqlTaxonRepository;
 use Thinktomorrow\Trader\Infrastructure\Laravel\Repositories\MysqlVariantRepository;
+use Thinktomorrow\Trader\Infrastructure\Test\Repositories\InMemoryTaxonRepository;
+use Thinktomorrow\Trader\Infrastructure\Test\TestContainer;
 
 trait TaxonHelpers
 {
@@ -55,7 +53,6 @@ trait TaxonHelpers
     private function createTaxon(Taxon $taxon, array $productIds = [])
     {
         foreach ($this->entityRepositories() as $taxonRepository) {
-
             $taxonRepository->save($taxon);
 
             // In memory
@@ -65,11 +62,9 @@ trait TaxonHelpers
             // Mysql
             else {
                 foreach ($productIds as $productId) {
-
-                    try{
+                    try {
                         $this->mysqlProductRepository()->find(ProductId::fromString($productId));
-                    }
-                    catch(CouldNotFindProduct $e) {
+                    } catch(CouldNotFindProduct $e) {
                         $this->mysqlProductRepository()->save(Product::create(ProductId::fromString($productId)));
                     }
 

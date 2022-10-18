@@ -32,7 +32,6 @@ final class CartRepositoryTest extends TestCase
         $order = $this->createDefaultOrder();
 
         foreach ($this->orderRepositories() as $i => $orderRepository) {
-
             $this->prepareWorldForOrder($i);
 
             $orderRepository->save($order);
@@ -57,7 +56,6 @@ final class CartRepositoryTest extends TestCase
         $order->updateState(OrderState::cart_pending);
 
         foreach ($this->orderRepositories() as $i => $orderRepository) {
-
             $this->prepareWorldForOrder($i);
 
             $orderRepository->save($order);
@@ -86,7 +84,6 @@ final class CartRepositoryTest extends TestCase
         ]);
 
         foreach ($this->orderRepositories() as $i => $orderRepository) {
-
             $this->prepareWorldForOrder($i);
 
             $orderRepository->save($order);
@@ -105,7 +102,6 @@ final class CartRepositoryTest extends TestCase
         $order->updateState(OrderState::confirmed);
 
         foreach ($this->orderRepositories() as $i => $orderRepository) {
-
             $this->prepareWorldForOrder($i);
 
             $orderRepository->save($order);
@@ -125,7 +121,6 @@ final class CartRepositoryTest extends TestCase
         $order->updateState(OrderState::confirmed);
 
         foreach ($this->orderRepositories() as $i => $orderRepository) {
-
             $this->prepareWorldForOrder($i);
 
             $orderRepository->save($order);

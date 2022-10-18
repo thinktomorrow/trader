@@ -33,7 +33,6 @@ class InvoiceRepositoryTest extends TestCase
         $order = $this->createOrder(['order_id' => 'yyy', 'order_ref' => 'yy-ref', 'invoice_ref' => '2208001'], [], [], [], [], null, null, $this->createOrderShopper(['shopper_id' => 'sss']));
 
         foreach ($this->orderRepositories() as $i => $orderRepository) {
-
             $this->prepareWorldForOrder($i);
 
             $orderRepository->save($order);
