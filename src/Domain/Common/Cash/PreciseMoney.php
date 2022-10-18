@@ -97,7 +97,7 @@ class PreciseMoney
 
     public function getMoney(): Money
     {
-        $normalisedAmount = $this->money->divide(pow(10, $this->precisionDecimals))->getAmount();
+        $normalisedAmount = $this->money->divide((string) pow(10, $this->precisionDecimals))->getAmount();
 
         return new Money($normalisedAmount, $this->money->getCurrency());
     }
