@@ -17,7 +17,7 @@ abstract class OrderReadLine
     use RendersMoney;
 
     protected string $line_id;
-    protected string $variant_id;
+    protected ?string $variant_id;
     protected string $product_id;
     protected Price $linePrice;
     protected VariantUnitPrice $unitPrice;
@@ -43,7 +43,7 @@ abstract class OrderReadLine
         $line = new static();
 
         $line->line_id = $state['line_id'];
-        $line->variant_id = $state['variant_id'];
+        $line->variant_id = $state['variant_id'] ?: null;
         $line->linePrice = $state['linePrice'];
         $line->total = $state['total'];
         $line->discountTotal = $state['discountTotal'];
@@ -78,7 +78,7 @@ abstract class OrderReadLine
         return $this->line_id;
     }
 
-    public function getVariantId(): string
+    public function getVariantId(): ?string
     {
         return $this->variant_id;
     }

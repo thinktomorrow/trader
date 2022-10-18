@@ -18,11 +18,11 @@ final class Discount implements ChildEntity
     use HasData;
 
     public readonly OrderId $orderId;
+    public readonly DiscountId $discountId;
     public readonly DiscountableType $discountableType;
     public readonly DiscountableId $discountableId;
-    public readonly PromoId $promoId;
-    public readonly DiscountId $discountId;
-    public readonly PromoDiscountId $promoDiscountId;
+    public readonly ?PromoId $promoId;
+    public readonly ?PromoDiscountId $promoDiscountId;
     private readonly DiscountTotal $total;
 
     private function __construct()
@@ -41,17 +41,22 @@ final class Discount implements ChildEntity
 
     public function getMappedData(): array
     {
+        $data = $this->addDataIfNotNull([
+            'promo_id' => $this->promoId?->get(),
+            'promo_discount_id' => $this->promoDiscountId?->get(),
+        ]);
+
         return [
             'order_id' => $this->orderId->get(),
             'discountable_type' => $this->discountableType->value,
             'discountable_id' => $this->discountableId->get(),
             'discount_id' => $this->discountId->get(),
-            'promo_id' => $this->promoId->get(),
-            'promo_discount_id' => $this->promoDiscountId->get(),
+            'promo_id' => $this->promoId?->get(),
+            'promo_discount_id' => $this->promoDiscountId?->get(),
             'total' => $this->total->getIncludingVat()->getAmount(),
             'tax_rate' => $this->total->getTaxRate()->toPercentage()->get(),
             'includes_vat' => $this->total->includesVat(),
-            'data' => json_encode($this->data),
+            'data' => json_encode($data),
         ];
     }
 
@@ -76,11 +81,11 @@ final class Discount implements ChildEntity
         $discount = new static();
 
         $discount->orderId = OrderId::fromString($aggregateState['order_id']);
+        $discount->discountId = DiscountId::fromString($state['discount_id']);
         $discount->discountableType = DiscountableType::from($state['discountable_type']);
         $discount->discountableId = DiscountableId::fromString($state['discountable_id']);
-        $discount->promoId = PromoId::fromString($state['promo_id']);
-        $discount->discountId = DiscountId::fromString($state['discount_id']);
-        $discount->promoDiscountId = PromoDiscountId::fromString($state['promo_discount_id']);
+        $discount->promoId = $state['promo_id'] ? PromoId::fromString($state['promo_id']) : null;
+        $discount->promoDiscountId = $state['promo_discount_id'] ? PromoDiscountId::fromString($state['promo_discount_id']) : null;
         $discount->total = DiscountTotal::fromScalars($state['total'], $state['tax_rate'], $state['includes_vat']);
         $discount->data = json_decode($state['data'], true);
 

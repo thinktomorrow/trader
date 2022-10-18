@@ -12,7 +12,7 @@ class MissingOptionCombinationsTest extends ProductContext
     /** @test */
     public function it_can_check_missing_combos()
     {
-        $product = $this->createdProductWithOptions();
+        $product = $this->createProductWithOptions();
         $this->productRepository->save($product);
 
         $missingCombos = $this->missingOptionCombinations->get($product);
@@ -25,7 +25,7 @@ class MissingOptionCombinationsTest extends ProductContext
     /** @test */
     public function it_can_render_missing_combos_with_labels()
     {
-        $product = $this->createdProductWithOptions();
+        $product = $this->createProductWithOptions();
         $this->productRepository->save($product);
 
         $missingComboLabels = $this->missingOptionCombinations->getAsLabels($product, 'foo', 'value.nl');

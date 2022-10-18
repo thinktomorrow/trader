@@ -49,7 +49,7 @@ class ProductOptionTest extends TestCase
 
     public function test_when_deleting_option_all_corresponding_variant_option_values_are_removed_as_well()
     {
-        $product = $this->createdProductWithVariant();
+        $product = $this->createProductWithVariant();
 
         $this->assertCount(1, $product->getOptions());
         $this->assertCount(1, $product->getVariants()[0]->getOptionValueIds());
@@ -102,7 +102,7 @@ class ProductOptionTest extends TestCase
     /** @test */
     public function it_can_rearrange_options()
     {
-        $product = $this->createdProductWithOptions();
+        $product = $this->createProductWithOptions();
 
         // Switch order
         $product->updateOptions([
@@ -129,7 +129,7 @@ class ProductOptionTest extends TestCase
     /** @test */
     public function it_can_rearrange_option_values()
     {
-        $product = $this->createdProductWithOptions();
+        $product = $this->createProductWithOptions();
 
         $product->updateOptions([
             $option = Option::create($product->productId, OptionId::fromString('ooo'), ['foo' => 'bar']),
@@ -165,7 +165,7 @@ class ProductOptionTest extends TestCase
     /** @test */
     public function it_can_get_all_options()
     {
-        $product = $this->createdProductWithOptions();
+        $product = $this->createProductWithOptions();
 
         /** @var Option[] $options */
         $options = $product->getOptions();

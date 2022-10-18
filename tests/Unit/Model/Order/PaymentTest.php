@@ -39,7 +39,7 @@ class PaymentTest extends TestCase
             'cost' => $cost->getMoney()->getAmount(),
             'tax_rate' => $cost->getTaxRate()->toPercentage()->get(),
             'includes_vat' => $cost->includesVat(),
-            'data' => json_encode([]),
+            'data' => json_encode(['payment_method_id' => $paymentMethodId->get()]),
         ], $payment->getMappedData());
     }
 
@@ -57,7 +57,7 @@ class PaymentTest extends TestCase
             'cost' => '20',
             'tax_rate' => '10',
             'includes_vat' => true,
-            'data' => json_encode([]),
+            'data' => json_encode(['payment_method_id' => 'mmm']),
         ], $payment->getMappedData());
     }
 

@@ -15,6 +15,7 @@ use Thinktomorrow\Trader\Infrastructure\Test\TestContainer;
 final class CustomerLoginRepositoryTest extends TestCase
 {
     use RefreshDatabase;
+    use PrepareWorld;
 
     /**
      * @test
@@ -22,9 +23,10 @@ final class CustomerLoginRepositoryTest extends TestCase
      */
     public function it_can_save_an_customer(CustomerLogin $customerLogin)
     {
-        $this->createCustomer();
+        (new MysqlCustomerRepository(new TestContainer()))->save($this->createCustomer());
 
-        foreach ($this->repositories() as $customerRepository) {
+        foreach ($this->repositories() as $i => $customerRepository) {
+            $this->prepareCustomer($i);
             $customerRepository->save($customerLogin);
             $customerLogin->releaseEvents();
 
@@ -38,9 +40,10 @@ final class CustomerLoginRepositoryTest extends TestCase
      */
     public function it_can_find_an_customer_login(CustomerLogin $customerLogin)
     {
-        $this->createCustomer();
+        (new MysqlCustomerRepository(new TestContainer()))->save($this->createCustomer());
 
-        foreach ($this->repositories() as $customerRepository) {
+        foreach ($this->repositories() as $i => $customerRepository) {
+            $this->prepareCustomer($i);
             $customerRepository->save($customerLogin);
             $customerLogin->releaseEvents();
 
@@ -55,17 +58,12 @@ final class CustomerLoginRepositoryTest extends TestCase
 
     public function entities(): \Generator
     {
-        yield [$this->createdCustomerLogin()];
+        yield [$this->createCustomerLogin()];
 
         yield [CustomerLogin::create(
-            CustomerId::fromString('abc'),
+            CustomerId::fromString('ccc-123'),
             Email::fromString('ben@thinktomorrow.be'),
             'xxx'
         )];
-    }
-
-    private function createCustomer()
-    {
-        (new MysqlCustomerRepository(new TestContainer()))->save($this->createdCustomer());
     }
 }

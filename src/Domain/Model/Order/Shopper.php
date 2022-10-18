@@ -97,6 +97,10 @@ class Shopper implements ChildEntity
 
     public function getMappedData(): array
     {
+        $data = $this->addDataIfNotNull([
+            'customer_id' => $this->customerId?->get(),
+        ]);
+
         return [
             'shopper_id' => $this->shopperId->get(),
             'email' => $this->email->get(),
@@ -104,7 +108,7 @@ class Shopper implements ChildEntity
             'locale' => $this->locale->toIso15897(),
             'register_after_checkout' => $this->registerAfterCheckout,
             'customer_id' => $this->customerId?->get(),
-            'data' => json_encode($this->data),
+            'data' => json_encode($data),
         ];
     }
 

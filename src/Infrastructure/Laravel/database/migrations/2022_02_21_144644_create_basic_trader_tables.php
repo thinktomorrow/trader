@@ -304,11 +304,10 @@ class CreateBasicTraderTables extends Migration
             $table->string('line_2')->nullable();
             $table->string('postal_code')->nullable();
             $table->string('city')->nullable();
-            $table->string('country_id')->nullable();
+            $table->string('country_id')->index()->nullable();
             $table->json('data')->nullable();
 
             $table->foreign('order_id')->references('order_id')->on(static::PREFIX.'orders')->onDelete('cascade');
-            $table->foreign('country_id')->references('country_id')->on(static::PREFIX.'countries');
         });
 
         Schema::create(static::PREFIX.'order_events', function (Blueprint $table) {
@@ -414,5 +413,6 @@ class CreateBasicTraderTables extends Migration
         Schema::dropIfExists(static::PREFIX.'promos');
         Schema::dropIfExists(static::PREFIX.'promo_discounts');
         Schema::dropIfExists(static::PREFIX.'promo_discount_conditions');
+        Schema::dropIfExists(static::PREFIX.'countries');
     }
 }

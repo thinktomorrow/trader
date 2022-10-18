@@ -12,4 +12,9 @@ class DefaultCartLine extends OrderReadLine implements CartLine
     {
         return $this->getVariantId();
     }
+
+    public function getVariantId(): string
+    {
+        return parent::getVariantId();
+    }
 }

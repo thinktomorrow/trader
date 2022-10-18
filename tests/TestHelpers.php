@@ -135,7 +135,7 @@ trait TestHelpers
             'tax_rate' => '10',
             'includes_vat' => true,
             'quantity' => 2,
-            'data' => json_encode(['product_id' => 'aab', 'unit_price_including_vat' => '1000', 'unit_price_excluding_vat' => '900', 'foo' => 'bar']),
+            'data' => json_encode(['product_id' => 'xxx', 'unit_price_including_vat' => '1000', 'unit_price_excluding_vat' => '900', 'foo' => 'bar', 'variant_id' => 'yyy']),
         ], $values), array_merge([
             'order_id' => 'xxx',
         ], $aggregateState), [
@@ -154,7 +154,7 @@ trait TestHelpers
             'cost' => '30',
             'tax_rate' => '10',
             'includes_vat' => true,
-            'data' => "[]",
+            'data' => json_encode(['shipping_profile_id' => 'ppp']),
         ], $values), array_merge([
             'order_id' => 'xxx',
         ], $aggregateState), [
@@ -171,7 +171,7 @@ trait TestHelpers
             'cost' => '20',
             'tax_rate' => '10',
             'includes_vat' => true,
-            'data' => "[]",
+            'data' => json_encode(['payment_method_id' => 'mmm']),
         ], $values), array_merge([
             'order_id' => 'xxx',
         ], $aggregateState), [
@@ -237,15 +237,15 @@ trait TestHelpers
     protected function createOrderDiscount(array $data = [], array $aggregateState = []): Discount
     {
         return Discount::fromMappedData(array_merge([
-            'discount_id' => 'ababab',
+            'discount_id' => 'order-discount-abc',
             'discountable_type' => DiscountableType::order->value,
             'discountable_id' => 'xxx',
-            'promo_id' => 'def',
-            'promo_discount_id' => 'abc',
+            'promo_id' => 'abc',
+            'promo_discount_id' => 'ddd',
             'total' => '30',
             'tax_rate' => '9',
             'includes_vat' => true,
-            'data' => json_encode(['foo' => 'bar']),
+            'data' => json_encode(['foo' => 'bar', 'promo_id' => ($data['promo_id'] ?? 'abc'), 'promo_discount_id' => ($data['promo_discount_id'] ?? 'ddd')]),
         ], $data), array_merge([
             'order_id' => 'xxx',
         ], $aggregateState));
@@ -278,10 +278,10 @@ trait TestHelpers
         ], $data));
     }
 
-    protected function createdCustomer(): Customer
+    protected function createCustomer(): Customer
     {
         return Customer::fromMappedData([
-            'customer_id' => 'abc',
+            'customer_id' => 'ccc-123',
             'email' => 'ben@thinktomorrow.be',
             'is_business' => false,
             'locale' => 'fr_BE',
@@ -295,7 +295,7 @@ trait TestHelpers
     protected function createPaymentMethod(array $values = []): PaymentMethod
     {
         return PaymentMethod::fromMappedData(array_merge([
-            'payment_method_id' => 'ppp',
+            'payment_method_id' => 'mmm',
             'rate' => '123',
             'data' => json_encode([]),
         ], $values));
@@ -304,7 +304,7 @@ trait TestHelpers
     protected function createShippingProfile(array $values = []): ShippingProfile
     {
         return ShippingProfile::fromMappedData(array_merge([
-            'shipping_profile_id' => 'sss',
+            'shipping_profile_id' => 'ppp',
             'state' => ShippingProfileState::online->value,
             'requires_address' => true,
             'data' => json_encode([]),
@@ -322,10 +322,10 @@ trait TestHelpers
         ], $values));
     }
 
-    protected function createdCustomerLogin(): CustomerLogin
+    protected function createCustomerLogin(): CustomerLogin
     {
         return CustomerLogin::fromMappedData([
-            'customer_id' => 'abc',
+            'customer_id' => 'ccc-123',
             'email' => 'ben@thinktomorrow.be',
             'password' => 'xxx',
         ]);
@@ -361,34 +361,9 @@ trait TestHelpers
         return $product;
     }
 
-    protected function createdProductWithOption(): Product
+    protected function createProductWithPersonalisations(): Product
     {
-        $product = $this->createProduct();
-
-        $product->updateOptions([
-            $option = Option::create($product->productId, OptionId::fromString('ooo'), ['foo' => 'bar']),
-        ]);
-
-        $option->updateOptionValues([OptionValue::create($option->optionId, OptionValueId::fromString('xxx'), [
-            'label' => [
-                'nl' => 'option label nl',
-                'en' => 'option label en',
-            ],
-            'value' => [
-                'nl' => 'option value nl',
-                'en' => 'option value en',
-            ],
-        ])]);
-
-        $variant = $this->createdVariantWithOption();
-        $product->createVariant($variant);
-
-        return $product;
-    }
-
-    protected function createdProductWithPersonalisations(): Product
-    {
-        $product = $this->createProduct();
+        $product = $this->createProductWithVariant();
 
         $product->updatePersonalisations([
             Personalisation::create(
@@ -399,13 +374,10 @@ trait TestHelpers
             ),
         ]);
 
-        $variant = $this->createdVariantWithOption();
-        $product->createVariant($variant);
-
         return $product;
     }
 
-    protected function createdProductWithOptions(): Product
+    protected function createProductWithOptions(): Product
     {
         $product = $this->createProduct();
 
@@ -450,7 +422,7 @@ trait TestHelpers
             ]),
         ]);
 
-        $variant = $this->createdVariantWithOption();
+        $variant = $this->createVariantWithOption();
 
         // TODO: how/where to protect from duplicates (multiple values from same option). In create/updateVariant of product
         $variant->updateOptionValueIds([
@@ -462,21 +434,21 @@ trait TestHelpers
         return $product;
     }
 
-    protected function createdProductWithVariant(): Product
+    protected function createProductWithVariant(): Product
     {
         $product = $this->createProduct();
         $product->updateOptions([Option::create($product->productId, OptionId::fromString('ooo'), ['foo' => 'bar'])]);
         $product->updateOptionValues(OptionId::fromString('ooo'), [
             OptionValue::create(OptionId::fromString('ooo'), OptionValueId::fromString('ppp'), ['foo' => 'bar']),
         ]);
-        $variant = $this->createdVariantWithOption();
+        $variant = $this->createVariantWithOption();
 
         $product->createVariant($variant);
 
         return $product;
     }
 
-    protected function createdVariantWithOption(): Variant
+    protected function createVariantWithOption(): Variant
     {
         $variant = Variant::create(
             ProductId::fromString('xxx'),
@@ -520,7 +492,7 @@ trait TestHelpers
     protected function createPromo(array $mappedData = [], array $discounts = []): Promo
     {
         return Promo::fromMappedData(array_merge([
-            'promo_id' => 'xxx',
+            'promo_id' => 'abc',
             'state' => PromoState::online->value,
             'is_combinable' => false,
             'coupon_code' => null,
@@ -533,10 +505,10 @@ trait TestHelpers
     protected function createDiscount(array $mappedData = [], array $conditions = [])
     {
         return FixedAmountDiscount::fromMappedData(array_merge([
-            'discount_id' => 'abc',
+            'discount_id' => 'ddd',
             'data' => json_encode(['amount' => '40']),
         ], $mappedData), [
-            'promo_id' => 'xxx',
+            'promo_id' => 'abc',
         ], [
             Condition::class => $conditions,
         ]);

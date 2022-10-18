@@ -19,7 +19,7 @@ class OptionLinksComposerTest extends ProductContext
     {
         $repo = new InMemoryProductRepository();
 
-        $product = $this->createdProductWithOptions();
+        $product = $this->createProductWithOptions();
         $repo->save($product);
 
         $optionLinks = (new VariantLinksComposer($repo, new TestContainer()))->get(

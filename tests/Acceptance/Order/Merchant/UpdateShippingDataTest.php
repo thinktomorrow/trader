@@ -41,6 +41,8 @@ class UpdateShippingDataTest extends CartContext
 
         $order = $this->orderRepository->find($order->orderId);
 
-        $this->assertEquals(['foo' => 'bar'], $order->getShippings()[0]->getData());
+        $this->assertEquals([
+            'foo' => 'bar', 'shipping_profile_id' => $shipping->getShippingProfileId()->get()
+            ], $order->getShippings()[0]->getData());
     }
 }

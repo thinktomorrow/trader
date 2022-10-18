@@ -7,7 +7,7 @@ interface MerchantOrderLine
     public static function fromMappedData(array $state, array $orderState, iterable $discounts, iterable $personalisations): static;
 
     public function getLineId(): string;
-    public function getVariantId(): string;
+    public function getVariantId(): ?string;
     public function getProductId(): string;
 
     public function getUnitPrice(): string;

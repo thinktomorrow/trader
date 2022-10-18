@@ -22,6 +22,7 @@ use Thinktomorrow\Trader\Infrastructure\Test\TestContainer;
 final class CustomerRepositoryTest extends TestCase
 {
     use RefreshDatabase;
+    use PrepareWorld;
 
     /**
      * @test
@@ -29,7 +30,8 @@ final class CustomerRepositoryTest extends TestCase
      */
     public function it_can_save_and_find_a_customer(Customer $customer)
     {
-        foreach ($this->repositories() as $repository) {
+        foreach ($this->repositories() as $i => $repository) {
+            $this->prepareCountries($i);
             $repository->save($customer);
             $customer->releaseEvents();
 
@@ -43,7 +45,8 @@ final class CustomerRepositoryTest extends TestCase
      */
     public function it_can_save_and_find_a_customer_by_email(Customer $customer)
     {
-        foreach ($this->repositories() as $repository) {
+        foreach ($this->repositories() as $i => $repository) {
+            $this->prepareCountries($i);
             $repository->save($customer);
             $customer->releaseEvents();
 
@@ -59,7 +62,8 @@ final class CustomerRepositoryTest extends TestCase
     {
         $customersNotFound = 0;
 
-        foreach ($this->repositories() as $repository) {
+        foreach ($this->repositories() as $i => $repository) {
+            $this->prepareCountries($i);
             $repository->save($customer);
             $repository->delete($customer->customerId);
 
@@ -86,7 +90,8 @@ final class CustomerRepositoryTest extends TestCase
      */
     public function test_it_can_get_customer_read(Customer $customer)
     {
-        foreach ($this->repositories() as $repository) {
+        foreach ($this->repositories() as $i => $repository) {
+            $this->prepareCountries($i);
             $repository->save($customer);
             $customer->releaseEvents();
 
@@ -102,7 +107,7 @@ final class CustomerRepositoryTest extends TestCase
 
     public function customers(): \Generator
     {
-        yield [$this->createdCustomer()];
+        yield [$this->createCustomer()];
 
         yield [Customer::create(
             CustomerId::fromString('xxx-1'),

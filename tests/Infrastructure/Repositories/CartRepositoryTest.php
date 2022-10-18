@@ -15,16 +15,14 @@ use Thinktomorrow\Trader\Domain\Model\Product\Personalisation\PersonalisationId;
 use Thinktomorrow\Trader\Domain\Model\Product\Personalisation\PersonalisationType;
 use Thinktomorrow\Trader\Infrastructure\Laravel\Repositories\MysqlCartRepository;
 use Thinktomorrow\Trader\Infrastructure\Laravel\Repositories\MysqlOrderRepository;
-use Thinktomorrow\Trader\Infrastructure\Laravel\Repositories\MysqlProductRepository;
-use Thinktomorrow\Trader\Infrastructure\Laravel\Repositories\MysqlVariantRepository;
 use Thinktomorrow\Trader\Infrastructure\Test\Repositories\InMemoryCartRepository;
 use Thinktomorrow\Trader\Infrastructure\Test\Repositories\InMemoryOrderRepository;
-use Thinktomorrow\Trader\Infrastructure\Test\Repositories\InMemoryProductRepository;
 use Thinktomorrow\Trader\Infrastructure\Test\TestContainer;
 
 final class CartRepositoryTest extends TestCase
 {
     use RefreshDatabase;
+    use PrepareWorld;
 
     /**
      * @test
@@ -34,14 +32,12 @@ final class CartRepositoryTest extends TestCase
         $order = $this->createDefaultOrder();
 
         foreach ($this->orderRepositories() as $i => $orderRepository) {
+
+            $this->prepareWorldForOrder($i);
+
             $orderRepository->save($order);
 
-            $productRepository = iterator_to_array($this->productRepositories())[$i];
             $cartRepository = iterator_to_array($this->cartRepositories())[$i];
-
-            // Make sure we have a purchasable variant
-            $product = $this->createdProductWithVariant();
-            $productRepository->save($product);
 
             $cart = $cartRepository->findCart($order->orderId);
 
@@ -61,6 +57,9 @@ final class CartRepositoryTest extends TestCase
         $order->updateState(OrderState::cart_pending);
 
         foreach ($this->orderRepositories() as $i => $orderRepository) {
+
+            $this->prepareWorldForOrder($i);
+
             $orderRepository->save($order);
 
             $cartRepository = iterator_to_array($this->cartRepositories())[$i];
@@ -79,7 +78,7 @@ final class CartRepositoryTest extends TestCase
             LinePersonalisation::create(
                 $line->lineId,
                 LinePersonalisationId::fromString('xxx'),
-                PersonalisationId::fromString('abc'),
+                PersonalisationId::fromString('ooo'),
                 PersonalisationType::fromString('text'),
                 'foobar',
                 ['foo' => 'bar']
@@ -87,6 +86,9 @@ final class CartRepositoryTest extends TestCase
         ]);
 
         foreach ($this->orderRepositories() as $i => $orderRepository) {
+
+            $this->prepareWorldForOrder($i);
+
             $orderRepository->save($order);
 
             $cartRepository = iterator_to_array($this->cartRepositories())[$i];
@@ -103,6 +105,9 @@ final class CartRepositoryTest extends TestCase
         $order->updateState(OrderState::confirmed);
 
         foreach ($this->orderRepositories() as $i => $orderRepository) {
+
+            $this->prepareWorldForOrder($i);
+
             $orderRepository->save($order);
 
             $cartRepository = iterator_to_array($this->cartRepositories())[$i];
@@ -120,6 +125,9 @@ final class CartRepositoryTest extends TestCase
         $order->updateState(OrderState::confirmed);
 
         foreach ($this->orderRepositories() as $i => $orderRepository) {
+
+            $this->prepareWorldForOrder($i);
+
             $orderRepository->save($order);
 
             $cartRepository = iterator_to_array($this->cartRepositories())[$i];
@@ -144,11 +152,5 @@ final class CartRepositoryTest extends TestCase
     {
         yield new InMemoryCartRepository();
         yield new MysqlCartRepository(new TestContainer(), (new TestContainer())->get(MysqlOrderRepository::class));
-    }
-
-    private function productRepositories(): \Generator
-    {
-        yield new InMemoryProductRepository();
-        yield new MysqlProductRepository(new MysqlVariantRepository(new TestContainer()));
     }
 }

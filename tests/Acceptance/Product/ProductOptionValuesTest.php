@@ -16,7 +16,7 @@ class ProductOptionValuesTest extends ProductContext
     {
         $repo = new InMemoryProductRepository();
 
-        $product = $this->createdProductWithOptions();
+        $product = $this->createProductWithOptions();
         $repo->save($product);
 
         $values = (new ProductOptionValues($repo))->get($product->productId->get());

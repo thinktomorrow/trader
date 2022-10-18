@@ -49,7 +49,6 @@ class VineTaxonFilterTreeComposer implements TaxonFilterTreeComposer
         }
 
         return $taxonTree;
-//        return new TaxonFilters($this->convertNodeCollectionToArray($filterTaxons));
     }
 
     public function getActiveFilters(string $mainTaxonFilterKey, array $activeKeys): TaxonTree

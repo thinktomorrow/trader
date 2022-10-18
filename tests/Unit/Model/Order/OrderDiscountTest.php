@@ -43,7 +43,7 @@ class OrderDiscountTest extends TestCase
             'total' => $discountTotal->getIncludingVat()->getAmount(),
             'includes_vat' => true,
             'tax_rate' => '21',
-            'data' => json_encode(['foo' => 'bar']),
+            'data' => json_encode(['foo' => 'bar', 'promo_id' => $promoId->get(), 'promo_discount_id' => $promoDiscountId->get()]),
         ], $discount->getMappedData());
     }
 
@@ -122,7 +122,7 @@ class OrderDiscountTest extends TestCase
         $this->assertCount(1, $order->getChildEntities()[Discount::class]);
 
         $order->deleteDiscount(
-            DiscountId::fromString('ababab'),
+            DiscountId::fromString('order-discount-abc'),
         );
 
         $this->assertCount(0, $order->getChildEntities()[Discount::class]);

@@ -32,4 +32,17 @@ trait HasData
 
         return $this->data;
     }
+
+    private function addDataIfNotNull(array $values): array
+    {
+        $data = $this->data;
+
+        foreach($values as $key => $value) {
+            if($value) {
+                $data[$key] = $value;
+            }
+        }
+
+        return $data;
+    }
 }

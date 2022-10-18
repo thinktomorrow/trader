@@ -113,7 +113,7 @@ class MysqlVariantRepository implements VariantRepository, VariantForCartReposit
 
     public function delete(VariantId $variantId): void
     {
-        DB::table(static::$optionValueTable)->where('variant_id', $variantId->get())->delete();
+        DB::table(static::$variantOptionValueLookupTable)->where('variant_id', $variantId->get())->delete();
         DB::table(static::$variantTable)->where('variant_id', $variantId->get())->delete();
     }
 

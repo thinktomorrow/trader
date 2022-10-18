@@ -8,4 +8,8 @@ use Thinktomorrow\Trader\Infrastructure\Laravel\Models\OrderRead\OrderReadShippi
 
 class DefaultCartShipping extends OrderReadShipping implements CartShipping
 {
+    public function getShippingProfileId(): string
+    {
+        return parent::getShippingProfileId();
+    }
 }

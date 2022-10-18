@@ -21,7 +21,7 @@ class Payment implements ChildAggregate, Discountable
 
     public readonly OrderId $orderId;
     public readonly PaymentId $paymentId;
-    private PaymentMethodId $paymentMethodId;
+    private ?PaymentMethodId $paymentMethodId;
     private PaymentState $paymentState;
     private PaymentCost $paymentCost;
 
@@ -79,15 +79,17 @@ class Payment implements ChildAggregate, Discountable
 
     public function getMappedData(): array
     {
+        $data = $this->addDataIfNotNull(['payment_method_id' => $this->paymentMethodId?->get()]);
+
         return [
             'order_id' => $this->orderId->get(),
             'payment_id' => $this->paymentId->get(),
-            'payment_method_id' => $this->paymentMethodId->get(),
+            'payment_method_id' => $this->paymentMethodId?->get(),
             'payment_state' => $this->paymentState->value,
             'cost' => $this->paymentCost->getMoney()->getAmount(),
             'tax_rate' => $this->paymentCost->getTaxRate()->toPercentage()->get(),
             'includes_vat' => $this->paymentCost->includesVat(),
-            'data' => json_encode($this->data),
+            'data' => json_encode($data),
         ];
     }
 
@@ -104,7 +106,7 @@ class Payment implements ChildAggregate, Discountable
 
         $payment->orderId = OrderId::fromString($aggregateState['order_id']);
         $payment->paymentId = PaymentId::fromString($state['payment_id']);
-        $payment->paymentMethodId = PaymentMethodId::fromString($state['payment_method_id']);
+        $payment->paymentMethodId = $state['payment_method_id'] ? PaymentMethodId::fromString($state['payment_method_id']) : null;
         $payment->paymentState = PaymentState::from($state['payment_state']);
         $payment->paymentCost = PaymentCost::fromScalars(
             $state['cost'],

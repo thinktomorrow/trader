@@ -15,7 +15,7 @@ abstract class OrderReadShipping
 
     protected Price $cost;
     protected string $shipping_id;
-    protected string $shipping_profile_id;
+    protected ?string $shipping_profile_id;
     protected ShippingState $state;
     protected iterable $discounts;
     protected array $data;
@@ -32,7 +32,7 @@ abstract class OrderReadShipping
         $shipping = new static();
 
         $shipping->shipping_id = $state['shipping_id'];
-        $shipping->shipping_profile_id = $state['shipping_profile_id'];
+        $shipping->shipping_profile_id = $state['shipping_profile_id'] ?: null;
         $shipping->state = ShippingState::from($state['shipping_state']);
         $shipping->cost = $state['cost'];
         $shipping->data = json_decode($state['data'], true);
@@ -46,7 +46,7 @@ abstract class OrderReadShipping
         return $this->shipping_id;
     }
 
-    public function getShippingProfileId(): string
+    public function getShippingProfileId(): ?string
     {
         return $this->shipping_profile_id;
     }

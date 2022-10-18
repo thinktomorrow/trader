@@ -88,7 +88,7 @@ class ProductTest extends TestCase
     /** @test */
     public function it_can_add_variant()
     {
-        $product = $this->createdProductWithVariant();
+        $product = $this->createProductWithVariant();
 
         $this->assertEquals([
             new ProductCreated(ProductId::fromString('xxx')),
@@ -127,7 +127,7 @@ class ProductTest extends TestCase
     /** @test */
     public function it_can_update_variant()
     {
-        $product = $this->createdProductWithVariant();
+        $product = $this->createProductWithVariant();
 
         $variant = $product->getVariants()[0];
         $variant->updatePrice(VariantUnitPrice::zero(), VariantSalePrice::zero());
@@ -144,7 +144,7 @@ class ProductTest extends TestCase
     /** @test */
     public function it_can_delete_variant()
     {
-        $product = $this->createdProductWithVariant();
+        $product = $this->createProductWithVariant();
         $product->createVariant(Variant::create(
             ProductId::fromString('xxx'),
             VariantId::fromString('zzz'),
@@ -170,7 +170,7 @@ class ProductTest extends TestCase
     {
         $this->expectException(CouldNotDeleteVariant::class);
 
-        $product = $this->createdProductWithVariant();
+        $product = $this->createProductWithVariant();
 
         $product->deleteVariant(VariantId::fromString('yyy'));
 

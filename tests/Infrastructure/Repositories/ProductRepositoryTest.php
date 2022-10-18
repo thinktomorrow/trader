@@ -70,8 +70,7 @@ final class ProductRepositoryTest extends TestCase
     public function products(): \Generator
     {
         yield [$this->createProduct()];
-        yield [$this->createdProductWithVariant()];
-        yield [$this->createdProductWithOption()];
-        yield [$this->createdProductWithPersonalisations()];
+        yield [$this->createProductWithPersonalisations()];
+        yield [$this->createProductWithVariant()];
     }
 }

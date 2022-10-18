@@ -132,7 +132,7 @@ class UpdateProductOptionsTest extends ProductContext
     /** @test */
     public function it_can_remove_existing_options()
     {
-        $product = $this->createdProductWithOptions();
+        $product = $this->createProductWithOptions();
         $this->productRepository->save($product);
 
         $this->productApplication->updateProductOptions(new UpdateProductOptions($product->productId->get(), []));

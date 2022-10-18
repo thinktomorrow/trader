@@ -45,8 +45,8 @@ final class PromoTest extends TestCase
         ]);
 
         $this->assertEquals([
-            'promo_id' => 'xxx',
-            'discount_id' => 'abc',
+            'promo_id' => 'abc',
+            'discount_id' => 'ddd',
             'key' => 'fixed_amount',
             'data' => json_encode(['amount' => '40']),
         ], $discount->getMappedData());
@@ -86,7 +86,7 @@ final class PromoTest extends TestCase
         ]);
 
         $this->assertEquals([
-            'promo_id' => 'xxx',
+            'promo_id' => 'abc',
             'state' => PromoState::online->value,
             'data' => json_encode(['foo' => 'bar']),
             'coupon_code' => 'foobar',
@@ -121,8 +121,8 @@ final class PromoTest extends TestCase
         $this->assertEquals([
             Discount::class => [
                 [
-                    'promo_id' => 'xxx',
-                    'discount_id' => 'abc',
+                    'promo_id' => 'abc',
+                    'discount_id' => 'ddd',
                     'key' => 'fixed_amount',
                     'data' => json_encode(['amount' => '40']),
                 ],

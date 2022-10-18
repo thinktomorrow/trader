@@ -26,7 +26,7 @@ final class Line implements ChildAggregate, Discountable
 
     public readonly OrderId $orderId;
     public readonly LineId $lineId;
-    private VariantId $variantId;
+    private ?VariantId $variantId;
     private LinePrice $linePrice;
     private Quantity $quantity;
 
@@ -99,10 +99,12 @@ final class Line implements ChildAggregate, Discountable
 
     public function getMappedData(): array
     {
+        $data = $this->addDataIfNotNull(['variant_id' => $this->variantId?->get()]);
+
         return [
             'order_id' => $this->orderId->get(),
             'line_id' => $this->lineId->get(),
-            'variant_id' => $this->variantId->get(),
+            'variant_id' => $this->variantId?->get(),
             'line_price' => $this->linePrice->getMoney()->getAmount(),
             'tax_rate' => $this->linePrice->getTaxRate()->toPercentage()->get(),
             'includes_vat' => $this->linePrice->includesVat(),
@@ -112,7 +114,7 @@ final class Line implements ChildAggregate, Discountable
                 ? $this->getDiscountTotal()->getIncludingVat()->getAmount()
                 : $this->getDiscountTotal()->getExcludingVat()->getAmount(),
             'quantity' => $this->quantity->asInt(),
-            'data' => json_encode($this->data),
+            'data' => json_encode($data),
         ];
     }
 
@@ -130,7 +132,7 @@ final class Line implements ChildAggregate, Discountable
 
         $line->orderId = OrderId::fromString($aggregateState['order_id']);
         $line->lineId = LineId::fromString($state['line_id']);
-        $line->variantId = VariantId::fromString($state['variant_id']);
+        $line->variantId = $state['variant_id'] ? VariantId::fromString($state['variant_id']) : null;
         $line->linePrice = LinePrice::fromScalars($state['line_price'], $state['tax_rate'], $state['includes_vat']);
         $line->quantity = Quantity::fromInt($state['quantity']);
         $line->discounts = array_map(fn ($discountState) => Discount::fromMappedData($discountState, $state), $childEntities[Discount::class]);

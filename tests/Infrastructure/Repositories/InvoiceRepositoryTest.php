@@ -17,6 +17,7 @@ use Thinktomorrow\Trader\Infrastructure\Test\TestContainer;
 class InvoiceRepositoryTest extends TestCase
 {
     use RefreshDatabase;
+    use PrepareWorld;
 
     /** @test */
     public function it_can_generate_a_next_invoice_reference()
@@ -31,7 +32,10 @@ class InvoiceRepositoryTest extends TestCase
     {
         $order = $this->createOrder(['order_id' => 'yyy', 'order_ref' => 'yy-ref', 'invoice_ref' => '2208001'], [], [], [], [], null, null, $this->createOrderShopper(['shopper_id' => 'sss']));
 
-        foreach ($this->orderRepositories() as $orderRepository) {
+        foreach ($this->orderRepositories() as $i => $orderRepository) {
+
+            $this->prepareWorldForOrder($i);
+
             $orderRepository->save($order);
             $this->assertEquals(InvoiceReference::fromString('2208001'), $orderRepository->lastInvoiceReference());
         }

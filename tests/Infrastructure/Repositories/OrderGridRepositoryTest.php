@@ -18,6 +18,7 @@ use Thinktomorrow\Trader\Infrastructure\Test\TestTraderConfig;
 class OrderGridRepositoryTest extends TestCase
 {
     use RefreshDatabase;
+    use PrepareWorld;
 
     private \Thinktomorrow\Trader\Domain\Model\Order\Order $order;
 
@@ -25,6 +26,7 @@ class OrderGridRepositoryTest extends TestCase
     {
         parent::setUp();
 
+        $this->prepareWorldForOrder(1);
         $this->order = $this->createDefaultOrder();
         (new TestContainer())->get(MysqlOrderRepository::class)->save($this->order);
     }

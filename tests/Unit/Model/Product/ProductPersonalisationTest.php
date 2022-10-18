@@ -58,7 +58,7 @@ class ProductPersonalisationTest extends TestCase
     /** @test */
     public function it_can_rearrange_personalisations()
     {
-        $product = $this->createdProductWithPersonalisations();
+        $product = $this->createProductWithPersonalisations();
 
         // Switch order
         $product->updatePersonalisations([
@@ -85,7 +85,7 @@ class ProductPersonalisationTest extends TestCase
     /** @test */
     public function it_can_get_all_personalisations()
     {
-        $product = $this->createdProductWithPersonalisations();
+        $product = $this->createProductWithPersonalisations();
 
         $this->assertCount(1, $product->getPersonalisations());
     }

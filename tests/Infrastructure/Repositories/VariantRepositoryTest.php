@@ -24,7 +24,8 @@ final class VariantRepositoryTest extends TestCase
      */
     public function it_can_save_and_find_an_variant(Product $product, Variant $variant)
     {
-        foreach ($this->repositories() as $repository) {
+        foreach ($this->repositories() as $i => $repository) {
+            $this->productRepositories()[$i]->save($product);
             $repository->save($variant);
 
             $variantStates = $repository->getStatesByProduct($variant->productId);
@@ -38,7 +39,8 @@ final class VariantRepositoryTest extends TestCase
      */
     public function it_can_sync_option_values(Product $product, Variant $variant)
     {
-        foreach ($this->repositories() as $repository) {
+        foreach ($this->repositories() as $i => $repository) {
+            $this->productRepositories()[$i]->save($product);
             $repository->save($variant);
 
             // Resave so that the sync check occurs
@@ -54,7 +56,8 @@ final class VariantRepositoryTest extends TestCase
      */
     public function it_can_delete_an_variant(Product $product, Variant $variant)
     {
-        foreach ($this->repositories() as $repository) {
+        foreach ($this->repositories() as $i => $repository) {
+            $this->productRepositories()[$i]->save($product);
             $repository->save($variant);
             $repository->delete($variant->variantId);
 
@@ -112,14 +115,14 @@ final class VariantRepositoryTest extends TestCase
 
     public function variants(): \Generator
     {
-        $product = $this->createdProductWithVariant();
+        $product = $this->createProductWithVariant();
 
         yield [
             $product,
             $product->getVariants()[0],
         ];
 
-        $product = $this->createdProductWithPersonalisations();
+        $product = $this->createProductWithPersonalisations();
 
         yield [
             $product,

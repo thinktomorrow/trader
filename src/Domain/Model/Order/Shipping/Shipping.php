@@ -21,7 +21,7 @@ final class Shipping implements ChildAggregate, Discountable
 
     public readonly OrderId $orderId;
     public readonly ShippingId $shippingId;
-    private ShippingProfileId $shippingProfileId;
+    private ?ShippingProfileId $shippingProfileId;
     private ShippingState $shippingState;
     private ShippingCost $shippingCost;
 
@@ -79,15 +79,17 @@ final class Shipping implements ChildAggregate, Discountable
 
     public function getMappedData(): array
     {
+        $data = $this->addDataIfNotNull(['shipping_profile_id' => $this->shippingProfileId?->get()]);
+
         return [
             'order_id' => $this->orderId->get(),
             'shipping_id' => $this->shippingId->get(),
-            'shipping_profile_id' => $this->shippingProfileId->get(),
+            'shipping_profile_id' => $this->shippingProfileId?->get(),
             'shipping_state' => $this->shippingState->value,
             'cost' => $this->shippingCost->getMoney()->getAmount(),
             'tax_rate' => $this->shippingCost->getTaxRate()->toPercentage()->get(),
             'includes_vat' => $this->shippingCost->includesVat(),
-            'data' => json_encode($this->data),
+            'data' => json_encode($data),
         ];
     }
 
@@ -104,7 +106,7 @@ final class Shipping implements ChildAggregate, Discountable
 
         $shipping->orderId = OrderId::fromString($aggregateState['order_id']);
         $shipping->shippingId = ShippingId::fromString($state['shipping_id']);
-        $shipping->shippingProfileId = ShippingProfileId::fromString($state['shipping_profile_id']);
+        $shipping->shippingProfileId = $state['shipping_profile_id'] ? ShippingProfileId::fromString($state['shipping_profile_id']) : null;
         $shipping->shippingState = ShippingState::from($state['shipping_state']);
         $shipping->shippingCost = ShippingCost::fromScalars(
             $state['cost'],

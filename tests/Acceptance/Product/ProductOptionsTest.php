@@ -25,7 +25,7 @@ class ProductOptionsTest extends ProductContext
     /** @test */
     public function it_can_compose_options()
     {
-        $product = $this->createdProductWithOptions();
+        $product = $this->createProductWithOptions();
         $this->productRepository->save($product);
 
         $productOptions = $this->productOptionsComposer->get(

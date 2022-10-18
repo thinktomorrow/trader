@@ -39,7 +39,7 @@ class ShippingTest extends TestCase
             'cost' => $cost->getMoney()->getAmount(),
             'tax_rate' => $cost->getTaxRate()->toPercentage()->get(),
             'includes_vat' => $cost->includesVat(),
-            'data' => json_encode([]),
+            'data' => json_encode(['shipping_profile_id' => $shippingProfileId->get()]),
         ], $shipping->getMappedData());
     }
 
@@ -57,7 +57,7 @@ class ShippingTest extends TestCase
             'cost' => '30',
             'tax_rate' => '10',
             'includes_vat' => true,
-            'data' => json_encode([]),
+            'data' => json_encode(['shipping_profile_id' => 'ppp']),
         ], $shipping->getMappedData());
     }
 

@@ -6,8 +6,16 @@ use Illuminate\Support\Facades\DB;
 use Thinktomorrow\Trader\Domain\Model\Taxon\Taxon;
 use Thinktomorrow\Trader\Domain\Model\Taxon\TaxonId;
 use Thinktomorrow\Trader\Domain\Model\Taxon\TaxonKey;
+use Thinktomorrow\Trader\Domain\Model\Product\Product;
+use Thinktomorrow\Trader\Domain\Model\Product\ProductId;
+use Thinktomorrow\Trader\Infrastructure\Test\TestContainer;
+use Thinktomorrow\Trader\Domain\Model\Product\VariantRepository;
+use Thinktomorrow\Trader\Domain\Model\Product\Exceptions\CouldNotFindProduct;
 use Thinktomorrow\Trader\Infrastructure\Laravel\Repositories\MysqlTaxonRepository;
 use Thinktomorrow\Trader\Infrastructure\Test\Repositories\InMemoryTaxonRepository;
+use Thinktomorrow\Trader\Infrastructure\Laravel\Repositories\MysqlProductRepository;
+use Thinktomorrow\Trader\Infrastructure\Test\Repositories\InMemoryProductRepository;
+use Thinktomorrow\Trader\Infrastructure\Laravel\Repositories\MysqlVariantRepository;
 
 trait TaxonHelpers
 {
@@ -47,6 +55,9 @@ trait TaxonHelpers
     private function createTaxon(Taxon $taxon, array $productIds = [])
     {
         foreach ($this->entityRepositories() as $taxonRepository) {
+
+            $taxonRepository->save($taxon);
+
             // In memory
             if ($taxonRepository instanceof InMemoryTaxonRepository) {
                 $taxonRepository->setProductIds($taxon->taxonId, $productIds);
@@ -54,13 +65,19 @@ trait TaxonHelpers
             // Mysql
             else {
                 foreach ($productIds as $productId) {
+
+                    try{
+                        $this->mysqlProductRepository()->find(ProductId::fromString($productId));
+                    }
+                    catch(CouldNotFindProduct $e) {
+                        $this->mysqlProductRepository()->save(Product::create(ProductId::fromString($productId)));
+                    }
+
                     DB::table('trader_taxa_products')->insert([
                         ['taxon_id' => $taxon->taxonId->get(), 'product_id' => $productId],
                     ]);
                 }
             }
-
-            $taxonRepository->save($taxon);
         }
     }
 
@@ -68,5 +85,10 @@ trait TaxonHelpers
     {
         yield new InMemoryTaxonRepository();
         yield new MysqlTaxonRepository();
+    }
+
+    private function mysqlProductRepository()
+    {
+        return new MysqlProductRepository(new MysqlVariantRepository(new TestContainer()));
     }
 }

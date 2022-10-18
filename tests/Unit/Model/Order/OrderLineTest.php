@@ -64,7 +64,13 @@ class OrderLineTest extends TestCase
         $this->assertEquals('yyy', $firstLine['variant_id']);
         $this->assertEquals($linePrice->getMoney()->getAmount(), $firstLine['line_price']);
         $this->assertEquals(3, $firstLine['quantity']);
-        $this->assertEquals(json_encode(['product_id' => 'aab', 'unit_price_including_vat' => '1000', 'unit_price_excluding_vat' => '900', 'foo' => 'bar']), $firstLine['data']);
+        $this->assertEquals(json_encode([
+            'product_id' => 'xxx',
+            'unit_price_including_vat' => '1000',
+            'unit_price_excluding_vat' => '900',
+            'foo' => 'bar',
+            'variant_id' => $firstLine['variant_id'],
+        ]), $firstLine['data']);
 
         $this->assertEquals([
             new LineUpdated(

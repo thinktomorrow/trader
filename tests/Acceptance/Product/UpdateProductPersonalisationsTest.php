@@ -80,7 +80,7 @@ class UpdateProductPersonalisationsTest extends ProductContext
     /** @test */
     public function it_can_remove_existing_personalisations()
     {
-        $product = $this->createdProductWithPersonalisations();
+        $product = $this->createProductWithPersonalisations();
         $this->productRepository->save($product);
 
         $this->productApplication->updateProductPersonalisations(new UpdateProductPersonalisations($product->productId->get(), []));

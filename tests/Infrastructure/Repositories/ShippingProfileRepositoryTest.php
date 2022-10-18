@@ -21,14 +21,13 @@ use Thinktomorrow\Trader\Infrastructure\Test\TestContainer;
 class ShippingProfileRepositoryTest extends TestCase
 {
     use RefreshDatabase;
+    use PrepareWorld;
 
     private \Thinktomorrow\Trader\Domain\Model\Country\Country $country;
 
     protected function setUp(): void
     {
         parent::setUp();
-
-        $this->country = $this->createCountry(['country_id' => 'BE']);
     }
 
     /**
@@ -38,7 +37,7 @@ class ShippingProfileRepositoryTest extends TestCase
     public function it_can_save_and_find_a_profile(ShippingProfile $shippingProfile)
     {
         foreach ($this->repositories() as $i => $repository) {
-            $this->countryRepositories()[$i]->save($this->country);
+            $this->prepareCountries($i);
 
             $repository->save($shippingProfile);
             $shippingProfile->releaseEvents();
@@ -55,7 +54,8 @@ class ShippingProfileRepositoryTest extends TestCase
     {
         $profilesNotFound = 0;
 
-        foreach ($this->repositories() as $repository) {
+        foreach ($this->repositories() as $i => $repository) {
+            $this->prepareCountries($i);
             $repository->save($shippingProfile);
             $repository->delete($shippingProfile->shippingProfileId);
 
@@ -81,9 +81,7 @@ class ShippingProfileRepositoryTest extends TestCase
     public function it_can_get_available_shipping_countries()
     {
         foreach ($this->repositories() as $i => $repository) {
-            $this->countryRepositories()[$i]->save($this->country);
-            $country2 = $this->createCountry(['country_id' => 'NL']);
-            $this->countryRepositories()[$i]->save($country2);
+            $this->prepareCountries($i);
 
             $profile = $this->createShippingProfile();
             $profile->addCountry(CountryId::fromString('BE'));
@@ -91,7 +89,7 @@ class ShippingProfileRepositoryTest extends TestCase
             $repository->save($profile);
 
             $this->assertEquals([
-                \Thinktomorrow\Trader\Application\Country\Country::fromMappedData($this->country->getMappedData()),
+                \Thinktomorrow\Trader\Application\Country\Country::fromMappedData($this->createCountry(['country_id' => 'BE'])->getMappedData()),
             ], $repository->getAvailableShippingCountries());
         }
     }
@@ -100,14 +98,6 @@ class ShippingProfileRepositoryTest extends TestCase
     {
         yield new InMemoryShippingProfileRepository();
         yield new MysqlShippingProfileRepository(new TestContainer());
-    }
-
-    private function countryRepositories(): array
-    {
-        return [
-            new InMemoryCountryRepository(),
-            new MysqlCountryRepository(),
-        ];
     }
 
     public function shippingProfiles(): \Generator

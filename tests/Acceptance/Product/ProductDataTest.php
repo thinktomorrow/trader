@@ -13,7 +13,7 @@ class ProductDataTest extends ProductContext
     /** @test */
     public function it_can_render_localized_data()
     {
-        $product = $this->createdProductWithOptions();
+        $product = $this->createProductWithOptions();
         $product->addData([
             'content' => ['nl' => 'content nl', 'en' => 'content en'],
         ]);

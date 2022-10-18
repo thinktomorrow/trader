@@ -15,7 +15,7 @@ abstract class OrderReadPayment
 
     protected Price $cost;
     protected string $payment_id;
-    protected string $payment_method_id;
+    protected ?string $payment_method_id;
     protected PaymentState $state;
     protected iterable $discounts;
     protected array $data;
@@ -32,7 +32,7 @@ abstract class OrderReadPayment
         $payment = new static();
 
         $payment->payment_id = $state['payment_id'];
-        $payment->payment_method_id = $state['payment_method_id'];
+        $payment->payment_method_id = $state['payment_method_id'] ?: null;
         $payment->state = PaymentState::from($state['payment_state']);
         $payment->cost = $state['cost'];
         $payment->data = json_decode($state['data'], true);
@@ -46,7 +46,7 @@ abstract class OrderReadPayment
         return $this->payment_id;
     }
 
-    public function getPaymentMethodId(): string
+    public function getPaymentMethodId(): ?string
     {
         return $this->payment_method_id;
     }

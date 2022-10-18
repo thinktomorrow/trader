@@ -20,6 +20,7 @@ use Thinktomorrow\Trader\Infrastructure\Test\TestContainer;
 final class OrderRepositoryTest extends TestCase
 {
     use RefreshDatabase;
+    use PrepareWorld;
 
     /**
      * @test
@@ -27,7 +28,10 @@ final class OrderRepositoryTest extends TestCase
     public function it_can_save_and_find_an_order()
     {
         foreach ($this->orders() as $order) {
-            foreach ($this->orderRepositories() as $orderRepository) {
+            foreach ($this->orderRepositories() as $i => $orderRepository) {
+
+                $this->prepareWorldForOrder($i);
+
                 $orderRepository->save($order);
                 $order->releaseEvents();
 
@@ -47,7 +51,10 @@ final class OrderRepositoryTest extends TestCase
         foreach ($this->orders() as $order) {
             $ordersNotFound = 0;
 
-            foreach ($this->orderRepositories() as $orderRepository) {
+            foreach ($this->orderRepositories() as $i => $orderRepository) {
+
+                $this->prepareWorldForOrder($i);
+
                 $orderRepository->save($order);
                 $orderRepository->delete($order->orderId);
 
@@ -97,22 +104,23 @@ final class OrderRepositoryTest extends TestCase
         yield $this->createDefaultOrder();
 
         $orderWithDiscount = $this->createDefaultOrder();
-        $orderWithDiscount->addDiscount($this->createOrderDiscount(['discount_id' => 'def', 'promo_discount_id' => 'ghi'], $orderWithDiscount->getMappedData()));
+        $orderWithDiscount->addDiscount($this->createOrderDiscount(['discount_id' => 'order-discount-def', 'promo_discount_id' => 'eee'], $orderWithDiscount->getMappedData()));
+
         yield $orderWithDiscount;
 
         $orderWithLineDiscount = $this->createDefaultOrder();
         $orderWithLineDiscount->getLines()[0]->addDiscount($this->createOrderDiscount([
-            'discount_id' => 'def',
-            'promo_discount_id' => 'ghi',
+            'discount_id' => 'order-discount-def',
+            'promo_discount_id' => 'eee',
             'discountable_id' => $orderWithLineDiscount->getLines()[0]->lineId->get(),
             'discountable_type' => DiscountableType::line->value,
         ], $orderWithLineDiscount->getMappedData()));
         yield $orderWithLineDiscount;
-
+//
         $orderWithShippingDiscount = $this->createDefaultOrder();
         $orderWithShippingDiscount->getShippings()[0]->addDiscount($this->createOrderDiscount([
-            'discount_id' => 'def',
-            'promo_discount_id' => 'ghi',
+            'discount_id' => 'order-discount-def',
+            'promo_discount_id' => 'eee',
             'discountable_id' => $orderWithShippingDiscount->getShippings()[0]->shippingId->get(),
             'discountable_type' => DiscountableType::shipping->value,
         ], $orderWithShippingDiscount->getMappedData()));

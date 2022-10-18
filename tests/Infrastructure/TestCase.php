@@ -19,6 +19,7 @@ use Thinktomorrow\Trader\Application\Customer\Read\CustomerBillingAddress;
 use Thinktomorrow\Trader\Application\Customer\Read\CustomerRead;
 use Thinktomorrow\Trader\Application\Customer\Read\CustomerShippingAddress;
 use Thinktomorrow\Trader\Application\Order\MerchantOrder\MerchantOrder;
+use Thinktomorrow\Trader\Infrastructure\Test\Repositories\InMemoryCountryRepository;
 use Thinktomorrow\Trader\Application\Order\MerchantOrder\MerchantOrderBillingAddress;
 use Thinktomorrow\Trader\Application\Order\MerchantOrder\MerchantOrderDiscount;
 use Thinktomorrow\Trader\Application\Order\MerchantOrder\MerchantOrderEvent;
@@ -158,6 +159,7 @@ abstract class TestCase extends \Orchestra\Testbench\TestCase
         InMemoryVariantRepository::clear();
         InMemoryTaxonRepository::clear();
         InMemoryPromoRepository::clear();
+        InMemoryCountryRepository::clear();
 
         parent::tearDown();
     }
@@ -168,7 +170,7 @@ abstract class TestCase extends \Orchestra\Testbench\TestCase
      */
     protected function buildWorldForDefaultOrder(): void
     {
-        $product = $this->createdProductWithPersonalisations();
+        $product = $this->createProductWithPersonalisations();
         app(ProductRepository::class)->save($product);
 
         $promo = $this->createPromo([], [
