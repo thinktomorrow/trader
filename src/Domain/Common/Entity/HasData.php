@@ -37,8 +37,8 @@ trait HasData
     {
         $data = $this->data;
 
-        foreach($values as $key => $value) {
-            if($value) {
+        foreach ($values as $key => $value) {
+            if ($value) {
                 $data[$key] = $value;
             }
         }

@@ -82,7 +82,6 @@ final class TaxonFilterTreeComposerTest extends TestCase
         $this->createTaxon($second, ['aaa']);
 
         foreach ($this->repositories() as $i => $repository) {
-
             $composer = new VineTaxonFilterTreeComposer($repository);
 
             $taxonFilterTree = $composer->getAvailableFilters('taxon-main');
