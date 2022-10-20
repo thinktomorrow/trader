@@ -8,12 +8,7 @@ use Thinktomorrow\Trader\Domain\Model\Order\OrderId;
 
 final class LineUpdated
 {
-    public readonly OrderId $orderId;
-    public readonly LineId $lineId;
-
-    public function __construct(OrderId $orderId, LineId $lineId)
+    public function __construct(public readonly OrderId $orderId, public readonly LineId $lineId)
     {
-        $this->orderId = $orderId;
-        $this->lineId = $lineId;
     }
 }
