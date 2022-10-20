@@ -4,7 +4,6 @@ declare(strict_types=1);
 namespace Thinktomorrow\Trader\Application\Taxon\Filter;
 
 use Thinktomorrow\Trader\Application\Taxon\Tree\TaxonTree;
-use Thinktomorrow\Trader\Application\Taxon\Tree\TaxonNode;
 
 interface TaxonFilterTreeComposer
 {

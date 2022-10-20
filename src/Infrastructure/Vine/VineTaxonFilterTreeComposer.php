@@ -99,7 +99,7 @@ class VineTaxonFilterTreeComposer implements TaxonFilterTreeComposer
     {
         $node = $this->taxonTreeRepository->getTree()->find(fn (TaxonNode $node) => $node->getId() == $taxonId);
 
-        if(!$node) {
+        if (! $node) {
             throw new \InvalidArgumentException('Cannot retrieve product ids from taxon. No Taxon found by id ' . $taxonId);
         }
 
