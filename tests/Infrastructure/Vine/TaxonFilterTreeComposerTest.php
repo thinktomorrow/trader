@@ -51,6 +51,22 @@ final class TaxonFilterTreeComposerTest extends TestCase
     }
 
     /** @test */
+    public function it_can_retrieve_all_product_ids()
+    {
+        $this->createDefaultTaxons();
+
+        foreach ($this->repositories() as $repository) {
+            $composer = new VineTaxonFilterTreeComposer($repository);
+
+            $productIds = $composer->getProductIds('first');
+
+            $this->assertEquals([
+                'aaa','bbb','ccc','ddd',
+            ], $productIds);
+        }
+    }
+
+    /** @test */
     public function taxon_without_product_is_not_added_to_filter_tree()
     {
         $this->createTaxon(Taxon::create(TaxonId::fromString('first'), TaxonKey::fromString('taxon-first')), ['aaa']);

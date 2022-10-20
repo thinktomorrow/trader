@@ -26,7 +26,7 @@ class VineTaxonFilterTreeComposer implements TaxonFilterTreeComposer
             return new TaxonTree();
         }
 
-        $productIds = $this->getProductIds($mainTaxonNode);
+        $productIds = $this->getProductIds($mainTaxonNode->getId());
 
         /**
          * The products belonging to the main taxon determine which taxons will
@@ -95,8 +95,14 @@ class VineTaxonFilterTreeComposer implements TaxonFilterTreeComposer
      *
      * @return array
      */
-    private function getProductIds(TaxonNode $node): array
+    public function getProductIds(string $taxonId): array
     {
+        $node = $this->taxonTreeRepository->getTree()->find(fn (TaxonNode $node) => $node->getId() == $taxonId);
+
+        if(!$node) {
+            throw new \InvalidArgumentException('Cannot retrieve product ids from taxon. No Taxon found by id ' . $taxonId);
+        }
+
         $productIds = $node->getProductIds();
 
         $node->getChildNodes()->flatten()->each(function ($childNode) use (&$productIds) {
