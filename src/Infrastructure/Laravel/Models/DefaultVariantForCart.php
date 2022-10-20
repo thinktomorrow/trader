@@ -70,7 +70,7 @@ class DefaultVariantForCart implements VariantForCart
 
     public function getTitle(): string
     {
-        if($customTitle = $this->data('title')) {
+        if ($customTitle = $this->data('title')) {
             return $customTitle;
         }
 
