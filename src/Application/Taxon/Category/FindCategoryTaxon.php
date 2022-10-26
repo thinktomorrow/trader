@@ -3,12 +3,15 @@ declare(strict_types=1);
 
 namespace Thinktomorrow\Trader\Application\Taxon\Category;
 
+use Thinktomorrow\Trader\Application\Common\HasLocale;
 use Thinktomorrow\Trader\Application\Taxon\Tree\TaxonNode;
 use Thinktomorrow\Trader\Application\Taxon\Tree\TaxonTreeRepository;
 use Thinktomorrow\Trader\TraderConfig;
 
 class FindCategoryTaxon
 {
+    use HasLocale;
+
     private TaxonTreeRepository $taxonTreeRepository;
     private TraderConfig $traderConfig;
 
@@ -24,7 +27,7 @@ class FindCategoryTaxon
             return null;
         }
 
-        $tree = $this->taxonTreeRepository->getTree();
+        $tree = $this->taxonTreeRepository->setLocale($this->getLocale())->getTree();
 
         foreach ($taxon_ids as $taxon_id) {
             /** @var TaxonNode $taxonNode */
@@ -40,7 +43,7 @@ class FindCategoryTaxon
 
     public function getCategoryRoot(): ?TaxonNode
     {
-        $tree = $this->taxonTreeRepository->getTree();
+        $tree = $this->taxonTreeRepository->setLocale($this->getLocale())->getTree();
 
         if (! $categoryRootId = $this->traderConfig->getCategoryRootId()) {
             if (! $categoryRootId = $tree->first()?->getId()) {

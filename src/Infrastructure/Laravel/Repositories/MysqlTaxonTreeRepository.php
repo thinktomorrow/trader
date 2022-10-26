@@ -5,6 +5,8 @@ namespace Thinktomorrow\Trader\Infrastructure\Laravel\Repositories;
 
 use Illuminate\Support\Facades\DB;
 use Psr\Container\ContainerInterface;
+use Thinktomorrow\Trader\TraderConfig;
+use Thinktomorrow\Trader\Domain\Common\Locale;
 use Thinktomorrow\Trader\Application\Taxon\Category\CategoryRepository;
 use Thinktomorrow\Trader\Application\Taxon\Tree\TaxonNode;
 use Thinktomorrow\Trader\Application\Taxon\Tree\TaxonNodes;
@@ -16,15 +18,26 @@ use Thinktomorrow\Vine\NodeCollectionFactory;
 
 class MysqlTaxonTreeRepository implements TaxonTreeRepository, CategoryRepository
 {
-    private ?TaxonTree $tree = null;
+    /** @var TaxonTree[] tree per locale */
+    private array $trees = [];
+    private Locale $locale;
 
     private static $taxonTable = 'trader_taxa';
 
     private ContainerInterface $container;
 
-    public function __construct(ContainerInterface $container)
+    public function __construct(ContainerInterface $container, TraderConfig $traderConfig)
     {
         $this->container = $container;
+
+        $this->locale = $traderConfig->getDefaultLocale();
+    }
+
+    public function setLocale(Locale $locale): static
+    {
+        $this->locale = $locale;
+
+        return $this;
     }
 
     public function findTaxonById(string $taxonId): TaxonNode
@@ -53,15 +66,18 @@ class MysqlTaxonTreeRepository implements TaxonTreeRepository, CategoryRepositor
 
     public function getTree(): TaxonTree
     {
-        if ($this->tree) {
-            return $this->tree;
+        $localeKey = $this->locale->toIso15897();
+
+        if (isset($this->trees[$localeKey])) {
+            return $this->trees[$localeKey];
         }
 
-        $this->tree = new TaxonTree((new NodeCollectionFactory)->strict()->fromSource(
+        $this->trees[$localeKey] = (new TaxonTree((new NodeCollectionFactory)->strict()->fromSource(
             new TaxonSource($this->getTaxonNodes())
-        )->all());
+        )->all()))
+        ->eachRecursive(fn(TaxonNode $node) => $node->setLocale($this->locale));
 
-        return $this->tree;
+        return $this->trees[$localeKey];
     }
 
     private function getTaxonNodes(): TaxonNodes

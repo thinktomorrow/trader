@@ -31,7 +31,7 @@ class FindCategoryTaxonTest extends TaxonContext
     {
         $finder = new FindCategoryTaxon(
             new TestTraderConfig(['category_root_id' => 'fifth']),
-            new InMemoryTaxonTreeRepository(new TestContainer())
+            new InMemoryTaxonTreeRepository(new TestContainer(), new TestTraderConfig())
         );
 
         $this->assertEquals('sixth', $finder->byTaxonIds(['first','second','sixth'])->getId());
@@ -42,7 +42,7 @@ class FindCategoryTaxonTest extends TaxonContext
     {
         $finder = new FindCategoryTaxon(
             new TestTraderConfig(['category_root_id' => null]),
-            new InMemoryTaxonTreeRepository(new TestContainer())
+            new InMemoryTaxonTreeRepository(new TestContainer(), new TestTraderConfig())
         );
 
         $this->assertEquals('second', $finder->byTaxonIds(['second','sixth'])->getId());
@@ -53,7 +53,7 @@ class FindCategoryTaxonTest extends TaxonContext
     {
         $finder = new FindCategoryTaxon(
             new TestTraderConfig(['category_root_id' => null]),
-            new InMemoryTaxonTreeRepository(new TestContainer())
+            new InMemoryTaxonTreeRepository(new TestContainer(), new TestTraderConfig())
         );
 
         $this->assertEquals('first', $finder->byTaxonIds(['first','sixth'])->getId());

@@ -5,6 +5,7 @@ namespace Tests\Infrastructure\Vine;
 
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\Infrastructure\TestCase;
+use Thinktomorrow\Trader\Infrastructure\Test\TestTraderConfig;
 use Thinktomorrow\Trader\Infrastructure\Laravel\Repositories\MysqlTaxonTreeRepository;
 use Thinktomorrow\Trader\Infrastructure\Test\Repositories\InMemoryTaxonRepository;
 use Thinktomorrow\Trader\Infrastructure\Test\Repositories\InMemoryTaxonTreeRepository;
@@ -67,7 +68,7 @@ final class TaxonIdOptionsComposerTest extends TestCase
 
     private function repositories(): \Generator
     {
-        yield new InMemoryTaxonTreeRepository(new TestContainer());
-        yield new MysqlTaxonTreeRepository(new TestContainer());
+        yield new InMemoryTaxonTreeRepository(new TestContainer(), new TestTraderConfig());
+        yield new MysqlTaxonTreeRepository(new TestContainer(), new TestTraderConfig());
     }
 }

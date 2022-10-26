@@ -195,7 +195,7 @@ class GridRepositoryTest extends TestCase
         return new MysqlGridRepository(
             new TestContainer(),
             new TestTraderConfig(),
-            new VineFlattenedTaxonIdsComposer(new MysqlTaxonTreeRepository(new TestContainer()))
+            new VineFlattenedTaxonIdsComposer(new MysqlTaxonTreeRepository(new TestContainer(), new TestTraderConfig()))
         );
     }
 }

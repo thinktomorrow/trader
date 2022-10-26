@@ -3,6 +3,8 @@ declare(strict_types=1);
 
 namespace Thinktomorrow\Trader\Infrastructure\Laravel\Repositories;
 
+use Thinktomorrow\Trader\TraderConfig;
+use Thinktomorrow\Trader\Domain\Common\Locale;
 use Thinktomorrow\Trader\Application\Taxon\Category\CategoryRepository;
 use Thinktomorrow\Trader\Application\Taxon\Tree\TaxonNode;
 use Thinktomorrow\Trader\Application\Taxon\Tree\TaxonTree;
@@ -13,11 +15,22 @@ class MemoizedMysqlTaxonTreeRepository implements TaxonTreeRepository, CategoryR
 {
     private MysqlTaxonTreeRepository $taxonTreeRepository;
 
-    private static ?TaxonTree $tree = null;
+    /** @var TaxonTree[] - tree per locale */
+    private static array $trees = [];
+    private Locale $locale;
 
-    public function __construct(MysqlTaxonTreeRepository $taxonTreeRepository)
+    public function __construct(MysqlTaxonTreeRepository $taxonTreeRepository, TraderConfig $traderConfig)
     {
         $this->taxonTreeRepository = $taxonTreeRepository;
+
+        $this->locale = $traderConfig->getDefaultLocale();
+    }
+
+    public function setLocale(Locale $locale): static
+    {
+        $this->locale = $locale;
+
+        return $this;
     }
 
     public function findTaxonById(string $taxonId): TaxonNode
@@ -46,11 +59,15 @@ class MemoizedMysqlTaxonTreeRepository implements TaxonTreeRepository, CategoryR
 
     public function getTree(): TaxonTree
     {
-        if (static::$tree) {
-            return static::$tree;
+        $localeKey = $this->locale->toIso15897();
+
+        if (isset(static::$trees[$localeKey])) {
+            return static::$trees[$localeKey];
         }
 
-        return static::$tree = $this->taxonTreeRepository->getTree();
+        return static::$trees[$localeKey] = $this->taxonTreeRepository
+            ->setLocale($this->locale)
+            ->getTree();
     }
 
     public static function clear(): void

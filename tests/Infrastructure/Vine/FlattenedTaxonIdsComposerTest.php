@@ -6,6 +6,7 @@ namespace Tests\Infrastructure\Vine;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\Infrastructure\TestCase;
 use Thinktomorrow\Trader\Application\Taxon\Tree\TaxonNode;
+use Thinktomorrow\Trader\Infrastructure\Test\TestTraderConfig;
 use Thinktomorrow\Trader\Infrastructure\Laravel\Models\DefaultTaxonNode;
 use Thinktomorrow\Trader\Infrastructure\Laravel\Repositories\MysqlTaxonTreeRepository;
 use Thinktomorrow\Trader\Infrastructure\Test\Repositories\InMemoryTaxonRepository;
@@ -90,7 +91,7 @@ final class FlattenedTaxonIdsComposerTest extends TestCase
 
     private function repositories(): \Generator
     {
-        yield new InMemoryTaxonTreeRepository(new TestContainer());
-        yield new MysqlTaxonTreeRepository(new TestContainer());
+        yield new InMemoryTaxonTreeRepository(new TestContainer(), new TestTraderConfig());
+        yield new MysqlTaxonTreeRepository(new TestContainer(), new TestTraderConfig());
     }
 }

@@ -7,6 +7,7 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\Infrastructure\TestCase;
 use Tests\Infrastructure\Vine\TaxonHelpers;
 use Thinktomorrow\Trader\Application\Taxon\Tree\TaxonNode;
+use Thinktomorrow\Trader\Infrastructure\Test\TestTraderConfig;
 use Thinktomorrow\Trader\Infrastructure\Laravel\Repositories\MysqlTaxonTreeRepository;
 use Thinktomorrow\Trader\Infrastructure\Test\Repositories\InMemoryTaxonTreeRepository;
 use Thinktomorrow\Trader\Infrastructure\Test\TestContainer;
@@ -40,7 +41,7 @@ final class TaxonTreeRepositoryTest extends TestCase
 
     private function repositories(): \Generator
     {
-        yield new InMemoryTaxonTreeRepository(new TestContainer());
-        yield new MysqlTaxonTreeRepository(new TestContainer());
+        yield new InMemoryTaxonTreeRepository(new TestContainer(), new TestTraderConfig());
+        yield new MysqlTaxonTreeRepository(new TestContainer(), new TestTraderConfig());
     }
 }

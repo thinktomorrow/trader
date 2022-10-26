@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace Thinktomorrow\Trader\Infrastructure\Test\Repositories;
 
 use Psr\Container\ContainerInterface;
+use Thinktomorrow\Trader\TraderConfig;
 use Thinktomorrow\Trader\Application\Taxon\Category\CategoryRepository;
 use Thinktomorrow\Trader\Application\Taxon\Tree\TaxonNode;
 use Thinktomorrow\Trader\Application\Taxon\Tree\TaxonNodes;
@@ -11,22 +12,33 @@ use Thinktomorrow\Trader\Application\Taxon\Tree\TaxonTree;
 use Thinktomorrow\Trader\Application\Taxon\Tree\TaxonTreeRepository;
 use Thinktomorrow\Trader\Domain\Model\Taxon\TaxonId;
 use Thinktomorrow\Trader\Infrastructure\Vine\TaxonSource;
+use Thinktomorrow\Trader\Domain\Common\Locale;
 use Thinktomorrow\Vine\NodeCollectionFactory;
 
 final class InMemoryTaxonTreeRepository implements TaxonTreeRepository, CategoryRepository
 {
     private ContainerInterface $container;
+    private Locale $locale;
 
-    public function __construct(ContainerInterface $container)
+    public function __construct(ContainerInterface $container, TraderConfig $traderConfig)
     {
         $this->container = $container;
+
+        $this->locale = $traderConfig->getDefaultLocale();
+    }
+
+    public function setLocale(Locale $locale): static
+    {
+        $this->locale = $locale;
+
+        return $this;
     }
 
     public function getTree(): TaxonTree
     {
-        return new TaxonTree((new NodeCollectionFactory)->strict()->fromSource(
+        return (new TaxonTree((new NodeCollectionFactory)->strict()->fromSource(
             new TaxonSource($this->getTaxonNodes())
-        )->all());
+        )->all()))->eachRecursive(fn($node) => $node->setLocale($this->locale));
     }
 
     public function findTaxonById(string $id): TaxonNode
