@@ -4,15 +4,15 @@ declare(strict_types=1);
 namespace Thinktomorrow\Trader\Infrastructure\Test\Repositories;
 
 use Psr\Container\ContainerInterface;
-use Thinktomorrow\Trader\TraderConfig;
 use Thinktomorrow\Trader\Application\Taxon\Category\CategoryRepository;
 use Thinktomorrow\Trader\Application\Taxon\Tree\TaxonNode;
 use Thinktomorrow\Trader\Application\Taxon\Tree\TaxonNodes;
 use Thinktomorrow\Trader\Application\Taxon\Tree\TaxonTree;
 use Thinktomorrow\Trader\Application\Taxon\Tree\TaxonTreeRepository;
+use Thinktomorrow\Trader\Domain\Common\Locale;
 use Thinktomorrow\Trader\Domain\Model\Taxon\TaxonId;
 use Thinktomorrow\Trader\Infrastructure\Vine\TaxonSource;
-use Thinktomorrow\Trader\Domain\Common\Locale;
+use Thinktomorrow\Trader\TraderConfig;
 use Thinktomorrow\Vine\NodeCollectionFactory;
 
 final class InMemoryTaxonTreeRepository implements TaxonTreeRepository, CategoryRepository
@@ -38,7 +38,7 @@ final class InMemoryTaxonTreeRepository implements TaxonTreeRepository, Category
     {
         return (new TaxonTree((new NodeCollectionFactory)->strict()->fromSource(
             new TaxonSource($this->getTaxonNodes())
-        )->all()))->eachRecursive(fn($node) => $node->setLocale($this->locale));
+        )->all()))->eachRecursive(fn ($node) => $node->setLocale($this->locale));
     }
 
     public function findTaxonById(string $id): TaxonNode

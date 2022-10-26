@@ -5,15 +5,15 @@ namespace Thinktomorrow\Trader\Infrastructure\Laravel\Repositories;
 
 use Illuminate\Support\Facades\DB;
 use Psr\Container\ContainerInterface;
-use Thinktomorrow\Trader\TraderConfig;
-use Thinktomorrow\Trader\Domain\Common\Locale;
 use Thinktomorrow\Trader\Application\Taxon\Category\CategoryRepository;
 use Thinktomorrow\Trader\Application\Taxon\Tree\TaxonNode;
 use Thinktomorrow\Trader\Application\Taxon\Tree\TaxonNodes;
 use Thinktomorrow\Trader\Application\Taxon\Tree\TaxonTree;
 use Thinktomorrow\Trader\Application\Taxon\Tree\TaxonTreeRepository;
+use Thinktomorrow\Trader\Domain\Common\Locale;
 use Thinktomorrow\Trader\Domain\Model\Taxon\Exceptions\CouldNotFindTaxon;
 use Thinktomorrow\Trader\Infrastructure\Vine\TaxonSource;
+use Thinktomorrow\Trader\TraderConfig;
 use Thinktomorrow\Vine\NodeCollectionFactory;
 
 class MysqlTaxonTreeRepository implements TaxonTreeRepository, CategoryRepository
@@ -75,7 +75,7 @@ class MysqlTaxonTreeRepository implements TaxonTreeRepository, CategoryRepositor
         $this->trees[$localeKey] = (new TaxonTree((new NodeCollectionFactory)->strict()->fromSource(
             new TaxonSource($this->getTaxonNodes())
         )->all()))
-        ->eachRecursive(fn(TaxonNode $node) => $node->setLocale($this->locale));
+        ->eachRecursive(fn (TaxonNode $node) => $node->setLocale($this->locale));
 
         return $this->trees[$localeKey];
     }

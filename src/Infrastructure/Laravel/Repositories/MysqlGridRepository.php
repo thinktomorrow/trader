@@ -207,7 +207,7 @@ class MysqlGridRepository implements GridRepository
                 ->map(fn ($state) => $this->container->get(GridItem::class)::fromMappedData(array_merge($state, [
                     'includes_vat' => (bool) $state['includes_vat'],
                 ]), $this->locale))
-                ->each(fn(GridItem $gridItem) => $gridItem->setLocale($this->locale))
+                ->each(fn (GridItem $gridItem) => $gridItem->setLocale($this->locale))
         );
     }
 
