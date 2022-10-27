@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace Thinktomorrow\Trader\Infrastructure\Shop\Controllers;
 
+use Thinktomorrow\Trader\Domain\Common\Locale;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
@@ -16,14 +17,14 @@ trait TaxonControllerAssistant
 {
     protected ?TaxonTree $activeTaxons = null;
 
-    protected function extractTaxonFromSlug(string $taxonKeys): TaxonNode
+    protected function extractTaxonFromSlug(Locale $locale, string $taxonKeys): TaxonNode
     {
         // The main taxon for the page content and filtering
         $taxonKeys = explode('/', $taxonKeys);
         $taxonKey = urldecode($taxonKeys[count($taxonKeys) - 1]);
 
         try {
-            $taxonNode = $this->categoryRepository->findTaxonByKey($taxonKey);
+            $taxonNode = $this->categoryRepository->setLocale($locale)->findTaxonByKey($taxonKey);
 
             if (! $taxonNode->showOnline()) {
                 throw new CouldNotFindTaxon('Taxon ' . $taxonKey . ' is offline.');
@@ -31,17 +32,17 @@ trait TaxonControllerAssistant
 
             return $taxonNode;
         } catch (CouldNotFindTaxon $e) {
-            if ($redirect = $this->redirectRepository->find($taxonKey)) {
-                throw (new FoundRouteAsRedirect($this->getTaxonUrl($redirect->getFrom())))->setRedirect($this->getTaxonUrl($redirect->getTo()));
+            if ($redirect = $this->redirectRepository->find($locale, $taxonKey)) {
+                throw (new FoundRouteAsRedirect($this->getTaxonUrl($redirect->getLocale(), $redirect->getFrom())))->setRedirect($this->getTaxonUrl($redirect->getLocale(),$redirect->getTo()));
             }
 
             throw new NotFoundHttpException('No Taxon category found by slug ' . implode('/', $taxonKeys));
         }
     }
 
-    protected function getTaxonUrl(string $taxon_key): string
+    protected function getTaxonUrl(Locale $locale, string $taxon_key): string
     {
-        return $taxon_key;
+        return $locale->get() .'/'. $taxon_key;
     }
 
     protected function getProducts(TaxonNode $taxon, Request $request): LengthAwarePaginator
@@ -84,6 +85,6 @@ trait TaxonControllerAssistant
             return $this->activeTaxons;
         }
 
-        return $this->activeTaxons = $this->taxonFilterTreeComposer->getActiveFilters($taxon->getKey(), $taxonKeys);
+        return $this->activeTaxons = $this->taxonFilterTreeComposer->getActiveFilters($this->currentLocale->get(), $taxon->getKey(), $taxonKeys);
     }
 }

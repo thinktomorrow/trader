@@ -4,29 +4,35 @@ declare(strict_types=1);
 namespace Thinktomorrow\Trader\Infrastructure\Laravel\Repositories;
 
 use Illuminate\Support\Facades\DB;
+use Thinktomorrow\Trader\Domain\Common\Locale;
 use Thinktomorrow\Trader\Application\Taxon\Redirect\Redirect;
 use Thinktomorrow\Trader\Application\Taxon\Redirect\RedirectRepository;
 
 class MysqlRedirectRepository implements RedirectRepository
 {
-    private static string $redirectTable = 'trader_redirects';
+    private static string $redirectTable = 'trader_taxa_redirects';
 
-    public function find(string $from): ?Redirect
+    public function find(Locale $locale, string $from): ?Redirect
     {
-        $result = DB::table(static::$redirectTable)->where('from', static::sanitizeSlug($from))->first();
+        $result = DB::table(static::$redirectTable)
+            ->where('locale', $locale->get())
+            ->where('from', static::sanitizeSlug($from))
+            ->first();
 
         if (! $result) {
             return null;
         }
 
-        return new Redirect($result->from, $result->to, (string) $result->id, \DateTime::createFromFormat('Y-m-d H:i:s', $result->created_at));
+        return new Redirect($locale, $result->from, $result->to, (string) $result->id, \DateTime::createFromFormat('Y-m-d H:i:s', $result->created_at));
     }
 
-    public function getAllTo(string $to): array
+    public function getAllTo(Locale $locale, string $to): array
     {
-        return DB::table(static::$redirectTable)->where('to', static::sanitizeSlug($to))
+        return DB::table(static::$redirectTable)
+            ->where('locale', $locale->get())
+            ->where('to', static::sanitizeSlug($to))
             ->get()
-            ->map(fn ($result) => new Redirect($result->from, $result->to, (string) $result->id, \DateTime::createFromFormat('Y-m-d H:i:s', $result->created_at)))
+            ->map(fn ($result) => new Redirect($locale, $result->from, $result->to, (string) $result->id, \DateTime::createFromFormat('Y-m-d H:i:s', $result->created_at)))
             ->toArray();
     }
 
@@ -39,7 +45,7 @@ class MysqlRedirectRepository implements RedirectRepository
          * If there are any existing redirects with this 'from' as its 'to' target,
          * we'll update those as well to reflect the new target
          */
-        foreach ($this->getAllTo($from) as $existingRedirect) {
+        foreach ($this->getAllTo($redirect->getLocale(), $from) as $existingRedirect) {
             // If the from and to are the same, we'll remove the record
             if ($existingRedirect->getFrom() == $to) {
                 $this->delete($existingRedirect);
@@ -57,6 +63,7 @@ class MysqlRedirectRepository implements RedirectRepository
             ]);
         } else {
             DB::table(static::$redirectTable)->insert([
+                'locale' => $redirect->getLocale()->get(),
                 'from' => static::sanitizeSlug($redirect->getFrom()),
                 'to' => static::sanitizeSlug($redirect->getTo()),
                 'created_at' => new \DateTime(),

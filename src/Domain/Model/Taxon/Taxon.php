@@ -11,20 +11,19 @@ use Thinktomorrow\Trader\Domain\Model\Taxon\Exceptions\InvalidParentTaxonId;
 
 class Taxon implements Aggregate
 {
+    use HasTaxonKeys;
     use HasData;
     use RecordsEvents;
 
     public readonly TaxonId $taxonId;
-    public readonly TaxonKey $taxonKey;
     private TaxonState $taxonState;
     private int $order;
     private ?TaxonId $parentTaxonId = null;
 
-    public static function create(TaxonId $taxonId, TaxonKey $taxonKey, ?TaxonId $parentTaxonId = null): static
+    public static function create(TaxonId $taxonId, ?TaxonId $parentTaxonId = null): static
     {
         $taxon = new static();
         $taxon->taxonId = $taxonId;
-        $taxon->taxonKey = $taxonKey;
         $taxon->taxonState = TaxonState::online;
         $taxon->order = 0;
 
@@ -70,7 +69,6 @@ class Taxon implements Aggregate
     {
         return [
             'taxon_id' => $this->taxonId->get(),
-            'key' => $this->taxonKey->get(),
             'state' => $this->taxonState->value,
             'order' => $this->order,
             'parent_id' => $this->parentTaxonId?->get(),
@@ -80,18 +78,21 @@ class Taxon implements Aggregate
 
     public function getChildEntities(): array
     {
-        return [];
+        return [
+            TaxonKey::class => array_map(fn(TaxonKey $taxonKey) => $taxonKey->getMappedData(), $this->taxonKeys),
+        ];
     }
 
     public static function fromMappedData(array $state, array $childEntities = []): static
     {
         $taxon = new static();
         $taxon->taxonId = TaxonId::fromString($state['taxon_id']);
-        $taxon->taxonKey = TaxonKey::fromString($state['key']);
         $taxon->taxonState = TaxonState::from($state['state']);
         $taxon->order = (int) $state['order'];
         $taxon->data = json_decode($state['data'], true);
         $taxon->parentTaxonId = $state['parent_id'] ? TaxonId::fromString($state['parent_id']) : null;
+
+        $taxon->taxonKeys = array_map(fn($taxonKeyState) => TaxonKey::fromMappedData($taxonKeyState, $state), $childEntities[TaxonKey::class]);
 
         return $taxon;
     }

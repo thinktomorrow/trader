@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace Thinktomorrow\Trader\Infrastructure\Test\Repositories;
 
+use Thinktomorrow\Trader\Domain\Model\Taxon\TaxonKeyId;
 use Thinktomorrow\Trader\Domain\Model\Taxon\Exceptions\CouldNotFindTaxon;
 use Thinktomorrow\Trader\Domain\Model\Taxon\Taxon;
 use Thinktomorrow\Trader\Domain\Model\Taxon\TaxonId;
@@ -33,15 +34,15 @@ final class InMemoryTaxonRepository implements TaxonRepository
         return static::$taxons[$taxonId->get()];
     }
 
-    public function findByKey(TaxonKey $taxonKey): Taxon
+    public function findByKey(TaxonKeyId $taxonKeyId): Taxon
     {
         foreach (static::$taxons as $taxon) {
-            if ($taxon->taxonKey->equals($taxonKey)) {
+            if ($taxon->hasTaxonKeyId($taxonKeyId)) {
                 return $taxon;
             }
         }
 
-        throw new CouldNotFindTaxon('No taxon found by key ' . $taxonKey->get());
+        throw new CouldNotFindTaxon('No taxon found by key ' . $taxonKeyId->get());
     }
 
     public function getByParentId(TaxonId $taxonId): array
@@ -81,22 +82,22 @@ final class InMemoryTaxonRepository implements TaxonRepository
         static::$productIds[$taxonId->get()] = $productIds;
     }
 
-    public function uniqueKeyReference(TaxonKey $taxonKey, TaxonId $allowedTaxonId): TaxonKey
+    public function uniqueKeyReference(TaxonKeyId $taxonKeyId, TaxonId $allowedTaxonId): TaxonKeyId
     {
-        $key = $taxonKey;
+        $key = $taxonKeyId;
         $i = 1;
 
         while ($this->existsByKey($key, $allowedTaxonId)) {
-            $key = TaxonKey::fromString($taxonKey->get() . '_' . $i++);
+            $key = TaxonKeyId::fromString($taxonKeyId->get() . '_' . $i++);
         }
 
         return $key;
     }
 
-    private function existsByKey(TaxonKey $taxonKey, TaxonId $allowedTaxonId): bool
+    private function existsByKey(TaxonKeyId $taxonKeyId, TaxonId $allowedTaxonId): bool
     {
         foreach (static::$taxons as $taxon) {
-            if (! $taxon->taxonId->equals($allowedTaxonId) && $taxon->taxonKey->equals($taxonKey)) {
+            if (! $taxon->taxonId->equals($allowedTaxonId) && $taxon->hasTaxonKeyId($taxonKeyId)) {
                 return true;
             }
         }

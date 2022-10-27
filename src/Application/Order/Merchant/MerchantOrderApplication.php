@@ -135,8 +135,8 @@ class MerchantOrderApplication
 
         if (! $command->getLocale()->equals($shopper->getLocale())) {
             $updatedValues['locale'] = [
-                'old' => $shopper->getLocale()->toIso639(),
-                'new' => $command->getLocale()->toIso639(),
+                'old' => $shopper->getLocale()->get(),
+                'new' => $command->getLocale()->get(),
             ];
         }
 

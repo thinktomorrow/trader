@@ -27,7 +27,7 @@ class CustomerTest extends TestCase
             'customer_id' => $customerId->get(),
             'email' => $customerEmail->get(),
             'is_business' => false,
-            'locale' => 'nl_BE',
+            'locale' => 'nl-be',
             'data' => json_encode([]),
         ], $customer->getMappedData());
 
@@ -47,7 +47,7 @@ class CustomerTest extends TestCase
             'email' => 'ben@thinktomorrow.be',
             'customer_id' => 'yyy',
             'is_business' => true,
-            'locale' => 'nl_BE',
+            'locale' => 'nl-be',
             'data' => json_encode(['foo' => 'bar']),
         ], $customer->getMappedData());
     }

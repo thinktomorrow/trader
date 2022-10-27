@@ -8,13 +8,13 @@ use Thinktomorrow\Vine\Node;
 
 interface TaxonNode extends Node
 {
-    public function setLocale(Locale $locale): void;
+    public function setLocale(Locale $locale): static;
     public static function fromMappedData(array $state): static;
 
     public function getNodeId($key = null, $default = null): string;
     public function getParentNodeId(): ?string;
     public function getId(): string;
-    public function getKey(): string;
+    public function getKey(): ?string; // Localized key based on the locale
     public function getLabel(): string;
     public function getContent(): ?string;
 

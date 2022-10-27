@@ -9,7 +9,7 @@ interface TaxonRepository
 
     public function find(TaxonId $taxonId): Taxon;
 
-    public function findByKey(TaxonKey $taxonKey): Taxon;
+    public function findByKey(TaxonKeyId $taxonKeyIdId): Taxon;
 
     /** @return Taxon[] */
     public function getByParentId(TaxonId $taxonId): array;
@@ -18,5 +18,5 @@ interface TaxonRepository
 
     public function nextReference(): TaxonId;
 
-    public function uniqueKeyReference(TaxonKey $taxonKey, TaxonId $allowedTaxonId): TaxonKey;
+    public function uniqueKeyReference(TaxonKeyId $taxonKeyIdId, TaxonId $allowedTaxonId): TaxonKeyId;
 }

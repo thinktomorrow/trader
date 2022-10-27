@@ -471,8 +471,8 @@ trait TestHelpers
 
     protected function createCatalog(TaxonApplication $taxonApplication, ProductApplication $productApplication, ProductRepository $productRepository)
     {
-        $taxonId = $taxonApplication->createTaxon(new CreateTaxon('foobar', ['title' => ['nl' => 'foobar nl']]));
-        $taxonChildId = $taxonApplication->createTaxon(new CreateTaxon('foobar-child', ['title' => ['nl' => 'foobar child nl']], $taxonId->get()));
+        $taxonId = $taxonApplication->createTaxon(new CreateTaxon('foobar', 'nl', ['title' => ['nl' => 'foobar nl']]));
+        $taxonChildId = $taxonApplication->createTaxon(new CreateTaxon('foobar-child', 'nl', ['title' => ['nl' => 'foobar child nl']], $taxonId->get()));
 
         $productId = $productApplication->createProduct(new CreateProduct([$taxonId->get()], "100", "6", 'sku', ['title' => ['nl' => 'product one']], [ 'title' => ['nl' => 'variant title one'] ]));
         $product2Id = $productApplication->createProduct(new CreateProduct([$taxonChildId->get()], "250", "12", 'sku-2', ['title' => ['nl' => 'product two']], [ 'title' => ['nl' => 'variant title two'] ]));

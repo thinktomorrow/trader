@@ -43,7 +43,7 @@ final class CartRepositoryTest extends TestCase
             $this->assertInstanceOf(Cart::class, $cart);
             $this->assertCount(1, $cart->getLines());
             $this->assertEquals(
-                Cash::from($order->getTotal()->getIncludingVat())->toLocalizedFormat(Locale::make('nl', 'BE')),
+                Cash::from($order->getTotal()->getIncludingVat())->toLocalizedFormat(Locale::fromString('nl', 'BE')),
                 $cart->getTotalPrice()
             );
         }

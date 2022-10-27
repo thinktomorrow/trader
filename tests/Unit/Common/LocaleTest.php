@@ -50,7 +50,7 @@ final class LocaleTest extends TestCase
     public function test_it_cannot_create_locale_from_invalid_input()
     {
         $this->expectException(\InvalidArgumentException::class);
-        Locale::fromString('n_be');
+        Locale::fromString('n');
     }
 
     public function test_it_cannot_create_locale_from_invalid_construct_input()

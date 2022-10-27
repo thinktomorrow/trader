@@ -105,7 +105,7 @@ class Shopper implements ChildEntity
             'shopper_id' => $this->shopperId->get(),
             'email' => $this->email->get(),
             'is_business' => $this->isBusiness,
-            'locale' => $this->locale->toIso15897(),
+            'locale' => $this->locale->get(),
             'register_after_checkout' => $this->registerAfterCheckout,
             'customer_id' => $this->customerId?->get(),
             'data' => json_encode($data),

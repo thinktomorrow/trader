@@ -7,50 +7,39 @@ use Assert\Assertion;
 
 final class Locale
 {
-    private string $language;
-    private string $region;
+    private string $locale;
 
-    private function __construct(string $language, string $region)
+    private function __construct(string $locale)
     {
-        Assertion::minLength($language, 2);
-        Assertion::minLength($region, 2);
+        Assertion::minLength($locale, 2);
 
-        $this->language = $language;
-        $this->region = strtolower($region);
+        // Normalize the locale input
+        $this->locale = strtolower(str_replace('_','-', $locale));
     }
 
-    public static function make(string $language, string $region): self
+
+    public static function fromString(string $locale): self
     {
-        return new static($language, $region);
+        return new static($locale);
     }
 
-    /**
-     * From string e.g. nl-be, nl_BE or nl
-     *
-     * @param string $iso15897String
-     * @return $this
-     */
-    public static function fromString(string $iso15897String): self
+    public function get(): string
     {
-        if (strpos($iso15897String, '-')) {
-            return static::make(...explode('-', $iso15897String));
-        }
-
-        if (strpos($iso15897String, '_')) {
-            return static::make(...explode('_', $iso15897String));
-        }
-
-        return static::make($iso15897String, $iso15897String);
+        return $this->locale;
     }
 
     public function getLanguage(): string
     {
-        return $this->language;
+        [$language, $region] = $this->splitInLanguageAndRegion();
+
+        return $language;
     }
 
     public function getRegion(): string
     {
-        return $this->region;
+        [$language, $region] = $this->splitInLanguageAndRegion();
+
+        return $region;
     }
 
     /**
@@ -63,7 +52,9 @@ final class Locale
      */
     public function toIso15897(): string
     {
-        return $this->language . '_' . strtoupper($this->region);
+        [$language, $region] = $this->splitInLanguageAndRegion();
+
+        return $language . '_' . strtoupper($region);
     }
 
     /**
@@ -72,16 +63,16 @@ final class Locale
      */
     public function toIso639(): string
     {
-        if ($this->language == $this->region) {
-            return $this->language;
-        }
+        [$language, $region] = $this->splitInLanguageAndRegion();
 
-        return $this->language . '-' . strtoupper($this->region);
+        if($language == $region) return $language;
+
+        return $language . '-' . strtoupper($region);
     }
 
     public function __toString(): string
     {
-        return $this->toIso15897();
+        return $this->get();
     }
 
     public function equals($other): bool
@@ -89,4 +80,18 @@ final class Locale
         return get_class($other) === get_class($this)
             && (string)$this === (string)$other;
     }
+
+    private function splitInLanguageAndRegion(): array
+    {
+        if (strpos($this->locale, '-')) {
+            return explode('-', $this->locale);
+        }
+
+        if (strpos($this->locale, '_')) {
+            return explode('_', $this->locale);
+        }
+
+        return [$this->locale, $this->locale];
+    }
+
 }

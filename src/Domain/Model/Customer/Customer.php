@@ -94,7 +94,7 @@ class Customer implements Aggregate
             'customer_id' => $this->customerId->get(),
             'email' => $this->email->get(),
             'is_business' => $this->isBusiness,
-            'locale' => $this->locale->toIso15897(),
+            'locale' => $this->locale->get(),
             'data' => json_encode($this->data),
         ];
     }

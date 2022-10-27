@@ -3,15 +3,19 @@ declare(strict_types=1);
 
 namespace Thinktomorrow\Trader\Application\Taxon\Redirect;
 
+use Thinktomorrow\Trader\Domain\Common\Locale;
+
 class Redirect
 {
+    private Locale $locale;
     private string $from;
     private string $to;
     private ?string $id;
     private ?\DateTime $created_at;
 
-    public function __construct(string $from, string $to, ?string $id = null, ?\DateTime $created_at = null)
+    public function __construct(Locale $locale, string $from, string $to, ?string $id = null, ?\DateTime $created_at = null)
     {
+        $this->locale = $locale;
         $this->from = $from;
         $this->to = $to;
         $this->id = $id;
@@ -39,6 +43,12 @@ class Redirect
     {
         return $this->id;
     }
+
+    public function getLocale(): Locale
+    {
+        return $this->locale;
+    }
+
 
     public function getCreatedAt(): ?\DateTime
     {

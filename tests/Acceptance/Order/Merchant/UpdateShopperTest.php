@@ -57,13 +57,13 @@ class UpdateShopperTest extends CartContext
         $order = $this->orderRepository->find($order->orderId);
 
         $this->assertEquals('ben-changed@thinktomorrow.be', $order->getShopper()->getEmail()->get());
-        $this->assertEquals('nl', $order->getShopper()->getLocale()->toIso639());
+        $this->assertEquals('nl', $order->getShopper()->getLocale()->get());
         $this->assertFalse($order->getShopper()->isBusiness());
         $this->assertEquals(['foo' => 'baz', 'foz' => 'boss', 'customer_id' => $order->getShopper()->getCustomerId()], $order->getShopper()->getData());
 
         $this->assertEquals(new ShopperUpdatedByMerchant($order->orderId, [
             'email' => ['old' => 'ben@thinktomorrow.be', 'new' => 'ben-changed@thinktomorrow.be'],
-            'locale' => ['old' => 'en-GB', 'new' => 'nl'],
+            'locale' => ['old' => 'en-gb', 'new' => 'nl'],
             'foo' => ['old' => 'bar', 'new' => 'baz'],
             'foz' => ['old' => null, 'new' => 'boss'],
         ], []), $this->eventDispatcherSpy->releaseDispatchedEvents()[1]);

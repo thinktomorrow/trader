@@ -25,10 +25,10 @@ class CashTest extends TestCase
     public function it_can_represent_localised_money()
     {
         $cash = Cash::from(Money::EUR(120));
-        $this->assertEquals('€ 1,20', $cash->toLocalizedFormat(Locale::make('nl', 'BE')));
+        $this->assertEquals('€ 1,20', $cash->toLocalizedFormat(Locale::fromString('nl', 'BE')));
 
         $cash = Cash::from(Money::USD(120));
-        $this->assertEquals('$ 1,20', $cash->toLocalizedFormat(Locale::make('nl', 'BE')));
+        $this->assertEquals('$ 1,20', $cash->toLocalizedFormat(Locale::fromString('nl', 'BE')));
     }
 
     /** @test */
@@ -44,7 +44,7 @@ class CashTest extends TestCase
     public function by_default_currency_code_is_used_as_symbol()
     {
         $cash = Cash::from(Money::AMD(120));
-        $this->assertEquals('AMD 1,20', $cash->toLocalizedFormat(Locale::make('nl', 'BE')));
+        $this->assertEquals('AMD 1,20', $cash->toLocalizedFormat(Locale::fromString('nl', 'BE')));
     }
 
     /** @test */

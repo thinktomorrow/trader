@@ -17,7 +17,7 @@ class TestCase extends \PHPUnit\Framework\TestCase
         DiscountPriceDefaults::setDiscountTaxRate(TaxRate::fromString('21'));
         DiscountPriceDefaults::setDiscountIncludeTax(true);
 
-        DefaultLocale::set(Locale::make('nl', 'BE'));
+        DefaultLocale::set(Locale::fromString('nl', 'BE'));
 
         DataRenderer::setDataResolver(function (array $data, string $key, string $language = null, string $default = null) {
             if (! $language) {

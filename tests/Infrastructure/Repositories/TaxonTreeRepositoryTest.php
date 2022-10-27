@@ -11,11 +11,19 @@ use Thinktomorrow\Trader\Infrastructure\Laravel\Repositories\MysqlTaxonTreeRepos
 use Thinktomorrow\Trader\Infrastructure\Test\Repositories\InMemoryTaxonTreeRepository;
 use Thinktomorrow\Trader\Infrastructure\Test\TestContainer;
 use Thinktomorrow\Trader\Infrastructure\Test\TestTraderConfig;
+use Thinktomorrow\Trader\Infrastructure\Laravel\Repositories\MemoizedMysqlTaxonTreeRepository;
 
 final class TaxonTreeRepositoryTest extends TestCase
 {
     use RefreshDatabase;
     use TaxonHelpers;
+
+    protected function tearDown(): void
+    {
+        MemoizedMysqlTaxonTreeRepository::clear();
+
+        parent::tearDown();
+    }
 
     /** @test */
     public function it_can_get_the_entire_tree()
@@ -42,6 +50,7 @@ final class TaxonTreeRepositoryTest extends TestCase
     private function repositories(): \Generator
     {
         yield new InMemoryTaxonTreeRepository(new TestContainer(), new TestTraderConfig());
-        yield new MysqlTaxonTreeRepository(new TestContainer(), new TestTraderConfig());
+        yield $mysqlTaxonTreeRepo = new MysqlTaxonTreeRepository(new TestContainer(), new TestTraderConfig());
+        yield new MemoizedMysqlTaxonTreeRepository($mysqlTaxonTreeRepo, new TestTraderConfig());
     }
 }

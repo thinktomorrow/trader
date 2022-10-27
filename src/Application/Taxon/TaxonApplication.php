@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace Thinktomorrow\Trader\Application\Taxon;
 
+use Thinktomorrow\Trader\Domain\Model\Taxon\TaxonKey;
 use Thinktomorrow\Trader\Domain\Common\Event\EventDispatcher;
 use Thinktomorrow\Trader\Domain\Model\Taxon\Events\TaxonDeleted;
 use Thinktomorrow\Trader\Domain\Model\Taxon\Taxon;
@@ -26,13 +27,16 @@ final class TaxonApplication
     public function createTaxon(CreateTaxon $createTaxon): TaxonId
     {
         $taxonId = $this->taxonRepository->nextReference();
-        $taxonKey = $this->taxonRepository->uniqueKeyReference($createTaxon->getTaxonKey(), $taxonId);
+        $taxonKeyId = $this->taxonRepository->uniqueKeyReference($createTaxon->getTaxonKeyId(), $taxonId);
 
         $taxon = Taxon::create(
             $taxonId,
-            $taxonKey,
             $createTaxon->getParentTaxonId()
         );
+
+        $taxon->updateTaxonKeys([
+            TaxonKey::create($taxon->taxonId, $taxonKeyId, $createTaxon->getTaxonKeyLocale())
+        ]);
 
         $taxon->addData($createTaxon->getData());
 
@@ -41,6 +45,17 @@ final class TaxonApplication
         $this->eventDispatcher->dispatchAll($taxon->releaseEvents());
 
         return $taxonId;
+    }
+
+    public function updateTaxonKeys(UpdateTaxonKeys $command): void
+    {
+        $taxon = $this->taxonRepository->find($command->getTaxonId());
+
+        $taxon->updateTaxonKeys($command->getTaxonKeys());
+
+        $this->taxonRepository->save($taxon);
+
+        $this->eventDispatcher->dispatchAll($taxon->releaseEvents());
     }
 
     public function moveTaxon(MoveTaxon $moveTaxon): void

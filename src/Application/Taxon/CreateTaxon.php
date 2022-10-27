@@ -3,25 +3,34 @@ declare(strict_types=1);
 
 namespace Thinktomorrow\Trader\Application\Taxon;
 
+use Thinktomorrow\Trader\Domain\Common\Locale;
 use Thinktomorrow\Trader\Domain\Model\Taxon\TaxonId;
 use Thinktomorrow\Trader\Domain\Model\Taxon\TaxonKey;
+use Thinktomorrow\Trader\Domain\Model\Taxon\TaxonKeyId;
 
 final class CreateTaxon
 {
-    private string $taxon_key;
+    private string $taxonKeyId;
+    private string $taxonKeyLocale;
     private array $data;
     private ?string $parent_taxon_id;
 
-    public function __construct(string $taxon_key, array $data, ?string $parent_taxon_id = null)
+    public function __construct(string $taxonKeyId, string $taxonKeyLocale, array $data, ?string $parent_taxon_id = null)
     {
-        $this->taxon_key = $taxon_key;
+        $this->taxonKeyId = $taxonKeyId;
+        $this->taxonKeyLocale = $taxonKeyLocale;
         $this->data = $data;
         $this->parent_taxon_id = $parent_taxon_id;
     }
 
-    public function getTaxonKey(): TaxonKey
+    public function getTaxonKeyId(): TaxonKeyId
     {
-        return TaxonKey::fromString($this->taxon_key);
+        return TaxonKeyId::fromString($this->taxonKeyId);
+    }
+
+    public function getTaxonKeyLocale(): Locale
+    {
+        return Locale::fromString($this->taxonKeyLocale);
     }
 
     public function getData(): array

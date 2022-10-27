@@ -9,9 +9,11 @@ trait HasLocale
 {
     private ?Locale $locale = null;
 
-    public function setLocale(Locale $locale): void
+    public function setLocale(Locale $locale): static
     {
         $this->locale = $locale;
+
+        return $this;
     }
 
     protected function getLocale(): Locale

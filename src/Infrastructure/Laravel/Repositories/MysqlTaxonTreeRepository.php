@@ -23,6 +23,7 @@ class MysqlTaxonTreeRepository implements TaxonTreeRepository, CategoryRepositor
     private Locale $locale;
 
     private static $taxonTable = 'trader_taxa';
+    private static $taxonKeysTable = 'trader_taxa_keys';
 
     private ContainerInterface $container;
 
@@ -52,6 +53,13 @@ class MysqlTaxonTreeRepository implements TaxonTreeRepository, CategoryRepositor
         return $taxonNode;
     }
 
+    /**
+     * This searches the taxon by the localized key. Keep in mind that this only finds the taxon
+     * if the key is present for the current set locale as getKey() returns the localized key.
+     *
+     * @param string $key
+     * @return TaxonNode
+     */
     public function findTaxonByKey(string $key): TaxonNode
     {
         /** @var TaxonNode $taxonNode */
@@ -66,7 +74,7 @@ class MysqlTaxonTreeRepository implements TaxonTreeRepository, CategoryRepositor
 
     public function getTree(): TaxonTree
     {
-        $localeKey = $this->locale->toIso15897();
+        $localeKey = $this->locale->get();
 
         if (isset($this->trees[$localeKey])) {
             return $this->trees[$localeKey];
@@ -82,12 +90,21 @@ class MysqlTaxonTreeRepository implements TaxonTreeRepository, CategoryRepositor
 
     private function getTaxonNodes(): TaxonNodes
     {
+        $taxonKeyResults = DB::table(static::$taxonKeysTable)->get();
+
         $results = DB::table(static::$taxonTable)
             ->leftJoin('trader_taxa_products', 'trader_taxa.taxon_id', 'trader_taxa_products.taxon_id')
-            ->select(static::$taxonTable .'.*', DB::raw('GROUP_CONCAT(product_id) AS product_ids'))
+            ->select(static::$taxonTable . '.*', DB::raw('GROUP_CONCAT(product_id) AS product_ids'))
             ->groupBy(static::$taxonTable.'.taxon_id')
             ->orderBy(static::$taxonTable.'.order')
-            ->get();
+            ->get()
+            ->map(function($item) use($taxonKeyResults){
+
+                $keys = $taxonKeyResults->filter(fn($taxonKeyResult) => $taxonKeyResult->taxon_id == $item->taxon_id);
+                $item->keys = $keys->values()->toJson();
+
+                return $item;
+            });
 
         $taxonNodeClass = $this->container->get(TaxonNode::class);
 

@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace Thinktomorrow\Trader\Infrastructure\Vine;
 
+use Thinktomorrow\Trader\Domain\Common\Locale;
 use Thinktomorrow\Trader\Application\Taxon\Filter\TaxonFilterTreeComposer;
 use Thinktomorrow\Trader\Application\Taxon\Tree\TaxonNode;
 use Thinktomorrow\Trader\Application\Taxon\Tree\TaxonTree;
@@ -17,10 +18,10 @@ class VineTaxonFilterTreeComposer implements TaxonFilterTreeComposer
         $this->taxonTreeRepository = $taxonTreeRepository;
     }
 
-    public function getAvailableFilters(string $mainTaxonFilterKey): TaxonTree
+    public function getAvailableFilters(Locale $locale, string $mainTaxonFilterKey): TaxonTree
     {
         /** @var TaxonNode $mainTaxonNode */
-        $mainTaxonNode = $this->taxonTreeRepository->getTree()->find(fn (TaxonNode $node) => $node->getKey() == $mainTaxonFilterKey);
+        $mainTaxonNode = $this->taxonTreeRepository->setLocale($locale)->getTree()->find(fn (TaxonNode $node) => $node->getKey() == $mainTaxonFilterKey);
 
         if (! $mainTaxonNode) {
             return new TaxonTree();
@@ -51,9 +52,9 @@ class VineTaxonFilterTreeComposer implements TaxonFilterTreeComposer
         return $taxonTree;
     }
 
-    public function getActiveFilters(string $mainTaxonFilterKey, array $activeKeys): TaxonTree
+    public function getActiveFilters(Locale $locale, string $mainTaxonFilterKey, array $activeKeys): TaxonTree
     {
-        $mainTaxonNode = $this->taxonTreeRepository->getTree()->find(fn ($node) => $node->getKey() == $mainTaxonFilterKey);
+        $mainTaxonNode = $this->taxonTreeRepository->setLocale($locale)->getTree()->find(fn ($node) => $node->getKey() == $mainTaxonFilterKey);
 
         if (! $mainTaxonNode) {
             return new TaxonTree();

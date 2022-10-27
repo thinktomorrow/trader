@@ -31,7 +31,7 @@ class ProductOptionsTest extends ProductContext
         $productOptions = $this->productOptionsComposer->get(
             $product->productId,
             $product->getVariants()[0]->variantId,
-            Locale::make('nl', 'be')
+            Locale::fromString('nl', 'be')
         );
 
         $this->assertCount(3, $productOptions);

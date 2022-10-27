@@ -4,11 +4,15 @@ declare(strict_types=1);
 namespace Tests\Unit\Model;
 
 use PHPUnit\Framework\TestCase;
+use Thinktomorrow\Trader\Domain\Common\Locale;
+use Thinktomorrow\Trader\Domain\Model\Taxon\TaxonKeyId;
+use Thinktomorrow\Trader\Domain\Model\Taxon\Events\TaxonKeyUpdated;
 use Thinktomorrow\Trader\Domain\Model\Taxon\Exceptions\InvalidParentTaxonId;
 use Thinktomorrow\Trader\Domain\Model\Taxon\Taxon;
 use Thinktomorrow\Trader\Domain\Model\Taxon\TaxonId;
 use Thinktomorrow\Trader\Domain\Model\Taxon\TaxonKey;
 use Thinktomorrow\Trader\Domain\Model\Taxon\TaxonState;
+use Thinktomorrow\Trader\Domain\Model\Taxon\Exceptions\InvalidTaxonIdOnTaxonKey;
 
 class TaxonTest extends TestCase
 {
@@ -17,20 +21,23 @@ class TaxonTest extends TestCase
     {
         $taxon = Taxon::create(
             TaxonId::fromString('aaa'),
-            TaxonKey::fromString('taxon-key'),
             TaxonId::fromString('parent-aaa'),
         );
 
+        $taxon->updateTaxonKeys([
+            $taxonKey = TaxonKey::create($taxon->taxonId, TaxonKeyId::fromString('xxx'), Locale::fromString('nl_BE'))
+        ]);
         $taxon->addData(['foo' => 'bar']);
 
         $this->assertEquals([
             'taxon_id' => 'aaa',
-            'key' => 'taxon-key',
             'state' => TaxonState::online->value,
             'order' => 0,
             'parent_id' => 'parent-aaa',
             'data' => json_encode(['foo' => 'bar']),
         ], $taxon->getMappedData());
+
+        $this->assertEquals([$taxonKey->getMappedData()], $taxon->getChildEntities()[TaxonKey::class]);
     }
 
     /** @test */
@@ -38,7 +45,6 @@ class TaxonTest extends TestCase
     {
         $taxon = Taxon::create(
             TaxonId::fromString('aaa'),
-            TaxonKey::fromString('taxon-key'),
         );
 
         $this->assertNull($taxon->getMappedData()['parent_id']);
@@ -49,7 +55,6 @@ class TaxonTest extends TestCase
     {
         $taxon = Taxon::create(
             TaxonId::fromString('aaa'),
-            TaxonKey::fromString('taxon-key'),
         );
 
         $taxon->changeParent(TaxonId::fromString('bbb'), );
@@ -62,7 +67,6 @@ class TaxonTest extends TestCase
     {
         $taxon = Taxon::create(
             TaxonId::fromString('aaa'),
-            TaxonKey::fromString('taxon-key'),
             TaxonId::fromString('bbb')
         );
 
@@ -78,7 +82,6 @@ class TaxonTest extends TestCase
 
         Taxon::create(
             TaxonId::fromString('aaa'),
-            TaxonKey::fromString('taxon-key'),
             TaxonId::fromString('aaa'),
         );
     }
@@ -88,7 +91,6 @@ class TaxonTest extends TestCase
     {
         $taxon = Taxon::create(
             TaxonId::fromString('aaa'),
-            TaxonKey::fromString('taxon-key'),
             TaxonId::fromString('bbb')
         );
 
@@ -106,7 +108,6 @@ class TaxonTest extends TestCase
 
         $this->assertEquals([
             'taxon_id' => 'yyy',
-            'key' => 'taxon-key',
             'state' => TaxonState::offline->value,
             'order' => 5,
             'parent_id' => 'parent-yyy',
@@ -114,15 +115,90 @@ class TaxonTest extends TestCase
         ], $taxon->getMappedData());
     }
 
+    public function test_it_can_add_taxon_key()
+    {
+        $taxon = $this->createdTaxon();
+
+        $taxon->updateTaxonKeys([
+            $taxonKey = TaxonKey::create($taxon->taxonId, TaxonKeyId::fromString('xxx'), Locale::fromString('nl_BE'))
+        ]);
+
+        $this->assertEquals([$taxonKey], $taxon->getTaxonKeys());
+    }
+
+    public function test_it_can_update_taxon_key()
+    {
+        $taxon = $this->createdTaxon();
+
+        $taxon->updateTaxonKeys([
+            $taxonKey = TaxonKey::create($taxon->taxonId, TaxonKeyId::fromString('xxx'), Locale::fromString('nl_BE'))
+        ]);
+
+        $taxon->updateTaxonKeys([
+            $taxonKeyUpdated = TaxonKey::create($taxon->taxonId, TaxonKeyId::fromString('yyy'), Locale::fromString('nl_BE'))
+        ]);
+
+        $this->assertEquals([$taxonKeyUpdated], $taxon->getTaxonKeys());
+
+        $this->assertEquals([new TaxonKeyUpdated($taxon->taxonId, Locale::fromString('nl_BE'), TaxonKeyId::fromString('xxx'), TaxonKeyId::fromString('yyy'))], $taxon->releaseEvents());
+    }
+
+    public function test_it_protects_against_invalid_taxon_id_on_taxon_key()
+    {
+        $this->expectException(InvalidTaxonIdOnTaxonKey::class);
+
+        $taxon = $this->createdTaxon();
+
+        $taxon->updateTaxonKeys([
+            TaxonKey::create(TaxonId::fromString('invalid'), TaxonKeyId::fromString('xxx'), Locale::fromString('nl_BE'))
+        ]);
+
+        $this->assertEquals([], $taxon->getTaxonKeys());
+    }
+
+    public function test_taxon_key_is_per_locale()
+    {
+        $taxon = $this->createdTaxon();
+
+        $taxon->updateTaxonKeys([
+            $taxonKey = TaxonKey::create($taxon->taxonId, TaxonKeyId::fromString('xxx'), Locale::fromString('nl_BE')),
+            $taxonKey2 = TaxonKey::create($taxon->taxonId, TaxonKeyId::fromString('xxx-fr'), Locale::fromString('fr_BE'))
+        ]);
+
+        // Override by locale
+        $taxon->updateTaxonKeys([
+            $taxonKey3 = TaxonKey::create($taxon->taxonId, TaxonKeyId::fromString('yyy'), Locale::fromString('nl_BE'))
+        ]);
+
+        $this->assertEquals([$taxonKey3, $taxonKey2], $taxon->getTaxonKeys());
+    }
+
+    public function test_it_can_check_if_taxon_has_taxon_key_id()
+    {
+        $taxon = $this->createdTaxon();
+
+        $taxon->updateTaxonKeys([
+            $taxonKey = TaxonKey::create($taxon->taxonId, TaxonKeyId::fromString('xxx'), Locale::fromString('nl_BE')),
+            $taxonKey2 = TaxonKey::create($taxon->taxonId, TaxonKeyId::fromString('xxx-fr'), Locale::fromString('fr_BE'))
+        ]);
+
+        $this->assertTrue($taxon->hasTaxonKeyId($taxonKey->taxonKeyId));
+        $this->assertTrue($taxon->hasTaxonKeyId($taxonKey2->taxonKeyId));
+        $this->assertFalse($taxon->hasTaxonKeyId(TaxonKeyId::fromString('invalid')));
+    }
+
     private function createdTaxon(): Taxon
     {
         return Taxon::fromMappedData([
             'taxon_id' => 'yyy',
-            'key' => 'taxon-key',
             'state' => TaxonState::offline->value,
             'order' => 5,
             'parent_id' => 'parent-yyy',
             'data' => json_encode(['foo' => 'bar']),
-        ], []);
+        ], [
+            TaxonKey::class => [
+
+            ],
+        ]);
     }
 }

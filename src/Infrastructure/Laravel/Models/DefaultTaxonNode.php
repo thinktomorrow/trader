@@ -15,22 +15,25 @@ class DefaultTaxonNode extends DefaultNode implements TaxonNode
     use RendersData;
 
     public readonly string $id;
-    private string $key;
-    private TaxonState $taxonState;
-    public readonly int $order; // Make publicly available for sorting via vine
-    private array $data;
-    private array $product_ids;
-    private ?string $parentId;
-    private iterable $images;
 
-    private function __construct(string $id, string $key, TaxonState $taxonState, int $order, array $data, array $product_ids, ?string $parentId = null)
+    /** @var array  */
+    protected array $keys;
+
+    protected TaxonState $taxonState;
+    public readonly int $order; // Make publicly available for sorting via vine
+    protected array $data;
+    protected array $product_ids;
+    protected ?string $parentId;
+    protected iterable $images;
+
+    private function __construct(string $id, TaxonState $taxonState, int $order, array $data, array $product_ids, array $keys, ?string $parentId = null)
     {
         $this->id = $id;
-        $this->key = $key;
         $this->taxonState = $taxonState;
         $this->order = $order;
         $this->data = $data;
         $this->product_ids = $product_ids;
+        $this->keys = $keys;
         $this->parentId = $parentId;
 
         // Add node entry data so we can use it for sorting.
@@ -45,11 +48,11 @@ class DefaultTaxonNode extends DefaultNode implements TaxonNode
     {
         return new static(
             $state['taxon_id'],
-            $state['key'],
             TaxonState::from($state['state']),
             $state['order'],
             $state['data'] ? json_decode($state['data'], true) : [],
             $state['product_ids'] ? explode(',', $state['product_ids']) : [],
+            json_decode($state['keys'], true),
             $state['parent_id'],
         );
     }
@@ -69,9 +72,21 @@ class DefaultTaxonNode extends DefaultNode implements TaxonNode
         return $this->id;
     }
 
-    public function getKey(): string
+    public function getKey(): ?string
     {
-        return $this->key;
+        if(count($this->keys) < 1) return null;
+
+        $localeString = $this->getLocale()->get();
+
+        foreach($this->keys as $key) {
+            if($key['locale'] == $localeString) return $key['key'];
+        }
+
+        if(!isset($this->keys[0])) {
+            dd($this->keys);
+        }
+
+        return $this->keys[0]['key'];
     }
 
     public function getLabel(): string

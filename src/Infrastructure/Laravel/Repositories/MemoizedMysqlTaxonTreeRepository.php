@@ -17,6 +17,7 @@ class MemoizedMysqlTaxonTreeRepository implements TaxonTreeRepository, CategoryR
 
     /** @var TaxonTree[] - tree per locale */
     private static array $trees = [];
+
     private Locale $locale;
 
     public function __construct(MysqlTaxonTreeRepository $taxonTreeRepository, TraderConfig $traderConfig)
@@ -59,7 +60,7 @@ class MemoizedMysqlTaxonTreeRepository implements TaxonTreeRepository, CategoryR
 
     public function getTree(): TaxonTree
     {
-        $localeKey = $this->locale->toIso15897();
+        $localeKey = $this->locale->get();
 
         if (isset(static::$trees[$localeKey])) {
             return static::$trees[$localeKey];
@@ -72,6 +73,6 @@ class MemoizedMysqlTaxonTreeRepository implements TaxonTreeRepository, CategoryR
 
     public static function clear(): void
     {
-        static::$tree = null;
+        static::$trees = [];
     }
 }

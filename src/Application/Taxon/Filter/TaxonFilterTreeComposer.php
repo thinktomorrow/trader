@@ -3,13 +3,14 @@ declare(strict_types=1);
 
 namespace Thinktomorrow\Trader\Application\Taxon\Filter;
 
+use Thinktomorrow\Trader\Domain\Common\Locale;
 use Thinktomorrow\Trader\Application\Taxon\Tree\TaxonTree;
 
 interface TaxonFilterTreeComposer
 {
-    public function getAvailableFilters(string $mainTaxonFilterKey): TaxonTree;
+    public function getAvailableFilters(Locale $locale, string $mainTaxonFilterKey): TaxonTree;
 
-    public function getActiveFilters(string $mainTaxonFilterKey, array $activeKeys): TaxonTree;
+    public function getActiveFilters(Locale $locale, string $mainTaxonFilterKey, array $activeKeys): TaxonTree;
 
     /**
      * Get all product ids belonging to this taxon filter and all its children

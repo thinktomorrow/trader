@@ -25,7 +25,7 @@ class OptionLinksComposerTest extends ProductContext
         $optionLinks = (new VariantLinksComposer($repo, new TestContainer()))->get(
             $product->productId,
             $product->getVariants()[0]->variantId,
-            Locale::make('nl', 'BE')
+            Locale::fromString('nl', 'BE')
         );
 
         $this->assertCount(3, $optionLinks);

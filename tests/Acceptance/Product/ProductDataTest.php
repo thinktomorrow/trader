@@ -29,7 +29,7 @@ class ProductDataTest extends ProductContext
         $this->assertEquals('content nl', $productDetail->getIntro());
         $this->assertEquals('content nl', $productDetail->getContent());
 
-        $productDetail->setLocale(Locale::make('en', 'BE'));
+        $productDetail->setLocale(Locale::fromString('en', 'BE'));
         $this->assertEquals('title en', $productDetail->getTitle());
         $this->assertEquals('content en', $productDetail->getIntro());
         $this->assertEquals('content en', $productDetail->getContent());

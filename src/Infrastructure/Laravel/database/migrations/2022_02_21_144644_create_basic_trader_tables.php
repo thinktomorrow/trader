@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreateBasicTraderTables extends Migration
+return new class extends Migration
 {
     const PREFIX = 'trader_';
 
@@ -94,11 +94,18 @@ class CreateBasicTraderTables extends Migration
         Schema::create(static::PREFIX.'taxa', function (Blueprint $table) {
             $table->char('taxon_id', 36)->primary();
             $table->char('parent_id', 36)->nullable()->index();
-            $table->string('key')->unique();
             $table->string('state')->default(\Thinktomorrow\Trader\Domain\Model\Taxon\TaxonState::online->value);
             $table->json('data')->nullable();
             $table->unsignedInteger('order')->default(0);
             $table->timestamps();
+        });
+
+        Schema::create(static::PREFIX.'taxa_keys', function (Blueprint $table) {
+            $table->string('key', 255)->primary();
+            $table->char('taxon_id', 36)->index();
+            $table->string('locale');
+
+            $table->foreign('taxon_id')->references('taxon_id')->on(static::PREFIX.'taxa')->onDelete('cascade');
         });
 
         Schema::create(static::PREFIX.'taxa_products', function (Blueprint $table) {
@@ -111,11 +118,14 @@ class CreateBasicTraderTables extends Migration
             $table->foreign('product_id')->references('product_id')->on(static::PREFIX.'products')->onDelete('cascade');
         });
 
-        Schema::create(static::PREFIX.'redirects', function (Blueprint $table) {
+        Schema::create(static::PREFIX.'taxa_redirects', function (Blueprint $table) {
             $table->id();
+            $table->string('locale');
             $table->string('from');
             $table->string('to');
             $table->timestamp('created_at');
+
+            $table->unique(['locale','from']);
         });
     }
 
@@ -415,4 +425,4 @@ class CreateBasicTraderTables extends Migration
         Schema::dropIfExists(static::PREFIX.'promo_discount_conditions');
         Schema::dropIfExists(static::PREFIX.'countries');
     }
-}
+};

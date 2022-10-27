@@ -35,11 +35,6 @@ class MysqlProductRepository implements ProductRepository
 
     public function save(Product $product): void
     {
-        // Save product WITH
-        // VARIANTS,
-        // options
-        // personalisations
-
         $state = $product->getMappedData();
         $taxon_ids = TraderHelpers::array_remove($state, 'taxon_ids');
 
