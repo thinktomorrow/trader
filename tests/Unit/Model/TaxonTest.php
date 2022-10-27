@@ -5,14 +5,14 @@ namespace Tests\Unit\Model;
 
 use PHPUnit\Framework\TestCase;
 use Thinktomorrow\Trader\Domain\Common\Locale;
-use Thinktomorrow\Trader\Domain\Model\Taxon\TaxonKeyId;
 use Thinktomorrow\Trader\Domain\Model\Taxon\Events\TaxonKeyUpdated;
 use Thinktomorrow\Trader\Domain\Model\Taxon\Exceptions\InvalidParentTaxonId;
+use Thinktomorrow\Trader\Domain\Model\Taxon\Exceptions\InvalidTaxonIdOnTaxonKey;
 use Thinktomorrow\Trader\Domain\Model\Taxon\Taxon;
 use Thinktomorrow\Trader\Domain\Model\Taxon\TaxonId;
 use Thinktomorrow\Trader\Domain\Model\Taxon\TaxonKey;
+use Thinktomorrow\Trader\Domain\Model\Taxon\TaxonKeyId;
 use Thinktomorrow\Trader\Domain\Model\Taxon\TaxonState;
-use Thinktomorrow\Trader\Domain\Model\Taxon\Exceptions\InvalidTaxonIdOnTaxonKey;
 
 class TaxonTest extends TestCase
 {
@@ -25,7 +25,7 @@ class TaxonTest extends TestCase
         );
 
         $taxon->updateTaxonKeys([
-            $taxonKey = TaxonKey::create($taxon->taxonId, TaxonKeyId::fromString('xxx'), Locale::fromString('nl_BE'))
+            $taxonKey = TaxonKey::create($taxon->taxonId, TaxonKeyId::fromString('xxx'), Locale::fromString('nl_BE')),
         ]);
         $taxon->addData(['foo' => 'bar']);
 
@@ -120,7 +120,7 @@ class TaxonTest extends TestCase
         $taxon = $this->createdTaxon();
 
         $taxon->updateTaxonKeys([
-            $taxonKey = TaxonKey::create($taxon->taxonId, TaxonKeyId::fromString('xxx'), Locale::fromString('nl_BE'))
+            $taxonKey = TaxonKey::create($taxon->taxonId, TaxonKeyId::fromString('xxx'), Locale::fromString('nl_BE')),
         ]);
 
         $this->assertEquals([$taxonKey], $taxon->getTaxonKeys());
@@ -131,11 +131,11 @@ class TaxonTest extends TestCase
         $taxon = $this->createdTaxon();
 
         $taxon->updateTaxonKeys([
-            $taxonKey = TaxonKey::create($taxon->taxonId, TaxonKeyId::fromString('xxx'), Locale::fromString('nl_BE'))
+            $taxonKey = TaxonKey::create($taxon->taxonId, TaxonKeyId::fromString('xxx'), Locale::fromString('nl_BE')),
         ]);
 
         $taxon->updateTaxonKeys([
-            $taxonKeyUpdated = TaxonKey::create($taxon->taxonId, TaxonKeyId::fromString('yyy'), Locale::fromString('nl_BE'))
+            $taxonKeyUpdated = TaxonKey::create($taxon->taxonId, TaxonKeyId::fromString('yyy'), Locale::fromString('nl_BE')),
         ]);
 
         $this->assertEquals([$taxonKeyUpdated], $taxon->getTaxonKeys());
@@ -150,7 +150,7 @@ class TaxonTest extends TestCase
         $taxon = $this->createdTaxon();
 
         $taxon->updateTaxonKeys([
-            TaxonKey::create(TaxonId::fromString('invalid'), TaxonKeyId::fromString('xxx'), Locale::fromString('nl_BE'))
+            TaxonKey::create(TaxonId::fromString('invalid'), TaxonKeyId::fromString('xxx'), Locale::fromString('nl_BE')),
         ]);
 
         $this->assertEquals([], $taxon->getTaxonKeys());
@@ -162,12 +162,12 @@ class TaxonTest extends TestCase
 
         $taxon->updateTaxonKeys([
             $taxonKey = TaxonKey::create($taxon->taxonId, TaxonKeyId::fromString('xxx'), Locale::fromString('nl_BE')),
-            $taxonKey2 = TaxonKey::create($taxon->taxonId, TaxonKeyId::fromString('xxx-fr'), Locale::fromString('fr_BE'))
+            $taxonKey2 = TaxonKey::create($taxon->taxonId, TaxonKeyId::fromString('xxx-fr'), Locale::fromString('fr_BE')),
         ]);
 
         // Override by locale
         $taxon->updateTaxonKeys([
-            $taxonKey3 = TaxonKey::create($taxon->taxonId, TaxonKeyId::fromString('yyy'), Locale::fromString('nl_BE'))
+            $taxonKey3 = TaxonKey::create($taxon->taxonId, TaxonKeyId::fromString('yyy'), Locale::fromString('nl_BE')),
         ]);
 
         $this->assertEquals([$taxonKey3, $taxonKey2], $taxon->getTaxonKeys());
@@ -179,7 +179,7 @@ class TaxonTest extends TestCase
 
         $taxon->updateTaxonKeys([
             $taxonKey = TaxonKey::create($taxon->taxonId, TaxonKeyId::fromString('xxx'), Locale::fromString('nl_BE')),
-            $taxonKey2 = TaxonKey::create($taxon->taxonId, TaxonKeyId::fromString('xxx-fr'), Locale::fromString('fr_BE'))
+            $taxonKey2 = TaxonKey::create($taxon->taxonId, TaxonKeyId::fromString('xxx-fr'), Locale::fromString('fr_BE')),
         ]);
 
         $this->assertTrue($taxon->hasTaxonKeyId($taxonKey->taxonKeyId));

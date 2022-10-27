@@ -3,11 +3,11 @@ declare(strict_types=1);
 
 namespace Thinktomorrow\Trader\Application\Taxon;
 
-use Thinktomorrow\Trader\Domain\Model\Taxon\TaxonKey;
 use Thinktomorrow\Trader\Domain\Common\Event\EventDispatcher;
 use Thinktomorrow\Trader\Domain\Model\Taxon\Events\TaxonDeleted;
 use Thinktomorrow\Trader\Domain\Model\Taxon\Taxon;
 use Thinktomorrow\Trader\Domain\Model\Taxon\TaxonId;
+use Thinktomorrow\Trader\Domain\Model\Taxon\TaxonKey;
 use Thinktomorrow\Trader\Domain\Model\Taxon\TaxonRepository;
 use Thinktomorrow\Trader\TraderConfig;
 
@@ -35,7 +35,7 @@ final class TaxonApplication
         );
 
         $taxon->updateTaxonKeys([
-            TaxonKey::create($taxon->taxonId, $taxonKeyId, $createTaxon->getTaxonKeyLocale())
+            TaxonKey::create($taxon->taxonId, $taxonKeyId, $createTaxon->getTaxonKeyLocale()),
         ]);
 
         $taxon->addData($createTaxon->getData());

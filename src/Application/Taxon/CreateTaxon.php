@@ -5,7 +5,6 @@ namespace Thinktomorrow\Trader\Application\Taxon;
 
 use Thinktomorrow\Trader\Domain\Common\Locale;
 use Thinktomorrow\Trader\Domain\Model\Taxon\TaxonId;
-use Thinktomorrow\Trader\Domain\Model\Taxon\TaxonKey;
 use Thinktomorrow\Trader\Domain\Model\Taxon\TaxonKeyId;
 
 final class CreateTaxon

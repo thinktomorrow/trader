@@ -31,7 +31,7 @@ class UpdateTaxonKeys
     {
         $result = [];
 
-        foreach($this->taxonKeys as $locale => $taxonKey) {
+        foreach ($this->taxonKeys as $locale => $taxonKey) {
             $result[] = TaxonKey::create($this->getTaxonId(), TaxonKeyId::fromString($taxonKey), Locale::fromString($locale));
         }
 

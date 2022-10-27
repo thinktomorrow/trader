@@ -14,7 +14,7 @@ final class Locale
         Assertion::minLength($locale, 2);
 
         // Normalize the locale input
-        $this->locale = strtolower(str_replace('_','-', $locale));
+        $this->locale = strtolower(str_replace('_', '-', $locale));
     }
 
 
@@ -65,7 +65,9 @@ final class Locale
     {
         [$language, $region] = $this->splitInLanguageAndRegion();
 
-        if($language == $region) return $language;
+        if ($language == $region) {
+            return $language;
+        }
 
         return $language . '-' . strtoupper($region);
     }
@@ -93,5 +95,4 @@ final class Locale
 
         return [$this->locale, $this->locale];
     }
-
 }

@@ -98,9 +98,8 @@ class MysqlTaxonTreeRepository implements TaxonTreeRepository, CategoryRepositor
             ->groupBy(static::$taxonTable.'.taxon_id')
             ->orderBy(static::$taxonTable.'.order')
             ->get()
-            ->map(function($item) use($taxonKeyResults){
-
-                $keys = $taxonKeyResults->filter(fn($taxonKeyResult) => $taxonKeyResult->taxon_id == $item->taxon_id);
+            ->map(function ($item) use ($taxonKeyResults) {
+                $keys = $taxonKeyResults->filter(fn ($taxonKeyResult) => $taxonKeyResult->taxon_id == $item->taxon_id);
                 $item->keys = $keys->values()->toJson();
 
                 return $item;

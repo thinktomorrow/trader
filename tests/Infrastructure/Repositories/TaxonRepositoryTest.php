@@ -3,14 +3,14 @@ declare(strict_types=1);
 
 namespace Tests\Infrastructure\Repositories;
 
-use Thinktomorrow\Trader\Domain\Common\Locale;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\Infrastructure\TestCase;
-use Thinktomorrow\Trader\Domain\Model\Taxon\TaxonKeyId;
+use Thinktomorrow\Trader\Domain\Common\Locale;
 use Thinktomorrow\Trader\Domain\Model\Taxon\Exceptions\CouldNotFindTaxon;
 use Thinktomorrow\Trader\Domain\Model\Taxon\Taxon;
 use Thinktomorrow\Trader\Domain\Model\Taxon\TaxonId;
 use Thinktomorrow\Trader\Domain\Model\Taxon\TaxonKey;
+use Thinktomorrow\Trader\Domain\Model\Taxon\TaxonKeyId;
 use Thinktomorrow\Trader\Domain\Model\Taxon\TaxonState;
 use Thinktomorrow\Trader\Infrastructure\Laravel\Repositories\MysqlTaxonRepository;
 use Thinktomorrow\Trader\Infrastructure\Test\Repositories\InMemoryTaxonRepository;
@@ -43,7 +43,7 @@ final class TaxonRepositoryTest extends TestCase
             $taxonRepository->save($taxon);
             $taxon->releaseEvents();
 
-            foreach($taxon->getTaxonKeys() as $taxonKey) {
+            foreach ($taxon->getTaxonKeys() as $taxonKey) {
                 $this->assertEquals($taxon, $taxonRepository->findByKey($taxonKey->taxonKeyId));
             }
         }
@@ -94,7 +94,7 @@ final class TaxonRepositoryTest extends TestCase
             TaxonId::fromString('parent'),
         );
         $taxon->updateTaxonKeys([
-            TaxonKey::create($taxon->taxonId, TaxonKeyId::fromString('taxon-key'), Locale::fromString('nl'))
+            TaxonKey::create($taxon->taxonId, TaxonKeyId::fromString('taxon-key'), Locale::fromString('nl')),
         ]);
 
         $taxon->addData(['foo' => 'bar']);
@@ -108,7 +108,7 @@ final class TaxonRepositoryTest extends TestCase
 
         $taxon->updateTaxonKeys([
             TaxonKey::create($taxon->taxonId, TaxonKeyId::fromString('taxon-key'), Locale::fromString('nl')),
-            TaxonKey::create($taxon->taxonId, TaxonKeyId::fromString('taxon-key-fr'), Locale::fromString('fr'))
+            TaxonKey::create($taxon->taxonId, TaxonKeyId::fromString('taxon-key-fr'), Locale::fromString('fr')),
         ]);
 
         $taxon->addData(['foo' => 'bar']);
@@ -124,7 +124,7 @@ final class TaxonRepositoryTest extends TestCase
         );
 
         $taxon->updateTaxonKeys([
-            TaxonKey::create($taxon->taxonId, TaxonKeyId::fromString('taxon-key'), Locale::fromString('nl'))
+            TaxonKey::create($taxon->taxonId, TaxonKeyId::fromString('taxon-key'), Locale::fromString('nl')),
         ]);
 
         yield [$taxon];

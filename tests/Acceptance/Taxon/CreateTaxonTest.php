@@ -4,8 +4,8 @@ declare(strict_types=1);
 namespace Tests\Acceptance\Taxon;
 
 use Tests\Infrastructure\Vine\TaxonHelpers;
-use Thinktomorrow\Trader\Domain\Common\Locale;
 use Thinktomorrow\Trader\Application\Taxon\CreateTaxon;
+use Thinktomorrow\Trader\Domain\Common\Locale;
 
 class CreateTaxonTest extends TaxonContext
 {
@@ -20,7 +20,7 @@ class CreateTaxonTest extends TaxonContext
 
         $this->assertEquals(['foo' => 'bar'], $taxon->getData());
         $this->assertEquals('taxon-key', $taxon->getTaxonKeys()[0]->taxonKeyId->get());
-        $this->assertEquals(Locale::fromString( 'nl'), $taxon->getTaxonKeys()[0]->getLocale());
+        $this->assertEquals(Locale::fromString('nl'), $taxon->getTaxonKeys()[0]->getLocale());
         $this->assertNull($taxon->getParentId());
     }
 

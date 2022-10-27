@@ -16,7 +16,7 @@ class DefaultTaxonNode extends DefaultNode implements TaxonNode
 
     public readonly string $id;
 
-    /** @var array  */
+    /** @var array */
     protected array $keys;
 
     protected TaxonState $taxonState;
@@ -74,15 +74,19 @@ class DefaultTaxonNode extends DefaultNode implements TaxonNode
 
     public function getKey(): ?string
     {
-        if(count($this->keys) < 1) return null;
+        if (count($this->keys) < 1) {
+            return null;
+        }
 
         $localeString = $this->getLocale()->get();
 
-        foreach($this->keys as $key) {
-            if($key['locale'] == $localeString) return $key['key'];
+        foreach ($this->keys as $key) {
+            if ($key['locale'] == $localeString) {
+                return $key['key'];
+            }
         }
 
-        if(!isset($this->keys[0])) {
+        if (! isset($this->keys[0])) {
             dd($this->keys);
         }
 

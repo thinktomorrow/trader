@@ -19,8 +19,10 @@ trait HasTaxonKeys
 
     public function hasTaxonKeyId(TaxonKeyId $taxonKeyId): bool
     {
-        foreach($this->taxonKeys as $taxonKey) {
-            if($taxonKey->taxonKeyId->equals($taxonKeyId)) return true;
+        foreach ($this->taxonKeys as $taxonKey) {
+            if ($taxonKey->taxonKeyId->equals($taxonKeyId)) {
+                return true;
+            }
         }
 
         return false;
@@ -28,7 +30,7 @@ trait HasTaxonKeys
 
     public function updateTaxonKeys(array $taxonKeys): void
     {
-        foreach($taxonKeys as $taxonKey) {
+        foreach ($taxonKeys as $taxonKey) {
             $this->addOrUpdateTaxonKey($taxonKey);
         }
     }
@@ -42,17 +44,18 @@ trait HasTaxonKeys
      */
     private function addOrUpdateTaxonKey(TaxonKey $taxonKey): void
     {
-        if(!$taxonKey->taxonId->equals($this->taxonId)) {
+        if (! $taxonKey->taxonId->equals($this->taxonId)) {
             throw new InvalidTaxonIdOnTaxonKey('Cannot add or update TaxonKey. Passed TaxonKey has TaxonId ['.$taxonKey->taxonId->get().'] that doesn\'t match with TaxonId ['.$this->taxonId->get().'].');
         }
 
-        foreach($this->taxonKeys as $index => $existingTaxonKey) {
-            if($existingTaxonKey->getLocale()->equals($taxonKey->getLocale())) {
-                if(!$existingTaxonKey->taxonKeyId->equals($taxonKey->taxonKeyId)) {
+        foreach ($this->taxonKeys as $index => $existingTaxonKey) {
+            if ($existingTaxonKey->getLocale()->equals($taxonKey->getLocale())) {
+                if (! $existingTaxonKey->taxonKeyId->equals($taxonKey->taxonKeyId)) {
                     $this->taxonKeys[$index] = $taxonKey;
 
                     $this->recordEvent(new TaxonKeyUpdated($this->taxonId, $taxonKey->getLocale(), $existingTaxonKey->taxonKeyId, $taxonKey->taxonKeyId));
                 }
+
                 return;
             }
         }

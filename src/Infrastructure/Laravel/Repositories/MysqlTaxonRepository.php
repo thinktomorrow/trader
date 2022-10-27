@@ -6,11 +6,11 @@ namespace Thinktomorrow\Trader\Infrastructure\Laravel\Repositories;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use Ramsey\Uuid\Uuid;
-use Thinktomorrow\Trader\Domain\Model\Taxon\TaxonKeyId;
 use Thinktomorrow\Trader\Domain\Model\Taxon\Exceptions\CouldNotFindTaxon;
 use Thinktomorrow\Trader\Domain\Model\Taxon\Taxon;
 use Thinktomorrow\Trader\Domain\Model\Taxon\TaxonId;
 use Thinktomorrow\Trader\Domain\Model\Taxon\TaxonKey;
+use Thinktomorrow\Trader\Domain\Model\Taxon\TaxonKeyId;
 use Thinktomorrow\Trader\Domain\Model\Taxon\TaxonRepository;
 
 class MysqlTaxonRepository implements TaxonRepository
@@ -33,19 +33,19 @@ class MysqlTaxonRepository implements TaxonRepository
 
     private function upsertTaxonKeys(Taxon $taxon): void
     {
-        $taxonKeyIds = array_map(fn(TaxonKey $taxonKey) => $taxonKey->taxonKeyId->get(), $taxon->getTaxonKeys());
+        $taxonKeyIds = array_map(fn (TaxonKey $taxonKey) => $taxonKey->taxonKeyId->get(), $taxon->getTaxonKeys());
 
         DB::table(static::$taxonKeysTable)
             ->where('taxon_id', $taxon->taxonId->get())
             ->whereNotIn('key', $taxonKeyIds)
             ->delete();
 
-        foreach($taxon->getTaxonKeys() as $taxonKey) {
+        foreach ($taxon->getTaxonKeys() as $taxonKey) {
             DB::table(static::$taxonKeysTable)
                 ->updateOrInsert([
                     'taxon_id' => $taxonKey->taxonId->get(),
                     'key' => $taxonKey->taxonKeyId->get(),
-                ],$taxonKey->getMappedData());
+                ], $taxonKey->getMappedData());
         }
     }
 

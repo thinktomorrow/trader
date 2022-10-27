@@ -14,7 +14,6 @@ class TaxonKeyUpdated
         public readonly Locale $locale,
         public readonly TaxonKeyId $formerTaxonKeyId,
         public readonly TaxonKeyId $newTaxonKeyId,
-    )
-    {
+    ) {
     }
 }

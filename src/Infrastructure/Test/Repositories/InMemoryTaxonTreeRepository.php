@@ -4,7 +4,6 @@ declare(strict_types=1);
 namespace Thinktomorrow\Trader\Infrastructure\Test\Repositories;
 
 use Psr\Container\ContainerInterface;
-use Thinktomorrow\Trader\Domain\Model\Taxon\TaxonKey;
 use Thinktomorrow\Trader\Application\Taxon\Category\CategoryRepository;
 use Thinktomorrow\Trader\Application\Taxon\Tree\TaxonNode;
 use Thinktomorrow\Trader\Application\Taxon\Tree\TaxonNodes;
@@ -66,7 +65,7 @@ final class InMemoryTaxonTreeRepository implements TaxonTreeRepository, Category
                 'state' => $taxon->getMappedData()['state'],
                 'order' => $taxon->getMappedData()['order'],
                 'product_ids' => $this->getCommaSeparatedProductIds($taxon->taxonId),
-                'keys' => json_encode(array_map(fn($taxonKey) => $taxonKey->getMappedData(), $taxon->getTaxonKeys())),
+                'keys' => json_encode(array_map(fn ($taxonKey) => $taxonKey->getMappedData(), $taxon->getTaxonKeys())),
             ]);
         }
 
