@@ -19,7 +19,7 @@ interface VariantForCart
     public function getState(): VariantState;
     public function getUnitPrice(): VariantUnitPrice;
     public function getSalePrice(): VariantSalePrice;
-    public function getTitle(): string;
+    public function getTitle(?string $locale = null): string;
 
     /** @return Personalisation[] */
     public function getPersonalisations(): array;

@@ -68,15 +68,15 @@ class DefaultVariantForCart implements VariantForCart
         return $this->variantSalePrice;
     }
 
-    public function getTitle(): string
+    public function getTitle(?string $locale = null): string
     {
-        if ($customTitle = $this->data('title')) {
+        if ($customTitle = $this->data('title', $locale)) {
             return $customTitle;
         }
 
-        $productTitle = $this->data('title', null, '', $this->productData);
+        $productTitle = $this->data('title', $locale, '', $this->productData);
 
-        return ($productTitle ? $productTitle .' ' : '') . $this->data('option_title', null, '');
+        return ($productTitle ? $productTitle .' ' : '') . $this->data('option_title', $locale, '');
     }
 
     public function getPersonalisations(): array

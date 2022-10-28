@@ -122,7 +122,7 @@ final class CartApplication
             ),
             $addLine->getQuantity(),
             array_merge($addLine->getData(), [
-                'title' => $variant->getTitle(),
+                'title' => $variant->getTitle($addLine->getData()['locale'] ?? null),
                 'product_id' => $variant->getProductId()->get(),
                 'unit_price_excluding_vat' => $variant->getUnitPrice()->getExcludingVat()->getAmount(),
                 'unit_price_including_vat' => $variant->getUnitPrice()->getIncludingVat()->getAmount(),
