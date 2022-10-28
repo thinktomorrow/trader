@@ -14,16 +14,16 @@ interface TaxonNode extends Node
     public function getNodeId($key = null, $default = null): string;
     public function getParentNodeId(): ?string;
     public function getId(): string;
-    public function getKey(): ?string; // Localized key based on the locale
-    public function getLabel(): string;
-    public function getContent(): ?string;
+    public function getKey(?string $locale = null): ?string; // Localized key based on the locale
+    public function getLabel(?string $locale = null): string;
+    public function getContent(?string $locale = null): ?string;
 
     public function showOnline(): bool;
     public function getProductIds(): array;
-    public function getUrl(): string;
+    public function getUrl(?string $locale = null): string;
 
     public function getBreadCrumbs(): array;
-    public function getBreadCrumbLabelWithoutRoot(): string;
-    public function getBreadCrumbLabel(bool $withoutRoot = false): string;
+    public function getBreadCrumbLabelWithoutRoot(?string $locale = null): string;
+    public function getBreadCrumbLabel(?string $locale = null, bool $withoutRoot = false): string;
     public function getImages(): iterable;
 }

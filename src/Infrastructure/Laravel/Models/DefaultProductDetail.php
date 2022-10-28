@@ -69,11 +69,11 @@ class DefaultProductDetail implements ProductDetail
         return in_array($this->state, VariantState::availableStates());
     }
 
-    public function getTitle(): string
+    public function getTitle(?string $locale = null): string
     {
-        $productTitle = $this->data('product_data.title', null, '');
-        $variantTitle = $this->data('title');
-        $variantOptionTitle = $this->data('option_title');
+        $productTitle = $this->data('product_data.title', $locale, '');
+        $variantTitle = $this->data('title', $locale);
+        $variantOptionTitle = $this->data('option_title', $locale);
 
         if ($variantTitle) {
             return $variantTitle;
@@ -89,14 +89,14 @@ class DefaultProductDetail implements ProductDetail
         return $productTitle.' '.$variantOptionTitle;
     }
 
-    public function getIntro(): string
+    public function getIntro(?string $locale = null): string
     {
-        return Str::limit($this->getContent(), 160, '...');
+        return Str::limit($this->getContent($locale), 160, '...');
     }
 
-    public function getContent(): string
+    public function getContent(?string $locale = null): string
     {
-        return $this->data('product_data.content', null, '');
+        return $this->data('product_data.content', $locale, '');
     }
 
     public function getSku(): string
@@ -104,13 +104,9 @@ class DefaultProductDetail implements ProductDetail
         return $this->getVariantId();
     }
 
-    public function getUrl(): string
+    public function getUrl(?string $locale = null): string
     {
         return '/'.$this->getVariantId();
-    }
-
-    public function getThumbUrl(): string
-    {
     }
 
     public function setImages(iterable $images): void

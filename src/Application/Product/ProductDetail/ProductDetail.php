@@ -20,11 +20,11 @@ interface ProductDetail
     public function onSale(): bool;
     public function getSaleDiscount(): string;
 
-    public function getTitle(): string;
-    public function getIntro(): string;
-    public function getContent(): string;
+    public function getTitle(?string $locale = null): string;
+    public function getIntro(?string $locale = null): string;
+    public function getContent(?string $locale = null): string;
+    public function getUrl(?string $locale = null): string;
     public function getSku(): string;
-    public function getUrl(): string;
 
     public function setImages(iterable $images): void;
     public function getImages(): iterable;

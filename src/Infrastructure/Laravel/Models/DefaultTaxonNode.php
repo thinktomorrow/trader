@@ -72,13 +72,13 @@ class DefaultTaxonNode extends DefaultNode implements TaxonNode
         return $this->id;
     }
 
-    public function getKey(): ?string
+    public function getKey(?string $locale = null): ?string
     {
         if (count($this->keys) < 1) {
             return null;
         }
 
-        $localeString = $this->getLocale()->get();
+        $localeString = $locale ?: $this->getLocale()->get();
 
         foreach ($this->keys as $key) {
             if ($key['locale'] == $localeString) {
@@ -93,14 +93,14 @@ class DefaultTaxonNode extends DefaultNode implements TaxonNode
         return $this->keys[0]['key'];
     }
 
-    public function getLabel(): string
+    public function getLabel(?string $locale = null): string
     {
-        return $this->data('title', null, $this->getKey());
+        return $this->data('title', $locale, $this->getKey());
     }
 
-    public function getContent(): ?string
+    public function getContent(?string $locale = null): ?string
     {
-        return $this->data('content');
+        return $this->data('content', $locale);
     }
 
     public function showOnline(): bool
@@ -113,7 +113,7 @@ class DefaultTaxonNode extends DefaultNode implements TaxonNode
         return $this->product_ids;
     }
 
-    public function getUrl(): string
+    public function getUrl(?string $locale = null): string
     {
         return $this->getKey();
     }
@@ -123,23 +123,23 @@ class DefaultTaxonNode extends DefaultNode implements TaxonNode
         return $this->getAncestorNodes()->all();
     }
 
-    public function getBreadCrumbLabelWithoutRoot(): string
+    public function getBreadCrumbLabelWithoutRoot(?string $locale = null): string
     {
-        return $this->getBreadcrumbLabel(true);
+        return $this->getBreadcrumbLabel($locale,true);
     }
 
-    public function getBreadCrumbLabel(bool $withoutRoot = false): string
+    public function getBreadCrumbLabel(?string $locale = null, bool $withoutRoot = false): string
     {
-        $label = $this->getLabel();
+        $label = $this->getLabel($locale);
 
         if (! $this->isRootNode()) {
-            $label = array_reduce(array_reverse($this->getBreadCrumbs()), function ($carry, $taxon) use ($withoutRoot) {
+            $label = array_reduce(array_reverse($this->getBreadCrumbs()), function ($carry, $taxon) use ($withoutRoot, $locale) {
                 if ($taxon->isRootNode()) {
-                    return $withoutRoot ? $carry : $taxon->getLabel() . ': ' . $carry;
+                    return $withoutRoot ? $carry : $taxon->getLabel($locale) . ': ' . $carry;
                 }
 
-                return $taxon->getLabel() . ' > ' . $carry;
-            }, $this->getLabel());
+                return $taxon->getLabel($locale) . ' > ' . $carry;
+            }, $this->getLabel($locale));
         }
 
         return $label;
