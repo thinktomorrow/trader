@@ -125,7 +125,7 @@ class DefaultTaxonNode extends DefaultNode implements TaxonNode
 
     public function getBreadCrumbLabelWithoutRoot(?string $locale = null): string
     {
-        return $this->getBreadcrumbLabel($locale,true);
+        return $this->getBreadcrumbLabel($locale, true);
     }
 
     public function getBreadCrumbLabel(?string $locale = null, bool $withoutRoot = false): string
