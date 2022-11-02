@@ -238,7 +238,7 @@ class TraderServiceProvider extends ServiceProvider
         DiscountPriceDefaults::setDiscountTaxRate(TaxRate::fromString($this->app->make(TraderConfig::class)->getDefaultTaxRate()));
         DiscountPriceDefaults::setDiscountIncludeTax($this->app->make(TraderConfig::class)->includeVatInPrices());
 
-        // Default locale
+        // Default locale - this will be overwritten by the middleware so the current locale is used. Here we just ensure a fallback locale is available
         DefaultLocale::set($this->app->make(TraderConfig::class)->getDefaultLocale());
 
         /**

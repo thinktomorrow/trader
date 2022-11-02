@@ -87,7 +87,7 @@ class DefaultTaxonNode extends DefaultNode implements TaxonNode
         }
 
         if (! isset($this->keys[0])) {
-            dd($this->keys);
+            return null;
         }
 
         return $this->keys[0]['key'];
