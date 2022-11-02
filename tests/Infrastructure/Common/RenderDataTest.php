@@ -4,8 +4,8 @@ declare(strict_types=1);
 namespace Tests\Infrastructure\Common;
 
 use Tests\Infrastructure\TestCase;
-use Thinktomorrow\Trader\TraderConfig;
 use Thinktomorrow\Trader\Application\Common\DefaultLocale;
+use Thinktomorrow\Trader\TraderConfig;
 
 class RenderDataTest extends TestCase
 {
