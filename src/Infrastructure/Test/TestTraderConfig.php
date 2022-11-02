@@ -22,7 +22,7 @@ class TestTraderConfig implements TraderConfig
 
     public function getDefaultLocale(): Locale
     {
-        return Locale::fromString('nl', 'BE');
+        return Locale::fromString('nl');
     }
 
     public function getDefaultCurrency(): string

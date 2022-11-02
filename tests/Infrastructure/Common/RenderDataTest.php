@@ -4,6 +4,8 @@ declare(strict_types=1);
 namespace Tests\Infrastructure\Common;
 
 use Tests\Infrastructure\TestCase;
+use Thinktomorrow\Trader\TraderConfig;
+use Thinktomorrow\Trader\Application\Common\DefaultLocale;
 
 class RenderDataTest extends TestCase
 {
@@ -33,12 +35,19 @@ class RenderDataTest extends TestCase
     }
 
     /** @test */
-    public function it_can_render_default_localized_content()
+    public function it_can_render_default_localized_content_based_on_current_app_locale()
     {
         $stub = new RenderDataStub(['foo' => ['nl' => 'bar', 'en' => 'ber']]);
 
-        // Default locale is set to nl
+        app()->setLocale('nl');
+        DefaultLocale::set(app()->make(TraderConfig::class)->getDefaultLocale());
+
         $this->assertEquals('bar', $stub->get('foo'));
+
+        app()->setLocale('en');
+        DefaultLocale::set(app()->make(TraderConfig::class)->getDefaultLocale());
+
+        $this->assertEquals('ber', $stub->get('foo'));
     }
 
     /** @test */
