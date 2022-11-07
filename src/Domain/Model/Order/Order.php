@@ -129,7 +129,9 @@ final class Order implements Aggregate, Discountable
     {
         $oldState = $this->getOrderState();
 
-        if($oldState->equals($orderState)) return;
+        if ($oldState->equals($orderState)) {
+            return;
+        }
 
         $this->update('orderState', $orderState);
 
@@ -150,7 +152,9 @@ final class Order implements Aggregate, Discountable
     {
         $oldPaymentState = $this->findPayment($paymentId)->getPaymentState();
 
-        if($oldPaymentState->equals($paymentState)) return;
+        if ($oldPaymentState->equals($paymentState)) {
+            return;
+        }
 
         $this->findPayment($paymentId)->updateState($paymentState);
 
@@ -172,7 +176,9 @@ final class Order implements Aggregate, Discountable
     {
         $oldShippingState = $this->findShipping($shippingId)->getShippingState();
 
-        if($oldShippingState->equals($shippingState)) return;
+        if ($oldShippingState->equals($shippingState)) {
+            return;
+        }
 
         $this->findShipping($shippingId)->updateState($shippingState);
 
