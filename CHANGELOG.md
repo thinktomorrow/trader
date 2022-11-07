@@ -2,5 +2,11 @@
 
 Important changes will be notified in this file
 
-## next release
+## unreleased
+
+## 2022-11-07 - 0.5.1
+- Added: dataAsPrimitive() helper method to render data and ensure that a primitive is given, else the default is returned. The default data() method can also return object or array, which can cause - in case of missing translations - unexcepted array returns.
+
+## 2022-11-03 - 0.5.0
+First release of the trader package.
 

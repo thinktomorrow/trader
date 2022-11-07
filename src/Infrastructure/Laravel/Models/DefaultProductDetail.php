@@ -71,9 +71,9 @@ class DefaultProductDetail implements ProductDetail
 
     public function getTitle(?string $locale = null): string
     {
-        $productTitle = $this->data('product_data.title', $locale, '');
-        $variantTitle = $this->data('title', $locale);
-        $variantOptionTitle = $this->data('option_title', $locale);
+        $productTitle = $this->dataAsPrimitive('product_data.title', $locale, '');
+        $variantTitle = $this->dataAsPrimitive('title', $locale);
+        $variantOptionTitle = $this->dataAsPrimitive('option_title', $locale);
 
         if ($variantTitle) {
             return $variantTitle;
@@ -96,7 +96,7 @@ class DefaultProductDetail implements ProductDetail
 
     public function getContent(?string $locale = null): string
     {
-        return $this->data('product_data.content', $locale, '');
+        return $this->dataAsPrimitive('product_data.content', $locale, '');
     }
 
     public function getSku(): string

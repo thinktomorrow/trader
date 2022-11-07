@@ -49,12 +49,12 @@ class DefaultVariantLink implements VariantLink
 
     public function getGroupLabel(): string
     {
-        return $this->data('group_label', null, '');
+        return $this->dataAsPrimitive('group_label', null, '');
     }
 
     public function getLabel(): string
     {
-        return $this->data('label', null, '');
+        return $this->dataAsPrimitive('label', null, '');
     }
 
     public function getUrl(): ?string
