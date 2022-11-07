@@ -19,7 +19,9 @@ trait RendersData
     {
         $result = $this->data($key, $language, $default, $data);
 
-        if(is_array($result)) return $default;
+        if (is_array($result)) {
+            return $default;
+        }
 
         return $result;
     }
