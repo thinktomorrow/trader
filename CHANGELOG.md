@@ -3,6 +3,7 @@
 Important changes will be notified in this file
 
 ## unreleased
+- Fixed: do not record order update events when state hasn't changed.
 
 ## 2022-11-07 - 0.5.2
 - Fixed: localized variant option title returns full array when locale title wasn't present

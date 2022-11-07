@@ -73,6 +73,11 @@ enum OrderState: string implements State
         return $this->value;
     }
 
+    public function equals($other): bool
+    {
+        return (get_class($this) === get_class($other) && $this->getValueAsString() === $other->getValueAsString());
+    }
+
     public static function getDefaultTransitions(): array
     {
         return [

@@ -6,4 +6,6 @@ namespace Thinktomorrow\Trader\Domain\Common\State;
 interface State
 {
     public function getValueAsString(): string;
+
+    public function equals($other): bool;
 }

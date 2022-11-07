@@ -69,7 +69,6 @@ class OrderStateTest extends TestCase
     /** @test */
     public function it_can_record_payment_events()
     {
-        $this->assertPaymentStateEvent(PaymentInitialized::class, PaymentState::initialized);
         $this->assertPaymentStateEvent(PaymentPaid::class, PaymentState::paid);
         $this->assertPaymentStateEvent(PaymentMarkedPaidByMerchant::class, PaymentState::paid_by_merchant);
         $this->assertPaymentStateEvent(PaymentFailed::class, PaymentState::failed);
@@ -92,6 +91,30 @@ class OrderStateTest extends TestCase
         $this->assertShippingStateEvent(ShipmentFailed::class, ShippingState::failed);
     }
 
+    public function test_does_not_record_event_when_state_hasnt_changed()
+    {
+        $this->assertOrderStateEvent(CartAbandoned::class, OrderState::cart_abandoned);
+        $this->assertNoOrderStateEvent(CartAbandoned::class, OrderState::cart_abandoned);
+    }
+
+    /** @test */
+    public function it_does_not_record_payment_event_when_state_hasnt_changed()
+    {
+        $this->assertNoPaymentStateEvent(PaymentInitialized::class, PaymentState::initialized);
+
+        $this->assertPaymentStateEvent(PaymentPaid::class, PaymentState::paid);
+        $this->assertNoPaymentStateEvent(PaymentPaid::class, PaymentState::paid);
+    }
+
+    /** @test */
+    public function it_does_not_record_shipping_events_when_state_hasnt_changed()
+    {
+        $this->assertShippingStateEvent(ShipmentMarkedReadyForPacking::class, ShippingState::ready_for_packing);
+        $this->assertNoShippingStateEvent(ShipmentMarkedReadyForPacking::class, ShippingState::ready_for_packing);
+        $this->assertShippingStateEvent(ShipmentPacked::class, ShippingState::packed);
+        $this->assertNoShippingStateEvent(ShipmentPacked::class, ShippingState::packed);
+    }
+
     private function assertOrderStateEvent(string $eventClass, $newState, $oldState = null)
     {
         $oldState = $oldState ?: $this->order->getOrderState();
@@ -103,6 +126,26 @@ class OrderStateTest extends TestCase
             new $eventClass($this->order->orderId, $oldState, $newState, ['foo' => 'bar']),
             new OrderStateUpdated($this->order->orderId, $oldState, $newState),
         ], $this->order->releaseEvents());
+    }
+
+    private function assertNoOrderStateEvent(string $eventClass, $newState, $oldState = null)
+    {
+        $oldState = $oldState ?: $this->order->getOrderState();
+
+        $this->order->updateState($newState, ['foo' => 'bar']);
+
+        $this->assertEquals([], $this->order->releaseEvents());
+    }
+
+    private function assertNoPaymentStateEvent(string $eventClass, $newState, $oldState = null)
+    {
+        $payment = $this->order->getPayments()[0];
+
+        $oldState = $oldState ?: $payment->getPaymentState();
+
+        $this->order->updatePaymentState($payment->paymentId, $newState, ['foo' => 'bar']);
+
+        $this->assertEquals([], $this->order->releaseEvents());
     }
 
     private function assertPaymentStateEvent(string $eventClass, $newState, $oldState = null)
@@ -133,5 +176,16 @@ class OrderStateTest extends TestCase
             new ShippingStateUpdated($this->order->orderId, $shipping->shippingId, $oldState, $newState),
             new OrderUpdated($this->order->orderId),
         ], $this->order->releaseEvents());
+    }
+
+    private function assertNoShippingStateEvent(string $eventClass, $newState, $oldState = null)
+    {
+        $shipping = $this->order->getShippings()[0];
+
+        $oldState = $oldState ?: $shipping->getShippingState();
+
+        $this->order->updateShippingState($shipping->shippingId, $newState, ['foo' => 'bar']);
+
+        $this->assertEquals([], $this->order->releaseEvents());
     }
 }
