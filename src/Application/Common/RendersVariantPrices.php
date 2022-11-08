@@ -3,7 +3,6 @@
 namespace Thinktomorrow\Trader\Application\Common;
 
 use Money\Money;
-use Thinktomorrow\Trader\Domain\Common\Price\Price;
 use Thinktomorrow\Trader\Domain\Model\Product\Variant\VariantSalePrice;
 use Thinktomorrow\Trader\Domain\Model\Product\Variant\VariantUnitPrice;
 

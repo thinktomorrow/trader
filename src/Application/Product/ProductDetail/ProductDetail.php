@@ -3,8 +3,8 @@
 namespace Thinktomorrow\Trader\Application\Product\ProductDetail;
 
 use Money\Money;
-use Thinktomorrow\Trader\Domain\Model\Product\Variant\VariantUnitPrice;
 use Thinktomorrow\Trader\Domain\Model\Product\Variant\VariantSalePrice;
+use Thinktomorrow\Trader\Domain\Model\Product\Variant\VariantUnitPrice;
 
 interface ProductDetail
 {
