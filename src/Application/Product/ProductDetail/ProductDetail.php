@@ -3,6 +3,8 @@
 namespace Thinktomorrow\Trader\Application\Product\ProductDetail;
 
 use Money\Money;
+use Thinktomorrow\Trader\Domain\Model\Product\Variant\VariantUnitPrice;
+use Thinktomorrow\Trader\Domain\Model\Product\Variant\VariantSalePrice;
 
 interface ProductDetail
 {
@@ -17,6 +19,8 @@ interface ProductDetail
     public function getSalePrice(): string;
     public function getUnitPriceAsMoney(): Money;
     public function getSalePriceAsMoney(): Money;
+    public function getUnitPriceAsPrice(): VariantUnitPrice;
+    public function getSalePriceAsPrice(): VariantSalePrice;
     public function onSale(): bool;
     public function getSaleDiscount(): string;
 

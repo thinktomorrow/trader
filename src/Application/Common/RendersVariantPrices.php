@@ -3,6 +3,7 @@
 namespace Thinktomorrow\Trader\Application\Common;
 
 use Money\Money;
+use Thinktomorrow\Trader\Domain\Common\Price\Price;
 use Thinktomorrow\Trader\Domain\Model\Product\Variant\VariantSalePrice;
 use Thinktomorrow\Trader\Domain\Model\Product\Variant\VariantUnitPrice;
 
@@ -51,5 +52,15 @@ trait RendersVariantPrices
     public function getSalePriceAsMoney(bool $includeTax = true): Money
     {
         return $includeTax ? $this->salePrice->getIncludingVat() : $this->salePrice->getExcludingVat();
+    }
+
+    public function getUnitPriceAsPrice(): VariantUnitPrice
+    {
+        return $this->unitPrice;
+    }
+
+    public function getSalePriceAsPrice(): VariantSalePrice
+    {
+        return $this->salePrice;
     }
 }
