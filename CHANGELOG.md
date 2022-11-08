@@ -3,6 +3,8 @@
 Important changes will be notified in this file
 
 ## unreleased
+
+## 2022-11-08 - 0.5.3
 - Fixed: do not record order update events when state hasn't changed.
 - Added: ProductDetail::getUnitPriceAsPrice() and ProductDetail::getSalePriceAsPrice() to retrieve the original Price objects.
 
