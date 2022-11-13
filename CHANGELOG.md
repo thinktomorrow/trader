@@ -3,6 +3,7 @@
 Important changes will be notified in this file
 
 ## unreleased
+- Fixed: TaxonNode label and content when locale was missing returned as array.
 
 ## 2022-11-08 - 0.5.3
 - Fixed: do not record order update events when state hasn't changed.

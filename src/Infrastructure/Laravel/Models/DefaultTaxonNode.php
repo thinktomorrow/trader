@@ -95,12 +95,12 @@ class DefaultTaxonNode extends DefaultNode implements TaxonNode
 
     public function getLabel(?string $locale = null): string
     {
-        return $this->data('title', $locale, $this->getKey());
+        return $this->dataAsPrimitive('title', $locale, $this->getKey());
     }
 
     public function getContent(?string $locale = null): ?string
     {
-        return $this->data('content', $locale);
+        return $this->dataAsPrimitive('content', $locale);
     }
 
     public function showOnline(): bool
