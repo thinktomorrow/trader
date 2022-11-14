@@ -47,8 +47,6 @@ class ProductDetailTest extends ProductContext
         $this->assertEquals('€ 0,08', $productDetail->getSalePrice(false));
         $this->assertEquals('variant title nl', $productDetail->getTitle());
         $this->assertEquals(['1','2'], $productDetail->getTaxonIds());
-
-
     }
 
     public function test_it_can_get_sku_and_ean()
