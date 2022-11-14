@@ -459,7 +459,7 @@ trait TestHelpers
                 false
             ),
             VariantSalePrice::fromMoney(Money::EUR(8), TaxRate::fromString('20'), false),
-            'sku',
+            'fake-sku',
         );
 
         $variant->updateOptionValueIds([

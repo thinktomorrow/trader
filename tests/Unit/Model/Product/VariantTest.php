@@ -40,6 +40,7 @@ class VariantTest extends TestCase
             'option_value_ids' => [],
             'includes_vat' => false,
             'sku' => $sku,
+            'ean' => null,
             'show_in_grid' => false,
             'data' => json_encode([]),
         ], $variant->getMappedData());
@@ -74,6 +75,35 @@ class VariantTest extends TestCase
         $this->assertEquals(json_encode(['foo' => 'bar']), $variant->getMappedData()['data']);
     }
 
+    public function test_it_can_update_sku()
+    {
+        $variant = $this->createdVariant();
+        $this->assertEquals('sku', $variant->getMappedData()['sku']);
+
+        $variant->updateSku('sku-foobar');
+        $this->assertEquals('sku-foobar', $variant->getMappedData()['sku']);
+    }
+
+    public function test_it_can_update_ean()
+    {
+        $variant = $this->createdVariant();
+        $this->assertNull($variant->getMappedData()['ean']);
+
+        $variant->updateEan('ean-foobar');
+        $this->assertEquals('ean-foobar', $variant->getMappedData()['ean']);
+    }
+
+    public function test_it_can_remove_ean()
+    {
+        $variant = $this->createdVariant();
+
+        $variant->updateEan('ean-foobar');
+        $this->assertEquals('ean-foobar', $variant->getMappedData()['ean']);
+
+        $variant->updateEan(null);
+        $this->assertNull($variant->getMappedData()['ean']);
+    }
+
     /** @test */
     public function updating_data_merges_with_existing_data()
     {
@@ -102,6 +132,7 @@ class VariantTest extends TestCase
             'option_value_ids' => ['option-value-id'],
             'includes_vat' => false,
             'sku' => 'sku',
+            'ean' => 'ean',
             'data' => json_encode(['foo' => 'bar']),
             'show_in_grid' => true,
         ], [
@@ -116,6 +147,7 @@ class VariantTest extends TestCase
         $this->assertEquals('20', $variant->getMappedData()['tax_rate']);
         $this->assertEquals(false, $variant->getMappedData()['includes_vat']);
         $this->assertEquals('sku', $variant->getMappedData()['sku']);
+        $this->assertEquals('ean', $variant->getMappedData()['ean']);
         $this->assertEquals(['option-value-id'], $variant->getMappedData()['option_value_ids']);
         $this->assertEquals(json_encode(['foo' => 'bar']), $variant->getMappedData()['data']);
         $this->assertEquals(true, $variant->getMappedData()['show_in_grid']);

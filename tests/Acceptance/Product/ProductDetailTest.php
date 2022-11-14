@@ -34,9 +34,11 @@ class ProductDetailTest extends ProductContext
 
         $this->productRepository->save($product);
 
-        $productDetail = $this->productDetailRepository->findProductDetail($product->getVariants()[0]->variantId);
+        $variantId = $product->getVariants()[0]->variantId;
 
-        $this->assertEquals($product->getVariants()[0]->variantId->get(), $productDetail->getVariantId());
+        $productDetail = $this->productDetailRepository->findProductDetail($variantId);
+
+        $this->assertEquals($variantId->get(), $productDetail->getVariantId());
         $this->assertEquals($product->getVariants()[0]->productId->get(), $productDetail->getProductId());
         $this->assertTrue($productDetail->isAvailable());
         $this->assertEquals('€ 0,12', $productDetail->getUnitPrice(true));
@@ -45,6 +47,30 @@ class ProductDetailTest extends ProductContext
         $this->assertEquals('€ 0,08', $productDetail->getSalePrice(false));
         $this->assertEquals('variant title nl', $productDetail->getTitle());
         $this->assertEquals(['1','2'], $productDetail->getTaxonIds());
+
+
+    }
+
+    public function test_it_can_get_sku_and_ean()
+    {
+        $product = $this->createProductWithVariant();
+        $this->productRepository->save($product);
+
+        $variantId = $product->getVariants()[0]->variantId;
+        $productDetail = $this->productDetailRepository->findProductDetail($variantId);
+
+        // Fallback values for sku / ean
+        $this->assertEquals('fake-sku', $productDetail->getSku());
+        $this->assertNull($productDetail->getEan());
+
+        // Set specific sku / ean values
+        $product->getVariants()[0]->updateSku('sku-foobar');
+        $product->getVariants()[0]->updateEan('ean-foobar');
+        $this->productRepository->save($product);
+
+        $productDetail = $this->productDetailRepository->findProductDetail($variantId);
+        $this->assertEquals('sku-foobar', $productDetail->getSku());
+        $this->assertEquals('ean-foobar', $productDetail->getEan());
     }
 
     /** @test */

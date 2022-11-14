@@ -3,7 +3,11 @@
 Important changes will be notified in this file
 
 ## unreleased
+
+## 2022-11-14 - 0.5.4
 - Fixed: TaxonNode label and content when locale was missing returned as array.
+- Added: ean as non-required, unique variant column in migration.
+- Added: Now both sku and ean can be updated via domain methods `Variant::updateSku` and `Variant::updateEan`.
 
 ## 2022-11-08 - 0.5.3
 - Fixed: do not record order update events when state hasn't changed.

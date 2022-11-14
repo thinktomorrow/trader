@@ -29,6 +29,7 @@ interface ProductDetail
     public function getContent(?string $locale = null): string;
     public function getUrl(?string $locale = null): string;
     public function getSku(): string;
+    public function getEan(): ?string;
 
     public function setImages(iterable $images): void;
     public function getImages(): iterable;

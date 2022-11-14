@@ -24,6 +24,8 @@ class DefaultProductDetail implements ProductDetail
     private ProductId $productId;
     private VariantState $state;
     private array $taxon_ids;
+    private string $sku;
+    private ?string $ean;
     private array $data;
     private iterable $images;
 
@@ -41,6 +43,8 @@ class DefaultProductDetail implements ProductDetail
         $item->taxon_ids = $state['taxon_ids'];
         $item->salePrice = VariantSalePrice::fromScalars($state['sale_price'], $state['tax_rate'], $state['includes_vat']);
         $item->unitPrice = VariantUnitPrice::fromScalars($state['unit_price'], $state['tax_rate'], $state['includes_vat']);
+        $item->sku = $state['sku'] ?? $state['variant_id'];
+        $item->ean = $state['ean'] ?? null;
         $item->data = array_merge(
             ['product_data' => json_decode($state['product_data'], true)],
             json_decode($state['data'], true),
@@ -101,7 +105,12 @@ class DefaultProductDetail implements ProductDetail
 
     public function getSku(): string
     {
-        return $this->getVariantId();
+        return $this->sku;
+    }
+
+    public function getEan(): ?string
+    {
+        return $this->ean;
     }
 
     public function getUrl(?string $locale = null): string

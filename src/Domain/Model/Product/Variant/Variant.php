@@ -27,6 +27,7 @@ final class Variant implements ChildEntity
     private array $personalisations = [];
 
     private string $sku;
+    private ?string $ean = null;
     private bool $show_in_grid = false;
 
     private function __construct()
@@ -72,6 +73,16 @@ final class Variant implements ChildEntity
         $this->salePrice = $salePrice;
     }
 
+    public function updateSku(string $sku): void
+    {
+        $this->sku = $sku;
+    }
+
+    public function updateEan(?string $ean): void
+    {
+        $this->ean = $ean;
+    }
+
     public function showInGrid(bool $show_in_grid = true): void
     {
         $this->show_in_grid = $show_in_grid;
@@ -100,6 +111,7 @@ final class Variant implements ChildEntity
             'tax_rate' => $this->unitPrice->getTaxRate()->toPercentage()->get(),
             'includes_vat' => $this->unitPrice->includesVat(),
             'sku' => $this->sku,
+            'ean' => $this->ean,
             'option_value_ids' => array_map(fn ($optionValueId) => $optionValueId->get(), $this->optionValueIds),
             'show_in_grid' => $this->show_in_grid,
             'data' => json_encode($this->data),
@@ -116,6 +128,7 @@ final class Variant implements ChildEntity
         $variant->unitPrice = VariantUnitPrice::fromScalars($state['unit_price'], $state['tax_rate'], $state['includes_vat']);
         $variant->salePrice = VariantSalePrice::fromScalars($state['sale_price'], $state['tax_rate'], $state['includes_vat']);
         $variant->sku = $state['sku'];
+        $variant->ean = $state['ean'] ?? null;
         $variant->show_in_grid = $state['show_in_grid'] ? (bool) $state['show_in_grid'] : false;
         $variant->data = json_decode($state['data'], true);
 
