@@ -5,18 +5,18 @@ namespace Tests\Acceptance\Order;
 
 use Money\Money;
 use Tests\Acceptance\Cart\CartContext;
-use Thinktomorrow\Trader\Domain\Common\Taxes\TaxRate;
-use Thinktomorrow\Trader\Domain\Model\Order\Line\LinePrice;
 use Thinktomorrow\Trader\Application\Order\MerchantOrder\MerchantOrder;
-use Thinktomorrow\Trader\Domain\Model\Product\Variant\VariantUnitPrice;
 use Thinktomorrow\Trader\Application\Order\MerchantOrder\MerchantOrderPayment;
 use Thinktomorrow\Trader\Application\Order\MerchantOrder\MerchantOrderShipping;
 use Thinktomorrow\Trader\Application\Order\MerchantOrder\MerchantOrderShopper;
+use Thinktomorrow\Trader\Domain\Common\Taxes\TaxRate;
+use Thinktomorrow\Trader\Domain\Model\Order\Line\LinePrice;
 use Thinktomorrow\Trader\Domain\Model\Order\OrderId;
 use Thinktomorrow\Trader\Domain\Model\Order\Payment\PaymentState;
 use Thinktomorrow\Trader\Domain\Model\Order\Shipping\ShippingState;
 use Thinktomorrow\Trader\Domain\Model\Order\State\OrderState;
 use Thinktomorrow\Trader\Domain\Model\Product\Personalisation\PersonalisationType;
+use Thinktomorrow\Trader\Domain\Model\Product\Variant\VariantUnitPrice;
 
 class MerchantOrderTest extends CartContext
 {
