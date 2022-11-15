@@ -128,66 +128,102 @@ abstract class OrderRead
 
     public function getTotalPrice(?bool $includeTax = null): string
     {
-        $includeTax = $includeTax ?? $this->include_tax;
-
         return $this->renderMoney(
-            $includeTax ? $this->total->getIncludingVat() : $this->total->getExcludingVat(),
+            $this->getTotalPriceAsMoney($includeTax),
             $this->getLocale()
         );
+    }
+
+    public function getTotalPriceAsMoney(?bool $includeTax = null): Money
+    {
+        $includeTax = $includeTax ?? $this->include_tax;
+
+        return $includeTax ? $this->total->getIncludingVat() : $this->total->getExcludingVat();
     }
 
     public function getSubtotalPrice(?bool $includeTax = null): string
     {
-        $includeTax = $includeTax ?? $this->include_tax;
-
         return $this->renderMoney(
-            $includeTax ? $this->subtotal->getIncludingVat() : $this->subtotal->getExcludingVat(),
+            $this->getSubtotalPriceAsMoney($includeTax),
             $this->getLocale()
         );
     }
 
-    public function getShippingCost(): ?string
+    public function getSubtotalPriceAsMoney(?bool $includeTax = null): Money
+    {
+        $includeTax = $includeTax ?? $this->include_tax;
+
+        return $includeTax ? $this->subtotal->getIncludingVat() : $this->subtotal->getExcludingVat();
+    }
+
+    public function getShippingCost(?bool $includeTax = null): ?string
     {
         if (! $this->shippingCost->getMoney()->isPositive()) {
             return null;
         }
 
         return $this->renderMoney(
-            $this->include_tax ? $this->shippingCost->getIncludingVat() : $this->shippingCost->getExcludingVat(),
+            $this->getShippingCostAsMoney($includeTax),
             $this->getLocale()
         );
     }
 
-    public function getPaymentCost(): ?string
+    public function getShippingCostAsMoney(?bool $includeTax = null): Money
+    {
+        $includeTax = $includeTax ?? $this->include_tax;
+
+        return $includeTax ? $this->shippingCost->getIncludingVat() : $this->shippingCost->getExcludingVat();
+    }
+
+    public function getPaymentCost(?bool $includeTax = null): ?string
     {
         if (! $this->paymentCost->getMoney()->isPositive()) {
             return null;
         }
 
         return $this->renderMoney(
-            $this->include_tax ? $this->paymentCost->getIncludingVat() : $this->paymentCost->getExcludingVat(),
+            $this->getPaymentCostAsMoney($includeTax),
             $this->getLocale()
         );
     }
 
-    public function getDiscountPrice(): ?string
+    public function getPaymentCostAsMoney(?bool $includeTax = null): Money
+    {
+        $includeTax = $includeTax ?? $this->include_tax;
+
+        return $includeTax ? $this->paymentCost->getIncludingVat() : $this->paymentCost->getExcludingVat();
+    }
+
+    public function getDiscountPrice(?bool $includeTax = null): ?string
     {
         if (! $this->discountTotal->getMoney()->isPositive()) {
             return null;
         }
 
         return $this->renderMoney(
-            $this->include_tax ? $this->discountTotal->getIncludingVat() : $this->discountTotal->getExcludingVat(),
+            $this->getDiscountPriceAsMoney($includeTax),
             $this->getLocale()
         );
+    }
+
+    public function getDiscountPriceAsMoney(?bool $includeTax = null): Money
+    {
+        $includeTax = $includeTax ?? $this->include_tax;
+
+        return $includeTax ? $this->discountTotal->getIncludingVat() : $this->discountTotal->getExcludingVat();
     }
 
     public function getTaxPrice(): string
     {
         return $this->renderMoney(
-            $this->taxTotal,
+            $this->getTaxPriceAsMoney(),
             $this->getLocale()
         );
+    }
+
+    public function getTaxPriceAsMoney(): Money
+    {
+        return $this->taxTotal;
     }
 
     public function getShopper(): MerchantOrderShopper

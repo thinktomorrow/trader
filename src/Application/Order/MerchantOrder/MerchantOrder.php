@@ -2,6 +2,8 @@
 
 namespace Thinktomorrow\Trader\Application\Order\MerchantOrder;
 
+use Money\Money;
+
 interface MerchantOrder
 {
     public static function fromMappedData(array $state, array $childObjects, array $discounts): static;
@@ -24,13 +26,21 @@ interface MerchantOrder
     /** The quantity of all items combined */
     public function getQuantity(): int;
 
+    public function includeTax(bool $includeTax = true): void;
+
     public function getTotalPrice(?bool $includeTax = null): string;
     public function getSubtotalPrice(?bool $includeTax = null): string;
-    public function getShippingCost(): ?string;
-    public function getPaymentCost(): ?string;
-    public function getDiscountPrice(): ?string;
+    public function getShippingCost(?bool $includeTax = null): ?string;
+    public function getPaymentCost(?bool $includeTax = null): ?string;
+    public function getDiscountPrice(?bool $includeTax = null): ?string;
     public function getTaxPrice(): string;
-    public function includeTax(bool $includeTax = true): void;
+
+    public function getTotalPriceAsMoney(?bool $includeTax = null): Money;
+    public function getSubtotalPriceAsMoney(?bool $includeTax = null): Money;
+    public function getShippingCostAsMoney(?bool $includeTax = null): Money;
+    public function getPaymentCostAsMoney(?bool $includeTax = null): Money;
+    public function getDiscountPriceAsMoney(?bool $includeTax = null): Money;
+    public function getTaxPriceAsMoney(): Money;
 
     public function getShopper(): MerchantOrderShopper;
 

@@ -35,9 +35,27 @@ class MerchantOrderTest extends CartContext
         $this->assertNull($merchantOrder->getShippingCost());
         $this->assertNull($merchantOrder->getPaymentCost());
 
+        $this->assertEquals(Money::EUR(1000), $merchantOrder->getTotalPriceAsMoney());
+        $this->assertEquals(Money::EUR(833), $merchantOrder->getTotalPriceAsMoney(false));
+        $this->assertEquals(Money::EUR(1000), $merchantOrder->getSubtotalPriceAsMoney());
+        $this->assertEquals(Money::EUR(833), $merchantOrder->getSubtotalPriceAsMoney(false));
+        $this->assertEquals(Money::EUR(0), $merchantOrder->getShippingCostAsMoney());
+        $this->assertEquals(Money::EUR(0), $merchantOrder->getShippingCostAsMoney(false));
+        $this->assertEquals(Money::EUR(0), $merchantOrder->getPaymentCostAsMoney());
+        $this->assertEquals(Money::EUR(0), $merchantOrder->getPaymentCostAsMoney(false));
+        $this->assertEquals(Money::EUR(0), $merchantOrder->getDiscountPriceAsMoney());
+        $this->assertEquals(Money::EUR(0), $merchantOrder->getDiscountPriceAsMoney(false));
+        $this->assertEquals(Money::EUR(167), $merchantOrder->getTaxPriceAsMoney());
+
+
         $this->assertEquals(OrderState::cart_pending->value, $merchantOrder->getState());
         $this->assertEquals(1, $merchantOrder->getSize());
         $this->assertEquals(2, $merchantOrder->getQuantity());
+    }
+
+    public function test_it_can_get_totals()
+    {
+        $this->markTestSkipped('todo: with payment / shipping / discount values');
     }
 
     /** @test */

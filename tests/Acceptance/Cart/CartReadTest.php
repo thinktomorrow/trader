@@ -21,17 +21,27 @@ class CartReadTest extends CartContext
         $cart = $this->cartRepository->findCart(OrderId::fromString('xxx'));
 
         $this->assertEquals('€ 10', $cart->getTotalPrice());
-        $this->assertEquals(Money::EUR(1000), $cart->getTotalPriceAsMoney());
         $this->assertEquals('€ 10', $cart->getSubtotalPrice());
-        $this->assertEquals(Money::EUR(1000), $cart->getSubtotalPriceAsMoney());
         $this->assertEquals('€ 1,67', $cart->getTaxPrice()); // tax is 20%
-        $this->assertNull($cart->getDiscountPrice());
-        $this->assertNull($cart->getShippingCost());
         $this->assertNull($cart->getPaymentCost());
+        $this->assertNull($cart->getShippingCost());
+        $this->assertNull($cart->getDiscountPrice());
+        $this->assertEquals(Money::EUR(1000), $cart->getTotalPriceAsMoney());
+        $this->assertEquals(Money::EUR(1000), $cart->getSubtotalPriceAsMoney());
+        $this->assertEquals(Money::EUR(0), $cart->getShippingCostAsMoney());
+        $this->assertEquals(Money::EUR(0), $cart->getPaymentCostAsMoney());
+        $this->assertEquals(Money::EUR(0), $cart->getDiscountPriceAsMoney());
+        $this->assertEquals(Money::EUR(167), $cart->getTaxPriceAsMoney());
 
         $this->assertEquals(1, $cart->getSize());
         $this->assertEquals(2, $cart->getQuantity());
     }
+
+    public function test_it_can_get_totals()
+    {
+        $this->markTestSkipped('todo: with payment / shipping / discount values');
+    }
+
 
     /** @test */
     public function in_order_to_confirm_my_product_choice_as_a_visitor__i_need_to_be_able_to_see_each_line_of_my_cart()
