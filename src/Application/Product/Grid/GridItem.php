@@ -15,6 +15,7 @@ interface GridItem
 
     public function getVariantId(): string;
     public function getProductId(): string;
+    public function getTaxonIds(): array;
     public function isAvailable(): bool;
 
     public function getUnitPrice(): string;

@@ -3,6 +3,7 @@
 Important changes will be notified in this file
 
 ## unreleased
+- Added: method to the product gridItem interface `GridItem::getTaxonIds()`. to give all the associated taxon ids of this product item.
 
 ## 2022-11-14 - 0.5.4
 - Fixed: TaxonNode label and content when locale was missing returned as array.

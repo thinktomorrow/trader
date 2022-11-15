@@ -32,6 +32,21 @@ class GridRepositoryTest extends TestCase
     }
 
     /** @test */
+    public function it_can_fetch_grid_item()
+    {
+        $gridItems = $this->getMysqlGridRepository()->getResults();
+
+        /** @var GridItem $gridItem */
+        $gridItem = $gridItems->first();
+
+        $this->assertNotEmpty($gridItem->getSalePrice());
+        $this->assertNotEmpty($gridItem->getUnitPrice());
+        $this->assertNotEmpty($gridItem->getUrl());
+        $this->assertNotEmpty($gridItem->getTitle());
+        $this->assertNotEmpty($gridItem->getTaxonIds());
+    }
+
+    /** @test */
     public function it_only_fetches_grid_products()
     {
         $gridItems = $this->getMysqlGridRepository()->getResults();

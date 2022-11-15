@@ -47,10 +47,14 @@ class MysqlGridRepository implements GridRepository
             ->where(static::$variantTable . '.show_in_grid', true)
             ->whereIn(static::$productTable . '.state', ProductState::onlineStates())
             ->whereIn(static::$variantTable . '.state', VariantState::availableStates())
+
+            ->leftJoin(static::$taxonPivotTable, static::$variantTable.'.product_id', '=', static::$taxonPivotTable.'.product_id')
+            ->groupBy(static::$variantTable.'.variant_id')
             ->select([
                 static::$variantTable . '.*',
                 static::$productTable . '.data AS product_data',
                 static::$productTable . '.order_column AS product_order_column',
+                DB::raw('GROUP_CONCAT('.static::$taxonPivotTable.'.taxon_id) AS taxon_ids'),
             ]);
     }
 
@@ -206,6 +210,7 @@ class MysqlGridRepository implements GridRepository
                 ->map(fn ($state) => get_object_vars($state))
                 ->map(fn ($state) => $this->container->get(GridItem::class)::fromMappedData(array_merge($state, [
                     'includes_vat' => (bool) $state['includes_vat'],
+                    'taxon_ids' => $state['taxon_ids'] ? explode(',', $state['taxon_ids']) : [],
                 ]), $this->locale))
                 ->each(fn (GridItem $gridItem) => $gridItem->setLocale($this->locale))
         );

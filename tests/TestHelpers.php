@@ -2,6 +2,7 @@
 
 namespace Tests;
 
+use Illuminate\Support\Facades\DB;
 use Illuminate\Contracts\Debug\ExceptionHandler;
 use Money\Money;
 use Thinktomorrow\Trader\Application\Product\CreateProduct;
@@ -477,6 +478,11 @@ trait TestHelpers
         $productId = $productApplication->createProduct(new CreateProduct([$taxonId->get()], "100", "6", 'sku', ['title' => ['nl' => 'product one']], [ 'title' => ['nl' => 'variant title one'] ]));
         $product2Id = $productApplication->createProduct(new CreateProduct([$taxonChildId->get()], "250", "12", 'sku-2', ['title' => ['nl' => 'product two']], [ 'title' => ['nl' => 'variant title two'] ]));
         $product3Id = $productApplication->createProduct(new CreateProduct([], "500", "21", 'sku-3', ['title' => ['nl' => 'product three']], [ 'title' => ['nl' => 'variant title three'] ]));
+
+        // Force order for consistent testing assertions
+        DB::table('trader_products')->where('product_id', $productId->get())->update(['order_column' => 0]);
+        DB::table('trader_products')->where('product_id', $product2Id->get())->update(['order_column' => 1]);
+        DB::table('trader_products')->where('product_id', $product3Id->get())->update(['order_column' => 2]);
 
         // Set every product online
         foreach ([$productId, $product2Id, $product3Id] as $prodId) {

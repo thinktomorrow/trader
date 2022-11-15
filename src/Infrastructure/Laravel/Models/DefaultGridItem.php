@@ -24,6 +24,7 @@ class DefaultGridItem implements GridItem
     private VariantState $state;
     private array $data;
     private iterable $images;
+    protected array $taxonIds;
 
     final private function __construct()
     {
@@ -35,6 +36,7 @@ class DefaultGridItem implements GridItem
 
         $item->variantId = VariantId::fromString($state['variant_id']);
         $item->productId = ProductId::fromString($state['product_id']);
+        $item->taxonIds = $state['taxon_ids'] ?: [];
         $item->state = VariantState::from($state['state']);
         $item->salePrice = VariantSalePrice::fromScalars($state['sale_price'], $state['tax_rate'], $state['includes_vat']);
         $item->unitPrice = VariantUnitPrice::fromScalars($state['unit_price'], $state['tax_rate'], $state['includes_vat']);
@@ -54,6 +56,11 @@ class DefaultGridItem implements GridItem
     public function getProductId(): string
     {
         return $this->productId->get();
+    }
+
+    public function getTaxonIds(): array
+    {
+        return $this->taxonIds;
     }
 
     public function isAvailable(): bool
