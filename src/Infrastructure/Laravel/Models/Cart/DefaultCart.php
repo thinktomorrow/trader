@@ -103,22 +103,32 @@ class DefaultCart implements Cart
 
     public function getTotalPrice(?bool $includeTax = null): string
     {
-        $includeTax = $includeTax ?? $this->include_tax;
-
         return $this->renderMoney(
-            $includeTax ? $this->total->getIncludingVat() : $this->total->getExcludingVat(),
+            $this->getTotalPriceAsMoney($includeTax),
             $this->getLocale()
         );
     }
 
-    public function getSubtotalPrice(?bool $includeTax = null): string
+    public function getTotalPriceAsMoney(?bool $includeTax = null): Money
     {
         $includeTax = $includeTax ?? $this->include_tax;
 
+        return $includeTax ? $this->total->getIncludingVat() : $this->total->getExcludingVat();
+    }
+
+    public function getSubtotalPrice(?bool $includeTax = null): string
+    {
         return $this->renderMoney(
-            $includeTax ? $this->subtotal->getIncludingVat() : $this->subtotal->getExcludingVat(),
+            $this->getSubtotalPriceAsMoney($includeTax),
             $this->getLocale()
         );
+    }
+
+    public function getSubtotalPriceAsMoney(?bool $includeTax = null): Money
+    {
+        $includeTax = $includeTax ?? $this->include_tax;
+
+        return $includeTax ? $this->subtotal->getIncludingVat() : $this->subtotal->getExcludingVat();
     }
 
     public function getShippingCost(): ?string

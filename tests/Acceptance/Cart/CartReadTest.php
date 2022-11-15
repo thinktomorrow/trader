@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace Tests\Acceptance\Cart;
 
+use Money\Money;
 use Thinktomorrow\Trader\Application\Cart\Read\Cart;
 use Thinktomorrow\Trader\Application\Cart\Read\CartPayment;
 use Thinktomorrow\Trader\Application\Cart\Read\CartShipping;
@@ -20,7 +21,9 @@ class CartReadTest extends CartContext
         $cart = $this->cartRepository->findCart(OrderId::fromString('xxx'));
 
         $this->assertEquals('€ 10', $cart->getTotalPrice());
+        $this->assertEquals(Money::EUR(1000), $cart->getTotalPriceAsMoney());
         $this->assertEquals('€ 10', $cart->getSubtotalPrice());
+        $this->assertEquals(Money::EUR(1000), $cart->getSubtotalPriceAsMoney());
         $this->assertEquals('€ 1,67', $cart->getTaxPrice()); // tax is 20%
         $this->assertNull($cart->getDiscountPrice());
         $this->assertNull($cart->getShippingCost());
@@ -64,6 +67,11 @@ class CartReadTest extends CartContext
         $this->whenIAddTheVariantToTheCart('lightsaber-123', 2);
 
         $cart = $this->cartRepository->findCart(OrderId::fromString('xxx'));
+
+        $this->assertEquals(Money::EUR(1000), $cart->getTotalPriceAsMoney());
+        $this->assertEquals(Money::EUR(1000), $cart->getSubtotalPriceAsMoney());
+        $this->assertEquals(Money::EUR(833), $cart->getTotalPriceAsMoney(false));
+        $this->assertEquals(Money::EUR(833), $cart->getSubtotalPriceAsMoney(false));
 
         $line = $cart->getLines()[0];
 

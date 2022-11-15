@@ -2,6 +2,8 @@
 
 namespace Thinktomorrow\Trader\Application\Cart\Read;
 
+use Money\Money;
+
 interface Cart
 {
     public static function fromMappedData(array $state, array $childObjects, array $discounts): static;
@@ -20,7 +22,9 @@ interface Cart
     public function getQuantity(): int;
 
     public function getTotalPrice(?bool $includeTax = null): string;
+    public function getTotalPriceAsMoney(?bool $includeTax = null): Money;
     public function getSubtotalPrice(?bool $includeTax = null): string;
+    public function getSubtotalPriceAsMoney(?bool $includeTax = null): Money;
     public function getShippingCost(): ?string;
     public function getPaymentCost(): ?string;
     public function getDiscountPrice(): ?string;
