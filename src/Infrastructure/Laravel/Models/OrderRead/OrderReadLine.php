@@ -9,6 +9,7 @@ use Thinktomorrow\Trader\Application\Common\RendersData;
 use Thinktomorrow\Trader\Application\Common\RendersMoney;
 use Thinktomorrow\Trader\Domain\Common\Cash\Cash;
 use Thinktomorrow\Trader\Domain\Common\Price\Price;
+use Thinktomorrow\Trader\Domain\Model\Order\Line\LinePrice;
 use Thinktomorrow\Trader\Domain\Model\Product\Variant\VariantUnitPrice;
 
 abstract class OrderReadLine
@@ -19,7 +20,7 @@ abstract class OrderReadLine
     protected string $line_id;
     protected ?string $variant_id;
     protected string $product_id;
-    protected Price $linePrice;
+    protected LinePrice $linePrice;
     protected VariantUnitPrice $unitPrice;
     protected Price $total;
     protected Price $discountTotal;
@@ -96,17 +97,37 @@ abstract class OrderReadLine
     public function getUnitPrice(): string
     {
         return $this->renderMoney(
-            $this->include_tax ? $this->unitPrice->getIncludingVat() : $this->unitPrice->getExcludingVat(),
+            $this->getUnitPriceAsMoney(),
             $this->getLocale()
         );
+    }
+
+    public function getUnitPriceAsMoney(): Money
+    {
+        return $this->include_tax ? $this->unitPrice->getIncludingVat() : $this->unitPrice->getExcludingVat();
+    }
+
+    public function getUnitPriceAsPrice(): VariantUnitPrice
+    {
+        return $this->unitPrice;
     }
 
     public function getLinePrice(): string
     {
         return $this->renderMoney(
-            $this->include_tax ? $this->linePrice->getIncludingVat() : $this->linePrice->getExcludingVat(),
+            $this->getLinePriceAsMoney(),
             $this->getLocale()
         );
+    }
+
+    public function getLinePriceAsMoney(): Money
+    {
+        return $this->include_tax ? $this->linePrice->getIncludingVat() : $this->linePrice->getExcludingVat();
+    }
+
+    public function getLinePriceAsPrice(): LinePrice
+    {
+        return $this->linePrice;
     }
 
     public function getTotalPrice(): string

@@ -3,8 +3,12 @@ declare(strict_types=1);
 
 namespace Tests\Acceptance\Order;
 
+use Money\Money;
 use Tests\Acceptance\Cart\CartContext;
+use Thinktomorrow\Trader\Domain\Common\Taxes\TaxRate;
+use Thinktomorrow\Trader\Domain\Model\Order\Line\LinePrice;
 use Thinktomorrow\Trader\Application\Order\MerchantOrder\MerchantOrder;
+use Thinktomorrow\Trader\Domain\Model\Product\Variant\VariantUnitPrice;
 use Thinktomorrow\Trader\Application\Order\MerchantOrder\MerchantOrderPayment;
 use Thinktomorrow\Trader\Application\Order\MerchantOrder\MerchantOrderShipping;
 use Thinktomorrow\Trader\Application\Order\MerchantOrder\MerchantOrderShopper;
@@ -74,7 +78,15 @@ class MerchantOrderTest extends CartContext
         $line = $merchantOrder->getLines()[0];
 
         $line->includeTax(false);
+
+        $this->assertEquals('€ 8,33', $line->getUnitPrice()); // test unit price is set at 1000
+        $this->assertEquals(Money::EUR(833), $line->getUnitPriceAsMoney());
+        $this->assertEquals(VariantUnitPrice::fromMoney(Money::EUR(1000), TaxRate::fromString('20'), true), $line->getUnitPriceAsPrice());
+
         $this->assertEquals('€ 4,17', $line->getLinePrice()); // 4,1666666
+        $this->assertEquals(Money::EUR(417), $line->getLinePriceAsMoney()); // 4,1666666
+        $this->assertEquals(LinePrice::fromMoney(Money::EUR(500), TaxRate::fromString('20'), true), $line->getLinePriceAsPrice());
+
         $this->assertEquals('€ 8,33', $line->getTotalPrice()); // 8,333333
         $this->assertEquals('€ 8,33', $line->getSubtotalPrice());
         $this->assertEquals('€ 1,67', $line->getTaxPrice()); // tax is 20%

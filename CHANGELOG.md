@@ -4,6 +4,8 @@ Important changes will be notified in this file
 
 ## unreleased
 - Added: method to the product gridItem interface `GridItem::getTaxonIds()`. to give all the associated taxon ids of this product item.
+- Added: `CartLine::getUnitPriceAsMoney()`, `CartLine::getLinePriceAsMoney()`, `CartLine::getLinePriceAsMoney()` and `CartLine::getUnitPriceAsPrice`.
+- Added: `MerchantOrderLine::getUnitPriceAsMoney()`, `MerchantOrderLine::getLinePriceAsMoney()`, `MerchantOrderLine::getLinePriceAsMoney()` and `MerchantOrderLine::getUnitPriceAsPrice`.
 
 ## 2022-11-14 - 0.5.4
 - Fixed: TaxonNode label and content when locale was missing returned as array.

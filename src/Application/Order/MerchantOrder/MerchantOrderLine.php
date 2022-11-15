@@ -2,6 +2,10 @@
 
 namespace Thinktomorrow\Trader\Application\Order\MerchantOrder;
 
+use Money\Money;
+use Thinktomorrow\Trader\Domain\Model\Order\Line\LinePrice;
+use Thinktomorrow\Trader\Domain\Model\Product\Variant\VariantUnitPrice;
+
 interface MerchantOrderLine
 {
     public static function fromMappedData(array $state, array $orderState, iterable $discounts, iterable $personalisations): static;
@@ -12,6 +16,11 @@ interface MerchantOrderLine
 
     public function getUnitPrice(): string;
     public function getLinePrice(): string;
+    public function getUnitPriceAsMoney(): Money;
+    public function getLinePriceAsMoney(): Money;
+    public function getUnitPriceAsPrice(): VariantUnitPrice;
+    public function getLinePriceAsPrice(): LinePrice;
+
     public function getTotalPrice(): string;
     public function getSubtotalPrice(): string;
     public function getTaxPrice(): string;
