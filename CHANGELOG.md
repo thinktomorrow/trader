@@ -3,6 +3,8 @@
 Important changes will be notified in this file
 
 ## unreleased
+
+## 2022-11-17 - 0.5.5
 - Added: method to the product gridItem interface `GridItem::getTaxonIds()`. to give all the associated taxon ids of this product item.
 - Added: `CartLine::getUnitPriceAsMoney()`, `CartLine::getLinePriceAsMoney()`, `CartLine::getLinePriceAsMoney()` and `CartLine::getUnitPriceAsPrice`.
 - Added: `MerchantOrderLine::getUnitPriceAsMoney()`, `MerchantOrderLine::getLinePriceAsMoney()`, `MerchantOrderLine::getLinePriceAsMoney()` and `MerchantOrderLine::getUnitPriceAsPrice`.
