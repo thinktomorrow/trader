@@ -236,7 +236,7 @@ class MerchantOrderTest extends CartContext
             [
                 'personalisation_id' => 'xxx',
                 'personalisation_type' => PersonalisationType::TEXT,
-                'data' => ['label' => 'label'],
+                'data' => ['label' => ['nl' => 'label nl', 'en' => 'label en']],
             ],
         ]);
         $this->whenIAddTheVariantToTheCart('lightsaber-123', 1, ['foo' => 'bar'], ['xxx' => 'foobar']);
@@ -249,7 +249,9 @@ class MerchantOrderTest extends CartContext
         $this->assertCount(1, $line->getPersonalisations());
 
         $personalisation = $line->getPersonalisations()[0];
-        $this->assertEquals('label', $personalisation->getLabel());
+        $this->assertEquals('label nl', $personalisation->getLabel());
+        $this->assertEquals('label nl', $personalisation->getLabel('nl'));
+        $this->assertEquals('label en', $personalisation->getLabel('en'));
         $this->assertEquals('foobar', $personalisation->getValue());
         $this->assertEquals(PersonalisationType::TEXT, $personalisation->getType());
     }

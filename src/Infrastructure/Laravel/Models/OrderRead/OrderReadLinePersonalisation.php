@@ -44,9 +44,9 @@ abstract class OrderReadLinePersonalisation
         return $this->line_personalisation_id;
     }
 
-    public function getLabel(): string
+    public function getLabel(?string $locale = null): string
     {
-        return $this->data('label', null, '');
+        return $this->data('label', $locale, '');
     }
 
     public function getType(): string
