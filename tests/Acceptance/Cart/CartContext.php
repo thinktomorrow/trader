@@ -126,7 +126,7 @@ abstract class CartContext extends TestCase
         (new TestContainer())->add(AdjustLines::class, new AdjustLines(new InMemoryVariantRepository()));
         (new TestContainer())->add(AdjustDiscounts::class, new AdjustDiscounts($this->promoRepository, (new TestContainer())->get(ApplyPromoToOrder::class)));
         (new TestContainer())->add(OrderStateMachine::class, new OrderStateMachine([
-            ...OrderState::customerStates(), OrderState::confirmed
+            ...OrderState::customerStates(), OrderState::confirmed,
         ], [
             'complete' => OrderState::getDefaultTransitions()['complete'],
             'confirm' => OrderState::getDefaultTransitions()['confirm'],

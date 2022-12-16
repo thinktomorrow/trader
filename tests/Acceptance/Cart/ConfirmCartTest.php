@@ -3,8 +3,8 @@ declare(strict_types=1);
 
 namespace Tests\Acceptance\Cart;
 
-use Thinktomorrow\Trader\Application\Cart\ConfirmCart;
 use Thinktomorrow\Trader\Application\Cart\CompleteCart;
+use Thinktomorrow\Trader\Application\Cart\ConfirmCart;
 use Thinktomorrow\Trader\Domain\Model\Order\Events\OrderStateUpdated;
 use Thinktomorrow\Trader\Domain\Model\Order\Exceptions\OrderAlreadyInMerchantHands;
 use Thinktomorrow\Trader\Domain\Model\Order\OrderId;
