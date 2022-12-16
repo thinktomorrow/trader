@@ -16,6 +16,7 @@ abstract class TaxonContext extends TestCase
 {
     protected TaxonApplication $taxonApplication;
     protected EventDispatcherSpy $eventDispatcher;
+    protected InMemoryTaxonRepository $taxonRepository;
 
     protected function setUp(): void
     {

@@ -34,6 +34,7 @@ abstract class ProductContext extends TestCase
     protected EventDispatcherSpy $eventDispatcher;
     protected VariantLinksComposer $productOptionsComposer;
     protected InMemoryProductDetailRepository $productDetailRepository;
+    protected MissingOptionCombinations $missingOptionCombinations;
 
     protected function setUp(): void
     {

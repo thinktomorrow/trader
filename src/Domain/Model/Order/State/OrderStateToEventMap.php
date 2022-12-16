@@ -5,6 +5,7 @@ namespace Thinktomorrow\Trader\Domain\Model\Order\State;
 
 use Thinktomorrow\Trader\Domain\Common\Map\HasSimpleMapping;
 use Thinktomorrow\Trader\Domain\Model\Order\Events\OrderStates\CartAbandoned;
+use Thinktomorrow\Trader\Domain\Model\Order\Events\OrderStates\CartCompleted;
 use Thinktomorrow\Trader\Domain\Model\Order\Events\OrderStates\CartQueuedForDeletion;
 use Thinktomorrow\Trader\Domain\Model\Order\Events\OrderStates\CartRevived;
 use Thinktomorrow\Trader\Domain\Model\Order\Events\OrderStates\OrderCancelled;
@@ -29,6 +30,7 @@ class OrderStateToEventMap
             OrderState::cart_abandoned->value => CartAbandoned::class,
             OrderState::cart_revived->value => CartRevived::class,
             OrderState::cart_queued_for_deletion->value => CartQueuedForDeletion::class,
+            OrderState::cart_complete->value => CartCompleted::class,
             OrderState::confirmed->value => OrderConfirmed::class,
             OrderState::cancelled->value => OrderCancelled::class,
             OrderState::cancelled_by_merchant->value => OrderCancelledByMerchant::class,

@@ -15,6 +15,7 @@ abstract class Address
     protected ?string $line2;
     protected ?string $postalCode;
     protected ?string $city;
+    protected array $data;
 
     final private function __construct()
     {

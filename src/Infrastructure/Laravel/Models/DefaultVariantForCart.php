@@ -21,6 +21,7 @@ class DefaultVariantForCart implements VariantForCart
     private VariantUnitPrice $variantUnitPrice;
     private VariantSalePrice $variantSalePrice;
     private array $personalisations;
+    private array $data;
     private array $productData;
 
     final private function __construct()

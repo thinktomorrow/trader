@@ -12,6 +12,7 @@ class ShippingProfileContext extends TestCase
 {
     protected ShippingProfileApplication $shippingProfileApplication;
     protected InMemoryShippingProfileRepository $shippingProfileRepository;
+    protected EventDispatcherSpy $eventDispatcher;
 
     protected function setUp(): void
     {

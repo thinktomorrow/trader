@@ -26,6 +26,8 @@ abstract class StateContext extends TestCase
     protected PaymentStateMachine $paymentStateMachine;
     protected ShippingStateMachine $shippingStateMachine;
     protected OrderStateApplication $orderStateApplication;
+    protected EventDispatcherSpy $eventDispatcher;
+    protected OrderStateMachine $orderStateMachine;
 
     protected function setUp(): void
     {

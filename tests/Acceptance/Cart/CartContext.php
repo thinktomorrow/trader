@@ -94,6 +94,7 @@ abstract class CartContext extends TestCase
     protected EventDispatcherSpy $eventDispatcher;
     protected CustomerApplication $customerApplication;
     protected ProductApplication $productApplication;
+    protected InMemoryMerchantOrderRepository $merchantOrderRepository;
 
     protected function setUp(): void
     {
@@ -125,13 +126,10 @@ abstract class CartContext extends TestCase
         (new TestContainer())->add(AdjustLines::class, new AdjustLines(new InMemoryVariantRepository()));
         (new TestContainer())->add(AdjustDiscounts::class, new AdjustDiscounts($this->promoRepository, (new TestContainer())->get(ApplyPromoToOrder::class)));
         (new TestContainer())->add(OrderStateMachine::class, new OrderStateMachine([
-            OrderState::cart_pending,
-            OrderState::confirmed,
+            ...OrderState::customerStates(), OrderState::confirmed
         ], [
-            'confirm' => [
-                'from' => [OrderState::cart_pending, OrderState::confirmed],
-                'to' => OrderState::confirmed,
-            ],
+            'complete' => OrderState::getDefaultTransitions()['complete'],
+            'confirm' => OrderState::getDefaultTransitions()['confirm'],
         ]));
 
         $this->cartApplication = new CartApplication(

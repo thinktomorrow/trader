@@ -378,6 +378,17 @@ final class CartApplication
         ));
     }
 
+    public function completeCart(CompleteCart $command): void
+    {
+        $order = $this->orderRepository->findForCart($command->getOrderId());
+
+        $this->orderStateMachine->apply($order, 'complete');
+
+        $this->orderRepository->save($order);
+
+        $this->eventDispatcher->dispatchAll($order->releaseEvents());
+    }
+
     public function confirmCart(ConfirmCart $command): void
     {
         $order = $this->orderRepository->findForCart($command->getOrderId());

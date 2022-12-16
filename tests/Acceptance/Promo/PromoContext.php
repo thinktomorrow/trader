@@ -22,6 +22,7 @@ class PromoContext extends TestCase
 {
     protected PromoApplication $promoApplication;
     protected InMemoryPromoRepository $promoRepository;
+    protected EventDispatcherSpy $eventDispatcher;
 
     protected function setUp(): void
     {

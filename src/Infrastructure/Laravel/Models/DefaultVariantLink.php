@@ -18,6 +18,7 @@ class DefaultVariantLink implements VariantLink
     protected bool $isActive = false;
     protected ?Variant $variant;
     protected string $groupId;
+    protected array $data;
 
     private function __construct(string $groupId, ?Variant $variant, array $data)
     {

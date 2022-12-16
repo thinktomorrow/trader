@@ -5,6 +5,7 @@ namespace Tests\Unit\Model\Order;
 
 use Tests\Unit\TestCase;
 use Thinktomorrow\Trader\Domain\Model\Order\Events\OrderStates\CartAbandoned;
+use Thinktomorrow\Trader\Domain\Model\Order\Events\OrderStates\CartCompleted;
 use Thinktomorrow\Trader\Domain\Model\Order\Events\OrderStates\CartQueuedForDeletion;
 use Thinktomorrow\Trader\Domain\Model\Order\Events\OrderStates\CartRevived;
 use Thinktomorrow\Trader\Domain\Model\Order\Events\OrderStates\OrderCancelled;
@@ -57,6 +58,7 @@ class OrderStateTest extends TestCase
         $this->assertOrderStateEvent(CartQueuedForDeletion::class, OrderState::cart_queued_for_deletion);
         $this->assertOrderStateEvent(OrderCancelled::class, OrderState::cancelled);
         $this->assertOrderStateEvent(OrderCancelledByMerchant::class, OrderState::cancelled_by_merchant);
+        $this->assertOrderStateEvent(CartCompleted::class, OrderState::cart_complete);
         $this->assertOrderStateEvent(OrderConfirmed::class, OrderState::confirmed);
         $this->assertOrderStateEvent(OrderPaid::class, OrderState::paid);
         $this->assertOrderStateEvent(OrderPartiallyPaid::class, OrderState::partially_paid);
