@@ -4,6 +4,9 @@ Important changes will be notified in this file
 
 ## unreleased
 
+## 2022-12-19 - 0.5.7
+- Added: extra OrderState::cart_completed state which indicates that order has sufficient data for potential payment and fulfillment.
+
 ## 2022-12-01 - 0.5.6
 - Fixed: allow to show localized personalisation label
 
