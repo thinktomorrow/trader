@@ -17,7 +17,7 @@ enum OrderState: string implements State
     case cart_abandoned = 'cart_abandoned'; // cart has been stale for too long and is considered abandoned by customer
     case cart_revived = 'cart_revived'; // abandoned cart has been revived by customer
     case cart_queued_for_deletion = 'cart_queued_for_deletion'; // cart is soft deleted and ready for garbage collection
-    case cart_complete = 'cart_complete'; // cart info is considered complete and payment and order fulfillment is possible
+    case cart_completed = 'cart_completed'; // cart info is considered complete and payment and order fulfillment is possible
 
     /**
      * ------------------------------------------------
@@ -66,7 +66,7 @@ enum OrderState: string implements State
             self::cart_pending,
             self::cart_abandoned,
             self::cart_revived,
-            self::cart_complete,
+            self::cart_completed,
         ];
     }
 
@@ -84,11 +84,11 @@ enum OrderState: string implements State
     {
         return [
             'quote' => [
-                'from' => [self::cart_pending, self::cart_revived, self::cart_complete],
+                'from' => [self::cart_pending, self::cart_revived, self::cart_completed],
                 'to' => self::quoted,
             ],
             'abandon' => [
-                'from' => [self::cart_pending, self::cart_revived, self::cart_complete],
+                'from' => [self::cart_pending, self::cart_revived, self::cart_completed],
                 'to' => self::cart_abandoned,
             ],
             'revive' => [
@@ -96,15 +96,15 @@ enum OrderState: string implements State
                 'to' => self::cart_revived,
             ],
             'delete' => [
-                'from' => [self::cart_abandoned, self::cart_pending, self::cart_revived, self::cart_complete],
+                'from' => [self::cart_abandoned, self::cart_pending, self::cart_revived, self::cart_completed],
                 'to' => self::cart_queued_for_deletion,
             ],
             'complete' => [
                 'from' => [self::cart_pending, self::cart_revived],
-                'to' => self::cart_complete,
+                'to' => self::cart_completed,
             ],
             'confirm' => [
-                'from' => [self::cart_pending, self::cart_revived, self::cart_complete],
+                'from' => [self::cart_pending, self::cart_revived, self::cart_completed],
                 'to' => self::confirmed,
             ],
             'confirm_quote' => [
@@ -112,19 +112,19 @@ enum OrderState: string implements State
                 'to' => self::quote_confirmed,
             ],
             'cancel' => [
-                'from' => [self::cart_complete, self::cart_revived, self::confirmed],
+                'from' => [self::cart_completed, self::cart_revived, self::confirmed],
                 'to' => self::cancelled,
             ],
             'cancel_by_merchant' => [
-                'from' => [self::cart_complete, self::confirmed, self::quote_confirmed],
+                'from' => [self::cart_completed, self::confirmed, self::quote_confirmed],
                 'to' => self::cancelled_by_merchant,
             ],
             'partially_pay' => [
-                'from' => [self::cart_complete, self::confirmed],
+                'from' => [self::cart_completed, self::confirmed],
                 'to' => self::partially_paid,
             ],
             'pay' => [
-                'from' => [self::cart_complete, self::confirmed, self::partially_paid, self::quote_confirmed],
+                'from' => [self::cart_completed, self::confirmed, self::partially_paid, self::quote_confirmed],
                 'to' => self::paid,
             ],
             'partially_pack' => [

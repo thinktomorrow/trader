@@ -58,7 +58,7 @@ class OrderStateTest extends TestCase
         $this->assertOrderStateEvent(CartQueuedForDeletion::class, OrderState::cart_queued_for_deletion);
         $this->assertOrderStateEvent(OrderCancelled::class, OrderState::cancelled);
         $this->assertOrderStateEvent(OrderCancelledByMerchant::class, OrderState::cancelled_by_merchant);
-        $this->assertOrderStateEvent(CartCompleted::class, OrderState::cart_complete);
+        $this->assertOrderStateEvent(CartCompleted::class, OrderState::cart_completed);
         $this->assertOrderStateEvent(OrderConfirmed::class, OrderState::confirmed);
         $this->assertOrderStateEvent(OrderPaid::class, OrderState::paid);
         $this->assertOrderStateEvent(OrderPartiallyPaid::class, OrderState::partially_paid);

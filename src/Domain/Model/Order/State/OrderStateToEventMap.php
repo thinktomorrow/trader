@@ -30,7 +30,7 @@ class OrderStateToEventMap
             OrderState::cart_abandoned->value => CartAbandoned::class,
             OrderState::cart_revived->value => CartRevived::class,
             OrderState::cart_queued_for_deletion->value => CartQueuedForDeletion::class,
-            OrderState::cart_complete->value => CartCompleted::class,
+            OrderState::cart_completed->value => CartCompleted::class,
             OrderState::confirmed->value => OrderConfirmed::class,
             OrderState::cancelled->value => OrderCancelled::class,
             OrderState::cancelled_by_merchant->value => OrderCancelledByMerchant::class,

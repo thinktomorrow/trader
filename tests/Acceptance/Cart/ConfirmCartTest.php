@@ -21,12 +21,12 @@ class ConfirmCartTest extends CartContext
         $this->cartApplication->completeCart(new CompleteCart('xxx'));
 
         $this->assertEquals(
-            new OrderStateUpdated(OrderId::fromString('xxx'), OrderState::cart_pending, OrderState::cart_complete),
+            new OrderStateUpdated(OrderId::fromString('xxx'), OrderState::cart_pending, OrderState::cart_completed),
             last($this->eventDispatcher->releaseDispatchedEvents())
         );
 
         $order = $this->orderRepository->find(OrderId::fromString('xxx'));
-        $this->assertSame(OrderState::cart_complete, $order->getOrderState());
+        $this->assertSame(OrderState::cart_completed, $order->getOrderState());
     }
 
     /** @test */
@@ -56,7 +56,7 @@ class ConfirmCartTest extends CartContext
         $this->cartApplication->confirmCart(new ConfirmCart('xxx'));
 
         $this->assertEquals(
-            new OrderStateUpdated(OrderId::fromString('xxx'), OrderState::cart_complete, OrderState::confirmed),
+            new OrderStateUpdated(OrderId::fromString('xxx'), OrderState::cart_completed, OrderState::confirmed),
             last($this->eventDispatcher->releaseDispatchedEvents())
         );
 
