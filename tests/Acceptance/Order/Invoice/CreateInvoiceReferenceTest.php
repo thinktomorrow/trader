@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 
-namespace Tests\Acceptance\Order;
+namespace Tests\Acceptance\Order\Invoice;
 
 use Tests\Acceptance\Cart\CartContext;
 use Thinktomorrow\Trader\Domain\Model\Order\Invoice\InvoiceReference;
