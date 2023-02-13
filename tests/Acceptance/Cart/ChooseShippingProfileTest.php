@@ -2,7 +2,6 @@
 
 namespace Tests\Acceptance\Cart;
 
-use Thinktomorrow\Trader\Domain\Common\Cash\Cash;
 use Thinktomorrow\Trader\Domain\Model\Country\CountryId;
 use Thinktomorrow\Trader\Domain\Model\ShippingProfile\Exceptions\CouldNotFindShippingProfile;
 use Thinktomorrow\Trader\Domain\Model\ShippingProfile\ShippingProfile;

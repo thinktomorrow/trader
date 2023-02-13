@@ -2,7 +2,6 @@
 
 namespace Tests\Acceptance\Cart;
 
-use Illuminate\Support\Str;
 use Thinktomorrow\Trader\Domain\Common\Cash\Cash;
 use Thinktomorrow\Trader\Domain\Model\Country\CountryId;
 use Thinktomorrow\Trader\Domain\Model\PaymentMethod\Exceptions\CouldNotFindPaymentMethod;

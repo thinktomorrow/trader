@@ -457,7 +457,7 @@ abstract class CartContext extends TestCase
             $shippingProfileId
         ));
 
-        if(count($this->getOrder()->getShippings())) {
+        if (count($this->getOrder()->getShippings())) {
             $this->assertEquals($shippingProfileId, $this->getOrder()->getShippings()[0]->getShippingProfileId()->get());
         }
     }
@@ -469,7 +469,7 @@ abstract class CartContext extends TestCase
             $paymentMethodId
         ));
 
-        if(count($this->getOrder()->getPayments())) {
+        if (count($this->getOrder()->getPayments())) {
             $this->assertEquals($paymentMethodId, $this->getOrder()->getPayments()[0]->getPaymentMethodId()->get());
         }
     }
