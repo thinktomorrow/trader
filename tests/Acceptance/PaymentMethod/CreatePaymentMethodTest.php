@@ -5,11 +5,8 @@ namespace Tests\Acceptance\PaymentMethod;
 
 use Money\Money;
 use Thinktomorrow\Trader\Application\PaymentMethod\CreatePaymentMethod;
-use Thinktomorrow\Trader\Application\PaymentMethod\CreateTariff;
 use Thinktomorrow\Trader\Domain\Model\Country\CountryId;
 use Thinktomorrow\Trader\Domain\Model\PaymentMethod\PaymentMethodId;
-use Thinktomorrow\Trader\Domain\Model\PaymentMethod\Tariff;
-use Thinktomorrow\Trader\Domain\Model\PaymentMethod\TariffId;
 
 class CreatePaymentMethodTest extends PaymentMethodContext
 {
