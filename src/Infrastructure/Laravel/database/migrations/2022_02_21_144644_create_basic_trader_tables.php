@@ -143,7 +143,6 @@ return new class extends Migration {
             $table->boolean('requires_address')->default(1);
             $table->json('data')->nullable();
             $table->string('state')->default(\Thinktomorrow\Trader\Domain\Model\ShippingProfile\ShippingProfileState::online->value);
-            $table->boolean('active')->default(1);
             $table->unsignedInteger('order_column')->default(0);
         });
 
@@ -173,7 +172,6 @@ return new class extends Migration {
             $table->integer('rate')->unsigned();
             $table->json('data')->nullable();
             $table->string('state')->default(\Thinktomorrow\Trader\Domain\Model\PaymentMethod\PaymentMethodState::online->value);
-            $table->boolean('active')->default(1);
             $table->unsignedInteger('order_column')->default(0);
         });
 

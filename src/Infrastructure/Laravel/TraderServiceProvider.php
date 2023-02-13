@@ -5,6 +5,8 @@ namespace Thinktomorrow\Trader\Infrastructure\Laravel;
 
 use Illuminate\Support\Arr;
 use Illuminate\Support\ServiceProvider;
+use Thinktomorrow\Trader\Application\Cart\PaymentMethod\PaymentMethodForCart;
+use Thinktomorrow\Trader\Application\Cart\PaymentMethod\PaymentMethodForCartRepository;
 use Thinktomorrow\Trader\Application\Cart\Read\Cart;
 use Thinktomorrow\Trader\Application\Cart\Read\CartBillingAddress;
 use Thinktomorrow\Trader\Application\Cart\Read\CartDiscount;
@@ -101,6 +103,7 @@ use Thinktomorrow\Trader\Infrastructure\Laravel\Models\CustomerRead\DefaultCusto
 use Thinktomorrow\Trader\Infrastructure\Laravel\Models\CustomerRead\DefaultCustomerShippingAddress;
 use Thinktomorrow\Trader\Infrastructure\Laravel\Models\DefaultGridItem;
 use Thinktomorrow\Trader\Infrastructure\Laravel\Models\DefaultOrderGridItem;
+use Thinktomorrow\Trader\Infrastructure\Laravel\Models\DefaultPaymentMethodForCart;
 use Thinktomorrow\Trader\Infrastructure\Laravel\Models\DefaultPersonalisationField;
 use Thinktomorrow\Trader\Infrastructure\Laravel\Models\DefaultProductDetail;
 use Thinktomorrow\Trader\Infrastructure\Laravel\Models\DefaultShippingProfileForCart;
@@ -169,6 +172,7 @@ class TraderServiceProvider extends ServiceProvider
         $this->app->bind(CountryRepository::class, MysqlCountryRepository::class);
         $this->app->bind(CartRepository::class, MysqlCartRepository::class);
         $this->app->bind(ShippingProfileForCartRepository::class, MysqlShippingProfileRepository::class);
+        $this->app->bind(PaymentMethodForCartRepository::class, MysqlPaymentMethodRepository::class);
         $this->app->bind(PromoRepository::class, MysqlPromoRepository::class);
         $this->app->bind(OrderPromoRepository::class, MysqlPromoRepository::class);
         $this->app->bind(OrderRepository::class, MysqlOrderRepository::class);
@@ -202,6 +206,7 @@ class TraderServiceProvider extends ServiceProvider
         $this->app->bind(CartPayment::class, fn () => DefaultCartPayment::class);
         $this->app->bind(CartShipping::class, fn () => DefaultCartShipping::class);
         $this->app->bind(ShippingProfileForCart::class, fn () => DefaultShippingProfileForCart::class);
+        $this->app->bind(PaymentMethodForCart::class, fn () => DefaultPaymentMethodForCart::class);
 
         // MerchantOrder models
         $this->app->bind(MerchantOrder::class, fn () => DefaultMerchantOrder::class);
