@@ -5,6 +5,7 @@ Important changes will be notified in this file
 ## unreleased
 
 - Added: Payment method logic for add multiple payment options in checkout.
+- Added: Payment Method crud application api.
 - Added: state column to payment methods table. And removed unused 'active' columns. For existing projects, you can use the following migrations:
 ```php 
 Schema::table('trader_shipping_profiles', function (Blueprint $table) {
