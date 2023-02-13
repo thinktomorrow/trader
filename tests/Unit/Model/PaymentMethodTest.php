@@ -5,8 +5,10 @@ namespace Tests\Unit\Model;
 
 use Money\Money;
 use Tests\Unit\TestCase;
+use Thinktomorrow\Trader\Domain\Model\Country\CountryId;
 use Thinktomorrow\Trader\Domain\Model\PaymentMethod\PaymentMethod;
 use Thinktomorrow\Trader\Domain\Model\PaymentMethod\PaymentMethodId;
+use Thinktomorrow\Trader\Domain\Model\PaymentMethod\PaymentMethodState;
 
 class PaymentMethodTest extends TestCase
 {
@@ -20,6 +22,7 @@ class PaymentMethodTest extends TestCase
 
         $this->assertEquals([
             'payment_method_id' => $paymentMethodId->get(),
+            'state' => PaymentMethodState::online->value,
             'rate' => '10',
             'data' => "[]",
         ], $paymentMethod->getMappedData());
@@ -55,5 +58,53 @@ class PaymentMethodTest extends TestCase
         $paymentMethod->deleteData('bar');
 
         $this->assertEquals(json_encode(['foo' => 'bar']), $paymentMethod->getMappedData()['data']);
+    }
+
+    /** @test */
+    public function it_can_update_countries()
+    {
+        $paymentMethod = $this->createPaymentMethod();
+
+        $countries = [
+            CountryId::fromString('FR'),
+            CountryId::fromString('NL'),
+        ];
+
+        $paymentMethod->updateCountries($countries);
+
+        $this->assertCount(2, $paymentMethod->getCountryIds());
+        $this->assertCount(2, $paymentMethod->getChildEntities()[CountryId::class]);
+        $this->assertEquals($countries, $paymentMethod->getCountryIds());
+
+        $this->assertTrue($paymentMethod->hasCountry(CountryId::fromString('FR')));
+        $this->assertTrue($paymentMethod->hasCountry(CountryId::fromString('NL')));
+        $this->assertFalse($paymentMethod->hasCountry(CountryId::fromString('BE')));
+    }
+
+    /** @test */
+    public function it_can_add_country()
+    {
+        $paymentMethod = $this->createPaymentMethod();
+
+        $paymentMethod->addCountry(CountryId::fromString('FR'));
+
+        $this->assertCount(1, $paymentMethod->getCountryIds());
+        $this->assertEquals([
+            CountryId::fromString('FR'),
+        ], $paymentMethod->getCountryIds());
+    }
+
+    /** @test */
+    public function it_can_delete_country()
+    {
+        $paymentMethod = $this->createPaymentMethod();
+        $paymentMethod->addCountry(CountryId::fromString('BE'));
+        $paymentMethod->addCountry(CountryId::fromString('NL'));
+        $paymentMethod->deleteCountry(CountryId::fromString('BE'));
+
+        $this->assertCount(1, $paymentMethod->getCountryIds());
+        $this->assertEquals([
+            CountryId::fromString('NL'),
+        ], $paymentMethod->getCountryIds());
     }
 }

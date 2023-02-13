@@ -37,19 +37,15 @@ class UpdateShippingProfileOnOrder
             return;
         }
 
-        if ($shippingProfile->requiresAddress()) {
-            // Shipping country is required when shipping profile requires address.
-            if (! $shippingCountryId = $order->getShippingAddress()?->getAddress()->countryId) {
-                $this->removeAllShippingsFromOrder($order);
-
-                return;
-            }
-
-            if (! $shippingProfile->hasCountry($shippingCountryId)) {
-                $this->removeAllShippingsFromOrder($order);
-
-                return;
-            }
+        // When shipping country is not given, but profile is country restricted, we bail out.
+        if(!($shippingCountryId = $order->getShippingAddress()?->getAddress()->countryId) && $shippingProfile->hasAnyCountries()) {
+            $this->removeAllShippingsFromOrder($order);
+            return;
+        }
+        // If shipping country does not match the allowed countries, we bail out.
+        else if($shippingCountryId && !$shippingProfile->hasCountry($shippingCountryId)) {
+            $this->removeAllShippingsFromOrder($order);
+            return;
         }
 
         // Apply matching tariff - if no tariff is found, no rate will be applied

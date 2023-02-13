@@ -3,12 +3,16 @@ declare(strict_types=1);
 
 namespace Thinktomorrow\Trader\Infrastructure\Test\Repositories;
 
+use Thinktomorrow\Trader\Application\Cart\PaymentMethod\PaymentMethodForCartRepository;
+use Thinktomorrow\Trader\Domain\Model\Country\CountryId;
 use Thinktomorrow\Trader\Domain\Model\PaymentMethod\Exceptions\CouldNotFindPaymentMethod;
 use Thinktomorrow\Trader\Domain\Model\PaymentMethod\PaymentMethod;
 use Thinktomorrow\Trader\Domain\Model\PaymentMethod\PaymentMethodId;
 use Thinktomorrow\Trader\Domain\Model\PaymentMethod\PaymentMethodRepository;
+use Thinktomorrow\Trader\Domain\Model\PaymentMethod\PaymentMethodState;
+use Thinktomorrow\Trader\Infrastructure\Laravel\Models\DefaultPaymentMethodForCart;
 
-class InMemoryPaymentMethodRepository implements PaymentMethodRepository
+class InMemoryPaymentMethodRepository implements PaymentMethodRepository, PaymentMethodForCartRepository
 {
     public static array $paymentMethods = [];
 
@@ -51,5 +55,18 @@ class InMemoryPaymentMethodRepository implements PaymentMethodRepository
     public static function clear()
     {
         static::$paymentMethods = [];
+    }
+
+    public function findAllPaymentMethodsForCart(?string $countryId = null): array
+    {
+        $paymentMethods = [];
+
+        foreach (static::$paymentMethods as $paymentMethod) {
+            if ($paymentMethod->getState() == PaymentMethodState::online && (! $countryId || $paymentMethod->hasCountry(CountryId::fromString($countryId)))) {
+                $paymentMethods[] = $paymentMethod;
+            }
+        }
+
+        return array_map(fn ($paymentMethod) => DefaultPaymentMethodForCart::fromMappedData($paymentMethod->getMappedData()), $paymentMethods);
     }
 }

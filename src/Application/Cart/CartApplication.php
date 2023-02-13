@@ -8,6 +8,7 @@ use Thinktomorrow\Trader\Application\Cart\Line\AddLine;
 use Thinktomorrow\Trader\Application\Cart\Line\ChangeLineData;
 use Thinktomorrow\Trader\Application\Cart\Line\ChangeLineQuantity;
 use Thinktomorrow\Trader\Application\Cart\Line\RemoveLine;
+use Thinktomorrow\Trader\Application\Cart\PaymentMethod\UpdatePaymentMethodOnOrder;
 use Thinktomorrow\Trader\Application\Cart\RefreshCart\Adjusters\AdjustDiscounts;
 use Thinktomorrow\Trader\Application\Cart\RefreshCart\Adjusters\AdjustLines;
 use Thinktomorrow\Trader\Application\Cart\RefreshCart\Adjusters\AdjustShipping;
@@ -16,7 +17,6 @@ use Thinktomorrow\Trader\Application\Cart\RefreshCart\RefreshCartAction;
 use Thinktomorrow\Trader\Application\Cart\ShippingProfile\UpdateShippingProfileOnOrder;
 use Thinktomorrow\Trader\Application\Cart\VariantForCart\VariantForCartRepository;
 use Thinktomorrow\Trader\Domain\Common\Event\EventDispatcher;
-use Thinktomorrow\Trader\Domain\Common\Taxes\TaxRate;
 use Thinktomorrow\Trader\Domain\Model\Customer\CustomerRepository;
 use Thinktomorrow\Trader\Domain\Model\Order\Address\BillingAddress;
 use Thinktomorrow\Trader\Domain\Model\Order\Address\ShippingAddress;
@@ -25,11 +25,8 @@ use Thinktomorrow\Trader\Domain\Model\Order\Line\Personalisations\LinePersonalis
 use Thinktomorrow\Trader\Domain\Model\Order\Order;
 use Thinktomorrow\Trader\Domain\Model\Order\OrderId;
 use Thinktomorrow\Trader\Domain\Model\Order\OrderRepository;
-use Thinktomorrow\Trader\Domain\Model\Order\Payment\Payment;
-use Thinktomorrow\Trader\Domain\Model\Order\Payment\PaymentCost;
 use Thinktomorrow\Trader\Domain\Model\Order\Shopper;
 use Thinktomorrow\Trader\Domain\Model\Order\State\OrderStateMachine;
-use Thinktomorrow\Trader\Domain\Model\PaymentMethod\PaymentMethodRepository;
 use Thinktomorrow\Trader\Domain\Model\Product\Personalisation\PersonalisationId;
 use Thinktomorrow\Trader\Domain\Model\ShippingProfile\ShippingProfileRepository;
 use Thinktomorrow\Trader\TraderConfig;
@@ -40,12 +37,12 @@ final class CartApplication
     private OrderRepository $orderRepository;
     private ShippingProfileRepository $shippingProfileRepository;
     private EventDispatcher $eventDispatcher;
-    private PaymentMethodRepository $paymentMethodRepository;
     private CustomerRepository $customerRepository;
     private TraderConfig $config;
     private RefreshCartAction $refreshCartAction;
     private ContainerInterface $container;
     private UpdateShippingProfileOnOrder $updateShippingProfileOnOrder;
+    private UpdatePaymentMethodOnOrder $updatePaymentMethodOnOrder;
     private OrderStateMachine $orderStateMachine;
 
     public function __construct(
@@ -57,7 +54,7 @@ final class CartApplication
         RefreshCartAction         $refreshCartAction,
         ShippingProfileRepository $shippingProfileRepository,
         UpdateShippingProfileOnOrder $updateShippingProfileOnOrder,
-        PaymentMethodRepository   $paymentMethodRepository,
+        UpdatePaymentMethodOnOrder $updatePaymentMethodOnOrder,
         CustomerRepository        $customerRepository,
         EventDispatcher           $eventDispatcher
     ) {
@@ -66,7 +63,7 @@ final class CartApplication
         $this->shippingProfileRepository = $shippingProfileRepository;
         $this->eventDispatcher = $eventDispatcher;
         $this->updateShippingProfileOnOrder = $updateShippingProfileOnOrder;
-        $this->paymentMethodRepository = $paymentMethodRepository;
+        $this->updatePaymentMethodOnOrder = $updatePaymentMethodOnOrder;
         $this->customerRepository = $customerRepository;
         $this->config = $config;
         $this->refreshCartAction = $refreshCartAction;
@@ -257,40 +254,9 @@ final class CartApplication
 
     public function choosePaymentMethod(ChoosePaymentMethod $choosePaymentMethod): void
     {
-        $paymentMethod = $this->paymentMethodRepository->find($choosePaymentMethod->getPaymentMethodId());
         $order = $this->orderRepository->findForCart($choosePaymentMethod->getOrderId());
 
-        $paymentCost = PaymentCost::fromMoney(
-            $paymentMethod->getRate(),
-            TaxRate::fromString($this->config->getDefaultTaxRate()),
-            $this->config->doesTariffInputIncludesVat()
-        );
-
-        // Currently no restrictions on payment selection... if any, this should be checked here.
-
-        if (count($order->getPayments())) {
-            $payment = $order->getPayments()[0];
-            $payment->updatePaymentMethod($paymentMethod->paymentMethodId);
-            $payment->updateCost($paymentCost);
-            $payment->addData($paymentMethod->getData());
-
-            $order->updatePayment($payment);
-        } else {
-            $payment = Payment::create(
-                $order->orderId,
-                $this->orderRepository->nextPaymentReference(),
-                $paymentMethod->paymentMethodId,
-                $paymentCost
-            );
-            $payment->addData($paymentMethod->getData());
-
-            $order->addPayment($payment);
-        }
-
-
-
-
-        // TODO: Maybe do the refresh-cart here? before the save.
+        $this->updatePaymentMethodOnOrder->handle($order, $choosePaymentMethod->getPaymentMethodId());
 
         $this->orderRepository->save($order);
 

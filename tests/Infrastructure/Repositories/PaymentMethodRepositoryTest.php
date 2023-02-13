@@ -10,6 +10,7 @@ use Thinktomorrow\Trader\Domain\Model\PaymentMethod\PaymentMethod;
 use Thinktomorrow\Trader\Domain\Model\PaymentMethod\PaymentMethodId;
 use Thinktomorrow\Trader\Infrastructure\Laravel\Repositories\MysqlPaymentMethodRepository;
 use Thinktomorrow\Trader\Infrastructure\Test\Repositories\InMemoryPaymentMethodRepository;
+use Thinktomorrow\Trader\Infrastructure\Test\TestContainer;
 
 class PaymentMethodRepositoryTest extends TestCase
 {
@@ -62,7 +63,7 @@ class PaymentMethodRepositoryTest extends TestCase
     private function repositories(): \Generator
     {
         yield new InMemoryPaymentMethodRepository();
-        yield new MysqlPaymentMethodRepository();
+        yield new MysqlPaymentMethodRepository(new TestContainer());
     }
 
     public function paymentMethods(): \Generator

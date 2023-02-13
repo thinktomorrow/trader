@@ -172,6 +172,7 @@ return new class extends Migration {
 
             $table->integer('rate')->unsigned();
             $table->json('data')->nullable();
+            $table->string('state')->default(\Thinktomorrow\Trader\Domain\Model\PaymentMethod\PaymentMethodState::online->value);
             $table->boolean('active')->default(1);
             $table->unsignedInteger('order_column')->default(0);
         });

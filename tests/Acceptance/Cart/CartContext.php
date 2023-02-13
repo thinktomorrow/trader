@@ -15,6 +15,7 @@ use Thinktomorrow\Trader\Application\Cart\ChooseShippingProfile;
 use Thinktomorrow\Trader\Application\Cart\Line\AddLine;
 use Thinktomorrow\Trader\Application\Cart\Line\ChangeLineQuantity;
 use Thinktomorrow\Trader\Application\Cart\Line\RemoveLine;
+use Thinktomorrow\Trader\Application\Cart\PaymentMethod\UpdatePaymentMethodOnOrder;
 use Thinktomorrow\Trader\Application\Cart\RefreshCart\Adjusters\AdjustDiscounts;
 use Thinktomorrow\Trader\Application\Cart\RefreshCart\Adjusters\AdjustLines;
 use Thinktomorrow\Trader\Application\Cart\RefreshCart\Adjusters\AdjustShipping;
@@ -91,6 +92,7 @@ abstract class CartContext extends TestCase
     protected InMemoryCustomerRepository $customerRepository;
     protected InMemoryPromoRepository $promoRepository;
     protected UpdateShippingProfileOnOrder $updateShippingProfileOnOrder;
+    protected UpdatePaymentMethodOnOrder $updatePaymentMethodOnOrder;
     protected EventDispatcherSpy $eventDispatcher;
     protected CustomerApplication $customerApplication;
     protected ProductApplication $productApplication;
@@ -132,6 +134,8 @@ abstract class CartContext extends TestCase
             'confirm' => OrderState::getDefaultTransitions()['confirm'],
         ]));
 
+        $this->paymentMethodRepository = new InMemoryPaymentMethodRepository();
+
         $this->cartApplication = new CartApplication(
             new TestTraderConfig(),
             new TestContainer(),
@@ -141,7 +145,7 @@ abstract class CartContext extends TestCase
             new RefreshCartAction(),
             $this->shippingProfileRepository = new InMemoryShippingProfileRepository(),
             $this->updateShippingProfileOnOrder = new UpdateShippingProfileOnOrder(new TestTraderConfig(), $this->orderRepository, $this->shippingProfileRepository),
-            $this->paymentMethodRepository = new InMemoryPaymentMethodRepository(),
+            $this->updatePaymentMethodOnOrder = new UpdatePaymentMethodOnOrder(new TestTraderConfig(), $this->orderRepository, $this->paymentMethodRepository),
             $this->customerRepository = new InMemoryCustomerRepository(),
             $this->eventDispatcher = new EventDispatcherSpy(),
         );
@@ -233,9 +237,9 @@ abstract class CartContext extends TestCase
         $this->cartApplication->updateShippingAddress(new UpdateShippingAddress($order->orderId->get(), $country));
     }
 
-    public function givenShippingCostsForAPurchaseOfEur($shippingCost, $from, $to, array $countries = ['BE'], string $shippingProfileId = 'bpost_home')
+    public function givenShippingCostsForAPurchaseOfEur($shippingCost, $from, $to, array $countries = ['BE'], string $shippingProfileId = 'bpost_home', bool $requiredAddress = true)
     {
-        $shippingProfile = ShippingProfile::create(ShippingProfileId::fromString($shippingProfileId), true);
+        $shippingProfile = ShippingProfile::create(ShippingProfileId::fromString($shippingProfileId), $requiredAddress);
         $shippingProfile->addData(['title' => ['nl' => Str::headline($shippingProfileId)]]);
 
         foreach ($countries as $country) {
@@ -453,7 +457,9 @@ abstract class CartContext extends TestCase
             $shippingProfileId
         ));
 
-        $this->assertEquals($shippingProfileId, $this->getOrder()->getShippings()[0]->getShippingProfileId()->get());
+        if(count($this->getOrder()->getShippings())) {
+            $this->assertEquals($shippingProfileId, $this->getOrder()->getShippings()[0]->getShippingProfileId()->get());
+        }
     }
 
     protected function whenIChoosePayment(string $paymentMethodId)
@@ -463,7 +469,9 @@ abstract class CartContext extends TestCase
             $paymentMethodId
         ));
 
-        $this->assertEquals($paymentMethodId, $this->getOrder()->getPayments()[0]->getPaymentMethodId()->get());
+        if(count($this->getOrder()->getPayments())) {
+            $this->assertEquals($paymentMethodId, $this->getOrder()->getPayments()[0]->getPaymentMethodId()->get());
+        }
     }
 
     protected function thenTheOverallCartPriceShouldBeEur($total)

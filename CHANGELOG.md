@@ -4,6 +4,22 @@ Important changes will be notified in this file
 
 ## unreleased
 
+- Added: state column to payment methods table. And removed unused 'active' columns. For existing projects, you can use the following migrations:
+```php 
+Schema::table('trader_shipping_profiles', function (Blueprint $table) {
+    $table->dropColumn('active');
+});
+
+Schema::table('trader_payment_methods', function (Blueprint $table) {
+    $table->dropColumn('active');
+});
+
+Schema::table('trader_payment_methods', function (Blueprint $table) {
+    $table->string('state')->default(\Thinktomorrow\Trader\Domain\Model\PaymentMethod\PaymentMethodState::online->value);
+    $table->boolean('active')->default(1);
+});
+```
+
 ## 2022-12-20 - 0.5.7
 - Added: extra OrderState::cart_completed state which indicates that order has sufficient data for potential payment and fulfillment.
 - Added: php8.2 support

@@ -47,4 +47,9 @@ trait HasCountryIds
     {
         return $this->countryIds;
     }
+
+    public function hasAnyCountries(): bool
+    {
+        return count($this->countryIds) > 0;
+    }
 }

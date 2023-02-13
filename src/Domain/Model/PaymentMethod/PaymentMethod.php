@@ -8,13 +8,17 @@ use Thinktomorrow\Trader\Domain\Common\Cash\Cash;
 use Thinktomorrow\Trader\Domain\Common\Entity\Aggregate;
 use Thinktomorrow\Trader\Domain\Common\Entity\HasData;
 use Thinktomorrow\Trader\Domain\Common\Event\RecordsEvents;
+use Thinktomorrow\Trader\Domain\Model\Country\CountryId;
+use Thinktomorrow\Trader\Domain\Model\Country\HasCountryIds;
 
 class PaymentMethod implements Aggregate
 {
     use HasData;
+    use HasCountryIds;
     use RecordsEvents;
 
     public readonly PaymentMethodId $paymentMethodId;
+    private PaymentMethodState $state;
     private Money $rate;
 
     private function __construct()
@@ -26,9 +30,20 @@ class PaymentMethod implements Aggregate
         $method = new static();
 
         $method->paymentMethodId = $paymentMethodId;
+        $method->state = PaymentMethodState::online;
         $method->rate = $rate;
 
         return $method;
+    }
+
+    public function updateState(PaymentMethodState $state): void
+    {
+        $this->state = $state;
+    }
+
+    public function getState(): PaymentMethodState
+    {
+        return $this->state;
     }
 
     public function updateRate(Money $rate): void
@@ -45,19 +60,10 @@ class PaymentMethod implements Aggregate
     {
         return [
             'payment_method_id' => $this->paymentMethodId->get(),
+            'state' => $this->state->value,
             'rate' => $this->rate->getAmount(),
             'data' => json_encode($this->data),
         ];
-    }
-
-    public static function make(PaymentMethodId $paymentMethodId, Money $rate): static
-    {
-        $method = new static();
-
-        $method->paymentMethodId = $paymentMethodId;
-        $method->rate = $rate;
-
-        return $method;
     }
 
     public static function fromMappedData(array $state, array $childEntities = []): static
@@ -65,14 +71,18 @@ class PaymentMethod implements Aggregate
         $method = new static();
 
         $method->paymentMethodId = PaymentMethodId::fromString($state['payment_method_id']);
+        $method->state = PaymentMethodState::from($state['state']);
         $method->rate = Cash::make($state['rate']);
         $method->data = json_decode($state['data'], true);
+        $method->countryIds = array_map(fn ($countryState) => CountryId::fromString($countryState['country_id']), $childEntities[CountryId::class]);
 
         return $method;
     }
 
     public function getChildEntities(): array
     {
-        return [];
+        return [
+            CountryId::class => array_map(fn (CountryId $countryId) => $countryId->get(), $this->countryIds),
+        ];
     }
 }

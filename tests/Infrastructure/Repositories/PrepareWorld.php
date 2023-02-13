@@ -130,7 +130,7 @@ trait PrepareWorld
     private function paymentMethodRepositories(): \Generator
     {
         yield new InMemoryPaymentMethodRepository();
-        yield new MysqlPaymentMethodRepository();
+        yield new MysqlPaymentMethodRepository(new TestContainer());
     }
 
     private function promoRepositories(): \Generator
