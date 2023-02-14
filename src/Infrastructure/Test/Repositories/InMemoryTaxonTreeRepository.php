@@ -65,6 +65,7 @@ final class InMemoryTaxonTreeRepository implements TaxonTreeRepository, Category
                 'state' => $taxon->getMappedData()['state'],
                 'order' => $taxon->getMappedData()['order'],
                 'product_ids' => $this->getCommaSeparatedProductIds($taxon->taxonId),
+                'online_product_ids' => $this->getCommaSeparatedOnlineProductIds($taxon->taxonId),
                 'keys' => json_encode(array_map(fn ($taxonKey) => $taxonKey->getMappedData(), $taxon->getTaxonKeys())),
             ]);
         }
@@ -79,5 +80,14 @@ final class InMemoryTaxonTreeRepository implements TaxonTreeRepository, Category
         }
 
         return implode(',', InMemoryTaxonRepository::$productIds[$taxonId->get()]);
+    }
+
+    private function getCommaSeparatedOnlineProductIds(TaxonId $taxonId): string
+    {
+        if (! isset(InMemoryTaxonRepository::$onlineProductIds[$taxonId->get()])) {
+            return '';
+        }
+
+        return implode(',', InMemoryTaxonRepository::$onlineProductIds[$taxonId->get()]);
     }
 }

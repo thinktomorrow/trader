@@ -19,16 +19,18 @@ final class ShippingProfile implements Aggregate
     use HasData;
 
     public readonly ShippingProfileId $shippingProfileId;
+    private ShippingProviderId $shippingProviderId;
     private ShippingProfileState $state;
     private bool $requiresAddress;
 
     /** @var Tariff[] */
     private array $tariffs = [];
 
-    public static function create(ShippingProfileId $shippingProfileId, bool $requiresAddress): static
+    public static function create(ShippingProfileId $shippingProfileId, ShippingProviderId $shippingProviderId, bool $requiresAddress): static
     {
         $shippingProfile = new static();
         $shippingProfile->shippingProfileId = $shippingProfileId;
+        $shippingProfile->shippingProviderId = $shippingProviderId;
         $shippingProfile->state = ShippingProfileState::online;
         $shippingProfile->requiresAddress = $requiresAddress;
 
@@ -43,6 +45,16 @@ final class ShippingProfile implements Aggregate
     public function getState(): ShippingProfileState
     {
         return $this->state;
+    }
+
+    public function updateProvider(ShippingProviderId $shippingProviderId): void
+    {
+        $this->shippingProviderId = $shippingProviderId;
+    }
+
+    public function getProvider(): ShippingProviderId
+    {
+        return $this->shippingProviderId;
     }
 
     public function requiresAddress(): bool
@@ -103,6 +115,7 @@ final class ShippingProfile implements Aggregate
     {
         return [
             'shipping_profile_id' => $this->shippingProfileId->get(),
+            'provider_id' => $this->shippingProviderId->get(),
             'state' => $this->state->value,
             'requires_address' => $this->requiresAddress,
             'data' => json_encode($this->data),
@@ -121,6 +134,7 @@ final class ShippingProfile implements Aggregate
     {
         $shippingProfile = new static();
         $shippingProfile->shippingProfileId = ShippingProfileId::fromString($state['shipping_profile_id']);
+        $shippingProfile->shippingProviderId = ShippingProviderId::fromString($state['provider_id']);
         $shippingProfile->state = ShippingProfileState::from($state['state']);
         $shippingProfile->requiresAddress = $state['requires_address'];
         $shippingProfile->data = json_decode($state['data'], true);

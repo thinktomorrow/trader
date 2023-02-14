@@ -20,6 +20,7 @@ interface TaxonNode extends Node
 
     public function showOnline(): bool;
     public function getProductIds(): array;
+    public function getOnlineProductIds(): array;
     public function getUrl(?string $locale = null): string;
 
     public function getBreadCrumbs(): array;

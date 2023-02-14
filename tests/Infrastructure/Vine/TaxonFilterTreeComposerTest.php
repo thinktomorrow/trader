@@ -4,14 +4,22 @@ declare(strict_types=1);
 namespace Tests\Infrastructure\Vine;
 
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\DB;
 use Tests\Infrastructure\TestCase;
 use Thinktomorrow\Trader\Domain\Common\Locale;
+use Thinktomorrow\Trader\Domain\Model\Product\Exceptions\CouldNotFindProduct;
+use Thinktomorrow\Trader\Domain\Model\Product\Product;
+use Thinktomorrow\Trader\Domain\Model\Product\ProductId;
+use Thinktomorrow\Trader\Domain\Model\Product\ProductState;
 use Thinktomorrow\Trader\Domain\Model\Taxon\Taxon;
 use Thinktomorrow\Trader\Domain\Model\Taxon\TaxonId;
 use Thinktomorrow\Trader\Domain\Model\Taxon\TaxonKey;
 use Thinktomorrow\Trader\Domain\Model\Taxon\TaxonKeyId;
 use Thinktomorrow\Trader\Domain\Model\Taxon\TaxonState;
+use Thinktomorrow\Trader\Infrastructure\Laravel\Repositories\MysqlProductRepository;
 use Thinktomorrow\Trader\Infrastructure\Laravel\Repositories\MysqlTaxonTreeRepository;
+use Thinktomorrow\Trader\Infrastructure\Laravel\Repositories\MysqlVariantRepository;
+use Thinktomorrow\Trader\Infrastructure\Test\Repositories\InMemoryProductRepository;
 use Thinktomorrow\Trader\Infrastructure\Test\Repositories\InMemoryTaxonRepository;
 use Thinktomorrow\Trader\Infrastructure\Test\Repositories\InMemoryTaxonTreeRepository;
 use Thinktomorrow\Trader\Infrastructure\Test\TestContainer;
@@ -66,6 +74,41 @@ final class TaxonFilterTreeComposerTest extends TestCase
             $this->assertEquals([
                 'aaa','bbb','ccc','ddd',
             ], $productIds);
+        }
+    }
+
+    /** @test */
+    public function it_can_retrieve_all_online_product_ids()
+    {
+        $onlineProductIds = ['ccc','ddd'];
+
+        // Mysql
+        foreach ($onlineProductIds as $productId) {
+            $product = Product::create(ProductId::fromString($productId));
+            $product->updateState(ProductState::online);
+            (new MysqlProductRepository(new MysqlVariantRepository(new TestContainer())))->save($product);
+        }
+
+        $this->createTaxon(
+            Taxon::create(TaxonId::fromString('first')),
+            ['aaa', 'bbb', 'ccc', 'ddd']
+        );
+
+        foreach ($this->repositories() as $i => $repository) {
+
+            if ($i == 0) {
+                (new InMemoryTaxonRepository)->setOnlineProductIds(TaxonId::fromString('first'), $onlineProductIds);
+            }
+
+            $composer = new VineTaxonFilterTreeComposer($repository);
+
+            $this->assertEquals([
+                'ccc','ddd',
+            ], $composer->getOnlineProductIds('first'));
+
+            $this->assertEquals([
+                'aaa','bbb','ccc','ddd',
+            ], $composer->getProductIds('first'));
         }
     }
 
@@ -163,6 +206,21 @@ final class TaxonFilterTreeComposerTest extends TestCase
 
             $this->assertCount(1, $taxonFilterTree);
             $this->assertEquals('taxon-third', $taxonFilterTree[0]->getKey());
+        }
+    }
+
+    /** @test */
+    public function it_uses_main_taxon_as_filter_tree_when_no_actively_filters_are_used()
+    {
+        $this->createDefaultTaxons();
+
+        foreach ($this->repositories() as $repository) {
+            $taxonFilterTree = (new VineTaxonFilterTreeComposer($repository))->getActiveFilters(Locale::fromString('nl'), 'taxon-first', [
+
+            ]);
+
+            $this->assertCount(1, $taxonFilterTree);
+            $this->assertEquals('taxon-first', $taxonFilterTree[0]->getKey());
         }
     }
 

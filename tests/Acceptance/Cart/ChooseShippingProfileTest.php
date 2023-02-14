@@ -7,6 +7,7 @@ use Thinktomorrow\Trader\Domain\Model\ShippingProfile\Exceptions\CouldNotFindShi
 use Thinktomorrow\Trader\Domain\Model\ShippingProfile\ShippingProfile;
 use Thinktomorrow\Trader\Domain\Model\ShippingProfile\ShippingProfileId;
 use Thinktomorrow\Trader\Domain\Model\ShippingProfile\ShippingProfileState;
+use Thinktomorrow\Trader\Domain\Model\ShippingProfile\ShippingProviderId;
 
 class ChooseShippingProfileTest extends CartContext
 {
@@ -22,7 +23,7 @@ class ChooseShippingProfileTest extends CartContext
 
     public function test_it_cannot_choose_profile_when_none_is_online()
     {
-        $profile = ShippingProfile::create(ShippingProfileId::fromString('foobar'), true);
+        $profile = ShippingProfile::create(ShippingProfileId::fromString('foobar'), ShippingProviderId::fromString('postnl'), true);
         $profile->updateState(ShippingProfileState::offline);
         $this->shippingProfileRepository->save($profile);
 
@@ -34,7 +35,7 @@ class ChooseShippingProfileTest extends CartContext
 
     public function test_it_cannot_choose_profile_when_method_has_country_restriction_and_shipping_country_is_not_given()
     {
-        $profile = ShippingProfile::create(ShippingProfileId::fromString('foobar'), true);
+        $profile = ShippingProfile::create(ShippingProfileId::fromString('foobar'), ShippingProviderId::fromString('postnl'), true);
         $profile->addCountry(CountryId::fromString('LU'));
         $this->shippingProfileRepository->save($profile);
 
@@ -46,7 +47,7 @@ class ChooseShippingProfileTest extends CartContext
 
     public function test_it_cannot_choose_profile_when_method_has_country_but_does_not_require_address()
     {
-        $profile = ShippingProfile::create(ShippingProfileId::fromString('foobar'), false);
+        $profile = ShippingProfile::create(ShippingProfileId::fromString('foobar'), ShippingProviderId::fromString('postnl'), false);
         $profile->addCountry(CountryId::fromString('LU'));
         $this->shippingProfileRepository->save($profile);
 
@@ -58,7 +59,7 @@ class ChooseShippingProfileTest extends CartContext
 
     public function test_it_can_choose_profile_when_it_is_allowed_for_given_shipping_country()
     {
-        $profile = ShippingProfile::create(ShippingProfileId::fromString('foobar'), true);
+        $profile = ShippingProfile::create(ShippingProfileId::fromString('foobar'), ShippingProviderId::fromString('postnl'), true);
         $profile->addCountry(CountryId::fromString('LU'));
         $this->shippingProfileRepository->save($profile);
 
@@ -71,7 +72,7 @@ class ChooseShippingProfileTest extends CartContext
 
     public function test_it_cannot_choose_profile_when_none_is_allowed_for_given_shipping_country()
     {
-        $profile = ShippingProfile::create(ShippingProfileId::fromString('foobar'), true);
+        $profile = ShippingProfile::create(ShippingProfileId::fromString('foobar'), ShippingProviderId::fromString('postnl'), true);
         $profile->addCountry(CountryId::fromString('LU'));
         $this->shippingProfileRepository->save($profile);
 

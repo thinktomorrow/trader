@@ -51,6 +51,7 @@ use Thinktomorrow\Trader\Domain\Model\Order\State\OrderState;
 use Thinktomorrow\Trader\Domain\Model\Order\State\OrderStateMachine;
 use Thinktomorrow\Trader\Domain\Model\PaymentMethod\PaymentMethod;
 use Thinktomorrow\Trader\Domain\Model\PaymentMethod\PaymentMethodId;
+use Thinktomorrow\Trader\Domain\Model\PaymentMethod\PaymentMethodProviderId;
 use Thinktomorrow\Trader\Domain\Model\Product\Product;
 use Thinktomorrow\Trader\Domain\Model\Product\ProductId;
 use Thinktomorrow\Trader\Domain\Model\Product\Variant\Variant;
@@ -63,6 +64,7 @@ use Thinktomorrow\Trader\Domain\Model\Promo\DiscountFactory;
 use Thinktomorrow\Trader\Domain\Model\Promo\Discounts\FixedAmountDiscount;
 use Thinktomorrow\Trader\Domain\Model\ShippingProfile\ShippingProfile;
 use Thinktomorrow\Trader\Domain\Model\ShippingProfile\ShippingProfileId;
+use Thinktomorrow\Trader\Domain\Model\ShippingProfile\ShippingProviderId;
 use Thinktomorrow\Trader\Domain\Model\ShippingProfile\Tariff;
 use Thinktomorrow\Trader\Infrastructure\Test\EventDispatcherSpy;
 use Thinktomorrow\Trader\Infrastructure\Test\Repositories\InMemoryCartRepository;
@@ -239,7 +241,11 @@ abstract class CartContext extends TestCase
 
     public function givenShippingCostsForAPurchaseOfEur($shippingCost, $from, $to, array $countries = ['BE'], string $shippingProfileId = 'bpost_home', bool $requiredAddress = true)
     {
-        $shippingProfile = ShippingProfile::create(ShippingProfileId::fromString($shippingProfileId), $requiredAddress);
+        $shippingProfile = ShippingProfile::create(
+            ShippingProfileId::fromString($shippingProfileId),
+            ShippingProviderId::fromString('postnl'),
+            $requiredAddress
+        );
         $shippingProfile->addData(['title' => ['nl' => Str::headline($shippingProfileId)]]);
 
         foreach ($countries as $country) {
@@ -261,7 +267,11 @@ abstract class CartContext extends TestCase
 
     public function givenPaymentMethod($paymentRate, string $paymentMethodId = 'visa')
     {
-        $paymentMethod = PaymentMethod::create(PaymentMethodId::fromString($paymentMethodId), Cash::make($paymentRate * 100));
+        $paymentMethod = PaymentMethod::create(
+            PaymentMethodId::fromString($paymentMethodId),
+            PaymentMethodProviderId::fromString('mollie'),
+            Cash::make($paymentRate * 100)
+        );
         $paymentMethod->addData(['title' => ['nl' => Str::headline($paymentMethodId)]]);
 
         $this->paymentMethodRepository->save($paymentMethod);

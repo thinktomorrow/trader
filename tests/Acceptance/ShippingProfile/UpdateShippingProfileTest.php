@@ -9,6 +9,7 @@ use Thinktomorrow\Trader\Application\ShippingProfile\CreateTariff;
 use Thinktomorrow\Trader\Application\ShippingProfile\UpdateShippingProfile;
 use Thinktomorrow\Trader\Application\ShippingProfile\UpdateTariff;
 use Thinktomorrow\Trader\Domain\Model\Country\CountryId;
+use Thinktomorrow\Trader\Domain\Model\ShippingProfile\ShippingProviderId;
 
 class UpdateShippingProfileTest extends ShippingProfileContext
 {
@@ -16,6 +17,7 @@ class UpdateShippingProfileTest extends ShippingProfileContext
     public function it_can_update_a_profile()
     {
         $shippingProfileId = $this->shippingProfileApplication->createShippingProfile(new CreateShippingProfile(
+            'postnl',
             true,
             ['BE','NL'],
             ['foo' => 'bar']
@@ -23,22 +25,27 @@ class UpdateShippingProfileTest extends ShippingProfileContext
 
         $this->shippingProfileApplication->updateShippingProfile(new UpdateShippingProfile(
             $shippingProfileId->get(),
+            'bpack',
             false,
             ['BE'],
             ['foo' => 'baz']
         ));
 
+        $shippingProfile = $this->shippingProfileRepository->find($shippingProfileId);
+
         $this->assertEquals([
             CountryId::fromString('BE'),
-        ], $this->shippingProfileRepository->find($shippingProfileId)->getCountryIds());
-        $this->assertFalse($this->shippingProfileRepository->find($shippingProfileId)->requiresAddress());
-        $this->assertEquals(['foo' => 'baz'], $this->shippingProfileRepository->find($shippingProfileId)->getData());
+        ], $shippingProfile->getCountryIds());
+        $this->assertEquals(ShippingProviderId::fromString('bpack'), $shippingProfile->getProvider());
+        $this->assertFalse($shippingProfile->requiresAddress());
+        $this->assertEquals(['foo' => 'baz'], $shippingProfile->getData());
     }
 
     /** @test */
     public function it_can_update_a_tariff()
     {
         $shippingProfileId = $this->shippingProfileApplication->createShippingProfile(new CreateShippingProfile(
+            'postnl',
             true,
             ['BE','NL'],
             ['foo' => 'bar']

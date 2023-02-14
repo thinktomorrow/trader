@@ -8,6 +8,7 @@ use Thinktomorrow\Trader\Application\ShippingProfile\CreateShippingProfile;
 use Thinktomorrow\Trader\Application\ShippingProfile\CreateTariff;
 use Thinktomorrow\Trader\Domain\Model\Country\CountryId;
 use Thinktomorrow\Trader\Domain\Model\ShippingProfile\ShippingProfileId;
+use Thinktomorrow\Trader\Domain\Model\ShippingProfile\ShippingProviderId;
 use Thinktomorrow\Trader\Domain\Model\ShippingProfile\Tariff;
 use Thinktomorrow\Trader\Domain\Model\ShippingProfile\TariffId;
 
@@ -17,25 +18,30 @@ class CreateShippingProfileTest extends ShippingProfileContext
     public function it_can_create_a_shipping_profile()
     {
         $shippingProfileId = $this->shippingProfileApplication->createShippingProfile(new CreateShippingProfile(
+            'postnl',
             false,
             ['BE','NL'],
             ['foo' => 'bar']
         ));
 
+        $shippingProfile = $this->shippingProfileRepository->find($shippingProfileId);
+
         $this->assertInstanceOf(ShippingProfileId::class, $shippingProfileId);
-        $this->assertEquals($shippingProfileId, $this->shippingProfileRepository->find($shippingProfileId)->shippingProfileId);
-        $this->assertFalse($this->shippingProfileRepository->find($shippingProfileId)->requiresAddress());
+        $this->assertEquals($shippingProfileId, $shippingProfile->shippingProfileId);
+        $this->assertEquals(ShippingProviderId::fromString('postnl'), $shippingProfile->getProvider());
+        $this->assertFalse($shippingProfile->requiresAddress());
         $this->assertEquals([
             CountryId::fromString('BE'),
             CountryId::fromString('NL'),
-        ], $this->shippingProfileRepository->find($shippingProfileId)->getCountryIds());
-        $this->assertEquals(['foo' => 'bar'], $this->shippingProfileRepository->find($shippingProfileId)->getData());
+        ], $shippingProfile->getCountryIds());
+        $this->assertEquals(['foo' => 'bar'], $shippingProfile->getData());
     }
 
     /** @test */
     public function it_can_create_a_tariff()
     {
         $shippingProfileId = $this->shippingProfileApplication->createShippingProfile(new CreateShippingProfile(
+            'postnl',
             true,
             ['BE','NL'],
             ['foo' => 'bar']

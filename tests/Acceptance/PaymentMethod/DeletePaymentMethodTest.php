@@ -17,6 +17,7 @@ class DeletePaymentMethodTest extends PaymentMethodContext
     public function it_can_delete_a_method()
     {
         $paymentMethodId = $this->paymentMethodApplication->createPaymentMethod(new CreatePaymentMethod(
+            'pay-after-invoice',
             "10",
             ['BE','NL'],
             ['foo' => 'bar']

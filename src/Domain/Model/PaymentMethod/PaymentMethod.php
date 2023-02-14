@@ -18,6 +18,7 @@ class PaymentMethod implements Aggregate
     use RecordsEvents;
 
     public readonly PaymentMethodId $paymentMethodId;
+    private PaymentMethodProviderId $paymentMethodProviderId;
     private PaymentMethodState $state;
     private Money $rate;
 
@@ -25,11 +26,12 @@ class PaymentMethod implements Aggregate
     {
     }
 
-    public static function create(PaymentMethodId $paymentMethodId, Money $rate): static
+    public static function create(PaymentMethodId $paymentMethodId, PaymentMethodProviderId $paymentMethodProviderId, Money $rate): static
     {
         $method = new static();
 
         $method->paymentMethodId = $paymentMethodId;
+        $method->paymentMethodProviderId = $paymentMethodProviderId;
         $method->state = PaymentMethodState::online;
         $method->rate = $rate;
 
@@ -46,6 +48,16 @@ class PaymentMethod implements Aggregate
         return $this->state;
     }
 
+    public function updateProvider(PaymentMethodProviderId $paymentMethodProviderId): void
+    {
+        $this->paymentMethodProviderId = $paymentMethodProviderId;
+    }
+
+    public function getProvider(): PaymentMethodProviderId
+    {
+        return $this->paymentMethodProviderId;
+    }
+
     public function updateRate(Money $rate): void
     {
         $this->rate = $rate;
@@ -60,6 +72,7 @@ class PaymentMethod implements Aggregate
     {
         return [
             'payment_method_id' => $this->paymentMethodId->get(),
+            'provider_id' => $this->paymentMethodProviderId->get(),
             'state' => $this->state->value,
             'rate' => $this->rate->getAmount(),
             'data' => json_encode($this->data),
@@ -71,6 +84,7 @@ class PaymentMethod implements Aggregate
         $method = new static();
 
         $method->paymentMethodId = PaymentMethodId::fromString($state['payment_method_id']);
+        $method->paymentMethodProviderId = PaymentMethodProviderId::fromString($state['provider_id']);
         $method->state = PaymentMethodState::from($state['state']);
         $method->rate = Cash::make($state['rate']);
         $method->data = json_decode($state['data'], true);

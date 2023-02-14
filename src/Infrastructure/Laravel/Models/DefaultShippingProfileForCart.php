@@ -11,6 +11,7 @@ class DefaultShippingProfileForCart implements ShippingProfileForCart
     use RendersData;
 
     private string $shippingProfileId;
+    private string $providerId;
     private bool $requiresAddress;
     private iterable $images;
 
@@ -22,6 +23,7 @@ class DefaultShippingProfileForCart implements ShippingProfileForCart
     {
         $object = new static();
         $object->shippingProfileId = $state['shipping_profile_id'];
+        $object->providerId = $state['provider_id'];
         $object->requiresAddress = $state['requires_address'];
         $object->data = json_decode($state['data'], true);
         $object->images = [];
@@ -32,6 +34,11 @@ class DefaultShippingProfileForCart implements ShippingProfileForCart
     public function getShippingProfileId(): string
     {
         return $this->shippingProfileId;
+    }
+
+    public function getProviderId(): string
+    {
+        return $this->providerId;
     }
 
     public function getTitle(): string

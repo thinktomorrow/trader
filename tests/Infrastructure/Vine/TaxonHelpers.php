@@ -7,6 +7,7 @@ use Thinktomorrow\Trader\Domain\Common\Locale;
 use Thinktomorrow\Trader\Domain\Model\Product\Exceptions\CouldNotFindProduct;
 use Thinktomorrow\Trader\Domain\Model\Product\Product;
 use Thinktomorrow\Trader\Domain\Model\Product\ProductId;
+use Thinktomorrow\Trader\Domain\Model\Product\ProductState;
 use Thinktomorrow\Trader\Domain\Model\Taxon\Taxon;
 use Thinktomorrow\Trader\Domain\Model\Taxon\TaxonId;
 use Thinktomorrow\Trader\Domain\Model\Taxon\TaxonKey;
@@ -77,7 +78,8 @@ trait TaxonHelpers
                     try {
                         $this->mysqlProductRepository()->find(ProductId::fromString($productId));
                     } catch(CouldNotFindProduct $e) {
-                        $this->mysqlProductRepository()->save(Product::create(ProductId::fromString($productId)));
+                        $product = Product::create(ProductId::fromString($productId));
+                        $this->mysqlProductRepository()->save($product);
                     }
 
                     DB::table('trader_taxa_products')->insert([

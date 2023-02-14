@@ -16,6 +16,7 @@ final class InMemoryTaxonRepository implements TaxonRepository
 
     // Lookup of 'connected' product-taxon ids
     public static array $productIds = [];
+    public static array $onlineProductIds = [];
 
     private string $nextReference = 'ccc-123';
 
@@ -81,6 +82,11 @@ final class InMemoryTaxonRepository implements TaxonRepository
         static::$productIds[$taxonId->get()] = $productIds;
     }
 
+    public function setOnlineProductIds(TaxonId $taxonId, array $productIds): void
+    {
+        static::$onlineProductIds[$taxonId->get()] = $productIds;
+    }
+
     public function uniqueKeyReference(TaxonKeyId $taxonKeyId, TaxonId $allowedTaxonId): TaxonKeyId
     {
         $key = $taxonKeyId;
@@ -108,5 +114,6 @@ final class InMemoryTaxonRepository implements TaxonRepository
     {
         static::$taxons = [];
         static::$productIds = [];
+        static::$onlineProductIds = [];
     }
 }

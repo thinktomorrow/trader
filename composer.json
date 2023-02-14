@@ -21,7 +21,7 @@
         "ext-intl": "*",
         "psr/container": "^1.1.2|^2.0",
         "laravel/ui": "^4.2",
-        "thinktomorrow/vine": "^0.4.7",
+        "thinktomorrow/vine": "^0.4.11",
         "ramsey/uuid": "^4.5"
     },
     "require-dev": {

@@ -7,17 +7,20 @@ use Money\Money;
 use Thinktomorrow\Trader\Domain\Common\Cash\Cash;
 use Thinktomorrow\Trader\Domain\Model\Country\CountryId;
 use Thinktomorrow\Trader\Domain\Model\PaymentMethod\PaymentMethodId;
+use Thinktomorrow\Trader\Domain\Model\PaymentMethod\PaymentMethodProviderId;
 
 class UpdatePaymentMethod
 {
     private string $paymentMethodId;
+    private string $providerId;
     private string $rate;
     private array $countryIds;
     private array $data;
 
-    public function __construct(string $paymentMethodId, string $rate, array $countryIds, array $data)
+    public function __construct(string $paymentMethodId, string $providerId, string $rate, array $countryIds, array $data)
     {
         $this->paymentMethodId = $paymentMethodId;
+        $this->providerId = $providerId;
         $this->rate = $rate;
         $this->countryIds = $countryIds;
         $this->data = $data;
@@ -26,6 +29,11 @@ class UpdatePaymentMethod
     public function getPaymentMethodId(): PaymentMethodId
     {
         return PaymentMethodId::fromString($this->paymentMethodId);
+    }
+
+    public function getProviderId(): PaymentMethodProviderId
+    {
+        return PaymentMethodProviderId::fromString($this->providerId);
     }
 
     public function getRate(): Money

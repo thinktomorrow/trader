@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "8518512fd0d9f55664150d9610a31142",
+    "content-hash": "ad8ebe2e8841992fd634e27c36544dc0",
     "packages": [
         {
             "name": "beberlei/assert",
@@ -4556,25 +4556,25 @@
         },
         {
             "name": "thinktomorrow/vine",
-            "version": "0.4.10",
+            "version": "0.4.11",
             "source": {
                 "type": "git",
                 "url": "https://github.com/thinktomorrow/vine.git",
-                "reference": "c5c92c952bc7cb4d16b99a05da2a91c7d2361ad3"
+                "reference": "6965be9a49488617a57e49cd5ea06722aabd5c1c"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/thinktomorrow/vine/zipball/c5c92c952bc7cb4d16b99a05da2a91c7d2361ad3",
-                "reference": "c5c92c952bc7cb4d16b99a05da2a91c7d2361ad3",
+                "url": "https://api.github.com/repos/thinktomorrow/vine/zipball/6965be9a49488617a57e49cd5ea06722aabd5c1c",
+                "reference": "6965be9a49488617a57e49cd5ea06722aabd5c1c",
                 "shasum": ""
             },
             "require": {
                 "php": ">=8.1"
             },
             "require-dev": {
-                "friendsofphp/php-cs-fixer": "^3.13",
-                "phpstan/phpstan": "^1.9.2",
-                "phpunit/phpunit": "^9.5.27"
+                "friendsofphp/php-cs-fixer": "^3.14.3",
+                "phpstan/phpstan": "^1.9.14",
+                "phpunit/phpunit": "^9.6.0"
             },
             "type": "library",
             "autoload": {
@@ -4595,9 +4595,9 @@
             "description": "Generate a tree from an adjacent database structure",
             "support": {
                 "issues": "https://github.com/thinktomorrow/vine/issues",
-                "source": "https://github.com/thinktomorrow/vine/tree/0.4.10"
+                "source": "https://github.com/thinktomorrow/vine/tree/0.4.11"
             },
-            "time": "2023-02-03T10:58:15+00:00"
+            "time": "2023-02-14T10:30:19+00:00"
         },
         {
             "name": "tijsverkoyen/css-to-inline-styles",
@@ -8388,16 +8388,16 @@
         },
         {
             "name": "spatie/ray",
-            "version": "1.36.1",
+            "version": "1.36.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/spatie/ray.git",
-                "reference": "5558d48c4c0f1f2c02ad2ba0f3cee96811e111dd"
+                "reference": "71dfde21900447ab37698fc07ff28b7f1e1822b8"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/spatie/ray/zipball/5558d48c4c0f1f2c02ad2ba0f3cee96811e111dd",
-                "reference": "5558d48c4c0f1f2c02ad2ba0f3cee96811e111dd",
+                "url": "https://api.github.com/repos/spatie/ray/zipball/71dfde21900447ab37698fc07ff28b7f1e1822b8",
+                "reference": "71dfde21900447ab37698fc07ff28b7f1e1822b8",
                 "shasum": ""
             },
             "require": {
@@ -8448,7 +8448,7 @@
             ],
             "support": {
                 "issues": "https://github.com/spatie/ray/issues",
-                "source": "https://github.com/spatie/ray/tree/1.36.1"
+                "source": "https://github.com/spatie/ray/tree/1.36.2"
             },
             "funding": [
                 {
@@ -8460,7 +8460,7 @@
                     "type": "other"
                 }
             ],
-            "time": "2023-02-09T07:52:12+00:00"
+            "time": "2023-02-10T09:24:13+00:00"
         },
         {
             "name": "squizlabs/php_codesniffer",

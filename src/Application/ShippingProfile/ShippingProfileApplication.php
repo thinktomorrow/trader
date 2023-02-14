@@ -27,7 +27,7 @@ class ShippingProfileApplication
     {
         $shippingProfileId = $this->shippingProfileRepository->nextReference();
 
-        $shippingProfile = ShippingProfile::create($shippingProfileId, $command->requiresAddress());
+        $shippingProfile = ShippingProfile::create($shippingProfileId, $command->getProviderId(), $command->requiresAddress());
         $shippingProfile->updateCountries($command->getCountryIds());
         $shippingProfile->addData($command->getData());
 
@@ -42,6 +42,7 @@ class ShippingProfileApplication
     {
         $shippingProfile = $this->shippingProfileRepository->find($command->getShippingProfileId());
 
+        $shippingProfile->updateProvider($command->getProviderId());
         $shippingProfile->updateRequiresAddress($command->requiresAddress());
         $shippingProfile->updateCountries($command->getCountryIds());
         $shippingProfile->addData($command->getData());

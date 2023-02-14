@@ -8,6 +8,7 @@ use Tests\Unit\TestCase;
 use Thinktomorrow\Trader\Domain\Model\Country\CountryId;
 use Thinktomorrow\Trader\Domain\Model\PaymentMethod\PaymentMethod;
 use Thinktomorrow\Trader\Domain\Model\PaymentMethod\PaymentMethodId;
+use Thinktomorrow\Trader\Domain\Model\PaymentMethod\PaymentMethodProviderId;
 use Thinktomorrow\Trader\Domain\Model\PaymentMethod\PaymentMethodState;
 
 class PaymentMethodTest extends TestCase
@@ -17,11 +18,13 @@ class PaymentMethodTest extends TestCase
     {
         $paymentMethod = PaymentMethod::create(
             $paymentMethodId = PaymentMethodId::fromString('xxx'),
+            $paymentMethodProviderId = PaymentMethodProviderId::fromString('mollie'),
             Money::EUR(10),
         );
 
         $this->assertEquals([
             'payment_method_id' => $paymentMethodId->get(),
+            'provider_id' => $paymentMethodProviderId->get(),
             'state' => PaymentMethodState::online->value,
             'rate' => '10',
             'data' => "[]",
@@ -36,6 +39,16 @@ class PaymentMethodTest extends TestCase
         $paymentMethod->updateRate(Money::EUR(30));
 
         $this->assertEquals(Money::EUR(30), $paymentMethod->getRate());
+    }
+
+    /** @test */
+    public function it_can_update_provider()
+    {
+        $paymentMethod = $this->createPaymentMethod();
+
+        $paymentMethod->updateProvider($updatedProvider = PaymentMethodProviderId::fromString('updated-provider'));
+
+        $this->assertEquals($updatedProvider, $paymentMethod->getProvider());
     }
 
     /** @test */

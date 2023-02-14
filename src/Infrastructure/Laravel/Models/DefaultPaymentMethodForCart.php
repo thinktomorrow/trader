@@ -11,6 +11,7 @@ class DefaultPaymentMethodForCart implements PaymentMethodForCart
     use RendersData;
 
     private string $paymentMethodId;
+    private string $providerId;
     private iterable $images;
 
     final private function __construct()
@@ -21,6 +22,7 @@ class DefaultPaymentMethodForCart implements PaymentMethodForCart
     {
         $object = new static();
         $object->paymentMethodId = $state['payment_method_id'];
+        $object->providerId = $state['provider_id'];
         $object->data = json_decode($state['data'], true);
         $object->images = [];
 
@@ -30,6 +32,11 @@ class DefaultPaymentMethodForCart implements PaymentMethodForCart
     public function getPaymentMethodId(): string
     {
         return $this->paymentMethodId;
+    }
+
+    public function getProviderId(): string
+    {
+        return $this->providerId;
     }
 
     public function getTitle(): string
