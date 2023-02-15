@@ -83,7 +83,7 @@ abstract class StateContext extends TestCase
         $this->orderRepository->save($order);
 
 
-        if($useCartApplication) {
+        if ($useCartApplication) {
             $transitionClass = 'Thinktomorrow\\Trader\\Application\\Cart\\' . ucfirst($transitionMethod);
             $this->cartApplication->$transitionMethod(new $transitionClass($order->orderId->get()));
         } else {
