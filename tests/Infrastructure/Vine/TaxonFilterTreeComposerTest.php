@@ -16,6 +16,7 @@ use Thinktomorrow\Trader\Domain\Model\Taxon\TaxonId;
 use Thinktomorrow\Trader\Domain\Model\Taxon\TaxonKey;
 use Thinktomorrow\Trader\Domain\Model\Taxon\TaxonKeyId;
 use Thinktomorrow\Trader\Domain\Model\Taxon\TaxonState;
+use Thinktomorrow\Trader\Infrastructure\Laravel\Repositories\MemoizedMysqlTaxonTreeRepository;
 use Thinktomorrow\Trader\Infrastructure\Laravel\Repositories\MysqlProductRepository;
 use Thinktomorrow\Trader\Infrastructure\Laravel\Repositories\MysqlTaxonTreeRepository;
 use Thinktomorrow\Trader\Infrastructure\Laravel\Repositories\MysqlVariantRepository;
@@ -41,6 +42,12 @@ final class TaxonFilterTreeComposerTest extends TestCase
     /** @test */
     public function it_can_retrieve_an_available_taxon_filter_tree()
     {
+        // This is a product associated with a nested child node
+        (new InMemoryTaxonRepository())->setOnlineProductIds(TaxonId::fromString('fourth'), ['ddd']);
+
+        // Set this product online for mysql as well
+        $this->createProductInMysql('ddd');
+
         $this->createDefaultTaxons();
 
         foreach ($this->repositories() as $repository) {
@@ -53,11 +60,11 @@ final class TaxonFilterTreeComposerTest extends TestCase
 
             // Sublevel
             $this->assertTrue($taxonFilterTree[0]->hasChildNodes());
-            $this->assertEquals(2, count($taxonFilterTree[0]->getChildNodes()));
+            $this->assertEquals(1, count($taxonFilterTree[0]->getChildNodes()));
 
             // Sub sub level
-            $this->assertTrue($taxonFilterTree[0]->getChildNodes()[1]->hasChildNodes());
-            $this->assertEquals(1, count($taxonFilterTree[0]->getChildNodes()[1]->getChildNodes()));
+            $this->assertTrue($taxonFilterTree[0]->getChildNodes()[0]->hasChildNodes());
+            $this->assertEquals(1, count($taxonFilterTree[0]->getChildNodes()[0]->getChildNodes()));
         }
     }
 
@@ -84,9 +91,7 @@ final class TaxonFilterTreeComposerTest extends TestCase
 
         // Mysql
         foreach ($onlineProductIds as $productId) {
-            $product = Product::create(ProductId::fromString($productId));
-            $product->updateState(ProductState::online);
-            (new MysqlProductRepository(new MysqlVariantRepository(new TestContainer())))->save($product);
+            $this->createProductInMysql($productId);
         }
 
         $this->createTaxon(
@@ -115,6 +120,12 @@ final class TaxonFilterTreeComposerTest extends TestCase
     /** @test */
     public function taxon_without_product_is_not_added_to_filter_tree()
     {
+        // Create online products and set online products relation for in memory
+        $this->createProductInMysql('aaa');
+        $this->createProductInMysql('bbb');
+        (new InMemoryTaxonRepository())->setOnlineProductIds(TaxonId::fromString('first'), ['aaa']);
+        (new InMemoryTaxonRepository())->setOnlineProductIds(TaxonId::fromString('second'), ['bbb']);
+
         $taxon = Taxon::create(TaxonId::fromString('first'));
         $taxon->updateTaxonKeys([TaxonKey::create($taxon->taxonId, TaxonKeyId::fromString('taxon-first'), Locale::fromString('nl'))]);
         $this->createTaxon($taxon,  ['aaa']);
@@ -123,9 +134,15 @@ final class TaxonFilterTreeComposerTest extends TestCase
         $taxon->updateTaxonKeys([TaxonKey::create($taxon->taxonId, TaxonKeyId::fromString('taxon-second'), Locale::fromString('nl'))]);
         $this->createTaxon($taxon,  ['bbb']);
 
+        // No product
         $taxon = Taxon::create(TaxonId::fromString('third'), TaxonId::fromString('first'));
         $taxon->updateTaxonKeys([TaxonKey::create($taxon->taxonId, TaxonKeyId::fromString('taxon-third'), Locale::fromString('nl'))]);
         $this->createTaxon($taxon,  []);
+
+        // Offline product
+        $taxon = Taxon::create(TaxonId::fromString('fourth'), TaxonId::fromString('first'));
+        $taxon->updateTaxonKeys([TaxonKey::create($taxon->taxonId, TaxonKeyId::fromString('taxon-fourth'), Locale::fromString('nl'))]);
+        $this->createTaxon($taxon,  ['ccc']);
 
         foreach ($this->repositories() as $repository) {
             $composer = new VineTaxonFilterTreeComposer($repository);
@@ -139,6 +156,11 @@ final class TaxonFilterTreeComposerTest extends TestCase
     /** @test */
     public function it_can_order_filters()
     {
+        $this->createProductInMysql('aaa');
+        (new InMemoryTaxonRepository())->setOnlineProductIds(TaxonId::fromString('main'), ['aaa']);
+        (new InMemoryTaxonRepository())->setOnlineProductIds(TaxonId::fromString('first'), ['aaa']);
+        (new InMemoryTaxonRepository())->setOnlineProductIds(TaxonId::fromString('second'), ['aaa']);
+
         $taxon = Taxon::create(TaxonId::fromString('main'));
         $taxon->updateTaxonKeys([TaxonKey::create($taxon->taxonId, TaxonKeyId::fromString('taxon-main'), Locale::fromString('nl'))]);
         $this->createTaxon($taxon,  ['aaa']);
@@ -167,6 +189,11 @@ final class TaxonFilterTreeComposerTest extends TestCase
     /** @test */
     public function it_excludes_filters_that_are_offline()
     {
+        $this->createProductInMysql('aaa');
+        $this->createProductInMysql('bbb');
+        (new InMemoryTaxonRepository())->setOnlineProductIds(TaxonId::fromString('first'), ['aaa']);
+        (new InMemoryTaxonRepository())->setOnlineProductIds(TaxonId::fromString('second'), ['bbb']);
+
         $taxon = Taxon::create(TaxonId::fromString('first'));
         $taxon->updateTaxonKeys([TaxonKey::create($taxon->taxonId, TaxonKeyId::fromString('taxon-first'), Locale::fromString('nl'))]);
         $this->createTaxon($taxon,  ['aaa']);

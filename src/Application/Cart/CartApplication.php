@@ -367,6 +367,17 @@ final class CartApplication
         $this->eventDispatcher->dispatchAll($order->releaseEvents());
     }
 
+    public function confirmCartAsBusiness(ConfirmCartAsBusiness $command): void
+    {
+        $order = $this->orderRepository->findForCart($command->getOrderId());
+
+        $this->orderStateMachine->apply($order, 'confirm_as_business');
+
+        $this->orderRepository->save($order);
+
+        $this->eventDispatcher->dispatchAll($order->releaseEvents());
+    }
+
     public function clearCheckoutData(ClearCheckoutData $command): void
     {
         $order = $this->orderRepository->findForCart($command->getOrderId());

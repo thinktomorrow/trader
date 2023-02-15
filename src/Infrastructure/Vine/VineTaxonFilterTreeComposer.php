@@ -35,7 +35,7 @@ class VineTaxonFilterTreeComposer implements TaxonFilterTreeComposer
          * are only taxa left that match one or more of the same products
          */
         $taxonTree = $this->taxonTreeRepository->getTree()
-            ->shake(fn (TaxonNode $node) => count(array_intersect($node->getProductIds(), $productIds)) > 0)
+            ->shake(fn (TaxonNode $node) => count(array_intersect($node->getOnlineProductIds(), $productIds)) > 0)
             ->remove(fn (TaxonNode $node) => ! $node->showOnline());
 
         // For a better filter representation, we want to start from the given taxon as the root - and not the 'real' root.

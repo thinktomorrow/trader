@@ -54,7 +54,7 @@ class UpdatePaymentMethodOnOrder
             $existingPayment = $order->getPayments()[0];
             $existingPayment->updatePaymentMethod($paymentMethod->paymentMethodId);
             $existingPayment->updateCost($paymentCost);
-            $existingPayment->addData($paymentMethod->getData());
+            $existingPayment->addData(array_merge($paymentMethod->getData(), ['provider_id' => $paymentMethod->getProvider()->get()]));
 
             $order->updatePayment($existingPayment);
         } else {
@@ -65,7 +65,7 @@ class UpdatePaymentMethodOnOrder
                 $paymentCost
             );
 
-            $payment->addData($paymentMethod->getData());
+            $payment->addData(array_merge($paymentMethod->getData(), ['provider_id' => $paymentMethod->getProvider()->get()]));
 
             $order->addPayment($payment);
         }

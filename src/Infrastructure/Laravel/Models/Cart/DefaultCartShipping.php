@@ -12,4 +12,9 @@ class DefaultCartShipping extends OrderReadShipping implements CartShipping
     {
         return parent::getShippingProfileId();
     }
+
+    public function getProviderId(): string
+    {
+        return $this->data('provider_id');
+    }
 }

@@ -9,6 +9,7 @@ use Thinktomorrow\Trader\Application\Order\State\Order\CancelOrderByMerchant;
 use Thinktomorrow\Trader\Application\Order\State\Order\ConfirmQuotedOrder;
 use Thinktomorrow\Trader\Application\Order\State\Order\DeleteOrder;
 use Thinktomorrow\Trader\Application\Order\State\Order\DeliverOrder;
+use Thinktomorrow\Trader\Application\Order\State\Order\MarkOrderPaidByMerchant;
 use Thinktomorrow\Trader\Application\Order\State\Order\PackOrder;
 use Thinktomorrow\Trader\Application\Order\State\Order\PartiallyDeliverOrder;
 use Thinktomorrow\Trader\Application\Order\State\Order\PartiallyPackOrder;
@@ -99,6 +100,11 @@ final class OrderStateApplication
     public function partiallyPayOrder(PartiallyPayOrder $command): void
     {
         $this->handleOrderStateEvent($command->getOrderId(), 'partially_pay', $command->getData());
+    }
+
+    public function markOrderPaidByMerchant(MarkOrderPaidByMerchant $command): void
+    {
+        $this->handleOrderStateEvent($command->getOrderId(), 'mark_paid_by_merchant', $command->getData());
     }
 
     public function packOrder(PackOrder $command): void

@@ -9,6 +9,7 @@ interface CartShipping
 
     public function getShippingId(): string;
     public function getShippingProfileId(): string;
+    public function getProviderId(): string;
     public function getCostPrice(): string;
     public function includeTax(bool $includeTax = true): void;
 

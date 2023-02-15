@@ -12,4 +12,9 @@ class DefaultCartPayment extends OrderReadPayment implements CartPayment
     {
         return parent::getPaymentMethodId();
     }
+
+    public function getProviderId(): string
+    {
+        return $this->data('provider_id');
+    }
 }

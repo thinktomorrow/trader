@@ -78,8 +78,7 @@ trait TaxonHelpers
                     try {
                         $this->mysqlProductRepository()->find(ProductId::fromString($productId));
                     } catch(CouldNotFindProduct $e) {
-                        $product = Product::create(ProductId::fromString($productId));
-                        $this->mysqlProductRepository()->save($product);
+                        $this->createProductInMysql($productId, false);
                     }
 
                     DB::table('trader_taxa_products')->insert([
@@ -88,6 +87,13 @@ trait TaxonHelpers
                 }
             }
         }
+    }
+
+    protected function createProductInMysql($productId, bool $online = true)
+    {
+        $product = Product::create(ProductId::fromString($productId));
+        $product->updateState(($online ? ProductState::online : ProductState::offline));
+        (new MysqlProductRepository(new MysqlVariantRepository(new TestContainer())))->save($product);
     }
 
     private function entityRepositories(): \Generator

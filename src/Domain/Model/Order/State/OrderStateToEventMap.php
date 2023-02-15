@@ -11,7 +11,9 @@ use Thinktomorrow\Trader\Domain\Model\Order\Events\OrderStates\CartRevived;
 use Thinktomorrow\Trader\Domain\Model\Order\Events\OrderStates\OrderCancelled;
 use Thinktomorrow\Trader\Domain\Model\Order\Events\OrderStates\OrderCancelledByMerchant;
 use Thinktomorrow\Trader\Domain\Model\Order\Events\OrderStates\OrderConfirmed;
+use Thinktomorrow\Trader\Domain\Model\Order\Events\OrderStates\OrderConfirmedAsBusiness;
 use Thinktomorrow\Trader\Domain\Model\Order\Events\OrderStates\OrderDelivered;
+use Thinktomorrow\Trader\Domain\Model\Order\Events\OrderStates\OrderMarkedPaidByMerchant;
 use Thinktomorrow\Trader\Domain\Model\Order\Events\OrderStates\OrderPacked;
 use Thinktomorrow\Trader\Domain\Model\Order\Events\OrderStates\OrderPaid;
 use Thinktomorrow\Trader\Domain\Model\Order\Events\OrderStates\OrderPartiallyDelivered;
@@ -36,8 +38,10 @@ class OrderStateToEventMap
             OrderState::cancelled_by_merchant->value => OrderCancelledByMerchant::class,
             OrderState::quoted->value => OrderQuoted::class,
             OrderState::quote_confirmed->value => QuotedOrderConfirmed::class,
+            OrderState::confirmed_as_business->value => OrderConfirmedAsBusiness::class,
             OrderState::paid->value => OrderPaid::class,
             OrderState::partially_paid->value => OrderPartiallyPaid::class,
+            OrderState::marked_paid_by_merchant->value => OrderMarkedPaidByMerchant::class,
             OrderState::packed->value => OrderPacked::class,
             OrderState::partially_packed->value => OrderPartiallyPacked::class,
             OrderState::delivered->value => OrderDelivered::class,

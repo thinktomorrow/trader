@@ -30,6 +30,16 @@ enum OrderState: string implements State
 
     /**
      * ------------------------------------------------
+     * Business states
+     * ------------------------------------------------
+     * The order is not paid but is ready for processing. In case of a business order,
+     * the fulfillment can take place before any payment is made.
+     * The invoice is the request for payment to the business customer.
+     */
+    case confirmed_as_business = 'confirmed_as_business';
+
+    /**
+     * ------------------------------------------------
      * Order quotation
      * ------------------------------------------------
      * The order is quoted which means that the customer cannot change this order but still needs to explicitly confirm this order.
@@ -48,6 +58,7 @@ enum OrderState: string implements State
 
     case partially_paid = 'partially_paid'; // one or more of many payments are delivered
     case paid = 'paid'; // fully paid so order can be processed
+    case marked_paid_by_merchant = 'marked_paid_by_merchant'; // merchant set this order as paid
 
     case partially_packed = 'partially_packed'; // one or more of many shipments are packed
     case packed = 'packed'; // internally processed the order so order can be shipped
@@ -111,28 +122,36 @@ enum OrderState: string implements State
                 'from' => [self::quoted],
                 'to' => self::quote_confirmed,
             ],
+            'confirm_as_business' => [
+                'from' => [self::cart_pending, self::cart_revived, self::cart_completed],
+                'to' => self::confirmed_as_business,
+            ],
             'cancel' => [
                 'from' => [self::cart_completed, self::cart_revived, self::confirmed],
                 'to' => self::cancelled,
             ],
             'cancel_by_merchant' => [
-                'from' => [self::cart_completed, self::confirmed, self::quote_confirmed],
+                'from' => [self::cart_completed, self::confirmed, self::paid, self::marked_paid_by_merchant, self::quote_confirmed, self::confirmed_as_business],
                 'to' => self::cancelled_by_merchant,
             ],
             'partially_pay' => [
                 'from' => [self::cart_completed, self::confirmed],
                 'to' => self::partially_paid,
             ],
+            'mark_paid_by_merchant' => [
+                'from' => [self::cart_completed, self::confirmed, self::partially_paid, self::quote_confirmed, self::confirmed_as_business],
+                'to' => self::marked_paid_by_merchant,
+            ],
             'pay' => [
-                'from' => [self::cart_completed, self::confirmed, self::partially_paid, self::quote_confirmed],
+                'from' => [self::cart_completed, self::confirmed, self::partially_paid, self::quote_confirmed, self::confirmed_as_business, self::marked_paid_by_merchant],
                 'to' => self::paid,
             ],
             'partially_pack' => [
-                'from' => [self::paid, self::partially_paid],
+                'from' => [self::paid, self::partially_paid, self::marked_paid_by_merchant, self::confirmed_as_business],
                 'to' => self::partially_packed,
             ],
             'pack' => [
-                'from' => [self::paid, self::partially_paid, self::partially_packed],
+                'from' => [self::paid, self::partially_paid, self::marked_paid_by_merchant, self::partially_packed, self::confirmed_as_business],
                 'to' => self::packed,
             ],
             'partially_deliver' => [

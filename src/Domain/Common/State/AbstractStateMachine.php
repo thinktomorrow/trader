@@ -21,6 +21,11 @@ abstract class AbstractStateMachine
 
     public function can($model, $transition): bool
     {
+        // Array of transitions passed means we check that at least one is allowed
+        if(is_array($transition)) {
+            return count(array_intersect($transition, $this->getAllowedTransitions($model))) > 0;
+        }
+
         if (! in_array($transition, $this->getAllowedTransitions($model))) {
             return false;
         }
