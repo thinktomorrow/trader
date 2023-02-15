@@ -16,6 +16,7 @@ use Thinktomorrow\Trader\Application\Cart\Line\AddLine;
 use Thinktomorrow\Trader\Application\Cart\Line\ChangeLineQuantity;
 use Thinktomorrow\Trader\Application\Cart\Line\RemoveLine;
 use Thinktomorrow\Trader\Application\Cart\PaymentMethod\UpdatePaymentMethodOnOrder;
+use Thinktomorrow\Trader\Application\Cart\PaymentMethod\VerifyPaymentMethodForCart;
 use Thinktomorrow\Trader\Application\Cart\RefreshCart\Adjusters\AdjustDiscounts;
 use Thinktomorrow\Trader\Application\Cart\RefreshCart\Adjusters\AdjustLines;
 use Thinktomorrow\Trader\Application\Cart\RefreshCart\Adjusters\AdjustShipping;
@@ -66,6 +67,7 @@ use Thinktomorrow\Trader\Domain\Model\ShippingProfile\ShippingProfile;
 use Thinktomorrow\Trader\Domain\Model\ShippingProfile\ShippingProfileId;
 use Thinktomorrow\Trader\Domain\Model\ShippingProfile\ShippingProviderId;
 use Thinktomorrow\Trader\Domain\Model\ShippingProfile\Tariff;
+use Thinktomorrow\Trader\Infrastructure\Laravel\Models\PaymentMethod\DefaultVerifyPaymentMethodForCart;
 use Thinktomorrow\Trader\Infrastructure\Test\EventDispatcherSpy;
 use Thinktomorrow\Trader\Infrastructure\Test\Repositories\InMemoryCartRepository;
 use Thinktomorrow\Trader\Infrastructure\Test\Repositories\InMemoryCustomerRepository;
@@ -122,8 +124,6 @@ abstract class CartContext extends TestCase
             ]))
         );
 
-        $this->orderRepository = new InMemoryOrderRepository();
-
         // Adjusters are loaded via container so set them up here
         (new TestContainer())->add(InvoiceRepository::class, $this->orderRepository);
         (new TestContainer())->add(ApplyPromoToOrder::class, new ApplyPromoToOrder($this->orderRepository));
@@ -136,8 +136,6 @@ abstract class CartContext extends TestCase
             'confirm' => OrderState::getDefaultTransitions()['confirm'],
         ]));
 
-        $this->paymentMethodRepository = new InMemoryPaymentMethodRepository();
-
         $this->cartApplication = new CartApplication(
             new TestTraderConfig(),
             new TestContainer(),
@@ -147,7 +145,7 @@ abstract class CartContext extends TestCase
             new RefreshCartAction(),
             $this->shippingProfileRepository = new InMemoryShippingProfileRepository(),
             $this->updateShippingProfileOnOrder = new UpdateShippingProfileOnOrder(new TestTraderConfig(), $this->orderRepository, $this->shippingProfileRepository),
-            $this->updatePaymentMethodOnOrder = new UpdatePaymentMethodOnOrder(new TestTraderConfig(), $this->orderRepository, $this->paymentMethodRepository),
+            $this->updatePaymentMethodOnOrder = (new TestContainer())->get(UpdatePaymentMethodOnOrder::class),
             $this->customerRepository = new InMemoryCustomerRepository(),
             $this->eventDispatcher = new EventDispatcherSpy(),
         );

@@ -71,7 +71,7 @@ abstract class StateContext extends TestCase
             new RefreshCartAction(),
             new InMemoryShippingProfileRepository(),
             new UpdateShippingProfileOnOrder(new TestTraderConfig(), $this->orderRepository, new InMemoryShippingProfileRepository()),
-            new UpdatePaymentMethodOnOrder(new TestTraderConfig(), $this->orderRepository, new InMemoryPaymentMethodRepository()),
+            TestContainer::make(UpdatePaymentMethodOnOrder::class),
             new InMemoryCustomerRepository(),
             $this->eventDispatcher,
         );

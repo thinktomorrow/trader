@@ -18,29 +18,22 @@ class UpdatePaymentMethodOnOrder
     private TraderConfig $config;
     private OrderRepository $orderRepository;
     private PaymentMethodRepository $paymentMethodRepository;
+    private VerifyPaymentMethodForCart $verifyPaymentMethodForCart;
 
-    public function __construct(TraderConfig $config, OrderRepository $orderRepository, PaymentMethodRepository $paymentMethodRepository)
+    public function __construct(TraderConfig $config, OrderRepository $orderRepository, VerifyPaymentMethodForCart $verifyPaymentMethodForCart, PaymentMethodRepository $paymentMethodRepository)
     {
         $this->config = $config;
         $this->orderRepository = $orderRepository;
         $this->paymentMethodRepository = $paymentMethodRepository;
+        $this->verifyPaymentMethodForCart = $verifyPaymentMethodForCart;
     }
 
     public function handle(Order $order, PaymentMethodId $paymentMethodId): void
     {
         $paymentMethod = $this->paymentMethodRepository->find($paymentMethodId);
 
-        if (! in_array($paymentMethod->getState(), PaymentMethodState::onlineStates())) {
+        if(!$this->verifyPaymentMethodForCart->verify($order, $paymentMethod)) {
             $this->removePaymentMethodFromOrder($order);
-
-            return;
-        }
-
-        $billingCountryId = $order->getBillingAddress()?->getAddress()->countryId;
-
-        if ($billingCountryId && $paymentMethod->hasAnyCountries() && ! $paymentMethod->hasCountry($billingCountryId)) {
-            $this->removePaymentMethodFromOrder($order);
-
             return;
         }
 

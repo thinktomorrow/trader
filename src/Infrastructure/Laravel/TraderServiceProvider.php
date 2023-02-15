@@ -7,6 +7,7 @@ use Illuminate\Support\Arr;
 use Illuminate\Support\ServiceProvider;
 use Thinktomorrow\Trader\Application\Cart\PaymentMethod\PaymentMethodForCart;
 use Thinktomorrow\Trader\Application\Cart\PaymentMethod\PaymentMethodForCartRepository;
+use Thinktomorrow\Trader\Application\Cart\PaymentMethod\VerifyPaymentMethodForCart;
 use Thinktomorrow\Trader\Application\Cart\Read\Cart;
 use Thinktomorrow\Trader\Application\Cart\Read\CartBillingAddress;
 use Thinktomorrow\Trader\Application\Cart\Read\CartDiscount;
@@ -103,7 +104,6 @@ use Thinktomorrow\Trader\Infrastructure\Laravel\Models\CustomerRead\DefaultCusto
 use Thinktomorrow\Trader\Infrastructure\Laravel\Models\CustomerRead\DefaultCustomerShippingAddress;
 use Thinktomorrow\Trader\Infrastructure\Laravel\Models\DefaultGridItem;
 use Thinktomorrow\Trader\Infrastructure\Laravel\Models\DefaultOrderGridItem;
-use Thinktomorrow\Trader\Infrastructure\Laravel\Models\DefaultPaymentMethodForCart;
 use Thinktomorrow\Trader\Infrastructure\Laravel\Models\DefaultPersonalisationField;
 use Thinktomorrow\Trader\Infrastructure\Laravel\Models\DefaultProductDetail;
 use Thinktomorrow\Trader\Infrastructure\Laravel\Models\DefaultShippingProfileForCart;
@@ -120,6 +120,8 @@ use Thinktomorrow\Trader\Infrastructure\Laravel\Models\MerchantOrder\DefaultMerc
 use Thinktomorrow\Trader\Infrastructure\Laravel\Models\MerchantOrder\DefaultMerchantOrderShipping;
 use Thinktomorrow\Trader\Infrastructure\Laravel\Models\MerchantOrder\DefaultMerchantOrderShippingAddress;
 use Thinktomorrow\Trader\Infrastructure\Laravel\Models\MerchantOrder\DefaultMerchantOrderShopper;
+use Thinktomorrow\Trader\Infrastructure\Laravel\Models\PaymentMethod\DefaultPaymentMethodForCart;
+use Thinktomorrow\Trader\Infrastructure\Laravel\Models\PaymentMethod\DefaultVerifyPaymentMethodForCart;
 use Thinktomorrow\Trader\Infrastructure\Laravel\Repositories\MysqlCartRepository;
 use Thinktomorrow\Trader\Infrastructure\Laravel\Repositories\MysqlCheckProductOptionsRepository;
 use Thinktomorrow\Trader\Infrastructure\Laravel\Repositories\MysqlCountryRepository;
@@ -207,6 +209,7 @@ class TraderServiceProvider extends ServiceProvider
         $this->app->bind(CartShipping::class, fn () => DefaultCartShipping::class);
         $this->app->bind(ShippingProfileForCart::class, fn () => DefaultShippingProfileForCart::class);
         $this->app->bind(PaymentMethodForCart::class, fn () => DefaultPaymentMethodForCart::class);
+        $this->app->bind(VerifyPaymentMethodForCart::class, fn () => DefaultVerifyPaymentMethodForCart::class);
 
         // MerchantOrder models
         $this->app->bind(MerchantOrder::class, fn () => DefaultMerchantOrder::class);

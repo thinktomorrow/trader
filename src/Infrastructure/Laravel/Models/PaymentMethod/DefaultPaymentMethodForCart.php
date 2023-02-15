@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 
-namespace Thinktomorrow\Trader\Infrastructure\Laravel\Models;
+namespace Thinktomorrow\Trader\Infrastructure\Laravel\Models\PaymentMethod;
 
 use Thinktomorrow\Trader\Application\Cart\PaymentMethod\PaymentMethodForCart;
 use Thinktomorrow\Trader\Application\Common\RendersData;
