@@ -95,7 +95,7 @@ class MysqlTaxonTreeRepository implements TaxonTreeRepository, CategoryRepositor
 
         $results = DB::table(static::$taxonTable)
             ->leftJoin('trader_taxa_products', 'trader_taxa.taxon_id', 'trader_taxa_products.taxon_id')
-            ->leftJoin('trader_products', function($join){
+            ->leftJoin('trader_products', function ($join) {
                 $join->on('trader_taxa_products.product_id', '=', 'trader_products.product_id')
                     ->whereIn('trader_products.state', ProductState::onlineStates());
             })

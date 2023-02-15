@@ -85,7 +85,9 @@ class VineTaxonFilterTreeComposer implements TaxonFilterTreeComposer
                 }
             }
 
-            if(count($selectedTaxons) > 0) return $selectedTaxons;
+            if (count($selectedTaxons) > 0) {
+                return $selectedTaxons;
+            }
         }
 
         return $taxonTree;

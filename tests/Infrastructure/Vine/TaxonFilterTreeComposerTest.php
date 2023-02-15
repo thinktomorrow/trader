@@ -4,10 +4,8 @@ declare(strict_types=1);
 namespace Tests\Infrastructure\Vine;
 
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Support\Facades\DB;
 use Tests\Infrastructure\TestCase;
 use Thinktomorrow\Trader\Domain\Common\Locale;
-use Thinktomorrow\Trader\Domain\Model\Product\Exceptions\CouldNotFindProduct;
 use Thinktomorrow\Trader\Domain\Model\Product\Product;
 use Thinktomorrow\Trader\Domain\Model\Product\ProductId;
 use Thinktomorrow\Trader\Domain\Model\Product\ProductState;
@@ -20,7 +18,6 @@ use Thinktomorrow\Trader\Infrastructure\Laravel\Repositories\MemoizedMysqlTaxonT
 use Thinktomorrow\Trader\Infrastructure\Laravel\Repositories\MysqlProductRepository;
 use Thinktomorrow\Trader\Infrastructure\Laravel\Repositories\MysqlTaxonTreeRepository;
 use Thinktomorrow\Trader\Infrastructure\Laravel\Repositories\MysqlVariantRepository;
-use Thinktomorrow\Trader\Infrastructure\Test\Repositories\InMemoryProductRepository;
 use Thinktomorrow\Trader\Infrastructure\Test\Repositories\InMemoryTaxonRepository;
 use Thinktomorrow\Trader\Infrastructure\Test\Repositories\InMemoryTaxonTreeRepository;
 use Thinktomorrow\Trader\Infrastructure\Test\TestContainer;
@@ -100,7 +97,6 @@ final class TaxonFilterTreeComposerTest extends TestCase
         );
 
         foreach ($this->repositories() as $i => $repository) {
-
             if ($i == 0) {
                 (new InMemoryTaxonRepository)->setOnlineProductIds(TaxonId::fromString('first'), $onlineProductIds);
             }
