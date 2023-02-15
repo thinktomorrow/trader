@@ -10,7 +10,6 @@ use Thinktomorrow\Trader\Domain\Model\Order\Payment\Payment;
 use Thinktomorrow\Trader\Domain\Model\Order\Payment\PaymentCost;
 use Thinktomorrow\Trader\Domain\Model\PaymentMethod\PaymentMethodId;
 use Thinktomorrow\Trader\Domain\Model\PaymentMethod\PaymentMethodRepository;
-use Thinktomorrow\Trader\Domain\Model\PaymentMethod\PaymentMethodState;
 use Thinktomorrow\Trader\TraderConfig;
 
 class UpdatePaymentMethodOnOrder
@@ -32,8 +31,9 @@ class UpdatePaymentMethodOnOrder
     {
         $paymentMethod = $this->paymentMethodRepository->find($paymentMethodId);
 
-        if(!$this->verifyPaymentMethodForCart->verify($order, $paymentMethod)) {
+        if (! $this->verifyPaymentMethodForCart->verify($order, $paymentMethod)) {
             $this->removePaymentMethodFromOrder($order);
+
             return;
         }
 
