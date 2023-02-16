@@ -18,6 +18,7 @@ use Thinktomorrow\Trader\Application\Cart\Read\CartRepository;
 use Thinktomorrow\Trader\Application\Cart\Read\CartShipping;
 use Thinktomorrow\Trader\Application\Cart\Read\CartShippingAddress;
 use Thinktomorrow\Trader\Application\Cart\Read\CartShopper;
+use Thinktomorrow\Trader\Application\Cart\RefreshCart\Adjusters\AdjustLine;
 use Thinktomorrow\Trader\Application\Cart\ShippingProfile\ShippingProfileForCart;
 use Thinktomorrow\Trader\Application\Cart\ShippingProfile\ShippingProfileForCartRepository;
 use Thinktomorrow\Trader\Application\Cart\VariantForCart\VariantForCart;
@@ -90,6 +91,7 @@ use Thinktomorrow\Trader\Domain\Model\Promo\Discounts\PercentageOffDiscount;
 use Thinktomorrow\Trader\Domain\Model\Promo\PromoRepository;
 use Thinktomorrow\Trader\Domain\Model\ShippingProfile\ShippingProfileRepository;
 use Thinktomorrow\Trader\Domain\Model\Taxon\TaxonRepository;
+use Thinktomorrow\Trader\Infrastructure\Laravel\Models\Cart\DefaultAdjustLine;
 use Thinktomorrow\Trader\Infrastructure\Laravel\Models\Cart\DefaultCart;
 use Thinktomorrow\Trader\Infrastructure\Laravel\Models\Cart\DefaultCartBillingAddress;
 use Thinktomorrow\Trader\Infrastructure\Laravel\Models\Cart\DefaultCartDiscount;
@@ -209,7 +211,8 @@ class TraderServiceProvider extends ServiceProvider
         $this->app->bind(CartShipping::class, fn () => DefaultCartShipping::class);
         $this->app->bind(ShippingProfileForCart::class, fn () => DefaultShippingProfileForCart::class);
         $this->app->bind(PaymentMethodForCart::class, fn () => DefaultPaymentMethodForCart::class);
-        $this->app->bind(VerifyPaymentMethodForCart::class, fn () => DefaultVerifyPaymentMethodForCart::class);
+        $this->app->bind(VerifyPaymentMethodForCart::class, DefaultVerifyPaymentMethodForCart::class);
+        $this->app->bind(AdjustLine::class, DefaultAdjustLine::class);
 
         // MerchantOrder models
         $this->app->bind(MerchantOrder::class, fn () => DefaultMerchantOrder::class);

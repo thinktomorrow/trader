@@ -22,6 +22,7 @@ interface GridItem
     public function getSalePrice(): string;
     public function getUnitPriceAsMoney(): Money;
     public function getSalePriceAsMoney(): Money;
+    public function getTaxRateAsString(): string;
     public function onSale(): bool;
     public function getSaleDiscount(): string;
 

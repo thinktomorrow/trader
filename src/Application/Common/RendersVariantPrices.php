@@ -62,4 +62,9 @@ trait RendersVariantPrices
     {
         return $this->salePrice;
     }
+
+    public function getTaxRateAsString(): string
+    {
+        return $this->salePrice->getTaxRate()->toPercentage()->get();
+    }
 }

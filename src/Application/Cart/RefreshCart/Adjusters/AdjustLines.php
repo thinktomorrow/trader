@@ -15,10 +15,12 @@ use Thinktomorrow\Trader\Domain\Model\Product\Variant\VariantState;
 class AdjustLines implements Adjuster
 {
     private VariantForCartRepository $variantForCartRepository;
+    private AdjustLine $adjustLine;
 
-    public function __construct(VariantForCartRepository $variantForCartRepository)
+    public function __construct(VariantForCartRepository $variantForCartRepository, AdjustLine $adjustLine)
     {
         $this->variantForCartRepository = $variantForCartRepository;
+        $this->adjustLine = $adjustLine;
     }
 
     public function adjust(Order $order): void
@@ -45,6 +47,8 @@ class AdjustLines implements Adjuster
             if (! $line->getLinePrice()->getExcludingVat()->equals($variant->getSalePrice()->getExcludingVat())) {
                 $line->updatePrice(LinePrice::fromPrice($variant->getSalePrice()));
             }
+
+            $this->adjustLine->adjust($order, $line);
         }
 
         // todo: Fetch variantForCart...

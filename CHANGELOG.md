@@ -7,6 +7,7 @@ Important changes will be notified in this file
 - Added: Payment method logic for add multiple payment options in checkout.
 - Added: Payment Method crud application api.
 - Added: Two order transitions: mark_order_as_paid and confirm_as_business. The latter allows to process a business order without actual payment.
+- Added: AdjustLine adjuster to change line quantity, price,... per project based on the given order context.
 - Added: Payment and Shipping provider id domain value via a `getProviderId` method. This is used in the project to handle each profile/method with proper gateway/provider handling.
 - Added: state column to payment methods table. And removed unused 'active' columns. For existing projects, you can use the following migrations:
 ```php 

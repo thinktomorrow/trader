@@ -19,6 +19,7 @@ use Thinktomorrow\Trader\Domain\Model\Order\Shipping\ShippingStateToEventMap;
 use Thinktomorrow\Trader\Domain\Model\Order\State\OrderState;
 use Thinktomorrow\Trader\Domain\Model\Order\State\OrderStateMachine;
 use Thinktomorrow\Trader\Domain\Model\Order\State\OrderStateToEventMap;
+use Thinktomorrow\Trader\Infrastructure\Laravel\Models\Cart\DefaultAdjustLine;
 use Thinktomorrow\Trader\Infrastructure\Test\EventDispatcherSpy;
 use Thinktomorrow\Trader\Infrastructure\Test\Repositories\InMemoryCustomerRepository;
 use Thinktomorrow\Trader\Infrastructure\Test\Repositories\InMemoryOrderRepository;
@@ -65,6 +66,7 @@ abstract class StateContext extends TestCase
             new TestTraderConfig(),
             new TestContainer(),
             new InMemoryVariantRepository(),
+            new DefaultAdjustLine(),
             $this->orderRepository,
             $this->orderStateMachine,
             new RefreshCartAction(),

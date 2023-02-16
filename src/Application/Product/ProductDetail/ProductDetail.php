@@ -21,6 +21,7 @@ interface ProductDetail
     public function getSalePriceAsMoney(): Money;
     public function getUnitPriceAsPrice(): VariantUnitPrice;
     public function getSalePriceAsPrice(): VariantSalePrice;
+    public function getTaxRateAsString(): string;
     public function onSale(): bool;
     public function getSaleDiscount(): string;
 
