@@ -32,7 +32,7 @@ trait HasLines
 
     public function findLine(LineId $lineId): Line
     {
-        if(null === ($lineIndexToBeUpdated = $this->findLineIndex($lineId))) {
+        if (null === ($lineIndexToBeUpdated = $this->findLineIndex($lineId))) {
             throw new \DomainException('No line found by id ' . $lineId->get() . ' on order ' . $this->orderId->get());
         }
 
