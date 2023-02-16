@@ -10,7 +10,6 @@ use Thinktomorrow\Trader\Application\Product\ProductDetail\ProductDetailReposito
 use Thinktomorrow\Trader\Domain\Model\Product\Exceptions\CouldNotFindVariant;
 use Thinktomorrow\Trader\Domain\Model\Product\ProductState;
 use Thinktomorrow\Trader\Domain\Model\Product\Variant\VariantId;
-use Thinktomorrow\Trader\Infrastructure\Laravel\Models\DefaultProductDetail;
 
 class MysqlProductDetailRepository implements ProductDetailRepository
 {
