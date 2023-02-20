@@ -2,15 +2,14 @@
 
 namespace Thinktomorrow\Trader\Application\Stock\Read;
 
-class DefaultStockable
+trait StockableDefault
 {
+    protected bool $ignore_out_of_stock;
+    protected int $stock_level;
+
     public function inStock(int $level = 1): bool
     {
-        if ($this->ignoreOutOfStock()) {
-            return true;
-        }
-
-        return $this->getStockLevel() >= $level;
+        return $this->ignoresOutOfStock() ?: $this->getStockLevel() >= $level;
     }
 
     /**
@@ -19,13 +18,13 @@ class DefaultStockable
      *
      * @return bool
      */
-    public function ignoreOutOfStock(): bool
+    public function ignoresOutOfStock(): bool
     {
         return $this->ignore_out_of_stock;
     }
 
     public function getStockLevel(): int
     {
-        return (int) $this->stock_level;
+        return $this->stock_level;
     }
 }

@@ -11,12 +11,17 @@ use Thinktomorrow\Trader\Domain\Model\Product\ProductId;
 use Thinktomorrow\Trader\Domain\Model\Product\Variant\Variant;
 use Thinktomorrow\Trader\Domain\Model\Product\Variant\VariantId;
 use Thinktomorrow\Trader\Domain\Model\Product\VariantRepository;
+use Thinktomorrow\Trader\Domain\Model\Stock\Exceptions\CouldNotFindStockItem;
+use Thinktomorrow\Trader\Domain\Model\Stock\StockItem;
+use Thinktomorrow\Trader\Domain\Model\Stock\StockItemId;
+use Thinktomorrow\Trader\Domain\Model\Stock\StockItemRepository;
 use Thinktomorrow\Trader\Infrastructure\Laravel\Models\DefaultVariantForCart;
 
-final class InMemoryVariantRepository implements VariantRepository, VariantForCartRepository
+final class InMemoryVariantRepository implements VariantRepository, VariantForCartRepository, StockItemRepository
 {
     /** @var Variant[] */
     public static array $variants = [];
+    public static array $stockItems = [];
     private static string $nextReference = 'xxx-123';
 
     public function save(Variant $variant): void
@@ -103,5 +108,21 @@ final class InMemoryVariantRepository implements VariantRepository, VariantForCa
         }
 
         return $personalisations;
+    }
+
+    public function findStockItem(StockItemId $stockItemId): StockItem
+    {
+        foreach (static::$stockItems as $stockItem) {
+            if ($stockItem->stockItemId->equals($stockItemId)) {
+                return $stockItem;
+            }
+        }
+
+        throw new CouldNotFindStockItem('No stockitem found by id ' . $stockItemId->get());
+    }
+
+    public function saveStockItem(StockItem $stockItem): void
+    {
+        static::$stockItems[] = $stockItem;
     }
 }

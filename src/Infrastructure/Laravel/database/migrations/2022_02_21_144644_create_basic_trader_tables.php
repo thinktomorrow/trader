@@ -43,6 +43,11 @@ return new class extends Migration {
             $table->char('tax_rate', 3);
             $table->boolean('includes_vat');
             $table->json('data')->nullable();
+
+            $table->integer('stock_level')->default(0);
+            $table->boolean('ignore_out_of_stock')->default(true);
+            $table->json('stock_data')->nullable();
+
             $table->unsignedInteger('order_column')->default(0);
             $table->timestamps();
 

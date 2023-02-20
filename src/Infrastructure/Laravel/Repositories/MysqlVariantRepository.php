@@ -15,8 +15,13 @@ use Thinktomorrow\Trader\Domain\Model\Product\ProductState;
 use Thinktomorrow\Trader\Domain\Model\Product\Variant\Variant;
 use Thinktomorrow\Trader\Domain\Model\Product\Variant\VariantId;
 use Thinktomorrow\Trader\Domain\Model\Product\VariantRepository;
+use Thinktomorrow\Trader\Domain\Model\Stock\Exceptions\CouldNotFindStockItem;
+use Thinktomorrow\Trader\Domain\Model\Stock\Exceptions\VariantRecordDoesNotExistWhenSavingStockItem;
+use Thinktomorrow\Trader\Domain\Model\Stock\StockItem;
+use Thinktomorrow\Trader\Domain\Model\Stock\StockItemId;
+use Thinktomorrow\Trader\Domain\Model\Stock\StockItemRepository;
 
-class MysqlVariantRepository implements VariantRepository, VariantForCartRepository
+class MysqlVariantRepository implements VariantRepository, VariantForCartRepository, StockItemRepository
 {
     private static string $productTable = 'trader_products';
     private static string $variantTable = 'trader_product_variants';
@@ -178,5 +183,40 @@ class MysqlVariantRepository implements VariantRepository, VariantForCartReposit
         return $this->container->get(VariantForCart::class)::fromMappedData(array_merge($state, [
             'includes_vat' => (bool) $state['includes_vat'],
         ]), $personalisations);
+    }
+
+    public function findStockItem(StockItemId $stockItemId): StockItem
+    {
+        // Basic builder query
+        $state = DB::table(static::$variantTable)
+            ->where(static::$variantTable . '.variant_id', $stockItemId->get())
+            ->select([
+                static::$variantTable . '.*',
+            ])
+            ->first();
+
+        if (! $state) {
+            throw new CouldNotFindStockItem('No stockitem found by id [' . $stockItemId->get(). ']');
+        }
+
+        $state = (array) $state;
+
+        return StockItem::fromMappedData(array_merge($state, [
+            'stockitem_id' => $state['variant_id'],
+        ]));
+    }
+
+    public function saveStockItem(StockItem $stockItem): void
+    {
+        $state = $stockItem->getMappedData();
+
+        // StockItemId corresponds to the variant id. This is a given requirement.
+        if (! $this->exists(VariantId::fromString($stockItem->stockItemId->get()))) {
+            throw new VariantRecordDoesNotExistWhenSavingStockItem('No variant record found by id ' . $stockItem->stockItemId->get());
+        }
+
+        unset($state['stockitem_id']);
+
+        DB::table(static::$variantTable)->where('variant_id', $stockItem->stockItemId->get())->update($state);
     }
 }

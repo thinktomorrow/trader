@@ -8,6 +8,7 @@ use Thinktomorrow\Trader\Application\Common\HasLocale;
 use Thinktomorrow\Trader\Application\Common\RendersData;
 use Thinktomorrow\Trader\Application\Common\RendersVariantPrices;
 use Thinktomorrow\Trader\Application\Product\ProductDetail\ProductDetail;
+use Thinktomorrow\Trader\Application\Stock\Read\StockableDefault;
 use Thinktomorrow\Trader\Domain\Model\Product\ProductId;
 use Thinktomorrow\Trader\Domain\Model\Product\Variant\VariantId;
 use Thinktomorrow\Trader\Domain\Model\Product\Variant\VariantSalePrice;
@@ -19,6 +20,7 @@ class DefaultProductDetail implements ProductDetail
     use RendersVariantPrices;
     use RendersData;
     use HasLocale;
+    use StockableDefault;
 
     private VariantId $variantId;
     private ProductId $productId;
@@ -47,8 +49,12 @@ class DefaultProductDetail implements ProductDetail
         $item->ean = $state['ean'] ?? null;
         $item->data = array_merge(
             ['product_data' => json_decode($state['product_data'], true)],
+            ['stock_data' => ($state['stock_data'] ? json_decode($state['stock_data'], true) : [])],
             json_decode($state['data'], true),
         );
+
+        $item->stock_level = $state['stock_level'];
+        $item->ignore_out_of_stock = (bool) $state['ignore_out_of_stock'];
 
         return $item;
     }

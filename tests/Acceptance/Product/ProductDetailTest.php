@@ -125,4 +125,16 @@ class ProductDetailTest extends ProductContext
 
         $this->assertEquals(['foo' => 'bar'], $productDetail->getImages());
     }
+
+    public function test_it_can_get_stockable_info()
+    {
+        $product = $this->createProductWithVariant();
+        $this->productRepository->save($product);
+
+        $stockable = $this->productDetailRepository->findProductDetail($product->getVariants()[0]->variantId);
+
+        $this->assertEquals(5, $stockable->getStockLevel());
+        $this->assertEquals(false, $stockable->ignoresOutOfStock());
+        $this->assertEquals(true, $stockable->inStock());
+    }
 }

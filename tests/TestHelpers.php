@@ -477,6 +477,20 @@ trait TestHelpers
         return $variant;
     }
 
+    protected function createStockItem(): Product
+    {
+        $product = $this->createProduct();
+        $product->updateOptions([Option::create($product->productId, OptionId::fromString('ooo'), ['foo' => 'bar'])]);
+        $product->updateOptionValues(OptionId::fromString('ooo'), [
+            OptionValue::create(OptionId::fromString('ooo'), OptionValueId::fromString('ppp'), ['foo' => 'bar']),
+        ]);
+        $variant = $this->createVariantWithOption();
+
+        $product->createVariant($variant);
+
+        return $product;
+    }
+
     protected function createCatalog(TaxonApplication $taxonApplication, ProductApplication $productApplication, ProductRepository $productRepository)
     {
         $taxonId = $taxonApplication->createTaxon(new CreateTaxon('foobar', 'nl', ['title' => ['nl' => 'foobar nl']]));

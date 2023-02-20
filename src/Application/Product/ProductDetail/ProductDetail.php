@@ -3,10 +3,11 @@
 namespace Thinktomorrow\Trader\Application\Product\ProductDetail;
 
 use Money\Money;
+use Thinktomorrow\Trader\Application\Stock\Read\Stockable;
 use Thinktomorrow\Trader\Domain\Model\Product\Variant\VariantSalePrice;
 use Thinktomorrow\Trader\Domain\Model\Product\Variant\VariantUnitPrice;
 
-interface ProductDetail
+interface ProductDetail extends Stockable
 {
     public static function fromMappedData(array $state): static;
 
