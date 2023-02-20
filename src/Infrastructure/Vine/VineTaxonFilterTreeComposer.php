@@ -27,7 +27,7 @@ class VineTaxonFilterTreeComposer implements TaxonFilterTreeComposer
             return new TaxonTree();
         }
 
-        $productIds = $this->getProductIds($mainTaxonNode->getId());
+        $productIds = $this->getOnlineProductIds($mainTaxonNode->getId());
 
         /**
          * The products belonging to the main taxon determine which taxons will
@@ -35,7 +35,7 @@ class VineTaxonFilterTreeComposer implements TaxonFilterTreeComposer
          * are only taxa left that match one or more of the same products
          */
         $taxonTree = $this->taxonTreeRepository->getTree()
-            ->shake(fn (TaxonNode $node) => array_intersect($node->getProductIds(), $productIds))
+            ->shake(fn (TaxonNode $node) => count(array_intersect($node->getOnlineProductIds(), $productIds)) > 0)
             ->remove(fn (TaxonNode $node) => ! $node->showOnline());
 
         // For a better filter representation, we want to start from the given taxon as the root - and not the 'real' root.
@@ -85,10 +85,22 @@ class VineTaxonFilterTreeComposer implements TaxonFilterTreeComposer
                 }
             }
 
-            $taxonTree = $taxonTree->merge($selectedTaxons);
+            if (count($selectedTaxons) > 0) {
+                return $selectedTaxons;
+            }
         }
 
         return $taxonTree;
+    }
+
+    /**
+     * Get all online product ids belonging to this taxon filter and all its children
+     *
+     * @return array
+     */
+    public function getOnlineProductIds(string $taxonId): array
+    {
+        return $this->getProductIds($taxonId, true);
     }
 
     /**
@@ -96,7 +108,7 @@ class VineTaxonFilterTreeComposer implements TaxonFilterTreeComposer
      *
      * @return array
      */
-    public function getProductIds(string $taxonId): array
+    public function getProductIds(string $taxonId, bool $onlineOnly = false): array
     {
         $node = $this->taxonTreeRepository->getTree()->find(fn (TaxonNode $node) => $node->getId() == $taxonId);
 
@@ -104,10 +116,10 @@ class VineTaxonFilterTreeComposer implements TaxonFilterTreeComposer
             throw new \InvalidArgumentException('Cannot retrieve product ids from taxon. No Taxon found by id ' . $taxonId);
         }
 
-        $productIds = $node->getProductIds();
+        $productIds = $onlineOnly ? $node->getOnlineProductIds() : $node->getProductIds();
 
-        $node->getChildNodes()->flatten()->each(function ($childNode) use (&$productIds) {
-            $productIds = array_merge($productIds, $childNode->getProductIds());
+        $node->getChildNodes()->flatten()->each(function ($childNode) use (&$productIds, $onlineOnly) {
+            $productIds = array_merge($productIds, ($onlineOnly ? $childNode->getOnlineProductIds() : $childNode->getProductIds()));
         });
 
         return array_values(array_unique($productIds));

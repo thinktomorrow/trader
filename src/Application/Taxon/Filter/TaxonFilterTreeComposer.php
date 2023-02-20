@@ -16,4 +16,6 @@ interface TaxonFilterTreeComposer
      * Get all product ids belonging to this taxon filter and all its children
      */
     public function getProductIds(string $taxonId): array;
+
+    public function getOnlineProductIds(string $taxonId): array;
 }

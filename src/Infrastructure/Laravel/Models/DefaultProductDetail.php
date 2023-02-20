@@ -127,4 +127,9 @@ class DefaultProductDetail implements ProductDetail
     {
         return $this->images;
     }
+
+    public static function stateSelect(): array
+    {
+        return [];
+    }
 }

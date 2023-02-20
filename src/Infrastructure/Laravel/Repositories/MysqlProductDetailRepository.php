@@ -10,7 +10,6 @@ use Thinktomorrow\Trader\Application\Product\ProductDetail\ProductDetailReposito
 use Thinktomorrow\Trader\Domain\Model\Product\Exceptions\CouldNotFindVariant;
 use Thinktomorrow\Trader\Domain\Model\Product\ProductState;
 use Thinktomorrow\Trader\Domain\Model\Product\Variant\VariantId;
-use Thinktomorrow\Trader\Infrastructure\Laravel\Models\DefaultProductDetail;
 
 class MysqlProductDetailRepository implements ProductDetailRepository
 {
@@ -25,7 +24,7 @@ class MysqlProductDetailRepository implements ProductDetailRepository
         $this->container = $container;
     }
 
-    public function findProductDetail(VariantId $variantId): DefaultProductDetail
+    public function findProductDetail(VariantId $variantId): ProductDetail
     {
         // Basic builder query
         $state = DB::table(static::$variantTable)
@@ -39,6 +38,7 @@ class MysqlProductDetailRepository implements ProductDetailRepository
                 static::$productTable . '.data AS product_data',
                 DB::raw('GROUP_CONCAT(taxon_id) AS taxon_ids'),
             ])
+            ->addSelect($this->container->get(ProductDetail::class)::stateSelect())
         ->first();
 
         if (! $state) {

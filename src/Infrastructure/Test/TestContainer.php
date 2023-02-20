@@ -27,4 +27,9 @@ final class TestContainer implements ContainerInterface
     {
         return isset(static::$entries[$id]);
     }
+
+    public static function make(string $id)
+    {
+        return (new static)->get($id);
+    }
 }

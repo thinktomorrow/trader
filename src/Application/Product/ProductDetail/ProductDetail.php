@@ -21,6 +21,7 @@ interface ProductDetail
     public function getSalePriceAsMoney(): Money;
     public function getUnitPriceAsPrice(): VariantUnitPrice;
     public function getSalePriceAsPrice(): VariantSalePrice;
+    public function getTaxRateAsString(): string;
     public function onSale(): bool;
     public function getSaleDiscount(): string;
 
@@ -33,4 +34,13 @@ interface ProductDetail
 
     public function setImages(iterable $images): void;
     public function getImages(): iterable;
+
+    /**
+     * This is used by the query builder to determine which values to return. This
+     * is only for custom data to return e.g. on the product table that is not
+     * included by default in the ProductDetail query result. Period. End.
+     *
+     * @return array
+     */
+    public static function stateSelect(): array;
 }

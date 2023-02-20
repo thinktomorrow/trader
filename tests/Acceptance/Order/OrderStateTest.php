@@ -17,6 +17,11 @@ final class OrderStateTest extends StateContext
         $this->assertOrderStateTransition('deleteOrder', OrderState::confirmed, OrderState::confirmed);
     }
 
+    public function test_it_can_confirm_order_as_business()
+    {
+        $this->assertCartStateTransition('confirmCartAsBusiness', OrderState::cart_completed, OrderState::confirmed_as_business);
+    }
+
     public function test_it_can_cancel_order()
     {
         $this->assertOrderStateTransition('cancelOrder', OrderState::confirmed, OrderState::cancelled);
@@ -41,6 +46,11 @@ final class OrderStateTest extends StateContext
     public function test_it_can_partially_pay_confirmed_order()
     {
         $this->assertOrderStateTransition('partiallyPayOrder', OrderState::confirmed, OrderState::partially_paid);
+    }
+
+    public function test_it_can_mark_order_as_paid()
+    {
+        $this->assertOrderStateTransition('markOrderPaidByMerchant', OrderState::cart_completed, OrderState::marked_paid_by_merchant);
     }
 
     public function test_it_can_pack_order()

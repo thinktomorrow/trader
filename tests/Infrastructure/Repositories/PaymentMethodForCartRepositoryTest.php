@@ -6,7 +6,7 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\Infrastructure\TestCase;
 use Thinktomorrow\Trader\Application\Cart\PaymentMethod\PaymentMethodForCart;
 use Thinktomorrow\Trader\Domain\Model\Country\CountryId;
-use Thinktomorrow\Trader\Infrastructure\Laravel\Models\DefaultPaymentMethodForCart;
+use Thinktomorrow\Trader\Infrastructure\Laravel\Models\PaymentMethod\DefaultPaymentMethodForCart;
 use Thinktomorrow\Trader\Infrastructure\Laravel\Repositories\MysqlCountryRepository;
 use Thinktomorrow\Trader\Infrastructure\Laravel\Repositories\MysqlPaymentMethodRepository;
 use Thinktomorrow\Trader\Infrastructure\Test\Repositories\InMemoryCountryRepository;

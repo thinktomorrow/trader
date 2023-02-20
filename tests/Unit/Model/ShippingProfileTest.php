@@ -10,6 +10,7 @@ use Thinktomorrow\Trader\Domain\Model\Country\CountryId;
 use Thinktomorrow\Trader\Domain\Model\ShippingProfile\ShippingProfile;
 use Thinktomorrow\Trader\Domain\Model\ShippingProfile\ShippingProfileId;
 use Thinktomorrow\Trader\Domain\Model\ShippingProfile\ShippingProfileState;
+use Thinktomorrow\Trader\Domain\Model\ShippingProfile\ShippingProviderId;
 use Thinktomorrow\Trader\Domain\Model\ShippingProfile\Tariff;
 use Thinktomorrow\Trader\Domain\Model\ShippingProfile\TariffId;
 
@@ -20,11 +21,13 @@ class ShippingProfileTest extends TestCase
     {
         $shippingProfile = ShippingProfile::create(
             $shippingProfileId = ShippingProfileId::fromString('yyy'),
+            $shippingProviderId = ShippingProviderId::fromString('postnl'),
             false,
         );
 
         $this->assertEquals([
             'shipping_profile_id' => $shippingProfileId->get(),
+            'provider_id' => $shippingProviderId->get(),
             'state' => ShippingProfileState::online->value,
             'requires_address' => false,
             'data' => "[]",
@@ -42,6 +45,7 @@ class ShippingProfileTest extends TestCase
         $shippingProfile = $this->createdShippingProfile();
 
         $this->assertEquals(ShippingProfileId::fromString('yyy'), $shippingProfile->shippingProfileId);
+        $this->assertEquals(ShippingProviderId::fromString('postnl'), $shippingProfile->getProvider());
         $this->assertEquals(ShippingProfileState::offline, $shippingProfile->getState());
         $this->assertTrue($shippingProfile->requiresAddress());
         $this->assertEquals('bar', $shippingProfile->getData('foo'));
@@ -55,6 +59,16 @@ class ShippingProfileTest extends TestCase
         ], $shippingProfile->getChildEntities()[Tariff::class][0]);
 
         $this->assertCount(2, $shippingProfile->getChildEntities()[CountryId::class]);
+    }
+
+    /** @test */
+    public function it_can_update_provider()
+    {
+        $shippingProfile = $this->createdShippingProfile();
+
+        $shippingProfile->updateProvider($updatedProviderId = ShippingProviderId::fromString('bpack'));
+
+        $this->assertEquals($updatedProviderId, $shippingProfile->getProvider());
     }
 
     /** @test */
@@ -141,6 +155,7 @@ class ShippingProfileTest extends TestCase
     {
         return ShippingProfile::fromMappedData([
             'shipping_profile_id' => 'yyy',
+            'provider_id' => 'postnl',
             'requires_address' => true,
             'state' => ShippingProfileState::offline->value,
             'data' => json_encode(['foo' => 'bar']),

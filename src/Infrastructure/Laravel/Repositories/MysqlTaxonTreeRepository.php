@@ -11,6 +11,7 @@ use Thinktomorrow\Trader\Application\Taxon\Tree\TaxonNodes;
 use Thinktomorrow\Trader\Application\Taxon\Tree\TaxonTree;
 use Thinktomorrow\Trader\Application\Taxon\Tree\TaxonTreeRepository;
 use Thinktomorrow\Trader\Domain\Common\Locale;
+use Thinktomorrow\Trader\Domain\Model\Product\ProductState;
 use Thinktomorrow\Trader\Domain\Model\Taxon\Exceptions\CouldNotFindTaxon;
 use Thinktomorrow\Trader\Infrastructure\Vine\TaxonSource;
 use Thinktomorrow\Trader\TraderConfig;
@@ -94,7 +95,13 @@ class MysqlTaxonTreeRepository implements TaxonTreeRepository, CategoryRepositor
 
         $results = DB::table(static::$taxonTable)
             ->leftJoin('trader_taxa_products', 'trader_taxa.taxon_id', 'trader_taxa_products.taxon_id')
-            ->select(static::$taxonTable . '.*', DB::raw('GROUP_CONCAT(product_id) AS product_ids'))
+            ->leftJoin('trader_products', function ($join) {
+                $join->on('trader_taxa_products.product_id', '=', 'trader_products.product_id')
+                    ->whereIn('trader_products.state', ProductState::onlineStates());
+            })
+            ->select(static::$taxonTable . '.*')
+            ->addSelect(DB::raw('GROUP_CONCAT(trader_taxa_products.product_id) AS product_ids'))
+            ->addSelect(DB::raw('GROUP_CONCAT(trader_products.product_id) AS online_product_ids'))
             ->groupBy(static::$taxonTable.'.taxon_id')
             ->orderBy(static::$taxonTable.'.order')
             ->get()

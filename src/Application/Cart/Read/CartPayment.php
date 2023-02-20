@@ -8,6 +8,7 @@ interface CartPayment
 
     public function getPaymentId(): string;
     public function getPaymentMethodId(): string;
+    public function getProviderId(): string;
     public function getCostPrice(): string;
     public function includeTax(bool $includeTax = true): void;
 

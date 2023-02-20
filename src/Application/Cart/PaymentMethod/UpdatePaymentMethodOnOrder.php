@@ -10,7 +10,6 @@ use Thinktomorrow\Trader\Domain\Model\Order\Payment\Payment;
 use Thinktomorrow\Trader\Domain\Model\Order\Payment\PaymentCost;
 use Thinktomorrow\Trader\Domain\Model\PaymentMethod\PaymentMethodId;
 use Thinktomorrow\Trader\Domain\Model\PaymentMethod\PaymentMethodRepository;
-use Thinktomorrow\Trader\Domain\Model\PaymentMethod\PaymentMethodState;
 use Thinktomorrow\Trader\TraderConfig;
 
 class UpdatePaymentMethodOnOrder
@@ -18,27 +17,21 @@ class UpdatePaymentMethodOnOrder
     private TraderConfig $config;
     private OrderRepository $orderRepository;
     private PaymentMethodRepository $paymentMethodRepository;
+    private VerifyPaymentMethodForCart $verifyPaymentMethodForCart;
 
-    public function __construct(TraderConfig $config, OrderRepository $orderRepository, PaymentMethodRepository $paymentMethodRepository)
+    public function __construct(TraderConfig $config, OrderRepository $orderRepository, VerifyPaymentMethodForCart $verifyPaymentMethodForCart, PaymentMethodRepository $paymentMethodRepository)
     {
         $this->config = $config;
         $this->orderRepository = $orderRepository;
         $this->paymentMethodRepository = $paymentMethodRepository;
+        $this->verifyPaymentMethodForCart = $verifyPaymentMethodForCart;
     }
 
     public function handle(Order $order, PaymentMethodId $paymentMethodId): void
     {
         $paymentMethod = $this->paymentMethodRepository->find($paymentMethodId);
 
-        if (! in_array($paymentMethod->getState(), PaymentMethodState::onlineStates())) {
-            $this->removePaymentMethodFromOrder($order);
-
-            return;
-        }
-
-        $billingCountryId = $order->getBillingAddress()?->getAddress()->countryId;
-
-        if ($billingCountryId && $paymentMethod->hasAnyCountries() && ! $paymentMethod->hasCountry($billingCountryId)) {
+        if (! $this->verifyPaymentMethodForCart->verify($order, $paymentMethod)) {
             $this->removePaymentMethodFromOrder($order);
 
             return;
@@ -54,7 +47,7 @@ class UpdatePaymentMethodOnOrder
             $existingPayment = $order->getPayments()[0];
             $existingPayment->updatePaymentMethod($paymentMethod->paymentMethodId);
             $existingPayment->updateCost($paymentCost);
-            $existingPayment->addData($paymentMethod->getData());
+            $existingPayment->addData(array_merge($paymentMethod->getData(), ['provider_id' => $paymentMethod->getProvider()->get()]));
 
             $order->updatePayment($existingPayment);
         } else {
@@ -65,7 +58,7 @@ class UpdatePaymentMethodOnOrder
                 $paymentCost
             );
 
-            $payment->addData($paymentMethod->getData());
+            $payment->addData(array_merge($paymentMethod->getData(), ['provider_id' => $paymentMethod->getProvider()->get()]));
 
             $order->addPayment($payment);
         }

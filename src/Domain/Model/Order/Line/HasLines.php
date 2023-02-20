@@ -30,6 +30,15 @@ trait HasLines
         );
     }
 
+    public function findLine(LineId $lineId): Line
+    {
+        if (null === ($lineIndexToBeUpdated = $this->findLineIndex($lineId))) {
+            throw new \DomainException('No line found by id ' . $lineId->get() . ' on order ' . $this->orderId->get());
+        }
+
+        return $this->lines[$lineIndexToBeUpdated];
+    }
+
     public function addOrUpdateLine(LineId $lineId, VariantId $productId, LinePrice $linePrice, Quantity $quantity, array $data): void
     {
         if (null !== $this->findLineIndex($lineId)) {
@@ -39,6 +48,11 @@ trait HasLines
         }
 
         $this->addLine($lineId, $productId, $linePrice, $quantity, $data);
+    }
+
+    public function recordLineUpdatedEvent(LineId $lineId): void
+    {
+        $this->recordEvent(new LineUpdated($this->orderId, $lineId));
     }
 
     private function addLine(LineId $lineId, VariantId $productId, LinePrice $linePrice, Quantity $quantity, array $data): void

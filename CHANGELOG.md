@@ -4,6 +4,11 @@ Important changes will be notified in this file
 
 ## unreleased
 
+- Added: Payment method logic for add multiple payment options in checkout.
+- Added: Payment Method crud application api.
+- Added: Two order transitions: mark_order_as_paid and confirm_as_business. The latter allows to process a business order without actual payment.
+- Added: AdjustLine adjuster to change line quantity, price,... per project based on the given order context.
+- Added: Payment and Shipping provider id domain value via a `getProviderId` method. This is used in the project to handle each profile/method with proper gateway/provider handling.
 - Added: state column to payment methods table. And removed unused 'active' columns. For existing projects, you can use the following migrations:
 ```php 
 Schema::table('trader_shipping_profiles', function (Blueprint $table) {
@@ -14,11 +19,21 @@ Schema::table('trader_payment_methods', function (Blueprint $table) {
     $table->dropColumn('active');
 });
 
+Schema::table('trader_shipping_profiles', function (Blueprint $table) {
+    $table->string('provider');
+});
+
+Schema::table('trader_payment_methods', function (Blueprint $table) {
+    $table->string('provider');
+});
+
 Schema::table('trader_payment_methods', function (Blueprint $table) {
     $table->string('state')->default(\Thinktomorrow\Trader\Domain\Model\PaymentMethod\PaymentMethodState::online->value);
     $table->boolean('active')->default(1);
 });
 ```
+- Added: TaxonFilterTreeComposer::getOnlineProductIds(string $taxonId); to collect product ids of online products.
+- Changed: TaxonFilterTreeComposer::getActiveFilters now returns filters that have online products
 
 ## 2022-12-20 - 0.5.7
 - Added: extra OrderState::cart_completed state which indicates that order has sufficient data for potential payment and fulfillment.

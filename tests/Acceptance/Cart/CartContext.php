@@ -17,6 +17,7 @@ use Thinktomorrow\Trader\Application\Cart\Line\ChangeLineQuantity;
 use Thinktomorrow\Trader\Application\Cart\Line\RemoveLine;
 use Thinktomorrow\Trader\Application\Cart\PaymentMethod\UpdatePaymentMethodOnOrder;
 use Thinktomorrow\Trader\Application\Cart\RefreshCart\Adjusters\AdjustDiscounts;
+use Thinktomorrow\Trader\Application\Cart\RefreshCart\Adjusters\AdjustLine;
 use Thinktomorrow\Trader\Application\Cart\RefreshCart\Adjusters\AdjustLines;
 use Thinktomorrow\Trader\Application\Cart\RefreshCart\Adjusters\AdjustShipping;
 use Thinktomorrow\Trader\Application\Cart\RefreshCart\RefreshCartAction;
@@ -51,6 +52,7 @@ use Thinktomorrow\Trader\Domain\Model\Order\State\OrderState;
 use Thinktomorrow\Trader\Domain\Model\Order\State\OrderStateMachine;
 use Thinktomorrow\Trader\Domain\Model\PaymentMethod\PaymentMethod;
 use Thinktomorrow\Trader\Domain\Model\PaymentMethod\PaymentMethodId;
+use Thinktomorrow\Trader\Domain\Model\PaymentMethod\PaymentMethodProviderId;
 use Thinktomorrow\Trader\Domain\Model\Product\Product;
 use Thinktomorrow\Trader\Domain\Model\Product\ProductId;
 use Thinktomorrow\Trader\Domain\Model\Product\Variant\Variant;
@@ -63,7 +65,9 @@ use Thinktomorrow\Trader\Domain\Model\Promo\DiscountFactory;
 use Thinktomorrow\Trader\Domain\Model\Promo\Discounts\FixedAmountDiscount;
 use Thinktomorrow\Trader\Domain\Model\ShippingProfile\ShippingProfile;
 use Thinktomorrow\Trader\Domain\Model\ShippingProfile\ShippingProfileId;
+use Thinktomorrow\Trader\Domain\Model\ShippingProfile\ShippingProviderId;
 use Thinktomorrow\Trader\Domain\Model\ShippingProfile\Tariff;
+use Thinktomorrow\Trader\Infrastructure\Laravel\Models\Cart\DefaultAdjustLine;
 use Thinktomorrow\Trader\Infrastructure\Test\EventDispatcherSpy;
 use Thinktomorrow\Trader\Infrastructure\Test\Repositories\InMemoryCartRepository;
 use Thinktomorrow\Trader\Infrastructure\Test\Repositories\InMemoryCustomerRepository;
@@ -120,12 +124,11 @@ abstract class CartContext extends TestCase
             ]))
         );
 
-        $this->orderRepository = new InMemoryOrderRepository();
-
         // Adjusters are loaded via container so set them up here
         (new TestContainer())->add(InvoiceRepository::class, $this->orderRepository);
         (new TestContainer())->add(ApplyPromoToOrder::class, new ApplyPromoToOrder($this->orderRepository));
-        (new TestContainer())->add(AdjustLines::class, new AdjustLines(new InMemoryVariantRepository()));
+        (new TestContainer())->add(AdjustLine::class, new DefaultAdjustLine());
+        (new TestContainer())->add(AdjustLines::class, new AdjustLines(new InMemoryVariantRepository(), TestContainer::make(AdjustLine::class)));
         (new TestContainer())->add(AdjustDiscounts::class, new AdjustDiscounts($this->promoRepository, (new TestContainer())->get(ApplyPromoToOrder::class)));
         (new TestContainer())->add(OrderStateMachine::class, new OrderStateMachine([
             ...OrderState::customerStates(), OrderState::confirmed,
@@ -134,18 +137,17 @@ abstract class CartContext extends TestCase
             'confirm' => OrderState::getDefaultTransitions()['confirm'],
         ]));
 
-        $this->paymentMethodRepository = new InMemoryPaymentMethodRepository();
-
         $this->cartApplication = new CartApplication(
             new TestTraderConfig(),
             new TestContainer(),
             $this->variantRepository = new InMemoryVariantRepository(),
+            TestContainer::make(AdjustLine::class),
             $this->orderRepository,
             (new TestContainer())->get(OrderStateMachine::class),
             new RefreshCartAction(),
             $this->shippingProfileRepository = new InMemoryShippingProfileRepository(),
             $this->updateShippingProfileOnOrder = new UpdateShippingProfileOnOrder(new TestTraderConfig(), $this->orderRepository, $this->shippingProfileRepository),
-            $this->updatePaymentMethodOnOrder = new UpdatePaymentMethodOnOrder(new TestTraderConfig(), $this->orderRepository, $this->paymentMethodRepository),
+            $this->updatePaymentMethodOnOrder = (new TestContainer())->get(UpdatePaymentMethodOnOrder::class),
             $this->customerRepository = new InMemoryCustomerRepository(),
             $this->eventDispatcher = new EventDispatcherSpy(),
         );
@@ -239,7 +241,11 @@ abstract class CartContext extends TestCase
 
     public function givenShippingCostsForAPurchaseOfEur($shippingCost, $from, $to, array $countries = ['BE'], string $shippingProfileId = 'bpost_home', bool $requiredAddress = true)
     {
-        $shippingProfile = ShippingProfile::create(ShippingProfileId::fromString($shippingProfileId), $requiredAddress);
+        $shippingProfile = ShippingProfile::create(
+            ShippingProfileId::fromString($shippingProfileId),
+            ShippingProviderId::fromString('postnl'),
+            $requiredAddress
+        );
         $shippingProfile->addData(['title' => ['nl' => Str::headline($shippingProfileId)]]);
 
         foreach ($countries as $country) {
@@ -261,7 +267,11 @@ abstract class CartContext extends TestCase
 
     public function givenPaymentMethod($paymentRate, string $paymentMethodId = 'visa')
     {
-        $paymentMethod = PaymentMethod::create(PaymentMethodId::fromString($paymentMethodId), Cash::make($paymentRate * 100));
+        $paymentMethod = PaymentMethod::create(
+            PaymentMethodId::fromString($paymentMethodId),
+            PaymentMethodProviderId::fromString('mollie'),
+            Cash::make($paymentRate * 100)
+        );
         $paymentMethod->addData(['title' => ['nl' => Str::headline($paymentMethodId)]]);
 
         $this->paymentMethodRepository->save($paymentMethod);
@@ -457,7 +467,7 @@ abstract class CartContext extends TestCase
             $shippingProfileId
         ));
 
-        if(count($this->getOrder()->getShippings())) {
+        if (count($this->getOrder()->getShippings())) {
             $this->assertEquals($shippingProfileId, $this->getOrder()->getShippings()[0]->getShippingProfileId()->get());
         }
     }
@@ -469,7 +479,7 @@ abstract class CartContext extends TestCase
             $paymentMethodId
         ));
 
-        if(count($this->getOrder()->getPayments())) {
+        if (count($this->getOrder()->getPayments())) {
             $this->assertEquals($paymentMethodId, $this->getOrder()->getPayments()[0]->getPaymentMethodId()->get());
         }
     }

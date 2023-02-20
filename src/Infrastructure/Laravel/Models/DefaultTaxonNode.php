@@ -23,16 +23,18 @@ class DefaultTaxonNode extends DefaultNode implements TaxonNode
     public readonly int $order; // Make publicly available for sorting via vine
     protected array $data;
     protected array $product_ids;
+    protected array $online_product_ids;
     protected ?string $parentId;
     protected iterable $images;
 
-    private function __construct(string $id, TaxonState $taxonState, int $order, array $data, array $product_ids, array $keys, ?string $parentId = null)
+    private function __construct(string $id, TaxonState $taxonState, int $order, array $data, array $product_ids, array $online_product_ids, array $keys, ?string $parentId = null)
     {
         $this->id = $id;
         $this->taxonState = $taxonState;
         $this->order = $order;
         $this->data = $data;
         $this->product_ids = $product_ids;
+        $this->online_product_ids = $online_product_ids;
         $this->keys = $keys;
         $this->parentId = $parentId;
 
@@ -52,6 +54,7 @@ class DefaultTaxonNode extends DefaultNode implements TaxonNode
             $state['order'],
             $state['data'] ? json_decode($state['data'], true) : [],
             $state['product_ids'] ? explode(',', $state['product_ids']) : [],
+            $state['online_product_ids'] ? explode(',', $state['online_product_ids']) : [],
             json_decode($state['keys'], true),
             $state['parent_id'],
         );
@@ -111,6 +114,11 @@ class DefaultTaxonNode extends DefaultNode implements TaxonNode
     public function getProductIds(): array
     {
         return $this->product_ids;
+    }
+
+    public function getOnlineProductIds(): array
+    {
+        return $this->online_product_ids;
     }
 
     public function getUrl(?string $locale = null): string

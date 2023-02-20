@@ -140,10 +140,10 @@ return new class extends Migration {
 
         Schema::create(static::PREFIX.'shipping_profiles', function (Blueprint $table) {
             $table->char('shipping_profile_id', 36)->primary();
+            $table->string('provider_id');
             $table->boolean('requires_address')->default(1);
             $table->json('data')->nullable();
             $table->string('state')->default(\Thinktomorrow\Trader\Domain\Model\ShippingProfile\ShippingProfileState::online->value);
-            $table->boolean('active')->default(1);
             $table->unsignedInteger('order_column')->default(0);
         });
 
@@ -169,11 +169,11 @@ return new class extends Migration {
 
         Schema::create(static::PREFIX.'payment_methods', function (Blueprint $table) {
             $table->char('payment_method_id', 36)->primary();
+            $table->string('provider_id');
 
             $table->integer('rate')->unsigned();
             $table->json('data')->nullable();
             $table->string('state')->default(\Thinktomorrow\Trader\Domain\Model\PaymentMethod\PaymentMethodState::online->value);
-            $table->boolean('active')->default(1);
             $table->unsignedInteger('order_column')->default(0);
         });
 

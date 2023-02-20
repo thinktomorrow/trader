@@ -5,6 +5,9 @@ namespace Thinktomorrow\Trader\Infrastructure\Laravel;
 
 use Illuminate\Support\Arr;
 use Illuminate\Support\ServiceProvider;
+use Thinktomorrow\Trader\Application\Cart\PaymentMethod\PaymentMethodForCart;
+use Thinktomorrow\Trader\Application\Cart\PaymentMethod\PaymentMethodForCartRepository;
+use Thinktomorrow\Trader\Application\Cart\PaymentMethod\VerifyPaymentMethodForCart;
 use Thinktomorrow\Trader\Application\Cart\Read\Cart;
 use Thinktomorrow\Trader\Application\Cart\Read\CartBillingAddress;
 use Thinktomorrow\Trader\Application\Cart\Read\CartDiscount;
@@ -15,6 +18,7 @@ use Thinktomorrow\Trader\Application\Cart\Read\CartRepository;
 use Thinktomorrow\Trader\Application\Cart\Read\CartShipping;
 use Thinktomorrow\Trader\Application\Cart\Read\CartShippingAddress;
 use Thinktomorrow\Trader\Application\Cart\Read\CartShopper;
+use Thinktomorrow\Trader\Application\Cart\RefreshCart\Adjusters\AdjustLine;
 use Thinktomorrow\Trader\Application\Cart\ShippingProfile\ShippingProfileForCart;
 use Thinktomorrow\Trader\Application\Cart\ShippingProfile\ShippingProfileForCartRepository;
 use Thinktomorrow\Trader\Application\Cart\VariantForCart\VariantForCart;
@@ -87,6 +91,7 @@ use Thinktomorrow\Trader\Domain\Model\Promo\Discounts\PercentageOffDiscount;
 use Thinktomorrow\Trader\Domain\Model\Promo\PromoRepository;
 use Thinktomorrow\Trader\Domain\Model\ShippingProfile\ShippingProfileRepository;
 use Thinktomorrow\Trader\Domain\Model\Taxon\TaxonRepository;
+use Thinktomorrow\Trader\Infrastructure\Laravel\Models\Cart\DefaultAdjustLine;
 use Thinktomorrow\Trader\Infrastructure\Laravel\Models\Cart\DefaultCart;
 use Thinktomorrow\Trader\Infrastructure\Laravel\Models\Cart\DefaultCartBillingAddress;
 use Thinktomorrow\Trader\Infrastructure\Laravel\Models\Cart\DefaultCartDiscount;
@@ -117,6 +122,8 @@ use Thinktomorrow\Trader\Infrastructure\Laravel\Models\MerchantOrder\DefaultMerc
 use Thinktomorrow\Trader\Infrastructure\Laravel\Models\MerchantOrder\DefaultMerchantOrderShipping;
 use Thinktomorrow\Trader\Infrastructure\Laravel\Models\MerchantOrder\DefaultMerchantOrderShippingAddress;
 use Thinktomorrow\Trader\Infrastructure\Laravel\Models\MerchantOrder\DefaultMerchantOrderShopper;
+use Thinktomorrow\Trader\Infrastructure\Laravel\Models\PaymentMethod\DefaultPaymentMethodForCart;
+use Thinktomorrow\Trader\Infrastructure\Laravel\Models\PaymentMethod\DefaultVerifyPaymentMethodForCart;
 use Thinktomorrow\Trader\Infrastructure\Laravel\Repositories\MysqlCartRepository;
 use Thinktomorrow\Trader\Infrastructure\Laravel\Repositories\MysqlCheckProductOptionsRepository;
 use Thinktomorrow\Trader\Infrastructure\Laravel\Repositories\MysqlCountryRepository;
@@ -169,6 +176,7 @@ class TraderServiceProvider extends ServiceProvider
         $this->app->bind(CountryRepository::class, MysqlCountryRepository::class);
         $this->app->bind(CartRepository::class, MysqlCartRepository::class);
         $this->app->bind(ShippingProfileForCartRepository::class, MysqlShippingProfileRepository::class);
+        $this->app->bind(PaymentMethodForCartRepository::class, MysqlPaymentMethodRepository::class);
         $this->app->bind(PromoRepository::class, MysqlPromoRepository::class);
         $this->app->bind(OrderPromoRepository::class, MysqlPromoRepository::class);
         $this->app->bind(OrderRepository::class, MysqlOrderRepository::class);
@@ -202,6 +210,9 @@ class TraderServiceProvider extends ServiceProvider
         $this->app->bind(CartPayment::class, fn () => DefaultCartPayment::class);
         $this->app->bind(CartShipping::class, fn () => DefaultCartShipping::class);
         $this->app->bind(ShippingProfileForCart::class, fn () => DefaultShippingProfileForCart::class);
+        $this->app->bind(PaymentMethodForCart::class, fn () => DefaultPaymentMethodForCart::class);
+        $this->app->bind(VerifyPaymentMethodForCart::class, DefaultVerifyPaymentMethodForCart::class);
+        $this->app->bind(AdjustLine::class, DefaultAdjustLine::class);
 
         // MerchantOrder models
         $this->app->bind(MerchantOrder::class, fn () => DefaultMerchantOrder::class);

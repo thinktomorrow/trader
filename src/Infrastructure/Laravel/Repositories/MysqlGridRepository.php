@@ -49,7 +49,7 @@ class MysqlGridRepository implements GridRepository
             ->whereIn(static::$variantTable . '.state', VariantState::availableStates())
 
             ->leftJoin(static::$taxonPivotTable, static::$variantTable.'.product_id', '=', static::$taxonPivotTable.'.product_id')
-            ->groupBy(static::$variantTable.'.variant_id')
+            ->groupBy(static::$variantTable.'.variant_id', 'product_data', 'product_order_column')
             ->select([
                 static::$variantTable . '.*',
                 static::$productTable . '.data AS product_data',
@@ -91,6 +91,10 @@ class MysqlGridRepository implements GridRepository
 
     public function filterByProductIds(array $product_ids): static
     {
+        if (empty($product_ids)) {
+            return $this;
+        }
+
         $this->builder->whereIn(static::$productTable.'.product_id', $product_ids);
 
         return $this;

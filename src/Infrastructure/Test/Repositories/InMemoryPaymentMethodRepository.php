@@ -10,7 +10,7 @@ use Thinktomorrow\Trader\Domain\Model\PaymentMethod\PaymentMethod;
 use Thinktomorrow\Trader\Domain\Model\PaymentMethod\PaymentMethodId;
 use Thinktomorrow\Trader\Domain\Model\PaymentMethod\PaymentMethodRepository;
 use Thinktomorrow\Trader\Domain\Model\PaymentMethod\PaymentMethodState;
-use Thinktomorrow\Trader\Infrastructure\Laravel\Models\DefaultPaymentMethodForCart;
+use Thinktomorrow\Trader\Infrastructure\Laravel\Models\PaymentMethod\DefaultPaymentMethodForCart;
 
 class InMemoryPaymentMethodRepository implements PaymentMethodRepository, PaymentMethodForCartRepository
 {

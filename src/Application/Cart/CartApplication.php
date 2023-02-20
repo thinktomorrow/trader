@@ -10,6 +10,7 @@ use Thinktomorrow\Trader\Application\Cart\Line\ChangeLineQuantity;
 use Thinktomorrow\Trader\Application\Cart\Line\RemoveLine;
 use Thinktomorrow\Trader\Application\Cart\PaymentMethod\UpdatePaymentMethodOnOrder;
 use Thinktomorrow\Trader\Application\Cart\RefreshCart\Adjusters\AdjustDiscounts;
+use Thinktomorrow\Trader\Application\Cart\RefreshCart\Adjusters\AdjustLine;
 use Thinktomorrow\Trader\Application\Cart\RefreshCart\Adjusters\AdjustLines;
 use Thinktomorrow\Trader\Application\Cart\RefreshCart\Adjusters\AdjustShipping;
 use Thinktomorrow\Trader\Application\Cart\RefreshCart\RefreshCart;
@@ -34,6 +35,7 @@ use Thinktomorrow\Trader\TraderConfig;
 final class CartApplication
 {
     private VariantForCartRepository $findVariantDetailsForCart;
+    private AdjustLine $adjustLine;
     private OrderRepository $orderRepository;
     private ShippingProfileRepository $shippingProfileRepository;
     private EventDispatcher $eventDispatcher;
@@ -46,19 +48,21 @@ final class CartApplication
     private OrderStateMachine $orderStateMachine;
 
     public function __construct(
-        TraderConfig              $config,
-        ContainerInterface $container,
-        VariantForCartRepository  $findVariantDetailsForCart,
-        OrderRepository           $orderRepository,
-        OrderStateMachine $orderStateMachine,
-        RefreshCartAction         $refreshCartAction,
-        ShippingProfileRepository $shippingProfileRepository,
+        TraderConfig                 $config,
+        ContainerInterface           $container,
+        VariantForCartRepository     $findVariantDetailsForCart,
+        AdjustLine                   $adjustLine,
+        OrderRepository              $orderRepository,
+        OrderStateMachine            $orderStateMachine,
+        RefreshCartAction            $refreshCartAction,
+        ShippingProfileRepository    $shippingProfileRepository,
         UpdateShippingProfileOnOrder $updateShippingProfileOnOrder,
-        UpdatePaymentMethodOnOrder $updatePaymentMethodOnOrder,
-        CustomerRepository        $customerRepository,
-        EventDispatcher           $eventDispatcher
+        UpdatePaymentMethodOnOrder   $updatePaymentMethodOnOrder,
+        CustomerRepository           $customerRepository,
+        EventDispatcher              $eventDispatcher
     ) {
         $this->findVariantDetailsForCart = $findVariantDetailsForCart;
+        $this->adjustLine = $adjustLine;
         $this->orderRepository = $orderRepository;
         $this->shippingProfileRepository = $shippingProfileRepository;
         $this->eventDispatcher = $eventDispatcher;
@@ -126,6 +130,8 @@ final class CartApplication
             ])
         );
 
+        $this->adjustLine->adjust($order, $order->findLine($lineId));
+
         $linePersonalisations = [];
 
         foreach ($addLine->getPersonalisations() as $personalisation_id => $personalisation_value) {
@@ -138,7 +144,7 @@ final class CartApplication
             }
 
             if (! $originalPersonalisation) {
-                throw new \InvalidArgumentException('No personalisation found for variant ['.$addLine->getVariantId()->get().'] by personalisation id [' . $personalisation_id.'].');
+                throw new \InvalidArgumentException('No personalisation found for variant [' . $addLine->getVariantId()->get() . '] by personalisation id [' . $personalisation_id . '].');
             }
 
             $linePersonalisations[] = LinePersonalisation::create(
@@ -168,6 +174,8 @@ final class CartApplication
             $changeLineQuantity->getLineId(),
             $changeLineQuantity->getQuantity()
         );
+
+        $this->adjustLine->adjust($order, $order->findLine($changeLineQuantity->getLineId()));
 
         $this->orderRepository->save($order);
 
@@ -361,6 +369,17 @@ final class CartApplication
 
         // TODO: make sure event is recorded!!!
         $this->orderStateMachine->apply($order, 'confirm');
+
+        $this->orderRepository->save($order);
+
+        $this->eventDispatcher->dispatchAll($order->releaseEvents());
+    }
+
+    public function confirmCartAsBusiness(ConfirmCartAsBusiness $command): void
+    {
+        $order = $this->orderRepository->findForCart($command->getOrderId());
+
+        $this->orderStateMachine->apply($order, 'confirm_as_business');
 
         $this->orderRepository->save($order);
 

@@ -35,6 +35,7 @@ use Thinktomorrow\Trader\Domain\Model\Order\Shipping\ShippingState;
 use Thinktomorrow\Trader\Domain\Model\Order\Shopper;
 use Thinktomorrow\Trader\Domain\Model\Order\State\OrderState;
 use Thinktomorrow\Trader\Domain\Model\PaymentMethod\PaymentMethod;
+use Thinktomorrow\Trader\Domain\Model\PaymentMethod\PaymentMethodProviderId;
 use Thinktomorrow\Trader\Domain\Model\PaymentMethod\PaymentMethodState;
 use Thinktomorrow\Trader\Domain\Model\Product\Option\Option;
 use Thinktomorrow\Trader\Domain\Model\Product\Option\OptionId;
@@ -298,6 +299,7 @@ trait TestHelpers
     {
         return PaymentMethod::fromMappedData(array_merge([
             'payment_method_id' => 'mmm',
+            'provider_id' => PaymentMethodProviderId::fromString('mollie')->get(),
             'state' => PaymentMethodState::online->value,
             'rate' => '123',
             'data' => json_encode([]),
@@ -310,6 +312,7 @@ trait TestHelpers
     {
         return ShippingProfile::fromMappedData(array_merge([
             'shipping_profile_id' => 'ppp',
+            'provider_id' => 'postnl',
             'state' => ShippingProfileState::online->value,
             'requires_address' => true,
             'data' => json_encode([]),
