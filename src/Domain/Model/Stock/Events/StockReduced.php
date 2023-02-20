@@ -10,5 +10,6 @@ class StockReduced
         public readonly StockItemId $stockItemId,
         public readonly int $formerStockLevel,
         public readonly int $newStockLevel
-    ) {}
+    ) {
+    }
 }

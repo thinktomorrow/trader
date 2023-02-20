@@ -29,18 +29,18 @@ class StockItem implements Aggregate
     private function recordStockChange(int $formerStockLevel, int $newStockLevel): void
     {
         $eventPayload = [
-            $this->stockItemId, $formerStockLevel, $newStockLevel
+            $this->stockItemId, $formerStockLevel, $newStockLevel,
         ];
 
-        if($formerStockLevel < $this->stockLevel) {
+        if ($formerStockLevel < $this->stockLevel) {
             $this->recordEvent(new StockAdded(...$eventPayload));
         }
 
-        if($formerStockLevel > $this->stockLevel) {
+        if ($formerStockLevel > $this->stockLevel) {
             $this->recordEvent(new StockReduced(...$eventPayload));
         }
 
-        if($this->stockLevel <= 0) {
+        if ($this->stockLevel <= 0) {
             $this->recordEvent(new StockDepleted(...$eventPayload));
         }
     }
