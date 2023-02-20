@@ -22,7 +22,6 @@ class StockItemRepositoryTest extends TestCase
     public function it_can_find_and_save_a_stock_item(StockItem $stockItem)
     {
         foreach ($this->repositories() as $repository) {
-
             // Save variant
             $repository->save($this->createProductWithVariant()->getVariants()[0]);
 
@@ -32,12 +31,12 @@ class StockItemRepositoryTest extends TestCase
         }
     }
 
-    public function test_it_halts_when_stockItem_is_not_found()
+    public function test_it_halts_when_stock_item_is_not_found()
     {
         $flag = 0;
 
         foreach ($this->repositories() as $i => $repository) {
-            try{
+            try {
                 $repository->findStockItem(StockItemId::fromString('unknown'));
             } catch(CouldNotFindStockItem $e) {
                 $flag++;
