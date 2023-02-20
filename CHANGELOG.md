@@ -4,6 +4,7 @@ Important changes will be notified in this file
 
 ## unreleased
 
+- Added: stock logic
 - Added: Payment method logic for add multiple payment options in checkout.
 - Added: Payment Method crud application api.
 - Added: Two order transitions: mark_order_as_paid and confirm_as_business. The latter allows to process a business order without actual payment.
