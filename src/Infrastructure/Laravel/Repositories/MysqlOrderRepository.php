@@ -313,6 +313,7 @@ class MysqlOrderRepository implements OrderRepository, InvoiceRepository
             ->map(fn ($item) => (array)$item)
             ->map(fn ($item) => array_merge($item, [
                 'includes_vat' => (bool)$item['includes_vat'],
+                'reduced_from_stock' => (bool)$item['reduced_from_stock'],
                 Discount::class => $allDiscountStates->filter(fn ($discountState) => $discountState['discountable_type'] == DiscountableType::line->value && $discountState['discountable_id'] == $item['line_id'])->values()->toArray(),
                 LinePersonalisation::class => $allPersonalisationStates->filter(fn ($personalisationState) => $personalisationState['line_id'] == $item['line_id'])->values()->toArray(),
             ]))

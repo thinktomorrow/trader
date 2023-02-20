@@ -137,6 +137,7 @@ trait TestHelpers
             'line_price' => 200,
             'tax_rate' => '10',
             'includes_vat' => true,
+            'reduced_from_stock' => false,
             'quantity' => 2,
             'data' => json_encode(['product_id' => 'xxx', 'unit_price_including_vat' => '1000', 'unit_price_excluding_vat' => '900', 'foo' => 'bar', 'variant_id' => 'yyy']),
         ], $values), array_merge([

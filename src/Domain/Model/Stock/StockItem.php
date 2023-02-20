@@ -82,7 +82,7 @@ class StockItem implements Aggregate
         $stockItem->stockItemId = StockItemId::fromString($state['stockitem_id']);
         $stockItem->stockLevel = (int) $state['stock_level'];
         $stockItem->ignoreOutOfStock = (bool) $state['ignore_out_of_stock'];
-        $stockItem->data = json_decode($state['stock_data'], true);
+        $stockItem->data = $state['stock_data'] ? json_decode($state['stock_data'], true) : [];
 
         return $stockItem;
     }

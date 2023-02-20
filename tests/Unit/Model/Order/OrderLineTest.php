@@ -111,6 +111,18 @@ class OrderLineTest extends TestCase
         $this->assertEquals($quantity, $line->getQuantity());
     }
 
+    public function test_it_can_mark_as_reduced_from_stock()
+    {
+        $order = $this->createDefaultOrder();
+        $line = $order->getLines()[0];
+
+        $this->assertFalse($line->reducedFromStock());
+
+        $line->reduceFromStock();
+
+        $this->assertTrue($line->reducedFromStock());
+    }
+
     public function test_it_can_update_line_price()
     {
         $order = $this->createDefaultOrder();

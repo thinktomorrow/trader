@@ -259,6 +259,7 @@ return new class extends Migration {
             $table->integer('discount_total')->unsigned();
             $table->integer('tax_total')->unsigned();
             $table->smallInteger('quantity')->unsigned();
+            $table->boolean('reduced_from_stock')->default(0);
             $table->integer('line_price')->unsigned();
             $table->string('tax_rate');
             $table->boolean('includes_vat');

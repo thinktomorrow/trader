@@ -90,6 +90,7 @@ use Thinktomorrow\Trader\Domain\Model\Promo\Discounts\FixedAmountDiscount;
 use Thinktomorrow\Trader\Domain\Model\Promo\Discounts\PercentageOffDiscount;
 use Thinktomorrow\Trader\Domain\Model\Promo\PromoRepository;
 use Thinktomorrow\Trader\Domain\Model\ShippingProfile\ShippingProfileRepository;
+use Thinktomorrow\Trader\Domain\Model\Stock\StockItemRepository;
 use Thinktomorrow\Trader\Domain\Model\Taxon\TaxonRepository;
 use Thinktomorrow\Trader\Infrastructure\Laravel\Models\Cart\DefaultAdjustLine;
 use Thinktomorrow\Trader\Infrastructure\Laravel\Models\Cart\DefaultCart;
@@ -161,6 +162,7 @@ class TraderServiceProvider extends ServiceProvider
         $this->app->bind(ProductDetailRepository::class, MysqlProductDetailRepository::class);
         $this->app->bind(VariantRepository::class, MysqlVariantRepository::class);
         $this->app->bind(VariantForCartRepository::class, MysqlVariantRepository::class);
+        $this->app->bind(StockItemRepository::class, MysqlVariantRepository::class);
         $this->app->bind(CheckProductOptionsRepository::class, MysqlCheckProductOptionsRepository::class);
         $this->app->bind(TaxonRepository::class, MysqlTaxonRepository::class);
         $this->app->bind(TaxonTreeRepository::class, MysqlTaxonTreeRepository::class);

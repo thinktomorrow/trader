@@ -23,6 +23,7 @@ final class Line implements ChildAggregate, Discountable
     use HasData;
     use HasDiscounts;
     use HasPersonalisations;
+    use ReducesStock;
 
     public readonly OrderId $orderId;
     public readonly LineId $lineId;
@@ -114,6 +115,7 @@ final class Line implements ChildAggregate, Discountable
                 ? $this->getDiscountTotal()->getIncludingVat()->getAmount()
                 : $this->getDiscountTotal()->getExcludingVat()->getAmount(),
             'quantity' => $this->quantity->asInt(),
+            'reduced_from_stock' => $this->reducedFromStock,
             'data' => json_encode($data),
         ];
     }
@@ -135,6 +137,7 @@ final class Line implements ChildAggregate, Discountable
         $line->variantId = $state['variant_id'] ? VariantId::fromString($state['variant_id']) : null;
         $line->linePrice = LinePrice::fromScalars($state['line_price'], $state['tax_rate'], $state['includes_vat']);
         $line->quantity = Quantity::fromInt($state['quantity']);
+        $line->reducedFromStock = $state['reduced_from_stock'];
         $line->discounts = array_map(fn ($discountState) => Discount::fromMappedData($discountState, $state), $childEntities[Discount::class]);
         $line->personalisations = array_map(fn ($personalisationState) => LinePersonalisation::fromMappedData($personalisationState, $state), $childEntities[LinePersonalisation::class]);
         $line->data = json_decode($state['data'], true);
