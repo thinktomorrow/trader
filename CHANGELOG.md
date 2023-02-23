@@ -35,6 +35,7 @@ Schema::table('trader_payment_methods', function (Blueprint $table) {
 ```
 - Added: TaxonFilterTreeComposer::getOnlineProductIds(string $taxonId); to collect product ids of online products.
 - Changed: TaxonFilterTreeComposer::getActiveFilters now returns filters that have online products
+- Changed: LineAdded property productId renamed to variantId. This was actually already the value of the variant id.
 
 ## 2022-12-20 - 0.5.7
 - Added: extra OrderState::cart_completed state which indicates that order has sufficient data for potential payment and fulfillment.

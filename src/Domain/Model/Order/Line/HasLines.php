@@ -55,11 +55,11 @@ trait HasLines
         $this->recordEvent(new LineUpdated($this->orderId, $lineId));
     }
 
-    private function addLine(LineId $lineId, VariantId $productId, LinePrice $linePrice, Quantity $quantity, array $data): void
+    private function addLine(LineId $lineId, VariantId $variantId, LinePrice $linePrice, Quantity $quantity, array $data): void
     {
-        $this->lines[] = Line::create($this->orderId, $lineId, $productId, $linePrice, $quantity, $data);
+        $this->lines[] = Line::create($this->orderId, $lineId, $variantId, $linePrice, $quantity, $data);
 
-        $this->recordEvent(new LineAdded($this->orderId, $lineId, $productId));
+        $this->recordEvent(new LineAdded($this->orderId, $lineId, $variantId));
     }
 
     private function updateLine(LineId $lineId, LinePrice $linePrice, Quantity $quantity, $data): void

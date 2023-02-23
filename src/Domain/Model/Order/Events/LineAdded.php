@@ -9,7 +9,7 @@ use Thinktomorrow\Trader\Domain\Model\Product\Variant\VariantId;
 
 final class LineAdded
 {
-    public function __construct(public readonly OrderId $orderId, public readonly LineId $lineId, public readonly VariantId $productId)
+    public function __construct(public readonly OrderId $orderId, public readonly LineId $lineId, public readonly VariantId $variantId)
     {
     }
 }
