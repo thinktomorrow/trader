@@ -7,7 +7,9 @@ use Tests\Infrastructure\TestCase;
 use Thinktomorrow\Trader\Domain\Model\Stock\Exceptions\CouldNotFindStockItem;
 use Thinktomorrow\Trader\Domain\Model\Stock\StockItem;
 use Thinktomorrow\Trader\Domain\Model\Stock\StockItemId;
+use Thinktomorrow\Trader\Infrastructure\Laravel\Repositories\MysqlProductRepository;
 use Thinktomorrow\Trader\Infrastructure\Laravel\Repositories\MysqlVariantRepository;
+use Thinktomorrow\Trader\Infrastructure\Test\Repositories\InMemoryProductRepository;
 use Thinktomorrow\Trader\Infrastructure\Test\Repositories\InMemoryVariantRepository;
 use Thinktomorrow\Trader\Infrastructure\Test\TestContainer;
 
@@ -21,9 +23,10 @@ class StockItemRepositoryTest extends TestCase
      */
     public function it_can_find_and_save_a_stock_item(StockItem $stockItem)
     {
-        foreach ($this->repositories() as $repository) {
-            // Save variant
-            $repository->save($this->createProductWithVariant()->getVariants()[0]);
+        foreach ($this->repositories() as $i => $repository) {
+
+            $product = $this->createProductWithVariant();
+            iterator_to_array($this->productRepositories())[$i]->save($product);
 
             $repository->saveStockItem($stockItem);
 
@@ -50,6 +53,12 @@ class StockItemRepositoryTest extends TestCase
     {
         yield new InMemoryVariantRepository();
         yield new MysqlVariantRepository(new TestContainer());
+    }
+
+    private function productRepositories(): \Generator
+    {
+        yield new InMemoryProductRepository();
+        yield new MysqlProductRepository(new MysqlVariantRepository(new TestContainer()));
     }
 
     public function items(): \Generator
