@@ -85,6 +85,7 @@ final class MysqlCartRepository implements CartRepository
 
         $shippings = array_map(fn (Shipping $shipping) => $this->container->get(CartShipping::class)::fromMappedData(
             array_merge($shipping->getMappedData(), [
+                'shipping_state' => $shipping->getShippingState(),
                 'cost' => $shipping->getShippingCost(),
             ]),
             $orderState,
@@ -96,6 +97,7 @@ final class MysqlCartRepository implements CartRepository
 
         $payments = array_map(fn (Payment $payment) => $this->container->get(CartPayment::class)::fromMappedData(
             array_merge($payment->getMappedData(), [
+                'payment_state' => $payment->getPaymentState(),
                 'cost' => $payment->getPaymentCost(),
             ]),
             $orderState,
@@ -131,7 +133,7 @@ final class MysqlCartRepository implements CartRepository
     {
         return DB::table(static::$orderTable)
             ->where('order_id', $orderId->get())
-            ->whereIn('order_state', array_map(fn (OrderState $state) => $state->value, OrderState::customerStates()))
+            ->whereIn('order_state', array_map(fn (OrderState $state) => $state->value, $this->container->get(OrderState::class)::customerStates()))
             ->exists();
     }
 }

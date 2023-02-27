@@ -12,9 +12,9 @@ use Thinktomorrow\Trader\Application\Order\MerchantOrder\MerchantOrderShopper;
 use Thinktomorrow\Trader\Domain\Common\Taxes\TaxRate;
 use Thinktomorrow\Trader\Domain\Model\Order\Line\LinePrice;
 use Thinktomorrow\Trader\Domain\Model\Order\OrderId;
-use Thinktomorrow\Trader\Domain\Model\Order\Payment\PaymentState;
-use Thinktomorrow\Trader\Domain\Model\Order\Shipping\ShippingState;
-use Thinktomorrow\Trader\Domain\Model\Order\State\OrderState;
+use Thinktomorrow\Trader\Domain\Model\Order\Payment\DefaultPaymentState;
+use Thinktomorrow\Trader\Domain\Model\Order\Shipping\DefaultShippingState;
+use Thinktomorrow\Trader\Domain\Model\Order\State\DefaultOrderState;
 use Thinktomorrow\Trader\Domain\Model\Product\Personalisation\PersonalisationType;
 use Thinktomorrow\Trader\Domain\Model\Product\Variant\VariantUnitPrice;
 
@@ -48,7 +48,7 @@ class MerchantOrderTest extends CartContext
         $this->assertEquals(Money::EUR(167), $merchantOrder->getTaxPriceAsMoney());
 
 
-        $this->assertEquals(OrderState::cart_pending->value, $merchantOrder->getState());
+        $this->assertEquals(DefaultOrderState::cart_pending->value, $merchantOrder->getState());
         $this->assertEquals(1, $merchantOrder->getSize());
         $this->assertEquals(2, $merchantOrder->getQuantity());
     }
@@ -167,7 +167,7 @@ class MerchantOrderTest extends CartContext
         $this->assertEquals('shipping-123', $merchantOrder->getShippings()[0]->getShippingId());
         $this->assertEquals('bpost_home', $merchantOrder->getShippings()[0]->getShippingProfileId());
         $this->assertEquals('€ 30', $merchantOrder->getShippings()[0]->getCostPrice());
-        $this->assertEquals(ShippingState::none->value, $merchantOrder->getShippings()[0]->getShippingState());
+        $this->assertEquals(DefaultShippingState::none->value, $merchantOrder->getShippings()[0]->getShippingState());
         $this->assertEquals('Bpost Home', $merchantOrder->getShippings()[0]->getTitle());
     }
 
@@ -184,7 +184,7 @@ class MerchantOrderTest extends CartContext
         $this->assertInstanceOf(MerchantOrderPayment::class, $merchantOrder->getPayments()[0]);
         $this->assertEquals('payment-123', $merchantOrder->getPayments()[0]->getPaymentId());
         $this->assertEquals('bancontact', $merchantOrder->getPayments()[0]->getPaymentMethodId());
-        $this->assertEquals(PaymentState::none->value, $merchantOrder->getPayments()[0]->getPaymentState());
+        $this->assertEquals(DefaultPaymentState::none->value, $merchantOrder->getPayments()[0]->getPaymentState());
         $this->assertEquals('€ 30', $merchantOrder->getPayments()[0]->getCostPrice());
     }
 

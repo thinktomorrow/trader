@@ -5,5 +5,5 @@ namespace Thinktomorrow\Trader\Application\Order\State\Payment;
 
 final class CancelPayment
 {
-    use HasDefaultPaymentStateValues;
+    use HasPaymentStateValues;
 }

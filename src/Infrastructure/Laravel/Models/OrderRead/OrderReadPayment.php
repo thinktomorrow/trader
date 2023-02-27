@@ -31,9 +31,13 @@ abstract class OrderReadPayment
     {
         $payment = new static();
 
+        if(!$state['payment_state'] instanceof  PaymentState) {
+            throw new \InvalidArgumentException('Payment state is expected to be instance of PaymentState. Instead ' . gettype($state['payment_state']) . ' is passed.');
+        }
+
         $payment->payment_id = $state['payment_id'];
         $payment->payment_method_id = $state['payment_method_id'] ?: null;
-        $payment->state = PaymentState::from($state['payment_state']);
+        $payment->state = $state['payment_state'];
         $payment->cost = $state['cost'];
         $payment->data = json_decode($state['data'], true);
         $payment->discounts = $discounts;

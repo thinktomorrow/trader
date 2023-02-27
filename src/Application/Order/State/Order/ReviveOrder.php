@@ -5,5 +5,5 @@ namespace Thinktomorrow\Trader\Application\Order\State\Order;
 
 class ReviveOrder
 {
-    use HasDefaultOrderStateValues;
+    use HasOrderStateValues;
 }

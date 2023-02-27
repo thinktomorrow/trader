@@ -6,7 +6,7 @@ namespace Tests\Acceptance\Cart;
 use Thinktomorrow\Trader\Application\Cart\RefreshCart\RefreshCart;
 use Thinktomorrow\Trader\Domain\Model\Order\Exceptions\OrderAlreadyInMerchantHands;
 use Thinktomorrow\Trader\Domain\Model\Order\OrderId;
-use Thinktomorrow\Trader\Domain\Model\Order\State\OrderState;
+use Thinktomorrow\Trader\Domain\Model\Order\State\DefaultOrderState;
 use Thinktomorrow\Trader\Domain\Model\Product\ProductId;
 use Thinktomorrow\Trader\Domain\Model\Product\Variant\VariantState;
 use Thinktomorrow\Trader\Domain\Model\Product\Variant\VariantUnitPrice;
@@ -38,7 +38,7 @@ class RefreshCartTest extends CartContext
 
         // Force a merchant state
         $order = $this->getOrder();
-        $order->updateState(OrderState::confirmed);
+        $order->updateState(DefaultOrderState::confirmed);
         $this->orderRepository->save($order);
 
         $this->updateVariant();

@@ -70,15 +70,15 @@ use Thinktomorrow\Trader\Domain\Model\Customer\CustomerRepository;
 use Thinktomorrow\Trader\Domain\Model\CustomerLogin\CustomerLoginRepository;
 use Thinktomorrow\Trader\Domain\Model\Order\Discount\DiscountPriceDefaults;
 use Thinktomorrow\Trader\Domain\Model\Order\OrderRepository;
+use Thinktomorrow\Trader\Domain\Model\Order\Payment\DefaultPaymentState;
 use Thinktomorrow\Trader\Domain\Model\Order\Payment\PaymentState;
 use Thinktomorrow\Trader\Domain\Model\Order\Payment\PaymentStateMachine;
-use Thinktomorrow\Trader\Domain\Model\Order\Payment\PaymentStateToEventMap;
+use Thinktomorrow\Trader\Domain\Model\Order\Shipping\DefaultShippingState;
 use Thinktomorrow\Trader\Domain\Model\Order\Shipping\ShippingState;
 use Thinktomorrow\Trader\Domain\Model\Order\Shipping\ShippingStateMachine;
-use Thinktomorrow\Trader\Domain\Model\Order\Shipping\ShippingStateToEventMap;
+use Thinktomorrow\Trader\Domain\Model\Order\State\DefaultOrderState;
 use Thinktomorrow\Trader\Domain\Model\Order\State\OrderState;
 use Thinktomorrow\Trader\Domain\Model\Order\State\OrderStateMachine;
-use Thinktomorrow\Trader\Domain\Model\Order\State\OrderStateToEventMap;
 use Thinktomorrow\Trader\Domain\Model\PaymentMethod\PaymentMethodRepository;
 use Thinktomorrow\Trader\Domain\Model\Product\ProductRepository;
 use Thinktomorrow\Trader\Domain\Model\Product\VariantRepository;
@@ -235,7 +235,6 @@ class TraderServiceProvider extends ServiceProvider
 
         $this->registerPromoConditionsAndDiscounts();
         $this->registerStateMachines();
-        $this->registerDefaultStateToEventMaps();
     }
 
     public function boot()
@@ -323,23 +322,23 @@ class TraderServiceProvider extends ServiceProvider
 
     private function registerStateMachines()
     {
+        $this->app->bind(OrderState::class, fn() => DefaultOrderState::class);
+        $this->app->bind(PaymentState::class, fn() => DefaultPaymentState::class);
+        $this->app->bind(ShippingState::class, fn() => DefaultShippingState::class);
+
         $this->app->bind(OrderStateMachine::class, function () {
-            return new OrderStateMachine(OrderState::cases(), OrderState::getDefaultTransitions());
+            $orderStateClass = $this->app->get(OrderState::class);
+            return new OrderStateMachine($orderStateClass::getStates(), $orderStateClass::getTransitions());
         });
 
         $this->app->bind(PaymentStateMachine::class, function () {
-            return new PaymentStateMachine(PaymentState::cases(), PaymentState::getDefaultTransitions());
+            $paymentStateClass = $this->app->get(PaymentState::class);
+            return new PaymentStateMachine($paymentStateClass::getStates(), $paymentStateClass::getTransitions());
         });
 
         $this->app->bind(ShippingStateMachine::class, function () {
-            return new ShippingStateMachine(ShippingState::cases(), ShippingState::getDefaultTransitions());
+            $shippingStateClass = $this->app->get(ShippingState::class);
+            return new ShippingStateMachine($shippingStateClass::getStates(), $shippingStateClass::getTransitions());
         });
-    }
-
-    private function registerDefaultStateToEventMaps()
-    {
-        OrderStateToEventMap::set(OrderStateToEventMap::getDefaultMapping());
-        PaymentStateToEventMap::set(PaymentStateToEventMap::getDefaultMapping());
-        ShippingStateToEventMap::set(ShippingStateToEventMap::getDefaultMapping());
     }
 }

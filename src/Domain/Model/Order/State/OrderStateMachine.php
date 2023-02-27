@@ -15,7 +15,9 @@ class OrderStateMachine extends AbstractStateMachine
     protected function getState($model): State
     {
         if ($model instanceof MerchantOrder) {
-            return OrderState::from($model->getState());
+            // Get class of state so we can create the state
+            $firstState = reset($this->states);
+            return get_class($firstState)::fromString($model->getState());
         }
 
         Assertion::isInstanceOf($model, Order::class);

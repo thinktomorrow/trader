@@ -5,5 +5,5 @@ namespace Thinktomorrow\Trader\Application\Order\State\Order;
 
 class QuoteOrder
 {
-    use HasDefaultOrderStateValues;
+    use HasOrderStateValues;
 }

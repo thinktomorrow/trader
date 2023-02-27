@@ -60,6 +60,7 @@ class MysqlMerchantOrderRepository implements MerchantOrderRepository
             ->first();
 
         $orderState = array_merge((array) $orderState, $order->getMappedData(), [
+            'order_state' => $order->getOrderState(),
             'total' => $order->getTotal(),
             'taxTotal' => $order->getTaxTotal(),
             'subtotal' => $order->getSubTotal(),
@@ -99,6 +100,7 @@ class MysqlMerchantOrderRepository implements MerchantOrderRepository
 
         $shippings = array_map(fn (Shipping $shipping) => $this->container->get(MerchantOrderShipping::class)::fromMappedData(
             array_merge($shipping->getMappedData(), [
+                'shipping_state' => $shipping->getShippingState(),
                 'cost' => $shipping->getShippingCost(),
             ]),
             $orderState,
@@ -110,6 +112,7 @@ class MysqlMerchantOrderRepository implements MerchantOrderRepository
 
         $payments = array_map(fn (Payment $payment) => $this->container->get(MerchantOrderPayment::class)::fromMappedData(
             array_merge($payment->getMappedData(), [
+                'payment_state' => $payment->getPaymentState(),
                 'cost' => $payment->getPaymentCost(),
             ]),
             $orderState,

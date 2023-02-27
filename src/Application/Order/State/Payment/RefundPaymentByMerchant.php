@@ -5,5 +5,5 @@ namespace Thinktomorrow\Trader\Application\Order\State\Payment;
 
 final class RefundPaymentByMerchant
 {
-    use HasDefaultPaymentStateValues;
+    use HasPaymentStateValues;
 }

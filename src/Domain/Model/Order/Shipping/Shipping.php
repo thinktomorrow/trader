@@ -29,14 +29,14 @@ final class Shipping implements ChildAggregate, Discountable
     {
     }
 
-    public static function create(OrderId $orderId, ShippingId $shippingId, ShippingProfileId $shippingProfileId, ShippingCost $shippingCost): static
+    public static function create(OrderId $orderId, ShippingId $shippingId, ShippingProfileId $shippingProfileId, ShippingState $shippingState, ShippingCost $shippingCost): static
     {
         $shipping = new static();
 
         $shipping->orderId = $orderId;
         $shipping->shippingId = $shippingId;
         $shipping->shippingProfileId = $shippingProfileId;
-        $shipping->shippingState = ShippingState::none;
+        $shipping->shippingState = $shippingState;
         $shipping->shippingCost = $shippingCost;
 
         return $shipping;
@@ -104,10 +104,14 @@ final class Shipping implements ChildAggregate, Discountable
     {
         $shipping = new static();
 
+        if(!$state['shipping_state'] instanceof  ShippingState) {
+            throw new \InvalidArgumentException('Shipping state is expected to be instance of ShippingState. Instead ' . gettype($state['shipping_state']) . ' is passed.');
+        }
+
         $shipping->orderId = OrderId::fromString($aggregateState['order_id']);
         $shipping->shippingId = ShippingId::fromString($state['shipping_id']);
         $shipping->shippingProfileId = $state['shipping_profile_id'] ? ShippingProfileId::fromString($state['shipping_profile_id']) : null;
-        $shipping->shippingState = ShippingState::from($state['shipping_state']);
+        $shipping->shippingState = $state['shipping_state'];
         $shipping->shippingCost = ShippingCost::fromScalars(
             $state['cost'],
             $state['tax_rate'],

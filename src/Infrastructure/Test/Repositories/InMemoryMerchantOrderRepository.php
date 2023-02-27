@@ -40,6 +40,7 @@ class InMemoryMerchantOrderRepository implements MerchantOrderRepository
         $order = InMemoryOrderRepository::$orders[$orderId->get()];
 
         $orderState = array_merge(InMemoryOrderRepository::$orders[$orderId->get()]->getMappedData(), [
+            'order_state' => $order->getOrderState(),
             'total' => $order->getTotal(),
             'taxTotal' => $order->getTaxTotal(),
             'subtotal' => $order->getSubTotal(),
@@ -77,6 +78,7 @@ class InMemoryMerchantOrderRepository implements MerchantOrderRepository
 
         $shippings = array_map(fn ($shipping) => DefaultMerchantOrderShipping::fromMappedData(
             array_merge($shipping->getMappedData(), [
+                'shipping_state' => $shipping->getShippingState(),
                 'cost' => $shipping->getShippingCost(),
             ]),
             $orderState,
@@ -88,6 +90,7 @@ class InMemoryMerchantOrderRepository implements MerchantOrderRepository
 
         $payments = array_map(fn ($payment) => DefaultMerchantOrderPayment::fromMappedData(
             array_merge($payment->getMappedData(), [
+                'payment_state' => $payment->getPaymentState(),
                 'cost' => $payment->getPaymentCost(),
             ]),
             $orderState,

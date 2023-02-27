@@ -48,6 +48,11 @@ use Thinktomorrow\Trader\Domain\Model\Order\Line\Quantity;
 use Thinktomorrow\Trader\Domain\Model\Order\Order;
 use Thinktomorrow\Trader\Domain\Model\Order\OrderId;
 use Thinktomorrow\Trader\Domain\Model\Order\OrderReference;
+use Thinktomorrow\Trader\Domain\Model\Order\Payment\DefaultPaymentState;
+use Thinktomorrow\Trader\Domain\Model\Order\Payment\PaymentState;
+use Thinktomorrow\Trader\Domain\Model\Order\Shipping\DefaultShippingState;
+use Thinktomorrow\Trader\Domain\Model\Order\Shipping\ShippingState;
+use Thinktomorrow\Trader\Domain\Model\Order\State\DefaultOrderState;
 use Thinktomorrow\Trader\Domain\Model\Order\State\OrderState;
 use Thinktomorrow\Trader\Domain\Model\Order\State\OrderStateMachine;
 use Thinktomorrow\Trader\Domain\Model\PaymentMethod\PaymentMethod;
@@ -106,6 +111,11 @@ abstract class CartContext extends TestCase
     {
         parent::setUp();
 
+        // states
+        (new TestContainer())->add(OrderState::class, DefaultOrderState::class);
+        (new TestContainer())->add(ShippingState::class, DefaultShippingState::class);
+        (new TestContainer())->add(PaymentState::class, DefaultPaymentState::class);
+
         $this->productRepository = new InMemoryProductRepository();
         $this->cartRepository = new InMemoryCartRepository();
         $this->merchantOrderRepository = new InMemoryMerchantOrderRepository();
@@ -131,10 +141,10 @@ abstract class CartContext extends TestCase
         (new TestContainer())->add(AdjustLines::class, new AdjustLines(new InMemoryVariantRepository(), TestContainer::make(AdjustLine::class)));
         (new TestContainer())->add(AdjustDiscounts::class, new AdjustDiscounts($this->promoRepository, (new TestContainer())->get(ApplyPromoToOrder::class)));
         (new TestContainer())->add(OrderStateMachine::class, new OrderStateMachine([
-            ...OrderState::customerStates(), OrderState::confirmed,
+            ...DefaultOrderState::customerStates(), DefaultOrderState::confirmed,
         ], [
-            'complete' => OrderState::getDefaultTransitions()['complete'],
-            'confirm' => OrderState::getDefaultTransitions()['confirm'],
+            'complete' => DefaultOrderState::getTransitions()['complete'],
+            'confirm' => DefaultOrderState::getTransitions()['confirm'],
         ]));
 
         $this->cartApplication = new CartApplication(
@@ -146,7 +156,7 @@ abstract class CartContext extends TestCase
             (new TestContainer())->get(OrderStateMachine::class),
             new RefreshCartAction(),
             $this->shippingProfileRepository = new InMemoryShippingProfileRepository(),
-            $this->updateShippingProfileOnOrder = new UpdateShippingProfileOnOrder(new TestTraderConfig(), $this->orderRepository, $this->shippingProfileRepository),
+            $this->updateShippingProfileOnOrder = new UpdateShippingProfileOnOrder(new TestContainer(), new TestTraderConfig(), $this->orderRepository, $this->shippingProfileRepository),
             $this->updatePaymentMethodOnOrder = (new TestContainer())->get(UpdatePaymentMethodOnOrder::class),
             $this->customerRepository = new InMemoryCustomerRepository(),
             $this->eventDispatcher = new EventDispatcherSpy(),
@@ -518,7 +528,8 @@ abstract class CartContext extends TestCase
         } catch (CouldNotFindOrder $e) {
             $this->orderRepository->save($order = Order::create(
                 OrderId::fromString('xxx'),
-                OrderReference::fromString('xx-ref')
+                OrderReference::fromString('xx-ref'),
+                DefaultOrderState::cart_pending,
             ));
 
             return $order;

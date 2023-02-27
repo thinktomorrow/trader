@@ -8,7 +8,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use Tests\Infrastructure\TestCase;
 use Thinktomorrow\Trader\Application\Order\Grid\OrderGridItem;
-use Thinktomorrow\Trader\Domain\Model\Order\State\OrderState;
+use Thinktomorrow\Trader\Domain\Model\Order\State\DefaultOrderState;
 use Thinktomorrow\Trader\Infrastructure\Laravel\Models\DefaultOrderGridItem;
 use Thinktomorrow\Trader\Infrastructure\Laravel\Repositories\MysqlOrderGridRepository;
 use Thinktomorrow\Trader\Infrastructure\Laravel\Repositories\MysqlOrderRepository;
@@ -75,8 +75,8 @@ class OrderGridRepositoryTest extends TestCase
     /** @test */
     public function it_can_filter_by_order_states()
     {
-        $this->assertCount(1, $this->getMysqlGridRepository()->filterByStates([OrderState::cart_revived->value])->getResults());
-        $this->assertCount(0, $this->getMysqlGridRepository()->filterByStates([OrderState::cancelled->value])->getResults());
+        $this->assertCount(1, $this->getMysqlGridRepository()->filterByStates([DefaultOrderState::cart_revived->value])->getResults());
+        $this->assertCount(0, $this->getMysqlGridRepository()->filterByStates([DefaultOrderState::cancelled->value])->getResults());
     }
 
     /** @test */

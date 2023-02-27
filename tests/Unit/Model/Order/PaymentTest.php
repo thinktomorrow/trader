@@ -16,7 +16,7 @@ use Thinktomorrow\Trader\Domain\Model\Order\OrderId;
 use Thinktomorrow\Trader\Domain\Model\Order\Payment\Payment;
 use Thinktomorrow\Trader\Domain\Model\Order\Payment\PaymentCost;
 use Thinktomorrow\Trader\Domain\Model\Order\Payment\PaymentId;
-use Thinktomorrow\Trader\Domain\Model\Order\Payment\PaymentState;
+use Thinktomorrow\Trader\Domain\Model\Order\Payment\DefaultPaymentState;
 use Thinktomorrow\Trader\Domain\Model\PaymentMethod\PaymentMethodId;
 
 class PaymentTest extends TestCase
@@ -28,6 +28,7 @@ class PaymentTest extends TestCase
             OrderId::fromString('aaa'),
             $paymentId = PaymentId::fromString('yyy'),
             $paymentMethodId = PaymentMethodId::fromString('zzz'),
+            $state = DefaultPaymentState::getDefaultState(),
             $cost = PaymentCost::fromScalars('150', '10', true),
         );
 
@@ -35,7 +36,7 @@ class PaymentTest extends TestCase
             'order_id' => 'aaa',
             'payment_id' => $paymentId->get(),
             'payment_method_id' => $paymentMethodId->get(),
-            'payment_state' => PaymentState::none->value,
+            'payment_state' => $state->value,
             'cost' => $cost->getMoney()->getAmount(),
             'tax_rate' => $cost->getTaxRate()->toPercentage()->get(),
             'includes_vat' => $cost->includesVat(),
@@ -53,7 +54,7 @@ class PaymentTest extends TestCase
             'order_id' => 'xxx',
             'payment_id' => 'ppppp',
             'payment_method_id' => 'mmm',
-            'payment_state' => PaymentState::initialized->value,
+            'payment_state' => DefaultPaymentState::initialized->value,
             'cost' => '20',
             'tax_rate' => '10',
             'includes_vat' => true,

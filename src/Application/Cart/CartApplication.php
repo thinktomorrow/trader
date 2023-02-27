@@ -27,6 +27,7 @@ use Thinktomorrow\Trader\Domain\Model\Order\Order;
 use Thinktomorrow\Trader\Domain\Model\Order\OrderId;
 use Thinktomorrow\Trader\Domain\Model\Order\OrderRepository;
 use Thinktomorrow\Trader\Domain\Model\Order\Shopper;
+use Thinktomorrow\Trader\Domain\Model\Order\State\OrderState;
 use Thinktomorrow\Trader\Domain\Model\Order\State\OrderStateMachine;
 use Thinktomorrow\Trader\Domain\Model\Product\Personalisation\PersonalisationId;
 use Thinktomorrow\Trader\Domain\Model\ShippingProfile\ShippingProfileRepository;
@@ -94,7 +95,8 @@ final class CartApplication
     {
         $order = Order::create(
             $this->orderRepository->nextReference(),
-            $this->orderRepository->nextExternalReference()
+            $this->orderRepository->nextExternalReference(),
+            $this->container->get(OrderState::class)::getDefaultState()
         );
 
         $this->orderRepository->save($order);

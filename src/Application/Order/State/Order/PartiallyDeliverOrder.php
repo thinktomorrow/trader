@@ -5,5 +5,5 @@ namespace Thinktomorrow\Trader\Application\Order\State\Order;
 
 final class PartiallyDeliverOrder
 {
-    use HasDefaultOrderStateValues;
+    use HasOrderStateValues;
 }

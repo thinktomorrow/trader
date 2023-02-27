@@ -5,5 +5,5 @@ namespace Thinktomorrow\Trader\Application\Order\State\Order;
 
 class AbandonOrder
 {
-    use HasDefaultOrderStateValues;
+    use HasOrderStateValues;
 }

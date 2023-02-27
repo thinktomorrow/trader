@@ -78,6 +78,7 @@ final class InMemoryCartRepository implements CartRepository
 
         $shippings = array_map(fn ($shipping) => DefaultCartShipping::fromMappedData(
             array_merge($shipping->getMappedData(), [
+                'shipping_state' => $shipping->getShippingState(),
                 'cost' => $shipping->getShippingCost(),
             ]),
             $orderState,
@@ -89,6 +90,7 @@ final class InMemoryCartRepository implements CartRepository
 
         $payments = array_map(fn ($payment) => DefaultCartPayment::fromMappedData(
             array_merge($payment->getMappedData(), [
+                'payment_state' => $payment->getPaymentState(),
                 'cost' => $payment->getPaymentCost(),
             ]),
             $orderState,

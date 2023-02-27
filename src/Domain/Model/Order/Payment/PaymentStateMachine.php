@@ -16,7 +16,9 @@ final class PaymentStateMachine extends AbstractStateMachine
     protected function getState($model): State
     {
         if ($model instanceof MerchantOrderPayment) {
-            return PaymentState::from($model->getPaymentState());
+            // Get class of state so we can create the state
+            $firstState = reset($this->states);
+            return get_class($firstState)::fromString($model->getPaymentState());
         }
 
         Assertion::isInstanceOf($model, Payment::class);

@@ -9,7 +9,7 @@ use Thinktomorrow\Trader\Domain\Model\Order\Discount\DiscountTotal;
 use Thinktomorrow\Trader\Domain\Model\Order\OrderTotal;
 use Thinktomorrow\Trader\Domain\Model\Order\Payment\PaymentCost;
 use Thinktomorrow\Trader\Domain\Model\Order\Shipping\ShippingCost;
-use Thinktomorrow\Trader\Domain\Model\Order\Shipping\ShippingState;
+use Thinktomorrow\Trader\Domain\Model\Order\Shipping\DefaultShippingState;
 use Thinktomorrow\Trader\Domain\Model\Product\Variant\VariantSalePrice;
 
 class OrderDetailsTest extends TestCase
@@ -55,7 +55,7 @@ class OrderDetailsTest extends TestCase
         $order = $this->createDefaultOrder();
 
         $this->assertCount(1, $order->getShippings());
-        $this->assertEquals(ShippingState::none, $order->getShippings()[0]->getShippingState());
+        $this->assertEquals(DefaultShippingState::none, $order->getShippings()[0]->getShippingState());
 
         $this->assertEquals([
             'order_id' => 'xxx',

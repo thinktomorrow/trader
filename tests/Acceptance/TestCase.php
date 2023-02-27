@@ -52,6 +52,6 @@ class TestCase extends \PHPUnit\Framework\TestCase
         $this->paymentMethodRepository = new InMemoryPaymentMethodRepository();
 
         (new TestContainer())->add(VerifyPaymentMethodForCart::class, new DefaultVerifyPaymentMethodForCart());
-        (new TestContainer())->add(UpdatePaymentMethodOnOrder::class, new UpdatePaymentMethodOnOrder(new TestTraderConfig(), $this->orderRepository, (new TestContainer())->get(VerifyPaymentMethodForCart::class), $this->paymentMethodRepository));
+        (new TestContainer())->add(UpdatePaymentMethodOnOrder::class, new UpdatePaymentMethodOnOrder(new TestContainer(), new TestTraderConfig(), $this->orderRepository, (new TestContainer())->get(VerifyPaymentMethodForCart::class), $this->paymentMethodRepository));
     }
 }

@@ -5,6 +5,7 @@ namespace Thinktomorrow\Trader\Infrastructure\Laravel\Repositories;
 
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
+use Psr\Container\ContainerInterface;
 use Ramsey\Uuid\Uuid;
 use Thinktomorrow\Trader\Application\Order\Invoice\CreateInvoiceReferenceByYearAndMonth;
 use Thinktomorrow\Trader\Domain\Common\Address\AddressType;
@@ -29,10 +30,13 @@ use Thinktomorrow\Trader\Domain\Model\Order\OrderReference;
 use Thinktomorrow\Trader\Domain\Model\Order\OrderRepository;
 use Thinktomorrow\Trader\Domain\Model\Order\Payment\Payment;
 use Thinktomorrow\Trader\Domain\Model\Order\Payment\PaymentId;
+use Thinktomorrow\Trader\Domain\Model\Order\Payment\PaymentState;
 use Thinktomorrow\Trader\Domain\Model\Order\Shipping\Shipping;
 use Thinktomorrow\Trader\Domain\Model\Order\Shipping\ShippingId;
+use Thinktomorrow\Trader\Domain\Model\Order\Shipping\ShippingState;
 use Thinktomorrow\Trader\Domain\Model\Order\Shopper;
 use Thinktomorrow\Trader\Domain\Model\Order\ShopperId;
+use Thinktomorrow\Trader\Domain\Model\Order\State\OrderState;
 use Thinktomorrow\Trader\TraderConfig;
 
 class MysqlOrderRepository implements OrderRepository, InvoiceRepository
@@ -47,10 +51,12 @@ class MysqlOrderRepository implements OrderRepository, InvoiceRepository
     private static $orderShopperTable = 'trader_order_shoppers';
     private static $orderEventsTable = 'trader_order_events';
 
+    private ContainerInterface $container;
     protected TraderConfig $traderConfig;
 
-    public function __construct(TraderConfig $traderConfig)
+    public function __construct(ContainerInterface $container, TraderConfig $traderConfig)
     {
+        $this->container = $container;
         $this->traderConfig = $traderConfig;
     }
 
@@ -324,6 +330,7 @@ class MysqlOrderRepository implements OrderRepository, InvoiceRepository
             ->get()
             ->map(fn ($item) => (array)$item)
             ->map(fn ($item) => array_merge($item, [
+                'shipping_state' => $this->container->get(ShippingState::class)::fromString($item['shipping_state']),
                 'includes_vat' => (bool)$item['includes_vat'],
                 Discount::class => $allDiscountStates->filter(fn ($discountState) => $discountState['discountable_type'] == DiscountableType::shipping->value && $discountState['discountable_id'] == $item['shipping_id'])->values()->toArray(),
             ]))
@@ -334,6 +341,7 @@ class MysqlOrderRepository implements OrderRepository, InvoiceRepository
             ->get()
             ->map(fn ($item) => (array)$item)
             ->map(fn ($item) => array_merge($item, [
+                'payment_state' => $this->container->get(PaymentState::class)::fromString($item['payment_state']),
                 'includes_vat' => (bool)$item['includes_vat'],
                 Discount::class => $allDiscountStates->filter(fn ($discountState) => $discountState['discountable_type'] == DiscountableType::payment->value && $discountState['discountable_id'] == $item['payment_id'])->values()->toArray(),
             ]))
@@ -377,7 +385,11 @@ class MysqlOrderRepository implements OrderRepository, InvoiceRepository
             OrderEvent::class => $orderEventStates,
         ];
 
-        return Order::fromMappedData((array)$orderState, $childEntities);
+        $orderState = (array) $orderState;
+
+        return Order::fromMappedData(array_merge($orderState, [
+            'order_state' => $this->container->get(OrderState::class)::fromString($orderState['order_state'])
+        ]), $childEntities);
     }
 
     public function findForCart(OrderId $orderId): Order

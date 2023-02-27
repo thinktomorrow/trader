@@ -5,5 +5,5 @@ namespace Thinktomorrow\Trader\Application\Order\State\Shipping;
 
 final class DeliverShipment
 {
-    use HasDefaultShippingStateValues;
+    use HasShippingStateValues;
 }

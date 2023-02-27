@@ -13,6 +13,7 @@ use Thinktomorrow\Trader\Domain\Model\Order\OrderEvent\OrderEventId;
 use Thinktomorrow\Trader\Domain\Model\Order\OrderId;
 use Thinktomorrow\Trader\Domain\Model\Order\OrderReference;
 use Thinktomorrow\Trader\Domain\Model\Order\Shipping\ShippingId;
+use Thinktomorrow\Trader\Domain\Model\Order\State\DefaultOrderState;
 use Thinktomorrow\Trader\Infrastructure\Laravel\Repositories\MysqlOrderRepository;
 use Thinktomorrow\Trader\Infrastructure\Test\Repositories\InMemoryOrderRepository;
 use Thinktomorrow\Trader\Infrastructure\Test\TestContainer;
@@ -126,7 +127,8 @@ final class OrderRepositoryTest extends TestCase
 
         yield Order::create(
             OrderId::fromString('xxx'),
-            OrderReference::fromString('xx-ref')
+            OrderReference::fromString('xx-ref'),
+            DefaultOrderState::confirmed
         );
 
         $orderWithLogEntries = $this->createDefaultOrder();

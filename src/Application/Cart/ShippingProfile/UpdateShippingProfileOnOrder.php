@@ -3,12 +3,14 @@ declare(strict_types=1);
 
 namespace Thinktomorrow\Trader\Application\Cart\ShippingProfile;
 
+use Psr\Container\ContainerInterface;
 use Thinktomorrow\Trader\Domain\Common\Cash\Cash;
 use Thinktomorrow\Trader\Domain\Common\Taxes\TaxRate;
 use Thinktomorrow\Trader\Domain\Model\Order\Order;
 use Thinktomorrow\Trader\Domain\Model\Order\OrderRepository;
 use Thinktomorrow\Trader\Domain\Model\Order\Shipping\Shipping;
 use Thinktomorrow\Trader\Domain\Model\Order\Shipping\ShippingCost;
+use Thinktomorrow\Trader\Domain\Model\Order\Shipping\ShippingState;
 use Thinktomorrow\Trader\Domain\Model\ShippingProfile\ShippingProfileId;
 use Thinktomorrow\Trader\Domain\Model\ShippingProfile\ShippingProfileRepository;
 use Thinktomorrow\Trader\Domain\Model\ShippingProfile\ShippingProfileState;
@@ -16,12 +18,14 @@ use Thinktomorrow\Trader\TraderConfig;
 
 class UpdateShippingProfileOnOrder
 {
+    private ContainerInterface $container;
     private TraderConfig $config;
     private OrderRepository $orderRepository;
     private ShippingProfileRepository $shippingProfileRepository;
 
-    public function __construct(TraderConfig $config, OrderRepository $orderRepository, ShippingProfileRepository $shippingProfileRepository)
+    public function __construct(ContainerInterface $container, TraderConfig $config, OrderRepository $orderRepository, ShippingProfileRepository $shippingProfileRepository)
     {
+        $this->container = $container;
         $this->config = $config;
         $this->orderRepository = $orderRepository;
         $this->shippingProfileRepository = $shippingProfileRepository;
@@ -72,6 +76,7 @@ class UpdateShippingProfileOnOrder
                 $order->orderId,
                 $this->orderRepository->nextShippingReference(),
                 $shippingProfile->shippingProfileId,
+                $this->container->get(ShippingState::class)::getDefaultState(),
                 $shippingCost
             );
 

@@ -29,14 +29,14 @@ class Payment implements ChildAggregate, Discountable
     {
     }
 
-    public static function create(OrderId $orderId, PaymentId $paymentId, PaymentMethodId $paymentMethodId, PaymentCost $paymentCost): static
+    public static function create(OrderId $orderId, PaymentId $paymentId, PaymentMethodId $paymentMethodId, PaymentState $paymentState, PaymentCost $paymentCost): static
     {
         $payment = new static();
 
         $payment->orderId = $orderId;
         $payment->paymentId = $paymentId;
         $payment->paymentMethodId = $paymentMethodId;
-        $payment->paymentState = PaymentState::none;
+        $payment->paymentState = $paymentState;
         $payment->paymentCost = $paymentCost;
 
         return $payment;
@@ -104,10 +104,14 @@ class Payment implements ChildAggregate, Discountable
     {
         $payment = new static();
 
+        if(!$state['payment_state'] instanceof  PaymentState) {
+            throw new \InvalidArgumentException('Payment state is expected to be instance of PaymentState. Instead ' . gettype($state['payment_state']) . ' is passed.');
+        }
+
         $payment->orderId = OrderId::fromString($aggregateState['order_id']);
         $payment->paymentId = PaymentId::fromString($state['payment_id']);
         $payment->paymentMethodId = $state['payment_method_id'] ? PaymentMethodId::fromString($state['payment_method_id']) : null;
-        $payment->paymentState = PaymentState::from($state['payment_state']);
+        $payment->paymentState = $state['payment_state'];
         $payment->paymentCost = PaymentCost::fromScalars(
             $state['cost'],
             $state['tax_rate'],

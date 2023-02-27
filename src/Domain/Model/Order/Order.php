@@ -32,14 +32,11 @@ use Thinktomorrow\Trader\Domain\Model\Order\Payment\HasPayments;
 use Thinktomorrow\Trader\Domain\Model\Order\Payment\Payment;
 use Thinktomorrow\Trader\Domain\Model\Order\Payment\PaymentId;
 use Thinktomorrow\Trader\Domain\Model\Order\Payment\PaymentState;
-use Thinktomorrow\Trader\Domain\Model\Order\Payment\PaymentStateToEventMap;
 use Thinktomorrow\Trader\Domain\Model\Order\Shipping\HasShippings;
 use Thinktomorrow\Trader\Domain\Model\Order\Shipping\Shipping;
 use Thinktomorrow\Trader\Domain\Model\Order\Shipping\ShippingId;
 use Thinktomorrow\Trader\Domain\Model\Order\Shipping\ShippingState;
-use Thinktomorrow\Trader\Domain\Model\Order\Shipping\ShippingStateToEventMap;
 use Thinktomorrow\Trader\Domain\Model\Order\State\OrderState;
-use Thinktomorrow\Trader\Domain\Model\Order\State\OrderStateToEventMap;
 
 final class Order implements Aggregate, Discountable
 {
@@ -65,13 +62,13 @@ final class Order implements Aggregate, Discountable
     {
     }
 
-    public static function create(OrderId $orderId, OrderReference $orderReference)
+    public static function create(OrderId $orderId, OrderReference $orderReference, OrderState $orderState)
     {
         $order = new static();
 
         $order->orderId = $orderId;
         $order->orderReference = $orderReference;
-        $order->orderState = OrderState::cart_pending;
+        $order->orderState = $orderState;
 
         $order->recordEvent(new OrderCreated($order->orderId));
 
@@ -141,7 +138,7 @@ final class Order implements Aggregate, Discountable
 
     private function recordOrderStateEvent(OrderState $oldState, OrderState $newState, array $data): void
     {
-        $map = OrderStateToEventMap::get();
+        $map = $newState::getEventMapping();
 
         if (isset($map[$newState->value])) {
             $this->recordEvent(new $map[$newState->value]($this->orderId, $oldState, $newState, $data));
@@ -165,7 +162,7 @@ final class Order implements Aggregate, Discountable
 
     private function recordPaymentStateEvent(PaymentId $paymentId, PaymentState $oldState, PaymentState $newState, array $data): void
     {
-        $map = PaymentStateToEventMap::get();
+        $map = $newState::getEventMapping();
 
         if (isset($map[$newState->value])) {
             $this->recordEvent(new $map[$newState->value]($this->orderId, $paymentId, $oldState, $newState, $data));
@@ -189,7 +186,7 @@ final class Order implements Aggregate, Discountable
 
     private function recordShippingStateEvent(ShippingId $shippingId, ShippingState $oldState, ShippingState $newState, array $data): void
     {
-        $map = ShippingStateToEventMap::get();
+        $map = $newState::getEventMapping();
 
         if (isset($map[$newState->value])) {
             $this->recordEvent(new $map[$newState->value]($this->orderId, $shippingId, $oldState, $newState, $data));
@@ -265,7 +262,7 @@ final class Order implements Aggregate, Discountable
             'order_id' => $this->orderId->get(),
             'order_ref' => $this->orderReference->get(),
             'invoice_ref' => $this->invoiceReference?->get(),
-            'order_state' => $this->orderState->value,
+            'order_state' => $this->orderState->getValueAsString(),
 
             'total' => $this->getTotal()->getMoney()->getAmount(),
             'tax_total' => $this->getTaxTotal()->getAmount(),
@@ -305,10 +302,14 @@ final class Order implements Aggregate, Discountable
     {
         $order = new static();
 
+        if(!$state['order_state'] instanceof  OrderState) {
+            throw new \InvalidArgumentException('Order state is expected to be instance of OrderState. Instead ' . gettype($state['order_state']) . ' is passed.');
+        }
+
         $order->orderId = OrderId::fromString($state['order_id']);
         $order->orderReference = OrderReference::fromString($state['order_ref']);
         $order->invoiceReference = $state['invoice_ref'] ? InvoiceReference::fromString($state['invoice_ref']) : null;
-        $order->orderState = OrderState::from($state['order_state']);
+        $order->orderState = $state['order_state'];
         $order->discounts = array_map(fn ($discountState) => Discount::fromMappedData($discountState, $state), $childEntities[Discount::class]);
 
         $order->lines = array_map(fn ($lineState) => Line::fromMappedData($lineState, $state, [

@@ -5,5 +5,5 @@ namespace Thinktomorrow\Trader\Application\Order\State\Order;
 
 class DeleteOrder
 {
-    use HasDefaultOrderStateValues;
+    use HasOrderStateValues;
 }

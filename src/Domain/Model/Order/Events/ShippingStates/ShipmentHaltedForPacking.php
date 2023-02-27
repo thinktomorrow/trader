@@ -10,11 +10,12 @@ use Thinktomorrow\Trader\Domain\Model\Order\Shipping\ShippingState;
 final class ShipmentHaltedForPacking
 {
     public function __construct(
-        public readonly OrderId $orderId,
-        public readonly ShippingId $shippingId,
+        public readonly OrderId       $orderId,
+        public readonly ShippingId    $shippingId,
         public readonly ShippingState $formerShippingState,
         public readonly ShippingState $newShippingState,
-        public readonly array $data,
-    ) {
+        public readonly array         $data,
+    )
+    {
     }
 }

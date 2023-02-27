@@ -34,9 +34,9 @@ use Thinktomorrow\Trader\Domain\Model\Order\Events\ShippingStates\ShipmentMarked
 use Thinktomorrow\Trader\Domain\Model\Order\Events\ShippingStates\ShipmentPacked;
 use Thinktomorrow\Trader\Domain\Model\Order\Events\ShippingStates\ShipmentReturned;
 use Thinktomorrow\Trader\Domain\Model\Order\Events\ShippingStateUpdated;
-use Thinktomorrow\Trader\Domain\Model\Order\Payment\PaymentState;
-use Thinktomorrow\Trader\Domain\Model\Order\Shipping\ShippingState;
-use Thinktomorrow\Trader\Domain\Model\Order\State\OrderState;
+use Thinktomorrow\Trader\Domain\Model\Order\Payment\DefaultPaymentState;
+use Thinktomorrow\Trader\Domain\Model\Order\Shipping\DefaultShippingState;
+use Thinktomorrow\Trader\Domain\Model\Order\State\DefaultOrderState;
 
 class OrderStateTest extends TestCase
 {
@@ -53,68 +53,68 @@ class OrderStateTest extends TestCase
     /** @test */
     public function it_can_record_order_events()
     {
-        $this->assertOrderStateEvent(CartAbandoned::class, OrderState::cart_abandoned);
-        $this->assertOrderStateEvent(CartRevived::class, OrderState::cart_revived);
-        $this->assertOrderStateEvent(CartQueuedForDeletion::class, OrderState::cart_queued_for_deletion);
-        $this->assertOrderStateEvent(OrderCancelled::class, OrderState::cancelled);
-        $this->assertOrderStateEvent(OrderCancelledByMerchant::class, OrderState::cancelled_by_merchant);
-        $this->assertOrderStateEvent(CartCompleted::class, OrderState::cart_completed);
-        $this->assertOrderStateEvent(OrderConfirmed::class, OrderState::confirmed);
-        $this->assertOrderStateEvent(OrderPaid::class, OrderState::paid);
-        $this->assertOrderStateEvent(OrderPartiallyPaid::class, OrderState::partially_paid);
-        $this->assertOrderStateEvent(OrderPacked::class, OrderState::packed);
-        $this->assertOrderStateEvent(OrderPartiallyPacked::class, OrderState::partially_packed);
-        $this->assertOrderStateEvent(OrderDelivered::class, OrderState::delivered);
-        $this->assertOrderStateEvent(OrderPartiallyDelivered::class, OrderState::partially_delivered);
+        $this->assertOrderStateEvent(CartAbandoned::class, DefaultOrderState::cart_abandoned);
+        $this->assertOrderStateEvent(CartRevived::class, DefaultOrderState::cart_revived);
+        $this->assertOrderStateEvent(CartQueuedForDeletion::class, DefaultOrderState::cart_queued_for_deletion);
+        $this->assertOrderStateEvent(OrderCancelled::class, DefaultOrderState::cancelled);
+        $this->assertOrderStateEvent(OrderCancelledByMerchant::class, DefaultOrderState::cancelled_by_merchant);
+        $this->assertOrderStateEvent(CartCompleted::class, DefaultOrderState::cart_completed);
+        $this->assertOrderStateEvent(OrderConfirmed::class, DefaultOrderState::confirmed);
+        $this->assertOrderStateEvent(OrderPaid::class, DefaultOrderState::paid);
+        $this->assertOrderStateEvent(OrderPartiallyPaid::class, DefaultOrderState::partially_paid);
+        $this->assertOrderStateEvent(OrderPacked::class, DefaultOrderState::packed);
+        $this->assertOrderStateEvent(OrderPartiallyPacked::class, DefaultOrderState::partially_packed);
+        $this->assertOrderStateEvent(OrderDelivered::class, DefaultOrderState::delivered);
+        $this->assertOrderStateEvent(OrderPartiallyDelivered::class, DefaultOrderState::partially_delivered);
     }
 
     /** @test */
     public function it_can_record_payment_events()
     {
-        $this->assertPaymentStateEvent(PaymentPaid::class, PaymentState::paid);
-        $this->assertPaymentStateEvent(PaymentMarkedPaidByMerchant::class, PaymentState::paid_by_merchant);
-        $this->assertPaymentStateEvent(PaymentFailed::class, PaymentState::failed);
-        $this->assertPaymentStateEvent(PaymentFailed::class, PaymentState::canceled);
-        $this->assertPaymentStateEvent(PaymentFailed::class, PaymentState::expired);
-        $this->assertPaymentStateEvent(PaymentRefunded::class, PaymentState::refunded);
-        $this->assertPaymentStateEvent(PaymentRefunded::class, PaymentState::charged_back);
-        $this->assertPaymentStateEvent(PaymentRefundedByMerchant::class, PaymentState::refunded_by_merchant);
+        $this->assertPaymentStateEvent(PaymentPaid::class, DefaultPaymentState::paid);
+        $this->assertPaymentStateEvent(PaymentMarkedPaidByMerchant::class, DefaultPaymentState::paid_by_merchant);
+        $this->assertPaymentStateEvent(PaymentFailed::class, DefaultPaymentState::failed);
+        $this->assertPaymentStateEvent(PaymentFailed::class, DefaultPaymentState::canceled);
+        $this->assertPaymentStateEvent(PaymentFailed::class, DefaultPaymentState::expired);
+        $this->assertPaymentStateEvent(PaymentRefunded::class, DefaultPaymentState::refunded);
+        $this->assertPaymentStateEvent(PaymentRefunded::class, DefaultPaymentState::charged_back);
+        $this->assertPaymentStateEvent(PaymentRefundedByMerchant::class, DefaultPaymentState::refunded_by_merchant);
     }
 
     /** @test */
     public function it_can_record_shipping_events()
     {
-        $this->assertShippingStateEvent(ShipmentMarkedReadyForPacking::class, ShippingState::ready_for_packing);
-        $this->assertShippingStateEvent(ShipmentHaltedForPacking::class, ShippingState::halted_for_packing);
-        $this->assertShippingStateEvent(ShipmentPacked::class, ShippingState::packed);
-        $this->assertShippingStateEvent(ShipmentInTransit::class, ShippingState::in_transit);
-        $this->assertShippingStateEvent(ShipmentDelivered::class, ShippingState::delivered);
-        $this->assertShippingStateEvent(ShipmentReturned::class, ShippingState::returned);
-        $this->assertShippingStateEvent(ShipmentFailed::class, ShippingState::failed);
+        $this->assertShippingStateEvent(ShipmentMarkedReadyForPacking::class, DefaultShippingState::ready_for_packing);
+        $this->assertShippingStateEvent(ShipmentHaltedForPacking::class, DefaultShippingState::halted_for_packing);
+        $this->assertShippingStateEvent(ShipmentPacked::class, DefaultShippingState::packed);
+        $this->assertShippingStateEvent(ShipmentInTransit::class, DefaultShippingState::in_transit);
+        $this->assertShippingStateEvent(ShipmentDelivered::class, DefaultShippingState::delivered);
+        $this->assertShippingStateEvent(ShipmentReturned::class, DefaultShippingState::returned);
+        $this->assertShippingStateEvent(ShipmentFailed::class, DefaultShippingState::failed);
     }
 
     public function test_does_not_record_event_when_state_hasnt_changed()
     {
-        $this->assertOrderStateEvent(CartAbandoned::class, OrderState::cart_abandoned);
-        $this->assertNoOrderStateEvent(CartAbandoned::class, OrderState::cart_abandoned);
+        $this->assertOrderStateEvent(CartAbandoned::class, DefaultOrderState::cart_abandoned);
+        $this->assertNoOrderStateEvent(CartAbandoned::class, DefaultOrderState::cart_abandoned);
     }
 
     /** @test */
     public function it_does_not_record_payment_event_when_state_hasnt_changed()
     {
-        $this->assertNoPaymentStateEvent(PaymentInitialized::class, PaymentState::initialized);
+        $this->assertNoPaymentStateEvent(PaymentInitialized::class, DefaultPaymentState::initialized);
 
-        $this->assertPaymentStateEvent(PaymentPaid::class, PaymentState::paid);
-        $this->assertNoPaymentStateEvent(PaymentPaid::class, PaymentState::paid);
+        $this->assertPaymentStateEvent(PaymentPaid::class, DefaultPaymentState::paid);
+        $this->assertNoPaymentStateEvent(PaymentPaid::class, DefaultPaymentState::paid);
     }
 
     /** @test */
     public function it_does_not_record_shipping_events_when_state_hasnt_changed()
     {
-        $this->assertShippingStateEvent(ShipmentMarkedReadyForPacking::class, ShippingState::ready_for_packing);
-        $this->assertNoShippingStateEvent(ShipmentMarkedReadyForPacking::class, ShippingState::ready_for_packing);
-        $this->assertShippingStateEvent(ShipmentPacked::class, ShippingState::packed);
-        $this->assertNoShippingStateEvent(ShipmentPacked::class, ShippingState::packed);
+        $this->assertShippingStateEvent(ShipmentMarkedReadyForPacking::class, DefaultShippingState::ready_for_packing);
+        $this->assertNoShippingStateEvent(ShipmentMarkedReadyForPacking::class, DefaultShippingState::ready_for_packing);
+        $this->assertShippingStateEvent(ShipmentPacked::class, DefaultShippingState::packed);
+        $this->assertNoShippingStateEvent(ShipmentPacked::class, DefaultShippingState::packed);
     }
 
     private function assertOrderStateEvent(string $eventClass, $newState, $oldState = null)

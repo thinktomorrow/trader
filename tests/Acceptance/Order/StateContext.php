@@ -10,13 +10,13 @@ use Thinktomorrow\Trader\Application\Cart\PaymentMethod\UpdatePaymentMethodOnOrd
 use Thinktomorrow\Trader\Application\Cart\RefreshCart\RefreshCartAction;
 use Thinktomorrow\Trader\Application\Cart\ShippingProfile\UpdateShippingProfileOnOrder;
 use Thinktomorrow\Trader\Application\Order\State\OrderStateApplication;
-use Thinktomorrow\Trader\Domain\Model\Order\Payment\PaymentState;
+use Thinktomorrow\Trader\Domain\Model\Order\Payment\DefaultPaymentState;
 use Thinktomorrow\Trader\Domain\Model\Order\Payment\PaymentStateMachine;
 use Thinktomorrow\Trader\Domain\Model\Order\Payment\PaymentStateToEventMap;
-use Thinktomorrow\Trader\Domain\Model\Order\Shipping\ShippingState;
+use Thinktomorrow\Trader\Domain\Model\Order\Shipping\DefaultShippingState;
 use Thinktomorrow\Trader\Domain\Model\Order\Shipping\ShippingStateMachine;
 use Thinktomorrow\Trader\Domain\Model\Order\Shipping\ShippingStateToEventMap;
-use Thinktomorrow\Trader\Domain\Model\Order\State\OrderState;
+use Thinktomorrow\Trader\Domain\Model\Order\State\DefaultOrderState;
 use Thinktomorrow\Trader\Domain\Model\Order\State\OrderStateMachine;
 use Thinktomorrow\Trader\Domain\Model\Order\State\OrderStateToEventMap;
 use Thinktomorrow\Trader\Infrastructure\Laravel\Models\Cart\DefaultAdjustLine;
@@ -45,13 +45,9 @@ abstract class StateContext extends TestCase
         parent::setUp();
 
         $this->orderRepository = new InMemoryOrderRepository();
-        $this->orderStateMachine = new OrderStateMachine(OrderState::cases(), OrderState::getDefaultTransitions());
-        $this->paymentStateMachine = new PaymentStateMachine(PaymentState::cases(), PaymentState::getDefaultTransitions());
-        $this->shippingStateMachine = new ShippingStateMachine(ShippingState::cases(), ShippingState::getDefaultTransitions());
-
-        OrderStateToEventMap::set(OrderStateToEventMap::getDefaultMapping());
-        PaymentStateToEventMap::set(PaymentStateToEventMap::getDefaultMapping());
-        ShippingStateToEventMap::set(ShippingStateToEventMap::getDefaultMapping());
+        $this->orderStateMachine = new OrderStateMachine(DefaultOrderState::cases(), DefaultOrderState::getTransitions());
+        $this->paymentStateMachine = new PaymentStateMachine(DefaultPaymentState::cases(), DefaultPaymentState::getTransitions());
+        $this->shippingStateMachine = new ShippingStateMachine(DefaultShippingState::cases(), DefaultShippingState::getTransitions());
 
         $this->orderStateApplication = new OrderStateApplication(
             $this->orderRepository,
@@ -71,16 +67,16 @@ abstract class StateContext extends TestCase
             $this->orderStateMachine,
             new RefreshCartAction(),
             new InMemoryShippingProfileRepository(),
-            new UpdateShippingProfileOnOrder(new TestTraderConfig(), $this->orderRepository, new InMemoryShippingProfileRepository()),
+            new UpdateShippingProfileOnOrder(new TestContainer(), new TestTraderConfig(), $this->orderRepository, new InMemoryShippingProfileRepository()),
             TestContainer::make(UpdatePaymentMethodOnOrder::class),
             new InMemoryCustomerRepository(),
             $this->eventDispatcher,
         );
     }
 
-    protected function assertOrderStateTransition(string $transitionMethod, OrderState $currentState, OrderState $newState, $useCartApplication = false)
+    protected function assertOrderStateTransition(string $transitionMethod, DefaultOrderState $currentState, DefaultOrderState $newState, $useCartApplication = false)
     {
-        $order = $this->createOrder(['order_id' => 'xxx', 'order_state' => $currentState->value]);
+        $order = $this->createOrder(['order_id' => 'xxx', 'order_state' => $currentState]);
         $this->orderRepository->save($order);
 
 
@@ -96,19 +92,19 @@ abstract class StateContext extends TestCase
         $this->assertEquals($newState, $order->getOrderState());
     }
 
-    protected function assertCartStateTransition(string $transitionMethod, OrderState $currentState, OrderState $newState)
+    protected function assertCartStateTransition(string $transitionMethod, DefaultOrderState $currentState, DefaultOrderState $newState)
     {
         $this->assertOrderStateTransition($transitionMethod, $currentState, $newState, true);
     }
 
-    protected function assertPaymentStateTransition(string $transitionMethod, PaymentState $currentState, PaymentState $newState, ?OrderState $orderState = null, ?OrderState $newOrderState = null)
+    protected function assertPaymentStateTransition(string $transitionMethod, DefaultPaymentState $currentState, DefaultPaymentState $newState, ?DefaultOrderState $orderState = null, ?DefaultOrderState $newOrderState = null)
     {
         if (! $orderState) {
-            $orderState = OrderState::confirmed;
+            $orderState = DefaultOrderState::confirmed;
         }
 
-        $order = $this->createOrder(['order_id' => 'xxx', 'order_state' => $orderState->value], [], [], [], [
-            $payment = $this->createOrderPayment(['payment_state' => $currentState->value]),
+        $order = $this->createOrder(['order_id' => 'xxx', 'order_state' => $orderState], [], [], [], [
+            $payment = $this->createOrderPayment(['payment_state' => $currentState]),
         ]);
         $this->orderRepository->save($order);
 
@@ -123,14 +119,14 @@ abstract class StateContext extends TestCase
         }
     }
 
-    protected function assertShippingStateTransition(string $transitionMethod, ShippingState $currentState, ShippingState $newState, ?OrderState $orderState = null, ?OrderState $newOrderState = null)
+    protected function assertShippingStateTransition(string $transitionMethod, DefaultShippingState $currentState, DefaultShippingState $newState, ?DefaultOrderState $orderState = null, ?DefaultOrderState $newOrderState = null)
     {
         if (! $orderState) {
-            $orderState = OrderState::confirmed;
+            $orderState = DefaultOrderState::confirmed;
         }
 
-        $order = $this->createOrder(['order_id' => 'xxx', 'order_state' => $orderState->value], [], [], [
-            $shipping = $this->createOrderShipping(['shipping_state' => $currentState->value]),
+        $order = $this->createOrder(['order_id' => 'xxx', 'order_state' => $orderState], [], [], [
+            $shipping = $this->createOrderShipping(['shipping_state' => $currentState]),
         ]);
         $this->orderRepository->save($order);
 

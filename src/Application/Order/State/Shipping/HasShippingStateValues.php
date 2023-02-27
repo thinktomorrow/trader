@@ -6,7 +6,7 @@ namespace Thinktomorrow\Trader\Application\Order\State\Shipping;
 use Thinktomorrow\Trader\Domain\Model\Order\OrderId;
 use Thinktomorrow\Trader\Domain\Model\Order\Shipping\ShippingId;
 
-trait HasDefaultShippingStateValues
+trait HasShippingStateValues
 {
     private string $orderId;
     private string $shippingId;

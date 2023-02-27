@@ -10,11 +10,12 @@ use Thinktomorrow\Trader\Domain\Model\Order\Payment\PaymentState;
 final class PaymentPaid
 {
     public function __construct(
-        public readonly OrderId $orderId,
-        public readonly PaymentId $paymentId,
+        public readonly OrderId      $orderId,
+        public readonly PaymentId    $paymentId,
         public readonly PaymentState $formerPaymentState,
         public readonly PaymentState $newPaymentState,
-        public readonly array $data,
-    ) {
+        public readonly array        $data,
+    )
+    {
     }
 }

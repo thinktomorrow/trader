@@ -16,7 +16,7 @@ use Thinktomorrow\Trader\Domain\Model\Order\OrderId;
 use Thinktomorrow\Trader\Domain\Model\Order\Shipping\Shipping;
 use Thinktomorrow\Trader\Domain\Model\Order\Shipping\ShippingCost;
 use Thinktomorrow\Trader\Domain\Model\Order\Shipping\ShippingId;
-use Thinktomorrow\Trader\Domain\Model\Order\Shipping\ShippingState;
+use Thinktomorrow\Trader\Domain\Model\Order\Shipping\DefaultShippingState;
 use Thinktomorrow\Trader\Domain\Model\ShippingProfile\ShippingProfileId;
 
 class ShippingTest extends TestCase
@@ -28,6 +28,7 @@ class ShippingTest extends TestCase
             OrderId::fromString('aaa'),
             $shippingId = ShippingId::fromString('yyy'),
             $shippingProfileId = ShippingProfileId::fromString('zzz'),
+            $state = DefaultShippingState::getDefaultState(),
             $cost = ShippingCost::fromScalars('150', '10', true),
         );
 
@@ -35,7 +36,7 @@ class ShippingTest extends TestCase
             'order_id' => 'aaa',
             'shipping_id' => $shippingId->get(),
             'shipping_profile_id' => $shippingProfileId->get(),
-            'shipping_state' => ShippingState::none->value,
+            'shipping_state' => $state->value,
             'cost' => $cost->getMoney()->getAmount(),
             'tax_rate' => $cost->getTaxRate()->toPercentage()->get(),
             'includes_vat' => $cost->includesVat(),
@@ -53,7 +54,7 @@ class ShippingTest extends TestCase
             'order_id' => 'xxx',
             'shipping_id' => 'sss',
             'shipping_profile_id' => 'ppp',
-            'shipping_state' => ShippingState::none->value,
+            'shipping_state' => DefaultShippingState::none->value,
             'cost' => '30',
             'tax_rate' => '10',
             'includes_vat' => true,

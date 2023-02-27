@@ -5,7 +5,7 @@ namespace Tests\Unit\Common\State;
 use Tests\TestHelpers;
 use Tests\Unit\TestCase;
 use Thinktomorrow\Trader\Domain\Common\State\StateException;
-use Thinktomorrow\Trader\Domain\Model\Order\State\OrderState;
+use Thinktomorrow\Trader\Domain\Model\Order\State\DefaultOrderState;
 use Thinktomorrow\Trader\Domain\Model\Order\State\OrderStateMachine;
 
 class OrderStateMachineTest extends TestCase
@@ -20,20 +20,20 @@ class OrderStateMachineTest extends TestCase
         parent::setUp();
 
         $this->order = $this->createDefaultOrder();
-        $this->order->updateState(OrderState::cart_pending);
+        $this->order->updateState(DefaultOrderState::cart_pending);
 
         $this->machine = new OrderStateMachine([
-            OrderState::cart_pending,
-            OrderState::confirmed,
-            OrderState::paid,
+            DefaultOrderState::cart_pending,
+            DefaultOrderState::confirmed,
+            DefaultOrderState::paid,
         ], [
             'confirm' => [
-                'from' => [OrderState::cart_pending],
-                'to' => OrderState::confirmed,
+                'from' => [DefaultOrderState::cart_pending],
+                'to' => DefaultOrderState::confirmed,
             ],
             'pay' => [
-                'from' => [OrderState::confirmed],
-                'to' => OrderState::paid,
+                'from' => [DefaultOrderState::confirmed],
+                'to' => DefaultOrderState::paid,
             ],
         ]);
     }
@@ -41,10 +41,10 @@ class OrderStateMachineTest extends TestCase
     /** @test */
     public function it_can_apply_transition()
     {
-        $this->assertSame(OrderState::cart_pending, $this->order->getOrderState());
+        $this->assertSame(DefaultOrderState::cart_pending, $this->order->getOrderState());
 
         $this->machine->apply($this->order, 'confirm');
-        $this->assertSame(OrderState::confirmed, $this->order->getOrderState());
+        $this->assertSame(DefaultOrderState::confirmed, $this->order->getOrderState());
     }
 
     /** @test */
@@ -61,7 +61,7 @@ class OrderStateMachineTest extends TestCase
         $this->expectException(StateException::class);
 
         $this->machine->apply($this->order, 'pay');
-        $this->assertSame(OrderState::cart_pending, $this->order->getOrderState());
+        $this->assertSame(DefaultOrderState::cart_pending, $this->order->getOrderState());
     }
 
     /** @test */
@@ -69,9 +69,9 @@ class OrderStateMachineTest extends TestCase
     {
         $this->expectException(StateException::class);
 
-        new OrderStateMachine([OrderState::cart_pending], [
+        new OrderStateMachine([DefaultOrderState::cart_pending], [
             'confirm' => [
-                'from' => [OrderState::cart_pending],
+                'from' => [DefaultOrderState::cart_pending],
             ],
         ]);
     }
@@ -83,7 +83,7 @@ class OrderStateMachineTest extends TestCase
 
         new OrderStateMachine([], [
             'confirm' => [
-                'from' => [OrderState::cart_pending],
+                'from' => [DefaultOrderState::cart_pending],
             ],
         ]);
     }

@@ -6,7 +6,7 @@ namespace Tests\Acceptance\Order;
 use DateTime;
 use Tests\Acceptance\TestCase;
 use Tests\TestHelpers;
-use Thinktomorrow\Trader\Domain\Model\Order\State\OrderState;
+use Thinktomorrow\Trader\Domain\Model\Order\State\DefaultOrderState;
 use Thinktomorrow\Trader\Infrastructure\Laravel\Models\DefaultOrderGridItem;
 
 class OrderGridItemTest extends TestCase
@@ -22,7 +22,7 @@ class OrderGridItemTest extends TestCase
         $this->assertEquals('xxx', $gridItem->getOrderId());
         $this->assertEquals('xx-ref', $gridItem->getOrderReference());
         $this->assertEquals('xx-invoice-ref', $gridItem->getInvoiceReference());
-        $this->assertEquals(OrderState::cart_revived->value, $gridItem->getOrderState());
+        $this->assertEquals(DefaultOrderState::cart_revived->value, $gridItem->getOrderState());
 
         $this->assertEquals('€ 4,20', $gridItem->getTotalPrice());
         $this->assertEquals('xx-ref', $gridItem->getTitle());

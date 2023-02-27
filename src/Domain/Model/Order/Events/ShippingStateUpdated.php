@@ -10,8 +10,8 @@ use Thinktomorrow\Trader\Domain\Model\Order\Shipping\ShippingState;
 class ShippingStateUpdated
 {
     public function __construct(
-        public readonly OrderId $orderId,
-        public readonly ShippingId $shippingId,
+        public readonly OrderId              $orderId,
+        public readonly ShippingId           $shippingId,
         public readonly ShippingState $formerShippingState,
         public readonly ShippingState $newShippingState
     ) {

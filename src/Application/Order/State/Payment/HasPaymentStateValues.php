@@ -6,7 +6,7 @@ namespace Thinktomorrow\Trader\Application\Order\State\Payment;
 use Thinktomorrow\Trader\Domain\Model\Order\OrderId;
 use Thinktomorrow\Trader\Domain\Model\Order\Payment\PaymentId;
 
-trait HasDefaultPaymentStateValues
+trait HasPaymentStateValues
 {
     private string $orderId;
     private string $paymentId;

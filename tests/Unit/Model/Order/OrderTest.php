@@ -18,10 +18,11 @@ use Thinktomorrow\Trader\Domain\Model\Order\OrderEvent\OrderEvent;
 use Thinktomorrow\Trader\Domain\Model\Order\OrderEvent\OrderEventId;
 use Thinktomorrow\Trader\Domain\Model\Order\OrderId;
 use Thinktomorrow\Trader\Domain\Model\Order\OrderReference;
+use Thinktomorrow\Trader\Domain\Model\Order\Shipping\DefaultShippingState;
 use Thinktomorrow\Trader\Domain\Model\Order\Shipping\Shipping;
 use Thinktomorrow\Trader\Domain\Model\Order\Shipping\ShippingCost;
 use Thinktomorrow\Trader\Domain\Model\Order\Shipping\ShippingId;
-use Thinktomorrow\Trader\Domain\Model\Order\State\OrderState;
+use Thinktomorrow\Trader\Domain\Model\Order\State\DefaultOrderState;
 use Thinktomorrow\Trader\Domain\Model\ShippingProfile\ShippingProfileId;
 
 class OrderTest extends TestCase
@@ -31,13 +32,14 @@ class OrderTest extends TestCase
     {
         $order = Order::create(
             $orderId = OrderId::fromString('xxx'),
-            $orderReference = OrderReference::fromString('xx-ref')
+            $orderReference = OrderReference::fromString('xx-ref'),
+            DefaultOrderState::cart_pending
         );
 
         $this->assertEquals([
             'order_id' => $orderId->get(),
             'order_ref' => $orderReference->get(),
-            'order_state' => OrderState::cart_pending->value,
+            'order_state' => DefaultOrderState::cart_pending->value,
             'invoice_ref' => null,
             'total' => '0',
             'tax_total' => '0',
@@ -82,6 +84,7 @@ class OrderTest extends TestCase
             $order->orderId, // TODO: avoid this here or assert it is the same...
             $shippingId = ShippingId::fromString('qqqq'),
             ShippingProfileId::fromString('postnl_home'),
+            DefaultShippingState::getDefaultState(),
             ShippingCost::fromScalars('23', '1', false)
         ));
 

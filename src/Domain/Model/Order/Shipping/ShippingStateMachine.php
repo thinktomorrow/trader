@@ -16,7 +16,9 @@ final class ShippingStateMachine extends AbstractStateMachine
     protected function getState($model): State
     {
         if ($model instanceof MerchantOrderShipping) {
-            return ShippingState::from($model->getShippingState());
+            // Get class of state so we can create the state
+            $firstState = reset($this->states);
+            return get_class($firstState)::fromString($model->getShippingState());
         }
 
         Assertion::isInstanceOf($model, Shipping::class);

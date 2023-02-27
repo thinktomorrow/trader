@@ -60,8 +60,12 @@ abstract class OrderRead
     {
         $order = new static();
 
+        if(!$state['order_state'] instanceof OrderState) {
+            throw new \InvalidArgumentException('Order state is expected to be instance of OrderState. Instead ' . gettype($state['order_state']) . ' is passed.');
+        }
+
         $order->orderId = $state['order_id'];
-        $order->state = OrderState::from($state['order_state']);
+        $order->state = $state['order_state'];
         $order->orderReference = $state['order_ref'];
         $order->invoiceReference = $state['invoice_ref'];
 

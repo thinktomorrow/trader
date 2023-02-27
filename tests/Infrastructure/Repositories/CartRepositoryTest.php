@@ -10,7 +10,7 @@ use Thinktomorrow\Trader\Domain\Common\Cash\Cash;
 use Thinktomorrow\Trader\Domain\Common\Locale;
 use Thinktomorrow\Trader\Domain\Model\Order\Line\Personalisations\LinePersonalisation;
 use Thinktomorrow\Trader\Domain\Model\Order\Line\Personalisations\LinePersonalisationId;
-use Thinktomorrow\Trader\Domain\Model\Order\State\OrderState;
+use Thinktomorrow\Trader\Domain\Model\Order\State\DefaultOrderState;
 use Thinktomorrow\Trader\Domain\Model\Product\Personalisation\PersonalisationId;
 use Thinktomorrow\Trader\Domain\Model\Product\Personalisation\PersonalisationType;
 use Thinktomorrow\Trader\Infrastructure\Laravel\Repositories\MysqlCartRepository;
@@ -53,7 +53,7 @@ final class CartRepositoryTest extends TestCase
     public function it_can_check_if_cart_exists()
     {
         $order = $this->createDefaultOrder();
-        $order->updateState(OrderState::cart_pending);
+        $order->updateState(DefaultOrderState::cart_pending);
 
         foreach ($this->orderRepositories() as $i => $orderRepository) {
             $this->prepareWorldForOrder($i);
@@ -99,7 +99,7 @@ final class CartRepositoryTest extends TestCase
     public function it_checks_if_cart_is_in_customer_hands()
     {
         $order = $this->createDefaultOrder();
-        $order->updateState(OrderState::confirmed);
+        $order->updateState(DefaultOrderState::confirmed);
 
         foreach ($this->orderRepositories() as $i => $orderRepository) {
             $this->prepareWorldForOrder($i);
@@ -118,7 +118,7 @@ final class CartRepositoryTest extends TestCase
         $calls = 0;
 
         $order = $this->createDefaultOrder();
-        $order->updateState(OrderState::confirmed);
+        $order->updateState(DefaultOrderState::confirmed);
 
         foreach ($this->orderRepositories() as $i => $orderRepository) {
             $this->prepareWorldForOrder($i);

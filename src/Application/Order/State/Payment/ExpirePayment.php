@@ -5,5 +5,5 @@ namespace Thinktomorrow\Trader\Application\Order\State\Payment;
 
 final class ExpirePayment
 {
-    use HasDefaultPaymentStateValues;
+    use HasPaymentStateValues;
 }

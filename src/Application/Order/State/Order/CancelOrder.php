@@ -5,5 +5,5 @@ namespace Thinktomorrow\Trader\Application\Order\State\Order;
 
 final class CancelOrder
 {
-    use HasDefaultOrderStateValues;
+    use HasOrderStateValues;
 }

@@ -8,7 +8,7 @@ use Thinktomorrow\Trader\Application\Cart\ConfirmCart;
 use Thinktomorrow\Trader\Domain\Model\Order\Events\OrderStateUpdated;
 use Thinktomorrow\Trader\Domain\Model\Order\Exceptions\OrderAlreadyInMerchantHands;
 use Thinktomorrow\Trader\Domain\Model\Order\OrderId;
-use Thinktomorrow\Trader\Domain\Model\Order\State\OrderState;
+use Thinktomorrow\Trader\Domain\Model\Order\State\DefaultOrderState;
 
 class ConfirmCartTest extends CartContext
 {
@@ -21,12 +21,12 @@ class ConfirmCartTest extends CartContext
         $this->cartApplication->completeCart(new CompleteCart('xxx'));
 
         $this->assertEquals(
-            new OrderStateUpdated(OrderId::fromString('xxx'), OrderState::cart_pending, OrderState::cart_completed),
+            new OrderStateUpdated(OrderId::fromString('xxx'), DefaultOrderState::cart_pending, DefaultOrderState::cart_completed),
             last($this->eventDispatcher->releaseDispatchedEvents())
         );
 
         $order = $this->orderRepository->find(OrderId::fromString('xxx'));
-        $this->assertSame(OrderState::cart_completed, $order->getOrderState());
+        $this->assertSame(DefaultOrderState::cart_completed, $order->getOrderState());
     }
 
     /** @test */
@@ -38,12 +38,12 @@ class ConfirmCartTest extends CartContext
         $this->cartApplication->confirmCart(new ConfirmCart('xxx'));
 
         $this->assertEquals(
-            new OrderStateUpdated(OrderId::fromString('xxx'), OrderState::cart_pending, OrderState::confirmed),
+            new OrderStateUpdated(OrderId::fromString('xxx'), DefaultOrderState::cart_pending, DefaultOrderState::confirmed),
             last($this->eventDispatcher->releaseDispatchedEvents())
         );
 
         $order = $this->orderRepository->find(OrderId::fromString('xxx'));
-        $this->assertSame(OrderState::confirmed, $order->getOrderState());
+        $this->assertSame(DefaultOrderState::confirmed, $order->getOrderState());
     }
 
     /** @test */
@@ -56,12 +56,12 @@ class ConfirmCartTest extends CartContext
         $this->cartApplication->confirmCart(new ConfirmCart('xxx'));
 
         $this->assertEquals(
-            new OrderStateUpdated(OrderId::fromString('xxx'), OrderState::cart_completed, OrderState::confirmed),
+            new OrderStateUpdated(OrderId::fromString('xxx'), DefaultOrderState::cart_completed, DefaultOrderState::confirmed),
             last($this->eventDispatcher->releaseDispatchedEvents())
         );
 
         $order = $this->orderRepository->find(OrderId::fromString('xxx'));
-        $this->assertSame(OrderState::confirmed, $order->getOrderState());
+        $this->assertSame(DefaultOrderState::confirmed, $order->getOrderState());
     }
 
     /** @test */

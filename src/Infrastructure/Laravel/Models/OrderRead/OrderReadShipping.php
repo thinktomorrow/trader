@@ -31,9 +31,13 @@ abstract class OrderReadShipping
     {
         $shipping = new static();
 
+        if(!$state['shipping_state'] instanceof  ShippingState) {
+            throw new \InvalidArgumentException('Shipping state is expected to be instance of ShippingState. Instead ' . gettype($state['shipping_state']) . ' is passed.');
+        }
+
         $shipping->shipping_id = $state['shipping_id'];
         $shipping->shipping_profile_id = $state['shipping_profile_id'] ?: null;
-        $shipping->state = ShippingState::from($state['shipping_state']);
+        $shipping->state = $state['shipping_state'];
         $shipping->cost = $state['cost'];
         $shipping->data = json_decode($state['data'], true);
         $shipping->discounts = $discounts;

@@ -5,7 +5,7 @@ namespace Thinktomorrow\Trader\Application\Order\State\Order;
 
 use Thinktomorrow\Trader\Domain\Model\Order\OrderId;
 
-trait HasDefaultOrderStateValues
+trait HasOrderStateValues
 {
     private string $orderId;
     private array $data;

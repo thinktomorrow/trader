@@ -39,6 +39,12 @@ use Thinktomorrow\Trader\Domain\Model\Customer\Customer;
 use Thinktomorrow\Trader\Domain\Model\Customer\CustomerId;
 use Thinktomorrow\Trader\Domain\Model\Customer\CustomerRepository;
 use Thinktomorrow\Trader\Domain\Model\Order\Discount\DiscountPriceDefaults;
+use Thinktomorrow\Trader\Domain\Model\Order\Payment\DefaultPaymentState;
+use Thinktomorrow\Trader\Domain\Model\Order\Payment\PaymentState;
+use Thinktomorrow\Trader\Domain\Model\Order\Shipping\DefaultShippingState;
+use Thinktomorrow\Trader\Domain\Model\Order\Shipping\ShippingState;
+use Thinktomorrow\Trader\Domain\Model\Order\State\DefaultOrderState;
+use Thinktomorrow\Trader\Domain\Model\Order\State\OrderState;
 use Thinktomorrow\Trader\Domain\Model\PaymentMethod\PaymentMethod;
 use Thinktomorrow\Trader\Domain\Model\PaymentMethod\PaymentMethodId;
 use Thinktomorrow\Trader\Domain\Model\PaymentMethod\PaymentMethodRepository;
@@ -109,6 +115,11 @@ abstract class TestCase extends \Orchestra\Testbench\TestCase
         DiscountPriceDefaults::setDiscountTaxRate(TaxRate::fromString('21'));
         DiscountPriceDefaults::setDiscountIncludeTax(true);
 
+        // States
+        (new TestContainer())->add(OrderState::class, DefaultOrderState::class);
+        (new TestContainer())->add(ShippingState::class, DefaultShippingState::class);
+        (new TestContainer())->add(PaymentState::class, DefaultPaymentState::class);
+
         (new TestContainer())->add(TaxonNode::class, DefaultTaxonNode::class);
         (new TestContainer())->add(VariantForCart::class, DefaultVariantForCart::class);
 
@@ -141,7 +152,7 @@ abstract class TestCase extends \Orchestra\Testbench\TestCase
         (new TestContainer())->add(CustomerBillingAddress::class, DefaultCustomerBillingAddress::class);
 
         // Repositories
-        (new TestContainer())->add(MysqlOrderRepository::class, new MysqlOrderRepository(new TestTraderConfig()));
+        (new TestContainer())->add(MysqlOrderRepository::class, new MysqlOrderRepository(new TestContainer(), new TestTraderConfig()));
     }
 
     public function getPackageProviders($app)

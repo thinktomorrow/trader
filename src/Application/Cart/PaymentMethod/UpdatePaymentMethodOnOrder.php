@@ -3,24 +3,28 @@ declare(strict_types=1);
 
 namespace Thinktomorrow\Trader\Application\Cart\PaymentMethod;
 
+use Psr\Container\ContainerInterface;
 use Thinktomorrow\Trader\Domain\Common\Taxes\TaxRate;
 use Thinktomorrow\Trader\Domain\Model\Order\Order;
 use Thinktomorrow\Trader\Domain\Model\Order\OrderRepository;
 use Thinktomorrow\Trader\Domain\Model\Order\Payment\Payment;
 use Thinktomorrow\Trader\Domain\Model\Order\Payment\PaymentCost;
+use Thinktomorrow\Trader\Domain\Model\Order\Payment\PaymentState;
 use Thinktomorrow\Trader\Domain\Model\PaymentMethod\PaymentMethodId;
 use Thinktomorrow\Trader\Domain\Model\PaymentMethod\PaymentMethodRepository;
 use Thinktomorrow\Trader\TraderConfig;
 
 class UpdatePaymentMethodOnOrder
 {
+    private ContainerInterface $container;
     private TraderConfig $config;
     private OrderRepository $orderRepository;
     private PaymentMethodRepository $paymentMethodRepository;
     private VerifyPaymentMethodForCart $verifyPaymentMethodForCart;
 
-    public function __construct(TraderConfig $config, OrderRepository $orderRepository, VerifyPaymentMethodForCart $verifyPaymentMethodForCart, PaymentMethodRepository $paymentMethodRepository)
+    public function __construct(ContainerInterface $container, TraderConfig $config, OrderRepository $orderRepository, VerifyPaymentMethodForCart $verifyPaymentMethodForCart, PaymentMethodRepository $paymentMethodRepository)
     {
+        $this->container = $container;
         $this->config = $config;
         $this->orderRepository = $orderRepository;
         $this->paymentMethodRepository = $paymentMethodRepository;
@@ -55,6 +59,7 @@ class UpdatePaymentMethodOnOrder
                 $order->orderId,
                 $this->orderRepository->nextPaymentReference(),
                 $paymentMethod->paymentMethodId,
+                $this->container->get(PaymentState::class)::getDefaultState(),
                 $paymentCost
             );
 

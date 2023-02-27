@@ -29,11 +29,11 @@ use Thinktomorrow\Trader\Domain\Model\Order\Line\Personalisations\LinePersonalis
 use Thinktomorrow\Trader\Domain\Model\Order\Order;
 use Thinktomorrow\Trader\Domain\Model\Order\OrderEvent\OrderEvent;
 use Thinktomorrow\Trader\Domain\Model\Order\Payment\Payment;
-use Thinktomorrow\Trader\Domain\Model\Order\Payment\PaymentState;
+use Thinktomorrow\Trader\Domain\Model\Order\Payment\DefaultPaymentState;
 use Thinktomorrow\Trader\Domain\Model\Order\Shipping\Shipping;
-use Thinktomorrow\Trader\Domain\Model\Order\Shipping\ShippingState;
+use Thinktomorrow\Trader\Domain\Model\Order\Shipping\DefaultShippingState;
 use Thinktomorrow\Trader\Domain\Model\Order\Shopper;
-use Thinktomorrow\Trader\Domain\Model\Order\State\OrderState;
+use Thinktomorrow\Trader\Domain\Model\Order\State\DefaultOrderState;
 use Thinktomorrow\Trader\Domain\Model\PaymentMethod\PaymentMethod;
 use Thinktomorrow\Trader\Domain\Model\PaymentMethod\PaymentMethodProviderId;
 use Thinktomorrow\Trader\Domain\Model\PaymentMethod\PaymentMethodState;
@@ -96,7 +96,7 @@ trait TestHelpers
             'order_id' => 'xxx',
             'order_ref' => 'xx-ref',
             'invoice_ref' => 'xx-invoice-ref',
-            'order_state' => OrderState::cart_revived->value,
+            'order_state' => DefaultOrderState::cart_revived,
             'data' => "[]",
         ], $orderValues), [
             Line::class => array_map(fn (Line $line) => [
@@ -104,8 +104,8 @@ trait TestHelpers
                 Discount::class => array_map(fn (Discount $discount) => $discount->getMappedData(), $line->getDiscounts()),
                 LinePersonalisation::class => array_map(fn (LinePersonalisation $linePersonalisation) => $linePersonalisation->getMappedData(), $line->getPersonalisations()),
             ], $lines),
-            Shipping::class => array_map(fn (Shipping $shipping) => [...$shipping->getMappedData(), Discount::class => array_map(fn (Discount $discount) => $discount->getMappedData(), $shipping->getDiscounts())], $shippings),
-            Payment::class => array_map(fn (Payment $payment) => [...$payment->getMappedData(), Discount::class => array_map(fn (Discount $discount) => $discount->getMappedData(), $payment->getDiscounts())], $payments),
+            Shipping::class => array_map(fn (Shipping $shipping) => [...array_merge($shipping->getMappedData(), ['shipping_state' => $shipping->getShippingState()]), Discount::class => array_map(fn (Discount $discount) => $discount->getMappedData(), $shipping->getDiscounts())], $shippings),
+            Payment::class => array_map(fn (Payment $payment) => [...array_merge($payment->getMappedData(), ['payment_state' => $payment->getPaymentState()]), Discount::class => array_map(fn (Discount $discount) => $discount->getMappedData(), $payment->getDiscounts())], $payments),
             ShippingAddress::class => $shippingAddress?->getMappedData(),
             BillingAddress::class => $billingAddress?->getMappedData(),
             Shopper::class => $shopper?->getMappedData(),
@@ -154,7 +154,7 @@ trait TestHelpers
             'order_id' => 'xxx',
             'shipping_id' => 'sss',
             'shipping_profile_id' => 'ppp',
-            'shipping_state' => ShippingState::none->value,
+            'shipping_state' => DefaultShippingState::none,
             'cost' => '30',
             'tax_rate' => '10',
             'includes_vat' => true,
@@ -171,7 +171,7 @@ trait TestHelpers
         return Payment::fromMappedData(array_merge([
             'payment_id' => 'ppppp',
             'payment_method_id' => 'mmm',
-            'payment_state' => PaymentState::initialized->value,
+            'payment_state' => DefaultPaymentState::initialized,
             'cost' => '20',
             'tax_rate' => '10',
             'includes_vat' => true,
