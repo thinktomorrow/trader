@@ -13,7 +13,6 @@ final class CartAbandoned
         public readonly OrderState $oldState,
         public readonly OrderState $newState,
         public readonly array      $data,
-    )
-    {
+    ) {
     }
 }

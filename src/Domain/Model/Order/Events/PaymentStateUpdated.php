@@ -14,7 +14,6 @@ class PaymentStateUpdated
         public readonly PaymentId    $paymentId,
         public readonly PaymentState $formerPaymentState,
         public readonly PaymentState $newPaymentState
-    )
-    {
+    ) {
     }
 }

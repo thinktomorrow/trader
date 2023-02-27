@@ -15,7 +15,6 @@ final class PaymentFailed
         public readonly PaymentState $formerPaymentState,
         public readonly PaymentState $newPaymentState,
         public readonly array        $data,
-    )
-    {
+    ) {
     }
 }

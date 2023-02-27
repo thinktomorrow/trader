@@ -388,7 +388,7 @@ class MysqlOrderRepository implements OrderRepository, InvoiceRepository
         $orderState = (array) $orderState;
 
         return Order::fromMappedData(array_merge($orderState, [
-            'order_state' => $this->container->get(OrderState::class)::fromString($orderState['order_state'])
+            'order_state' => $this->container->get(OrderState::class)::fromString($orderState['order_state']),
         ]), $childEntities);
     }
 

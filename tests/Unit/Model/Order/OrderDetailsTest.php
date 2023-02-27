@@ -8,8 +8,8 @@ use Thinktomorrow\Trader\Domain\Common\Address\AddressType;
 use Thinktomorrow\Trader\Domain\Model\Order\Discount\DiscountTotal;
 use Thinktomorrow\Trader\Domain\Model\Order\OrderTotal;
 use Thinktomorrow\Trader\Domain\Model\Order\Payment\PaymentCost;
-use Thinktomorrow\Trader\Domain\Model\Order\Shipping\ShippingCost;
 use Thinktomorrow\Trader\Domain\Model\Order\Shipping\DefaultShippingState;
+use Thinktomorrow\Trader\Domain\Model\Order\Shipping\ShippingCost;
 use Thinktomorrow\Trader\Domain\Model\Product\Variant\VariantSalePrice;
 
 class OrderDetailsTest extends TestCase

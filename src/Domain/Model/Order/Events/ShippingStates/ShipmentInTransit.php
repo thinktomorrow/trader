@@ -15,7 +15,6 @@ final class ShipmentInTransit
         public readonly ShippingState $formerShippingState,
         public readonly ShippingState $newShippingState,
         public readonly array         $data,
-    )
-    {
+    ) {
     }
 }

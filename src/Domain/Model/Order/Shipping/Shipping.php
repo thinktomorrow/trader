@@ -104,7 +104,7 @@ final class Shipping implements ChildAggregate, Discountable
     {
         $shipping = new static();
 
-        if(!$state['shipping_state'] instanceof  ShippingState) {
+        if (! $state['shipping_state'] instanceof  ShippingState) {
             throw new \InvalidArgumentException('Shipping state is expected to be instance of ShippingState. Instead ' . gettype($state['shipping_state']) . ' is passed.');
         }
 

@@ -13,10 +13,10 @@ use Thinktomorrow\Trader\Domain\Model\Order\Events\PaymentUpdated;
 use Thinktomorrow\Trader\Domain\Model\Order\Exceptions\CouldNotFindPaymentOnOrder;
 use Thinktomorrow\Trader\Domain\Model\Order\Exceptions\PaymentAlreadyOnOrder;
 use Thinktomorrow\Trader\Domain\Model\Order\OrderId;
+use Thinktomorrow\Trader\Domain\Model\Order\Payment\DefaultPaymentState;
 use Thinktomorrow\Trader\Domain\Model\Order\Payment\Payment;
 use Thinktomorrow\Trader\Domain\Model\Order\Payment\PaymentCost;
 use Thinktomorrow\Trader\Domain\Model\Order\Payment\PaymentId;
-use Thinktomorrow\Trader\Domain\Model\Order\Payment\DefaultPaymentState;
 use Thinktomorrow\Trader\Domain\Model\PaymentMethod\PaymentMethodId;
 
 class PaymentTest extends TestCase

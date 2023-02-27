@@ -57,7 +57,7 @@ class ShippingStateTest extends TestCase
     {
         $merchantOrderShipping = DefaultMerchantOrderShipping::fromMappedData(array_merge($this->shipping->getMappedData(), [
             'cost' => $this->shipping->getShippingCost(),
-            'shipping_state' => $this->shipping->getShippingState()
+            'shipping_state' => $this->shipping->getShippingState(),
         ]), $this->order->getMappedData(), []);
 
         $this->assertTrue($this->machine->can($merchantOrderShipping, 'ship'));

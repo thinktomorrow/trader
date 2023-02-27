@@ -12,7 +12,6 @@ class OrderMarkedPaidByMerchant
         public readonly OrderState $oldState,
         public readonly OrderState $newState,
         public readonly array      $data,
-    )
-    {
+    ) {
     }
 }

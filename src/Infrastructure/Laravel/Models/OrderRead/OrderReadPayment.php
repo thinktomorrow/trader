@@ -31,7 +31,7 @@ abstract class OrderReadPayment
     {
         $payment = new static();
 
-        if(!$state['payment_state'] instanceof  PaymentState) {
+        if (! $state['payment_state'] instanceof  PaymentState) {
             throw new \InvalidArgumentException('Payment state is expected to be instance of PaymentState. Instead ' . gettype($state['payment_state']) . ' is passed.');
         }
 

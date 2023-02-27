@@ -18,6 +18,7 @@ final class ShippingStateMachine extends AbstractStateMachine
         if ($model instanceof MerchantOrderShipping) {
             // Get class of state so we can create the state
             $firstState = reset($this->states);
+
             return get_class($firstState)::fromString($model->getShippingState());
         }
 

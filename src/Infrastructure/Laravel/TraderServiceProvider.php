@@ -322,22 +322,25 @@ class TraderServiceProvider extends ServiceProvider
 
     private function registerStateMachines()
     {
-        $this->app->bind(OrderState::class, fn() => DefaultOrderState::class);
-        $this->app->bind(PaymentState::class, fn() => DefaultPaymentState::class);
-        $this->app->bind(ShippingState::class, fn() => DefaultShippingState::class);
+        $this->app->bind(OrderState::class, fn () => DefaultOrderState::class);
+        $this->app->bind(PaymentState::class, fn () => DefaultPaymentState::class);
+        $this->app->bind(ShippingState::class, fn () => DefaultShippingState::class);
 
         $this->app->bind(OrderStateMachine::class, function () {
             $orderStateClass = $this->app->get(OrderState::class);
+
             return new OrderStateMachine($orderStateClass::getStates(), $orderStateClass::getTransitions());
         });
 
         $this->app->bind(PaymentStateMachine::class, function () {
             $paymentStateClass = $this->app->get(PaymentState::class);
+
             return new PaymentStateMachine($paymentStateClass::getStates(), $paymentStateClass::getTransitions());
         });
 
         $this->app->bind(ShippingStateMachine::class, function () {
             $shippingStateClass = $this->app->get(ShippingState::class);
+
             return new ShippingStateMachine($shippingStateClass::getStates(), $shippingStateClass::getTransitions());
         });
     }

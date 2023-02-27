@@ -302,7 +302,7 @@ final class Order implements Aggregate, Discountable
     {
         $order = new static();
 
-        if(!$state['order_state'] instanceof  OrderState) {
+        if (! $state['order_state'] instanceof  OrderState) {
             throw new \InvalidArgumentException('Order state is expected to be instance of OrderState. Instead ' . gettype($state['order_state']) . ' is passed.');
         }
 

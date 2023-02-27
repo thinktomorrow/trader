@@ -6,5 +6,4 @@ use Thinktomorrow\Trader\Domain\Common\State\State;
 
 interface ShippingState extends State
 {
-
 }

@@ -12,13 +12,10 @@ use Thinktomorrow\Trader\Application\Cart\ShippingProfile\UpdateShippingProfileO
 use Thinktomorrow\Trader\Application\Order\State\OrderStateApplication;
 use Thinktomorrow\Trader\Domain\Model\Order\Payment\DefaultPaymentState;
 use Thinktomorrow\Trader\Domain\Model\Order\Payment\PaymentStateMachine;
-use Thinktomorrow\Trader\Domain\Model\Order\Payment\PaymentStateToEventMap;
 use Thinktomorrow\Trader\Domain\Model\Order\Shipping\DefaultShippingState;
 use Thinktomorrow\Trader\Domain\Model\Order\Shipping\ShippingStateMachine;
-use Thinktomorrow\Trader\Domain\Model\Order\Shipping\ShippingStateToEventMap;
 use Thinktomorrow\Trader\Domain\Model\Order\State\DefaultOrderState;
 use Thinktomorrow\Trader\Domain\Model\Order\State\OrderStateMachine;
-use Thinktomorrow\Trader\Domain\Model\Order\State\OrderStateToEventMap;
 use Thinktomorrow\Trader\Infrastructure\Laravel\Models\Cart\DefaultAdjustLine;
 use Thinktomorrow\Trader\Infrastructure\Test\EventDispatcherSpy;
 use Thinktomorrow\Trader\Infrastructure\Test\Repositories\InMemoryCustomerRepository;
