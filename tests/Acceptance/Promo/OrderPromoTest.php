@@ -8,6 +8,7 @@ use Tests\Acceptance\Cart\CartContext;
 use Thinktomorrow\Trader\Application\Cart\RefreshCart\RefreshCart;
 use Thinktomorrow\Trader\Application\Promo\Coupon\EnterCoupon;
 use Thinktomorrow\Trader\Domain\Common\Cash\Cash;
+use Thinktomorrow\Trader\Domain\Model\Order\Discount\DiscountPriceDefaults;
 
 class OrderPromoTest extends CartContext
 {
@@ -28,6 +29,8 @@ class OrderPromoTest extends CartContext
         $cart = $this->cartRepository->findCart($this->getOrder()->orderId);
         $this->assertCount(1, $cart->getDiscounts());
 
+        $this->assertTrue($order->getDiscountTotal()->includesVat());
+
         $this->assertEquals(Money::EUR(2500), $order->getSubTotal()->getIncludingVat());
         $this->assertEquals(Money::EUR(40), $order->getDiscountTotal()->getIncludingVat());
         $this->assertEquals(Money::EUR(2460), $order->getTotal()->getIncludingVat());
@@ -35,6 +38,37 @@ class OrderPromoTest extends CartContext
         $this->assertEquals('€ 25', $cart->getSubtotalPrice());
         $this->assertEquals('€ 0,40', $cart->getDiscountPrice());
         $this->assertEquals('€ 24,60', $cart->getTotalPrice());
+    }
+
+    /** @test */
+    public function it_can_apply_promo_when_discount_amount_is_excluded_vat()
+    {
+        DiscountPriceDefaults::setDiscountIncludeTax(false);
+
+        $this->givenThereIsAPromo(['coupon_code' => 'foobar']);
+        $this->givenThereIsAProductWhichCostsEur('lightsaber', 5);
+        $this->whenIAddTheVariantToTheCart('lightsaber-123', 5);
+
+        $this->promoApplication->enterCoupon(new EnterCoupon($this->getOrder()->orderId->get(), 'foobar'));
+
+        $order = $this->orderRepository->find($this->getOrder()->orderId);
+        $this->assertCount(1, $order->getDiscounts());
+
+        $this->assertEquals('foobar', $order->getEnteredCouponCode());
+
+        $cart = $this->cartRepository->findCart($this->getOrder()->orderId);
+        $this->assertCount(1, $cart->getDiscounts());
+
+        $this->assertFalse($order->getDiscountTotal()->includesVat());
+
+        $this->assertEquals(Money::EUR(2500), $order->getSubTotal()->getIncludingVat());
+        $this->assertEquals(Money::EUR(40), $order->getDiscountTotal()->getExcludingVat());
+        $this->assertEquals(Money::EUR(48), $order->getDiscountTotal()->getIncludingVat());
+        $this->assertEquals(Money::EUR(2452), $order->getTotal()->getIncludingVat());
+
+        $this->assertEquals('€ 25', $cart->getSubtotalPrice());
+        $this->assertEquals('€ 0,48', $cart->getDiscountPrice());
+        $this->assertEquals('€ 24,52', $cart->getTotalPrice());
     }
 
     /** @test */

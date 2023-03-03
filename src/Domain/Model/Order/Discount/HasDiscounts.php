@@ -40,7 +40,7 @@ trait HasDiscounts
             return $carry === null
                 ? $discount->getTotal()
                 : $carry->add(DiscountTotal::fromMoney(
-                    $discount->getTotal()->getIncludingVat(),
+                    $discountIncludesVat ? $discount->getTotal()->getIncludingVat() : $discount->getTotal()->getExcludingVat(),
                     $discountTaxRate,
                     $discountIncludesVat
                 ));

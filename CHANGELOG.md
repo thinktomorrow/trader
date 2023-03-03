@@ -35,6 +35,7 @@ Schema::table('trader_payment_methods', function (Blueprint $table) {
 });
 ```
 - Added: TaxonFilterTreeComposer::getOnlineProductIds(string $taxonId); to collect product ids of online products.
+- Fixed: Discount calculation when price calculations is set to 'include_vat_in_prices'
 - Changed: TaxonFilterTreeComposer::getActiveFilters now returns filters that have online products
 - Changed: LineAdded property productId renamed to variantId. This was actually already the value of the variant id.
 

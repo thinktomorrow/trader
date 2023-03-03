@@ -30,6 +30,7 @@ class AdjustDiscounts implements Adjuster
 
         // If coupon is given on cart, we'll refresh that promo first
         if ($order->getEnteredCouponCode() && $couponPromo = $this->orderPromoRepository->findOrderPromoByCouponCode($order->getEnteredCouponCode())) {
+
             $this->applyPromoToOrder->apply($order, $couponPromo->getDiscounts());
 
             if ($couponPromo->isCombinable()) {

@@ -7,6 +7,7 @@ use Thinktomorrow\Trader\Application\Promo\OrderPromo\OrderDiscount;
 use Thinktomorrow\Trader\Domain\Common\Cash\Cash;
 use Thinktomorrow\Trader\Domain\Common\Cash\Percentage;
 use Thinktomorrow\Trader\Domain\Model\Order\Discount\Discountable;
+use Thinktomorrow\Trader\Domain\Model\Order\Discount\DiscountPriceDefaults;
 use Thinktomorrow\Trader\Domain\Model\Order\Discount\DiscountTotal;
 use Thinktomorrow\Trader\Domain\Model\Order\Order;
 use Thinktomorrow\Trader\Domain\Model\Promo\Discounts\PercentageOffDiscount;
@@ -32,11 +33,11 @@ class PercentageOffOrderDiscount extends BaseDiscount implements OrderDiscount
 
     public function getDiscountTotal(Order $order, Discountable $discountable): DiscountTotal
     {
-        $amount = Cash::from(
+        $discountMoney = Cash::from(
             $order->getSubTotal()->getIncludingVat()
         )->percentage($this->percentage);
 
-        return DiscountTotal::fromDefault($amount);
+        return DiscountTotal::fromMoney($discountMoney, DiscountPriceDefaults::getDiscountTaxRate(), $order->getSubTotal()->includesVat());
     }
 
     public static function fromMappedData(array $state, array $aggregateState, array $conditions): static
