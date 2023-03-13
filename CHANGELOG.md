@@ -4,6 +4,7 @@ Important changes will be notified in this file
 
 ## unreleased
 
+## 2023-03-13 - 0.6.0
 - Changed: OrderState, ShippingState and PaymentState are now interfaces. Default State classes are provided out of the box.
 - Added: stock logic
 - Added: Payment method logic for add multiple payment options in checkout.
