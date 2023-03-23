@@ -4,6 +4,9 @@ Important changes will be notified in this file
 
 ## unreleased
 
+## 2023-03-23 - 0.6.1
+- Added: `orderGridRepository::sortByCreatedAt` and `orderGridRepository::sortByCreatedAt`.
+
 ## 2023-03-13 - 0.6.0
 - Changed: OrderState, ShippingState and PaymentState are now interfaces. Default State classes are provided out of the box.
 - Added: stock logic

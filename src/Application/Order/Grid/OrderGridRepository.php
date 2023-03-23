@@ -17,6 +17,8 @@ interface OrderGridRepository
     public function filterByStates(array $states): static;
     public function filterByConfirmedAt(string $startAt = null, string $endAt = null): static;
     public function filterByDeliveredAt(string $startAt = null, string $endAt = null): static;
+    public function sortByCreatedAt(): static;
+    public function sortByCreatedAtDesc(): static;
     public function sortByConfirmedAt(): static;
     public function sortByConfirmedAtDesc(): static;
     public function sortByDeliveredAt(): static;

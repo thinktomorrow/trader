@@ -103,6 +103,20 @@ final class MysqlOrderGridRepository implements OrderGridRepository
         return $this;
     }
 
+    public function sortByCreatedAt(): static
+    {
+        $this->builder->orderBy('created_at', 'ASC');
+
+        return $this;
+    }
+
+    public function sortByCreatedAtDesc(): static
+    {
+        $this->builder->orderBy('created_at', 'DESC');
+
+        return $this;
+    }
+
     public function sortByConfirmedAt(): static
     {
         $this->builder->orderBy('confirmed_at', 'ASC');
@@ -184,6 +198,6 @@ final class MysqlOrderGridRepository implements OrderGridRepository
 
     private function sortByDefault(): void
     {
-        $this->builder->orderBy(static::$orderTable . '.created_at', 'ASC');
+        $this->builder->orderBy(static::$orderTable . '.created_at', 'DESC');
     }
 }
