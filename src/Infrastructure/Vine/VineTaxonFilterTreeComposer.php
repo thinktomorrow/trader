@@ -80,7 +80,11 @@ class VineTaxonFilterTreeComposer implements TaxonFilterTreeComposer
              * and therefore omit the main taxon as filter and use the selected taxa as the only active filters instead.
              */
             foreach ($selectedTaxons as $selectedTaxon) {
-                if ($selectedTaxon->getRootNode()->getNodeId() === $mainTaxonNode->getRootNode()->getNodeId()) {
+
+                $selectedTaxonRootId = $taxonTree->find(fn($taxonNode) => $taxonNode->getNodeId() == $selectedTaxon->getNodeId())
+                    ?->getRootNode()?->getNodeId();
+
+                if ($selectedTaxonRootId === $mainTaxonNode->getRootNode()->getNodeId()) {
                     $taxonTree = new TaxonTree();
                 }
             }
