@@ -81,7 +81,7 @@ class VineTaxonFilterTreeComposer implements TaxonFilterTreeComposer
              */
             foreach ($selectedTaxons as $selectedTaxon) {
 
-                $selectedTaxonRootId = $taxonTree->find(fn($taxonNode) => $taxonNode->getNodeId() == $selectedTaxon->getNodeId())
+                $selectedTaxonRootId = $taxonTree->find(fn ($taxonNode) => $taxonNode->getNodeId() == $selectedTaxon->getNodeId())
                     ?->getRootNode()?->getNodeId();
 
                 if ($selectedTaxonRootId === $mainTaxonNode->getRootNode()->getNodeId()) {

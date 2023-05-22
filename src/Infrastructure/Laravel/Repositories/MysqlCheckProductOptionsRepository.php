@@ -8,8 +8,8 @@ use Thinktomorrow\Trader\Application\Product\CheckProductOptions\CheckProductOpt
 
 class MysqlCheckProductOptionsRepository implements CheckProductOptionsRepository
 {
-//    private static string $optionTable = 'trader_product_options';
-//    private static string $optionValueTable = 'trader_product_option_values';
+    //    private static string $optionTable = 'trader_product_options';
+    //    private static string $optionValueTable = 'trader_product_option_values';
     private static string $variantOptionValueLookupTable = 'trader_variant_option_values';
 
     public function exists(array $option_value_ids, $excluded_variant_id = null): bool

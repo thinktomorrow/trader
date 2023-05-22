@@ -131,9 +131,9 @@ class Promo implements Aggregate
         $promo->data = json_decode($state['data'], true);
         $promo->discounts = $childEntities[Discount::class];
 
-//        $promo->discounts = array_key_exists(Discount::class, $childEntities)
-//            ? array_map(fn ($discountState) => Discount::fromMappedData($discountState, $state, [Condition::class => $discountState[Condition::class]]), $childEntities[Discount::class])
-//            : [];
+        //        $promo->discounts = array_key_exists(Discount::class, $childEntities)
+        //            ? array_map(fn ($discountState) => Discount::fromMappedData($discountState, $state, [Condition::class => $discountState[Condition::class]]), $childEntities[Discount::class])
+        //            : [];
 
 
         return $promo;

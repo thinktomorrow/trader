@@ -114,7 +114,7 @@ final class OrderRepositoryTest extends TestCase
             'discountable_type' => DiscountableType::line->value,
         ], $orderWithLineDiscount->getMappedData()));
         yield $orderWithLineDiscount;
-//
+        //
         $orderWithShippingDiscount = $this->createDefaultOrder();
         $orderWithShippingDiscount->getShippings()[0]->addDiscount($this->createOrderDiscount([
             'discount_id' => 'order-discount-def',
