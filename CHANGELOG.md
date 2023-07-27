@@ -26,17 +26,27 @@ Schema::table('trader_payment_methods', function (Blueprint $table) {
 });
 
 Schema::table('trader_shipping_profiles', function (Blueprint $table) {
-    $table->string('provider');
+    $table->string('provider_id');
 });
 
 Schema::table('trader_payment_methods', function (Blueprint $table) {
-    $table->string('provider');
+    $table->string('provider_id');
 });
 
 Schema::table('trader_payment_methods', function (Blueprint $table) {
     $table->string('state')->default(\Thinktomorrow\Trader\Domain\Model\PaymentMethod\PaymentMethodState::online->value);
-    $table->boolean('active')->default(1);
 });
+
+Schema::create('trader_order_lines', function (Blueprint $table) {
+    $table->boolean('reduced_from_stock')->default(0);
+});
+
+Schema::create('trader_product_variants', function (Blueprint $table) {
+        $table->integer('stock_level')->default(0);
+        $table->boolean('ignore_out_of_stock')->default(true);
+        $table->json('stock_data')->nullable();
+});
+
 ```
 - Added: TaxonFilterTreeComposer::getOnlineProductIds(string $taxonId); to collect product ids of online products.
 - Fixed: Discount calculation when price calculations is set to 'include_vat_in_prices'
