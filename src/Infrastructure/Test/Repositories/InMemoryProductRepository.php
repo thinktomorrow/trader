@@ -61,16 +61,16 @@ final class InMemoryProductRepository implements ProductRepository
         static::$products = [];
     }
 
-//    public function findVariantForCart(VariantId $variantId): VariantForCart
-//    {
-//        foreach(static::$products as $product) {
-//            foreach($product->getVariants() as $variant) {
-//                if($variant->variantId->equals($variantId)) {
-//                    return new VariantForCart(
-//                        $variant->getSalePrice()
-//                    );
-//                }
-//            }
-//        }
-//    }
+    //    public function findVariantForCart(VariantId $variantId): VariantForCart
+    //    {
+    //        foreach(static::$products as $product) {
+    //            foreach($product->getVariants() as $variant) {
+    //                if($variant->variantId->equals($variantId)) {
+    //                    return new VariantForCart(
+    //                        $variant->getSalePrice()
+    //                    );
+    //                }
+    //            }
+    //        }
+    //    }
 }

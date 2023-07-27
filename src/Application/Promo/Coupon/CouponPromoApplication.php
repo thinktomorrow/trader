@@ -46,8 +46,8 @@ final class CouponPromoApplication
 
         $this->applyPromoToOrder->apply($order, $promo->getDiscounts(), $enterCoupon->getCouponCode());
 
-//        if($promo->)
-//        $order->setEnteredCouponCode($enterCoupon->getCouponCode());
+        //        if($promo->)
+        //        $order->setEnteredCouponCode($enterCoupon->getCouponCode());
 
         // is applicable on order?
         // apply

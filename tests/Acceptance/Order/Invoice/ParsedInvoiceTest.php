@@ -17,7 +17,7 @@ class ParsedInvoiceTest extends TestCase
         $this->assertEquals("000003", $parsed->number);
         $this->assertEquals(3, $parsed->getNumberAsInt());
 
-//        $parsed
+        //        $parsed
 
         //
         // 23000003

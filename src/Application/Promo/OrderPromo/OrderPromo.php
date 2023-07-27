@@ -30,38 +30,38 @@ class OrderPromo
         return $this->coupon_code;
     }
 
-//    public function apply(Order $order): void
-//    {
-//        $hasBeenApplied = false;
-//
-//        // TODO: check if order is in customer hands still? Or can admin add promo afterwards??
-//
-//        // Loop over different discountables
-//        foreach ($this->discounts as $discount) {
-//            foreach ($order->getShippings() as $shipping) {
-//                if ($discount->isApplicable($order, $shipping)) {
-//                    $discount->apply($order, $shipping);
-//                    $hasBeenApplied = true;
-//                }
-//            }
-//
-//            foreach ($order->getLines() as $line) {
-//                if ($discount->isApplicable($order, $line)) {
-//                    $discount->apply($order, $line);
-//                    $hasBeenApplied = true;
-//                }
-//            }
-//
-//            if ($discount->isApplicable($order, $order)) {
-//                $discount->apply($order, $order);
-//                $hasBeenApplied = true;
-//            }
-//        }
-//
-//        if ($this->coupon_code && $hasBeenApplied) {
-//            $order->setEnteredCouponCode($this->coupon_code);
-//        }
-//    }
+    //    public function apply(Order $order): void
+    //    {
+    //        $hasBeenApplied = false;
+    //
+    //        // TODO: check if order is in customer hands still? Or can admin add promo afterwards??
+    //
+    //        // Loop over different discountables
+    //        foreach ($this->discounts as $discount) {
+    //            foreach ($order->getShippings() as $shipping) {
+    //                if ($discount->isApplicable($order, $shipping)) {
+    //                    $discount->apply($order, $shipping);
+    //                    $hasBeenApplied = true;
+    //                }
+    //            }
+    //
+    //            foreach ($order->getLines() as $line) {
+    //                if ($discount->isApplicable($order, $line)) {
+    //                    $discount->apply($order, $line);
+    //                    $hasBeenApplied = true;
+    //                }
+    //            }
+    //
+    //            if ($discount->isApplicable($order, $order)) {
+    //                $discount->apply($order, $order);
+    //                $hasBeenApplied = true;
+    //            }
+    //        }
+    //
+    //        if ($this->coupon_code && $hasBeenApplied) {
+    //            $order->setEnteredCouponCode($this->coupon_code);
+    //        }
+    //    }
 
     public function isCombinable(): bool
     {

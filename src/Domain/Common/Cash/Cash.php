@@ -157,11 +157,11 @@ class Cash
         return $this->money->divide($tax_percentage, $roundMethod, $returnAsMoney, $round);
     }
 
-//        // TODO Rate exchanger...
-//    public function convert(Currency $currency)
-//    {
-//        return RateExchange::fromMoney($this->money)->to($currency);
-//    }
+    //        // TODO Rate exchanger...
+    //    public function convert(Currency $currency)
+    //    {
+    //        return RateExchange::fromMoney($this->money)->to($currency);
+    //    }
 
     /**
      * Format according to locale preferences (default is fetched from Config)
