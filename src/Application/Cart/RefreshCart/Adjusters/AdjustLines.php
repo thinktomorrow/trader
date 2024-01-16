@@ -32,6 +32,7 @@ class AdjustLines implements Adjuster
             // No longer there? Maybe deleted.
             if (! $variant = $this->findVariant($variants, $line->getVariantId())) {
                 $order->deleteLine($line->lineId);
+
                 // TODO: event + note
                 continue;
             }
