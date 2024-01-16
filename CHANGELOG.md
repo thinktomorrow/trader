@@ -4,6 +4,9 @@ Important changes will be notified in this file
 
 ## unreleased
 
+## 2024-01-16 - 0.6.2
+- Fixed: Taxon MultiSelect support for chief > 0.8.3
+
 ## 2023-03-23 - 0.6.1
 - Added: `orderGridRepository::sortByCreatedAt` and `orderGridRepository::sortByCreatedAt`.
 
