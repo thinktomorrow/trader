@@ -34,8 +34,8 @@ final class TaxonIdOptionsComposerTest extends TestCase
 
             $this->assertEquals([
                 [
-                    'group' => 'Taxon first',
-                    'values' => [
+                    'label' => 'Taxon first',
+                    'options' => [
                         'first' => 'Taxon first',
                         'second' => 'Taxon second',
                         'third' => 'Taxon third',
@@ -43,8 +43,8 @@ final class TaxonIdOptionsComposerTest extends TestCase
                     ],
                 ],
                 [
-                    'group' => 'Taxon fifth',
-                    'values' => [
+                    'label' => 'Taxon fifth',
+                    'options' => [
                         'fifth' => 'Taxon fifth',
                         'sixth' => 'Taxon sixth',
                     ],

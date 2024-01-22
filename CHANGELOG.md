@@ -4,6 +4,9 @@ Important changes will be notified in this file
 
 ## unreleased
 
+## 2024-01-22 - 0.6.3
+- Fixed: TaxonFilterTreeComposer::getAvailableFilters() filtering improved: For type type of category taxa, only children of the given main taxon are returned.
+
 ## 2024-01-16 - 0.6.2
 - Fixed: Taxon MultiSelect support for chief > 0.8.3
 

@@ -8,14 +8,17 @@ use Thinktomorrow\Trader\Application\Taxon\Tree\TaxonNode;
 use Thinktomorrow\Trader\Application\Taxon\Tree\TaxonTree;
 use Thinktomorrow\Trader\Application\Taxon\Tree\TaxonTreeRepository;
 use Thinktomorrow\Trader\Domain\Common\Locale;
+use Thinktomorrow\Trader\TraderConfig;
 
 class VineTaxonFilterTreeComposer implements TaxonFilterTreeComposer
 {
     private TaxonTreeRepository $taxonTreeRepository;
+    private TraderConfig $traderConfig;
 
-    public function __construct(TaxonTreeRepository $taxonTreeRepository)
+    public function __construct(TraderConfig $traderConfig, TaxonTreeRepository $taxonTreeRepository)
     {
         $this->taxonTreeRepository = $taxonTreeRepository;
+        $this->traderConfig = $traderConfig;
     }
 
     public function getAvailableFilters(Locale $locale, string $mainTaxonFilterKey): TaxonTree
@@ -27,6 +30,8 @@ class VineTaxonFilterTreeComposer implements TaxonFilterTreeComposer
             return new TaxonTree();
         }
 
+        $categoryRootId = $this->traderConfig->getCategoryRootId();
+
         $productIds = $this->getOnlineProductIds($mainTaxonNode->getId());
 
         /**
@@ -35,7 +40,13 @@ class VineTaxonFilterTreeComposer implements TaxonFilterTreeComposer
          * are only taxa left that match one or more of the same products
          */
         $taxonTree = $this->taxonTreeRepository->getTree()
+            // For the category taxa, only return the taxa that are children of the given main taxon
+            ->shake(fn (TaxonNode $node) => !$categoryRootId || $categoryRootId != $node->getRootNode()->getNodeId() || in_array($mainTaxonNode->getNodeId(), $node->pluckAncestorNodes('id')) )
+
+            // Only fetch taxa that are related to the given listing of products
             ->shake(fn (TaxonNode $node) => count(array_intersect($node->getOnlineProductIds(), $productIds)) > 0)
+
+            // Remove offline taxa
             ->remove(fn (TaxonNode $node) => ! $node->showOnline());
 
         // For a better filter representation, we want to start from the given taxon as the root - and not the 'real' root.
