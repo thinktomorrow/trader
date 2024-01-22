@@ -41,7 +41,7 @@ class VineTaxonFilterTreeComposer implements TaxonFilterTreeComposer
          */
         $taxonTree = $this->taxonTreeRepository->getTree()
             // For the category taxa, only return the taxa that are children of the given main taxon
-            ->shake(fn (TaxonNode $node) => !$categoryRootId || $categoryRootId != $node->getRootNode()->getNodeId() || in_array($mainTaxonNode->getNodeId(), $node->pluckAncestorNodes('id')) )
+            ->shake(fn (TaxonNode $node) => ! $categoryRootId || $categoryRootId != $node->getRootNode()->getNodeId() || in_array($mainTaxonNode->getNodeId(), $node->pluckAncestorNodes('id')))
 
             // Only fetch taxa that are related to the given listing of products
             ->shake(fn (TaxonNode $node) => count(array_intersect($node->getOnlineProductIds(), $productIds)) > 0)
