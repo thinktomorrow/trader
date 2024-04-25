@@ -24,31 +24,35 @@ class MysqlProductDetailRepository implements ProductDetailRepository
         $this->container = $container;
     }
 
-    public function findProductDetail(VariantId $variantId): ProductDetail
+    public function findProductDetail(VariantId $variantId, bool $allowOffline = false): ProductDetail
     {
         // Basic builder query
-        $state = DB::table(static::$variantTable)
+        $builder = DB::table(static::$variantTable)
             ->join(static::$productTable, static::$variantTable . '.product_id', '=', static::$productTable . '.product_id')
-            ->leftJoin(static::$taxonLookupTable, static::$productTable.'.product_id', static::$taxonLookupTable.'.product_id')
-            ->whereIn(static::$productTable . '.state', ProductState::onlineStates())
+            ->leftJoin(static::$taxonLookupTable, static::$productTable . '.product_id', static::$taxonLookupTable . '.product_id')
             ->where(static::$variantTable . '.variant_id', $variantId->get())
-            ->groupBy(static::$variantTable.'.variant_id')
+            ->groupBy(static::$variantTable . '.variant_id')
             ->select([
                 static::$variantTable . '.*',
                 static::$productTable . '.data AS product_data',
                 DB::raw('GROUP_CONCAT(taxon_id) AS taxon_ids'),
             ])
-            ->addSelect($this->container->get(ProductDetail::class)::stateSelect())
-        ->first();
+            ->addSelect($this->container->get(ProductDetail::class)::stateSelect());
 
-        if (! $state) {
-            throw new CouldNotFindVariant('No online variant found by id [' . $variantId->get(). ']');
+        if (!$allowOffline) {
+            $builder->whereIn(static::$productTable . '.state', ProductState::onlineStates());
         }
 
-        $state = (array) $state;
+        $state = $builder->first();
+
+        if (!$state) {
+            throw new CouldNotFindVariant('No online variant found by id [' . $variantId->get() . ']');
+        }
+
+        $state = (array)$state;
 
         return $this->container->get(ProductDetail::class)::fromMappedData(array_merge($state, [
-            'includes_vat' => (bool) $state['includes_vat'],
+            'includes_vat' => (bool)$state['includes_vat'],
             'taxon_ids' => $state['taxon_ids'] ? explode(',', $state['taxon_ids']) : [],
         ]));
     }

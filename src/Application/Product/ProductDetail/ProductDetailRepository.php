@@ -7,5 +7,5 @@ use Thinktomorrow\Trader\Domain\Model\Product\Variant\VariantId;
 
 interface ProductDetailRepository
 {
-    public function findProductDetail(VariantId $variantId): ProductDetail;
+    public function findProductDetail(VariantId $variantId, bool $allowOffline = false): ProductDetail;
 }

@@ -3,6 +3,7 @@
 Important changes will be notified in this file
 
 ## unreleased
+- Changed: `ProductDetailRepository::findProductDetail` now accepts a second parameter `allowOffline` to also return offline variants. This defaults to false.
 
 ## 2024-01-22 - 0.6.3
 - Fixed: TaxonFilterTreeComposer::getAvailableFilters() filtering improved: For type type of category taxa, only children of the given main taxon are returned.

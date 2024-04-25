@@ -370,6 +370,14 @@ trait TestHelpers
         return $product;
     }
 
+    protected function createOfflineProduct(): Product
+    {
+        $product = Product::create(ProductId::fromString('xxx'));
+        $product->updateState(ProductState::offline);
+
+        return $product;
+    }
+
     protected function createProductWithPersonalisations(): Product
     {
         $product = $this->createProductWithVariant();
@@ -446,6 +454,17 @@ trait TestHelpers
     protected function createProductWithVariant(): Product
     {
         $product = $this->createProduct();
+        return $this->withVariant($product);
+    }
+
+    protected function createOfflineProductWithVariant(): Product
+    {
+        $product = $this->createOfflineProduct();
+        return $this->withVariant($product);
+    }
+
+    private function withVariant(Product $product): Product
+    {
         $product->updateOptions([Option::create($product->productId, OptionId::fromString('ooo'), ['foo' => 'bar'])]);
         $product->updateOptionValues(OptionId::fromString('ooo'), [
             OptionValue::create(OptionId::fromString('ooo'), OptionValueId::fromString('ppp'), ['foo' => 'bar']),
