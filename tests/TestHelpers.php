@@ -454,12 +454,14 @@ trait TestHelpers
     protected function createProductWithVariant(): Product
     {
         $product = $this->createProduct();
+
         return $this->withVariant($product);
     }
 
     protected function createOfflineProductWithVariant(): Product
     {
         $product = $this->createOfflineProduct();
+
         return $this->withVariant($product);
     }
 
