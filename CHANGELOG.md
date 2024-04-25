@@ -3,6 +3,8 @@
 Important changes will be notified in this file
 
 ## unreleased
+
+## 2024-04-25 - 0.6.4
 - Changed: `ProductDetailRepository::findProductDetail` now accepts a second parameter `allowOffline` to also return offline variants. This defaults to false.
 
 ## 2024-01-22 - 0.6.3
