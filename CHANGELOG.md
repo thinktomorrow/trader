@@ -3,6 +3,7 @@
 Important changes will be notified in this file
 
 ## unreleased
+- Added: Verify parsed invoice number is positive integer
 
 ## 2024-04-25 - 0.6.4
 - Changed: `ProductDetailRepository::findProductDetail` now accepts a second parameter `allowOffline` to also return offline variants. This defaults to false.
