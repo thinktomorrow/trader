@@ -9,6 +9,7 @@ use Thinktomorrow\Trader\Application\Product\VariantLinks\VariantLink;
 use Thinktomorrow\Trader\Domain\Model\Product\Option\Option;
 use Thinktomorrow\Trader\Domain\Model\Product\Option\OptionValue;
 use Thinktomorrow\Trader\Domain\Model\Product\Variant\Variant;
+use Thinktomorrow\Trader\Domain\Model\Product\Variant\VariantState;
 
 class DefaultVariantLink implements VariantLink
 {
@@ -65,6 +66,15 @@ class DefaultVariantLink implements VariantLink
         }
 
         return '/' . $this->variant->variantId->get();
+    }
+
+    public function isVariantAvailable(): bool
+    {
+        if (! $this->variant) {
+            return false;
+        }
+
+        return in_array($this->variant->getState(), VariantState::availableStates());
     }
 
     public function isActive(): bool
