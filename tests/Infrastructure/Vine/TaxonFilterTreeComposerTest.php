@@ -273,6 +273,39 @@ final class TaxonFilterTreeComposerTest extends TestCase
     }
 
     /** @test */
+    public function it_removes_main_taxon_as_filter_when_one_of_active_filters_are_child_of_main_taxon()
+    {
+        $this->createDefaultTaxons();
+
+        foreach ($this->repositories() as $repository) {
+            $taxonFilterTree = (new VineTaxonFilterTreeComposer(new TestTraderConfig(), $repository))->getActiveFilters(Locale::fromString('nl'), 'taxon-first', [
+                'taxon-second',
+                'taxon-fifth',
+            ]);
+
+            $this->assertCount(2, $taxonFilterTree);
+            $this->assertEquals('taxon-second', $taxonFilterTree[0]->getKey());
+            $this->assertEquals('taxon-fifth', $taxonFilterTree[1]->getKey());
+        }
+    }
+
+    /** @test */
+    public function it_keeps_main_taxon_as_filter_when_the_active_filters_are_no_children_of_main_taxon()
+    {
+        $this->createDefaultTaxons();
+
+        foreach ($this->repositories() as $repository) {
+            $taxonFilterTree = (new VineTaxonFilterTreeComposer(new TestTraderConfig(), $repository))->getActiveFilters(Locale::fromString('nl'), 'taxon-first', [
+                'taxon-fifth',
+            ]);
+
+            $this->assertCount(2, $taxonFilterTree);
+            $this->assertEquals('taxon-first', $taxonFilterTree[0]->getKey());
+            $this->assertEquals('taxon-fifth', $taxonFilterTree[1]->getKey());
+        }
+    }
+
+    /** @test */
     public function it_returns_empty_active_filter_if_taxon_key_does_not_exist()
     {
         foreach ($this->repositories() as $repository) {

@@ -77,13 +77,13 @@ class VineTaxonFilterTreeComposer implements TaxonFilterTreeComposer
         /** Used filters from current request */
         if (count($activeKeys) > 0) {
             $selectedTaxons = $this->taxonTreeRepository->getTree()
-                ->findMany(fn ($node) => in_array($node->getKey(), $activeKeys))
+                ->findMany(fn ($node) => in_array($node->getKey(), $activeKeys));
 
                 // Remove any parents where the child taxon is present in the payload.
                 // We want to filter on the more specific child taxon - and not in combination with its parent.
-                ->remove(function (TaxonNode $node) use ($activeKeys) {
-                    return count(array_intersect($activeKeys, $node->pluckChildNodes('getKey'))) > 0;
-                });
+//                ->remove(function (TaxonNode $node) use ($activeKeys) {
+//                    return count(array_intersect($activeKeys, $node->pluckChildNodes('getKey'))) > 0;
+//                });
 
             /**
              * Subfiltering
@@ -96,9 +96,7 @@ class VineTaxonFilterTreeComposer implements TaxonFilterTreeComposer
                 }
             }
 
-            if (count($selectedTaxons) > 0) {
-                return $selectedTaxons;
-            }
+            $taxonTree = $taxonTree->merge($selectedTaxons);
         }
 
         return $taxonTree;
