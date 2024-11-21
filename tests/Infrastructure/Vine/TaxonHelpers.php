@@ -77,7 +77,7 @@ trait TaxonHelpers
                 foreach ($productIds as $productId) {
                     try {
                         $this->mysqlProductRepository()->find(ProductId::fromString($productId));
-                    } catch(CouldNotFindProduct $e) {
+                    } catch (CouldNotFindProduct $e) {
                         $this->createProductInMysql($productId, false);
                     }
 

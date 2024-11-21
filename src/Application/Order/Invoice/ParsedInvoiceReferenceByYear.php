@@ -11,7 +11,7 @@ class ParsedInvoiceReferenceByYear
     {
         $number = (int)$number;
 
-        if($number < 0) {
+        if ($number < 0) {
             throw new \InvalidArgumentException('Invalid invoice number for invoice reference ' . $this->year . $this->number . '. Invoice number should be a positive integer.');
         }
     }

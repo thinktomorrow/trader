@@ -40,7 +40,7 @@ class StockItemRepositoryTest extends TestCase
         foreach ($this->repositories() as $i => $repository) {
             try {
                 $repository->findStockItem(StockItemId::fromString('unknown'));
-            } catch(CouldNotFindStockItem $e) {
+            } catch (CouldNotFindStockItem $e) {
                 $flag++;
             }
         }
