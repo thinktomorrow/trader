@@ -3,7 +3,13 @@
 Important changes will be notified in this file
 
 ## unreleased
+
+## 2024-05-01 - 0.6.6
+- Added: availability check for variant. `VariantLink::isVariantAvailable()`.
+
+## 2024-05-01 - 0.6.5
 - Added: Verify parsed invoice number is positive integer
+- Fixed: In VineTaxonFilterTreeComposer, the subfiltering was not correctly applied. This is now fixed.
 
 ## 2024-04-25 - 0.6.4
 - Changed: `ProductDetailRepository::findProductDetail` now accepts a second parameter `allowOffline` to also return offline variants. This defaults to false.
