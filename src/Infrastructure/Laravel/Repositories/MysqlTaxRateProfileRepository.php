@@ -8,12 +8,12 @@ use Psr\Container\ContainerInterface;
 use Ramsey\Uuid\Uuid;
 use Thinktomorrow\Trader\Domain\Model\Country\CountryId;
 use Thinktomorrow\Trader\Domain\Model\TaxRateProfile\Exceptions\CouldNotFindTaxRateProfile;
+use Thinktomorrow\Trader\Domain\Model\TaxRateProfile\TaxRateDouble;
+use Thinktomorrow\Trader\Domain\Model\TaxRateProfile\TaxRateDoubleId;
 use Thinktomorrow\Trader\Domain\Model\TaxRateProfile\TaxRateProfile;
 use Thinktomorrow\Trader\Domain\Model\TaxRateProfile\TaxRateProfileId;
 use Thinktomorrow\Trader\Domain\Model\TaxRateProfile\TaxRateProfileRepository;
 use Thinktomorrow\Trader\Domain\Model\TaxRateProfile\TaxRateProfileState;
-use Thinktomorrow\Trader\Domain\Model\TaxRateProfile\TaxRateDouble;
-use Thinktomorrow\Trader\Domain\Model\TaxRateProfile\TaxRateDoubleId;
 
 class MysqlTaxRateProfileRepository implements TaxRateProfileRepository
 {
@@ -109,7 +109,7 @@ class MysqlTaxRateProfileRepository implements TaxRateProfileRepository
             ->select(static::$taxRateProfileTable.'.*')
             ->first();
 
-        if(!$result) {
+        if (! $result) {
             return null;
         }
 

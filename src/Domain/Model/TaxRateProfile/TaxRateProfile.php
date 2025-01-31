@@ -61,7 +61,7 @@ final class TaxRateProfile implements Aggregate
     public function findTaxRateDouble(TaxRateDoubleId $taxRateDoubleId): TaxRateDouble
     {
         foreach ($this->taxRateDoubles as $double) {
-            if($double->taxRateDoubleId->equals($taxRateDoubleId)) {
+            if ($double->taxRateDoubleId->equals($taxRateDoubleId)) {
                 return $double;
             }
         }

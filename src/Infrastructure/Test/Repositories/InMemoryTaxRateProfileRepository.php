@@ -5,11 +5,11 @@ namespace Thinktomorrow\Trader\Infrastructure\Test\Repositories;
 
 use Thinktomorrow\Trader\Domain\Model\Country\CountryId;
 use Thinktomorrow\Trader\Domain\Model\TaxRateProfile\Exceptions\CouldNotFindTaxRateProfile;
+use Thinktomorrow\Trader\Domain\Model\TaxRateProfile\TaxRateDoubleId;
 use Thinktomorrow\Trader\Domain\Model\TaxRateProfile\TaxRateProfile;
 use Thinktomorrow\Trader\Domain\Model\TaxRateProfile\TaxRateProfileId;
 use Thinktomorrow\Trader\Domain\Model\TaxRateProfile\TaxRateProfileRepository;
 use Thinktomorrow\Trader\Domain\Model\TaxRateProfile\TaxRateProfileState;
-use Thinktomorrow\Trader\Domain\Model\TaxRateProfile\TaxRateDoubleId;
 
 final class InMemoryTaxRateProfileRepository implements TaxRateProfileRepository
 {

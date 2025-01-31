@@ -6,11 +6,11 @@ namespace Tests\Unit\Model;
 use PHPUnit\Framework\TestCase;
 use Thinktomorrow\Trader\Domain\Common\Taxes\TaxRate;
 use Thinktomorrow\Trader\Domain\Model\Country\CountryId;
+use Thinktomorrow\Trader\Domain\Model\TaxRateProfile\TaxRateDouble;
+use Thinktomorrow\Trader\Domain\Model\TaxRateProfile\TaxRateDoubleId;
 use Thinktomorrow\Trader\Domain\Model\TaxRateProfile\TaxRateProfile;
 use Thinktomorrow\Trader\Domain\Model\TaxRateProfile\TaxRateProfileId;
 use Thinktomorrow\Trader\Domain\Model\TaxRateProfile\TaxRateProfileState;
-use Thinktomorrow\Trader\Domain\Model\TaxRateProfile\TaxRateDouble;
-use Thinktomorrow\Trader\Domain\Model\TaxRateProfile\TaxRateDoubleId;
 
 class TaxRateProfileTest extends TestCase
 {

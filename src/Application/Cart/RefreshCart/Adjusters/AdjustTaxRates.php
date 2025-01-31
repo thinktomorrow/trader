@@ -18,11 +18,11 @@ class AdjustTaxRates implements Adjuster
 
     public function adjust(Order $order): void
     {
-        if (!$billingCountryId = $order->getBillingAddress()?->getAddress()?->countryId) {
+        if (! $billingCountryId = $order->getBillingAddress()?->getAddress()?->countryId) {
             return;
         }
 
-        if (!$taxRateProfile = $this->taxRateProfileRepository->findTaxRateProfileForCountry($billingCountryId->get())) {
+        if (! $taxRateProfile = $this->taxRateProfileRepository->findTaxRateProfileForCountry($billingCountryId->get())) {
             return;
         }
 

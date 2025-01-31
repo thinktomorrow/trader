@@ -40,7 +40,7 @@ class DeleteTaxRateProfileTest extends TaxRateProfileContext
             ['foo' => 'bar']
         ));
 
-        $taxRateDoubleId = $this->taxRateProfileApplication->createTaxRateDouble(new CreateTaxRateDouble($taxRateProfileId->get(),'21', '10'));
+        $taxRateDoubleId = $this->taxRateProfileApplication->createTaxRateDouble(new CreateTaxRateDouble($taxRateProfileId->get(), '21', '10'));
 
         $this->taxRateProfileApplication->deleteTaxRateDouble(new DeleteTaxRateDouble($taxRateProfileId->get(), $taxRateDoubleId->get()));
 

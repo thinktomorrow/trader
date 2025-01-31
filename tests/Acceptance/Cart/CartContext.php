@@ -313,7 +313,7 @@ abstract class CartContext extends TestCase
             $taxRateProfile->addCountry(CountryId::fromString($country));
         }
 
-        foreach($mapping as $originalTaxRate => $taxRate) {
+        foreach ($mapping as $originalTaxRate => $taxRate) {
             $taxRateProfile->addTaxRateDouble(
                 TaxRateDouble::create(
                     $this->taxRateProfileRepository->nextTaxRateDoubleReference(),

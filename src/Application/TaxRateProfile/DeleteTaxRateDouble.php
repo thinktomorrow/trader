@@ -3,8 +3,8 @@ declare(strict_types=1);
 
 namespace Thinktomorrow\Trader\Application\TaxRateProfile;
 
-use Thinktomorrow\Trader\Domain\Model\TaxRateProfile\TaxRateProfileId;
 use Thinktomorrow\Trader\Domain\Model\TaxRateProfile\TaxRateDoubleId;
+use Thinktomorrow\Trader\Domain\Model\TaxRateProfile\TaxRateProfileId;
 
 class DeleteTaxRateDouble
 {
