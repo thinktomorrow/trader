@@ -60,6 +60,9 @@ use Thinktomorrow\Trader\Domain\Model\Promo\PromoState;
 use Thinktomorrow\Trader\Domain\Model\ShippingProfile\ShippingProfile;
 use Thinktomorrow\Trader\Domain\Model\ShippingProfile\ShippingProfileState;
 use Thinktomorrow\Trader\Domain\Model\ShippingProfile\Tariff;
+use Thinktomorrow\Trader\Domain\Model\TaxRateProfile\TaxRateDouble;
+use Thinktomorrow\Trader\Domain\Model\TaxRateProfile\TaxRateProfile;
+use Thinktomorrow\Trader\Domain\Model\TaxRateProfile\TaxRateProfileState;
 use Throwable;
 
 trait TestHelpers
@@ -319,6 +322,25 @@ trait TestHelpers
             'data' => json_encode([]),
         ], $values), [
             Tariff::class => [],
+            CountryId::class => [],
+        ]);
+    }
+
+    protected function createTaxRateProfile(array $values = []): TaxRateProfile
+    {
+        return TaxRateProfile::fromMappedData(array_merge([
+            'taxrate_profile_id' => 'ppp',
+            'state' => TaxRateProfileState::online->value,
+            'data' => json_encode([]),
+        ], $values), [
+            TaxRateDouble::class => [
+                [
+                    'taxrate_profile_id' => 'ppp',
+                    'taxrate_double_id' => 'ppp-xxx',
+                    'original_rate' => '21',
+                    'rate' => '10',
+                ],
+            ],
             CountryId::class => [],
         ]);
     }

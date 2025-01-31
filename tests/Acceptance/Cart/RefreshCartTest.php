@@ -18,8 +18,7 @@ class RefreshCartTest extends CartContext
         parent::setUp();
     }
 
-    /** @test */
-    public function it_can_refresh_order()
+    public function test_it_can_refresh_order()
     {
         $this->givenThereIsAProductWhichCostsEur('aaa', 5);
         $this->whenIAddTheVariantToTheCart('aaa-123', 2);
@@ -30,8 +29,7 @@ class RefreshCartTest extends CartContext
         $this->assertEquals('€ 10', $cart->getTotalPrice());
     }
 
-    /** @test */
-    public function it_cannot_refresh_cart_when_order_is_no_longer_is_shopper_hands()
+    public function test_it_cannot_refresh_cart_when_order_is_no_longer_is_shopper_hands()
     {
         $this->givenThereIsAProductWhichCostsEur('aaa', 5);
         $this->whenIAddTheVariantToTheCart('aaa-123', 2);
@@ -50,8 +48,7 @@ class RefreshCartTest extends CartContext
         $this->assertEquals('€ 10', $cart->getTotalPrice());
     }
 
-    /** @test */
-    public function it_can_refresh_variant_prices()
+    public function test_it_can_refresh_variant_prices()
     {
         $this->givenThereIsAProductWhichCostsEur('aaa', 5);
         $this->whenIAddTheVariantToTheCart('aaa-123', 2);
@@ -68,8 +65,7 @@ class RefreshCartTest extends CartContext
         $this->assertEquals('€ 20', $cart->getTotalPrice());
     }
 
-    /** @test */
-    public function it_can_refresh_variant_availability()
+    public function test_it_can_refresh_variant_availability()
     {
         $this->givenThereIsAProductWhichCostsEur('aaa', 5);
         $this->whenIAddTheVariantToTheCart('aaa-123', 2);
@@ -88,30 +84,90 @@ class RefreshCartTest extends CartContext
         $this->assertEquals(0, $cart->getSize());
     }
 
-    /** @test */
-    public function it_can_refresh_discounts()
+    public function test_it_can_refresh_tax_rates()
+    {
+        $this->givenThereIsATaxRateProfile(['20' => '10'], ['NL']);
+        $this->givenThereIsAProductWhichCostsEur('aaa', 5);
+        $this->whenIAddTheVariantToTheCart('aaa-123', 1);
+
+        // Check unchanged line first
+        $cart = $this->cartRepository->findCart(OrderId::fromString('xxx'));
+        $lineTaxRate = $cart->getLines()[0]->getLinePriceAsPrice()->getTaxRate();
+        $this->assertEquals('20', $lineTaxRate->get());
+
+        // Change billing country to NL
+        $this->givenOrderHasABillingCountry('NL');
+
+        $this->cartApplication->refresh(new RefreshCart('xxx'));
+
+        $cart = $this->cartRepository->findCart(OrderId::fromString('xxx'));
+        $lineTaxRate = $cart->getLines()[0]->getLinePriceAsPrice()->getTaxRate();
+        $this->assertEquals('10', $lineTaxRate->get());
+    }
+
+    public function test_it_does_not_change_tax_rates_when_billing_country_does_not_belong_to_taxrate_profile()
+    {
+        $this->givenThereIsATaxRateProfile(['20' => '10'], ['NL']);
+        $this->givenThereIsAProductWhichCostsEur('aaa', 5);
+        $this->whenIAddTheVariantToTheCart('aaa-123', 1);
+
+        // Check unchanged line first
+        $cart = $this->cartRepository->findCart(OrderId::fromString('xxx'));
+        $lineTaxRate = $cart->getLines()[0]->getLinePriceAsPrice()->getTaxRate();
+        $this->assertEquals('20', $lineTaxRate->get());
+
+        $this->givenOrderHasABillingCountry('FR');
+
+        $this->cartApplication->refresh(new RefreshCart('xxx'));
+
+        $cart = $this->cartRepository->findCart(OrderId::fromString('xxx'));
+        $lineTaxRate = $cart->getLines()[0]->getLinePriceAsPrice()->getTaxRate();
+        $this->assertEquals('20', $lineTaxRate->get());
+    }
+
+    public function test_it_can_refresh_shipping_cost_tax_rates()
+    {
+        $this->givenOrderHasAShippingCountry('BE');
+        $this->givenShippingCostsForAPurchaseOfEur('50', 0, 1000);
+        $this->givenThereIsAProductWhichCostsEur('aaa', 5);
+        $this->whenIAddTheVariantToTheCart('aaa-123', 1);
+        $this->whenIChooseShipping('bpost_home');
+
+        // Apply shipping
+        $this->cartApplication->refresh(new RefreshCart('xxx'));
+
+        // Check unchanged cost first
+        $order = $this->orderRepository->find(OrderId::fromString('xxx'));
+        $this->assertEquals('10', $order->getShippings()[0]->getShippingCost()->getTaxRate()->get());
+
+        // Change billing country to NL
+        $this->givenThereIsATaxRateProfile(['10' => '25'], ['NL']);
+        $this->givenOrderHasABillingCountry('NL');
+
+        $this->cartApplication->refresh(new RefreshCart('xxx'));
+
+        $order = $this->orderRepository->find(OrderId::fromString('xxx'));
+        $this->assertEquals('25', $order->getShippings()[0]->getShippingCost()->getTaxRate()->get());
+
+    }
+
+    public function test_it_can_refresh_discounts()
     {
     }
 
-    /** @test */
-    public function it_can_refresh_shipping_profile_cost()
+    public function test_it_can_refresh_shipping_profile_cost()
     {
     }
 
-    /** @test */
-    public function it_can_refresh_payment_method_cost()
+    public function test_it_can_refresh_payment_method_cost()
     {
     }
 
-    /** @test */
-    public function it_can_find_cart_without_variant_when_variant_is_no_longer_present()
+    public function test_it_can_find_cart_without_variant_when_variant_is_no_longer_present()
     {
         // TODO: this should be detected by refresh job of the order. Triggered by variant
     }
 
-    /**
-     * @return void
-     */
     private function updateVariant(?VariantState $state = null): void
     {
         $product = $this->productRepository->find(ProductId::fromString('aaa'));

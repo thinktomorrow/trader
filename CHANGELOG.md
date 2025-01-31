@@ -3,6 +3,7 @@
 Important changes will be notified in this file
 
 ## unreleased
+- Removed: Old Locale class.
 
 ## 2024-05-01 - 0.6.6
 - Added: availability check for variant. `VariantLink::isVariantAvailable()`.

@@ -48,7 +48,7 @@ class ShippingProfileRepositoryTest extends TestCase
      * @test
      * @dataProvider shippingProfiles
      */
-    public function it_can_delete_a_product(ShippingProfile $shippingProfile)
+    public function it_can_delete_a_profile(ShippingProfile $shippingProfile)
     {
         $profilesNotFound = 0;
 

@@ -20,6 +20,7 @@ use Thinktomorrow\Trader\Application\Cart\RefreshCart\Adjusters\AdjustDiscounts;
 use Thinktomorrow\Trader\Application\Cart\RefreshCart\Adjusters\AdjustLine;
 use Thinktomorrow\Trader\Application\Cart\RefreshCart\Adjusters\AdjustLines;
 use Thinktomorrow\Trader\Application\Cart\RefreshCart\Adjusters\AdjustShipping;
+use Thinktomorrow\Trader\Application\Cart\RefreshCart\Adjusters\AdjustTaxRates;
 use Thinktomorrow\Trader\Application\Cart\RefreshCart\RefreshCartAction;
 use Thinktomorrow\Trader\Application\Cart\ShippingProfile\UpdateShippingProfileOnOrder;
 use Thinktomorrow\Trader\Application\Cart\UpdateBillingAddress;
@@ -72,6 +73,9 @@ use Thinktomorrow\Trader\Domain\Model\ShippingProfile\ShippingProfile;
 use Thinktomorrow\Trader\Domain\Model\ShippingProfile\ShippingProfileId;
 use Thinktomorrow\Trader\Domain\Model\ShippingProfile\ShippingProviderId;
 use Thinktomorrow\Trader\Domain\Model\ShippingProfile\Tariff;
+use Thinktomorrow\Trader\Domain\Model\TaxRateProfile\TaxRateDouble;
+use Thinktomorrow\Trader\Domain\Model\TaxRateProfile\TaxRateProfile;
+use Thinktomorrow\Trader\Domain\Model\TaxRateProfile\TaxRateProfileId;
 use Thinktomorrow\Trader\Infrastructure\Laravel\Models\Cart\DefaultAdjustLine;
 use Thinktomorrow\Trader\Infrastructure\Test\EventDispatcherSpy;
 use Thinktomorrow\Trader\Infrastructure\Test\Repositories\InMemoryCartRepository;
@@ -82,6 +86,7 @@ use Thinktomorrow\Trader\Infrastructure\Test\Repositories\InMemoryPaymentMethodR
 use Thinktomorrow\Trader\Infrastructure\Test\Repositories\InMemoryProductRepository;
 use Thinktomorrow\Trader\Infrastructure\Test\Repositories\InMemoryPromoRepository;
 use Thinktomorrow\Trader\Infrastructure\Test\Repositories\InMemoryShippingProfileRepository;
+use Thinktomorrow\Trader\Infrastructure\Test\Repositories\InMemoryTaxRateProfileRepository;
 use Thinktomorrow\Trader\Infrastructure\Test\Repositories\InMemoryVariantRepository;
 use Thinktomorrow\Trader\Infrastructure\Test\TestContainer;
 use Thinktomorrow\Trader\Infrastructure\Test\TestTraderConfig;
@@ -95,6 +100,7 @@ abstract class CartContext extends TestCase
     protected InMemoryProductRepository $productRepository;
     protected InMemoryOrderRepository $orderRepository;
     protected InMemoryShippingProfileRepository $shippingProfileRepository;
+    protected InMemoryTaxRateProfileRepository $taxRateProfileRepository;
     protected InMemoryVariantRepository $variantRepository;
     protected InMemoryCartRepository $cartRepository;
     protected InMemoryPaymentMethodRepository $paymentMethodRepository;
@@ -119,6 +125,7 @@ abstract class CartContext extends TestCase
         $this->productRepository = new InMemoryProductRepository();
         $this->cartRepository = new InMemoryCartRepository();
         $this->merchantOrderRepository = new InMemoryMerchantOrderRepository();
+        $this->taxRateProfileRepository = new InMemoryTaxRateProfileRepository();
         $this->promoRepository = new InMemoryPromoRepository(
             new DiscountFactory([
                 FixedAmountDiscount::class,
@@ -139,6 +146,7 @@ abstract class CartContext extends TestCase
         (new TestContainer())->add(ApplyPromoToOrder::class, new ApplyPromoToOrder($this->orderRepository));
         (new TestContainer())->add(AdjustLine::class, new DefaultAdjustLine());
         (new TestContainer())->add(AdjustLines::class, new AdjustLines(new InMemoryVariantRepository(), TestContainer::make(AdjustLine::class)));
+        (new TestContainer())->add(AdjustTaxRates::class, new AdjustTaxRates($this->taxRateProfileRepository));
         (new TestContainer())->add(AdjustDiscounts::class, new AdjustDiscounts($this->promoRepository, (new TestContainer())->get(ApplyPromoToOrder::class)));
         (new TestContainer())->add(OrderStateMachine::class, new OrderStateMachine([
             ...DefaultOrderState::customerStates(), DefaultOrderState::confirmed,
@@ -249,6 +257,13 @@ abstract class CartContext extends TestCase
         $this->cartApplication->updateShippingAddress(new UpdateShippingAddress($order->orderId->get(), $country));
     }
 
+    public function givenOrderHasABillingCountry(string $country)
+    {
+        $order = $this->getOrder();
+
+        $this->cartApplication->updateBillingAddress(new UpdateBillingAddress($order->orderId->get(), $country));
+    }
+
     public function givenShippingCostsForAPurchaseOfEur($shippingCost, $from, $to, array $countries = ['BE'], string $shippingProfileId = 'bpost_home', bool $requiredAddress = true)
     {
         $shippingProfile = ShippingProfile::create(
@@ -285,6 +300,31 @@ abstract class CartContext extends TestCase
         $paymentMethod->addData(['title' => ['nl' => Str::headline($paymentMethodId)]]);
 
         $this->paymentMethodRepository->save($paymentMethod);
+    }
+
+    public function givenThereIsATaxRateProfile(array $mapping, array $countries = ['NL'], string $taxRateProfileId = 'taxrates-nl')
+    {
+        $taxRateProfile = TaxRateProfile::create(
+            TaxRateProfileId::fromString($taxRateProfileId),
+        );
+        $taxRateProfile->addData(['title' => ['nl' => Str::headline($taxRateProfileId)]]);
+
+        foreach ($countries as $country) {
+            $taxRateProfile->addCountry(CountryId::fromString($country));
+        }
+
+        foreach($mapping as $originalTaxRate => $taxRate) {
+            $taxRateProfile->addTaxRateDouble(
+                TaxRateDouble::create(
+                    $this->taxRateProfileRepository->nextTaxRateDoubleReference(),
+                    $taxRateProfile->taxRateProfileId,
+                    TaxRate::fromString((string) $originalTaxRate),
+                    TaxRate::fromString($taxRate)
+                )
+            );
+        }
+
+        $this->taxRateProfileRepository->save($taxRateProfile);
     }
 
     public function givenACustomerExists(string $email, bool $is_business = false, string $locale = 'nl_BE'): Customer

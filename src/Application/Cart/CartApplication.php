@@ -13,6 +13,7 @@ use Thinktomorrow\Trader\Application\Cart\RefreshCart\Adjusters\AdjustDiscounts;
 use Thinktomorrow\Trader\Application\Cart\RefreshCart\Adjusters\AdjustLine;
 use Thinktomorrow\Trader\Application\Cart\RefreshCart\Adjusters\AdjustLines;
 use Thinktomorrow\Trader\Application\Cart\RefreshCart\Adjusters\AdjustShipping;
+use Thinktomorrow\Trader\Application\Cart\RefreshCart\Adjusters\AdjustTaxRates;
 use Thinktomorrow\Trader\Application\Cart\RefreshCart\RefreshCart;
 use Thinktomorrow\Trader\Application\Cart\RefreshCart\RefreshCartAction;
 use Thinktomorrow\Trader\Application\Cart\ShippingProfile\UpdateShippingProfileOnOrder;
@@ -83,6 +84,7 @@ final class CartApplication
         $this->refreshCartAction->handle($order, [
             $this->container->get(AdjustLines::class),
             $this->container->get(AdjustShipping::class),
+            $this->container->get(AdjustTaxRates::class),
             $this->container->get(AdjustDiscounts::class),
         ]);
 

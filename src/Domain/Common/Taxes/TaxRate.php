@@ -28,6 +28,11 @@ class TaxRate
         return (get_class($other) === get_class($this) && $other->percentage->equals($this->percentage));
     }
 
+    public function get(): string
+    {
+        return $this->percentage->get();
+    }
+
     public function __toString(): string
     {
         return $this->percentage->get();
