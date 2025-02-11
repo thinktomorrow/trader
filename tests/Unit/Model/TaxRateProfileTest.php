@@ -6,10 +6,10 @@ namespace Tests\Unit\Model;
 use PHPUnit\Framework\TestCase;
 use Thinktomorrow\Trader\Domain\Common\Taxes\TaxRate;
 use Thinktomorrow\Trader\Domain\Model\Country\CountryId;
-use Thinktomorrow\Trader\Domain\Model\VatRate\VatRateMapping;
-use Thinktomorrow\Trader\Domain\Model\VatRate\VatRateMappingId;
 use Thinktomorrow\Trader\Domain\Model\VatRate\VatRate;
 use Thinktomorrow\Trader\Domain\Model\VatRate\VatRateId;
+use Thinktomorrow\Trader\Domain\Model\VatRate\VatRateMapping;
+use Thinktomorrow\Trader\Domain\Model\VatRate\VatRateMappingId;
 use Thinktomorrow\Trader\Domain\Model\VatRate\VatRateState;
 
 class TaxRateProfileTest extends TestCase

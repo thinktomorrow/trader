@@ -5,9 +5,9 @@ namespace Thinktomorrow\Trader\Infrastructure\Test\Repositories;
 
 use Thinktomorrow\Trader\Domain\Model\Country\CountryId;
 use Thinktomorrow\Trader\Domain\Model\VatRate\Exceptions\CouldNotFindVatRate;
-use Thinktomorrow\Trader\Domain\Model\VatRate\VatRateMappingId;
 use Thinktomorrow\Trader\Domain\Model\VatRate\VatRate;
 use Thinktomorrow\Trader\Domain\Model\VatRate\VatRateId;
+use Thinktomorrow\Trader\Domain\Model\VatRate\VatRateMappingId;
 use Thinktomorrow\Trader\Domain\Model\VatRate\VatRateRepository;
 use Thinktomorrow\Trader\Domain\Model\VatRate\VatRateState;
 

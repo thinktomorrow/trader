@@ -143,8 +143,8 @@ use Thinktomorrow\Trader\Infrastructure\Laravel\Repositories\MysqlRedirectReposi
 use Thinktomorrow\Trader\Infrastructure\Laravel\Repositories\MysqlShippingProfileRepository;
 use Thinktomorrow\Trader\Infrastructure\Laravel\Repositories\MysqlTaxonRepository;
 use Thinktomorrow\Trader\Infrastructure\Laravel\Repositories\MysqlTaxonTreeRepository;
-use Thinktomorrow\Trader\Infrastructure\Laravel\Repositories\MysqlVatRateRepository;
 use Thinktomorrow\Trader\Infrastructure\Laravel\Repositories\MysqlVariantRepository;
+use Thinktomorrow\Trader\Infrastructure\Laravel\Repositories\MysqlVatRateRepository;
 use Thinktomorrow\Trader\Infrastructure\Vine\VineFlattenedTaxonIdsComposer;
 use Thinktomorrow\Trader\Infrastructure\Vine\VineTaxonFilterTreeComposer;
 use Thinktomorrow\Trader\Infrastructure\Vine\VineTaxonIdOptionsComposer;

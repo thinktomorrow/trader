@@ -4,10 +4,10 @@ declare(strict_types=1);
 namespace Tests\Acceptance\TaxRateProfile;
 
 use Tests\TestHelpers;
-use Thinktomorrow\Trader\Application\VatRate\CreateVatRateMapping;
 use Thinktomorrow\Trader\Application\VatRate\CreateVatRate;
-use Thinktomorrow\Trader\Application\VatRate\DeleteVatRateMapping;
+use Thinktomorrow\Trader\Application\VatRate\CreateVatRateMapping;
 use Thinktomorrow\Trader\Application\VatRate\DeleteVatRate;
+use Thinktomorrow\Trader\Application\VatRate\DeleteVatRateMapping;
 use Thinktomorrow\Trader\Domain\Model\VatRate\Events\BaseVatRateDeleted;
 use Thinktomorrow\Trader\Domain\Model\VatRate\Events\VatRateDeleted;
 use Thinktomorrow\Trader\Domain\Model\VatRate\Exceptions\CouldNotFindVatRate;

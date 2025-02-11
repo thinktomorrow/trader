@@ -3,8 +3,8 @@ declare(strict_types=1);
 
 namespace Tests\Acceptance\TaxRateProfile;
 
-use Thinktomorrow\Trader\Application\VatRate\CreateVatRateMapping;
 use Thinktomorrow\Trader\Application\VatRate\CreateVatRate;
+use Thinktomorrow\Trader\Application\VatRate\CreateVatRateMapping;
 use Thinktomorrow\Trader\Application\VatRate\UpdateTaxRateDouble;
 use Thinktomorrow\Trader\Application\VatRate\UpdateVatRate;
 use Thinktomorrow\Trader\Domain\Common\Taxes\TaxRate;

@@ -3,13 +3,13 @@ declare(strict_types=1);
 
 namespace Tests\Acceptance\TaxRateProfile;
 
-use Thinktomorrow\Trader\Application\VatRate\CreateVatRateMapping;
 use Thinktomorrow\Trader\Application\VatRate\CreateVatRate;
+use Thinktomorrow\Trader\Application\VatRate\CreateVatRateMapping;
 use Thinktomorrow\Trader\Domain\Common\Taxes\TaxRate;
 use Thinktomorrow\Trader\Domain\Model\Country\CountryId;
+use Thinktomorrow\Trader\Domain\Model\VatRate\VatRateId;
 use Thinktomorrow\Trader\Domain\Model\VatRate\VatRateMapping;
 use Thinktomorrow\Trader\Domain\Model\VatRate\VatRateMappingId;
-use Thinktomorrow\Trader\Domain\Model\VatRate\VatRateId;
 
 class CreateTaxRateProfileTest extends TaxRateProfileContext
 {
