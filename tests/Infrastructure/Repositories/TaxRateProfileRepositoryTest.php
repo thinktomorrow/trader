@@ -7,13 +7,13 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\Infrastructure\TestCase;
 use Thinktomorrow\Trader\Domain\Common\Taxes\TaxRate;
 use Thinktomorrow\Trader\Domain\Model\Country\CountryId;
-use Thinktomorrow\Trader\Domain\Model\TaxRateProfile\Exceptions\CouldNotFindTaxRateProfile;
-use Thinktomorrow\Trader\Domain\Model\TaxRateProfile\TaxRateDouble;
-use Thinktomorrow\Trader\Domain\Model\TaxRateProfile\TaxRateDoubleId;
-use Thinktomorrow\Trader\Domain\Model\TaxRateProfile\TaxRateProfile;
-use Thinktomorrow\Trader\Domain\Model\TaxRateProfile\TaxRateProfileId;
-use Thinktomorrow\Trader\Infrastructure\Laravel\Repositories\MysqlTaxRateProfileRepository;
-use Thinktomorrow\Trader\Infrastructure\Test\Repositories\InMemoryTaxRateProfileRepository;
+use Thinktomorrow\Trader\Domain\Model\VatRate\Exceptions\CouldNotFindVatRate;
+use Thinktomorrow\Trader\Domain\Model\VatRate\VatRateMapping;
+use Thinktomorrow\Trader\Domain\Model\VatRate\VatRateMappingId;
+use Thinktomorrow\Trader\Domain\Model\VatRate\VatRate;
+use Thinktomorrow\Trader\Domain\Model\VatRate\VatRateId;
+use Thinktomorrow\Trader\Infrastructure\Laravel\Repositories\MysqlVatRateRepository;
+use Thinktomorrow\Trader\Infrastructure\Test\Repositories\InMemoryVatRateRepository;
 use Thinktomorrow\Trader\Infrastructure\Test\TestContainer;
 
 class TaxRateProfileRepositoryTest extends TestCase
@@ -32,7 +32,7 @@ class TaxRateProfileRepositoryTest extends TestCase
      * @test
      * @dataProvider taxRateProfiles
      */
-    public function it_can_save_and_find_a_profile(TaxRateProfile $taxRateProfile)
+    public function it_can_save_and_find_a_profile(VatRate $taxRateProfile)
     {
         foreach ($this->repositories() as $i => $repository) {
             $this->prepareCountries($i);
@@ -48,7 +48,7 @@ class TaxRateProfileRepositoryTest extends TestCase
      * @test
      * @dataProvider taxRateProfiles
      */
-    public function it_can_delete_a_profile(TaxRateProfile $taxRateProfile)
+    public function it_can_delete_a_profile(VatRate $taxRateProfile)
     {
         $profilesNotFound = 0;
 
@@ -59,7 +59,7 @@ class TaxRateProfileRepositoryTest extends TestCase
 
             try {
                 $repository->find($taxRateProfile->taxRateProfileId);
-            } catch (CouldNotFindTaxRateProfile $e) {
+            } catch (CouldNotFindVatRate $e) {
                 $profilesNotFound++;
             }
         }
@@ -70,7 +70,7 @@ class TaxRateProfileRepositoryTest extends TestCase
     public function test_it_can_generate_a_next_reference()
     {
         foreach ($this->repositories() as $repository) {
-            $this->assertInstanceOf(TaxRateProfileId::class, $repository->nextReference());
+            $this->assertInstanceOf(VatRateId::class, $repository->nextReference());
         }
     }
 
@@ -84,15 +84,15 @@ class TaxRateProfileRepositoryTest extends TestCase
 
             $repository->save($profile);
 
-            $this->assertEquals($profile, $repository->findTaxRateProfileForCountry('BE'));
-            $this->assertNull($repository->findTaxRateProfileForCountry('NL'));
+            $this->assertEquals($profile, $repository->findVatRateForCountry('BE'));
+            $this->assertNull($repository->findVatRateForCountry('NL'));
         }
     }
 
     private function repositories(): \Generator
     {
-        yield new InMemoryTaxRateProfileRepository();
-        yield new MysqlTaxRateProfileRepository(new TestContainer());
+        yield new InMemoryVatRateRepository();
+        yield new MysqlVatRateRepository(new TestContainer());
     }
 
     public function taxRateProfiles(): \Generator
@@ -101,7 +101,7 @@ class TaxRateProfileRepositoryTest extends TestCase
 
         $profile = $this->createTaxRateProfile();
         $profile->addCountry(CountryId::fromString('BE'));
-        $profile->addTaxRateDouble(TaxRateDouble::create(TaxRateDoubleId::fromString('xxx'), $profile->taxRateProfileId, TaxRate::fromString('21'), TaxRate::fromString('10')));
+        $profile->addBaseRate(VatRateMapping::create(VatRateMappingId::fromString('xxx'), $profile->taxRateProfileId, TaxRate::fromString('21'), TaxRate::fromString('10')));
 
         yield [$profile];
     }

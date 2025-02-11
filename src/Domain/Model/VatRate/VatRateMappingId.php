@@ -1,11 +1,11 @@
 <?php
 declare(strict_types=1);
 
-namespace Thinktomorrow\Trader\Domain\Model\TaxRateProfile;
+namespace Thinktomorrow\Trader\Domain\Model\VatRate;
 
 use Thinktomorrow\Trader\Domain\Common\Entity\AggregateId;
 
-class TaxRateProfileId
+class VatRateMappingId
 {
     use AggregateId;
 }

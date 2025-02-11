@@ -7,15 +7,15 @@ use Illuminate\Support\Facades\DB;
 use Psr\Container\ContainerInterface;
 use Ramsey\Uuid\Uuid;
 use Thinktomorrow\Trader\Domain\Model\Country\CountryId;
-use Thinktomorrow\Trader\Domain\Model\TaxRateProfile\Exceptions\CouldNotFindTaxRateProfile;
-use Thinktomorrow\Trader\Domain\Model\TaxRateProfile\TaxRateDouble;
-use Thinktomorrow\Trader\Domain\Model\TaxRateProfile\TaxRateDoubleId;
-use Thinktomorrow\Trader\Domain\Model\TaxRateProfile\TaxRateProfile;
-use Thinktomorrow\Trader\Domain\Model\TaxRateProfile\TaxRateProfileId;
-use Thinktomorrow\Trader\Domain\Model\TaxRateProfile\TaxRateProfileRepository;
-use Thinktomorrow\Trader\Domain\Model\TaxRateProfile\TaxRateProfileState;
+use Thinktomorrow\Trader\Domain\Model\VatRate\Exceptions\CouldNotFindVatRate;
+use Thinktomorrow\Trader\Domain\Model\VatRate\VatRateMapping;
+use Thinktomorrow\Trader\Domain\Model\VatRate\VatRateMappingId;
+use Thinktomorrow\Trader\Domain\Model\VatRate\VatRate;
+use Thinktomorrow\Trader\Domain\Model\VatRate\VatRateId;
+use Thinktomorrow\Trader\Domain\Model\VatRate\VatRateRepository;
+use Thinktomorrow\Trader\Domain\Model\VatRate\VatRateState;
 
-class MysqlTaxRateProfileRepository implements TaxRateProfileRepository
+class MysqlVatRateRepository implements VatRateRepository
 {
     private static $taxRateProfileTable = 'trader_taxrate_profiles';
     private static $taxRateProfileTaxRateDoubleTable = 'trader_taxrate_profile_doubles';
@@ -29,7 +29,7 @@ class MysqlTaxRateProfileRepository implements TaxRateProfileRepository
         $this->container = $container;
     }
 
-    public function save(TaxRateProfile $taxRateProfile): void
+    public function save(VatRate $taxRateProfile): void
     {
         $state = $taxRateProfile->getMappedData();
 
@@ -43,17 +43,17 @@ class MysqlTaxRateProfileRepository implements TaxRateProfileRepository
         $this->upsertCountryIds($taxRateProfile);
     }
 
-    private function upsertTaxRateDoubles(TaxRateProfile $taxRateProfile): void
+    private function upsertTaxRateDoubles(VatRate $taxRateProfile): void
     {
         DB::table(static::$taxRateProfileTaxRateDoubleTable)
             ->where('taxrate_profile_id', $taxRateProfile->taxRateProfileId->get())
             ->delete();
 
         DB::table(static::$taxRateProfileTaxRateDoubleTable)
-            ->insert($taxRateProfile->getChildEntities()[TaxRateDouble::class]);
+            ->insert($taxRateProfile->getChildEntities()[VatRateMapping::class]);
     }
 
-    private function upsertCountryIds(TaxRateProfile $taxRateProfile): void
+    private function upsertCountryIds(VatRate $taxRateProfile): void
     {
         DB::table(static::$taxRateProfileCountryTable)
             ->where('taxrate_profile_id', $taxRateProfile->taxRateProfileId->get())
@@ -66,43 +66,43 @@ class MysqlTaxRateProfileRepository implements TaxRateProfileRepository
             ], $taxRateProfile->getChildEntities()[CountryId::class]));
     }
 
-    private function exists(TaxRateProfileId $taxRateProfileId): bool
+    private function exists(VatRateId $taxRateProfileId): bool
     {
         return DB::table(static::$taxRateProfileTable)->where('taxrate_profile_id', $taxRateProfileId->get())->exists();
     }
 
-    public function find(TaxRateProfileId $taxRateProfileId): TaxRateProfile
+    public function find(VatRateId $taxRateProfileId): VatRate
     {
         $taxRateProfileState = DB::table(static::$taxRateProfileTable)
             ->where(static::$taxRateProfileTable . '.taxrate_profile_id', $taxRateProfileId->get())
             ->first();
 
         if (! $taxRateProfileState) {
-            throw new CouldNotFindTaxRateProfile('No taxRate profile found by id [' . $taxRateProfileId->get() . ']');
+            throw new CouldNotFindVatRate('No taxRate profile found by id [' . $taxRateProfileId->get() . ']');
         }
 
         return $this->makeWithChildEntities($taxRateProfileId, $taxRateProfileState);
     }
 
-    public function delete(TaxRateProfileId $taxRateProfileId): void
+    public function delete(VatRateId $taxRateProfileId): void
     {
         DB::table(static::$taxRateProfileTable)->where('taxrate_profile_id', $taxRateProfileId->get())->delete();
     }
 
-    public function nextReference(): TaxRateProfileId
+    public function nextReference(): VatRateId
     {
-        return TaxRateProfileId::fromString((string)Uuid::uuid4());
+        return VatRateId::fromString((string)Uuid::uuid4());
     }
 
-    public function nextTaxRateDoubleReference(): TaxRateDoubleId
+    public function nextVatRateMappingReference(): VatRateMappingId
     {
-        return TaxRateDoubleId::fromString((string)Uuid::uuid4());
+        return VatRateMappingId::fromString((string)Uuid::uuid4());
     }
 
-    public function findTaxRateProfileForCountry(string $countryId): ?TaxRateProfile
+    public function findVatRateForCountry(string $countryId): ?VatRate
     {
         $result = DB::table(static::$taxRateProfileTable)
-            ->whereIn('state', TaxRateProfileState::onlineStates())
+            ->whereIn('state', VatRateState::onlineStates())
             ->orderBy('order_column', 'ASC')
             ->leftJoin(static::$taxRateProfileCountryTable, static::$taxRateProfileTable.'.taxrate_profile_id', '=', static::$taxRateProfileCountryTable.'.taxrate_profile_id')
             ->where(static::$taxRateProfileCountryTable . '.country_id', $countryId)
@@ -113,10 +113,10 @@ class MysqlTaxRateProfileRepository implements TaxRateProfileRepository
             return null;
         }
 
-        return $this->makeWithChildEntities(TaxRateProfileId::fromString($result->taxrate_profile_id), $result);
+        return $this->makeWithChildEntities(VatRateId::fromString($result->taxrate_profile_id), $result);
     }
 
-    private function makeWithChildEntities(TaxRateProfileId $taxRateProfileId, $taxRateProfileState): TaxRateProfile
+    private function makeWithChildEntities(VatRateId $taxRateProfileId, $taxRateProfileState): VatRate
     {
         $taxRateDoubleStates = DB::table(static::$taxRateProfileTaxRateDoubleTable)
             ->where(static::$taxRateProfileTaxRateDoubleTable . '.taxrate_profile_id', $taxRateProfileId->get())
@@ -133,8 +133,8 @@ class MysqlTaxRateProfileRepository implements TaxRateProfileRepository
             ->map(fn ($item) => (array)$item)
             ->toArray();
 
-        return TaxRateProfile::fromMappedData((array)$taxRateProfileState, [
-            TaxRateDouble::class => $taxRateDoubleStates,
+        return VatRate::fromMappedData((array)$taxRateProfileState, [
+            VatRateMapping::class => $taxRateDoubleStates,
             CountryId::class => $countryStates,
         ]);
     }

@@ -73,9 +73,9 @@ use Thinktomorrow\Trader\Domain\Model\ShippingProfile\ShippingProfile;
 use Thinktomorrow\Trader\Domain\Model\ShippingProfile\ShippingProfileId;
 use Thinktomorrow\Trader\Domain\Model\ShippingProfile\ShippingProviderId;
 use Thinktomorrow\Trader\Domain\Model\ShippingProfile\Tariff;
-use Thinktomorrow\Trader\Domain\Model\TaxRateProfile\TaxRateDouble;
-use Thinktomorrow\Trader\Domain\Model\TaxRateProfile\TaxRateProfile;
-use Thinktomorrow\Trader\Domain\Model\TaxRateProfile\TaxRateProfileId;
+use Thinktomorrow\Trader\Domain\Model\VatRate\VatRateMapping;
+use Thinktomorrow\Trader\Domain\Model\VatRate\VatRate;
+use Thinktomorrow\Trader\Domain\Model\VatRate\VatRateId;
 use Thinktomorrow\Trader\Infrastructure\Laravel\Models\Cart\DefaultAdjustLine;
 use Thinktomorrow\Trader\Infrastructure\Test\EventDispatcherSpy;
 use Thinktomorrow\Trader\Infrastructure\Test\Repositories\InMemoryCartRepository;
@@ -86,7 +86,7 @@ use Thinktomorrow\Trader\Infrastructure\Test\Repositories\InMemoryPaymentMethodR
 use Thinktomorrow\Trader\Infrastructure\Test\Repositories\InMemoryProductRepository;
 use Thinktomorrow\Trader\Infrastructure\Test\Repositories\InMemoryPromoRepository;
 use Thinktomorrow\Trader\Infrastructure\Test\Repositories\InMemoryShippingProfileRepository;
-use Thinktomorrow\Trader\Infrastructure\Test\Repositories\InMemoryTaxRateProfileRepository;
+use Thinktomorrow\Trader\Infrastructure\Test\Repositories\InMemoryVatRateRepository;
 use Thinktomorrow\Trader\Infrastructure\Test\Repositories\InMemoryVariantRepository;
 use Thinktomorrow\Trader\Infrastructure\Test\TestContainer;
 use Thinktomorrow\Trader\Infrastructure\Test\TestTraderConfig;
@@ -100,7 +100,7 @@ abstract class CartContext extends TestCase
     protected InMemoryProductRepository $productRepository;
     protected InMemoryOrderRepository $orderRepository;
     protected InMemoryShippingProfileRepository $shippingProfileRepository;
-    protected InMemoryTaxRateProfileRepository $taxRateProfileRepository;
+    protected InMemoryVatRateRepository $taxRateProfileRepository;
     protected InMemoryVariantRepository $variantRepository;
     protected InMemoryCartRepository $cartRepository;
     protected InMemoryPaymentMethodRepository $paymentMethodRepository;
@@ -125,7 +125,7 @@ abstract class CartContext extends TestCase
         $this->productRepository = new InMemoryProductRepository();
         $this->cartRepository = new InMemoryCartRepository();
         $this->merchantOrderRepository = new InMemoryMerchantOrderRepository();
-        $this->taxRateProfileRepository = new InMemoryTaxRateProfileRepository();
+        $this->taxRateProfileRepository = new InMemoryVatRateRepository();
         $this->promoRepository = new InMemoryPromoRepository(
             new DiscountFactory([
                 FixedAmountDiscount::class,
@@ -304,8 +304,8 @@ abstract class CartContext extends TestCase
 
     public function givenThereIsATaxRateProfile(array $mapping, array $countries = ['NL'], string $taxRateProfileId = 'taxrates-nl')
     {
-        $taxRateProfile = TaxRateProfile::create(
-            TaxRateProfileId::fromString($taxRateProfileId),
+        $taxRateProfile = VatRate::create(
+            VatRateId::fromString($taxRateProfileId),
         );
         $taxRateProfile->addData(['title' => ['nl' => Str::headline($taxRateProfileId)]]);
 
@@ -314,9 +314,9 @@ abstract class CartContext extends TestCase
         }
 
         foreach ($mapping as $originalTaxRate => $taxRate) {
-            $taxRateProfile->addTaxRateDouble(
-                TaxRateDouble::create(
-                    $this->taxRateProfileRepository->nextTaxRateDoubleReference(),
+            $taxRateProfile->addBaseRate(
+                VatRateMapping::create(
+                    $this->taxRateProfileRepository->nextVatRateMappingReference(),
                     $taxRateProfile->taxRateProfileId,
                     TaxRate::fromString((string) $originalTaxRate),
                     TaxRate::fromString($taxRate)

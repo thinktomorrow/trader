@@ -60,9 +60,9 @@ use Thinktomorrow\Trader\Domain\Model\Promo\PromoState;
 use Thinktomorrow\Trader\Domain\Model\ShippingProfile\ShippingProfile;
 use Thinktomorrow\Trader\Domain\Model\ShippingProfile\ShippingProfileState;
 use Thinktomorrow\Trader\Domain\Model\ShippingProfile\Tariff;
-use Thinktomorrow\Trader\Domain\Model\TaxRateProfile\TaxRateDouble;
-use Thinktomorrow\Trader\Domain\Model\TaxRateProfile\TaxRateProfile;
-use Thinktomorrow\Trader\Domain\Model\TaxRateProfile\TaxRateProfileState;
+use Thinktomorrow\Trader\Domain\Model\VatRate\VatRateMapping;
+use Thinktomorrow\Trader\Domain\Model\VatRate\VatRate;
+use Thinktomorrow\Trader\Domain\Model\VatRate\VatRateState;
 use Throwable;
 
 trait TestHelpers
@@ -326,14 +326,14 @@ trait TestHelpers
         ]);
     }
 
-    protected function createTaxRateProfile(array $values = []): TaxRateProfile
+    protected function createTaxRateProfile(array $values = []): VatRate
     {
-        return TaxRateProfile::fromMappedData(array_merge([
+        return VatRate::fromMappedData(array_merge([
             'taxrate_profile_id' => 'ppp',
-            'state' => TaxRateProfileState::online->value,
+            'state' => VatRateState::online->value,
             'data' => json_encode([]),
         ], $values), [
-            TaxRateDouble::class => [
+            VatRateMapping::class => [
                 [
                     'taxrate_profile_id' => 'ppp',
                     'taxrate_double_id' => 'ppp-xxx',

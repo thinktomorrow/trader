@@ -1,9 +1,9 @@
 <?php
 declare(strict_types=1);
 
-namespace Thinktomorrow\Trader\Domain\Model\TaxRateProfile;
+namespace Thinktomorrow\Trader\Domain\Model\VatRate;
 
-enum TaxRateProfileState: string
+enum VatRateState: string
 {
     case offline = 'offline';
     case online = 'online';
@@ -12,7 +12,7 @@ enum TaxRateProfileState: string
     public static function onlineStates(): array
     {
         return [
-            static::online,
+            self::online,
         ];
     }
 }

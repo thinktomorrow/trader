@@ -4,13 +4,13 @@ declare(strict_types=1);
 namespace Tests\Acceptance\TaxRateProfile;
 
 use Tests\TestHelpers;
-use Thinktomorrow\Trader\Application\TaxRateProfile\CreateTaxRateDouble;
-use Thinktomorrow\Trader\Application\TaxRateProfile\CreateTaxRateProfile;
-use Thinktomorrow\Trader\Application\TaxRateProfile\DeleteTaxRateDouble;
-use Thinktomorrow\Trader\Application\TaxRateProfile\DeleteTaxRateProfile;
-use Thinktomorrow\Trader\Domain\Model\TaxRateProfile\Events\TaxRateDoubleDeleted;
-use Thinktomorrow\Trader\Domain\Model\TaxRateProfile\Events\TaxRateProfileDeleted;
-use Thinktomorrow\Trader\Domain\Model\TaxRateProfile\Exceptions\CouldNotFindTaxRateProfile;
+use Thinktomorrow\Trader\Application\VatRate\CreateVatRateMapping;
+use Thinktomorrow\Trader\Application\VatRate\CreateVatRate;
+use Thinktomorrow\Trader\Application\VatRate\DeleteVatRateMapping;
+use Thinktomorrow\Trader\Application\VatRate\DeleteVatRate;
+use Thinktomorrow\Trader\Domain\Model\VatRate\Events\BaseVatRateDeleted;
+use Thinktomorrow\Trader\Domain\Model\VatRate\Events\VatRateDeleted;
+use Thinktomorrow\Trader\Domain\Model\VatRate\Exceptions\CouldNotFindVatRate;
 
 class DeleteTaxRateProfileTest extends TaxRateProfileContext
 {
@@ -18,37 +18,37 @@ class DeleteTaxRateProfileTest extends TaxRateProfileContext
 
     public function test_it_can_delete_a_profile()
     {
-        $taxRateProfileId = $this->taxRateProfileApplication->createTaxRateProfile(new CreateTaxRateProfile(
+        $taxRateProfileId = $this->taxRateProfileApplication->createVatRate(new CreateVatRate(
             ['BE','NL'],
             ['foo' => 'bar']
         ));
 
-        $this->taxRateProfileApplication->deleteTaxRateProfile(new DeleteTaxRateProfile($taxRateProfileId->get()));
+        $this->taxRateProfileApplication->deleteVatRate(new DeleteVatRate($taxRateProfileId->get()));
 
         $this->assertEquals([
-            new TaxRateProfileDeleted($taxRateProfileId),
+            new VatRateDeleted($taxRateProfileId),
         ], $this->eventDispatcher->releaseDispatchedEvents());
 
-        $this->expectException(CouldNotFindTaxRateProfile::class);
+        $this->expectException(CouldNotFindVatRate::class);
         $this->taxRateProfileRepository->find($taxRateProfileId);
     }
 
     public function test_it_can_delete_a_double()
     {
-        $taxRateProfileId = $this->taxRateProfileApplication->createTaxRateProfile(new CreateTaxRateProfile(
+        $taxRateProfileId = $this->taxRateProfileApplication->createVatRate(new CreateVatRate(
             ['BE','NL'],
             ['foo' => 'bar']
         ));
 
-        $taxRateDoubleId = $this->taxRateProfileApplication->createTaxRateDouble(new CreateTaxRateDouble($taxRateProfileId->get(), '21', '10'));
+        $taxRateDoubleId = $this->taxRateProfileApplication->createTaxRateDouble(new CreateVatRateMapping($taxRateProfileId->get(), '21', '10'));
 
-        $this->taxRateProfileApplication->deleteTaxRateDouble(new DeleteTaxRateDouble($taxRateProfileId->get(), $taxRateDoubleId->get()));
+        $this->taxRateProfileApplication->deleteTaxRateDouble(new DeleteVatRateMapping($taxRateProfileId->get(), $taxRateDoubleId->get()));
 
         $this->assertEquals([
-            new TaxRateDoubleDeleted($taxRateProfileId, $taxRateDoubleId),
+            new BaseVatRateDeleted($taxRateProfileId, $taxRateDoubleId),
         ], $this->eventDispatcher->releaseDispatchedEvents());
 
         $taxRateProfile = $this->taxRateProfileRepository->find($taxRateProfileId);
-        $this->assertCount(0, $taxRateProfile->getTaxRateDoubles());
+        $this->assertCount(0, $taxRateProfile->getBaseRates());
     }
 }

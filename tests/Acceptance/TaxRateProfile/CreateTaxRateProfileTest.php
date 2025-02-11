@@ -3,26 +3,26 @@ declare(strict_types=1);
 
 namespace Tests\Acceptance\TaxRateProfile;
 
-use Thinktomorrow\Trader\Application\TaxRateProfile\CreateTaxRateDouble;
-use Thinktomorrow\Trader\Application\TaxRateProfile\CreateTaxRateProfile;
+use Thinktomorrow\Trader\Application\VatRate\CreateVatRateMapping;
+use Thinktomorrow\Trader\Application\VatRate\CreateVatRate;
 use Thinktomorrow\Trader\Domain\Common\Taxes\TaxRate;
 use Thinktomorrow\Trader\Domain\Model\Country\CountryId;
-use Thinktomorrow\Trader\Domain\Model\TaxRateProfile\TaxRateDouble;
-use Thinktomorrow\Trader\Domain\Model\TaxRateProfile\TaxRateDoubleId;
-use Thinktomorrow\Trader\Domain\Model\TaxRateProfile\TaxRateProfileId;
+use Thinktomorrow\Trader\Domain\Model\VatRate\VatRateMapping;
+use Thinktomorrow\Trader\Domain\Model\VatRate\VatRateMappingId;
+use Thinktomorrow\Trader\Domain\Model\VatRate\VatRateId;
 
 class CreateTaxRateProfileTest extends TaxRateProfileContext
 {
     public function test_it_can_create_a_taxrate_profile()
     {
-        $taxRateProfileId = $this->taxRateProfileApplication->createTaxRateProfile(new CreateTaxRateProfile(
+        $taxRateProfileId = $this->taxRateProfileApplication->createVatRate(new CreateVatRate(
             ['BE','NL'],
             ['foo' => 'bar']
         ));
 
         $taxRateProfile = $this->taxRateProfileRepository->find($taxRateProfileId);
 
-        $this->assertInstanceOf(TaxRateProfileId::class, $taxRateProfileId);
+        $this->assertInstanceOf(VatRateId::class, $taxRateProfileId);
         $this->assertEquals($taxRateProfileId, $taxRateProfile->taxRateProfileId);
         $this->assertEquals([
             CountryId::fromString('BE'),
@@ -33,16 +33,16 @@ class CreateTaxRateProfileTest extends TaxRateProfileContext
 
     public function test_it_can_create_a_rate_double()
     {
-        $taxRateProfileId = $this->taxRateProfileApplication->createTaxRateProfile(new CreateTaxRateProfile(
+        $taxRateProfileId = $this->taxRateProfileApplication->createVatRate(new CreateVatRate(
             ['BE','NL'],
             ['foo' => 'bar']
         ));
 
-        $doubleId = $this->taxRateProfileApplication->createTaxRateDouble(new CreateTaxRateDouble($taxRateProfileId->get(), '21', '10'));
+        $doubleId = $this->taxRateProfileApplication->createTaxRateDouble(new CreateVatRateMapping($taxRateProfileId->get(), '21', '10'));
 
-        $this->assertInstanceOf(TaxRateDoubleId::class, $doubleId);
-        $this->assertInstanceOf(TaxRateDouble::class, $double = $this->taxRateProfileRepository->find($taxRateProfileId)->findTaxRateDouble($doubleId));
+        $this->assertInstanceOf(VatRateMappingId::class, $doubleId);
+        $this->assertInstanceOf(VatRateMapping::class, $double = $this->taxRateProfileRepository->find($taxRateProfileId)->findBaseRate($doubleId));
         $this->assertTrue($double->hasOriginalRate(TaxRate::fromString('21')));
-        $this->assertEquals(TaxRate::fromString('10'), $double->getRate());
+        $this->assertEquals(TaxRate::fromString('10'), $double->getTargetRate());
     }
 }

@@ -92,6 +92,7 @@ use Thinktomorrow\Trader\Domain\Model\Promo\PromoRepository;
 use Thinktomorrow\Trader\Domain\Model\ShippingProfile\ShippingProfileRepository;
 use Thinktomorrow\Trader\Domain\Model\Stock\StockItemRepository;
 use Thinktomorrow\Trader\Domain\Model\Taxon\TaxonRepository;
+use Thinktomorrow\Trader\Domain\Model\VatRate\VatRateRepository;
 use Thinktomorrow\Trader\Infrastructure\Laravel\Models\Cart\DefaultAdjustLine;
 use Thinktomorrow\Trader\Infrastructure\Laravel\Models\Cart\DefaultCart;
 use Thinktomorrow\Trader\Infrastructure\Laravel\Models\Cart\DefaultCartBillingAddress;
@@ -142,6 +143,7 @@ use Thinktomorrow\Trader\Infrastructure\Laravel\Repositories\MysqlRedirectReposi
 use Thinktomorrow\Trader\Infrastructure\Laravel\Repositories\MysqlShippingProfileRepository;
 use Thinktomorrow\Trader\Infrastructure\Laravel\Repositories\MysqlTaxonRepository;
 use Thinktomorrow\Trader\Infrastructure\Laravel\Repositories\MysqlTaxonTreeRepository;
+use Thinktomorrow\Trader\Infrastructure\Laravel\Repositories\MysqlVatRateRepository;
 use Thinktomorrow\Trader\Infrastructure\Laravel\Repositories\MysqlVariantRepository;
 use Thinktomorrow\Trader\Infrastructure\Vine\VineFlattenedTaxonIdsComposer;
 use Thinktomorrow\Trader\Infrastructure\Vine\VineTaxonFilterTreeComposer;
@@ -183,6 +185,7 @@ class TraderServiceProvider extends ServiceProvider
         $this->app->bind(OrderPromoRepository::class, MysqlPromoRepository::class);
         $this->app->bind(OrderRepository::class, MysqlOrderRepository::class);
         $this->app->bind(ShippingProfileRepository::class, MysqlShippingProfileRepository::class);
+        $this->app->bind(VatRateRepository::class, MysqlVatRateRepository::class);
         $this->app->bind(PaymentMethodRepository::class, MysqlPaymentMethodRepository::class);
         $this->app->bind(MerchantOrderRepository::class, MysqlMerchantOrderRepository::class);
         $this->app->bind(\Thinktomorrow\Trader\Application\Order\Grid\OrderGridRepository::class, MysqlOrderGridRepository::class);

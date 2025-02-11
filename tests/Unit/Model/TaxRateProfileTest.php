@@ -6,28 +6,28 @@ namespace Tests\Unit\Model;
 use PHPUnit\Framework\TestCase;
 use Thinktomorrow\Trader\Domain\Common\Taxes\TaxRate;
 use Thinktomorrow\Trader\Domain\Model\Country\CountryId;
-use Thinktomorrow\Trader\Domain\Model\TaxRateProfile\TaxRateDouble;
-use Thinktomorrow\Trader\Domain\Model\TaxRateProfile\TaxRateDoubleId;
-use Thinktomorrow\Trader\Domain\Model\TaxRateProfile\TaxRateProfile;
-use Thinktomorrow\Trader\Domain\Model\TaxRateProfile\TaxRateProfileId;
-use Thinktomorrow\Trader\Domain\Model\TaxRateProfile\TaxRateProfileState;
+use Thinktomorrow\Trader\Domain\Model\VatRate\VatRateMapping;
+use Thinktomorrow\Trader\Domain\Model\VatRate\VatRateMappingId;
+use Thinktomorrow\Trader\Domain\Model\VatRate\VatRate;
+use Thinktomorrow\Trader\Domain\Model\VatRate\VatRateId;
+use Thinktomorrow\Trader\Domain\Model\VatRate\VatRateState;
 
 class TaxRateProfileTest extends TestCase
 {
     public function test_it_can_create_a_taxrate_profile()
     {
-        $taxRateProfile = TaxRateProfile::create(
-            $taxRateProfileId = TaxRateProfileId::fromString('yyy'),
+        $taxRateProfile = VatRate::create(
+            $taxRateProfileId = VatRateId::fromString('yyy'),
         );
 
         $this->assertEquals([
             'taxrate_profile_id' => $taxRateProfileId->get(),
-            'state' => TaxRateProfileState::online->value,
+            'state' => VatRateState::online->value,
             'data' => "[]",
         ], $taxRateProfile->getMappedData());
 
         $this->assertEquals([
-            TaxRateDouble::class => [],
+            VatRateMapping::class => [],
             CountryId::class => [],
         ], $taxRateProfile->getChildEntities());
     }
@@ -36,16 +36,16 @@ class TaxRateProfileTest extends TestCase
     {
         $taxRateProfile = $this->createdTaxRateProfile();
 
-        $this->assertEquals(TaxRateProfileId::fromString('yyy'), $taxRateProfile->taxRateProfileId);
-        $this->assertEquals(TaxRateProfileState::offline, $taxRateProfile->getState());
+        $this->assertEquals(VatRateId::fromString('yyy'), $taxRateProfile->taxRateProfileId);
+        $this->assertEquals(VatRateState::offline, $taxRateProfile->getState());
         $this->assertEquals('bar', $taxRateProfile->getData('foo'));
-        $this->assertCount(2, $taxRateProfile->getChildEntities()[TaxRateDouble::class]);
+        $this->assertCount(2, $taxRateProfile->getChildEntities()[VatRateMapping::class]);
         $this->assertEquals([
             'taxrate_profile_id' => 'yyy',
             'taxrate_double_id' => 'xxx',
             'original_rate' => '21',
             'rate' => '10',
-        ], $taxRateProfile->getChildEntities()[TaxRateDouble::class][0]);
+        ], $taxRateProfile->getChildEntities()[VatRateMapping::class][0]);
 
         $this->assertCount(2, $taxRateProfile->getChildEntities()[CountryId::class]);
     }
@@ -54,16 +54,16 @@ class TaxRateProfileTest extends TestCase
     {
         $taxRateProfile = $this->createdTaxRateProfile();
 
-        $taxRateProfile->addTaxRateDouble(
-            TaxRateDouble::create(
-                TaxRateDoubleId::fromString('xxx'),
+        $taxRateProfile->addBaseRate(
+            VatRateMapping::create(
+                VatRateMappingId::fromString('xxx'),
                 $taxRateProfile->taxRateProfileId,
                 TaxRate::fromString('21'),
                 TaxRate::fromString('10')
             )
         );
 
-        $this->assertCount(3, $taxRateProfile->getChildEntities()[TaxRateDouble::class]);
+        $this->assertCount(3, $taxRateProfile->getChildEntities()[VatRateMapping::class]);
     }
 
     public function test_it_can_update_countries()
@@ -114,19 +114,19 @@ class TaxRateProfileTest extends TestCase
 
     public function test_it_can_check_if_double_applies_for_a_rate()
     {
-        $double = TaxRateDouble::create(TaxRateDoubleId::fromString('xxx'), TaxRateProfileId::fromString('yyy'), TaxRate::fromString('21'), TaxRate::fromString('10'));
+        $double = VatRateMapping::create(VatRateMappingId::fromString('xxx'), VatRateId::fromString('yyy'), TaxRate::fromString('21'), TaxRate::fromString('10'));
         $this->assertTrue($double->hasOriginalRate(TaxRate::fromString('21')));
         $this->assertFalse($double->hasOriginalRate(TaxRate::fromString('10')));
     }
 
-    private function createdTaxRateProfile(): TaxRateProfile
+    private function createdTaxRateProfile(): VatRate
     {
-        return TaxRateProfile::fromMappedData([
+        return VatRate::fromMappedData([
             'taxrate_profile_id' => 'yyy',
-            'state' => TaxRateProfileState::offline->value,
+            'state' => VatRateState::offline->value,
             'data' => json_encode(['foo' => 'bar']),
         ], [
-            TaxRateDouble::class => [
+            VatRateMapping::class => [
                 [
                     'taxrate_double_id' => 'xxx',
                     'original_rate' => '21',
