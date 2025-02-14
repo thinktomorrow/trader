@@ -3,20 +3,22 @@ declare(strict_types=1);
 
 namespace Tests\Acceptance\VatRate;
 
-use Thinktomorrow\Trader\Application\VatRate\CreateVatRate;
 use Thinktomorrow\Trader\Application\VatRate\CreateBaseRate;
+use Thinktomorrow\Trader\Application\VatRate\CreateVatRate;
 use Thinktomorrow\Trader\Domain\Common\Taxes\TaxRate;
 use Thinktomorrow\Trader\Domain\Model\Country\CountryId;
-use Thinktomorrow\Trader\Domain\Model\VatRate\VatRateId;
 use Thinktomorrow\Trader\Domain\Model\VatRate\BaseRate;
 use Thinktomorrow\Trader\Domain\Model\VatRate\BaseRateId;
+use Thinktomorrow\Trader\Domain\Model\VatRate\VatRateId;
 
 class CreateVatRateTest extends VatRateContext
 {
     public function test_it_can_create_a_vat_rate()
     {
         $vatRateId = $this->vatRateApplication->createVatRate(new CreateVatRate(
-            'BE', '21', ['foo' => 'bar']
+            'BE',
+            '21',
+            ['foo' => 'bar']
         ));
 
         $vatRate = $this->vatRateRepository->find($vatRateId);
@@ -49,12 +51,16 @@ class CreateVatRateTest extends VatRateContext
     public function test_base_rate_belongs_to_target_rate()
     {
         $originVatRateId = $this->vatRateApplication->createVatRate(new CreateVatRate(
-            'BE', '21', ['foo' => 'bar']
+            'BE',
+            '21',
+            ['foo' => 'bar']
         ));
 
         $this->vatRateRepository->setNextReference('zzz-123');
         $targetVatRateId = $this->vatRateApplication->createVatRate(new CreateVatRate(
-            'NL', '20', ['foo' => 'baz']
+            'NL',
+            '20',
+            ['foo' => 'baz']
         ));
 
         $this->vatRateApplication->createBaseRate(new CreateBaseRate($originVatRateId->get(), $targetVatRateId->get()));

@@ -4,7 +4,6 @@ declare(strict_types=1);
 namespace Tests\Acceptance\VatRate;
 
 use Tests\TestHelpers;
-use Thinktomorrow\Trader\Application\VatRate\CreateBaseRate;
 use Thinktomorrow\Trader\Application\VatRate\CreateVatRate;
 use Thinktomorrow\Trader\Application\VatRate\DeleteBaseRate;
 use Thinktomorrow\Trader\Application\VatRate\DeleteVatRate;
@@ -19,7 +18,9 @@ class DeleteVatRateTest extends VatRateContext
     public function test_it_can_delete_a_vat_rate()
     {
         $vatRateId = $this->vatRateApplication->createVatRate(new CreateVatRate(
-            'BE', '21', ['foo' => 'bar']
+            'BE',
+            '21',
+            ['foo' => 'bar']
         ));
 
         $this->vatRateApplication->deleteVatRate(new DeleteVatRate($vatRateId->get()));

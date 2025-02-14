@@ -13,7 +13,9 @@ class UpdateVatRateTest extends VatRateContext
     public function test_it_can_update_a_vat_rate()
     {
         $vatRateId = $this->vatRateApplication->createVatRate(new CreateVatRate(
-            'BE', '21', ['foo' => 'bar']
+            'BE',
+            '21',
+            ['foo' => 'bar']
         ));
 
         $this->vatRateApplication->updateVatRate(new UpdateVatRate(
