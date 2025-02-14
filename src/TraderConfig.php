@@ -31,12 +31,12 @@ interface TraderConfig
     /**
      * @deprecated Use getPrimaryVatRate instead
      */
-//    public function getDefaultTaxRate(): string;
+    //    public function getDefaultTaxRate(): string;
 
     /**
      * @deprecated Use getPrimaryVatCountry instead to fetch all available tax rates.
      */
-//    public function getAvailableTaxRates(): array;
+    //    public function getAvailableTaxRates(): array;
 
     /**
      * When this value is true, all catalog prices as given by the merchant are considered to have
