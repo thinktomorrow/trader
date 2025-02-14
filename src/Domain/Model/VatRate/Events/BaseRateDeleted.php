@@ -8,7 +8,7 @@ use Thinktomorrow\Trader\Domain\Model\VatRate\VatRateId;
 
 readonly class BaseRateDeleted
 {
-    public function __construct(public VatRateId $vatRateId, public BaseRateId $baseRateId)
+    public function __construct(public BaseRateId $baseRateId, public VatRateId $vatRateId)
     {
     }
 }

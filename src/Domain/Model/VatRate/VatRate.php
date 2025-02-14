@@ -117,7 +117,7 @@ final class VatRate implements Aggregate
         foreach ($this->baseRates as $i => $baseRates) {
             if ($baseRates->baseRateId->equals($baseRateId)) {
                 unset($this->baseRates[$i]);
-                $this->recordEvent(new BaseRateDeleted($this->vatRateId, $baseRateId));
+                $this->recordEvent(new BaseRateDeleted($baseRateId, $this->vatRateId));
             }
         }
     }

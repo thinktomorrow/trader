@@ -50,7 +50,6 @@ class VatRateApplication
         $vatRate = $this->vatRateRepository->find($command->getVatRateId());
 
         $vatRate->updateRate($command->getRate());
-        $vatRate->updateCountry($command->getCountryId());
         $vatRate->addData($command->getData());
 
         $this->vatRateRepository->save($vatRate);

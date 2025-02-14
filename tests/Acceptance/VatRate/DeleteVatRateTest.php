@@ -16,39 +16,37 @@ class DeleteVatRateTest extends VatRateContext
 {
     use TestHelpers;
 
-    public function test_it_can_delete_a_profile()
+    public function test_it_can_delete_a_vat_rate()
     {
-        $taxRateProfileId = $this->vatRateApplication->createVatRate(new CreateVatRate(
-            ['BE', 'NL'],
-            ['foo' => 'bar']
+        $vatRateId = $this->vatRateApplication->createVatRate(new CreateVatRate(
+            'BE', '21', ['foo' => 'bar']
         ));
 
-        $this->vatRateApplication->deleteVatRate(new DeleteVatRate($taxRateProfileId->get()));
+        $this->vatRateApplication->deleteVatRate(new DeleteVatRate($vatRateId->get()));
 
         $this->assertEquals([
-            new VatRateDeleted($taxRateProfileId),
+            new VatRateDeleted($vatRateId),
         ], $this->eventDispatcher->releaseDispatchedEvents());
 
         $this->expectException(CouldNotFindVatRate::class);
-        $this->vatRateRepository->find($taxRateProfileId);
+        $this->vatRateRepository->find($vatRateId);
     }
 
-    public function test_it_can_delete_a_double()
+    public function test_it_can_delete_a_base_rate()
     {
-        $taxRateProfileId = $this->vatRateApplication->createVatRate(new CreateVatRate(
-            ['BE', 'NL'],
-            ['foo' => 'bar']
-        ));
+        [
+            'originVatRateId' => $originVatRateId,
+            'targetVatRateId' => $targetVatRateId,
+            'baseRateId' => $baseRateId
+        ] = $this->createBaseRateStub();
 
-        $taxRateDoubleId = $this->vatRateApplication->createBaseRate(new CreateBaseRate($taxRateProfileId->get(), '21', '10'));
-
-        $this->vatRateApplication->deleteBaseRate(new DeleteBaseRate($taxRateProfileId->get(), $taxRateDoubleId->get()));
+        $this->vatRateApplication->deleteBaseRate(new DeleteBaseRate($baseRateId->get(), $targetVatRateId->get()));
 
         $this->assertEquals([
-            new BaseRateDeleted($taxRateProfileId, $taxRateDoubleId),
+            new BaseRateDeleted($baseRateId, $targetVatRateId),
         ], $this->eventDispatcher->releaseDispatchedEvents());
 
-        $taxRateProfile = $this->vatRateRepository->find($taxRateProfileId);
-        $this->assertCount(0, $taxRateProfile->getBaseRates());
+        $vatRate = $this->vatRateRepository->find($targetVatRateId);
+        $this->assertCount(0, $vatRate->getBaseRates());
     }
 }

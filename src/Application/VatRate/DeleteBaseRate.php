@@ -8,13 +8,13 @@ use Thinktomorrow\Trader\Domain\Model\VatRate\VatRateId;
 
 class DeleteBaseRate
 {
-    private string $vatRateId;
     private string $baseRateId;
+    private string $vatRateId;
 
-    public function __construct(string $vatRateId, string $baseRateId)
+    public function __construct(string $baseRateId, string $vatRateId)
     {
-        $this->vatRateId = $vatRateId;
         $this->baseRateId = $baseRateId;
+        $this->vatRateId = $vatRateId;
     }
 
     public function getVatRateId(): VatRateId

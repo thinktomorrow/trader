@@ -29,16 +29,11 @@ class CreateVatRateTest extends VatRateContext
 
     public function test_it_can_create_a_base_rate()
     {
-        $originVatRateId = $this->vatRateApplication->createVatRate(new CreateVatRate(
-            'BE', '21', ['foo' => 'bar']
-        ));
-
-        $this->vatRateRepository->setNextReference('zzz-123');
-        $targetVatRateId = $this->vatRateApplication->createVatRate(new CreateVatRate(
-            'NL', '20', ['foo' => 'baz']
-        ));
-
-        $baseRateId = $this->vatRateApplication->createBaseRate(new CreateBaseRate($originVatRateId->get(), $targetVatRateId->get()));
+        [
+            'originVatRateId' => $originVatRateId,
+            'targetVatRateId' => $targetVatRateId,
+            'baseRateId' => $baseRateId
+        ] = $this->createBaseRateStub();
 
         $baseRate = $this->vatRateRepository->find($targetVatRateId)->findBaseRate($baseRateId);
 
