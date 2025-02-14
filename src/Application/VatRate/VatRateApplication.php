@@ -7,8 +7,8 @@ use Thinktomorrow\Trader\Domain\Common\Event\EventDispatcher;
 use Thinktomorrow\Trader\Domain\Model\VatRate\Events\VatRateDeleted;
 use Thinktomorrow\Trader\Domain\Model\VatRate\VatRate;
 use Thinktomorrow\Trader\Domain\Model\VatRate\VatRateId;
-use Thinktomorrow\Trader\Domain\Model\VatRate\VatRateMapping;
-use Thinktomorrow\Trader\Domain\Model\VatRate\VatRateMappingId;
+use Thinktomorrow\Trader\Domain\Model\VatRate\BaseRate;
+use Thinktomorrow\Trader\Domain\Model\VatRate\BaseRateId;
 use Thinktomorrow\Trader\Domain\Model\VatRate\VatRateRepository;
 
 class VatRateApplication
@@ -21,7 +21,6 @@ class VatRateApplication
         $this->eventDispatcher = $eventDispatcher;
         $this->vatRateRepository = $vatRateRepository;
     }
-
 
     public function createVatRate(CreateVatRate $command): VatRateId
     {
@@ -68,16 +67,17 @@ class VatRateApplication
         ]);
     }
 
-    public function createTaxRateDouble(CreateVatRateMapping $command): VatRateMappingId
+    public function createBaseRate(CreateBaseRate $command): BaseRateId
     {
-        $vatRate = $this->vatRateRepository->find($command->getVatRateId());
+        $vatRate = $this->vatRateRepository->find($command->getTargetVatRateId());
+        $originVatRate = $this->vatRateRepository->find($command->getOriginVatRateId());
 
         $vatRate->addBaseRate(
-            VatRateMapping::create(
-                $taxRateDoubleId = $this->vatRateRepository->nextVatRateMappingReference(),
+            BaseRate::create(
+                $baseRateId = $this->vatRateRepository->nextBaseRateReference(),
+                $originVatRate->vatRateId,
                 $vatRate->vatRateId,
-                $command->getOriginalRate(),
-                $command->getRate(),
+                $originVatRate->getRate(),
             )
         );
 
@@ -85,31 +85,32 @@ class VatRateApplication
 
         $this->eventDispatcher->dispatchAll($vatRate->releaseEvents());
 
-        return $taxRateDoubleId;
+        return $baseRateId;
     }
 
-    public function updateTaxRateDouble(UpdateTaxRateDouble $command): void
+    public function deleteBaseRate(DeleteBaseRate $command): void
     {
         $vatRate = $this->vatRateRepository->find($command->getVatRateId());
 
-        $taxRateDouble = $vatRate->findBaseRate($command->getTaxRateDoubleId());
-
-        $taxRateDouble->update(
-            $command->getOriginalRate(),
-            $command->getRate()
-        );
+        $vatRate->deleteBaseRate($command->getBaseRateId());
 
         $this->vatRateRepository->save($vatRate);
 
         $this->eventDispatcher->dispatchAll($vatRate->releaseEvents());
     }
 
-    public function deleteTaxRateDouble(DeleteVatRateMapping $command): void
+    public function changeStandardVatRateForCountry(ChangeStandardVatRateForCountry $command): void
     {
+        // Unset existing standard vat rate first
+        $standardVatRate = $this->vatRateRepository->findStandardVatRateForCountry($command->getCountryId());
+        $standardVatRate->unsetAsStandard();
+        $this->vatRateRepository->save($standardVatRate);
+
+        $this->eventDispatcher->dispatchAll($standardVatRate->releaseEvents());
+
+        // Set new standard vat rate
         $vatRate = $this->vatRateRepository->find($command->getVatRateId());
-
-        $vatRate->deleteBaseRate($command->getTaxRateDoubleId());
-
+        $vatRate->setAsStandard();
         $this->vatRateRepository->save($vatRate);
 
         $this->eventDispatcher->dispatchAll($vatRate->releaseEvents());

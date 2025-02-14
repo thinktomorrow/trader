@@ -8,7 +8,7 @@ use Thinktomorrow\Trader\Domain\Common\Entity\HasData;
 use Thinktomorrow\Trader\Domain\Common\Event\RecordsEvents;
 use Thinktomorrow\Trader\Domain\Common\Taxes\TaxRate;
 use Thinktomorrow\Trader\Domain\Model\Country\CountryId;
-use Thinktomorrow\Trader\Domain\Model\VatRate\Events\BaseVatRateDeleted;
+use Thinktomorrow\Trader\Domain\Model\VatRate\Events\BaseRateDeleted;
 
 final class VatRate implements Aggregate
 {
@@ -29,7 +29,7 @@ final class VatRate implements Aggregate
 
     /**
      * Mapping of any the primary country rates to this rate
-     * @var VatRate[]
+     * @var BaseRate[]
      */
     private array $baseRates = [];
 
@@ -45,14 +45,29 @@ final class VatRate implements Aggregate
         return $object;
     }
 
-    public function updateState(VatRateState $state): void
+    public function getRate(): TaxRate
     {
-        $this->state = $state;
+        return $this->rate;
+    }
+
+    public function updateRate(TaxRate $rate): void
+    {
+        $this->rate = $rate;
     }
 
     public function getState(): VatRateState
     {
         return $this->state;
+    }
+
+    public function updateState(VatRateState $state): void
+    {
+        $this->state = $state;
+    }
+
+    public function isStandard(): bool
+    {
+        return $this->isStandard;
     }
 
     public function setAsStandard(): void
@@ -70,39 +85,39 @@ final class VatRate implements Aggregate
         return $this->baseRates;
     }
 
-    public function hasBaseRate(TaxRate $taxRate): ?VatRate
+    public function hasBaseRateOf(TaxRate $taxRate): bool
     {
         foreach ($this->baseRates as $baseRates) {
             if ($baseRates->rate->equals($taxRate)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    public function findBaseRate(BaseRateId $baseRateId): BaseRate
+    {
+        foreach ($this->baseRates as $baseRates) {
+            if ($baseRates->baseRateId->equals($baseRateId)) {
                 return $baseRates;
             }
         }
 
-        return null;
+        throw new \InvalidArgumentException('No base rate found by id ' . $baseRateId->get());
     }
 
-    public function findBaseRate(VatRateId $vatRateId): VatRate
+    public function addBaseRate(BaseRate $baseRate): void
     {
-        foreach ($this->baseRates as $baseRate) {
-            if ($baseRate->vatRateId->equals($vatRateId)) {
-                return $baseRate;
-            }
-        }
-
-        throw new \InvalidArgumentException('No baseRate found by id ' . $vatRateId->get());
+        $this->baseRates[] = $baseRate;
     }
 
-    public function addBaseRate(VatRate $vatRate): void
+    public function deleteBaseRate(BaseRateId $baseRateId): void
     {
-        $this->baseRates[] = $vatRate;
-    }
-
-    public function deleteBaseRate(VatRateId $vatRateId): void
-    {
-        foreach ($this->baseRates as $i => $baseRate) {
-            if ($baseRate->vatRateId->equals($vatRateId)) {
+        foreach ($this->baseRates as $i => $baseRates) {
+            if ($baseRates->baseRateId->equals($baseRateId)) {
                 unset($this->baseRates[$i]);
-                $this->recordEvent(new BaseVatRateDeleted($this->vatRateId, $vatRateId));
+                $this->recordEvent(new BaseRateDeleted($this->vatRateId, $baseRateId));
             }
         }
     }
@@ -122,7 +137,7 @@ final class VatRate implements Aggregate
     public function getChildEntities(): array
     {
         return [
-            VatRate::class => array_map(fn (VatRate $vatRate) => $vatRate->getMappedData(), $this->baseRates),
+            BaseRate::class => array_map(fn(BaseRate $baseRate) => $baseRate->getMappedData(), $this->baseRates),
         ];
     }
 
@@ -135,7 +150,7 @@ final class VatRate implements Aggregate
         $object->isStandard = $state['is_standard'];
         $object->state = VatRateState::from($state['state']);
         $object->data = json_decode($state['data'], true);
-        $object->baseRates = array_map(fn ($vatRateState) => VatRate::fromMappedData($vatRateState, $state), $childEntities[VatRate::class]);
+        $object->baseRates = array_map(fn($baseRateState) => BaseRate::fromMappedData($baseRateState, $state), $childEntities[BaseRate::class]);
 
         return $object;
     }

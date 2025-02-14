@@ -5,7 +5,7 @@ namespace Thinktomorrow\Trader\Domain\Model\VatRate;
 
 use Thinktomorrow\Trader\Domain\Common\Entity\AggregateId;
 
-class VatRateMappingId
+class BaseRateId
 {
     use AggregateId;
 }

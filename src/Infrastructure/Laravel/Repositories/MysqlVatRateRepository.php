@@ -10,8 +10,8 @@ use Thinktomorrow\Trader\Domain\Model\Country\CountryId;
 use Thinktomorrow\Trader\Domain\Model\VatRate\Exceptions\CouldNotFindVatRate;
 use Thinktomorrow\Trader\Domain\Model\VatRate\VatRate;
 use Thinktomorrow\Trader\Domain\Model\VatRate\VatRateId;
-use Thinktomorrow\Trader\Domain\Model\VatRate\VatRateMapping;
-use Thinktomorrow\Trader\Domain\Model\VatRate\VatRateMappingId;
+use Thinktomorrow\Trader\Domain\Model\VatRate\BaseRate;
+use Thinktomorrow\Trader\Domain\Model\VatRate\BaseRateId;
 use Thinktomorrow\Trader\Domain\Model\VatRate\VatRateRepository;
 use Thinktomorrow\Trader\Domain\Model\VatRate\VatRateState;
 
@@ -50,7 +50,7 @@ class MysqlVatRateRepository implements VatRateRepository
             ->delete();
 
         DB::table(static::$taxRateProfileTaxRateDoubleTable)
-            ->insert($taxRateProfile->getChildEntities()[VatRateMapping::class]);
+            ->insert($taxRateProfile->getChildEntities()[BaseRate::class]);
     }
 
     private function upsertCountryIds(VatRate $taxRateProfile): void
@@ -94,9 +94,9 @@ class MysqlVatRateRepository implements VatRateRepository
         return VatRateId::fromString((string)Uuid::uuid4());
     }
 
-    public function nextVatRateMappingReference(): VatRateMappingId
+    public function nextVatRateMappingReference(): BaseRateId
     {
-        return VatRateMappingId::fromString((string)Uuid::uuid4());
+        return BaseRateId::fromString((string)Uuid::uuid4());
     }
 
     public function findVatRateForCountry(string $countryId): ?VatRate
@@ -134,7 +134,7 @@ class MysqlVatRateRepository implements VatRateRepository
             ->toArray();
 
         return VatRate::fromMappedData((array)$taxRateProfileState, [
-            VatRateMapping::class => $taxRateDoubleStates,
+            BaseRate::class => $taxRateDoubleStates,
             CountryId::class => $countryStates,
         ]);
     }

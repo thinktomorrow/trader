@@ -61,7 +61,7 @@ use Thinktomorrow\Trader\Domain\Model\ShippingProfile\ShippingProfile;
 use Thinktomorrow\Trader\Domain\Model\ShippingProfile\ShippingProfileState;
 use Thinktomorrow\Trader\Domain\Model\ShippingProfile\Tariff;
 use Thinktomorrow\Trader\Domain\Model\VatRate\VatRate;
-use Thinktomorrow\Trader\Domain\Model\VatRate\VatRateMapping;
+use Thinktomorrow\Trader\Domain\Model\VatRate\BaseRate;
 use Thinktomorrow\Trader\Domain\Model\VatRate\VatRateState;
 use Throwable;
 
@@ -333,7 +333,7 @@ trait TestHelpers
             'state' => VatRateState::online->value,
             'data' => json_encode([]),
         ], $values), [
-            VatRateMapping::class => [
+            BaseRate::class => [
                 [
                     'taxrate_profile_id' => 'ppp',
                     'taxrate_double_id' => 'ppp-xxx',

@@ -15,7 +15,9 @@ interface VatRateRepository
 
     public function nextReference(): VatRateId;
 
-    public function getVatRatesForCountry(CountryId $countryId): iterable;
+    public function nextBaseRateReference(): BaseRateId;
 
-    public function findStandardVatRateForCountry(CountryId $countryId): VatRate;
+    public function getActiveVatRatesForCountry(CountryId $countryId): iterable;
+
+    public function findStandardVatRateForCountry(CountryId $countryId): ?VatRate;
 }

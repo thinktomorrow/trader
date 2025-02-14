@@ -13,6 +13,10 @@ interface TraderConfig
 
     public function getDefaultCurrency(): string;
 
+    /**
+     * The default vat rate for the catalog. This is typically
+     * the standard rate of the primary VAT country.
+     */
     public function getPrimaryVatRate(): string;
 
     /**
@@ -27,12 +31,12 @@ interface TraderConfig
     /**
      * @deprecated Use getPrimaryVatRate instead
      */
-    public function getDefaultTaxRate(): string;
+//    public function getDefaultTaxRate(): string;
 
     /**
      * @deprecated Use getPrimaryVatCountry instead to fetch all available tax rates.
      */
-    public function getAvailableTaxRates(): array;
+//    public function getAvailableTaxRates(): array;
 
     /**
      * When this value is true, all catalog prices as given by the merchant are considered to have

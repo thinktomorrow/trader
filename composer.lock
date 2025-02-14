@@ -707,16 +707,16 @@
         },
         {
             "name": "guzzlehttp/uri-template",
-            "version": "v1.0.3",
+            "version": "v1.0.4",
             "source": {
                 "type": "git",
                 "url": "https://github.com/guzzle/uri-template.git",
-                "reference": "ecea8feef63bd4fef1f037ecb288386999ecc11c"
+                "reference": "30e286560c137526eccd4ce21b2de477ab0676d2"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/guzzle/uri-template/zipball/ecea8feef63bd4fef1f037ecb288386999ecc11c",
-                "reference": "ecea8feef63bd4fef1f037ecb288386999ecc11c",
+                "url": "https://api.github.com/repos/guzzle/uri-template/zipball/30e286560c137526eccd4ce21b2de477ab0676d2",
+                "reference": "30e286560c137526eccd4ce21b2de477ab0676d2",
                 "shasum": ""
             },
             "require": {
@@ -773,7 +773,7 @@
             ],
             "support": {
                 "issues": "https://github.com/guzzle/uri-template/issues",
-                "source": "https://github.com/guzzle/uri-template/tree/v1.0.3"
+                "source": "https://github.com/guzzle/uri-template/tree/v1.0.4"
             },
             "funding": [
                 {
@@ -789,20 +789,20 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2023-12-03T19:50:20+00:00"
+            "time": "2025-02-03T10:55:03+00:00"
         },
         {
             "name": "laravel/framework",
-            "version": "v9.52.19",
+            "version": "v9.52.20",
             "source": {
                 "type": "git",
                 "url": "https://github.com/laravel/framework.git",
-                "reference": "0d244f0e7ef871b6d4efcacb396e155e6a13912c"
+                "reference": "2bb6835af73fcf0d1d0bfb84af71cef236cb8609"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/laravel/framework/zipball/0d244f0e7ef871b6d4efcacb396e155e6a13912c",
-                "reference": "0d244f0e7ef871b6d4efcacb396e155e6a13912c",
+                "url": "https://api.github.com/repos/laravel/framework/zipball/2bb6835af73fcf0d1d0bfb84af71cef236cb8609",
+                "reference": "2bb6835af73fcf0d1d0bfb84af71cef236cb8609",
                 "shasum": ""
             },
             "require": {
@@ -987,7 +987,7 @@
                 "issues": "https://github.com/laravel/framework/issues",
                 "source": "https://github.com/laravel/framework"
             },
-            "time": "2025-01-21T16:07:36+00:00"
+            "time": "2025-01-31T10:09:38+00:00"
         },
         {
             "name": "laravel/serializable-closure",
@@ -1682,16 +1682,16 @@
         },
         {
             "name": "nesbot/carbon",
-            "version": "2.72.6",
+            "version": "2.73.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/CarbonPHP/carbon.git",
-                "reference": "1e9d50601e7035a4c61441a208cb5bed73e108c5"
+                "reference": "9228ce90e1035ff2f0db84b40ec2e023ed802075"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/CarbonPHP/carbon/zipball/1e9d50601e7035a4c61441a208cb5bed73e108c5",
-                "reference": "1e9d50601e7035a4c61441a208cb5bed73e108c5",
+                "url": "https://api.github.com/repos/CarbonPHP/carbon/zipball/9228ce90e1035ff2f0db84b40ec2e023ed802075",
+                "reference": "9228ce90e1035ff2f0db84b40ec2e023ed802075",
                 "shasum": ""
             },
             "require": {
@@ -1785,7 +1785,7 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2024-12-27T09:28:11+00:00"
+            "time": "2025-01-08T20:10:23+00:00"
         },
         {
             "name": "nette/schema",
@@ -5733,16 +5733,16 @@
         },
         {
             "name": "infection/infection",
-            "version": "0.29.10",
+            "version": "0.29.11",
             "source": {
                 "type": "git",
                 "url": "https://github.com/infection/infection.git",
-                "reference": "cac7d20e5d286a37488527e477f5a695a9d7a44c"
+                "reference": "e241c8f58cf4121818c5a20a74ebb321dd94bb25"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/infection/infection/zipball/cac7d20e5d286a37488527e477f5a695a9d7a44c",
-                "reference": "cac7d20e5d286a37488527e477f5a695a9d7a44c",
+                "url": "https://api.github.com/repos/infection/infection/zipball/e241c8f58cf4121818c5a20a74ebb321dd94bb25",
+                "reference": "e241c8f58cf4121818c5a20a74ebb321dd94bb25",
                 "shasum": ""
             },
             "require": {
@@ -5764,7 +5764,7 @@
                 "php": "^8.2",
                 "sanmai/later": "^0.1.1",
                 "sanmai/pipeline": "^5.1 || ^6",
-                "sebastian/diff": "^3.0.2 || ^4.0 || ^5.0 || ^6.0",
+                "sebastian/diff": "^3.0.2 || ^4.0 || ^5.0 || ^6.0 || ^7.0",
                 "shish/safe": "^2.6",
                 "symfony/console": "^5.4 || ^6.0 || ^7.0",
                 "symfony/filesystem": "^5.4 || ^6.0 || ^7.0",
@@ -5845,7 +5845,7 @@
             ],
             "support": {
                 "issues": "https://github.com/infection/infection/issues",
-                "source": "https://github.com/infection/infection/tree/0.29.10"
+                "source": "https://github.com/infection/infection/tree/0.29.11"
             },
             "funding": [
                 {
@@ -5857,7 +5857,7 @@
                     "type": "open_collective"
                 }
             ],
-            "time": "2024-12-17T19:11:10+00:00"
+            "time": "2025-02-11T10:05:15+00:00"
         },
         {
             "name": "infection/mutator",
@@ -6128,16 +6128,16 @@
         },
         {
             "name": "myclabs/deep-copy",
-            "version": "1.12.1",
+            "version": "1.13.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/myclabs/DeepCopy.git",
-                "reference": "123267b2c49fbf30d78a7b2d333f6be754b94845"
+                "reference": "024473a478be9df5fdaca2c793f2232fe788e414"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/myclabs/DeepCopy/zipball/123267b2c49fbf30d78a7b2d333f6be754b94845",
-                "reference": "123267b2c49fbf30d78a7b2d333f6be754b94845",
+                "url": "https://api.github.com/repos/myclabs/DeepCopy/zipball/024473a478be9df5fdaca2c793f2232fe788e414",
+                "reference": "024473a478be9df5fdaca2c793f2232fe788e414",
                 "shasum": ""
             },
             "require": {
@@ -6176,7 +6176,7 @@
             ],
             "support": {
                 "issues": "https://github.com/myclabs/DeepCopy/issues",
-                "source": "https://github.com/myclabs/DeepCopy/tree/1.12.1"
+                "source": "https://github.com/myclabs/DeepCopy/tree/1.13.0"
             },
             "funding": [
                 {
@@ -6184,7 +6184,7 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2024-11-08T17:47:46+00:00"
+            "time": "2025-02-12T12:17:51+00:00"
         },
         {
             "name": "nikic/php-parser",
@@ -6605,16 +6605,16 @@
         },
         {
             "name": "orchestra/testbench-core",
-            "version": "v7.51.1",
+            "version": "v7.51.3",
             "source": {
                 "type": "git",
                 "url": "https://github.com/orchestral/testbench-core.git",
-                "reference": "eb0a8d8724488bbf4835ea964c086ef28e182801"
+                "reference": "b0ce36e8961f0eb05919e748ad4b2f73eba2fd3b"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/orchestral/testbench-core/zipball/eb0a8d8724488bbf4835ea964c086ef28e182801",
-                "reference": "eb0a8d8724488bbf4835ea964c086ef28e182801",
+                "url": "https://api.github.com/repos/orchestral/testbench-core/zipball/b0ce36e8961f0eb05919e748ad4b2f73eba2fd3b",
+                "reference": "b0ce36e8961f0eb05919e748ad4b2f73eba2fd3b",
                 "shasum": ""
             },
             "require": {
@@ -6699,7 +6699,7 @@
                 "issues": "https://github.com/orchestral/testbench/issues",
                 "source": "https://github.com/orchestral/testbench-core"
             },
-            "time": "2025-01-07T01:20:48+00:00"
+            "time": "2025-02-06T04:43:33+00:00"
         },
         {
             "name": "orchestra/workbench",
@@ -6887,16 +6887,16 @@
         },
         {
             "name": "phpstan/phpstan",
-            "version": "1.12.16",
+            "version": "1.12.18",
             "source": {
                 "type": "git",
                 "url": "https://github.com/phpstan/phpstan.git",
-                "reference": "e0bb5cb78545aae631220735aa706eac633a6be9"
+                "reference": "fef9f07814a573399229304bb0046affdf558812"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/phpstan/phpstan/zipball/e0bb5cb78545aae631220735aa706eac633a6be9",
-                "reference": "e0bb5cb78545aae631220735aa706eac633a6be9",
+                "url": "https://api.github.com/repos/phpstan/phpstan/zipball/fef9f07814a573399229304bb0046affdf558812",
+                "reference": "fef9f07814a573399229304bb0046affdf558812",
                 "shasum": ""
             },
             "require": {
@@ -6941,7 +6941,7 @@
                     "type": "github"
                 }
             ],
-            "time": "2025-01-21T14:50:05+00:00"
+            "time": "2025-02-13T12:44:44+00:00"
         },
         {
             "name": "phpunit/php-code-coverage",

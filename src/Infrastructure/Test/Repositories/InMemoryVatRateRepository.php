@@ -4,42 +4,43 @@ declare(strict_types=1);
 namespace Thinktomorrow\Trader\Infrastructure\Test\Repositories;
 
 use Thinktomorrow\Trader\Domain\Model\Country\CountryId;
+use Thinktomorrow\Trader\Domain\Model\VatRate\Exceptions\CouldNotFindStandardVatRate;
 use Thinktomorrow\Trader\Domain\Model\VatRate\Exceptions\CouldNotFindVatRate;
 use Thinktomorrow\Trader\Domain\Model\VatRate\VatRate;
 use Thinktomorrow\Trader\Domain\Model\VatRate\VatRateId;
-use Thinktomorrow\Trader\Domain\Model\VatRate\VatRateMappingId;
+use Thinktomorrow\Trader\Domain\Model\VatRate\BaseRateId;
 use Thinktomorrow\Trader\Domain\Model\VatRate\VatRateRepository;
 use Thinktomorrow\Trader\Domain\Model\VatRate\VatRateState;
 
 final class InMemoryVatRateRepository implements VatRateRepository
 {
     /** @var VatRate[] */
-    private static array $taxRateProfiles = [];
+    private static array $vatRates = [];
 
     private string $nextReference = 'yyy-123';
-    private $nextTaxRateDoubleReference = 'zzz-123';
+    private $nextBaseRateReference = 'zzz-123';
 
-    public function save(VatRate $taxRateProfile): void
+    public function save(VatRate $vatRate): void
     {
-        static::$taxRateProfiles[$taxRateProfile->taxRateProfileId->get()] = $taxRateProfile;
+        static::$vatRates[$vatRate->vatRateId->get()] = $vatRate;
     }
 
-    public function find(VatRateId $taxRateProfileId): VatRate
+    public function find(VatRateId $vatRateId): VatRate
     {
-        if (! isset(static::$taxRateProfiles[$taxRateProfileId->get()])) {
-            throw new CouldNotFindVatRate('No taxRate found by id ' . $taxRateProfileId);
+        if (!isset(static::$vatRates[$vatRateId->get()])) {
+            throw new CouldNotFindVatRate('No vatRate found by id ' . $vatRateId);
         }
 
-        return static::$taxRateProfiles[$taxRateProfileId->get()];
+        return static::$vatRates[$vatRateId->get()];
     }
 
-    public function delete(VatRateId $taxRateProfileId): void
+    public function delete(VatRateId $vatRateId): void
     {
-        if (! isset(static::$taxRateProfiles[$taxRateProfileId->get()])) {
-            throw new CouldNotFindVatRate('No available taxRate found by id ' . $taxRateProfileId);
+        if (!isset(static::$vatRates[$vatRateId->get()])) {
+            throw new CouldNotFindVatRate('No available vatRate found by id ' . $vatRateId);
         }
 
-        unset(static::$taxRateProfiles[$taxRateProfileId->get()]);
+        unset(static::$vatRates[$vatRateId->get()]);
     }
 
     public function nextReference(): VatRateId
@@ -55,19 +56,43 @@ final class InMemoryVatRateRepository implements VatRateRepository
 
     public static function clear()
     {
-        static::$taxRateProfiles = [];
+        static::$vatRates = [];
     }
 
-    public function nextVatRateMappingReference(): VatRateMappingId
+    public function nextBaseRateReference(): BaseRateId
     {
-        return VatRateMappingId::fromString($this->nextTaxRateDoubleReference);
+        return BaseRateId::fromString($this->nextBaseRateReference);
     }
 
-    public function findVatRateForCountry(string $countryId): ?VatRate
+//    public function findVatRateForCountry(string $countryId): ?VatRate
+//    {
+//        foreach (static::$vatRates as $vatRate) {
+//            if ($vatRate->getState() == VatRateState::online && $vatRate->hasCountry(CountryId::fromString($countryId))) {
+//                return $vatRate;
+//            }
+//        }
+//
+//        return null;
+//    }
+
+    public function getActiveVatRatesForCountry(CountryId $countryId): iterable
     {
-        foreach (static::$taxRateProfiles as $taxRateProfile) {
-            if ($taxRateProfile->getState() == VatRateState::online && $taxRateProfile->hasCountry(CountryId::fromString($countryId))) {
-                return $taxRateProfile;
+        $rates = [];
+
+        foreach (static::$vatRates as $vatRate) {
+            if ($vatRate->getState() == VatRateState::online && $vatRate->countryId->equals($countryId)) {
+                $rates[] = $vatRate;
+            }
+        }
+
+        return $rates;
+    }
+
+    public function findStandardVatRateForCountry(CountryId $countryId): ?VatRate
+    {
+        foreach (static::$vatRates as $vatRate) {
+            if ($vatRate->getState() == VatRateState::online && $vatRate->isStandard() && $vatRate->countryId->equals($countryId)) {
+                return $vatRate;
             }
         }
 

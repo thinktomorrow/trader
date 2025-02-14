@@ -10,8 +10,8 @@ use Thinktomorrow\Trader\Domain\Model\Country\CountryId;
 use Thinktomorrow\Trader\Domain\Model\VatRate\Exceptions\CouldNotFindVatRate;
 use Thinktomorrow\Trader\Domain\Model\VatRate\VatRate;
 use Thinktomorrow\Trader\Domain\Model\VatRate\VatRateId;
-use Thinktomorrow\Trader\Domain\Model\VatRate\VatRateMapping;
-use Thinktomorrow\Trader\Domain\Model\VatRate\VatRateMappingId;
+use Thinktomorrow\Trader\Domain\Model\VatRate\BaseRate;
+use Thinktomorrow\Trader\Domain\Model\VatRate\BaseRateId;
 use Thinktomorrow\Trader\Infrastructure\Laravel\Repositories\MysqlVatRateRepository;
 use Thinktomorrow\Trader\Infrastructure\Test\Repositories\InMemoryVatRateRepository;
 use Thinktomorrow\Trader\Infrastructure\Test\TestContainer;
@@ -101,7 +101,7 @@ class TaxRateProfileRepositoryTest extends TestCase
 
         $profile = $this->createTaxRateProfile();
         $profile->addCountry(CountryId::fromString('BE'));
-        $profile->addBaseRate(VatRateMapping::create(VatRateMappingId::fromString('xxx'), $profile->taxRateProfileId, TaxRate::fromString('21'), TaxRate::fromString('10')));
+        $profile->addBaseRate(BaseRate::create(BaseRateId::fromString('xxx'), $profile->taxRateProfileId, TaxRate::fromString('21'), TaxRate::fromString('10')));
 
         yield [$profile];
     }

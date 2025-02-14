@@ -7,15 +7,15 @@ use Thinktomorrow\Trader\Domain\Model\VatRate\VatRateId;
 
 class DeleteVatRate
 {
-    private string $taxRateProfileId;
+    private string $vatRateId;
 
-    public function __construct(string $taxRateProfileId)
+    public function __construct(string $vatRateId)
     {
-        $this->taxRateProfileId = $taxRateProfileId;
+        $this->vatRateId = $vatRateId;
     }
 
-    public function getTaxRateProfileId(): VatRateId
+    public function getVatRateId(): VatRateId
     {
-        return VatRateId::fromString($this->taxRateProfileId);
+        return VatRateId::fromString($this->vatRateId);
     }
 }

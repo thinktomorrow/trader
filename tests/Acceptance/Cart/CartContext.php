@@ -75,7 +75,7 @@ use Thinktomorrow\Trader\Domain\Model\ShippingProfile\ShippingProviderId;
 use Thinktomorrow\Trader\Domain\Model\ShippingProfile\Tariff;
 use Thinktomorrow\Trader\Domain\Model\VatRate\VatRate;
 use Thinktomorrow\Trader\Domain\Model\VatRate\VatRateId;
-use Thinktomorrow\Trader\Domain\Model\VatRate\VatRateMapping;
+use Thinktomorrow\Trader\Domain\Model\VatRate\BaseRate;
 use Thinktomorrow\Trader\Infrastructure\Laravel\Models\Cart\DefaultAdjustLine;
 use Thinktomorrow\Trader\Infrastructure\Test\EventDispatcherSpy;
 use Thinktomorrow\Trader\Infrastructure\Test\Repositories\InMemoryCartRepository;
@@ -315,7 +315,7 @@ abstract class CartContext extends TestCase
 
         foreach ($mapping as $originalTaxRate => $taxRate) {
             $taxRateProfile->addBaseRate(
-                VatRateMapping::create(
+                BaseRate::create(
                     $this->taxRateProfileRepository->nextVatRateMappingReference(),
                     $taxRateProfile->taxRateProfileId,
                     TaxRate::fromString((string) $originalTaxRate),

@@ -1,31 +1,31 @@
 <?php
 declare(strict_types=1);
 
-namespace Tests\Acceptance\TaxRateProfile;
+namespace Tests\Acceptance\VatRate;
 
 use Tests\Acceptance\TestCase;
 use Thinktomorrow\Trader\Application\VatRate\VatRateApplication;
 use Thinktomorrow\Trader\Infrastructure\Test\EventDispatcherSpy;
 use Thinktomorrow\Trader\Infrastructure\Test\Repositories\InMemoryVatRateRepository;
 
-class TaxRateProfileContext extends TestCase
+class VatRateContext extends TestCase
 {
-    protected VatRateApplication $taxRateProfileApplication;
-    protected InMemoryVatRateRepository $taxRateProfileRepository;
+    protected VatRateApplication $vatRateApplication;
+    protected InMemoryVatRateRepository $vatRateRepository;
     protected EventDispatcherSpy $eventDispatcher;
 
     protected function setUp(): void
     {
         parent::setUp();
 
-        $this->taxRateProfileApplication = new VatRateApplication(
+        $this->vatRateApplication = new VatRateApplication(
             $this->eventDispatcher = new EventDispatcherSpy(),
-            $this->taxRateProfileRepository = new InMemoryVatRateRepository(),
+            $this->vatRateRepository = new InMemoryVatRateRepository(),
         );
     }
 
     public function tearDown(): void
     {
-        $this->taxRateProfileRepository->clear();
+        $this->vatRateRepository->clear();
     }
 }
