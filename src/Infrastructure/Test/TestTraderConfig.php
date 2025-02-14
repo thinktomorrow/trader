@@ -52,15 +52,15 @@ class TestTraderConfig implements TraderConfig
     }
 
 
-//    public function getDefaultTaxRate(): string
-//    {
-//        return '10';
-//    }
-//
-//    public function getAvailableTaxRates(): array
-//    {
-//        return ['21', '12', '6', '10'];
-//    }
+    //    public function getDefaultTaxRate(): string
+    //    {
+    //        return '10';
+    //    }
+    //
+    //    public function getAvailableTaxRates(): array
+    //    {
+    //        return ['21', '12', '6', '10'];
+    //    }
 
     public function doesPriceInputIncludesVat(): bool
     {
