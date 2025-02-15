@@ -3,6 +3,8 @@ declare(strict_types=1);
 
 namespace Thinktomorrow\Trader\Infrastructure\Test\Repositories;
 
+use Ramsey\Uuid\Uuid;
+use Thinktomorrow\Trader\Domain\Common\Taxes\TaxRate;
 use Thinktomorrow\Trader\Domain\Model\Country\CountryId;
 use Thinktomorrow\Trader\Domain\Model\VatRate\BaseRateId;
 use Thinktomorrow\Trader\Domain\Model\VatRate\Exceptions\CouldNotFindVatRate;
@@ -10,14 +12,15 @@ use Thinktomorrow\Trader\Domain\Model\VatRate\VatRate;
 use Thinktomorrow\Trader\Domain\Model\VatRate\VatRateId;
 use Thinktomorrow\Trader\Domain\Model\VatRate\VatRateRepository;
 use Thinktomorrow\Trader\Domain\Model\VatRate\VatRateState;
+use Thinktomorrow\Trader\Infrastructure\Laravel\config\TraderConfig;
 
 final class InMemoryVatRateRepository implements VatRateRepository
 {
     /** @var VatRate[] */
     private static array $vatRates = [];
 
-    private string $nextReference = 'yyy-123';
-    private $nextBaseRateReference = 'zzz-123';
+    private ?string $nextReference = null;
+    private ?string $nextBaseRateReference = null;
 
     public function save(VatRate $vatRate): void
     {
@@ -26,7 +29,7 @@ final class InMemoryVatRateRepository implements VatRateRepository
 
     public function find(VatRateId $vatRateId): VatRate
     {
-        if (! isset(static::$vatRates[$vatRateId->get()])) {
+        if (!isset(static::$vatRates[$vatRateId->get()])) {
             throw new CouldNotFindVatRate('No vatRate found by id ' . $vatRateId);
         }
 
@@ -35,7 +38,7 @@ final class InMemoryVatRateRepository implements VatRateRepository
 
     public function delete(VatRateId $vatRateId): void
     {
-        if (! isset(static::$vatRates[$vatRateId->get()])) {
+        if (!isset(static::$vatRates[$vatRateId->get()])) {
             throw new CouldNotFindVatRate('No available vatRate found by id ' . $vatRateId);
         }
 
@@ -44,6 +47,10 @@ final class InMemoryVatRateRepository implements VatRateRepository
 
     public function nextReference(): VatRateId
     {
+        if (!$this->nextReference) {
+            return VatRateId::fromString('vatRate-' . Uuid::uuid4());
+        }
+
         return VatRateId::fromString($this->nextReference);
     }
 
@@ -60,21 +67,14 @@ final class InMemoryVatRateRepository implements VatRateRepository
 
     public function nextBaseRateReference(): BaseRateId
     {
+        if (!$this->nextBaseRateReference) {
+            return BaseRateId::fromString('baseRate-' . Uuid::uuid4());
+        }
+
         return BaseRateId::fromString($this->nextBaseRateReference);
     }
 
-    //    public function findVatRateForCountry(string $countryId): ?VatRate
-    //    {
-    //        foreach (static::$vatRates as $vatRate) {
-    //            if ($vatRate->getState() == VatRateState::online && $vatRate->hasCountry(CountryId::fromString($countryId))) {
-    //                return $vatRate;
-    //            }
-    //        }
-    //
-    //        return null;
-    //    }
-
-    public function getActiveVatRatesForCountry(CountryId $countryId): iterable
+    public function getVatRatesForCountry(CountryId $countryId): iterable
     {
         $rates = [];
 
@@ -96,5 +96,26 @@ final class InMemoryVatRateRepository implements VatRateRepository
         }
 
         return null;
+    }
+
+
+    public function getPrimaryVatRates(): iterable
+    {
+        $primaryCountryId = CountryId::fromString(app(TraderConfig::class)->getPrimaryVatCountry());
+
+        return $this->getVatRatesForCountry($primaryCountryId);
+    }
+
+    public function getStandardPrimaryVatRate(): TaxRate
+    {
+        $primaryCountryId = CountryId::fromString(app(TraderConfig::class)->getPrimaryVatCountry());
+
+        $standardVatRate = $this->findStandardVatRateForCountry($primaryCountryId);
+
+        if (!$standardVatRate) {
+            return TaxRate::fromString(app(TraderConfig::class)->getFallBackStandardVatRate());
+        }
+
+        return $this->findStandardVatRateForCountry($primaryCountryId)->getRate();
     }
 }

@@ -6,6 +6,7 @@ namespace Thinktomorrow\Trader\Infrastructure\Laravel\Repositories;
 use Illuminate\Support\Facades\DB;
 use Psr\Container\ContainerInterface;
 use Ramsey\Uuid\Uuid;
+use Thinktomorrow\Trader\Domain\Common\Taxes\TaxRate;
 use Thinktomorrow\Trader\Domain\Model\Country\CountryId;
 use Thinktomorrow\Trader\Domain\Model\VatRate\BaseRate;
 use Thinktomorrow\Trader\Domain\Model\VatRate\BaseRateId;
@@ -14,13 +15,12 @@ use Thinktomorrow\Trader\Domain\Model\VatRate\VatRate;
 use Thinktomorrow\Trader\Domain\Model\VatRate\VatRateId;
 use Thinktomorrow\Trader\Domain\Model\VatRate\VatRateRepository;
 use Thinktomorrow\Trader\Domain\Model\VatRate\VatRateState;
+use Thinktomorrow\Trader\Infrastructure\Laravel\config\TraderConfig;
 
 class MysqlVatRateRepository implements VatRateRepository
 {
-    private static $taxRateProfileTable = 'trader_taxrate_profiles';
-    private static $taxRateProfileTaxRateDoubleTable = 'trader_taxrate_profile_doubles';
-    private static $taxRateProfileCountryTable = 'trader_taxrate_profile_countries';
-    private static $countryTable = 'trader_countries';
+    private static $vatRateTable = 'trader_vat_rates';
+    private static $baseRateTable = 'trader_vat_base_rates';
 
     private ContainerInterface $container;
 
@@ -29,64 +29,50 @@ class MysqlVatRateRepository implements VatRateRepository
         $this->container = $container;
     }
 
-    public function save(VatRate $taxRateProfile): void
+    public function save(VatRate $vatRate): void
     {
-        $state = $taxRateProfile->getMappedData();
+        $state = $vatRate->getMappedData();
 
-        if (! $this->exists($taxRateProfile->taxRateProfileId)) {
-            DB::table(static::$taxRateProfileTable)->insert($state);
+        if (!$this->exists($vatRate->vatRateId)) {
+            DB::table(static::$vatRateTable)->insert($state);
         } else {
-            DB::table(static::$taxRateProfileTable)->where('taxrate_profile_id', $taxRateProfile->taxRateProfileId->get())->update($state);
+            DB::table(static::$vatRateTable)->where('vat_rate_id', $vatRate->vatRateId->get())->update($state);
         }
 
-        $this->upsertTaxRateDoubles($taxRateProfile);
-        $this->upsertCountryIds($taxRateProfile);
+        $this->upsertBaseRates($vatRate);
     }
 
-    private function upsertTaxRateDoubles(VatRate $taxRateProfile): void
+    private function upsertBaseRates(VatRate $vatRate): void
     {
-        DB::table(static::$taxRateProfileTaxRateDoubleTable)
-            ->where('taxrate_profile_id', $taxRateProfile->taxRateProfileId->get())
+        DB::table(static::$baseRateTable)
+            ->where('target_vat_rate_id', $vatRate->vatRateId->get())
             ->delete();
 
-        DB::table(static::$taxRateProfileTaxRateDoubleTable)
-            ->insert($taxRateProfile->getChildEntities()[BaseRate::class]);
+        DB::table(static::$baseRateTable)
+            ->insert($vatRate->getChildEntities()[BaseRate::class]);
     }
 
-    private function upsertCountryIds(VatRate $taxRateProfile): void
+    private function exists(VatRateId $vatRateId): bool
     {
-        DB::table(static::$taxRateProfileCountryTable)
-            ->where('taxrate_profile_id', $taxRateProfile->taxRateProfileId->get())
-            ->delete();
-
-        DB::table(static::$taxRateProfileCountryTable)
-            ->insert(array_map(fn (string $countryId) => [
-                'taxrate_profile_id' => $taxRateProfile->taxRateProfileId->get(),
-                'country_id' => $countryId,
-            ], $taxRateProfile->getChildEntities()[CountryId::class]));
+        return DB::table(static::$vatRateTable)->where('vat_rate_id', $vatRateId->get())->exists();
     }
 
-    private function exists(VatRateId $taxRateProfileId): bool
+    public function find(VatRateId $vatRateId): VatRate
     {
-        return DB::table(static::$taxRateProfileTable)->where('taxrate_profile_id', $taxRateProfileId->get())->exists();
-    }
-
-    public function find(VatRateId $taxRateProfileId): VatRate
-    {
-        $taxRateProfileState = DB::table(static::$taxRateProfileTable)
-            ->where(static::$taxRateProfileTable . '.taxrate_profile_id', $taxRateProfileId->get())
+        $vatRateState = DB::table(static::$vatRateTable)
+            ->where(static::$vatRateTable . '.vat_rate_id', $vatRateId->get())
             ->first();
 
-        if (! $taxRateProfileState) {
-            throw new CouldNotFindVatRate('No taxRate profile found by id [' . $taxRateProfileId->get() . ']');
+        if (!$vatRateState) {
+            throw new CouldNotFindVatRate('No vatRate found by id [' . $vatRateId->get() . ']');
         }
 
-        return $this->makeWithChildEntities($taxRateProfileId, $taxRateProfileState);
+        return $this->makeWithChildEntities($vatRateId->get(), $vatRateState);
     }
 
-    public function delete(VatRateId $taxRateProfileId): void
+    public function delete(VatRateId $vatRateId): void
     {
-        DB::table(static::$taxRateProfileTable)->where('taxrate_profile_id', $taxRateProfileId->get())->delete();
+        DB::table(static::$vatRateTable)->where('vat_rate_id', $vatRateId->get())->delete();
     }
 
     public function nextReference(): VatRateId
@@ -94,48 +80,75 @@ class MysqlVatRateRepository implements VatRateRepository
         return VatRateId::fromString((string)Uuid::uuid4());
     }
 
-    public function nextVatRateMappingReference(): BaseRateId
+    public function nextBaseRateReference(): BaseRateId
     {
         return BaseRateId::fromString((string)Uuid::uuid4());
     }
 
-    public function findVatRateForCountry(string $countryId): ?VatRate
+    private function makeWithChildEntities(string $vatRateId, $vatRateState): VatRate
     {
-        $result = DB::table(static::$taxRateProfileTable)
+        $vatRateState = (array)$vatRateState;
+        $vatRateState['is_standard'] = (bool)$vatRateState['is_standard'];
+
+        $baseRateStates = DB::table(static::$baseRateTable)
+            ->join(static::$vatRateTable, static::$baseRateTable . '.origin_vat_rate_id', '=', static::$vatRateTable . '.vat_rate_id')
+            ->where(static::$baseRateTable . '.target_vat_rate_id', $vatRateId)
+            ->select([static::$baseRateTable . '.*', static::$vatRateTable . '.rate'])
+            ->get()
+            ->map(fn($item) => (array)$item)
+            ->toArray();
+
+        return VatRate::fromMappedData((array)$vatRateState, [
+            BaseRate::class => $baseRateStates,
+        ]);
+    }
+
+    public function getVatRatesForCountry(CountryId $countryId): iterable
+    {
+        $vatRateStates = DB::table(static::$vatRateTable)
+            ->where('country_id', $countryId->get())
             ->whereIn('state', VatRateState::onlineStates())
             ->orderBy('order_column', 'ASC')
-            ->leftJoin(static::$taxRateProfileCountryTable, static::$taxRateProfileTable.'.taxrate_profile_id', '=', static::$taxRateProfileCountryTable.'.taxrate_profile_id')
-            ->where(static::$taxRateProfileCountryTable . '.country_id', $countryId)
-            ->select(static::$taxRateProfileTable.'.*')
+            ->get();
+
+        foreach ($vatRateStates as $vatRateState) {
+            yield $this->makeWithChildEntities($vatRateState->vat_rate_id, $vatRateState);
+        }
+    }
+
+    public function findStandardVatRateForCountry(CountryId $countryId): ?VatRate
+    {
+        $vatRateState = DB::table(static::$vatRateTable)
+            ->where('country_id', $countryId->get())
+            ->where('is_standard', true)
+            ->whereIn('state', VatRateState::onlineStates())
+            ->orderBy('order_column', 'ASC')
             ->first();
 
-        if (! $result) {
+        if (!$vatRateState) {
             return null;
         }
 
-        return $this->makeWithChildEntities(VatRateId::fromString($result->taxrate_profile_id), $result);
+        return $this->makeWithChildEntities($vatRateState->vat_rate_id, $vatRateState);
     }
 
-    private function makeWithChildEntities(VatRateId $taxRateProfileId, $taxRateProfileState): VatRate
+    public function getPrimaryVatRates(): iterable
     {
-        $taxRateDoubleStates = DB::table(static::$taxRateProfileTaxRateDoubleTable)
-            ->where(static::$taxRateProfileTaxRateDoubleTable . '.taxrate_profile_id', $taxRateProfileId->get())
-            ->get()
-            ->map(fn ($item) => (array)$item)
-            ->toArray();
+        $primaryCountryId = CountryId::fromString(app(TraderConfig::class)->getPrimaryVatCountry());
 
-        $countryStates = DB::table(static::$taxRateProfileCountryTable)
-            ->join(static::$countryTable, static::$taxRateProfileCountryTable.'.country_id', '=', static::$countryTable.'.country_id')
-            ->where(static::$taxRateProfileCountryTable . '.taxrate_profile_id', $taxRateProfileId->get())
-            ->where(static::$countryTable . '.active', '1')
-            ->select(static::$countryTable.'.country_id')
-            ->get()
-            ->map(fn ($item) => (array)$item)
-            ->toArray();
+        return $this->getVatRatesForCountry($primaryCountryId);
+    }
 
-        return VatRate::fromMappedData((array)$taxRateProfileState, [
-            BaseRate::class => $taxRateDoubleStates,
-            CountryId::class => $countryStates,
-        ]);
+    public function getStandardPrimaryVatRate(): TaxRate
+    {
+        $primaryCountryId = CountryId::fromString(app(TraderConfig::class)->getPrimaryVatCountry());
+
+        $standardVatRate = $this->findStandardVatRateForCountry($primaryCountryId);
+
+        if (!$standardVatRate) {
+            return TaxRate::fromString(app(TraderConfig::class)->getFallBackStandardVatRate());
+        }
+
+        return $standardVatRate->getRate();
     }
 }

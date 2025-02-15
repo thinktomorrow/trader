@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace Tests\Infrastructure;
 
+use Illuminate\Support\Facades\DB;
 use Money\Money;
 use Tests\TestHelpers;
 use Thinktomorrow\Trader\Application\Cart\Read\Cart;
@@ -88,6 +89,7 @@ use Thinktomorrow\Trader\Infrastructure\Test\Repositories\InMemoryProductReposit
 use Thinktomorrow\Trader\Infrastructure\Test\Repositories\InMemoryPromoRepository;
 use Thinktomorrow\Trader\Infrastructure\Test\Repositories\InMemoryTaxonRepository;
 use Thinktomorrow\Trader\Infrastructure\Test\Repositories\InMemoryVariantRepository;
+use Thinktomorrow\Trader\Infrastructure\Test\Repositories\InMemoryVatRateRepository;
 use Thinktomorrow\Trader\Infrastructure\Test\TestContainer;
 use Thinktomorrow\Trader\Infrastructure\Test\TestTraderConfig;
 
@@ -98,16 +100,16 @@ abstract class TestCase extends \Orchestra\Testbench\TestCase
     protected function getEnvironmentSetUp($app)
     {
         # Setup default database to use sqlite :memory:
-        //        $app['config']->set('database.default', 'mysql');
-        //        $app['config']->set('database.connections.mysql', [
-        //            'driver' => 'mysql',
-        //            'host' => '127.0.0.1',
-        //            'port' => '3306',
-        //            'database' => 'trader-test',
-        //            'username' => 'root',
-        //            'password' => null,
-        //            'prefix' => '',
-        //        ]);
+//        $app['config']->set('database.default', 'mysql');
+//        $app['config']->set('database.connections.mysql', [
+//            'driver' => 'mysql',
+//            'host' => '127.0.0.1',
+//            'port' => '3306',
+//            'database' => 'trader-test',
+//            'username' => 'root',
+//            'password' => null,
+//            'prefix' => '',
+//        ]);
     }
 
     protected function setUp(): void
@@ -174,6 +176,7 @@ abstract class TestCase extends \Orchestra\Testbench\TestCase
         InMemoryTaxonRepository::clear();
         InMemoryPromoRepository::clear();
         InMemoryCountryRepository::clear();
+        InMemoryVatRateRepository::clear();
 
         parent::tearDown();
     }

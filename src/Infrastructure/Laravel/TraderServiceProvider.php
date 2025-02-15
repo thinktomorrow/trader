@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace Thinktomorrow\Trader\Infrastructure\Laravel;
 
 use Illuminate\Support\Arr;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\ServiceProvider;
 use Thinktomorrow\Trader\Application\Cart\PaymentMethod\PaymentMethodForCart;
 use Thinktomorrow\Trader\Application\Cart\PaymentMethod\PaymentMethodForCartRepository;
@@ -196,45 +197,45 @@ class TraderServiceProvider extends ServiceProvider
         $this->app->bind(CustomerReadRepository::class, MysqlCustomerRepository::class);
 
         // Product models
-        $this->app->bind(GridItem::class, fn () => DefaultGridItem::class);
-        $this->app->bind(ProductDetail::class, fn () => DefaultProductDetail::class);
-        $this->app->bind(VariantLink::class, fn () => DefaultVariantLink::class);
-        $this->app->bind(PersonalisationField::class, fn () => DefaultPersonalisationField::class);
-        $this->app->bind(TaxonNode::class, fn () => DefaultTaxonNode::class);
-        $this->app->bind(VariantForCart::class, fn () => DefaultVariantForCart::class);
+        $this->app->bind(GridItem::class, fn() => DefaultGridItem::class);
+        $this->app->bind(ProductDetail::class, fn() => DefaultProductDetail::class);
+        $this->app->bind(VariantLink::class, fn() => DefaultVariantLink::class);
+        $this->app->bind(PersonalisationField::class, fn() => DefaultPersonalisationField::class);
+        $this->app->bind(TaxonNode::class, fn() => DefaultTaxonNode::class);
+        $this->app->bind(VariantForCart::class, fn() => DefaultVariantForCart::class);
 
         // Order models
-        $this->app->bind(\Thinktomorrow\Trader\Application\Order\Grid\OrderGridItem::class, fn () => DefaultOrderGridItem::class);
-        $this->app->bind(Cart::class, fn () => DefaultCart::class);
-        $this->app->bind(CartLine::class, fn () => DefaultCartLine::class);
-        $this->app->bind(CartLinePersonalisation::class, fn () => DefaultCartLinePersonalisation::class);
-        $this->app->bind(CartDiscount::class, fn () => DefaultCartDiscount::class);
-        $this->app->bind(CartShippingAddress::class, fn () => DefaultCartShippingAddress::class);
-        $this->app->bind(CartBillingAddress::class, fn () => DefaultCartBillingAddress::class);
-        $this->app->bind(CartShopper::class, fn () => DefaultCartShopper::class);
-        $this->app->bind(CartPayment::class, fn () => DefaultCartPayment::class);
-        $this->app->bind(CartShipping::class, fn () => DefaultCartShipping::class);
-        $this->app->bind(ShippingProfileForCart::class, fn () => DefaultShippingProfileForCart::class);
-        $this->app->bind(PaymentMethodForCart::class, fn () => DefaultPaymentMethodForCart::class);
+        $this->app->bind(\Thinktomorrow\Trader\Application\Order\Grid\OrderGridItem::class, fn() => DefaultOrderGridItem::class);
+        $this->app->bind(Cart::class, fn() => DefaultCart::class);
+        $this->app->bind(CartLine::class, fn() => DefaultCartLine::class);
+        $this->app->bind(CartLinePersonalisation::class, fn() => DefaultCartLinePersonalisation::class);
+        $this->app->bind(CartDiscount::class, fn() => DefaultCartDiscount::class);
+        $this->app->bind(CartShippingAddress::class, fn() => DefaultCartShippingAddress::class);
+        $this->app->bind(CartBillingAddress::class, fn() => DefaultCartBillingAddress::class);
+        $this->app->bind(CartShopper::class, fn() => DefaultCartShopper::class);
+        $this->app->bind(CartPayment::class, fn() => DefaultCartPayment::class);
+        $this->app->bind(CartShipping::class, fn() => DefaultCartShipping::class);
+        $this->app->bind(ShippingProfileForCart::class, fn() => DefaultShippingProfileForCart::class);
+        $this->app->bind(PaymentMethodForCart::class, fn() => DefaultPaymentMethodForCart::class);
         $this->app->bind(VerifyPaymentMethodForCart::class, DefaultVerifyPaymentMethodForCart::class);
         $this->app->bind(AdjustLine::class, DefaultAdjustLine::class);
 
         // MerchantOrder models
-        $this->app->bind(MerchantOrder::class, fn () => DefaultMerchantOrder::class);
-        $this->app->bind(MerchantOrderLine::class, fn () => DefaultMerchantOrderLine::class);
-        $this->app->bind(MerchantOrderLinePersonalisation::class, fn () => DefaultMerchantOrderLinePersonalisation::class);
-        $this->app->bind(MerchantOrderDiscount::class, fn () => DefaultMerchantOrderDiscount::class);
-        $this->app->bind(MerchantOrderShippingAddress::class, fn () => DefaultMerchantOrderShippingAddress::class);
-        $this->app->bind(MerchantOrderBillingAddress::class, fn () => DefaultMerchantOrderBillingAddress::class);
-        $this->app->bind(MerchantOrderShopper::class, fn () => DefaultMerchantOrderShopper::class);
-        $this->app->bind(MerchantOrderShipping::class, fn () => DefaultMerchantOrderShipping::class);
-        $this->app->bind(MerchantOrderPayment::class, fn () => DefaultMerchantOrderPayment::class);
-        $this->app->bind(MerchantOrderEvent::class, fn () => DefaultMerchantOrderEvent::class);
+        $this->app->bind(MerchantOrder::class, fn() => DefaultMerchantOrder::class);
+        $this->app->bind(MerchantOrderLine::class, fn() => DefaultMerchantOrderLine::class);
+        $this->app->bind(MerchantOrderLinePersonalisation::class, fn() => DefaultMerchantOrderLinePersonalisation::class);
+        $this->app->bind(MerchantOrderDiscount::class, fn() => DefaultMerchantOrderDiscount::class);
+        $this->app->bind(MerchantOrderShippingAddress::class, fn() => DefaultMerchantOrderShippingAddress::class);
+        $this->app->bind(MerchantOrderBillingAddress::class, fn() => DefaultMerchantOrderBillingAddress::class);
+        $this->app->bind(MerchantOrderShopper::class, fn() => DefaultMerchantOrderShopper::class);
+        $this->app->bind(MerchantOrderShipping::class, fn() => DefaultMerchantOrderShipping::class);
+        $this->app->bind(MerchantOrderPayment::class, fn() => DefaultMerchantOrderPayment::class);
+        $this->app->bind(MerchantOrderEvent::class, fn() => DefaultMerchantOrderEvent::class);
 
         // Customer models
-        $this->app->bind(CustomerRead::class, fn () => DefaultCustomerRead::class);
-        $this->app->bind(CustomerBillingAddress::class, fn () => DefaultCustomerBillingAddress::class);
-        $this->app->bind(CustomerShippingAddress::class, fn () => DefaultCustomerShippingAddress::class);
+        $this->app->bind(CustomerRead::class, fn() => DefaultCustomerRead::class);
+        $this->app->bind(CustomerBillingAddress::class, fn() => DefaultCustomerBillingAddress::class);
+        $this->app->bind(CustomerShippingAddress::class, fn() => DefaultCustomerShippingAddress::class);
 
         $this->registerPromoConditionsAndDiscounts();
         $this->registerStateMachines();
@@ -243,14 +244,18 @@ class TraderServiceProvider extends ServiceProvider
     public function boot()
     {
         // Config
-        $this->publishes([__DIR__.'/config/config.php' => config_path('trader.php')]);
-        $this->mergeConfigFrom(__DIR__.'/config/config.php', 'trader');
+        $this->publishes([__DIR__ . '/config/config.php' => config_path('trader.php')]);
+        $this->mergeConfigFrom(__DIR__ . '/config/config.php', 'trader');
 
         // Migrations
-        $this->loadMigrationsFrom(__DIR__.'/database/migrations');
+        $this->loadMigrationsFrom(__DIR__ . '/database/migrations');
 
-        // Default discount tax rate
-        DiscountPriceDefaults::setDiscountTaxRate(TaxRate::fromString($this->app->make(TraderConfig::class)->getDefaultTaxRate()));
+        // Discount vat rate
+        $standardPrimaryVatRateValue = app()->environment('testing')
+            ? TaxRate::fromString($this->app->make(TraderConfig::class)->getFallBackStandardVatRate())
+            : $this->app->make(VatRateRepository::class)->getStandardPrimaryVatRate();
+
+        DiscountPriceDefaults::setDiscountTaxRate($standardPrimaryVatRateValue);
         DiscountPriceDefaults::setDiscountIncludeTax($this->app->make(TraderConfig::class)->includeVatInPrices());
 
         // Default locale - this will be overwritten by the middleware so the current locale is used. Here we just ensure a fallback locale is available
@@ -268,7 +273,7 @@ class TraderServiceProvider extends ServiceProvider
                 ->getDefaultLocale()
                 ->get();
 
-            if (! $language) {
+            if (!$language) {
                 $language = $defaultLanguage;
             }
 
@@ -282,7 +287,7 @@ class TraderServiceProvider extends ServiceProvider
                 )
             );
 
-            return $value === null ? $default :$value;
+            return $value === null ? $default : $value;
         });
     }
 
@@ -325,9 +330,9 @@ class TraderServiceProvider extends ServiceProvider
 
     private function registerStateMachines()
     {
-        $this->app->bind(OrderState::class, fn () => DefaultOrderState::class);
-        $this->app->bind(PaymentState::class, fn () => DefaultPaymentState::class);
-        $this->app->bind(ShippingState::class, fn () => DefaultShippingState::class);
+        $this->app->bind(OrderState::class, fn() => DefaultOrderState::class);
+        $this->app->bind(PaymentState::class, fn() => DefaultPaymentState::class);
+        $this->app->bind(ShippingState::class, fn() => DefaultShippingState::class);
 
         $this->app->bind(OrderStateMachine::class, function () {
             $orderStateClass = $this->app->get(OrderState::class);

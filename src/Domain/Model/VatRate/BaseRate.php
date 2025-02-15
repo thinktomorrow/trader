@@ -30,7 +30,6 @@ final class BaseRate implements ChildEntity
             'base_rate_id' => $this->baseRateId->get(),
             'origin_vat_rate_id' => $this->originVatRateId->get(),
             'target_vat_rate_id' => $this->targetVatRateId->get(),
-            'rate' => $this->rate->get(),
         ];
     }
 

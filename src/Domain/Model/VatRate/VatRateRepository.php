@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace Thinktomorrow\Trader\Domain\Model\VatRate;
 
+use Thinktomorrow\Trader\Domain\Common\Taxes\TaxRate;
 use Thinktomorrow\Trader\Domain\Model\Country\CountryId;
 
 interface VatRateRepository
@@ -17,7 +18,11 @@ interface VatRateRepository
 
     public function nextBaseRateReference(): BaseRateId;
 
-    public function getActiveVatRatesForCountry(CountryId $countryId): iterable;
+    public function getVatRatesForCountry(CountryId $countryId): iterable;
 
     public function findStandardVatRateForCountry(CountryId $countryId): ?VatRate;
+
+    public function getPrimaryVatRates(): iterable;
+
+    public function getStandardPrimaryVatRate(): TaxRate;
 }

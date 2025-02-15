@@ -5,6 +5,7 @@ namespace Tests;
 use Illuminate\Contracts\Debug\ExceptionHandler;
 use Illuminate\Support\Facades\DB;
 use Money\Money;
+use Ramsey\Uuid\Uuid;
 use Thinktomorrow\Trader\Application\Product\CreateProduct;
 use Thinktomorrow\Trader\Application\Product\CreateVariant;
 use Thinktomorrow\Trader\Application\Product\ProductApplication;
@@ -73,9 +74,11 @@ trait TestHelpers
             public function __construct()
             {
             }
+
             public function report(\Throwable $e)
             {
             }
+
             public function render($request, \Throwable $e)
             {
                 throw $e;
@@ -102,18 +105,18 @@ trait TestHelpers
             'order_state' => DefaultOrderState::cart_revived,
             'data' => "[]",
         ], $orderValues), [
-            Line::class => array_map(fn (Line $line) => [
+            Line::class => array_map(fn(Line $line) => [
                 ...$line->getMappedData(),
-                Discount::class => array_map(fn (Discount $discount) => $discount->getMappedData(), $line->getDiscounts()),
-                LinePersonalisation::class => array_map(fn (LinePersonalisation $linePersonalisation) => $linePersonalisation->getMappedData(), $line->getPersonalisations()),
+                Discount::class => array_map(fn(Discount $discount) => $discount->getMappedData(), $line->getDiscounts()),
+                LinePersonalisation::class => array_map(fn(LinePersonalisation $linePersonalisation) => $linePersonalisation->getMappedData(), $line->getPersonalisations()),
             ], $lines),
-            Shipping::class => array_map(fn (Shipping $shipping) => [...array_merge($shipping->getMappedData(), ['shipping_state' => $shipping->getShippingState()]), Discount::class => array_map(fn (Discount $discount) => $discount->getMappedData(), $shipping->getDiscounts())], $shippings),
-            Payment::class => array_map(fn (Payment $payment) => [...array_merge($payment->getMappedData(), ['payment_state' => $payment->getPaymentState()]), Discount::class => array_map(fn (Discount $discount) => $discount->getMappedData(), $payment->getDiscounts())], $payments),
+            Shipping::class => array_map(fn(Shipping $shipping) => [...array_merge($shipping->getMappedData(), ['shipping_state' => $shipping->getShippingState()]), Discount::class => array_map(fn(Discount $discount) => $discount->getMappedData(), $shipping->getDiscounts())], $shippings),
+            Payment::class => array_map(fn(Payment $payment) => [...array_merge($payment->getMappedData(), ['payment_state' => $payment->getPaymentState()]), Discount::class => array_map(fn(Discount $discount) => $discount->getMappedData(), $payment->getDiscounts())], $payments),
             ShippingAddress::class => $shippingAddress?->getMappedData(),
             BillingAddress::class => $billingAddress?->getMappedData(),
             Shopper::class => $shopper?->getMappedData(),
-            Discount::class => array_map(fn (Discount $discount) => $discount->getMappedData(), $discounts),
-            OrderEvent::class => array_map(fn (OrderEvent $logEntry) => $logEntry->getMappedData(), $logEntries),
+            Discount::class => array_map(fn(Discount $discount) => $discount->getMappedData(), $discounts),
+            OrderEvent::class => array_map(fn(OrderEvent $logEntry) => $logEntry->getMappedData(), $logEntries),
         ]);
     }
 
@@ -146,8 +149,8 @@ trait TestHelpers
         ], $values), array_merge([
             'order_id' => 'xxx',
         ], $aggregateState), [
-            Discount::class => array_map(fn (Discount $discount) => $discount->getMappedData(), $discounts),
-            LinePersonalisation::class => array_map(fn (LinePersonalisation $linePersonalisation) => $linePersonalisation->getMappedData(), $personalisations),
+            Discount::class => array_map(fn(Discount $discount) => $discount->getMappedData(), $discounts),
+            LinePersonalisation::class => array_map(fn(LinePersonalisation $linePersonalisation) => $linePersonalisation->getMappedData(), $personalisations),
         ]);
     }
 
@@ -165,7 +168,7 @@ trait TestHelpers
         ], $values), array_merge([
             'order_id' => 'xxx',
         ], $aggregateState), [
-            Discount::class => array_map(fn (Discount $discount) => $discount->getMappedData(), $discounts),
+            Discount::class => array_map(fn(Discount $discount) => $discount->getMappedData(), $discounts),
         ]);
     }
 
@@ -182,7 +185,7 @@ trait TestHelpers
         ], $values), array_merge([
             'order_id' => 'xxx',
         ], $aggregateState), [
-            Discount::class => array_map(fn (Discount $discount) => $discount->getMappedData(), $discounts),
+            Discount::class => array_map(fn(Discount $discount) => $discount->getMappedData(), $discounts),
         ]);
     }
 
@@ -326,22 +329,29 @@ trait TestHelpers
         ]);
     }
 
-    protected function createTaxRateProfile(array $values = []): VatRate
+    protected function createVatRateWithoutBaseRates(array $values = []): VatRate
+    {
+        return $this->createVatRate($values, [], false);
+    }
+
+    protected function createVatRate(array $values = [], array $baseRateValues = [], bool $withBaseRates = true): VatRate
     {
         return VatRate::fromMappedData(array_merge([
-            'taxrate_profile_id' => 'ppp',
+            'vat_rate_id' => 'vatRate-' . Uuid::uuid4(),
+            'country_id' => 'BE',
+            'rate' => '21',
+            'is_standard' => false,
             'state' => VatRateState::online->value,
             'data' => json_encode([]),
         ], $values), [
-            BaseRate::class => [
-                [
-                    'taxrate_profile_id' => 'ppp',
-                    'taxrate_double_id' => 'ppp-xxx',
-                    'original_rate' => '21',
+            BaseRate::class => $withBaseRates ? [
+                array_merge([
+                    'base_rate_id' => 'baseRate-' . Uuid::uuid4(),
+                    'origin_vat_rate_id' => 'originVatRate-123',
+                    'target_vat_rate_id' => 'ppp',
                     'rate' => '10',
-                ],
-            ],
-            CountryId::class => [],
+                ], $baseRateValues),
+            ] : [],
         ]);
     }
 
@@ -540,9 +550,9 @@ trait TestHelpers
         $taxonId = $taxonApplication->createTaxon(new CreateTaxon('foobar', 'nl', ['title' => ['nl' => 'foobar nl']]));
         $taxonChildId = $taxonApplication->createTaxon(new CreateTaxon('foobar-child', 'nl', ['title' => ['nl' => 'foobar child nl']], $taxonId->get()));
 
-        $productId = $productApplication->createProduct(new CreateProduct([$taxonId->get()], "100", "6", 'sku', ['title' => ['nl' => 'product one']], [ 'title' => ['nl' => 'variant title one'] ]));
-        $product2Id = $productApplication->createProduct(new CreateProduct([$taxonChildId->get()], "250", "12", 'sku-2', ['title' => ['nl' => 'product two']], [ 'title' => ['nl' => 'variant title two'] ]));
-        $product3Id = $productApplication->createProduct(new CreateProduct([], "500", "21", 'sku-3', ['title' => ['nl' => 'product three']], [ 'title' => ['nl' => 'variant title three'] ]));
+        $productId = $productApplication->createProduct(new CreateProduct([$taxonId->get()], "100", "6", 'sku', ['title' => ['nl' => 'product one']], ['title' => ['nl' => 'variant title one']]));
+        $product2Id = $productApplication->createProduct(new CreateProduct([$taxonChildId->get()], "250", "12", 'sku-2', ['title' => ['nl' => 'product two']], ['title' => ['nl' => 'variant title two']]));
+        $product3Id = $productApplication->createProduct(new CreateProduct([], "500", "21", 'sku-3', ['title' => ['nl' => 'product three']], ['title' => ['nl' => 'variant title three']]));
 
         // Force order for consistent testing assertions
         DB::table('trader_products')->where('product_id', $productId->get())->update(['order_column' => 0]);
@@ -601,7 +611,7 @@ trait TestHelpers
         $this->assertEquals(array_keys($expected), array_keys($actual), 'Keys do not match: ' . $message);
 
         foreach ($expected as $expectedKey => $expectedValue) {
-            if (is_array($expectedValue) && ! is_array($actual[$expectedKey])) {
+            if (is_array($expectedValue) && !is_array($actual[$expectedKey])) {
                 $this->assertEquals($expectedValue, $actual[$expectedKey], $message);
             }
 

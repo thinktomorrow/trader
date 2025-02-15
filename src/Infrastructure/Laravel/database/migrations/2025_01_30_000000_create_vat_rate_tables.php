@@ -17,6 +17,7 @@ return new class extends Migration {
             $table->boolean('is_standard')->default(false);
             $table->json('data')->nullable();
             $table->string('state')->default(VatRateState::online->value);
+            $table->unsignedInteger('order_column')->default(0);
 
             $table->unique(['country_id', 'rate']);
             $table->foreign('country_id')->references('country_id')->on(static::PREFIX . 'countries')->onDelete('cascade');

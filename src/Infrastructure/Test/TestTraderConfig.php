@@ -31,15 +31,6 @@ class TestTraderConfig implements TraderConfig
     }
 
     /**
-     * The default vat rate for the catalog. This is typically
-     * the standard rate of the primary VAT country.
-     */
-    public function getPrimaryVatRate(): string
-    {
-        return '10';
-    }
-
-    /**
      * The country that provides the default vat rates.
      * returns a country id like BE, NL, ...
      *
@@ -51,16 +42,10 @@ class TestTraderConfig implements TraderConfig
         return 'BE';
     }
 
-
-    //    public function getDefaultTaxRate(): string
-    //    {
-    //        return '10';
-    //    }
-    //
-    //    public function getAvailableTaxRates(): array
-    //    {
-    //        return ['21', '12', '6', '10'];
-    //    }
+    public function getFallBackStandardVatRate(): string
+    {
+        return '21';
+    }
 
     public function doesPriceInputIncludesVat(): bool
     {
