@@ -111,9 +111,9 @@ class MysqlVatRateRepository implements VatRateRepository
             ->orderBy('order_column', 'ASC')
             ->get();
 
-        return collect($vatRateStates)->mapWithKeys(function ($vatRateState) {
-            return [$vatRateState->vat_rate_id => $this->makeWithChildEntities($vatRateState->vat_rate_id, $vatRateState)];
-        })->toArray();
+        return collect($vatRateStates)->map(function ($vatRateState) {
+            return $this->makeWithChildEntities($vatRateState->vat_rate_id, $vatRateState);
+        })->all();
     }
 
     public function findStandardVatRateForCountry(CountryId $countryId): ?VatRate

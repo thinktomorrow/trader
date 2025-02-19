@@ -13,6 +13,7 @@ use Thinktomorrow\Trader\Domain\Model\VatRate\VatRateState;
 use Thinktomorrow\Trader\Infrastructure\Laravel\Repositories\MysqlVatRateRepository;
 use Thinktomorrow\Trader\Infrastructure\Test\Repositories\InMemoryVatRateRepository;
 use Thinktomorrow\Trader\Infrastructure\Test\TestContainer;
+use Thinktomorrow\Trader\Infrastructure\Test\TestTraderConfig;
 use Thinktomorrow\Trader\TraderConfig;
 
 class VatRateRepositoryTest extends TestCase
@@ -186,7 +187,7 @@ class VatRateRepositoryTest extends TestCase
 
     private function repositories(): \Generator
     {
-        yield new InMemoryVatRateRepository();
+        yield new InMemoryVatRateRepository(new TestTraderConfig());
         yield new MysqlVatRateRepository(new TestContainer());
     }
 
