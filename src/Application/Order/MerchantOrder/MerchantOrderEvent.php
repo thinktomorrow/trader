@@ -7,7 +7,9 @@ interface MerchantOrderEvent
     public static function fromMappedData(array $state, array $orderState): static;
 
     public function getOrderEventId(): string;
+
     public function getEvent(): string;
+
     public function getCreatedAt(): \DateTime;
 
     /**
@@ -15,5 +17,5 @@ interface MerchantOrderEvent
      * @param string $key
      * @return mixed
      */
-    public function getData(string $key, string $language = null, $default = null);
+    public function getData(string $key, ?string $language = null, $default = null);
 }
