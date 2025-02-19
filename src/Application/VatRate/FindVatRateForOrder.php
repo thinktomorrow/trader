@@ -80,11 +80,11 @@ class FindVatRateForOrder
             return $this->vatRatesPerOrder[$order->orderId->get()];
         }
 
-        if (!$billingCountryId = $order->getBillingAddress()?->getAddress()?->countryId) {
+        if (! $billingCountryId = $order->getBillingAddress()?->getAddress()?->countryId) {
             return [];
         }
 
-        if (!$countryVatRates = $this->vatRateRepository->getVatRatesForCountry($billingCountryId)) {
+        if (! $countryVatRates = $this->vatRateRepository->getVatRatesForCountry($billingCountryId)) {
             return [];
         }
 
