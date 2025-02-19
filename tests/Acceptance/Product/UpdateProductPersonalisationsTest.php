@@ -12,10 +12,9 @@ class UpdateProductPersonalisationsTest extends ProductContext
 {
     use TestHelpers;
 
-    /** @test */
-    public function it_can_add_personalisations()
+    public function test_it_can_add_personalisations()
     {
-        $productId = $this->createAProduct('50', ['1','2'], 'sku', ['title' => ['nl' => 'foobar nl']]);
+        $productId = $this->createAProduct('50', ['1', '2'], 'sku', ['title' => ['nl' => 'foobar nl']]);
 
         $dataPayload = [
             'label' => ['nl' => 'label nl'],
@@ -31,19 +30,18 @@ class UpdateProductPersonalisationsTest extends ProductContext
         $product = $this->productRepository->find($productId);
 
         $this->assertArrayEqualsWithWildcard([
-           [
-               'product_id' => '*',
-               'personalisation_id' => '*',
-               'personalisation_type' => PersonalisationType::TEXT,
-               'data' => json_encode($dataPayload),
-           ],
+            [
+                'product_id' => '*',
+                'personalisation_id' => '*',
+                'personalisation_type' => PersonalisationType::TEXT,
+                'data' => json_encode($dataPayload),
+            ],
         ], $product->getChildEntities()[Personalisation::class]);
     }
 
-    /** @test */
-    public function it_can_update_existing_personalisations()
+    public function test_it_can_update_existing_personalisations()
     {
-        $productId = $this->createAProduct('50', ['1','2'], 'sku', ['title' => ['nl' => 'foobar nl']]);
+        $productId = $this->createAProduct('50', ['1', '2'], 'sku', ['title' => ['nl' => 'foobar nl']]);
 
         $dataPayload = [
             'label' => ['nl' => 'label nl'],
@@ -77,8 +75,7 @@ class UpdateProductPersonalisationsTest extends ProductContext
         ], $product->getChildEntities()[Personalisation::class]);
     }
 
-    /** @test */
-    public function it_can_remove_existing_personalisations()
+    public function test_it_can_remove_existing_personalisations()
     {
         $product = $this->createProductWithPersonalisations();
         $this->productRepository->save($product);
@@ -90,8 +87,7 @@ class UpdateProductPersonalisationsTest extends ProductContext
         $this->assertEquals([], $product->getChildEntities()[Personalisation::class]);
     }
 
-    /** @test */
-    public function it_can_reorder_personalisations()
+    public function test_it_can_reorder_personalisations()
     {
     }
 }

@@ -9,8 +9,7 @@ use Thinktomorrow\Trader\Domain\Model\Promo\Conditions\MinimumAmount;
 
 class PromoConditionsTest extends TestCase
 {
-    /** @test */
-    public function it_can_create_minimum_amount_model_via_factory()
+    public function test_it_can_create_minimum_amount_model_via_factory()
     {
         $factory = new ConditionFactory([
             MinimumAmount::class,

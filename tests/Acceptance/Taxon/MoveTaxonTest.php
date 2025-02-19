@@ -11,8 +11,7 @@ class MoveTaxonTest extends TaxonContext
 {
     use TaxonHelpers;
 
-    /** @test */
-    public function it_can_move_a_taxon_to_root()
+    public function test_it_can_move_a_taxon_to_root()
     {
         $taxonRootId = $this->taxonApplication->createTaxon(new CreateTaxon('taxon-key-root', 'nl', []));
         $this->taxonRepository->setNextReference('abc');
@@ -27,8 +26,7 @@ class MoveTaxonTest extends TaxonContext
         $this->assertNull($taxon->getMappedData()['parent_id']);
     }
 
-    /** @test */
-    public function it_can_move_a_taxon_to_another_taxon()
+    public function test_it_can_move_a_taxon_to_another_taxon()
     {
         $taxonRootId = $this->taxonApplication->createTaxon(new CreateTaxon('taxon-key-root', 'nl', []));
         $this->taxonRepository->setNextReference('abc');

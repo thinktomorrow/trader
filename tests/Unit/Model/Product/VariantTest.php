@@ -5,7 +5,7 @@ namespace Tests\Unit\Model\Product;
 
 use Money\Money;
 use PHPUnit\Framework\TestCase;
-use Thinktomorrow\Trader\Domain\Common\Taxes\TaxRate;
+use Thinktomorrow\Trader\Domain\Common\Vat\VatPercentage;
 use Thinktomorrow\Trader\Domain\Model\Product\ProductId;
 use Thinktomorrow\Trader\Domain\Model\Product\Variant\Variant;
 use Thinktomorrow\Trader\Domain\Model\Product\Variant\VariantId;
@@ -15,18 +15,17 @@ use Thinktomorrow\Trader\Domain\Model\Product\Variant\VariantUnitPrice;
 
 class VariantTest extends TestCase
 {
-    /** @test */
-    public function it_can_create_a_variant()
+    public function test_it_can_create_a_variant()
     {
         $variant = Variant::create(
             $productId = ProductId::fromString('xxx'),
             $variantId = VariantId::fromString('yyy'),
             $productUnitPrice = VariantUnitPrice::fromMoney(
                 Money::EUR(10),
-                TaxRate::fromString('20'),
+                VatPercentage::fromString('20'),
                 false
             ),
-            $productSalePrice = VariantSalePrice::fromMoney(Money::EUR(8), TaxRate::fromString('20'), false),
+            $productSalePrice = VariantSalePrice::fromMoney(Money::EUR(8), VatPercentage::fromString('20'), false),
             $sku = 'sku',
         );
 
@@ -36,7 +35,7 @@ class VariantTest extends TestCase
             'state' => VariantState::available->value,
             'unit_price' => $productUnitPrice->getExcludingVat()->getAmount(),
             'sale_price' => $productSalePrice->getExcludingVat()->getAmount(),
-            'tax_rate' => $productUnitPrice->getTaxRate()->toPercentage()->get(),
+            'tax_rate' => $productUnitPrice->getVatPercentage()->toPercentage()->get(),
             'option_value_ids' => [],
             'includes_vat' => false,
             'sku' => $sku,
@@ -46,25 +45,23 @@ class VariantTest extends TestCase
         ], $variant->getMappedData());
     }
 
-    /** @test */
-    public function it_can_update_a_variant_price()
+    public function test_it_can_update_a_variant_price()
     {
         $variant = $this->createdVariant();
 
         $variant->updatePrice(
-            $unitPrice = VariantUnitPrice::fromMoney(Money::EUR(10), TaxRate::fromString('20'), false),
-            $salePrice = VariantSalePrice::fromMoney(Money::EUR(8), TaxRate::fromString('20'), false),
+            $unitPrice = VariantUnitPrice::fromMoney(Money::EUR(10), VatPercentage::fromString('20'), false),
+            $salePrice = VariantSalePrice::fromMoney(Money::EUR(8), VatPercentage::fromString('20'), false),
         );
 
         $this->assertEquals($unitPrice->getMoney()->getAmount(), $variant->getMappedData()['unit_price']);
         $this->assertEquals($salePrice->getMoney()->getAmount(), $variant->getMappedData()['sale_price']);
-        $this->assertEquals($salePrice->getTaxRate()->toPercentage()->get(), $variant->getMappedData()['tax_rate']);
+        $this->assertEquals($salePrice->getVatPercentage()->toPercentage()->get(), $variant->getMappedData()['tax_rate']);
         $this->assertEquals($salePrice->includesVat(), $variant->getMappedData()['includes_vat']);
         $this->assertEquals($salePrice, $variant->getSalePrice());
     }
 
-    /** @test */
-    public function it_can_update_variant_data()
+    public function test_it_can_update_variant_data()
     {
         $variant = $this->createdVariant();
 
@@ -104,8 +101,7 @@ class VariantTest extends TestCase
         $this->assertNull($variant->getMappedData()['ean']);
     }
 
-    /** @test */
-    public function updating_data_merges_with_existing_data()
+    public function test_updating_data_merges_with_existing_data()
     {
         $variant = $this->createdVariant();
 
@@ -120,8 +116,7 @@ class VariantTest extends TestCase
         $this->assertEquals(json_encode(['bar' => 'baz', 'foo' => 'bar']), $variant->getMappedData()['data']);
     }
 
-    /** @test */
-    public function it_can_be_build_from_raw_data()
+    public function test_it_can_be_build_from_raw_data()
     {
         $variant = Variant::fromMappedData([
             'variant_id' => 'yyy',
@@ -160,10 +155,10 @@ class VariantTest extends TestCase
             VariantId::fromString('yyy'),
             VariantUnitPrice::fromMoney(
                 Money::EUR(10),
-                TaxRate::fromString('20'),
+                VatPercentage::fromString('20'),
                 false
             ),
-            VariantSalePrice::fromMoney(Money::EUR(8), TaxRate::fromString('20'), false),
+            VariantSalePrice::fromMoney(Money::EUR(8), VatPercentage::fromString('20'), false),
             'sku',
         );
     }

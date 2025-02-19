@@ -4,8 +4,9 @@ declare(strict_types=1);
 namespace Thinktomorrow\Trader\Application\Cart\ShippingProfile;
 
 use Psr\Container\ContainerInterface;
+use Thinktomorrow\Trader\Application\VatRate\FindVatRateForOrder;
 use Thinktomorrow\Trader\Domain\Common\Cash\Cash;
-use Thinktomorrow\Trader\Domain\Common\Taxes\TaxRate;
+use Thinktomorrow\Trader\Domain\Common\Vat\VatPercentage;
 use Thinktomorrow\Trader\Domain\Model\Order\Order;
 use Thinktomorrow\Trader\Domain\Model\Order\OrderRepository;
 use Thinktomorrow\Trader\Domain\Model\Order\Shipping\Shipping;
@@ -14,6 +15,7 @@ use Thinktomorrow\Trader\Domain\Model\Order\Shipping\ShippingState;
 use Thinktomorrow\Trader\Domain\Model\ShippingProfile\ShippingProfileId;
 use Thinktomorrow\Trader\Domain\Model\ShippingProfile\ShippingProfileRepository;
 use Thinktomorrow\Trader\Domain\Model\ShippingProfile\ShippingProfileState;
+use Thinktomorrow\Trader\Domain\Model\VatRate\VatRateRepository;
 use Thinktomorrow\Trader\TraderConfig;
 
 class UpdateShippingProfileOnOrder
@@ -22,33 +24,34 @@ class UpdateShippingProfileOnOrder
     private TraderConfig $config;
     private OrderRepository $orderRepository;
     private ShippingProfileRepository $shippingProfileRepository;
+    private FindVatRateForOrder $findVatRateForOrder;
 
-    public function __construct(ContainerInterface $container, TraderConfig $config, OrderRepository $orderRepository, ShippingProfileRepository $shippingProfileRepository)
+    public function __construct(ContainerInterface $container, TraderConfig $config, OrderRepository $orderRepository, ShippingProfileRepository $shippingProfileRepository, FindVatRateForOrder $findVatRateForOrder)
     {
         $this->container = $container;
         $this->config = $config;
         $this->orderRepository = $orderRepository;
         $this->shippingProfileRepository = $shippingProfileRepository;
+        $this->findVatRateForOrder = $findVatRateForOrder;
     }
 
     public function handle(Order $order, ShippingProfileId $shippingProfileId): void
     {
         $shippingProfile = $this->shippingProfileRepository->find($shippingProfileId);
 
-        if (! in_array($shippingProfile->getState(), ShippingProfileState::onlineStates())) {
+        if (!in_array($shippingProfile->getState(), ShippingProfileState::onlineStates())) {
             $this->removeAllShippingsFromOrder($order);
 
             return;
         }
 
         // When shipping country is not given, but profile is country restricted, we bail out.
-        if (! ($shippingCountryId = $order->getShippingAddress()?->getAddress()->countryId) && $shippingProfile->hasAnyCountries()) {
+        if (!($shippingCountryId = $order->getShippingAddress()?->getAddress()->countryId) && $shippingProfile->hasAnyCountries()) {
             $this->removeAllShippingsFromOrder($order);
 
             return;
-        }
-        // If shipping country does not match the allowed countries, we bail out.
-        elseif ($shippingCountryId && ! $shippingProfile->hasCountry($shippingCountryId)) {
+        } // If shipping country does not match the allowed countries, we bail out.
+        elseif ($shippingCountryId && !$shippingProfile->hasCountry($shippingCountryId)) {
             $this->removeAllShippingsFromOrder($order);
 
             return;
@@ -59,7 +62,7 @@ class UpdateShippingProfileOnOrder
 
         $shippingCost = ShippingCost::fromMoney(
             $tariff ? $tariff->getRate() : Cash::zero(),
-            TaxRate::fromString($this->config->getDefaultTaxRate()),
+            $this->findVatRateForOrder->findForShippingCost($order),
             $this->config->doesTariffInputIncludesVat()
         );
 

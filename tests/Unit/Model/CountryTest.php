@@ -12,8 +12,7 @@ class CountryTest extends TestCase
 {
     use TestHelpers;
 
-    /** @test */
-    public function it_can_create_a_country()
+    public function test_it_can_create_a_country()
     {
         $country = Country::create(
             $countryId = CountryId::fromString('yyy'),
@@ -26,8 +25,7 @@ class CountryTest extends TestCase
         ], $country->getMappedData());
     }
 
-    /** @test */
-    public function it_can_be_build_from_raw_data()
+    public function test_it_can_be_build_from_raw_data()
     {
         $country = $this->createCountry(['data' => json_encode(['foo' => 'bar'])]);
 
@@ -35,8 +33,7 @@ class CountryTest extends TestCase
         $this->assertEquals('bar', $country->getData('foo'));
     }
 
-    /** @test */
-    public function adding_data_merges_with_existing_data()
+    public function test_adding_data_merges_with_existing_data()
     {
         $country = $this->createCountry();
 
@@ -46,8 +43,7 @@ class CountryTest extends TestCase
         $this->assertEquals(json_encode(['bar' => 'boo', 'foo' => 'bar']), $country->getMappedData()['data']);
     }
 
-    /** @test */
-    public function it_can_delete_data()
+    public function test_it_can_delete_data()
     {
         $country = $this->createCountry();
 

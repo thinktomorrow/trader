@@ -5,10 +5,9 @@ namespace Tests\Acceptance\Product;
 
 class CreateProductTest extends ProductContext
 {
-    /** @test */
-    public function it_can_create_a_product()
+    public function test_it_can_create_a_product()
     {
-        $productId = $this->createAProduct('50', ['1','2'], 'sku', ['title' => ['nl' => 'foobar nl']]);
+        $productId = $this->createAProduct('50', ['1', '2'], 'sku', ['title' => ['nl' => 'foobar nl']]);
 
         $product = $this->productRepository->find($productId);
 
@@ -16,7 +15,7 @@ class CreateProductTest extends ProductContext
         $this->assertEquals(json_encode(['title' => ['nl' => 'foobar nl']]), $product->getMappedData()['data']);
 
         // Taxon ids
-        $this->assertEquals(['1','2'], $product->getMappedData()['taxon_ids']);
+        $this->assertEquals(['1', '2'], $product->getMappedData()['taxon_ids']);
 
         // Auto created variant
         $variants = $product->getVariants();

@@ -15,8 +15,7 @@ use Thinktomorrow\Trader\Domain\Model\Promo\PromoState;
 
 final class PromoTest extends TestCase
 {
-    /** @test */
-    public function it_can_create_a_promo()
+    public function test_it_can_create_a_promo()
     {
         $promo = Promo::create(PromoId::fromString('xxx'), 'foobar', \DateTime::createFromFormat('Y-m-d H:i:s', '2022-02-02 10:10:10'), \DateTime::createFromFormat('Y-m-d H:i:s', '2023-02-02 10:10:10'), false);
 
@@ -35,8 +34,7 @@ final class PromoTest extends TestCase
         ], $promo->releaseEvents());
     }
 
-    /** @test */
-    public function it_can_build_discount_from_mapped_data()
+    public function test_it_can_build_discount_from_mapped_data()
     {
         $discount = $this->createDiscount([], [
             MinimumLinesQuantity::fromMappedData([
@@ -64,8 +62,7 @@ final class PromoTest extends TestCase
         ], $discount->getChildEntities());
     }
 
-    /** @test */
-    public function it_can_build_promo_from_mapped_data()
+    public function test_it_can_build_promo_from_mapped_data()
     {
         $promo = $this->createPromo([
             'coupon_code' => 'foobar',
@@ -108,8 +105,7 @@ final class PromoTest extends TestCase
         ], $promo->getChildEntities());
     }
 
-    /** @test */
-    public function it_can_update_discounts()
+    public function test_it_can_update_discounts()
     {
         $promo = Promo::create(PromoId::fromString('xxx'), 'foobar', \DateTime::createFromFormat('Y-m-d H:i:s', '2022-02-02 10:10:10'), \DateTime::createFromFormat('Y-m-d H:i:s', '2023-02-02 10:10:10'), false);
 
@@ -130,8 +126,7 @@ final class PromoTest extends TestCase
         ], $promo->getChildEntities());
     }
 
-    /** @test */
-    public function it_can_update_state()
+    public function test_it_can_update_state()
     {
         $promo = Promo::create(PromoId::fromString('xxx'), 'foobar', \DateTime::createFromFormat('Y-m-d H:i:s', '2022-02-02 10:10:10'), \DateTime::createFromFormat('Y-m-d H:i:s', '2023-02-02 10:10:10'), false);
 
@@ -140,8 +135,7 @@ final class PromoTest extends TestCase
         $this->assertEquals(PromoState::archived->value, $promo->getMappedData()['state']);
     }
 
-    /** @test */
-    public function it_can_delete_discount()
+    public function test_it_can_delete_discount()
     {
         $promo = Promo::create(PromoId::fromString('xxx'), 'foobar', \DateTime::createFromFormat('Y-m-d H:i:s', '2022-02-02 10:10:10'), \DateTime::createFromFormat('Y-m-d H:i:s', '2023-02-02 10:10:10'), false);
 
@@ -157,8 +151,7 @@ final class PromoTest extends TestCase
         $this->assertCount(0, $promo->getChildEntities()[Discount::class]);
     }
 
-    /** @test */
-    public function discount_can_add_condition()
+    public function test_discount_can_add_condition()
     {
         $discount = $this->createDiscount();
 
@@ -179,8 +172,7 @@ final class PromoTest extends TestCase
         ], $discount->getChildEntities());
     }
 
-    /** @test */
-    public function discount_can_update_condition()
+    public function test_discount_can_update_condition()
     {
         $discount = $this->createDiscount();
 
@@ -207,8 +199,7 @@ final class PromoTest extends TestCase
         ], $discount->getChildEntities());
     }
 
-    /** @test */
-    public function discount_can_delete_condition()
+    public function test_discount_can_delete_condition()
     {
         $discount = $this->createDiscount();
 

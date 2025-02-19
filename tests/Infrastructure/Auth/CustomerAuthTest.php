@@ -24,16 +24,14 @@ class CustomerAuthTest extends TestCase
         $this->app['view']->addLocation(__DIR__ . '/views');
     }
 
-    /** @test */
-    public function non_authenticated_are_kept_out()
+    public function test_non_authenticated_are_kept_out()
     {
         $response = $this->get(route('customer.index'));
         $response->assertRedirect(route('customer.login'));
     }
 
 
-    /** @test */
-    public function it_returns_a_json_error_if_unauthenticated_request_expects_json_response()
+    public function test_it_returns_a_json_error_if_unauthenticated_request_expects_json_response()
     {
         $response = $this->get(route('customer.index'), [
             'Accept' => 'application/json',
@@ -42,8 +40,7 @@ class CustomerAuthTest extends TestCase
         $response->assertStatus(401);
     }
 
-    /** @test */
-    public function entering_valid_login_credentials_lets_you_pass()
+    public function test_entering_valid_login_credentials_lets_you_pass()
     {
         $customer = $this->createACustomerLogin();
 
@@ -59,8 +56,7 @@ class CustomerAuthTest extends TestCase
         $this->assertFalse(session()->has('errors'));
     }
 
-    /** @test */
-    public function when_logging_in_an_event_is_published()
+    public function test_when_logging_in_an_event_is_published()
     {
         Event::fake();
 
@@ -74,8 +70,7 @@ class CustomerAuthTest extends TestCase
         Event::assertDispatched(CustomerHasLoggedIn::class);
     }
 
-    /** @test */
-    public function entering_invalid_login_credentials_keeps_you_out()
+    public function test_entering_invalid_login_credentials_keeps_you_out()
     {
         $this->createACustomerLogin();
 
@@ -90,8 +85,7 @@ class CustomerAuthTest extends TestCase
         $response->assertRedirect('/');
     }
 
-    /** @test */
-    public function it_displays_customer_page_for_authenticated()
+    public function test_it_displays_customer_page_for_authenticated()
     {
         $customer = $this->createACustomerLogin();
 
@@ -102,13 +96,12 @@ class CustomerAuthTest extends TestCase
         $this->assertFalse(session()->has('errors'));
     }
 
-    /** @test */
-    public function it_redirects_authenticated_customer_to_intended_page()
+    public function test_it_redirects_authenticated_customer_to_intended_page()
     {
         $this->createACustomerLogin();
 
         $this->get(route('customer.orders'))
-             ->assertRedirect(route('customer.login'));
+            ->assertRedirect(route('customer.login'));
 
         $response = $this->post(route('customer.login.store'), [
             'email' => 'ben@thinktomorrow.be',
@@ -118,14 +111,12 @@ class CustomerAuthTest extends TestCase
         $response->assertRedirect(route('customer.orders'));
     }
 
-    /** @test */
-    public function customer_is_attached_to_current_cart_after_login()
+    public function test_customer_is_attached_to_current_cart_after_login()
     {
         $this->markTestSkipped();
     }
 
-    /** @test */
-    public function it_can_log_out()
+    public function test_it_can_log_out()
     {
         $customer = $this->createACustomerLogin();
 
@@ -139,8 +130,7 @@ class CustomerAuthTest extends TestCase
         $this->assertFalse(Auth::guard('customer')->check());
     }
 
-    /** @test */
-    public function when_logging_out_an_event_is_published()
+    public function test_when_logging_out_an_event_is_published()
     {
         Event::fake();
 
@@ -154,8 +144,7 @@ class CustomerAuthTest extends TestCase
         Event::assertDispatched(CustomerHasLoggedOut::class);
     }
 
-    /** @test */
-    public function it_will_redirect_if_logged_in_when_trying_to_log_in()
+    public function test_it_will_redirect_if_logged_in_when_trying_to_log_in()
     {
         $customer = $this->createACustomerLogin();
 

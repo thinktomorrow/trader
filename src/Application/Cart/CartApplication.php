@@ -62,7 +62,8 @@ final class CartApplication
         UpdatePaymentMethodOnOrder   $updatePaymentMethodOnOrder,
         CustomerRepository           $customerRepository,
         EventDispatcher              $eventDispatcher
-    ) {
+    )
+    {
         $this->findVariantDetailsForCart = $findVariantDetailsForCart;
         $this->adjustLine = $adjustLine;
         $this->orderRepository = $orderRepository;
@@ -122,7 +123,7 @@ final class CartApplication
             $addLine->getVariantId(),
             LinePrice::fromMoney(
                 $this->config->includeVatInPrices() ? $variant->getSalePrice()->getIncludingVat() : $variant->getSalePrice()->getExcludingVat(),
-                $variant->getSalePrice()->getTaxRate(),
+                $variant->getSalePrice()->getVatPercentage(),
                 $this->config->includeVatInPrices()
             ),
             $addLine->getQuantity(),
@@ -147,7 +148,7 @@ final class CartApplication
                 }
             }
 
-            if (! $originalPersonalisation) {
+            if (!$originalPersonalisation) {
                 throw new \InvalidArgumentException('No personalisation found for variant [' . $addLine->getVariantId()->get() . '] by personalisation id [' . $personalisation_id . '].');
             }
 
@@ -322,11 +323,11 @@ final class CartApplication
         $shopper->addData($customer->getData());
         $order->updateShopper($shopper);
 
-        if (! $order->getBillingAddress() && $billingAddress = $customer->getBillingAddress()) {
+        if (!$order->getBillingAddress() && $billingAddress = $customer->getBillingAddress()) {
             $this->chooseCustomerBillingAddress($order, $billingAddress);
         }
 
-        if (! $order->getShippingAddress() && $shippingAddress = $customer->getShippingAddress()) {
+        if (!$order->getShippingAddress() && $shippingAddress = $customer->getShippingAddress()) {
             $this->chooseCustomerShippingAddress($order, $shippingAddress);
         }
 

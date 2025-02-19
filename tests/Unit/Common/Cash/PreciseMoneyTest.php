@@ -9,8 +9,7 @@ use Thinktomorrow\Trader\Domain\Common\Cash\PreciseMoney;
 
 class PreciseMoneyTest extends TestCase
 {
-    /** @test */
-    public function it_can_be_called()
+    public function test_it_can_be_called()
     {
         $preciseMoney = new PreciseMoney(Money::EUR(50001));
 
@@ -18,8 +17,7 @@ class PreciseMoneyTest extends TestCase
         $this->assertEquals(Money::EUR(5), $preciseMoney->getMoney());
     }
 
-    /** @test */
-    public function it_can_be_called_with_specific_precision()
+    public function test_it_can_be_called_with_specific_precision()
     {
         $preciseMoney = new PreciseMoney(Money::EUR(500010000), 6);
 
@@ -27,8 +25,7 @@ class PreciseMoneyTest extends TestCase
         $this->assertEquals(Money::EUR(500), $preciseMoney->getMoney());
     }
 
-    /** @test */
-    public function it_will_be_rounded()
+    public function test_it_will_be_rounded()
     {
         $preciseMoney = new PreciseMoney(Money::EUR(50057), 2);
 
@@ -36,8 +33,7 @@ class PreciseMoneyTest extends TestCase
         $this->assertEquals(Money::EUR(501), $preciseMoney->getMoney());
     }
 
-    /** @test */
-    public function it_can_have_no_precision()
+    public function test_it_can_have_no_precision()
     {
         $preciseMoney = new PreciseMoney(Money::EUR(50057), 0);
 
@@ -45,8 +41,7 @@ class PreciseMoneyTest extends TestCase
         $this->assertEquals(Money::EUR(50057), $preciseMoney->getMoney());
     }
 
-    /** @test */
-    public function it_can_be_called_from_amount()
+    public function test_it_can_be_called_from_amount()
     {
         $preciseMoney = PreciseMoney::calculateFromFloat(500.01, 4);
 
@@ -59,8 +54,7 @@ class PreciseMoneyTest extends TestCase
         $this->assertEquals(Money::USD(501), $preciseMoney->getMoney());
     }
 
-    /** @test */
-    public function it_can_add_precise_amount()
+    public function test_it_can_add_precise_amount()
     {
         $preciseMoney = PreciseMoney::calculateFromFloat(500.01, 4);
         $otherPreciseMoney = PreciseMoney::calculateFromFloat(400.01, 4);
@@ -69,8 +63,7 @@ class PreciseMoneyTest extends TestCase
         $this->assertEquals(Money::EUR(900), $preciseMoney->add($otherPreciseMoney)->getMoney());
     }
 
-    /** @test */
-    public function it_cannot_add_precise_amount_with_different_precisions()
+    public function test_it_cannot_add_precise_amount_with_different_precisions()
     {
         $this->expectException(\Exception::class);
 
@@ -80,8 +73,7 @@ class PreciseMoneyTest extends TestCase
         $preciseMoney->add($otherPreciseMoney)->getPreciseMoney();
     }
 
-    /** @test */
-    public function it_can_subtract_precise_amount_with_different_precisions()
+    public function test_it_can_subtract_precise_amount_with_different_precisions()
     {
         $this->expectException(\Exception::class);
 
@@ -91,8 +83,7 @@ class PreciseMoneyTest extends TestCase
         $preciseMoney->subtract($otherPreciseMoney)->getPreciseMoney();
     }
 
-    /** @test */
-    public function it_can_subtract_precise_amount()
+    public function test_it_can_subtract_precise_amount()
     {
         $preciseMoney = PreciseMoney::calculateFromFloat(500.03, 4);
         $otherPreciseMoney = PreciseMoney::calculateFromFloat(400.01, 4);

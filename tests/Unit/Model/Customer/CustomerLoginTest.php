@@ -11,8 +11,7 @@ use Thinktomorrow\Trader\Domain\Model\CustomerLogin\Events\PasswordChanged;
 
 class CustomerLoginTest extends TestCase
 {
-    /** @test */
-    public function it_can_create_a_customer_login()
+    public function test_it_can_create_a_customer_login()
     {
         $customerLogin = CustomerLogin::create(
             CustomerId::fromString('abc'),
@@ -30,8 +29,7 @@ class CustomerLoginTest extends TestCase
         $this->assertEquals([], $customerLogin->getChildEntities());
     }
 
-    /** @test */
-    public function it_can_be_build_from_raw_data()
+    public function test_it_can_be_build_from_raw_data()
     {
         $customer = $this->createdCustomerLogin();
 

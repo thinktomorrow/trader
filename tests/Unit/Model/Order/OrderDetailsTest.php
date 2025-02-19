@@ -14,8 +14,7 @@ use Thinktomorrow\Trader\Domain\Model\Product\Variant\VariantSalePrice;
 
 class OrderDetailsTest extends TestCase
 {
-    /** @test */
-    public function it_can_get_prices()
+    public function test_it_can_get_prices()
     {
         $order = $this->createDefaultOrder();
 
@@ -49,8 +48,7 @@ class OrderDetailsTest extends TestCase
         );
     }
 
-    /** @test */
-    public function it_can_get_shipping_details()
+    public function test_it_can_get_shipping_details()
     {
         $order = $this->createDefaultOrder();
 
@@ -69,8 +67,7 @@ class OrderDetailsTest extends TestCase
         ], $order->getShippingAddress()->getMappedData());
     }
 
-    /** @test */
-    public function it_can_get_payment_details()
+    public function test_it_can_get_payment_details()
     {
         $order = $this->createDefaultOrder();
 

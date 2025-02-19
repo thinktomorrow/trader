@@ -86,13 +86,13 @@ class RefreshCartTest extends CartContext
 
     public function test_it_can_refresh_tax_rates()
     {
-        $this->givenThereIsATaxRateProfile(['20' => '10'], ['NL']);
+        $nlVatRate = $this->givenThereIsAVatRate('NL', '10');
         $this->givenThereIsAProductWhichCostsEur('aaa', 5);
         $this->whenIAddTheVariantToTheCart('aaa-123', 1);
 
         // Check unchanged line first
         $cart = $this->cartRepository->findCart(OrderId::fromString('xxx'));
-        $lineTaxRate = $cart->getLines()[0]->getLinePriceAsPrice()->getTaxRate();
+        $lineTaxRate = $cart->getLines()[0]->getLinePriceAsPrice()->getVatPercentage();
         $this->assertEquals('20', $lineTaxRate->get());
 
         // Change billing country to NL
@@ -101,19 +101,44 @@ class RefreshCartTest extends CartContext
         $this->cartApplication->refresh(new RefreshCart('xxx'));
 
         $cart = $this->cartRepository->findCart(OrderId::fromString('xxx'));
-        $lineTaxRate = $cart->getLines()[0]->getLinePriceAsPrice()->getTaxRate();
+        $lineTaxRate = $cart->getLines()[0]->getLinePriceAsPrice()->getVatPercentage();
         $this->assertEquals('10', $lineTaxRate->get());
     }
 
-    public function test_it_does_not_change_tax_rates_when_billing_country_does_not_belong_to_taxrate_profile()
+    public function test_it_can_refresh_tax_rates_by_base_mapping()
     {
-        $this->givenThereIsATaxRateProfile(['20' => '10'], ['NL']);
+        $primaryVatRate = $this->givenThereIsAVatRate('BE', '21');
+        $nlVatRate = $this->givenThereIsAVatRate('NL', '10');
+        $nlVatRate2 = $this->givenThereIsAVatRate('NL', '15');
+        $this->givenVatRateHasBaseRateOf($nlVatRate2->vatRateId, $primaryVatRate->vatRateId);
+
         $this->givenThereIsAProductWhichCostsEur('aaa', 5);
         $this->whenIAddTheVariantToTheCart('aaa-123', 1);
 
         // Check unchanged line first
         $cart = $this->cartRepository->findCart(OrderId::fromString('xxx'));
-        $lineTaxRate = $cart->getLines()[0]->getLinePriceAsPrice()->getTaxRate();
+        $lineTaxRate = $cart->getLines()[0]->getLinePriceAsPrice()->getVatPercentage();
+        $this->assertEquals('21', $lineTaxRate->get());
+
+        // Change billing country to NL
+        $this->givenOrderHasABillingCountry('NL');
+
+        $this->cartApplication->refresh(new RefreshCart('xxx'));
+
+        $cart = $this->cartRepository->findCart(OrderId::fromString('xxx'));
+        $lineTaxRate = $cart->getLines()[0]->getLinePriceAsPrice()->getVatPercentage();
+        $this->assertEquals('15', $lineTaxRate->get());
+    }
+
+    public function test_it_does_not_change_tax_rates_when_billing_country_does_not_belong_to_taxrate_profile()
+    {
+        $this->givenThereIsAVatRate(['20' => '10'], ['NL']);
+        $this->givenThereIsAProductWhichCostsEur('aaa', 5);
+        $this->whenIAddTheVariantToTheCart('aaa-123', 1);
+
+        // Check unchanged line first
+        $cart = $this->cartRepository->findCart(OrderId::fromString('xxx'));
+        $lineTaxRate = $cart->getLines()[0]->getLinePriceAsPrice()->getVatPercentage();
         $this->assertEquals('20', $lineTaxRate->get());
 
         $this->givenOrderHasABillingCountry('FR');
@@ -121,7 +146,7 @@ class RefreshCartTest extends CartContext
         $this->cartApplication->refresh(new RefreshCart('xxx'));
 
         $cart = $this->cartRepository->findCart(OrderId::fromString('xxx'));
-        $lineTaxRate = $cart->getLines()[0]->getLinePriceAsPrice()->getTaxRate();
+        $lineTaxRate = $cart->getLines()[0]->getLinePriceAsPrice()->getVatPercentage();
         $this->assertEquals('20', $lineTaxRate->get());
     }
 
@@ -138,16 +163,16 @@ class RefreshCartTest extends CartContext
 
         // Check unchanged cost first
         $order = $this->orderRepository->find(OrderId::fromString('xxx'));
-        $this->assertEquals('10', $order->getShippings()[0]->getShippingCost()->getTaxRate()->get());
+        $this->assertEquals('10', $order->getShippings()[0]->getShippingCost()->getVatPercentage()->get());
 
         // Change billing country to NL
-        $this->givenThereIsATaxRateProfile(['10' => '25'], ['NL']);
+        $this->givenThereIsAVatRate(['10' => '25'], ['NL']);
         $this->givenOrderHasABillingCountry('NL');
 
         $this->cartApplication->refresh(new RefreshCart('xxx'));
 
         $order = $this->orderRepository->find(OrderId::fromString('xxx'));
-        $this->assertEquals('25', $order->getShippings()[0]->getShippingCost()->getTaxRate()->get());
+        $this->assertEquals('25', $order->getShippings()[0]->getShippingCost()->getVatPercentage()->get());
 
     }
 

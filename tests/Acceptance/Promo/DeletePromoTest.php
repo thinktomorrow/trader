@@ -12,8 +12,7 @@ class DeletePromoTest extends PromoContext
 {
     use TestHelpers;
 
-    /** @test */
-    public function it_can_delete_a_promo()
+    public function test_it_can_delete_a_promo()
     {
         $promo = $this->createPromo([], [
             $this->createDiscount([], [$this->createCondition()]),

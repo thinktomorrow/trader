@@ -12,10 +12,9 @@ class UpdateProductOptionsTest extends ProductContext
 {
     use TestHelpers;
 
-    /** @test */
-    public function it_can_add_options()
+    public function test_it_can_add_options()
     {
-        $productId = $this->createAProduct('50', ['1','2'], 'sku', ['title' => ['nl' => 'foobar nl']]);
+        $productId = $this->createAProduct('50', ['1', '2'], 'sku', ['title' => ['nl' => 'foobar nl']]);
 
         $dataPayload = [
             'label' => ['nl' => 'label nl'],
@@ -37,18 +36,18 @@ class UpdateProductOptionsTest extends ProductContext
         $product = $this->productRepository->find($productId);
 
         $this->assertArrayEqualsWithWildcard([
-           [
-               'product_id' => '*',
-               'option_id' => '*',
-               'data' => json_encode($dataPayload),
-               'values' => [
+            [
+                'product_id' => '*',
+                'option_id' => '*',
+                'data' => json_encode($dataPayload),
+                'values' => [
                     [
                         'option_id' => '*',
                         'option_value_id' => '*',
                         'data' => json_encode($dataPayload),
                     ],
-               ],
-           ],
+                ],
+            ],
         ], $product->getChildEntities()[Option::class]);
 
         $this->assertEquals([
@@ -56,10 +55,9 @@ class UpdateProductOptionsTest extends ProductContext
         ], $this->eventDispatcher->releaseDispatchedEvents());
     }
 
-    /** @test */
-    public function it_can_update_existing_options()
+    public function test_it_can_update_existing_options()
     {
-        $productId = $this->createAProduct('50', ['1','2'], 'sku', ['title' => ['nl' => 'foobar nl']]);
+        $productId = $this->createAProduct('50', ['1', '2'], 'sku', ['title' => ['nl' => 'foobar nl']]);
 
         $dataPayload = [
             'label' => ['nl' => 'label nl'],
@@ -129,8 +127,7 @@ class UpdateProductOptionsTest extends ProductContext
         ], $this->eventDispatcher->releaseDispatchedEvents());
     }
 
-    /** @test */
-    public function it_can_remove_existing_options()
+    public function test_it_can_remove_existing_options()
     {
         $product = $this->createProductWithOptions();
         $this->productRepository->save($product);
@@ -142,10 +139,9 @@ class UpdateProductOptionsTest extends ProductContext
         $this->assertEquals([], $product->getChildEntities()[Option::class]);
     }
 
-    /** @test */
-    public function it_can_remove_existing_option_values()
+    public function test_it_can_remove_existing_option_values()
     {
-        $productId = $this->createAProduct('50', ['1','2'], 'sku', ['title' => ['nl' => 'foobar nl']]);
+        $productId = $this->createAProduct('50', ['1', '2'], 'sku', ['title' => ['nl' => 'foobar nl']]);
 
         $dataPayload = [
             'label' => ['nl' => 'label nl'],
@@ -186,8 +182,7 @@ class UpdateProductOptionsTest extends ProductContext
         ], $product->getChildEntities()[Option::class]);
     }
 
-    /** @test */
-    public function it_can_reorder_options()
+    public function test_it_can_reorder_options()
     {
     }
 }

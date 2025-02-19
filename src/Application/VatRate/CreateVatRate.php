@@ -3,7 +3,7 @@ declare(strict_types=1);
 
 namespace Thinktomorrow\Trader\Application\VatRate;
 
-use Thinktomorrow\Trader\Domain\Common\Taxes\TaxRate;
+use Thinktomorrow\Trader\Domain\Common\Vat\VatPercentage;
 use Thinktomorrow\Trader\Domain\Model\Country\CountryId;
 
 class CreateVatRate
@@ -24,9 +24,9 @@ class CreateVatRate
         return CountryId::fromString($this->countryId);
     }
 
-    public function getRate(): TaxRate
+    public function getRate(): VatPercentage
     {
-        return TaxRate::fromString($this->rate);
+        return VatPercentage::fromString($this->rate);
     }
 
     public function getData(): array

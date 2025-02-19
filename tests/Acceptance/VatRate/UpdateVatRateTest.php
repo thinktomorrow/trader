@@ -5,7 +5,7 @@ namespace Tests\Acceptance\VatRate;
 
 use Thinktomorrow\Trader\Application\VatRate\CreateVatRate;
 use Thinktomorrow\Trader\Application\VatRate\UpdateVatRate;
-use Thinktomorrow\Trader\Domain\Common\Taxes\TaxRate;
+use Thinktomorrow\Trader\Domain\Common\Vat\VatPercentage;
 use Thinktomorrow\Trader\Domain\Model\Country\CountryId;
 
 class UpdateVatRateTest extends VatRateContext
@@ -26,7 +26,7 @@ class UpdateVatRateTest extends VatRateContext
 
         $vatRate = $this->vatRateRepository->find($vatRateId);
 
-        $this->assertEquals(TaxRate::fromString('20'), $vatRate->getRate());
+        $this->assertEquals(VatPercentage::fromString('20'), $vatRate->getRate());
         $this->assertEquals(['foo' => 'baz'], $vatRate->getData());
         $this->assertEquals(CountryId::fromString('BE'), $vatRate->countryId);
     }

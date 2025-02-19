@@ -68,24 +68,21 @@ final class OrderRepositoryTest extends TestCase
         }
     }
 
-    /** @test */
-    public function it_can_generate_a_next_reference()
+    public function test_it_can_generate_a_next_reference()
     {
         foreach ($this->orderRepositories() as $orderRepository) {
             $this->assertInstanceOf(OrderId::class, $orderRepository->nextReference());
         }
     }
 
-    /** @test */
-    public function it_can_generate_a_next_external_reference()
+    public function test_it_can_generate_a_next_external_reference()
     {
         foreach ($this->orderRepositories() as $orderRepository) {
             $this->assertInstanceOf(OrderReference::class, $orderRepository->nextExternalReference());
         }
     }
 
-    /** @test */
-    public function it_can_generate_a_next_shipping_reference()
+    public function test_it_can_generate_a_next_shipping_reference()
     {
         foreach ($this->orderRepositories() as $orderRepository) {
             $this->assertInstanceOf(ShippingId::class, $orderRepository->nextShippingReference());

@@ -38,8 +38,7 @@ class OrderStateMachineTest extends TestCase
         ]);
     }
 
-    /** @test */
-    public function it_can_apply_transition()
+    public function test_it_can_apply_transition()
     {
         $this->assertSame(DefaultOrderState::cart_pending, $this->order->getOrderState());
 
@@ -47,16 +46,14 @@ class OrderStateMachineTest extends TestCase
         $this->assertSame(DefaultOrderState::confirmed, $this->order->getOrderState());
     }
 
-    /** @test */
-    public function it_cannot_change_to_invalid_state()
+    public function test_it_cannot_change_to_invalid_state()
     {
         $this->expectException(StateException::class);
 
         $this->machine->apply($this->order, 'foobar');
     }
 
-    /** @test */
-    public function it_only_allows_transition_to_allowed_state()
+    public function test_it_only_allows_transition_to_allowed_state()
     {
         $this->expectException(StateException::class);
 
@@ -64,8 +61,7 @@ class OrderStateMachineTest extends TestCase
         $this->assertSame(DefaultOrderState::cart_pending, $this->order->getOrderState());
     }
 
-    /** @test */
-    public function it_throws_exception_if_transition_map_is_malformed()
+    public function test_it_throws_exception_if_transition_map_is_malformed()
     {
         $this->expectException(StateException::class);
 
@@ -76,8 +72,7 @@ class OrderStateMachineTest extends TestCase
         ]);
     }
 
-    /** @test */
-    public function it_throws_exception_if_transition_contains_invalid_state()
+    public function test_it_throws_exception_if_transition_contains_invalid_state()
     {
         $this->expectException(StateException::class);
 

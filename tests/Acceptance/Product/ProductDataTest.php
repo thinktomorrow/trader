@@ -10,8 +10,7 @@ class ProductDataTest extends ProductContext
 {
     use TestHelpers;
 
-    /** @test */
-    public function it_can_render_localized_data()
+    public function test_it_can_render_localized_data()
     {
         $product = $this->createProductWithOptions();
         $product->addData([

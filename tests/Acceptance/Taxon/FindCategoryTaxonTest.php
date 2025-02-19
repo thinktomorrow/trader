@@ -26,36 +26,33 @@ class FindCategoryTaxonTest extends TaxonContext
         yield new InMemoryTaxonRepository();
     }
 
-    /** @test */
-    public function it_can_find_the_category_taxon()
+    public function test_it_can_find_the_category_taxon()
     {
         $finder = new FindCategoryTaxon(
             new TestTraderConfig(['category_root_id' => 'fifth']),
             new InMemoryTaxonTreeRepository(new TestContainer(), new TestTraderConfig())
         );
 
-        $this->assertEquals('sixth', $finder->byTaxonIds(['first','second','sixth'])->getId());
+        $this->assertEquals('sixth', $finder->byTaxonIds(['first', 'second', 'sixth'])->getId());
     }
 
-    /** @test */
-    public function it_uses_the_first_taxon_subtree_as_default_category()
+    public function test_it_uses_the_first_taxon_subtree_as_default_category()
     {
         $finder = new FindCategoryTaxon(
             new TestTraderConfig(['category_root_id' => null]),
             new InMemoryTaxonTreeRepository(new TestContainer(), new TestTraderConfig())
         );
 
-        $this->assertEquals('second', $finder->byTaxonIds(['second','sixth'])->getId());
+        $this->assertEquals('second', $finder->byTaxonIds(['second', 'sixth'])->getId());
     }
 
-    /** @test */
-    public function if_own_taxon_is_also_category_root()
+    public function test_if_own_taxon_is_also_category_root()
     {
         $finder = new FindCategoryTaxon(
             new TestTraderConfig(['category_root_id' => null]),
             new InMemoryTaxonTreeRepository(new TestContainer(), new TestTraderConfig())
         );
 
-        $this->assertEquals('first', $finder->byTaxonIds(['first','sixth'])->getId());
+        $this->assertEquals('first', $finder->byTaxonIds(['first', 'sixth'])->getId());
     }
 }

@@ -4,7 +4,7 @@ declare(strict_types=1);
 namespace Thinktomorrow\Trader\Domain\Common\Price;
 
 use Money\Money;
-use Thinktomorrow\Trader\Domain\Common\Taxes\TaxRateTotals;
+use Thinktomorrow\Trader\Domain\Common\Vat\VatTotals;
 
 /**
  * The total of multiple prices combined. This can refer to a subtotal of a cart where
@@ -13,11 +13,11 @@ use Thinktomorrow\Trader\Domain\Common\Taxes\TaxRateTotals;
  */
 interface PriceTotal extends ConvertsToMoney
 {
-    public static function make(Money $money, TaxRateTotals $taxRateTotals, bool $includesVat): static;
+    public static function make(Money $money, VatTotals $vatTotals, bool $includesVat): static;
 
     public static function zero(): static;
 
-    public function getTaxRateTotals(): TaxRateTotals;
+    public function getVatTotals(): VatTotals;
 
     public function includesVat(): bool;
 

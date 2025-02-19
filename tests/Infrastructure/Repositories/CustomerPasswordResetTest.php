@@ -18,8 +18,7 @@ class CustomerPasswordResetTest extends TestCase
 {
     use RefreshDatabase;
 
-    /** @test */
-    public function it_can_send_a_password_reset_mail()
+    public function test_it_can_send_a_password_reset_mail()
     {
         Notification::fake();
 
@@ -41,8 +40,7 @@ class CustomerPasswordResetTest extends TestCase
         );
     }
 
-    /** @test */
-    public function it_cannot_send_a_password_reset_when_account_does_not_exist()
+    public function test_it_cannot_send_a_password_reset_when_account_does_not_exist()
     {
         Notification::fake();
 
@@ -58,8 +56,7 @@ class CustomerPasswordResetTest extends TestCase
         Notification::assertNothingSent();
     }
 
-    /** @test */
-    public function it_can_reset_your_password()
+    public function test_it_can_reset_your_password()
     {
         $this->disableExceptionHandling();
 

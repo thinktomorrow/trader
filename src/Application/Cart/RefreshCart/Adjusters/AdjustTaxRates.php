@@ -4,71 +4,68 @@ namespace Thinktomorrow\Trader\Application\Cart\RefreshCart\Adjusters;
 
 use Thinktomorrow\Trader\Application\Cart\RefreshCart\Adjuster;
 use Thinktomorrow\Trader\Application\Cart\VariantForCart\VariantForCartRepository;
+use Thinktomorrow\Trader\Application\VatRate\FindVatRateForOrder;
 use Thinktomorrow\Trader\Domain\Model\Order\Order;
 use Thinktomorrow\Trader\Domain\Model\VatRate\VatRate;
 use Thinktomorrow\Trader\Domain\Model\VatRate\VatRateRepository;
 
 class AdjustTaxRates implements Adjuster
 {
-    private VatRateRepository $taxRateProfileRepository;
+    private VatRateRepository $vatRateRepository;
     private VariantForCartRepository $variantForCartRepository;
+    private FindVatRateForOrder $findVatRateForOrder;
 
-    public function __construct(VatRateRepository $taxRateProfileRepository, VariantForCartRepository $variantForCartRepository)
+    public function __construct(VatRateRepository $vatRateRepository, VariantForCartRepository $variantForCartRepository, FindVatRateForOrder $findVatRateForOrder)
     {
-        $this->taxRateProfileRepository = $taxRateProfileRepository;
+        $this->vatRateRepository = $vatRateRepository;
         $this->variantForCartRepository = $variantForCartRepository;
+        $this->findVatRateForOrder = $findVatRateForOrder;
     }
 
     public function adjust(Order $order): void
     {
-        if (! $billingCountryId = $order->getBillingAddress()?->getAddress()?->countryId) {
-            return;
-        }
-
-        if (! $taxRateProfile = $this->taxRateProfileRepository->findVatRateForCountry($billingCountryId->get())) {
-            return;
-        }
-
-        $this->adjustLinePrices($order, $taxRateProfile);
-        $this->adjustShippingCosts($order, $taxRateProfile);
-        $this->adjustPaymentCosts($order, $taxRateProfile);
+        $this->adjustLinePrices($order);
+        $this->adjustShippingCosts($order);
+        $this->adjustPaymentCosts($order);
     }
 
-    private function adjustLinePrices(Order $order, VatRate $taxRateProfile): void
+    private function adjustLinePrices(Order $order): void
     {
         foreach ($order->getLines() as $line) {
 
             // Get variant of line for original price
             $variant = $this->variantForCartRepository->findVariantForCart($line->getVariantId());
+            $originalVatPercentage = $variant->getSalePrice()->getVatPercentage();
 
-            dd($line, $variant);
-            if ($double = $taxRateProfile->hasMappingForRate($line->getLinePrice()->getTaxRate())) {
-                $linePrice = $line->getLinePrice();
-                $linePrice = $linePrice->changeTaxRate($double->getTargetRate());
-                $line->updatePrice($linePrice);
-            }
+            $vatPercentage = $this->findVatRateForOrder->findForLine($order, $originalVatPercentage);
+
+            $linePrice = $line->getLinePrice();
+            $linePrice = $linePrice->changeVatPercentage($vatPercentage);
+            $line->updatePrice($linePrice);
         }
     }
 
-    private function adjustShippingCosts(Order $order, VatRate $taxRateProfile): void
+    private function adjustShippingCosts(Order $order): void
     {
         foreach ($order->getShippings() as $shipping) {
-            if ($double = $taxRateProfile->hasMappingForRate($shipping->getShippingCost()->getTaxRate())) {
-                $shippingCost = $shipping->getShippingCost();
-                $shippingCost = $shippingCost->changeTaxRate($double->getTargetRate());
-                $shipping->updateCost($shippingCost);
-            }
+
+            $vatPercentage = $this->findVatRateForOrder->findForShippingCost($order);
+
+            $shippingCost = $shipping->getShippingCost();
+            $shippingCost = $shippingCost->changeVatPercentage($vatPercentage);
+            $shipping->updateCost($shippingCost);
         }
     }
 
-    private function adjustPaymentCosts(Order $order, VatRate $taxRateProfile): void
+    private function adjustPaymentCosts(Order $order): void
     {
         foreach ($order->getPayments() as $payment) {
-            if ($double = $taxRateProfile->hasMappingForRate($payment->getPaymentCost()->getTaxRate())) {
-                $paymentCost = $payment->getPaymentCost();
-                $paymentCost = $paymentCost->changeTaxRate($double->getTargetRate());
-                $payment->updateCost($paymentCost);
-            }
+
+            $vatPercentage = $this->findVatRateForOrder->findForPaymentCost($order);
+
+            $paymentCost = $payment->getPaymentCost();
+            $paymentCost = $paymentCost->changeVatPercentage($vatPercentage);
+            $payment->updateCost($paymentCost);
         }
     }
 }

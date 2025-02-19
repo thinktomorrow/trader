@@ -9,16 +9,14 @@ use PHPUnit\Framework\TestCase;
 
 class MoneyTest extends TestCase
 {
-    /** @test */
-    public function it_can_be_called()
+    public function test_it_can_be_called()
     {
         $money = new Money(500, new Currency('EUR'));
 
         $this->assertInstanceOf(Money::class, $money);
     }
 
-    /** @test */
-    public function it_can_be_called_with_shorthand()
+    public function test_it_can_be_called_with_shorthand()
     {
         $money = Money::USD(530);
 

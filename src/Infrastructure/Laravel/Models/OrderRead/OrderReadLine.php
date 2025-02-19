@@ -65,7 +65,7 @@ abstract class OrderReadLine
         $line->product_id = $line->data('product_id');
         $line->unitPrice = VariantUnitPrice::fromMoney(
             Cash::make($line->linePrice->includesVat() ? $line->data('unit_price_including_vat') : $line->data('unit_price_excluding_vat')),
-            $line->linePrice->getTaxRate(),
+            $line->linePrice->getVatPercentage(),
             $line->linePrice->includesVat()
         );
 

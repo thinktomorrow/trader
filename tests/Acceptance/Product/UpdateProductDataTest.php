@@ -11,8 +11,7 @@ class UpdateProductDataTest extends ProductContext
 {
     use TestHelpers;
 
-    /** @test */
-    public function it_can_add_data()
+    public function test_it_can_add_data()
     {
         $productId = $this->createAProduct('50', []);
         $dataPayload = ['foo' => 'bar'];
@@ -28,8 +27,7 @@ class UpdateProductDataTest extends ProductContext
         ], $this->eventDispatcher->releaseDispatchedEvents());
     }
 
-    /** @test */
-    public function it_overwrites_data_by_payload()
+    public function test_it_overwrites_data_by_payload()
     {
         $productId = $this->createAProduct('50', [], 'sku', ['foo' => 'bar']);
 
@@ -40,8 +38,7 @@ class UpdateProductDataTest extends ProductContext
         $this->assertEquals(json_encode(['foo' => ['nl' => 'baz']]), $product->getMappedData()['data']);
     }
 
-    /** @test */
-    public function it_does_not_remove_data_not_in_payload()
+    public function test_it_does_not_remove_data_not_in_payload()
     {
         $productId = $this->createAProduct('50', [], 'sku', ['foo' => 'bar']);
 

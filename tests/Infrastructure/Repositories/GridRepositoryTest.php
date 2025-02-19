@@ -31,8 +31,7 @@ class GridRepositoryTest extends TestCase
         $this->createMysqlCatalog();
     }
 
-    /** @test */
-    public function it_can_fetch_grid_item()
+    public function test_it_can_fetch_grid_item()
     {
         $gridItems = $this->getMysqlGridRepository()->getResults();
 
@@ -46,16 +45,14 @@ class GridRepositoryTest extends TestCase
         $this->assertNotEmpty($gridItem->getTaxonIds());
     }
 
-    /** @test */
-    public function it_only_fetches_grid_products()
+    public function test_it_only_fetches_grid_products()
     {
         $gridItems = $this->getMysqlGridRepository()->getResults();
 
         $this->assertCount(3, $gridItems);
     }
 
-    /** @test */
-    public function it_can_filter_by_minimum_sale_price()
+    public function test_it_can_filter_by_minimum_sale_price()
     {
         $gridItems = $this->getMysqlGridRepository()->filterByPrice('251')->getResults();
 
@@ -63,8 +60,7 @@ class GridRepositoryTest extends TestCase
         $this->assertTrue($gridItems->first()->getSalePriceAsMoney()->greaterThan(Money::EUR(251)));
     }
 
-    /** @test */
-    public function it_can_filter_by_maximum_sale_price()
+    public function test_it_can_filter_by_maximum_sale_price()
     {
         $gridItems = $this->getMysqlGridRepository()->filterByPrice(null, '251')->getResults();
 
@@ -73,8 +69,7 @@ class GridRepositoryTest extends TestCase
         $this->assertTrue($gridItems[1]->getSalePriceAsMoney()->lessThan(Money::EUR(251)));
     }
 
-    /** @test */
-    public function it_can_filter_by_price_range()
+    public function test_it_can_filter_by_price_range()
     {
         $gridItems = $this->getMysqlGridRepository()->filterByPrice('101', '251')->getResults();
 
@@ -83,8 +78,7 @@ class GridRepositoryTest extends TestCase
         $this->assertTrue($gridItems[0]->getSalePriceAsMoney()->lessThan(Money::EUR(251)));
     }
 
-    /** @test */
-    public function it_can_filter_by_exact_search_term()
+    public function test_it_can_filter_by_exact_search_term()
     {
         $gridItems = $this->getMysqlGridRepository()->filterByTerm('product one')->getResults();
 
@@ -92,8 +86,7 @@ class GridRepositoryTest extends TestCase
         $this->assertEquals('product one', $gridItems->first()->getTitle());
     }
 
-    /** @test */
-    public function it_can_filter_by_partial_search_term()
+    public function test_it_can_filter_by_partial_search_term()
     {
         $gridItems = $this->getMysqlGridRepository()->filterByTerm('one')->getResults();
 
@@ -101,24 +94,21 @@ class GridRepositoryTest extends TestCase
         $this->assertEquals('product one', $gridItems->first()->getTitle());
     }
 
-    /** @test */
-    public function it_can_filter_by_taxonomy()
+    public function test_it_can_filter_by_taxonomy()
     {
         $gridItems = $this->getMysqlGridRepository()->filterByTaxonKeys(['foobar-child'])->getResults();
 
         $this->assertCount(1, $gridItems);
     }
 
-    /** @test */
-    public function when_filtering_taxon_all_child_taxonomy_is_included_in_the_search()
+    public function test_when_filtering_taxon_all_child_taxonomy_is_included_in_the_search()
     {
         $gridItems = $this->getMysqlGridRepository()->filterByTaxonKeys(['foobar'])->getResults();
 
         $this->assertCount(2, $gridItems);
     }
 
-    /** @test */
-    public function it_can_sort_by_sale_price()
+    public function test_it_can_sort_by_sale_price()
     {
         $gridItems = $this->getMysqlGridRepository()->sortByPrice()->getResults();
 
@@ -136,8 +126,7 @@ class GridRepositoryTest extends TestCase
         }
     }
 
-    /** @test */
-    public function it_can_sort_by_descending_sale_price()
+    public function test_it_can_sort_by_descending_sale_price()
     {
         $gridItems = $this->getMysqlGridRepository()->sortByPriceDesc()->getResults();
 
@@ -155,14 +144,13 @@ class GridRepositoryTest extends TestCase
         }
     }
 
-    /** @test */
-    public function it_can_sort_by_product_title()
+    public function test_it_can_sort_by_product_title()
     {
         $gridItems = $this->getMysqlGridRepository()->sortByLabel()->getResults();
 
         $this->assertCount(3, $gridItems);
 
-        $titles = $gridItems->map(fn ($gridItem) => $gridItem->getTitle());
+        $titles = $gridItems->map(fn($gridItem) => $gridItem->getTitle());
 
         $expected = $titles->toArray();
         natcasesort($expected);
@@ -170,14 +158,13 @@ class GridRepositoryTest extends TestCase
         $this->assertEquals($expected, $titles->toArray());
     }
 
-    /** @test */
-    public function it_can_sort_by_descending_label()
+    public function test_it_can_sort_by_descending_label()
     {
         $gridItems = $this->getMysqlGridRepository()->sortByLabelDesc()->getResults();
 
         $this->assertCount(3, $gridItems);
 
-        $titles = $gridItems->map(fn ($gridItem) => $gridItem->getTitle());
+        $titles = $gridItems->map(fn($gridItem) => $gridItem->getTitle());
 
         $expected = $titles->toArray();
         natcasesort($expected);

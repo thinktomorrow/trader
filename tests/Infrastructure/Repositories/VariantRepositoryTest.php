@@ -29,7 +29,7 @@ final class VariantRepositoryTest extends TestCase
             $repository->save($variant);
 
             $variantStates = $repository->getStatesByProduct($variant->productId);
-            $this->assertEquals([$variant], array_map(fn ($variantState) => Variant::fromMappedData($variantState, ['product_id' => 'xxx']), $variantStates));
+            $this->assertEquals([$variant], array_map(fn($variantState) => Variant::fromMappedData($variantState, ['product_id' => 'xxx']), $variantStates));
         }
     }
 
@@ -65,8 +65,7 @@ final class VariantRepositoryTest extends TestCase
         }
     }
 
-    /** @test */
-    public function it_can_generate_a_next_reference()
+    public function test_it_can_generate_a_next_reference()
     {
         foreach ($this->repositories() as $repository) {
             $this->assertInstanceOf(VariantId::class, $repository->nextReference());

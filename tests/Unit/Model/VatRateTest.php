@@ -4,7 +4,7 @@ declare(strict_types=1);
 namespace Tests\Unit\Model;
 
 use PHPUnit\Framework\TestCase;
-use Thinktomorrow\Trader\Domain\Common\Taxes\TaxRate;
+use Thinktomorrow\Trader\Domain\Common\Vat\VatPercentage;
 use Thinktomorrow\Trader\Domain\Model\Country\CountryId;
 use Thinktomorrow\Trader\Domain\Model\VatRate\BaseRate;
 use Thinktomorrow\Trader\Domain\Model\VatRate\BaseRateId;
@@ -19,7 +19,7 @@ class VatRateTest extends TestCase
         $vatRate = VatRate::create(
             $vatRateId = VatRateId::fromString('yyy'),
             $countryId = CountryId::fromString('BE'),
-            $rate = TaxRate::fromString('21'),
+            $rate = VatPercentage::fromString('21'),
             $isStandard = false
         );
 
@@ -43,7 +43,7 @@ class VatRateTest extends TestCase
 
         $this->assertEquals(VatRateId::fromString('yyy'), $vatRate->vatRateId);
         $this->assertEquals(CountryId::fromString('BE'), $vatRate->countryId);
-        $this->assertEquals(TaxRate::fromString('21'), $vatRate->getRate());
+        $this->assertEquals(VatPercentage::fromString('21'), $vatRate->getRate());
         $this->assertEquals(VatRateState::offline, $vatRate->getState());
         $this->assertEquals('bar', $vatRate->getData('foo'));
         $this->assertCount(2, $vatRate->getChildEntities()[BaseRate::class]);
@@ -51,16 +51,15 @@ class VatRateTest extends TestCase
             'base_rate_id' => 'xxx',
             'origin_vat_rate_id' => 'aaa',
             'target_vat_rate_id' => 'yyy',
-            'rate' => '10',
         ], $vatRate->getChildEntities()[BaseRate::class][0]);
     }
 
     public function test_it_can_update_rate()
     {
         $vatRate = $this->createdVatRate();
-        $vatRate->updateRate(TaxRate::fromString('25'));
+        $vatRate->updateRate(VatPercentage::fromString('25'));
 
-        $this->assertEquals(TaxRate::fromString('25'), $vatRate->getRate());
+        $this->assertEquals(VatPercentage::fromString('25'), $vatRate->getRate());
     }
 
     public function test_it_can_add_a_base_rate()
@@ -72,7 +71,7 @@ class VatRateTest extends TestCase
                 BaseRateId::fromString('zzz'),
                 VatRateId::fromString('bbb'),
                 VatRateId::fromString('xxx'),
-                TaxRate::fromString('10'),
+                VatPercentage::fromString('10'),
             )
         );
 
@@ -92,9 +91,9 @@ class VatRateTest extends TestCase
     {
         $vatRate = $this->createdVatRate();
 
-        $this->assertFalse($vatRate->hasBaseRateOf(TaxRate::fromString('15')));
-        $this->assertTrue($vatRate->hasBaseRateOf(TaxRate::fromString('12')));
-        $this->assertTrue($vatRate->hasBaseRateOf(TaxRate::fromString('10')));
+        $this->assertFalse($vatRate->hasBaseRateOf(VatPercentage::fromString('15')));
+        $this->assertTrue($vatRate->hasBaseRateOf(VatPercentage::fromString('12')));
+        $this->assertTrue($vatRate->hasBaseRateOf(VatPercentage::fromString('10')));
     }
 
     private function createdVatRate(): VatRate

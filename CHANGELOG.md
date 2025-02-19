@@ -16,6 +16,13 @@ vat country.
 - Removed from laravel config file: `'default_tax_rate' => '21',` and `'tax_rates' => ['21', '6', '12']`.
 - Added to laravel config file: `'primary_vat_country' => 'BE'`.
 
+Tax is a more generic term and can be used for other types of taxes as well. The vat term is more specific to the vat of
+the catalog prices. Therefore, the term `vat` is used in the codebase instead of `tax`. Tax is used in the context of
+the checkout and order.
+
+- Renamed Vat methods to better reflect its behavior. `getTaxRate` is now `getVatPercentage`, `getTaxableTotal` is now
+  `getVatApplicableTotal`, `getTaxTotal` is now `getVatTotal` and `getPreciseTaxTotal` is now `getPreciseVatTotal`.
+
 ## 2024-05-01 - 0.6.6
 
 - Added: availability check for variant. `VariantLink::isVariantAvailable()`.

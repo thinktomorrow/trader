@@ -4,7 +4,8 @@ declare(strict_types=1);
 namespace Thinktomorrow\Trader\Application\Cart\PaymentMethod;
 
 use Psr\Container\ContainerInterface;
-use Thinktomorrow\Trader\Domain\Common\Taxes\TaxRate;
+use Thinktomorrow\Trader\Application\VatRate\FindVatRateForOrder;
+use Thinktomorrow\Trader\Domain\Common\Vat\VatPercentage;
 use Thinktomorrow\Trader\Domain\Model\Order\Order;
 use Thinktomorrow\Trader\Domain\Model\Order\OrderRepository;
 use Thinktomorrow\Trader\Domain\Model\Order\Payment\Payment;
@@ -21,21 +22,23 @@ class UpdatePaymentMethodOnOrder
     private OrderRepository $orderRepository;
     private PaymentMethodRepository $paymentMethodRepository;
     private VerifyPaymentMethodForCart $verifyPaymentMethodForCart;
+    private FindVatRateForOrder $findVatRateForOrder;
 
-    public function __construct(ContainerInterface $container, TraderConfig $config, OrderRepository $orderRepository, VerifyPaymentMethodForCart $verifyPaymentMethodForCart, PaymentMethodRepository $paymentMethodRepository)
+    public function __construct(ContainerInterface $container, TraderConfig $config, OrderRepository $orderRepository, VerifyPaymentMethodForCart $verifyPaymentMethodForCart, PaymentMethodRepository $paymentMethodRepository, FindVatRateForOrder $findVatRateForOrder)
     {
         $this->container = $container;
         $this->config = $config;
         $this->orderRepository = $orderRepository;
         $this->paymentMethodRepository = $paymentMethodRepository;
         $this->verifyPaymentMethodForCart = $verifyPaymentMethodForCart;
+        $this->findVatRateForOrder = $findVatRateForOrder;
     }
 
     public function handle(Order $order, PaymentMethodId $paymentMethodId): void
     {
         $paymentMethod = $this->paymentMethodRepository->find($paymentMethodId);
 
-        if (! $this->verifyPaymentMethodForCart->verify($order, $paymentMethod)) {
+        if (!$this->verifyPaymentMethodForCart->verify($order, $paymentMethod)) {
             $this->removePaymentMethodFromOrder($order);
 
             return;
@@ -43,7 +46,7 @@ class UpdatePaymentMethodOnOrder
 
         $paymentCost = PaymentCost::fromMoney(
             $paymentMethod->getRate(),
-            TaxRate::fromString($this->config->getDefaultTaxRate()),
+            $this->findVatRateForOrder->findForPaymentCost($order),
             $this->config->doesTariffInputIncludesVat()
         );
 

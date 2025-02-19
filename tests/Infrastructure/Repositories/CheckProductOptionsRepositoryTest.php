@@ -14,8 +14,7 @@ final class CheckProductOptionsRepositoryTest extends TestCase
 {
     use RefreshDatabase;
 
-    /** @test */
-    public function it_can_check_if_option_combination_is_already_used()
+    public function test_it_can_check_if_option_combination_is_already_used()
     {
         $product = $this->createProductWithOptions();
         (new MysqlProductRepository(new MysqlVariantRepository(new TestContainer())))->save($product);

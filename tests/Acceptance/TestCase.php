@@ -9,7 +9,7 @@ use Thinktomorrow\Trader\Application\Cart\PaymentMethod\VerifyPaymentMethodForCa
 use Thinktomorrow\Trader\Application\Common\DataRenderer;
 use Thinktomorrow\Trader\Application\Common\DefaultLocale;
 use Thinktomorrow\Trader\Domain\Common\Locale;
-use Thinktomorrow\Trader\Domain\Common\Taxes\TaxRate;
+use Thinktomorrow\Trader\Domain\Common\Vat\VatPercentage;
 use Thinktomorrow\Trader\Domain\Model\Order\Discount\DiscountPriceDefaults;
 use Thinktomorrow\Trader\Infrastructure\Laravel\Models\PaymentMethod\DefaultVerifyPaymentMethodForCart;
 use Thinktomorrow\Trader\Infrastructure\Test\Repositories\InMemoryOrderRepository;
@@ -26,13 +26,13 @@ class TestCase extends \PHPUnit\Framework\TestCase
     {
         $this->addInstancesToContainer();
 
-        DiscountPriceDefaults::setDiscountTaxRate(TaxRate::fromString('21'));
+        DiscountPriceDefaults::setDiscountTaxRate(VatPercentage::fromString('21'));
         DiscountPriceDefaults::setDiscountIncludeTax(true);
 
         DefaultLocale::set(Locale::fromString('nl'));
 
         DataRenderer::setDataResolver(function (array $data, string $key, ?string $language = null, ?string $default = null) {
-            if (! $language) {
+            if (!$language) {
                 $language = 'nl';
             }
 
@@ -42,7 +42,7 @@ class TestCase extends \PHPUnit\Framework\TestCase
                 Arr::get($data, $key, $default)
             );
 
-            return $value === null ? $default :$value;
+            return $value === null ? $default : $value;
         });
     }
 
@@ -51,7 +51,7 @@ class TestCase extends \PHPUnit\Framework\TestCase
         $this->orderRepository = new InMemoryOrderRepository();
         $this->paymentMethodRepository = new InMemoryPaymentMethodRepository();
 
-        (new TestContainer())->add(VerifyPaymentMethodForCart::class, new DefaultVerifyPaymentMethodForCart());
-        (new TestContainer())->add(UpdatePaymentMethodOnOrder::class, new UpdatePaymentMethodOnOrder(new TestContainer(), new TestTraderConfig(), $this->orderRepository, (new TestContainer())->get(VerifyPaymentMethodForCart::class), $this->paymentMethodRepository));
+//        (new TestContainer())->add(VerifyPaymentMethodForCart::class, new DefaultVerifyPaymentMethodForCart());
+//        (new TestContainer())->add(UpdatePaymentMethodOnOrder::class, new UpdatePaymentMethodOnOrder(new TestContainer(), new TestTraderConfig(), $this->orderRepository, (new TestContainer())->get(VerifyPaymentMethodForCart::class), $this->paymentMethodRepository));
     }
 }

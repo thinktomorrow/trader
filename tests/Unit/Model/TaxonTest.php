@@ -16,8 +16,7 @@ use Thinktomorrow\Trader\Domain\Model\Taxon\TaxonState;
 
 class TaxonTest extends TestCase
 {
-    /** @test */
-    public function it_can_create_a_taxon()
+    public function test_it_can_create_a_taxon()
     {
         $taxon = Taxon::create(
             TaxonId::fromString('aaa'),
@@ -40,8 +39,7 @@ class TaxonTest extends TestCase
         $this->assertEquals([$taxonKey->getMappedData()], $taxon->getChildEntities()[TaxonKey::class]);
     }
 
-    /** @test */
-    public function parent_id_is_not_required()
+    public function test_parent_id_is_not_required()
     {
         $taxon = Taxon::create(
             TaxonId::fromString('aaa'),
@@ -50,20 +48,18 @@ class TaxonTest extends TestCase
         $this->assertNull($taxon->getMappedData()['parent_id']);
     }
 
-    /** @test */
-    public function it_can_change_parent()
+    public function test_it_can_change_parent()
     {
         $taxon = Taxon::create(
             TaxonId::fromString('aaa'),
         );
 
-        $taxon->changeParent(TaxonId::fromString('bbb'), );
+        $taxon->changeParent(TaxonId::fromString('bbb'));
 
         $this->assertEquals('bbb', $taxon->getMappedData()['parent_id']);
     }
 
-    /** @test */
-    public function it_can_move_taxon_to_root()
+    public function test_it_can_move_taxon_to_root()
     {
         $taxon = Taxon::create(
             TaxonId::fromString('aaa'),
@@ -75,8 +71,7 @@ class TaxonTest extends TestCase
         $this->assertNull($taxon->getMappedData()['parent_id']);
     }
 
-    /** @test */
-    public function parent_id_cannot_be_same_as_own_id()
+    public function test_parent_id_cannot_be_same_as_own_id()
     {
         $this->expectException(InvalidParentTaxonId::class);
 
@@ -86,8 +81,7 @@ class TaxonTest extends TestCase
         );
     }
 
-    /** @test */
-    public function it_can_change_state()
+    public function test_it_can_change_state()
     {
         $taxon = Taxon::create(
             TaxonId::fromString('aaa'),
@@ -99,8 +93,7 @@ class TaxonTest extends TestCase
         $this->assertEquals(TaxonState::offline->value, $taxon->getMappedData()['state']);
     }
 
-    /** @test */
-    public function it_can_be_build_from_raw_data()
+    public function test_it_can_be_build_from_raw_data()
     {
         $taxon = $this->createdTaxon();
 

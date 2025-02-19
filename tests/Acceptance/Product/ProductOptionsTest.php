@@ -13,8 +13,7 @@ class ProductOptionsTest extends ProductContext
 {
     use TestHelpers;
 
-    /** @test */
-    public function it_can_create_a_product_option()
+    public function test_it_can_create_a_product_option()
     {
         $productOption = OptionValue::create(OptionId::fromString('aaa'), OptionValueId::fromString('aaa-value'), []);
 
@@ -22,8 +21,7 @@ class ProductOptionsTest extends ProductContext
         $this->assertEquals(OptionValueId::fromString('aaa-value'), $productOption->optionValueId);
     }
 
-    /** @test */
-    public function it_can_compose_options()
+    public function test_it_can_compose_options()
     {
         $product = $this->createProductWithOptions();
         $this->productRepository->save($product);

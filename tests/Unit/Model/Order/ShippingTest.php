@@ -21,8 +21,7 @@ use Thinktomorrow\Trader\Domain\Model\ShippingProfile\ShippingProfileId;
 
 class ShippingTest extends TestCase
 {
-    /** @test */
-    public function it_can_create_a_order_shipping()
+    public function test_it_can_create_a_order_shipping()
     {
         $shipping = Shipping::create(
             OrderId::fromString('aaa'),
@@ -38,14 +37,13 @@ class ShippingTest extends TestCase
             'shipping_profile_id' => $shippingProfileId->get(),
             'shipping_state' => $state->value,
             'cost' => $cost->getMoney()->getAmount(),
-            'tax_rate' => $cost->getTaxRate()->toPercentage()->get(),
+            'tax_rate' => $cost->getVatPercentage()->toPercentage()->get(),
             'includes_vat' => $cost->includesVat(),
             'data' => json_encode(['shipping_profile_id' => $shippingProfileId->get()]),
         ], $shipping->getMappedData());
     }
 
-    /** @test */
-    public function it_can_be_build_from_raw_data()
+    public function test_it_can_be_build_from_raw_data()
     {
         $shipping = $this->createOrderShipping();
 
@@ -62,8 +60,7 @@ class ShippingTest extends TestCase
         ], $shipping->getMappedData());
     }
 
-    /** @test */
-    public function it_can_add_a_discount_to_shipping()
+    public function test_it_can_add_a_discount_to_shipping()
     {
         $order = $this->createDefaultOrder();
         $shipping = $order->getShippings()[0];
@@ -72,10 +69,10 @@ class ShippingTest extends TestCase
         $this->assertCount(1, $shipping->getDiscounts());
 
         $shippingCost = $shipping->getShippingCost();
-        $this->assertEquals(ShippingCost::fromMoney(Money::EUR(0), $shippingCost->getTaxRate(), $shippingCost->includesVat()), $shipping->getShippingCostTotal());
+        $this->assertEquals(ShippingCost::fromMoney(Money::EUR(0), $shippingCost->getVatPercentage(), $shippingCost->includesVat()), $shipping->getShippingCostTotal());
 
         $this->assertEquals([
-            Discount::class => array_map(fn ($discount) => $discount->getMappedData(), $shipping->getDiscounts()),
+            Discount::class => array_map(fn($discount) => $discount->getMappedData(), $shipping->getDiscounts()),
         ], $shipping->getChildEntities());
     }
 
@@ -85,7 +82,7 @@ class ShippingTest extends TestCase
         $shipping = $order->getShippings()[0];
         $shipping->addDiscount($this->createOrderShippingDiscount(['promo_discount_id' => 'qqq', 'discount_id' => 'defgh'], $order->getMappedData()));
 
-        $discountTotal = DiscountTotal::fromMoney(Money::EUR('30'), $shipping->getShippingCost()->getTaxRate(), $shipping->getShippingCost()->includesVat());
+        $discountTotal = DiscountTotal::fromMoney(Money::EUR('30'), $shipping->getShippingCost()->getVatPercentage(), $shipping->getShippingCost()->includesVat());
 
         $this->assertEquals($discountTotal, $shipping->getDiscountTotal());
     }
@@ -136,8 +133,7 @@ class ShippingTest extends TestCase
         $order->addShipping($this->createOrderShipping());
     }
 
-    /** @test */
-    public function it_can_update_shipping()
+    public function test_it_can_update_shipping()
     {
         $order = $this->createDefaultOrder();
 

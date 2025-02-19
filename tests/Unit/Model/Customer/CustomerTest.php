@@ -13,8 +13,7 @@ use Thinktomorrow\Trader\Domain\Model\Customer\CustomerId;
 
 class CustomerTest extends TestCase
 {
-    /** @test */
-    public function it_can_create_a_customer()
+    public function test_it_can_create_a_customer()
     {
         $customer = Customer::create(
             $customerId = CustomerId::fromString('yyy'),
@@ -37,8 +36,7 @@ class CustomerTest extends TestCase
         ], $customer->getChildEntities());
     }
 
-    /** @test */
-    public function it_can_be_build_from_raw_data()
+    public function test_it_can_be_build_from_raw_data()
     {
         $customer = $this->createdCustomer();
 
@@ -52,8 +50,7 @@ class CustomerTest extends TestCase
         ], $customer->getMappedData());
     }
 
-    /** @test */
-    public function it_can_update_shipping_address()
+    public function test_it_can_update_shipping_address()
     {
         $customer = $this->createdCustomer();
 
@@ -73,8 +70,7 @@ class CustomerTest extends TestCase
         $this->assertEquals(ShippingAddress::fromMappedData($addressPayload, $customer->getMappedData())->getMappedData(), $customer->getChildEntities()[ShippingAddress::class]);
     }
 
-    /** @test */
-    public function it_can_update_billing_address()
+    public function test_it_can_update_billing_address()
     {
         $customer = $this->createdCustomer();
 

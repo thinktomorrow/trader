@@ -9,7 +9,7 @@ use Thinktomorrow\Trader\Application\Order\MerchantOrder\MerchantOrder;
 use Thinktomorrow\Trader\Application\Order\MerchantOrder\MerchantOrderPayment;
 use Thinktomorrow\Trader\Application\Order\MerchantOrder\MerchantOrderShipping;
 use Thinktomorrow\Trader\Application\Order\MerchantOrder\MerchantOrderShopper;
-use Thinktomorrow\Trader\Domain\Common\Taxes\TaxRate;
+use Thinktomorrow\Trader\Domain\Common\Vat\VatPercentage;
 use Thinktomorrow\Trader\Domain\Model\Order\Line\LinePrice;
 use Thinktomorrow\Trader\Domain\Model\Order\OrderId;
 use Thinktomorrow\Trader\Domain\Model\Order\Payment\DefaultPaymentState;
@@ -20,8 +20,7 @@ use Thinktomorrow\Trader\Domain\Model\Product\Variant\VariantUnitPrice;
 
 class MerchantOrderTest extends CartContext
 {
-    /** @test */
-    public function as_a_merchant_i_need_to_be_able_to_see_the_totals()
+    public function test_as_a_merchant_i_need_to_be_able_to_see_the_totals()
     {
         $this->givenThereIsAProductWhichCostsEur('aaa', 5);
         $this->whenIAddTheVariantToTheCart('aaa-123', 2);
@@ -58,8 +57,7 @@ class MerchantOrderTest extends CartContext
         $this->markTestSkipped('todo: with payment / shipping / discount values');
     }
 
-    /** @test */
-    public function as_a_merchant_i_need_to_be_able_to_see_each_line_of_my_cart()
+    public function test_as_a_merchant_i_need_to_be_able_to_see_each_line_of_my_cart()
     {
         $this->orderRepository->setNextLineReference('foobar');
 
@@ -85,8 +83,7 @@ class MerchantOrderTest extends CartContext
         $this->assertCount(0, $line->getDiscounts());
     }
 
-    /** @test */
-    public function as_a_merchant_i_need_to_be_able_to_see_prices_with_or_without_tax()
+    public function test_as_a_merchant_i_need_to_be_able_to_see_prices_with_or_without_tax()
     {
         $this->givenThereIsAProductWhichCostsEur('lightsaber', 5);
         $this->whenIAddTheVariantToTheCart('lightsaber-123', 2);
@@ -99,11 +96,11 @@ class MerchantOrderTest extends CartContext
 
         $this->assertEquals('€ 8,33', $line->getUnitPrice()); // test unit price is set at 1000
         $this->assertEquals(Money::EUR(833), $line->getUnitPriceAsMoney());
-        $this->assertEquals(VariantUnitPrice::fromMoney(Money::EUR(1000), TaxRate::fromString('20'), true), $line->getUnitPriceAsPrice());
+        $this->assertEquals(VariantUnitPrice::fromMoney(Money::EUR(1000), VatPercentage::fromString('20'), true), $line->getUnitPriceAsPrice());
 
         $this->assertEquals('€ 4,17', $line->getLinePrice()); // 4,1666666
         $this->assertEquals(Money::EUR(417), $line->getLinePriceAsMoney()); // 4,1666666
-        $this->assertEquals(LinePrice::fromMoney(Money::EUR(500), TaxRate::fromString('20'), true), $line->getLinePriceAsPrice());
+        $this->assertEquals(LinePrice::fromMoney(Money::EUR(500), VatPercentage::fromString('20'), true), $line->getLinePriceAsPrice());
 
         $this->assertEquals('€ 8,33', $line->getTotalPrice()); // 8,333333
         $this->assertEquals('€ 8,33', $line->getSubtotalPrice());
@@ -116,8 +113,7 @@ class MerchantOrderTest extends CartContext
         $this->assertEquals('€ 1,67', $line->getTaxPrice()); // tax is 20%
     }
 
-    /** @test */
-    public function as_a_merchant_i_need_to_be_able_to_see_shipping_address()
+    public function test_as_a_merchant_i_need_to_be_able_to_see_shipping_address()
     {
         $this->givenThereIsAProductWhichCostsEur('lightsaber', 5);
         $this->whenIAddTheVariantToTheCart('lightsaber-123', 2);
@@ -134,8 +130,7 @@ class MerchantOrderTest extends CartContext
         $this->assertNull($merchantOrder->getShippingAddress()->getDescription());
     }
 
-    /** @test */
-    public function as_a_merchant_i_need_to_be_able_to_see_billing_address()
+    public function test_as_a_merchant_i_need_to_be_able_to_see_billing_address()
     {
         $this->givenThereIsAProductWhichCostsEur('lightsaber', 5);
         $this->whenIAddTheVariantToTheCart('lightsaber-123', 2);
@@ -152,8 +147,7 @@ class MerchantOrderTest extends CartContext
         $this->assertNull($merchantOrder->getBillingAddress()->getDescription());
     }
 
-    /** @test */
-    public function as_a_merchant_i_need_to_be_able_to_see_shipping()
+    public function test_as_a_merchant_i_need_to_be_able_to_see_shipping()
     {
         $this->givenOrderHasAShippingCountry('BE');
         $this->givenShippingCostsForAPurchaseOfEur(30, 0, 1000);
@@ -171,8 +165,7 @@ class MerchantOrderTest extends CartContext
         $this->assertEquals('Bpost Home', $merchantOrder->getShippings()[0]->getTitle());
     }
 
-    /** @test */
-    public function as_a_merchant_i_need_to_be_able_to_see_payment()
+    public function test_as_a_merchant_i_need_to_be_able_to_see_payment()
     {
         $this->givenPaymentMethod(30, 'bancontact');
         $this->givenThereIsAProductWhichCostsEur('lightsaber', 5);
@@ -188,8 +181,7 @@ class MerchantOrderTest extends CartContext
         $this->assertEquals('€ 30', $merchantOrder->getPayments()[0]->getCostPrice());
     }
 
-    /** @test */
-    public function as_a_merchant_i_need_to_be_able_to_see_guest_shopper_info()
+    public function test_as_a_merchant_i_need_to_be_able_to_see_guest_shopper_info()
     {
         $this->whenIEnterShopperDetails('foo@example.com');
 
@@ -202,8 +194,7 @@ class MerchantOrderTest extends CartContext
         $this->assertFalse($merchantOrder->getShopper()->isCustomer());
     }
 
-    /** @test */
-    public function as_a_merchant_i_need_to_be_able_to_see_customer_shopper_info()
+    public function test_as_a_merchant_i_need_to_be_able_to_see_customer_shopper_info()
     {
         $this->givenACustomerExists('foo@example.com');
         $this->whenIChooseCustomer('foo@example.com');
@@ -217,8 +208,7 @@ class MerchantOrderTest extends CartContext
         $this->assertTrue($merchantOrder->getShopper()->isCustomer());
     }
 
-    /** @test */
-    public function as_a_merchant_i_need_to_be_able_to_see_business_shopper_info()
+    public function test_as_a_merchant_i_need_to_be_able_to_see_business_shopper_info()
     {
         $this->givenACustomerExists('foo@example.com', true);
         $this->whenIChooseCustomer('foo@example.com');
@@ -228,8 +218,7 @@ class MerchantOrderTest extends CartContext
         $this->assertTrue($merchantOrder->getShopper()->isBusiness());
     }
 
-    /** @test */
-    public function as_a_merchant_i_need_to_be_able_to_see_a_line_personalisation()
+    public function test_as_a_merchant_i_need_to_be_able_to_see_a_line_personalisation()
     {
         $this->givenThereIsAProductWhichCostsEur('lightsaber', 5);
         $this->givenThereIsAProductPersonalisation('lightsaber', [

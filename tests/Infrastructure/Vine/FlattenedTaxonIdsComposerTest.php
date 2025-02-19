@@ -33,8 +33,7 @@ final class FlattenedTaxonIdsComposerTest extends TestCase
         (new InMemoryTaxonRepository())->clear();
     }
 
-    /** @test */
-    public function it_can_retrieve_all_ids_grouped_by_root()
+    public function test_it_can_retrieve_all_ids_grouped_by_root()
     {
         $this->createDefaultTaxons();
 
@@ -42,14 +41,13 @@ final class FlattenedTaxonIdsComposerTest extends TestCase
             $result = (new VineFlattenedTaxonIdsComposer($repository))->getGroupedByRootByKeys(['taxon-first', 'taxon-sixth']);
 
             $this->assertEquals([
-                'first' => ['first','second','third','fourth'],
+                'first' => ['first', 'second', 'third', 'fourth'],
                 'fifth' => ['sixth'],
             ], $result);
         }
     }
 
-    /** @test */
-    public function it_can_find_taxon_ids_by_ids()
+    public function test_it_can_find_taxon_ids_by_ids()
     {
         $this->createDefaultTaxons();
 
@@ -57,14 +55,13 @@ final class FlattenedTaxonIdsComposerTest extends TestCase
             $result = (new VineFlattenedTaxonIdsComposer($repository))->getGroupedByRootByIds(['first', 'sixth']);
 
             $this->assertEquals([
-                'first' => ['first','second','third','fourth'],
+                'first' => ['first', 'second', 'third', 'fourth'],
                 'fifth' => ['sixth'],
             ], $result);
         }
     }
 
-    /** @test */
-    public function it_returns_unique_values()
+    public function test_it_returns_unique_values()
     {
         $this->createDefaultTaxons();
 
@@ -72,13 +69,12 @@ final class FlattenedTaxonIdsComposerTest extends TestCase
             $result = (new VineFlattenedTaxonIdsComposer($repository))->getGroupedByRootByKeys(['taxon-first', 'taxon-second']);
 
             $this->assertEquals([
-                'first' => ['first','second','third','fourth'],
+                'first' => ['first', 'second', 'third', 'fourth'],
             ], $result);
         }
     }
 
-    /** @test */
-    public function it_returns_empty_list_for_non_found_taxons()
+    public function test_it_returns_empty_list_for_non_found_taxons()
     {
         $this->createDefaultTaxons();
 

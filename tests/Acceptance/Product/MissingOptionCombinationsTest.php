@@ -9,8 +9,7 @@ class MissingOptionCombinationsTest extends ProductContext
 {
     use TestHelpers;
 
-    /** @test */
-    public function it_can_check_missing_combos()
+    public function test_it_can_check_missing_combos()
     {
         $product = $this->createProductWithOptions();
         $this->productRepository->save($product);
@@ -19,11 +18,10 @@ class MissingOptionCombinationsTest extends ProductContext
 
         $this->assertCount(1, $missingCombos);
         $this->assertCount(2, $missingCombos[0]);
-        $this->assertEquals(['yyy','zzz'], $missingCombos[0]);
+        $this->assertEquals(['yyy', 'zzz'], $missingCombos[0]);
     }
 
-    /** @test */
-    public function it_can_render_missing_combos_with_labels()
+    public function test_it_can_render_missing_combos_with_labels()
     {
         $product = $this->createProductWithOptions();
         $this->productRepository->save($product);

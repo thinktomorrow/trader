@@ -107,7 +107,7 @@ final class Line implements ChildAggregate, Discountable
             'line_id' => $this->lineId->get(),
             'variant_id' => $this->variantId?->get(),
             'line_price' => $this->linePrice->getMoney()->getAmount(),
-            'tax_rate' => $this->linePrice->getTaxRate()->toPercentage()->get(),
+            'tax_rate' => $this->linePrice->getVatPercentage()->get(),
             'includes_vat' => $this->linePrice->includesVat(),
             'total' => $this->getTotal()->getMoney()->getAmount(),
             'tax_total' => $this->getTaxTotal()->getAmount(),
@@ -123,8 +123,8 @@ final class Line implements ChildAggregate, Discountable
     public function getChildEntities(): array
     {
         return [
-            LinePersonalisation::class => array_map(fn ($personalisation) => $personalisation->getMappedData(), $this->personalisations),
-            Discount::class => array_map(fn ($discount) => $discount->getMappedData(), $this->discounts),
+            LinePersonalisation::class => array_map(fn($personalisation) => $personalisation->getMappedData(), $this->personalisations),
+            Discount::class => array_map(fn($discount) => $discount->getMappedData(), $this->discounts),
         ];
     }
 
@@ -138,8 +138,8 @@ final class Line implements ChildAggregate, Discountable
         $line->linePrice = LinePrice::fromScalars($state['line_price'], $state['tax_rate'], $state['includes_vat']);
         $line->quantity = Quantity::fromInt($state['quantity']);
         $line->reducedFromStock = $state['reduced_from_stock'];
-        $line->discounts = array_map(fn ($discountState) => Discount::fromMappedData($discountState, $state), $childEntities[Discount::class]);
-        $line->personalisations = array_map(fn ($personalisationState) => LinePersonalisation::fromMappedData($personalisationState, $state), $childEntities[LinePersonalisation::class]);
+        $line->discounts = array_map(fn($discountState) => Discount::fromMappedData($discountState, $state), $childEntities[Discount::class]);
+        $line->personalisations = array_map(fn($personalisationState) => LinePersonalisation::fromMappedData($personalisationState, $state), $childEntities[LinePersonalisation::class]);
         $line->data = json_decode($state['data'], true);
 
         return $line;

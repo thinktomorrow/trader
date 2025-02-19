@@ -64,8 +64,7 @@ class MerchantOrderRepositoryTest extends TestCase
         }
     }
 
-    /** @test */
-    public function it_can_find_merchant_order_without_variant_when_variant_is_no_longer_present()
+    public function test_it_can_find_merchant_order_without_variant_when_variant_is_no_longer_present()
     {
         $order = $this->createDefaultOrder();
 

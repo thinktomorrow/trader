@@ -5,7 +5,7 @@ namespace Tests\Unit\Model\Product;
 
 use Money\Money;
 use Tests\Unit\TestCase;
-use Thinktomorrow\Trader\Domain\Common\Taxes\TaxRate;
+use Thinktomorrow\Trader\Domain\Common\Vat\VatPercentage;
 use Thinktomorrow\Trader\Domain\Model\Product\Events\OptionsUpdated;
 use Thinktomorrow\Trader\Domain\Model\Product\Events\OptionValuesUpdated;
 use Thinktomorrow\Trader\Domain\Model\Product\Events\ProductCreated;
@@ -25,8 +25,7 @@ use Thinktomorrow\Trader\Domain\Model\Taxon\TaxonId;
 
 class ProductTest extends TestCase
 {
-    /** @test */
-    public function it_can_create_a_product()
+    public function test_it_can_create_a_product()
     {
         $product = $this->createProduct();
 
@@ -42,8 +41,7 @@ class ProductTest extends TestCase
         ], $product->releaseEvents());
     }
 
-    /** @test */
-    public function it_can_be_build_from_raw_data()
+    public function test_it_can_be_build_from_raw_data()
     {
         $data = json_encode([
             'title' => [
@@ -57,12 +55,12 @@ class ProductTest extends TestCase
             'product_id' => 'xxx',
             'state' => ProductState::offline->value,
             'data' => $data,
-            'taxon_ids' => ['1','2'],
+            'taxon_ids' => ['1', '2'],
         ]);
 
         $this->assertEquals(ProductId::fromString('xxx'), $product->getMappedData()['product_id']);
         $this->assertEquals(ProductState::offline, $product->getState());
-        $this->assertEquals(['1','2'], $product->getMappedData()['taxon_ids']);
+        $this->assertEquals(['1', '2'], $product->getMappedData()['taxon_ids']);
         $this->assertEquals([
             'nl' => 'title nl',
             'en' => 'title en',
@@ -70,8 +68,7 @@ class ProductTest extends TestCase
         $this->assertEquals($data, $product->getMappedData()['data']);
     }
 
-    /** @test */
-    public function it_can_add_taxon()
+    public function test_it_can_add_taxon()
     {
         $product = $this->createProduct();
 
@@ -85,8 +82,7 @@ class ProductTest extends TestCase
         $this->assertEquals(['zzz'], $product->getMappedData()['taxon_ids']);
     }
 
-    /** @test */
-    public function it_can_add_variant()
+    public function test_it_can_add_variant()
     {
         $product = $this->createProductWithVariant();
 
@@ -98,8 +94,7 @@ class ProductTest extends TestCase
         ], $product->releaseEvents());
     }
 
-    /** @test */
-    public function it_cannot_add_variant_of_other_product()
+    public function test_it_cannot_add_variant_of_other_product()
     {
         $this->expectException(\InvalidArgumentException::class);
 
@@ -114,8 +109,7 @@ class ProductTest extends TestCase
         ));
     }
 
-    /** @test */
-    public function it_can_update_state()
+    public function test_it_can_update_state()
     {
         $product = $this->createProduct();
 
@@ -124,8 +118,7 @@ class ProductTest extends TestCase
         $this->assertEquals(ProductState::archived->value, $product->getMappedData()['state']);
     }
 
-    /** @test */
-    public function it_can_update_variant()
+    public function test_it_can_update_variant()
     {
         $product = $this->createProductWithVariant();
 
@@ -141,15 +134,14 @@ class ProductTest extends TestCase
         ], $product->getVariants()[0]->getMappedData()['option_value_ids']);
     }
 
-    /** @test */
-    public function it_can_delete_variant()
+    public function test_it_can_delete_variant()
     {
         $product = $this->createProductWithVariant();
         $product->createVariant(Variant::create(
             ProductId::fromString('xxx'),
             VariantId::fromString('zzz'),
-            VariantUnitPrice::fromMoney(Money::EUR(10), TaxRate::fromString('20'), false),
-            VariantSalePrice::fromMoney(Money::EUR(8), TaxRate::fromString('20'), false),
+            VariantUnitPrice::fromMoney(Money::EUR(10), VatPercentage::fromString('20'), false),
+            VariantSalePrice::fromMoney(Money::EUR(8), VatPercentage::fromString('20'), false),
             'sku',
         ));
 
@@ -165,8 +157,7 @@ class ProductTest extends TestCase
         ], $product->releaseEvents());
     }
 
-    /** @test */
-    public function it_cannot_delete_last_variant()
+    public function test_it_cannot_delete_last_variant()
     {
         $this->expectException(CouldNotDeleteVariant::class);
 

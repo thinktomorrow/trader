@@ -5,7 +5,7 @@ namespace Tests\Acceptance\VatRate;
 
 use Thinktomorrow\Trader\Application\VatRate\CreateBaseRate;
 use Thinktomorrow\Trader\Application\VatRate\CreateVatRate;
-use Thinktomorrow\Trader\Domain\Common\Taxes\TaxRate;
+use Thinktomorrow\Trader\Domain\Common\Vat\VatPercentage;
 use Thinktomorrow\Trader\Domain\Model\Country\CountryId;
 use Thinktomorrow\Trader\Domain\Model\VatRate\BaseRate;
 use Thinktomorrow\Trader\Domain\Model\VatRate\BaseRateId;
@@ -45,7 +45,7 @@ class CreateVatRateTest extends VatRateContext
         $this->assertEquals($baseRateId, $baseRate->baseRateId);
         $this->assertEquals($originVatRateId, $baseRate->originVatRateId);
         $this->assertEquals($targetVatRateId, $baseRate->targetVatRateId);
-        $this->assertEquals(TaxRate::fromString('21'), $baseRate->rate);
+        $this->assertEquals(VatPercentage::fromString('21'), $baseRate->rate);
     }
 
     public function test_base_rate_belongs_to_target_rate()

@@ -16,13 +16,12 @@ class DeleteShippingProfileTest extends ShippingProfileContext
 {
     use TestHelpers;
 
-    /** @test */
-    public function it_can_delete_a_profile()
+    public function test_it_can_delete_a_profile()
     {
         $shippingProfileId = $this->shippingProfileApplication->createShippingProfile(new CreateShippingProfile(
             'postnl',
             true,
-            ['BE','NL'],
+            ['BE', 'NL'],
             ['foo' => 'bar']
         ));
 
@@ -36,13 +35,12 @@ class DeleteShippingProfileTest extends ShippingProfileContext
         $this->shippingProfileRepository->find($shippingProfileId);
     }
 
-    /** @test */
-    public function it_can_delete_a_tariff()
+    public function test_it_can_delete_a_tariff()
     {
         $shippingProfileId = $this->shippingProfileApplication->createShippingProfile(new CreateShippingProfile(
             'postnl',
             true,
-            ['BE','NL'],
+            ['BE', 'NL'],
             ['foo' => 'bar']
         ));
 

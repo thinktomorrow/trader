@@ -10,8 +10,7 @@ class ProductDetailTest extends ProductContext
 {
     use TestHelpers;
 
-    /** @test */
-    public function it_can_get_a_product_detail()
+    public function test_it_can_get_a_product_detail()
     {
         $product = $this->createProductWithOptions();
         $product->updateTaxonIds([
@@ -46,7 +45,7 @@ class ProductDetailTest extends ProductContext
         $this->assertEquals('€ 0,10', $productDetail->getSalePrice(true));
         $this->assertEquals('€ 0,08', $productDetail->getSalePrice(false));
         $this->assertEquals('variant title nl', $productDetail->getTitle());
-        $this->assertEquals(['1','2'], $productDetail->getTaxonIds());
+        $this->assertEquals(['1', '2'], $productDetail->getTaxonIds());
     }
 
     public function test_it_can_get_sku_and_ean()
@@ -71,8 +70,7 @@ class ProductDetailTest extends ProductContext
         $this->assertEquals('ean-foobar', $productDetail->getEan());
     }
 
-    /** @test */
-    public function if_variant_title_is_empty_it_uses_product_title()
+    public function test_if_variant_title_is_empty_it_uses_product_title()
     {
         $product = $this->createProductWithOptions();
         $product->addData([
@@ -88,8 +86,7 @@ class ProductDetailTest extends ProductContext
         $this->assertEquals('product title nl', $productDetail->getTitle());
     }
 
-    /** @test */
-    public function if_variant_title_is_empty_it_uses_product_title_and_option_title()
+    public function test_if_variant_title_is_empty_it_uses_product_title_and_option_title()
     {
         $product = $this->createProductWithOptions();
         $product->addData([
@@ -114,8 +111,7 @@ class ProductDetailTest extends ProductContext
         $this->assertEquals('product title nl variant option_title nl', $productDetail->getTitle());
     }
 
-    /** @test */
-    public function it_can_add_images()
+    public function test_it_can_add_images()
     {
         $product = $this->createProductWithOptions();
         $this->productRepository->save($product);

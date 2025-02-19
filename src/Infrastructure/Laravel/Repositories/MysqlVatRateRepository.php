@@ -6,7 +6,7 @@ namespace Thinktomorrow\Trader\Infrastructure\Laravel\Repositories;
 use Illuminate\Support\Facades\DB;
 use Psr\Container\ContainerInterface;
 use Ramsey\Uuid\Uuid;
-use Thinktomorrow\Trader\Domain\Common\Taxes\TaxRate;
+use Thinktomorrow\Trader\Domain\Common\Vat\VatPercentage;
 use Thinktomorrow\Trader\Domain\Model\Country\CountryId;
 use Thinktomorrow\Trader\Domain\Model\VatRate\BaseRate;
 use Thinktomorrow\Trader\Domain\Model\VatRate\BaseRateId;
@@ -33,7 +33,7 @@ class MysqlVatRateRepository implements VatRateRepository
     {
         $state = $vatRate->getMappedData();
 
-        if (! $this->exists($vatRate->vatRateId)) {
+        if (!$this->exists($vatRate->vatRateId)) {
             DB::table(static::$vatRateTable)->insert($state);
         } else {
             DB::table(static::$vatRateTable)->where('vat_rate_id', $vatRate->vatRateId->get())->update($state);
@@ -63,7 +63,7 @@ class MysqlVatRateRepository implements VatRateRepository
             ->where(static::$vatRateTable . '.vat_rate_id', $vatRateId->get())
             ->first();
 
-        if (! $vatRateState) {
+        if (!$vatRateState) {
             throw new CouldNotFindVatRate('No vatRate found by id [' . $vatRateId->get() . ']');
         }
 
@@ -95,7 +95,7 @@ class MysqlVatRateRepository implements VatRateRepository
             ->where(static::$baseRateTable . '.target_vat_rate_id', $vatRateId)
             ->select([static::$baseRateTable . '.*', static::$vatRateTable . '.rate'])
             ->get()
-            ->map(fn ($item) => (array)$item)
+            ->map(fn($item) => (array)$item)
             ->toArray();
 
         return VatRate::fromMappedData((array)$vatRateState, [
@@ -103,7 +103,7 @@ class MysqlVatRateRepository implements VatRateRepository
         ]);
     }
 
-    public function getVatRatesForCountry(CountryId $countryId): iterable
+    public function getVatRatesForCountry(CountryId $countryId): array
     {
         $vatRateStates = DB::table(static::$vatRateTable)
             ->where('country_id', $countryId->get())
@@ -111,9 +111,9 @@ class MysqlVatRateRepository implements VatRateRepository
             ->orderBy('order_column', 'ASC')
             ->get();
 
-        foreach ($vatRateStates as $vatRateState) {
-            yield $this->makeWithChildEntities($vatRateState->vat_rate_id, $vatRateState);
-        }
+        return collect($vatRateStates)->mapWithKeys(function ($vatRateState) {
+            return [$vatRateState->vat_rate_id => $this->makeWithChildEntities($vatRateState->vat_rate_id, $vatRateState)];
+        })->toArray();
     }
 
     public function findStandardVatRateForCountry(CountryId $countryId): ?VatRate
@@ -125,28 +125,28 @@ class MysqlVatRateRepository implements VatRateRepository
             ->orderBy('order_column', 'ASC')
             ->first();
 
-        if (! $vatRateState) {
+        if (!$vatRateState) {
             return null;
         }
 
         return $this->makeWithChildEntities($vatRateState->vat_rate_id, $vatRateState);
     }
 
-    public function getPrimaryVatRates(): iterable
+    public function getPrimaryVatRates(): array
     {
         $primaryCountryId = CountryId::fromString(app(TraderConfig::class)->getPrimaryVatCountry());
 
         return $this->getVatRatesForCountry($primaryCountryId);
     }
 
-    public function getStandardPrimaryVatRate(): TaxRate
+    public function getStandardPrimaryVatRate(): VatPercentage
     {
         $primaryCountryId = CountryId::fromString(app(TraderConfig::class)->getPrimaryVatCountry());
 
         $standardVatRate = $this->findStandardVatRateForCountry($primaryCountryId);
 
-        if (! $standardVatRate) {
-            return TaxRate::fromString(app(TraderConfig::class)->getFallBackStandardVatRate());
+        if (!$standardVatRate) {
+            return VatPercentage::fromString(app(TraderConfig::class)->getFallBackStandardVatRate());
         }
 
         return $standardVatRate->getRate();

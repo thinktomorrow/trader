@@ -12,8 +12,7 @@ use Thinktomorrow\Trader\Domain\Model\Product\Personalisation\PersonalisationTyp
 
 class CartReadTest extends CartContext
 {
-    /** @test */
-    public function in_order_to_know_how_much_to_pay_as_a_visitor__i_need_to_be_able_to_see_the_cart_totals()
+    public function test_in_order_to_know_how_much_to_pay_as_a_visitor__i_need_to_be_able_to_see_the_cart_totals()
     {
         $this->givenThereIsAProductWhichCostsEur('aaa', 5);
         $this->whenIAddTheVariantToTheCart('aaa-123', 2);
@@ -43,8 +42,7 @@ class CartReadTest extends CartContext
     }
 
 
-    /** @test */
-    public function in_order_to_confirm_my_product_choice_as_a_visitor__i_need_to_be_able_to_see_each_line_of_my_cart()
+    public function test_in_order_to_confirm_my_product_choice_as_a_visitor__i_need_to_be_able_to_see_each_line_of_my_cart()
     {
         $this->orderRepository->setNextLineReference('foobar');
 
@@ -70,8 +68,7 @@ class CartReadTest extends CartContext
         $this->assertCount(0, $line->getDiscounts());
     }
 
-    /** @test */
-    public function it_can_show_line_prices_without_tax_for_business_accounts()
+    public function test_it_can_show_line_prices_without_tax_for_business_accounts()
     {
         $this->givenThereIsAProductWhichCostsEur('lightsaber', 5);
         $this->whenIAddTheVariantToTheCart('lightsaber-123', 2);
@@ -98,8 +95,7 @@ class CartReadTest extends CartContext
         $this->assertEquals('€ 1,67', $line->getTaxPrice()); // tax is 20%
     }
 
-    /** @test */
-    public function it_can_see_shipping_address()
+    public function test_it_can_see_shipping_address()
     {
         $this->givenThereIsAProductWhichCostsEur('lightsaber', 5);
         $this->whenIAddTheVariantToTheCart('lightsaber-123', 2);
@@ -116,8 +112,7 @@ class CartReadTest extends CartContext
         $this->assertNull($cart->getShippingAddress()->getDescription());
     }
 
-    /** @test */
-    public function it_can_see_billing_address()
+    public function test_it_can_see_billing_address()
     {
         $this->givenThereIsAProductWhichCostsEur('lightsaber', 5);
         $this->whenIAddTheVariantToTheCart('lightsaber-123', 2);
@@ -134,8 +129,7 @@ class CartReadTest extends CartContext
         $this->assertNull($cart->getBillingAddress()->getDescription());
     }
 
-    /** @test */
-    public function it_can_check_if_address_equals_other_address()
+    public function test_it_can_check_if_address_equals_other_address()
     {
         $this->givenThereIsAProductWhichCostsEur('lightsaber', 5);
         $this->whenIAddTheVariantToTheCart('lightsaber-123', 2);
@@ -151,8 +145,7 @@ class CartReadTest extends CartContext
         $this->assertFalse($cart->getShippingAddress()->equalsAddress($cart->getBillingAddress()));
     }
 
-    /** @test */
-    public function it_can_see_shipping()
+    public function test_it_can_see_shipping()
     {
         $this->givenOrderHasAShippingCountry('BE');
         $this->givenShippingCostsForAPurchaseOfEur(30, 0, 1000);
@@ -170,8 +163,7 @@ class CartReadTest extends CartContext
         $this->assertEquals('Bpost Home', $cart->getShipping()->getTitle());
     }
 
-    /** @test */
-    public function it_can_see_payment()
+    public function test_it_can_see_payment()
     {
         $this->givenPaymentMethod(30, 'bancontact');
         $this->givenThereIsAProductWhichCostsEur('lightsaber', 5);
@@ -186,8 +178,7 @@ class CartReadTest extends CartContext
         $this->assertEquals('€ 30', $cart->getPayment()->getCostPrice());
     }
 
-    /** @test */
-    public function it_can_see_personalisations()
+    public function test_it_can_see_personalisations()
     {
         $this->givenThereIsAProductWhichCostsEur('lightsaber', 5);
         $this->givenThereIsAProductPersonalisation('lightsaber', [
@@ -219,7 +210,7 @@ class CartReadTest extends CartContext
             [
                 'personalisation_id' => 'xxx',
                 'personalisation_type' => PersonalisationType::TEXT,
-                'data' => ['label' => ['nl' => 'label nl' , 'en' => 'label en']],
+                'data' => ['label' => ['nl' => 'label nl', 'en' => 'label en']],
             ],
         ]);
         $this->whenIAddTheVariantToTheCart('lightsaber-123', 1, ['foo' => 'bar'], ['xxx' => 'foobar']);

@@ -14,13 +14,12 @@ use Thinktomorrow\Trader\Domain\Model\ShippingProfile\TariffId;
 
 class CreateShippingProfileTest extends ShippingProfileContext
 {
-    /** @test */
-    public function it_can_create_a_shipping_profile()
+    public function test_it_can_create_a_shipping_profile()
     {
         $shippingProfileId = $this->shippingProfileApplication->createShippingProfile(new CreateShippingProfile(
             'postnl',
             false,
-            ['BE','NL'],
+            ['BE', 'NL'],
             ['foo' => 'bar']
         ));
 
@@ -37,13 +36,12 @@ class CreateShippingProfileTest extends ShippingProfileContext
         $this->assertEquals(['foo' => 'bar'], $shippingProfile->getData());
     }
 
-    /** @test */
-    public function it_can_create_a_tariff()
+    public function test_it_can_create_a_tariff()
     {
         $shippingProfileId = $this->shippingProfileApplication->createShippingProfile(new CreateShippingProfile(
             'postnl',
             true,
-            ['BE','NL'],
+            ['BE', 'NL'],
             ['foo' => 'bar']
         ));
 

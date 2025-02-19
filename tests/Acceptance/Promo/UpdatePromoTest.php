@@ -11,8 +11,7 @@ use Thinktomorrow\Trader\Domain\Model\Promo\PromoId;
 
 class UpdatePromoTest extends PromoContext
 {
-    /** @test */
-    public function it_can_update_a_promo_with_discounts()
+    public function test_it_can_update_a_promo_with_discounts()
     {
         $promoId = $this->createPromo();
 
@@ -49,8 +48,7 @@ class UpdatePromoTest extends PromoContext
         $this->assertInstanceOf(FixedAmountDiscount::class, $this->promoRepository->find($promoId)->getDiscounts()[0]);
     }
 
-    /** @test */
-    public function it_can_update_a_promo_with_discount_and_conditions()
+    public function test_it_can_update_a_promo_with_discount_and_conditions()
     {
         $promoId = $this->createPromo();
 
