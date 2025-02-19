@@ -9,6 +9,7 @@ use Thinktomorrow\Trader\Application\VatRate\CreateVatRate;
 use Thinktomorrow\Trader\Application\VatRate\VatRateApplication;
 use Thinktomorrow\Trader\Infrastructure\Test\EventDispatcherSpy;
 use Thinktomorrow\Trader\Infrastructure\Test\Repositories\InMemoryVatRateRepository;
+use Thinktomorrow\Trader\Infrastructure\Test\TestTraderConfig;
 
 class VatRateContext extends TestCase
 {
@@ -22,7 +23,7 @@ class VatRateContext extends TestCase
 
         $this->vatRateApplication = new VatRateApplication(
             $this->eventDispatcher = new EventDispatcherSpy(),
-            $this->vatRateRepository = new InMemoryVatRateRepository(),
+            $this->vatRateRepository = new InMemoryVatRateRepository(new TestTraderConfig()),
         );
     }
 

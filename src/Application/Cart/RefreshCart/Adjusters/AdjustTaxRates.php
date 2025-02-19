@@ -6,17 +6,14 @@ use Thinktomorrow\Trader\Application\Cart\RefreshCart\Adjuster;
 use Thinktomorrow\Trader\Application\Cart\VariantForCart\VariantForCartRepository;
 use Thinktomorrow\Trader\Application\VatRate\FindVatRateForOrder;
 use Thinktomorrow\Trader\Domain\Model\Order\Order;
-use Thinktomorrow\Trader\Domain\Model\VatRate\VatRateRepository;
 
 class AdjustTaxRates implements Adjuster
 {
-    private VatRateRepository $vatRateRepository;
     private VariantForCartRepository $variantForCartRepository;
     private FindVatRateForOrder $findVatRateForOrder;
 
-    public function __construct(VatRateRepository $vatRateRepository, VariantForCartRepository $variantForCartRepository, FindVatRateForOrder $findVatRateForOrder)
+    public function __construct(VariantForCartRepository $variantForCartRepository, FindVatRateForOrder $findVatRateForOrder)
     {
-        $this->vatRateRepository = $vatRateRepository;
         $this->variantForCartRepository = $variantForCartRepository;
         $this->findVatRateForOrder = $findVatRateForOrder;
     }
