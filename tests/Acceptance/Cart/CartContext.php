@@ -130,7 +130,7 @@ abstract class CartContext extends TestCase
         $this->cartRepository = new InMemoryCartRepository();
         $this->merchantOrderRepository = new InMemoryMerchantOrderRepository();
         $this->vatRateRepository = new InMemoryVatRateRepository(new TestTraderConfig());
-        $this->findVatRateForOrder = new FindVatRateForOrder($this->vatRateRepository);
+        $this->findVatRateForOrder = new FindVatRateForOrder(new TestTraderConfig(), $this->vatRateRepository);
         $this->promoRepository = new InMemoryPromoRepository(
             new DiscountFactory([
                 FixedAmountDiscount::class,
@@ -151,7 +151,7 @@ abstract class CartContext extends TestCase
         (new TestContainer())->add(ApplyPromoToOrder::class, new ApplyPromoToOrder($this->orderRepository));
         (new TestContainer())->add(AdjustLine::class, new DefaultAdjustLine());
         (new TestContainer())->add(AdjustLines::class, new AdjustLines(new InMemoryVariantRepository(), TestContainer::make(AdjustLine::class)));
-        (new TestContainer())->add(AdjustTaxRates::class, new AdjustTaxRates($this->vatRateRepository, $this->variantRepository, $this->findVatRateForOrder));
+        (new TestContainer())->add(AdjustTaxRates::class, new AdjustTaxRates($this->variantRepository, new FindVatRateForOrder(new TestTraderConfig(), $this->vatRateRepository)));
         (new TestContainer())->add(AdjustDiscounts::class, new AdjustDiscounts($this->promoRepository, (new TestContainer())->get(ApplyPromoToOrder::class)));
         (new TestContainer())->add(OrderStateMachine::class, new OrderStateMachine([
             ...DefaultOrderState::customerStates(), DefaultOrderState::confirmed,
@@ -208,6 +208,7 @@ abstract class CartContext extends TestCase
     public function tearDown(): void
     {
         $this->clearRepositories();
+        $this->resetMemoizedVatPercentages();
     }
 
     private function clearRepositories()
@@ -218,6 +219,12 @@ abstract class CartContext extends TestCase
         $this->shippingProfileRepository->clear();
         $this->paymentMethodRepository->clear();
         $this->promoRepository->clear();
+        $this->vatRateRepository->clear();
+    }
+
+    protected function resetMemoizedVatPercentages(): void
+    {
+        $this->findVatRateForOrder = new FindVatRateForOrder(new TestTraderConfig(), $this->vatRateRepository);
     }
 
     protected function givenThereIsAProductWhichCostsEur($productTitle, $price)
@@ -380,7 +387,7 @@ abstract class CartContext extends TestCase
             }
         }
 
-        if (! $checkFlag) {
+        if (!$checkFlag) {
             throw new \Exception('Cartitem presence check failed. No line found by ' . $productVariantId);
         }
     }
@@ -406,7 +413,7 @@ abstract class CartContext extends TestCase
             }
         }
 
-        if (! $checkFlag) {
+        if (!$checkFlag) {
             throw new \Exception('Cartitem presence check failed. No line found by ' . $productVariantId);
         }
     }
@@ -561,7 +568,7 @@ abstract class CartContext extends TestCase
             }
         }
 
-        if (! $line) {
+        if (!$line) {
             throw new \Exception('No line found by ' . $productVariantId);
         }
 

@@ -13,6 +13,7 @@ use Thinktomorrow\Trader\Domain\Model\Order\OrderReference;
 use Thinktomorrow\Trader\Domain\Model\Order\State\DefaultOrderState;
 use Thinktomorrow\Trader\Domain\Model\VatRate\BaseRate;
 use Thinktomorrow\Trader\Domain\Model\VatRate\VatRate;
+use Thinktomorrow\Trader\Infrastructure\Test\TestTraderConfig;
 
 class FindVatRateForOrderTest extends VatRateContext
 {
@@ -22,13 +23,13 @@ class FindVatRateForOrderTest extends VatRateContext
     {
         parent::setUp();
 
-        $this->findVatRateForOrder = new FindVatRateForOrder($this->vatRateRepository);
+        $this->findVatRateForOrder = new FindVatRateForOrder(new TestTraderConfig(), $this->vatRateRepository);
     }
 
     public function tearDown(): void
     {
         $this->orderRepository->clear();
-        $this->findVatRateForOrder = new FindVatRateForOrder($this->vatRateRepository);
+        $this->findVatRateForOrder = new FindVatRateForOrder(new TestTraderConfig(), $this->vatRateRepository);
 
         parent::tearDown();
     }
@@ -83,6 +84,30 @@ class FindVatRateForOrderTest extends VatRateContext
 
         $order = $this->getOrder('BE');
         $variantVatPercentage = VatPercentage::fromString('21');
+
+        $result = $this->findVatRateForOrder->findForLine($order, $variantVatPercentage);
+
+        $this->assertEquals($variantVatPercentage, $result);
+    }
+
+    public function test_it_should_not_affect_line_vat_when_primary_country_rate_applies()
+    {
+        $this->createVatRate('BE', '10');
+
+        $order = $this->getOrder('BE');
+        $variantVatPercentage = VatPercentage::fromString('20');
+
+        $result = $this->findVatRateForOrder->findForLine($order, $variantVatPercentage);
+
+        $this->assertEquals($variantVatPercentage, $result);
+    }
+
+    public function test_it_should_not_affect_line_vat_billing_country_has_no_rates()
+    {
+        $this->createVatRate('NL', '10');
+
+        $order = $this->getOrder('FR');
+        $variantVatPercentage = VatPercentage::fromString('20');
 
         $result = $this->findVatRateForOrder->findForLine($order, $variantVatPercentage);
 

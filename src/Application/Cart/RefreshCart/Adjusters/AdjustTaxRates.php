@@ -23,6 +23,9 @@ class AdjustTaxRates implements Adjuster
         $this->adjustLinePrices($order);
         $this->adjustShippingCosts($order);
         $this->adjustPaymentCosts($order);
+
+        // Allows to sequentially adjust the vat rates for the same order
+        $this->findVatRateForOrder->clearMemoizedVatRates();
     }
 
     private function adjustLinePrices(Order $order): void
@@ -36,20 +39,25 @@ class AdjustTaxRates implements Adjuster
             $vatPercentage = $this->findVatRateForOrder->findForLine($order, $originalVatPercentage);
 
             $linePrice = $line->getLinePrice();
-            $linePrice = $linePrice->changeVatPercentage($vatPercentage);
-            $line->updatePrice($linePrice);
+
+            if (!$linePrice->getVatPercentage()->equals($vatPercentage)) {
+                $linePrice = $linePrice->changeVatPercentage($vatPercentage);
+                $line->updatePrice($linePrice);
+            }
         }
     }
 
     private function adjustShippingCosts(Order $order): void
     {
         foreach ($order->getShippings() as $shipping) {
-
             $vatPercentage = $this->findVatRateForOrder->findForShippingCost($order);
 
             $shippingCost = $shipping->getShippingCost();
-            $shippingCost = $shippingCost->changeVatPercentage($vatPercentage);
-            $shipping->updateCost($shippingCost);
+
+            if (!$shippingCost->getVatPercentage()->equals($vatPercentage)) {
+                $shippingCost = $shippingCost->changeVatPercentage($vatPercentage);
+                $shipping->updateCost($shippingCost);
+            }
         }
     }
 
@@ -60,8 +68,11 @@ class AdjustTaxRates implements Adjuster
             $vatPercentage = $this->findVatRateForOrder->findForPaymentCost($order);
 
             $paymentCost = $payment->getPaymentCost();
-            $paymentCost = $paymentCost->changeVatPercentage($vatPercentage);
-            $payment->updateCost($paymentCost);
+
+            if (!$paymentCost->getVatPercentage()->equals($vatPercentage)) {
+                $paymentCost = $paymentCost->changeVatPercentage($vatPercentage);
+                $payment->updateCost($paymentCost);
+            }
         }
     }
 }

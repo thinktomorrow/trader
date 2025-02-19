@@ -6,21 +6,26 @@ use Thinktomorrow\Trader\Domain\Common\Vat\VatPercentage;
 use Thinktomorrow\Trader\Domain\Model\Order\Order;
 use Thinktomorrow\Trader\Domain\Model\VatRate\VatRate;
 use Thinktomorrow\Trader\Domain\Model\VatRate\VatRateRepository;
+use Thinktomorrow\Trader\TraderConfig;
 
 class FindVatRateForOrder
 {
     /** @var array memoized array of vatRates per given OrderId */
-    private array $vatRatesPerOrder = [];
+    private array $countryVatPerOrder = [];
 
     private ?VatPercentage $standardPrimaryVatRate = null;
 
-    public function __construct(private VatRateRepository $vatRateRepository)
+    public function __construct(private TraderConfig $config, private VatRateRepository $vatRateRepository)
     {
 
     }
 
     public function findForLine(Order $order, VatPercentage $variantVatPercentage): VatPercentage
     {
+        if (!$this->doesOrderHasBillingCountryOtherThanPrimary($order)) {
+            return $variantVatPercentage;
+        }
+
         $vatRates = $this->getVatRatesForOrder($order);
 
         foreach ($vatRates as $vatRate) {
@@ -29,7 +34,9 @@ class FindVatRateForOrder
             }
         }
 
-        return $this->getStandardVatPercentageForOrder($order);
+        return ($countryVat = $this->getStandardCountryVatForOrder($order))
+            ? $countryVat->getRate()
+            : $variantVatPercentage;
     }
 
     /**
@@ -50,7 +57,7 @@ class FindVatRateForOrder
 
     private function getStandardVatPercentageForOrder(Order $order): VatPercentage
     {
-        return ($applicableVatRate = $this->getStandardVatRateForOrder($order)) ? $applicableVatRate->getRate() : $this->getStandardPrimaryVatRate();
+        return ($countryVat = $this->getStandardCountryVatForOrder($order)) ? $countryVat->getRate() : $this->getStandardPrimaryVatRate();
     }
 
     private function getStandardPrimaryVatRate(): VatPercentage
@@ -58,11 +65,11 @@ class FindVatRateForOrder
         return $this->standardPrimaryVatRate ?? $this->standardPrimaryVatRate = $this->vatRateRepository->getStandardPrimaryVatRate();
     }
 
-    private function getStandardVatRateForOrder(Order $order): ?VatRate
+    private function getStandardCountryVatForOrder(Order $order): ?VatRate
     {
-        $applicableVatRates = $this->getVatRatesForOrder($order);
+        $countryVatRates = $this->getVatRatesForOrder($order);
 
-        foreach ($applicableVatRates as $applicableVatRate) {
+        foreach ($countryVatRates as $applicableVatRate) {
             if ($applicableVatRate->isStandard()) {
                 return $applicableVatRate;
             }
@@ -76,18 +83,37 @@ class FindVatRateForOrder
      */
     private function getVatRatesForOrder(Order $order): array
     {
-        if (isset($this->vatRatesPerOrder[$order->orderId->get()])) {
-            return $this->vatRatesPerOrder[$order->orderId->get()];
+        if (isset($this->countryVatPerOrder[$order->orderId->get()])) {
+            return $this->countryVatPerOrder[$order->orderId->get()];
         }
 
-        if (! $billingCountryId = $order->getBillingAddress()?->getAddress()?->countryId) {
-            return [];
+        if (!$billingCountryId = $order->getBillingAddress()?->getAddress()?->countryId) {
+            return $this->countryVatPerOrder[$order->orderId->get()] = [];
         }
 
-        if (! $countryVatRates = $this->vatRateRepository->getVatRatesForCountry($billingCountryId)) {
-            return [];
+        if (!$this->doesOrderHasBillingCountryOtherThanPrimary($order)) {
+            return $this->countryVatPerOrder[$order->orderId->get()] = [];
         }
 
-        return $this->vatRatesPerOrder[$order->orderId->get()] = $countryVatRates;
+        if (!$countryVatRates = $this->vatRateRepository->getVatRatesForCountry($billingCountryId)) {
+            return $this->countryVatPerOrder[$order->orderId->get()] = [];
+        }
+
+        return $this->countryVatPerOrder[$order->orderId->get()] = $countryVatRates;
+    }
+
+    private function doesOrderHasBillingCountryOtherThanPrimary(Order $order): bool
+    {
+        if (!$billingCountryId = $order->getBillingAddress()?->getAddress()?->countryId) {
+            return false;
+        }
+
+        return $billingCountryId->get() != $this->config->getPrimaryVatCountry();
+    }
+
+    public function clearMemoizedVatRates(): void
+    {
+        $this->countryVatPerOrder = [];
+        $this->standardPrimaryVatRate = null;
     }
 }
