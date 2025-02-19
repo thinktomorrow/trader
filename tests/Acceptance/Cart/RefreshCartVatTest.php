@@ -97,7 +97,7 @@ class RefreshCartVatTest extends CartContext
         $this->whenIAddTheVariantToTheCart('aaa-123', 1);
         $this->whenIChooseShipping('bpost_home');
 
-//        // Apply shipping
+        //        // Apply shipping
         $this->cartApplication->refresh(new RefreshCart('xxx'));
 
         // Check unchanged cost first
