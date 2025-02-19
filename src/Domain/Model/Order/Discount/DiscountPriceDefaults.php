@@ -17,7 +17,7 @@ class DiscountPriceDefaults
 
     public static function getDiscountTaxRate(): VatPercentage
     {
-        if (!isset(static::$discountTaxRate)) {
+        if (! isset(static::$discountTaxRate)) {
             throw new \DomainException('Please set the default tax rate for the discount. Use the DiscountTotal::setDiscountTaxRate() method.');
         }
 
@@ -31,7 +31,7 @@ class DiscountPriceDefaults
 
     public static function getDiscountIncludeTax(): bool
     {
-        if (!isset(static::$discountIncludeTax)) {
+        if (! isset(static::$discountIncludeTax)) {
             throw new \DomainException('Please set the default includeTax for the discount. Use the DiscountTotal::setDiscountIncludeTax() method.');
         }
 

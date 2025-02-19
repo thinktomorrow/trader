@@ -3,7 +3,6 @@
 namespace Thinktomorrow\Trader\Application\VatRate;
 
 use Thinktomorrow\Trader\Domain\Common\Vat\VatPercentage;
-use Thinktomorrow\Trader\Domain\Model\Order\Line\Line;
 use Thinktomorrow\Trader\Domain\Model\Order\Order;
 use Thinktomorrow\Trader\Domain\Model\VatRate\VatRate;
 use Thinktomorrow\Trader\Domain\Model\VatRate\VatRateRepository;
@@ -77,13 +76,15 @@ class FindVatRateForOrder
      */
     private function getVatRatesForOrder(Order $order): array
     {
-        if (isset($this->vatRatesPerOrder[$order->orderId->get()])) return $this->vatRatesPerOrder[$order->orderId->get()];
+        if (isset($this->vatRatesPerOrder[$order->orderId->get()])) {
+            return $this->vatRatesPerOrder[$order->orderId->get()];
+        }
 
-        if (!$billingCountryId = $order->getBillingAddress()?->getAddress()?->countryId) {
+        if (! $billingCountryId = $order->getBillingAddress()?->getAddress()?->countryId) {
             return [];
         }
 
-        if (!$countryVatRates = $this->vatRateRepository->getVatRatesForCountry($billingCountryId)) {
+        if (! $countryVatRates = $this->vatRateRepository->getVatRatesForCountry($billingCountryId)) {
             return [];
         }
 

@@ -5,7 +5,6 @@ namespace Thinktomorrow\Trader\Application\Cart\PaymentMethod;
 
 use Psr\Container\ContainerInterface;
 use Thinktomorrow\Trader\Application\VatRate\FindVatRateForOrder;
-use Thinktomorrow\Trader\Domain\Common\Vat\VatPercentage;
 use Thinktomorrow\Trader\Domain\Model\Order\Order;
 use Thinktomorrow\Trader\Domain\Model\Order\OrderRepository;
 use Thinktomorrow\Trader\Domain\Model\Order\Payment\Payment;
@@ -38,7 +37,7 @@ class UpdatePaymentMethodOnOrder
     {
         $paymentMethod = $this->paymentMethodRepository->find($paymentMethodId);
 
-        if (!$this->verifyPaymentMethodForCart->verify($order, $paymentMethod)) {
+        if (! $this->verifyPaymentMethodForCart->verify($order, $paymentMethod)) {
             $this->removePaymentMethodFromOrder($order);
 
             return;

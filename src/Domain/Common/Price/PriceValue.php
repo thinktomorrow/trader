@@ -66,7 +66,7 @@ trait PriceValue
 
     public function getExcludingVat(): Money
     {
-        if (!$this->includesVat) {
+        if (! $this->includesVat) {
             return $this->money;
         }
 
@@ -144,7 +144,7 @@ trait PriceValue
 
     private function assertSameTaxRates(Price $otherPrice): void
     {
-        if (!$otherPrice->getVatPercentage()->equals($this->getVatPercentage())) {
+        if (! $otherPrice->getVatPercentage()->equals($this->getVatPercentage())) {
             throw new PriceCannotContainMultipleTaxRates($otherPrice->getVatPercentage() . ' differs from expected ' . $this->getVatPercentage());
         }
     }
