@@ -45,7 +45,7 @@ class VatTotals
             }
         }
 
-        if (!$match) {
+        if (! $match) {
             $vatTotals[] = new VatTotal($vatPercentage, $taxableTotal);
         }
 
@@ -64,7 +64,7 @@ class VatTotals
             }
         }
 
-        if (!$match) {
+        if (! $match) {
             $vatTotals[] = new VatTotal($vatPercentage, $vatApplicableTotal->negative());
         }
 
@@ -91,7 +91,7 @@ class VatTotals
     {
         $total = array_reduce(
             $this->vatTotals,
-            fn(VatApplicableTotal $carry, VatTotal $vatTotal) => $carry->add($vatTotal->getVatApplicableTotal()),
+            fn (VatApplicableTotal $carry, VatTotal $vatTotal) => $carry->add($vatTotal->getVatApplicableTotal()),
             VatApplicableTotal::zero(VatTotal::VAT_CALCULATION_PRECISION)
         );
 
@@ -102,7 +102,7 @@ class VatTotals
     {
         $total = array_reduce(
             $this->vatTotals,
-            fn($carry, VatTotal $taxRateTotal) => $carry->add($taxRateTotal->getPreciseVatTotal()->getPreciseMoney()),
+            fn ($carry, VatTotal $taxRateTotal) => $carry->add($taxRateTotal->getPreciseVatTotal()->getPreciseMoney()),
             Cash::zero()
         );
 
@@ -130,7 +130,7 @@ class VatTotals
         foreach ($vatApplicables as $vatApplicable) {
             $key = $vatApplicable->getVatPercentage()->toPercentage()->get();
 
-            if (!isset($totalsPerRate[$key])) {
+            if (! isset($totalsPerRate[$key])) {
                 $totalsPerRate[$key] = VatTotal::zero($vatApplicable->getVatPercentage());
             }
 

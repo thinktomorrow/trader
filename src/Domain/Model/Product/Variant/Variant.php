@@ -112,7 +112,7 @@ final class Variant implements ChildEntity
             'includes_vat' => $this->unitPrice->includesVat(),
             'sku' => $this->sku,
             'ean' => $this->ean,
-            'option_value_ids' => array_map(fn($optionValueId) => $optionValueId->get(), $this->optionValueIds),
+            'option_value_ids' => array_map(fn ($optionValueId) => $optionValueId->get(), $this->optionValueIds),
             'show_in_grid' => $this->show_in_grid,
             'data' => json_encode($this->data),
         ];
@@ -132,7 +132,7 @@ final class Variant implements ChildEntity
         $variant->show_in_grid = $state['show_in_grid'] ? (bool)$state['show_in_grid'] : false;
         $variant->data = json_decode($state['data'], true);
 
-        $variant->optionValueIds = array_map(fn($optionValueState) => OptionValueId::fromString($optionValueState), $state['option_value_ids']);
+        $variant->optionValueIds = array_map(fn ($optionValueState) => OptionValueId::fromString($optionValueState), $state['option_value_ids']);
 
         return $variant;
     }

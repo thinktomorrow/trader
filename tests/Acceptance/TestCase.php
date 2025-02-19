@@ -32,7 +32,7 @@ class TestCase extends \PHPUnit\Framework\TestCase
         DefaultLocale::set(Locale::fromString('nl'));
 
         DataRenderer::setDataResolver(function (array $data, string $key, ?string $language = null, ?string $default = null) {
-            if (!$language) {
+            if (! $language) {
                 $language = 'nl';
             }
 
@@ -51,7 +51,7 @@ class TestCase extends \PHPUnit\Framework\TestCase
         $this->orderRepository = new InMemoryOrderRepository();
         $this->paymentMethodRepository = new InMemoryPaymentMethodRepository();
 
-//        (new TestContainer())->add(VerifyPaymentMethodForCart::class, new DefaultVerifyPaymentMethodForCart());
-//        (new TestContainer())->add(UpdatePaymentMethodOnOrder::class, new UpdatePaymentMethodOnOrder(new TestContainer(), new TestTraderConfig(), $this->orderRepository, (new TestContainer())->get(VerifyPaymentMethodForCart::class), $this->paymentMethodRepository));
+        //        (new TestContainer())->add(VerifyPaymentMethodForCart::class, new DefaultVerifyPaymentMethodForCart());
+        //        (new TestContainer())->add(UpdatePaymentMethodOnOrder::class, new UpdatePaymentMethodOnOrder(new TestContainer(), new TestTraderConfig(), $this->orderRepository, (new TestContainer())->get(VerifyPaymentMethodForCart::class), $this->paymentMethodRepository));
     }
 }

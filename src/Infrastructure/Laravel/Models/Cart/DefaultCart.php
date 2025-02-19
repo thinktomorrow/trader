@@ -93,7 +93,7 @@ class DefaultCart implements Cart
 
     public function getQuantity(): int
     {
-        return array_reduce((array)$this->getLines(), fn($carry, $line) => $carry + $line->getQuantity(), 0);
+        return array_reduce((array)$this->getLines(), fn ($carry, $line) => $carry + $line->getQuantity(), 0);
     }
 
     public function includeTax(bool $includeTax = true): void
@@ -133,7 +133,7 @@ class DefaultCart implements Cart
 
     public function getShippingCost(?bool $includeTax = null): ?string
     {
-        if (!$this->shippingCost->getMoney()->isPositive()) {
+        if (! $this->shippingCost->getMoney()->isPositive()) {
             return null;
         }
 
@@ -152,7 +152,7 @@ class DefaultCart implements Cart
 
     public function getPaymentCost(?bool $includeTax = null): ?string
     {
-        if (!$this->paymentCost->getMoney()->isPositive()) {
+        if (! $this->paymentCost->getMoney()->isPositive()) {
             return null;
         }
 
@@ -171,7 +171,7 @@ class DefaultCart implements Cart
 
     public function getDiscountPrice(?bool $includeTax = null): ?string
     {
-        if (!$this->discountTotal->getMoney()->isPositive()) {
+        if (! $this->discountTotal->getMoney()->isPositive()) {
             return null;
         }
 

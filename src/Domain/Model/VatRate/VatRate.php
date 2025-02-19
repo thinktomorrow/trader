@@ -148,7 +148,7 @@ final class VatRate implements Aggregate
     public function getChildEntities(): array
     {
         return [
-            BaseRate::class => array_map(fn(BaseRate $baseRate) => $baseRate->getMappedData(), $this->baseRates),
+            BaseRate::class => array_map(fn (BaseRate $baseRate) => $baseRate->getMappedData(), $this->baseRates),
         ];
     }
 
@@ -161,7 +161,7 @@ final class VatRate implements Aggregate
         $object->isStandard = $state['is_standard'];
         $object->state = VatRateState::from($state['state']);
         $object->data = json_decode($state['data'], true);
-        $object->baseRates = array_map(fn($baseRateState) => BaseRate::fromMappedData($baseRateState, $state), $childEntities[BaseRate::class]);
+        $object->baseRates = array_map(fn ($baseRateState) => BaseRate::fromMappedData($baseRateState, $state), $childEntities[BaseRate::class]);
 
         return $object;
     }

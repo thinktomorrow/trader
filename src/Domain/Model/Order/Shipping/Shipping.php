@@ -96,7 +96,7 @@ final class Shipping implements ChildAggregate, Discountable
     public function getChildEntities(): array
     {
         return [
-            Discount::class => array_map(fn($discount) => $discount->getMappedData(), $this->discounts),
+            Discount::class => array_map(fn ($discount) => $discount->getMappedData(), $this->discounts),
         ];
     }
 
@@ -104,7 +104,7 @@ final class Shipping implements ChildAggregate, Discountable
     {
         $shipping = new static();
 
-        if (!$state['shipping_state'] instanceof ShippingState) {
+        if (! $state['shipping_state'] instanceof ShippingState) {
             throw new \InvalidArgumentException('Shipping state is expected to be instance of ShippingState. Instead ' . gettype($state['shipping_state']) . ' is passed.');
         }
 
@@ -117,7 +117,7 @@ final class Shipping implements ChildAggregate, Discountable
             $state['tax_rate'],
             $state['includes_vat']
         );
-        $shipping->discounts = array_map(fn($discountState) => Discount::fromMappedData($discountState, $state), $childEntities[Discount::class]);
+        $shipping->discounts = array_map(fn ($discountState) => Discount::fromMappedData($discountState, $state), $childEntities[Discount::class]);
         $shipping->data = json_decode($state['data'], true);
 
         return $shipping;

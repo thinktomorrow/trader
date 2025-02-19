@@ -150,7 +150,7 @@ class GridRepositoryTest extends TestCase
 
         $this->assertCount(3, $gridItems);
 
-        $titles = $gridItems->map(fn($gridItem) => $gridItem->getTitle());
+        $titles = $gridItems->map(fn ($gridItem) => $gridItem->getTitle());
 
         $expected = $titles->toArray();
         natcasesort($expected);
@@ -164,7 +164,7 @@ class GridRepositoryTest extends TestCase
 
         $this->assertCount(3, $gridItems);
 
-        $titles = $gridItems->map(fn($gridItem) => $gridItem->getTitle());
+        $titles = $gridItems->map(fn ($gridItem) => $gridItem->getTitle());
 
         $expected = $titles->toArray();
         natcasesort($expected);

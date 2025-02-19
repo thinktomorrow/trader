@@ -72,7 +72,7 @@ class ShippingTest extends TestCase
         $this->assertEquals(ShippingCost::fromMoney(Money::EUR(0), $shippingCost->getVatPercentage(), $shippingCost->includesVat()), $shipping->getShippingCostTotal());
 
         $this->assertEquals([
-            Discount::class => array_map(fn($discount) => $discount->getMappedData(), $shipping->getDiscounts()),
+            Discount::class => array_map(fn ($discount) => $discount->getMappedData(), $shipping->getDiscounts()),
         ], $shipping->getChildEntities());
     }
 
