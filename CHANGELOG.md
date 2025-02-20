@@ -23,6 +23,8 @@ the checkout and order.
 - Renamed Vat methods to better reflect its behavior. `getTaxRate` is now `getVatPercentage`, `getTaxableTotal` is now
   `getVatApplicableTotal`, `getTaxTotal` is now `getVatTotal` and `getPreciseTaxTotal` is now `getPreciseVatTotal`.
 
+- Added two config values to the trader config file: `fallback_standard_vat_rate` and `primary_vat_country`.
+
 ## 2024-05-01 - 0.6.6
 
 - Added: availability check for variant. `VariantLink::isVariantAvailable()`.

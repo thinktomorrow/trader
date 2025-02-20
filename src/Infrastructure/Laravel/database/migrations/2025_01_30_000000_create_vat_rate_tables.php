@@ -28,8 +28,8 @@ return new class extends Migration {
             $table->char('origin_vat_rate_id', 36);
             $table->char('target_vat_rate_id', 36);
 
-            $table->foreign('origin_vat_rate_id')->references('origin_vat_rate_id')->on(static::PREFIX . 'vat_rates')->onDelete('cascade');
-            $table->foreign('target_vat_rate_id')->references('target_vat_rate_id')->on(static::PREFIX . 'vat_rates')->onDelete('cascade');
+            $table->foreign('origin_vat_rate_id')->references('vat_rate_id')->on(static::PREFIX . 'vat_rates')->onDelete('cascade');
+            $table->foreign('target_vat_rate_id')->references('vat_rate_id')->on(static::PREFIX . 'vat_rates')->onDelete('cascade');
         });
     }
 

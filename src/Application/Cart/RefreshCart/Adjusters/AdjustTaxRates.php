@@ -40,7 +40,7 @@ class AdjustTaxRates implements Adjuster
 
             $linePrice = $line->getLinePrice();
 
-            if (! $linePrice->getVatPercentage()->equals($vatPercentage)) {
+            if (!$linePrice->getVatPercentage()->equals($vatPercentage)) {
                 $linePrice = $linePrice->changeVatPercentage($vatPercentage);
                 $line->updatePrice($linePrice);
             }
@@ -54,7 +54,7 @@ class AdjustTaxRates implements Adjuster
 
             $shippingCost = $shipping->getShippingCost();
 
-            if (! $shippingCost->getVatPercentage()->equals($vatPercentage)) {
+            if (!$shippingCost->getVatPercentage()->equals($vatPercentage)) {
                 $shippingCost = $shippingCost->changeVatPercentage($vatPercentage);
                 $shipping->updateCost($shippingCost);
             }
@@ -69,7 +69,7 @@ class AdjustTaxRates implements Adjuster
 
             $paymentCost = $payment->getPaymentCost();
 
-            if (! $paymentCost->getVatPercentage()->equals($vatPercentage)) {
+            if (!$paymentCost->getVatPercentage()->equals($vatPercentage)) {
                 $paymentCost = $paymentCost->changeVatPercentage($vatPercentage);
                 $payment->updateCost($paymentCost);
             }
