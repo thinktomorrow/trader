@@ -4,6 +4,7 @@ namespace Thinktomorrow\Trader\Domain\Model\Order\Line;
 
 use Thinktomorrow\Trader\Domain\Model\Order\Events\LineAdded;
 use Thinktomorrow\Trader\Domain\Model\Order\Events\LineDeleted;
+use Thinktomorrow\Trader\Domain\Model\Order\Events\LinePriceUpdated;
 use Thinktomorrow\Trader\Domain\Model\Order\Events\LineUpdated;
 use Thinktomorrow\Trader\Domain\Model\Order\Line\Personalisations\LinePersonalisation;
 use Thinktomorrow\Trader\Domain\Model\Product\Variant\VariantId;
@@ -24,7 +25,7 @@ trait HasLines
         return Quantity::fromInt(
             array_reduce(
                 $this->lines,
-                fn ($carry, Line $line) => $carry + $line->getQuantity()->asInt(),
+                fn($carry, Line $line) => $carry + $line->getQuantity()->asInt(),
                 0
             ),
         );
@@ -76,8 +77,11 @@ trait HasLines
     public function updateLinePrice(LineId $lineId, LinePrice $linePrice): void
     {
         if (null !== $lineIndexToBeUpdated = $this->findLineIndex($lineId)) {
-            $this->lines[$lineIndexToBeUpdated]->updatePrice($linePrice);
 
+            $formerPrice = $this->lines[$lineIndexToBeUpdated]->getLinePrice();
+
+            $this->lines[$lineIndexToBeUpdated]->updatePrice($linePrice);
+            $this->recordEvent(new LinePriceUpdated($this->orderId, $lineId, $formerPrice, $linePrice));
             $this->recordEvent(new LineUpdated($this->orderId, $lineId));
         }
     }

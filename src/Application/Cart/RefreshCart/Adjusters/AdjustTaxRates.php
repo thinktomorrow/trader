@@ -23,6 +23,7 @@ class AdjustTaxRates implements Adjuster
         $this->adjustLinePrices($order);
         $this->adjustShippingCosts($order);
         $this->adjustPaymentCosts($order);
+        $this->adjustDiscountVat($order);
 
         // Allows to sequentially adjust the vat rates for the same order
         $this->findVatRateForOrder->clearMemoizedVatRates();
@@ -37,12 +38,11 @@ class AdjustTaxRates implements Adjuster
             $originalVatPercentage = $variant->getSalePrice()->getVatPercentage();
 
             $vatPercentage = $this->findVatRateForOrder->findForLine($order, $originalVatPercentage);
-
             $linePrice = $line->getLinePrice();
 
             if (!$linePrice->getVatPercentage()->equals($vatPercentage)) {
                 $linePrice = $linePrice->changeVatPercentage($vatPercentage);
-                $line->updatePrice($linePrice);
+                $order->updateLinePrice($line->lineId, $linePrice);
             }
         }
     }
@@ -74,5 +74,10 @@ class AdjustTaxRates implements Adjuster
                 $payment->updateCost($paymentCost);
             }
         }
+    }
+
+    private function adjustDiscountVat(Order $order): void
+    {
+        // TODO: adjust vat for discounts as well...
     }
 }
