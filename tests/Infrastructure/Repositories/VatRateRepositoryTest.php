@@ -37,13 +37,13 @@ class VatRateRepositoryTest extends TestCase
         foreach ($this->repositories() as $i => $repository) {
             $this->prepareCountries($i);
 
-            $repository->save($vatRate);
-            $vatRate->releaseEvents();
-
             if ($originVatRate) {
                 $repository->save($originVatRate);
                 $originVatRate->releaseEvents();
             }
+
+            $repository->save($vatRate);
+            $vatRate->releaseEvents();
 
             $this->assertEquals($vatRate, $repository->find($vatRate->vatRateId));
         }
@@ -53,12 +53,18 @@ class VatRateRepositoryTest extends TestCase
      * @test
      * @dataProvider vatRates
      */
-    public function it_can_delete_a_vat_rate(VatRate $vatRate)
+    public function it_can_delete_a_vat_rate(VatRate $vatRate, ?VatRate $originVatRate = null)
     {
         $vatRatesNotFound = 0;
 
         foreach ($this->repositories() as $i => $repository) {
             $this->prepareCountries($i);
+
+            if ($originVatRate) {
+                $repository->save($originVatRate);
+                $originVatRate->releaseEvents();
+            }
+
             $repository->save($vatRate);
             $repository->delete($vatRate->vatRateId);
 
@@ -84,11 +90,11 @@ class VatRateRepositoryTest extends TestCase
         foreach ($this->repositories() as $i => $repository) {
             $this->prepareCountries($i);
 
-            $vatRate = $this->createVatRate([], ['rate' => '20']);
             $originVatRate = $this->createVatRate(['vat_rate_id' => 'originVatRate-123', 'country_id' => 'NL', 'rate' => '20'], ['rate' => '20']);
-
-            $repository->save($vatRate);
             $repository->save($originVatRate);
+
+            $vatRate = $this->createVatRate([], ['rate' => '20']);
+            $repository->save($vatRate);
 
             $this->assertEquals([$vatRate], iterator_to_array($repository->getVatRatesForCountry(CountryId::fromString('BE'))));
             $this->assertEquals([$originVatRate], iterator_to_array($repository->getVatRatesForCountry(CountryId::fromString('NL'))));
