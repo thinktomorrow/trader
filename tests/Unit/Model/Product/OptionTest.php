@@ -5,7 +5,7 @@ namespace Tests\Unit\Model\Product;
 
 use Money\Money;
 use PHPUnit\Framework\TestCase;
-use Thinktomorrow\Trader\Domain\Common\Taxes\TaxRate;
+use Thinktomorrow\Trader\Domain\Common\Vat\VatPercentage;
 use Thinktomorrow\Trader\Domain\Model\Product\Option\OptionValueId;
 use Thinktomorrow\Trader\Domain\Model\Product\ProductId;
 use Thinktomorrow\Trader\Domain\Model\Product\Variant\Variant;
@@ -15,18 +15,17 @@ use Thinktomorrow\Trader\Domain\Model\Product\Variant\VariantUnitPrice;
 
 class OptionTest extends TestCase
 {
-    /** @test */
-    public function a_variant_can_have_option_values()
+    public function test_a_variant_can_have_option_values()
     {
         $variant = Variant::create(
             $productId = ProductId::fromString('xxx'),
             $variantId = VariantId::fromString('yyy'),
             $productUnitPrice = VariantUnitPrice::fromMoney(
                 Money::EUR(10),
-                TaxRate::fromString('20'),
+                VatPercentage::fromString('20'),
                 false
             ),
-            $productSalePrice = VariantSalePrice::fromMoney(Money::EUR(8), TaxRate::fromString('20'), false),
+            $productSalePrice = VariantSalePrice::fromMoney(Money::EUR(8), VatPercentage::fromString('20'), false),
             'sku',
         );
 

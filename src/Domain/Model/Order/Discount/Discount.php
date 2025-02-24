@@ -54,7 +54,7 @@ final class Discount implements ChildEntity
             'promo_id' => $this->promoId?->get(),
             'promo_discount_id' => $this->promoDiscountId?->get(),
             'total' => $this->total->getIncludingVat()->getAmount(),
-            'tax_rate' => $this->total->getTaxRate()->toPercentage()->get(),
+            'tax_rate' => $this->total->getVatPercentage()->get(),
             'includes_vat' => $this->total->includesVat(),
             'data' => json_encode($data),
         ];

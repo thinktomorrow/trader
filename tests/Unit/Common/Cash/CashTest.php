@@ -12,8 +12,7 @@ use Thinktomorrow\Trader\Domain\Common\Locale;
 
 class CashTest extends TestCase
 {
-    /** @test */
-    public function it_can_get_money_instance_with_configurable_currency()
+    public function test_it_can_get_money_instance_with_configurable_currency()
     {
         $money = Cash::make(120, 'USD');
 
@@ -21,8 +20,7 @@ class CashTest extends TestCase
         $this->assertEquals('USD', $money->getCurrency()->getCode());
     }
 
-    /** @test */
-    public function it_can_represent_localised_money()
+    public function test_it_can_represent_localised_money()
     {
         $cash = Cash::from(Money::EUR(120));
         $this->assertEquals('€ 1,20', $cash->toLocalizedFormat(Locale::fromString('nl', 'BE')));
@@ -31,8 +29,7 @@ class CashTest extends TestCase
         $this->assertEquals('$ 1,20', $cash->toLocalizedFormat(Locale::fromString('nl', 'BE')));
     }
 
-    /** @test */
-    public function it_can_represent_money_in_specific_format()
+    public function test_it_can_represent_money_in_specific_format()
     {
         $this->assertEquals('1,20', Cash::from(Money::EUR(120))->toFormat(2, ','));
         $this->assertEquals('1,234.56', Cash::from(Money::EUR(123456))->toFormat(2, '.', ','));
@@ -40,22 +37,19 @@ class CashTest extends TestCase
         $this->assertEquals('15', Cash::from(Money::EUR(1455))->toFormat(0)); // format rounds off
     }
 
-    /** @test */
-    public function by_default_currency_code_is_used_as_symbol()
+    public function test_by_default_currency_code_is_used_as_symbol()
     {
         $cash = Cash::from(Money::AMD(120));
         $this->assertEquals('AMD 1,20', $cash->toLocalizedFormat(Locale::fromString('nl', 'BE')));
     }
 
-    /** @test */
-    public function it_can_get_percentage_of_money_values()
+    public function test_it_can_get_percentage_of_money_values()
     {
         $cash = Cash::from(Money::EUR(51));
         $this->assertEquals(Percentage::fromString("51.00"), $cash->asPercentage(Money::EUR(100)));
     }
 
-    /** @test */
-    public function it_can_get_percentage_with_specificity_of_2_decimals()
+    public function test_it_can_get_percentage_with_specificity_of_2_decimals()
     {
         $cash = Cash::from(Money::EUR(55));
 
@@ -67,8 +61,7 @@ class CashTest extends TestCase
         $this->assertEquals(Percentage::fromString('46'), $cash->asPercentage(Money::EUR(120), 0));
     }
 
-    /** @test */
-    public function it_can_get_new_result_as_percentage_of_original()
+    public function test_it_can_get_new_result_as_percentage_of_original()
     {
         $money = new Money(1000, new Currency('EUR'));
         $percentaged = Cash::from($money)->percentage('50');
@@ -79,8 +72,7 @@ class CashTest extends TestCase
         $this->assertEquals(Money::EUR(50), Cash::from(Money::EUR(500))->percentage('10.0'));
     }
 
-    /** @test */
-    public function percentage_can_be_rounded()
+    public function test_percentage_can_be_rounded()
     {
         $money = new Money(1000, new Currency('EUR'));
         $percentaged = Cash::from($money)->percentage('50');
@@ -91,15 +83,13 @@ class CashTest extends TestCase
         $this->assertEquals(50.00, Cash::from(Money::EUR(500))->percentage('10.0', Money::ROUND_HALF_UP, false, 2));
     }
 
-    /** @test */
-    public function it_can_add_percentage_of_amount()
+    public function test_it_can_add_percentage_of_amount()
     {
         $money = new Money(100, new Currency('EUR'));
         $this->assertEquals(120, Cash::from($money)->addPercentage(Percentage::fromString('20'))->getAmount());
     }
 
-    /** @test */
-    public function it_can_get_a_tax_percentage_of_gross_amount()
+    public function test_it_can_get_a_tax_percentage_of_gross_amount()
     {
         $money = new Money(120, new Currency('EUR'));
         $this->assertEquals(100, Cash::from($money)->subtractTaxPercentage(Percentage::fromString('20'))->getAmount());

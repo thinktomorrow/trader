@@ -12,10 +12,9 @@ class DeleteVariantTest extends ProductContext
 {
     use TestHelpers;
 
-    /** @test */
-    public function it_can_delete_a_variant()
+    public function test_it_can_delete_a_variant()
     {
-        $productId = $this->createAProduct('50', ['1','2'], 'sku', ['title' => ['nl' => 'foobar nl']]);
+        $productId = $this->createAProduct('50', ['1', '2'], 'sku', ['title' => ['nl' => 'foobar nl']]);
         $variantId = $this->createAVariant($productId->get(), '12', '3', [], 'yyy-123');
 
         $this->productApplication->deleteVariant(new DeleteVariant($productId->get(), $variantId->get()));
@@ -25,12 +24,11 @@ class DeleteVariantTest extends ProductContext
         ], $this->eventDispatcher->releaseDispatchedEvents());
     }
 
-    /** @test */
-    public function it_cannot_delete_last_remaining_variant()
+    public function test_it_cannot_delete_last_remaining_variant()
     {
         $this->expectException(CouldNotDeleteVariant::class);
 
-        $productId = $this->createAProduct('50', ['1','2'], 'sku', ['title' => ['nl' => 'foobar nl']]);
+        $productId = $this->createAProduct('50', ['1', '2'], 'sku', ['title' => ['nl' => 'foobar nl']]);
         $variantId = $this->productRepository->find($productId)->getVariants()[0]->variantId;
 
         $this->productApplication->deleteVariant(new DeleteVariant($productId->get(), $variantId->get()));

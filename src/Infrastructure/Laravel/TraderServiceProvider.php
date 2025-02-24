@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace Thinktomorrow\Trader\Infrastructure\Laravel;
 
 use Illuminate\Support\Arr;
+use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\ServiceProvider;
 use Thinktomorrow\Trader\Application\Cart\PaymentMethod\PaymentMethodForCart;
 use Thinktomorrow\Trader\Application\Cart\PaymentMethod\PaymentMethodForCartRepository;
@@ -64,7 +65,7 @@ use Thinktomorrow\Trader\Application\Taxon\TaxonSelect\TaxonIdOptionsComposer;
 use Thinktomorrow\Trader\Application\Taxon\Tree\TaxonNode;
 use Thinktomorrow\Trader\Application\Taxon\Tree\TaxonTreeRepository;
 use Thinktomorrow\Trader\Domain\Common\Event\EventDispatcher;
-use Thinktomorrow\Trader\Domain\Common\Taxes\TaxRate;
+use Thinktomorrow\Trader\Domain\Common\Vat\VatPercentage;
 use Thinktomorrow\Trader\Domain\Model\Country\CountryRepository;
 use Thinktomorrow\Trader\Domain\Model\Customer\CustomerRepository;
 use Thinktomorrow\Trader\Domain\Model\CustomerLogin\CustomerLoginRepository;
@@ -92,6 +93,7 @@ use Thinktomorrow\Trader\Domain\Model\Promo\PromoRepository;
 use Thinktomorrow\Trader\Domain\Model\ShippingProfile\ShippingProfileRepository;
 use Thinktomorrow\Trader\Domain\Model\Stock\StockItemRepository;
 use Thinktomorrow\Trader\Domain\Model\Taxon\TaxonRepository;
+use Thinktomorrow\Trader\Domain\Model\VatRate\VatRateRepository;
 use Thinktomorrow\Trader\Infrastructure\Laravel\Models\Cart\DefaultAdjustLine;
 use Thinktomorrow\Trader\Infrastructure\Laravel\Models\Cart\DefaultCart;
 use Thinktomorrow\Trader\Infrastructure\Laravel\Models\Cart\DefaultCartBillingAddress;
@@ -143,6 +145,7 @@ use Thinktomorrow\Trader\Infrastructure\Laravel\Repositories\MysqlShippingProfil
 use Thinktomorrow\Trader\Infrastructure\Laravel\Repositories\MysqlTaxonRepository;
 use Thinktomorrow\Trader\Infrastructure\Laravel\Repositories\MysqlTaxonTreeRepository;
 use Thinktomorrow\Trader\Infrastructure\Laravel\Repositories\MysqlVariantRepository;
+use Thinktomorrow\Trader\Infrastructure\Laravel\Repositories\MysqlVatRateRepository;
 use Thinktomorrow\Trader\Infrastructure\Vine\VineFlattenedTaxonIdsComposer;
 use Thinktomorrow\Trader\Infrastructure\Vine\VineTaxonFilterTreeComposer;
 use Thinktomorrow\Trader\Infrastructure\Vine\VineTaxonIdOptionsComposer;
@@ -183,6 +186,7 @@ class TraderServiceProvider extends ServiceProvider
         $this->app->bind(OrderPromoRepository::class, MysqlPromoRepository::class);
         $this->app->bind(OrderRepository::class, MysqlOrderRepository::class);
         $this->app->bind(ShippingProfileRepository::class, MysqlShippingProfileRepository::class);
+        $this->app->bind(VatRateRepository::class, MysqlVatRateRepository::class);
         $this->app->bind(PaymentMethodRepository::class, MysqlPaymentMethodRepository::class);
         $this->app->bind(MerchantOrderRepository::class, MysqlMerchantOrderRepository::class);
         $this->app->bind(\Thinktomorrow\Trader\Application\Order\Grid\OrderGridRepository::class, MysqlOrderGridRepository::class);
@@ -240,14 +244,18 @@ class TraderServiceProvider extends ServiceProvider
     public function boot()
     {
         // Config
-        $this->publishes([__DIR__.'/config/config.php' => config_path('trader.php')]);
-        $this->mergeConfigFrom(__DIR__.'/config/config.php', 'trader');
+        $this->publishes([__DIR__ . '/config/config.php' => config_path('trader.php')]);
+        $this->mergeConfigFrom(__DIR__ . '/config/config.php', 'trader');
 
         // Migrations
-        $this->loadMigrationsFrom(__DIR__.'/database/migrations');
+        $this->loadMigrationsFrom(__DIR__ . '/database/migrations');
 
-        // Default discount tax rate
-        DiscountPriceDefaults::setDiscountTaxRate(TaxRate::fromString($this->app->make(TraderConfig::class)->getDefaultTaxRate()));
+        // Discount vat rate
+        $standardPrimaryVatPercentage = Schema::hasTable('trader_vat_rates')
+            ? $this->app->make(VatRateRepository::class)->getStandardPrimaryVatRate()
+            : VatPercentage::fromString($this->app->make(TraderConfig::class)->getFallBackStandardVatRate());
+
+        DiscountPriceDefaults::setDiscountTaxRate($standardPrimaryVatPercentage);
         DiscountPriceDefaults::setDiscountIncludeTax($this->app->make(TraderConfig::class)->includeVatInPrices());
 
         // Default locale - this will be overwritten by the middleware so the current locale is used. Here we just ensure a fallback locale is available
@@ -279,7 +287,7 @@ class TraderServiceProvider extends ServiceProvider
                 )
             );
 
-            return $value === null ? $default :$value;
+            return $value === null ? $default : $value;
         });
     }
 

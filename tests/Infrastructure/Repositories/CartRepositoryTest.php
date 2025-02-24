@@ -49,8 +49,7 @@ final class CartRepositoryTest extends TestCase
         }
     }
 
-    /** @test */
-    public function it_can_check_if_cart_exists()
+    public function test_it_can_check_if_cart_exists()
     {
         $order = $this->createDefaultOrder();
         $order->updateState(DefaultOrderState::cart_pending);
@@ -66,8 +65,7 @@ final class CartRepositoryTest extends TestCase
         }
     }
 
-    /** @test */
-    public function it_can_save_line_personalisations()
+    public function test_it_can_save_line_personalisations()
     {
         $order = $this->createDefaultOrder();
 
@@ -95,8 +93,7 @@ final class CartRepositoryTest extends TestCase
         }
     }
 
-    /** @test */
-    public function it_checks_if_cart_is_in_customer_hands()
+    public function test_it_checks_if_cart_is_in_customer_hands()
     {
         $order = $this->createDefaultOrder();
         $order->updateState(DefaultOrderState::confirmed);
@@ -112,8 +109,7 @@ final class CartRepositoryTest extends TestCase
         }
     }
 
-    /** @test */
-    public function it_should_not_find_an_order_no_longer_in_customer_hands()
+    public function test_it_should_not_find_an_order_no_longer_in_customer_hands()
     {
         $calls = 0;
 

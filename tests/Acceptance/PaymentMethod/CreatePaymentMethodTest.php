@@ -11,13 +11,12 @@ use Thinktomorrow\Trader\Domain\Model\PaymentMethod\PaymentMethodProviderId;
 
 class CreatePaymentMethodTest extends PaymentMethodContext
 {
-    /** @test */
-    public function it_can_create_a_payment_method()
+    public function test_it_can_create_a_payment_method()
     {
         $paymentMethodId = $this->paymentMethodApplication->createPaymentMethod(new CreatePaymentMethod(
             'mollie',
             '10',
-            ['BE','NL'],
+            ['BE', 'NL'],
             ['foo' => 'bar']
         ));
 

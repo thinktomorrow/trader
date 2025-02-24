@@ -12,7 +12,7 @@ class DataRenderer
         static::$dataResolver = $dataResolver;
     }
 
-    public static function get(array $data, string $key, string $language = null, $default = null)
+    public static function get(array $data, string $key, ?string $language = null, $default = null)
     {
         return call_user_func_array(static::$dataResolver, [
             $data,

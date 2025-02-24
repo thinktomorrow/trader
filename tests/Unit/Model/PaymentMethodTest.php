@@ -13,8 +13,7 @@ use Thinktomorrow\Trader\Domain\Model\PaymentMethod\PaymentMethodState;
 
 class PaymentMethodTest extends TestCase
 {
-    /** @test */
-    public function it_can_create_an_payment_method_entity()
+    public function test_it_can_create_an_payment_method_entity()
     {
         $paymentMethod = PaymentMethod::create(
             $paymentMethodId = PaymentMethodId::fromString('xxx'),
@@ -31,8 +30,7 @@ class PaymentMethodTest extends TestCase
         ], $paymentMethod->getMappedData());
     }
 
-    /** @test */
-    public function it_can_update_rate()
+    public function test_it_can_update_rate()
     {
         $paymentMethod = $this->createPaymentMethod();
 
@@ -41,8 +39,7 @@ class PaymentMethodTest extends TestCase
         $this->assertEquals(Money::EUR(30), $paymentMethod->getRate());
     }
 
-    /** @test */
-    public function it_can_update_provider()
+    public function test_it_can_update_provider()
     {
         $paymentMethod = $this->createPaymentMethod();
 
@@ -51,8 +48,7 @@ class PaymentMethodTest extends TestCase
         $this->assertEquals($updatedProvider, $paymentMethod->getProvider());
     }
 
-    /** @test */
-    public function adding_data_merges_with_existing_data()
+    public function test_adding_data_merges_with_existing_data()
     {
         $paymentMethod = $this->createPaymentMethod();
 
@@ -62,8 +58,7 @@ class PaymentMethodTest extends TestCase
         $this->assertEquals(json_encode(['bar' => 'boo', 'foo' => 'bar']), $paymentMethod->getMappedData()['data']);
     }
 
-    /** @test */
-    public function it_can_delete_data()
+    public function test_it_can_delete_data()
     {
         $paymentMethod = $this->createPaymentMethod();
 
@@ -73,8 +68,7 @@ class PaymentMethodTest extends TestCase
         $this->assertEquals(json_encode(['foo' => 'bar']), $paymentMethod->getMappedData()['data']);
     }
 
-    /** @test */
-    public function it_can_update_countries()
+    public function test_it_can_update_countries()
     {
         $paymentMethod = $this->createPaymentMethod();
 
@@ -94,8 +88,7 @@ class PaymentMethodTest extends TestCase
         $this->assertFalse($paymentMethod->hasCountry(CountryId::fromString('BE')));
     }
 
-    /** @test */
-    public function it_can_add_country()
+    public function test_it_can_add_country()
     {
         $paymentMethod = $this->createPaymentMethod();
 
@@ -107,8 +100,7 @@ class PaymentMethodTest extends TestCase
         ], $paymentMethod->getCountryIds());
     }
 
-    /** @test */
-    public function it_can_delete_country()
+    public function test_it_can_delete_country()
     {
         $paymentMethod = $this->createPaymentMethod();
         $paymentMethod->addCountry(CountryId::fromString('BE'));

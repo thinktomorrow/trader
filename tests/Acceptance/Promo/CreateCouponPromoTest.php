@@ -8,8 +8,7 @@ use Thinktomorrow\Trader\Domain\Model\Promo\PromoId;
 
 class CreateCouponPromoTest extends PromoContext
 {
-    /** @test */
-    public function it_can_create_a_coupon_promo()
+    public function test_it_can_create_a_coupon_promo()
     {
         $promoId = $this->promoApplication->createPromo(new CreateCouponPromo(
             'foobar',

@@ -10,6 +10,7 @@ use Thinktomorrow\Trader\Application\Cart\PaymentMethod\UpdatePaymentMethodOnOrd
 use Thinktomorrow\Trader\Application\Cart\RefreshCart\RefreshCartAction;
 use Thinktomorrow\Trader\Application\Cart\ShippingProfile\UpdateShippingProfileOnOrder;
 use Thinktomorrow\Trader\Application\Order\State\OrderStateApplication;
+use Thinktomorrow\Trader\Application\VatRate\FindVatRateForOrder;
 use Thinktomorrow\Trader\Domain\Model\Order\Payment\DefaultPaymentState;
 use Thinktomorrow\Trader\Domain\Model\Order\Payment\PaymentStateMachine;
 use Thinktomorrow\Trader\Domain\Model\Order\Shipping\DefaultShippingState;
@@ -17,11 +18,14 @@ use Thinktomorrow\Trader\Domain\Model\Order\Shipping\ShippingStateMachine;
 use Thinktomorrow\Trader\Domain\Model\Order\State\DefaultOrderState;
 use Thinktomorrow\Trader\Domain\Model\Order\State\OrderStateMachine;
 use Thinktomorrow\Trader\Infrastructure\Laravel\Models\Cart\DefaultAdjustLine;
+use Thinktomorrow\Trader\Infrastructure\Laravel\Models\PaymentMethod\DefaultVerifyPaymentMethodForCart;
 use Thinktomorrow\Trader\Infrastructure\Test\EventDispatcherSpy;
 use Thinktomorrow\Trader\Infrastructure\Test\Repositories\InMemoryCustomerRepository;
 use Thinktomorrow\Trader\Infrastructure\Test\Repositories\InMemoryOrderRepository;
+use Thinktomorrow\Trader\Infrastructure\Test\Repositories\InMemoryPaymentMethodRepository;
 use Thinktomorrow\Trader\Infrastructure\Test\Repositories\InMemoryShippingProfileRepository;
 use Thinktomorrow\Trader\Infrastructure\Test\Repositories\InMemoryVariantRepository;
+use Thinktomorrow\Trader\Infrastructure\Test\Repositories\InMemoryVatRateRepository;
 use Thinktomorrow\Trader\Infrastructure\Test\TestContainer;
 use Thinktomorrow\Trader\Infrastructure\Test\TestTraderConfig;
 
@@ -64,8 +68,8 @@ abstract class StateContext extends TestCase
             $this->orderStateMachine,
             new RefreshCartAction(),
             new InMemoryShippingProfileRepository(),
-            new UpdateShippingProfileOnOrder(new TestContainer(), new TestTraderConfig(), $this->orderRepository, new InMemoryShippingProfileRepository()),
-            TestContainer::make(UpdatePaymentMethodOnOrder::class),
+            new UpdateShippingProfileOnOrder(new TestContainer(), new TestTraderConfig(), $this->orderRepository, new InMemoryShippingProfileRepository(), new FindVatRateForOrder(new TestTraderConfig(), new InMemoryVatRateRepository(new TestTraderConfig()))),
+            new UpdatePaymentMethodOnOrder(new TestContainer(), new TestTraderConfig(), $this->orderRepository, new DefaultVerifyPaymentMethodForCart(), new InMemoryPaymentMethodRepository(), new FindVatRateForOrder(new TestTraderConfig(), new InMemoryVatRateRepository(new TestTraderConfig()))),
             new InMemoryCustomerRepository(),
             $this->eventDispatcher,
         );

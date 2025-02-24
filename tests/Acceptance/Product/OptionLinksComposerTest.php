@@ -14,8 +14,7 @@ class OptionLinksComposerTest extends ProductContext
 {
     use TestHelpers;
 
-    /** @test */
-    public function it_can_compose_option_links()
+    public function test_it_can_compose_option_links()
     {
         $repo = new InMemoryProductRepository();
 

@@ -48,7 +48,7 @@ class ShippingProfileRepositoryTest extends TestCase
      * @test
      * @dataProvider shippingProfiles
      */
-    public function it_can_delete_a_product(ShippingProfile $shippingProfile)
+    public function it_can_delete_a_profile(ShippingProfile $shippingProfile)
     {
         $profilesNotFound = 0;
 
@@ -67,16 +67,14 @@ class ShippingProfileRepositoryTest extends TestCase
         $this->assertEquals(count(iterator_to_array($this->repositories())), $profilesNotFound);
     }
 
-    /** @test */
-    public function it_can_generate_a_next_reference()
+    public function test_it_can_generate_a_next_reference()
     {
         foreach ($this->repositories() as $repository) {
             $this->assertInstanceOf(ShippingProfileId::class, $repository->nextReference());
         }
     }
 
-    /** @test */
-    public function it_can_get_available_shipping_countries()
+    public function test_it_can_get_available_shipping_countries()
     {
         foreach ($this->repositories() as $i => $repository) {
             $this->prepareCountries($i);

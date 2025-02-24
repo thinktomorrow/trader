@@ -122,7 +122,7 @@ abstract class OrderRead
 
     public function getQuantity(): int
     {
-        return array_reduce((array) $this->getLines(), fn ($carry, $line) => $carry + $line->getQuantity(), 0);
+        return array_reduce((array)$this->getLines(), fn ($carry, $line) => $carry + $line->getQuantity(), 0);
     }
 
     public function includeTax(bool $includeTax = true): void
@@ -307,7 +307,7 @@ abstract class OrderRead
         return $allDiscounts;
     }
 
-    public function getData(string $key, string $language = null, $default = null)
+    public function getData(string $key, ?string $language = null, $default = null)
     {
         return $this->data($key, $language, $default);
     }

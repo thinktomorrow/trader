@@ -21,8 +21,7 @@ use Thinktomorrow\Trader\Domain\Model\PaymentMethod\PaymentMethodId;
 
 class PaymentTest extends TestCase
 {
-    /** @test */
-    public function it_can_create_a_order_payment()
+    public function test_it_can_create_a_order_payment()
     {
         $payment = Payment::create(
             OrderId::fromString('aaa'),
@@ -38,14 +37,13 @@ class PaymentTest extends TestCase
             'payment_method_id' => $paymentMethodId->get(),
             'payment_state' => $state->value,
             'cost' => $cost->getMoney()->getAmount(),
-            'tax_rate' => $cost->getTaxRate()->toPercentage()->get(),
+            'tax_rate' => $cost->getVatPercentage()->toPercentage()->get(),
             'includes_vat' => $cost->includesVat(),
             'data' => json_encode(['payment_method_id' => $paymentMethodId->get()]),
         ], $payment->getMappedData());
     }
 
-    /** @test */
-    public function it_can_be_build_from_raw_data()
+    public function test_it_can_be_build_from_raw_data()
     {
         $payment = $this->createOrderPayment();
 
@@ -108,8 +106,7 @@ class PaymentTest extends TestCase
         $order->addPayment($this->createOrderPayment());
     }
 
-    /** @test */
-    public function it_can_update_payment()
+    public function test_it_can_update_payment()
     {
         $order = $this->createDefaultOrder();
 
@@ -150,8 +147,7 @@ class PaymentTest extends TestCase
         $this->assertEquals($paymentMethodId, $payment->getPaymentMethodId());
     }
 
-    /** @test */
-    public function it_can_add_a_discount_to_payment()
+    public function test_it_can_add_a_discount_to_payment()
     {
         $order = $this->createDefaultOrder();
         $payment = $order->getPayments()[0];
@@ -160,7 +156,7 @@ class PaymentTest extends TestCase
         $this->assertCount(1, $payment->getDiscounts());
 
         $paymentCost = $payment->getPaymentCost();
-        $this->assertEquals(PaymentCost::fromMoney(Money::EUR(0), $paymentCost->getTaxRate(), $paymentCost->includesVat()), $payment->getPaymentCostTotal());
+        $this->assertEquals(PaymentCost::fromMoney(Money::EUR(0), $paymentCost->getVatPercentage(), $paymentCost->includesVat()), $payment->getPaymentCostTotal());
     }
 
     public function test_it_sets_discount_tax_the_same_as_discountable_tax()
@@ -170,7 +166,7 @@ class PaymentTest extends TestCase
         $payment->addDiscount($this->createOrderPaymentDiscount(['promo_discount_id' => 'qqq', 'discount_id' => 'defgh'], $order->getMappedData()));
 
         // 20 (and not 30 discount) because payment cost is only 20.
-        $discountTotal = DiscountTotal::fromMoney(Money::EUR('20'), $payment->getPaymentCost()->getTaxRate(), $payment->getPaymentCost()->includesVat());
+        $discountTotal = DiscountTotal::fromMoney(Money::EUR('20'), $payment->getPaymentCost()->getVatPercentage(), $payment->getPaymentCost()->includesVat());
 
         $this->assertEquals($discountTotal, $payment->getDiscountTotal());
     }

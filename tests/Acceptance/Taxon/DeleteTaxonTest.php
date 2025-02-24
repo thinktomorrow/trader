@@ -13,8 +13,7 @@ class DeleteTaxonTest extends TaxonContext
 {
     use TaxonHelpers;
 
-    /** @test */
-    public function it_can_delete_taxon()
+    public function test_it_can_delete_taxon()
     {
         $taxonId = $this->taxonApplication->createTaxon(new CreateTaxon('taxon-key', 'nl', []));
 
@@ -28,8 +27,7 @@ class DeleteTaxonTest extends TaxonContext
         ], $this->eventDispatcher->releaseDispatchedEvents());
     }
 
-    /** @test */
-    public function deleting_taxon_moves_child_taxa_to_level_above()
+    public function test_deleting_taxon_moves_child_taxa_to_level_above()
     {
         $taxonRootId = $this->taxonApplication->createTaxon(new CreateTaxon('taxon-key-root', 'nl', []));
         $this->taxonRepository->setNextReference('abc');

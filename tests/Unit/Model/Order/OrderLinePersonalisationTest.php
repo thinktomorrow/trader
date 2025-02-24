@@ -59,8 +59,7 @@ final class OrderLinePersonalisationTest extends TestCase
         ], $personalisation->getMappedData());
     }
 
-    /** @test */
-    public function it_can_add_personalisation()
+    public function test_it_can_add_personalisation()
     {
         $line = $this->order->getLines()[0];
 
@@ -71,8 +70,7 @@ final class OrderLinePersonalisationTest extends TestCase
         ], $line->getChildEntities()[LinePersonalisation::class]);
     }
 
-    /** @test */
-    public function it_can_get_all_personalisations()
+    public function test_it_can_get_all_personalisations()
     {
         $line = $this->order->getLines()[0];
 
@@ -82,8 +80,7 @@ final class OrderLinePersonalisationTest extends TestCase
         $this->assertCount(2, $line->getPersonalisations());
     }
 
-    /** @test */
-    public function it_can_delete_personalisations()
+    public function test_it_can_delete_personalisations()
     {
         $line = $this->order->getLines()[0];
 
@@ -97,8 +94,7 @@ final class OrderLinePersonalisationTest extends TestCase
         $this->assertCount(1, $line->getPersonalisations());
     }
 
-    /** @test */
-    public function it_can_delete_all_personalisations()
+    public function test_it_can_delete_all_personalisations()
     {
         $line = $this->order->getLines()[0];
 

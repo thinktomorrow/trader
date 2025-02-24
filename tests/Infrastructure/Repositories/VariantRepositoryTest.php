@@ -65,8 +65,7 @@ final class VariantRepositoryTest extends TestCase
         }
     }
 
-    /** @test */
-    public function it_can_generate_a_next_reference()
+    public function test_it_can_generate_a_next_reference()
     {
         foreach ($this->repositories() as $repository) {
             $this->assertInstanceOf(VariantId::class, $repository->nextReference());

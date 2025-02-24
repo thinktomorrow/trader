@@ -62,16 +62,14 @@ final class PromoRepositoryTest extends TestCase
         $this->assertEquals(count(iterator_to_array($this->repositories())), $promosNotFound);
     }
 
-    /** @test */
-    public function it_can_generate_a_next_reference()
+    public function test_it_can_generate_a_next_reference()
     {
         foreach ($this->repositories() as $repository) {
             $this->assertInstanceOf(PromoId::class, $repository->nextReference());
         }
     }
 
-    /** @test */
-    public function it_can_get_applicable_promos()
+    public function test_it_can_get_applicable_promos()
     {
         /** @var OrderPromoRepository $repository */
         foreach ($this->repositories() as $repository) {
@@ -95,8 +93,7 @@ final class PromoRepositoryTest extends TestCase
         }
     }
 
-    /** @test */
-    public function it_shall_not_get_non_applicable_promos()
+    public function test_it_shall_not_get_non_applicable_promos()
     {
         /** @var OrderPromoRepository $repository */
         foreach ($this->repositories() as $repository) {
@@ -117,8 +114,7 @@ final class PromoRepositoryTest extends TestCase
         }
     }
 
-    /** @test */
-    public function it_can_get_applicable_promo_by_coupon_code()
+    public function test_it_can_get_applicable_promo_by_coupon_code()
     {
         /** @var OrderPromoRepository $repository */
         foreach ($this->repositories() as $repository) {

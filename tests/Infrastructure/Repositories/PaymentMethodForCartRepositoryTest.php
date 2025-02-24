@@ -28,8 +28,7 @@ class PaymentMethodForCartRepositoryTest extends TestCase
         (new TestContainer())->add(PaymentMethodForCart::class, DefaultPaymentMethodForCart::class);
     }
 
-    /** @test */
-    public function it_can_find_payment_methods_for_cart()
+    public function test_it_can_find_payment_methods_for_cart()
     {
         $paymentMethod = $this->createPaymentMethod();
 
@@ -42,8 +41,7 @@ class PaymentMethodForCartRepositoryTest extends TestCase
         }
     }
 
-    /** @test */
-    public function it_can_find_methods_for_cart_with_matching_countries()
+    public function test_it_can_find_methods_for_cart_with_matching_countries()
     {
         $paymentMethod = $this->createPaymentMethod();
         $paymentMethod->addCountry(CountryId::fromString('BE'));

@@ -13,9 +13,19 @@ interface TraderConfig
 
     public function getDefaultCurrency(): string;
 
-    public function getDefaultTaxRate(): string;
+    /**
+     * The country that provides the default vat rates.
+     * returns a country id like BE, NL, ...
+     *
+     * This is used to determine the default available vat rates for the catalog.
+     * Make sure it is a valid country code and that vat rates for this country exist in database.
+     */
+    public function getPrimaryVatCountry(): string;
 
-    public function getAvailableTaxRates(): array;
+    /**
+     * Fallback vat rate for when no vat rate is found for the primary country from database
+     */
+    public function getFallBackStandardVatRate(): string;
 
     /**
      * When this value is true, all catalog prices as given by the merchant are considered to have

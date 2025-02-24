@@ -24,8 +24,7 @@ final class TaxonIdOptionsComposerTest extends TestCase
         (new InMemoryTaxonRepository())->clear();
     }
 
-    /** @test */
-    public function it_can_retrieve_options()
+    public function test_it_can_retrieve_options()
     {
         $this->createDefaultTaxons();
 
@@ -53,8 +52,7 @@ final class TaxonIdOptionsComposerTest extends TestCase
         }
     }
 
-    /** @test */
-    public function it_can_retrieve_only_roots()
+    public function test_it_can_retrieve_only_roots()
     {
         $this->createDefaultTaxons();
 

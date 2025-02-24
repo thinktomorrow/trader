@@ -12,8 +12,7 @@ use Thinktomorrow\Trader\Domain\Model\Order\Discount\DiscountPriceDefaults;
 
 class OrderPromoTest extends CartContext
 {
-    /** @test */
-    public function it_can_apply_promo_by_coupon_code()
+    public function test_it_can_apply_promo_by_coupon_code()
     {
         $this->givenThereIsAPromo(['coupon_code' => 'foobar']);
         $this->givenThereIsAProductWhichCostsEur('lightsaber', 5);
@@ -40,8 +39,7 @@ class OrderPromoTest extends CartContext
         $this->assertEquals('€ 24,60', $cart->getTotalPrice());
     }
 
-    /** @test */
-    public function it_can_apply_promo_when_discount_amount_is_excluded_vat()
+    public function test_it_can_apply_promo_when_discount_amount_is_excluded_vat()
     {
         DiscountPriceDefaults::setDiscountIncludeTax(false);
 
@@ -71,8 +69,7 @@ class OrderPromoTest extends CartContext
         $this->assertEquals('€ 24,52', $cart->getTotalPrice());
     }
 
-    /** @test */
-    public function it_cannot_apply_promo_by_coupon_code_if_code_is_wrong()
+    public function test_it_cannot_apply_promo_by_coupon_code_if_code_is_wrong()
     {
         $this->givenThereIsAPromo(['coupon_code' => 'foobar']);
         $this->givenThereIsAProductWhichCostsEur('lightsaber', 5);
@@ -88,8 +85,7 @@ class OrderPromoTest extends CartContext
         $this->assertEquals(Money::EUR(2500), $order->getTotal()->getIncludingVat());
     }
 
-    /** @test */
-    public function it_cannot_apply_promo_by_coupon_code_if_conditions_fail()
+    public function test_it_cannot_apply_promo_by_coupon_code_if_conditions_fail()
     {
         $this->givenThereIsAPromo(['coupon_code' => 'foobar']);
         $this->givenThereIsAProductWhichCostsEur('lightsaber', 5);
@@ -105,8 +101,7 @@ class OrderPromoTest extends CartContext
         $this->assertEquals(Money::EUR(2000), $order->getTotal()->getIncludingVat());
     }
 
-    /** @test */
-    public function it_can_apply_automatic_applicable_promos()
+    public function test_it_can_apply_automatic_applicable_promos()
     {
         $this->givenThereIsAPromo([]);
         $this->givenThereIsAProductWhichCostsEur('lightsaber', 5);
@@ -123,8 +118,7 @@ class OrderPromoTest extends CartContext
         $this->assertEquals(Money::EUR(2460), $order->getTotal()->getIncludingVat());
     }
 
-    /** @test */
-    public function it_can_apply_multiple_combinable_automatic_applicable_promos()
+    public function test_it_can_apply_multiple_combinable_automatic_applicable_promos()
     {
         $this->givenThereIsAPromo(['promo_id' => 'aaa', 'is_combinable' => true], [$this->createDiscount(['discount_id' => 'abc'])]);
         $this->givenThereIsAPromo(['promo_id' => 'bbb', 'is_combinable' => true], [$this->createDiscount(['discount_id' => 'abcd'])]);
@@ -142,8 +136,7 @@ class OrderPromoTest extends CartContext
         $this->assertEquals(Money::EUR(2420), $order->getTotal()->getIncludingVat());
     }
 
-    /** @test */
-    public function it_applies_promo_with_highest_discount()
+    public function test_it_applies_promo_with_highest_discount()
     {
         $this->givenThereIsAPromo(['promo_id' => 'aaa'], [$this->createDiscount(['data' => json_encode(['amount' => '100'])])]);
         $this->givenThereIsAPromo(['promo_id' => 'bbb'], [$this->createDiscount(['data' => json_encode(['amount' => '200'])])]);
@@ -161,8 +154,7 @@ class OrderPromoTest extends CartContext
         $this->assertEquals(Money::EUR(2300), $order->getTotal()->getIncludingVat());
     }
 
-    /** @test */
-    public function it_can_apply_combinable_automatic_applicable_promos_with_coupon_promo()
+    public function test_it_can_apply_combinable_automatic_applicable_promos_with_coupon_promo()
     {
         $this->givenThereIsAPromo(['promo_id' => 'aaa', 'coupon_code' => 'foobar', 'is_combinable' => true], [$this->createDiscount(['discount_id' => 'abc'])]);
         $this->givenThereIsAPromo(['promo_id' => 'bbb', 'is_combinable' => true], [$this->createDiscount(['discount_id' => 'abcd'])]);
@@ -183,8 +175,7 @@ class OrderPromoTest extends CartContext
         $this->assertEquals(Money::EUR(2420), $order->getTotal()->getIncludingVat());
     }
 
-    /** @test */
-    public function it_cannot_go_below_zero()
+    public function test_it_cannot_go_below_zero()
     {
         $this->givenThereIsAPromo(['promo_id' => 'aaa', 'is_combinable' => true], [$this->createDiscount(['data' => json_encode(['amount' => '100000'])])]);
         $this->givenThereIsAProductWhichCostsEur('lightsaber', 5);
@@ -201,18 +192,15 @@ class OrderPromoTest extends CartContext
         $this->assertEquals(Cash::zero(), $order->getTotal()->getExcludingVat());
     }
 
-    /** @test */
-    public function it_can_apply_discount_on_entire_order()
+    public function test_it_can_apply_discount_on_entire_order()
     {
     }
 
-    /** @test */
-    public function it_can_apply_discount_on_line()
+    public function test_it_can_apply_discount_on_line()
     {
     }
 
-    /** @test */
-    public function it_can_apply_discount_on_shipping()
+    public function test_it_can_apply_discount_on_shipping()
     {
     }
 }

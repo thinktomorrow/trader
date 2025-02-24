@@ -27,8 +27,7 @@ use Thinktomorrow\Trader\Domain\Model\ShippingProfile\ShippingProfileId;
 
 class OrderTest extends TestCase
 {
-    /** @test */
-    public function it_can_create_an_order_entity()
+    public function test_it_can_create_an_order_entity()
     {
         $order = Order::create(
             $orderId = OrderId::fromString('xxx'),
@@ -56,8 +55,7 @@ class OrderTest extends TestCase
         ], $order->releaseEvents());
     }
 
-    /** @test */
-    public function it_can_update_shopper()
+    public function test_it_can_update_shopper()
     {
         $order = $this->createDefaultOrder();
 
@@ -75,8 +73,7 @@ class OrderTest extends TestCase
         ], $order->releaseEvents());
     }
 
-    /** @test */
-    public function it_can_add_shipping()
+    public function test_it_can_add_shipping()
     {
         $order = $this->createDefaultOrder();
 
@@ -96,8 +93,7 @@ class OrderTest extends TestCase
         ], $order->releaseEvents());
     }
 
-    /** @test */
-    public function it_can_update_shipping()
+    public function test_it_can_update_shipping()
     {
         $order = $this->createDefaultOrder();
 
@@ -115,8 +111,7 @@ class OrderTest extends TestCase
         ], $order->releaseEvents());
     }
 
-    /** @test */
-    public function it_can_update_shipping_address()
+    public function test_it_can_update_shipping_address()
     {
         $order = $this->createDefaultOrder();
 
@@ -137,8 +132,7 @@ class OrderTest extends TestCase
         $this->assertEquals($shippingAddress->getMappedData(), $order->getChildEntities()[ShippingAddress::class]);
     }
 
-    /** @test */
-    public function it_can_update_billing_address()
+    public function test_it_can_update_billing_address()
     {
         $order = $this->createDefaultOrder();
 
@@ -159,8 +153,7 @@ class OrderTest extends TestCase
         $this->assertEquals($billingAddress->getMappedData(), $order->getChildEntities()[BillingAddress::class]);
     }
 
-    /** @test */
-    public function it_can_set_invoice_ref()
+    public function test_it_can_set_invoice_ref()
     {
         $order = $this->createDefaultOrder();
 
@@ -171,8 +164,7 @@ class OrderTest extends TestCase
         $this->assertEquals($invoiceReference, $order->getInvoiceReference());
     }
 
-    /** @test */
-    public function adding_data_merges_with_existing_data()
+    public function test_adding_data_merges_with_existing_data()
     {
         $order = $this->createDefaultOrder();
 
@@ -182,8 +174,7 @@ class OrderTest extends TestCase
         $this->assertEquals(json_encode(['bar' => 'boo', 'foo' => 'bar']), $order->getMappedData()['data']);
     }
 
-    /** @test */
-    public function it_can_delete_data()
+    public function test_it_can_delete_data()
     {
         $order = $this->createDefaultOrder();
 

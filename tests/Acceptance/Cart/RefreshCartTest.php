@@ -13,13 +13,13 @@ use Thinktomorrow\Trader\Domain\Model\Product\Variant\VariantUnitPrice;
 
 class RefreshCartTest extends CartContext
 {
+
     protected function setUp(): void
     {
         parent::setUp();
     }
 
-    /** @test */
-    public function it_can_refresh_order()
+    public function test_it_can_refresh_order()
     {
         $this->givenThereIsAProductWhichCostsEur('aaa', 5);
         $this->whenIAddTheVariantToTheCart('aaa-123', 2);
@@ -27,11 +27,11 @@ class RefreshCartTest extends CartContext
         $this->cartApplication->refresh(new RefreshCart('xxx'));
 
         $cart = $this->cartRepository->findCart(OrderId::fromString('xxx'));
+
         $this->assertEquals('€ 10', $cart->getTotalPrice());
     }
 
-    /** @test */
-    public function it_cannot_refresh_cart_when_order_is_no_longer_is_shopper_hands()
+    public function test_it_cannot_refresh_cart_when_order_is_no_longer_is_shopper_hands()
     {
         $this->givenThereIsAProductWhichCostsEur('aaa', 5);
         $this->whenIAddTheVariantToTheCart('aaa-123', 2);
@@ -44,14 +44,17 @@ class RefreshCartTest extends CartContext
         $this->updateVariant();
 
         $this->expectException(OrderAlreadyInMerchantHands::class);
+
+        // Reset memoized vat
+        $this->resetMemoizedVatPercentages();
+
         $this->cartApplication->refresh(new RefreshCart('xxx'));
 
         $cart = $this->cartRepository->findCart(OrderId::fromString('xxx'));
         $this->assertEquals('€ 10', $cart->getTotalPrice());
     }
 
-    /** @test */
-    public function it_can_refresh_variant_prices()
+    public function test_it_can_refresh_variant_prices()
     {
         $this->givenThereIsAProductWhichCostsEur('aaa', 5);
         $this->whenIAddTheVariantToTheCart('aaa-123', 2);
@@ -62,14 +65,16 @@ class RefreshCartTest extends CartContext
 
         $this->updateVariant();
 
+        // Reset memoized vat
+        $this->resetMemoizedVatPercentages();
+
         $this->cartApplication->refresh(new RefreshCart('xxx'));
 
         $cart = $this->cartRepository->findCart(OrderId::fromString('xxx'));
         $this->assertEquals('€ 20', $cart->getTotalPrice());
     }
 
-    /** @test */
-    public function it_can_refresh_variant_availability()
+    public function test_it_can_refresh_variant_availability()
     {
         $this->givenThereIsAProductWhichCostsEur('aaa', 5);
         $this->whenIAddTheVariantToTheCart('aaa-123', 2);
@@ -81,6 +86,9 @@ class RefreshCartTest extends CartContext
 
         $this->updateVariant(VariantState::unavailable);
 
+        // Reset memoized vat
+        $this->resetMemoizedVatPercentages();
+
         $this->cartApplication->refresh(new RefreshCart('xxx'));
 
         $cart = $this->cartRepository->findCart(OrderId::fromString('xxx'));
@@ -88,30 +96,23 @@ class RefreshCartTest extends CartContext
         $this->assertEquals(0, $cart->getSize());
     }
 
-    /** @test */
-    public function it_can_refresh_discounts()
+    public function test_it_can_refresh_discounts()
     {
     }
 
-    /** @test */
-    public function it_can_refresh_shipping_profile_cost()
+    public function test_it_can_refresh_shipping_profile_cost()
     {
     }
 
-    /** @test */
-    public function it_can_refresh_payment_method_cost()
+    public function test_it_can_refresh_payment_method_cost()
     {
     }
 
-    /** @test */
-    public function it_can_find_cart_without_variant_when_variant_is_no_longer_present()
+    public function test_it_can_find_cart_without_variant_when_variant_is_no_longer_present()
     {
         // TODO: this should be detected by refresh job of the order. Triggered by variant
     }
 
-    /**
-     * @return void
-     */
     private function updateVariant(?VariantState $state = null): void
     {
         $product = $this->productRepository->find(ProductId::fromString('aaa'));

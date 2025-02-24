@@ -50,8 +50,7 @@ class OrderStateTest extends TestCase
         $this->order = $this->createDefaultOrder();
     }
 
-    /** @test */
-    public function it_can_record_order_events()
+    public function test_it_can_record_order_events()
     {
         $this->assertOrderStateEvent(CartAbandoned::class, DefaultOrderState::cart_abandoned);
         $this->assertOrderStateEvent(CartRevived::class, DefaultOrderState::cart_revived);
@@ -68,8 +67,7 @@ class OrderStateTest extends TestCase
         $this->assertOrderStateEvent(OrderPartiallyDelivered::class, DefaultOrderState::partially_delivered);
     }
 
-    /** @test */
-    public function it_can_record_payment_events()
+    public function test_it_can_record_payment_events()
     {
         $this->assertPaymentStateEvent(PaymentPaid::class, DefaultPaymentState::paid);
         $this->assertPaymentStateEvent(PaymentMarkedPaidByMerchant::class, DefaultPaymentState::paid_by_merchant);
@@ -81,8 +79,7 @@ class OrderStateTest extends TestCase
         $this->assertPaymentStateEvent(PaymentRefundedByMerchant::class, DefaultPaymentState::refunded_by_merchant);
     }
 
-    /** @test */
-    public function it_can_record_shipping_events()
+    public function test_it_can_record_shipping_events()
     {
         $this->assertShippingStateEvent(ShipmentMarkedReadyForPacking::class, DefaultShippingState::ready_for_packing);
         $this->assertShippingStateEvent(ShipmentHaltedForPacking::class, DefaultShippingState::halted_for_packing);
@@ -99,8 +96,7 @@ class OrderStateTest extends TestCase
         $this->assertNoOrderStateEvent(CartAbandoned::class, DefaultOrderState::cart_abandoned);
     }
 
-    /** @test */
-    public function it_does_not_record_payment_event_when_state_hasnt_changed()
+    public function test_it_does_not_record_payment_event_when_state_hasnt_changed()
     {
         $this->assertNoPaymentStateEvent(PaymentInitialized::class, DefaultPaymentState::initialized);
 
@@ -108,8 +104,7 @@ class OrderStateTest extends TestCase
         $this->assertNoPaymentStateEvent(PaymentPaid::class, DefaultPaymentState::paid);
     }
 
-    /** @test */
-    public function it_does_not_record_shipping_events_when_state_hasnt_changed()
+    public function test_it_does_not_record_shipping_events_when_state_hasnt_changed()
     {
         $this->assertShippingStateEvent(ShipmentMarkedReadyForPacking::class, DefaultShippingState::ready_for_packing);
         $this->assertNoShippingStateEvent(ShipmentMarkedReadyForPacking::class, DefaultShippingState::ready_for_packing);

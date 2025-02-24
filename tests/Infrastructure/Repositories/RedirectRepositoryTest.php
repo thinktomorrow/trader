@@ -13,8 +13,7 @@ final class RedirectRepositoryTest extends TestCase
 {
     use RefreshDatabase;
 
-    /** @test */
-    public function it_can_create_redirect()
+    public function test_it_can_create_redirect()
     {
         foreach ($this->repositories() as $repository) {
             $repository->save(new Redirect(Locale::fromString('nl'), 'from', 'to'));
@@ -31,16 +30,14 @@ final class RedirectRepositoryTest extends TestCase
         }
     }
 
-    /** @test */
-    public function non_found_redirect_returns_null()
+    public function test_non_found_redirect_returns_null()
     {
         foreach ($this->repositories() as $repository) {
             $this->assertNull($repository->find(Locale::fromString('nl'), 'xxx'));
         }
     }
 
-    /** @test */
-    public function it_ignores_a_slash_when_finding_a_redirect()
+    public function test_it_ignores_a_slash_when_finding_a_redirect()
     {
         foreach ($this->repositories() as $repository) {
             $repository->save(new Redirect(Locale::fromString('nl'), '/from', '/to'));
@@ -48,8 +45,7 @@ final class RedirectRepositoryTest extends TestCase
         }
     }
 
-    /** @test */
-    public function it_can_update_a_redirect()
+    public function test_it_can_update_a_redirect()
     {
         foreach ($this->repositories() as $repository) {
             $repository->save(new Redirect(Locale::fromString('nl'), 'from', 'to'));
@@ -66,8 +62,7 @@ final class RedirectRepositoryTest extends TestCase
         }
     }
 
-    /** @test */
-    public function existing_redirects_are_adjusted_to_the_new_target()
+    public function test_existing_redirects_are_adjusted_to_the_new_target()
     {
         foreach ($this->repositories() as $repository) {
             $repository->save(new Redirect(Locale::fromString('nl'), '/existing/from', '/existing/to'));
@@ -83,8 +78,7 @@ final class RedirectRepositoryTest extends TestCase
         }
     }
 
-    /** @test */
-    public function it_removed_redirects_pointing_from_and_to_the_new_target()
+    public function test_it_removed_redirects_pointing_from_and_to_the_new_target()
     {
         foreach ($this->repositories() as $repository) {
             $repository->save(new Redirect(Locale::fromString('nl'), '/existing/from', '/existing/to'));

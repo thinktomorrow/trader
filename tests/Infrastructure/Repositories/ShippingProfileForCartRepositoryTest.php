@@ -29,8 +29,7 @@ class ShippingProfileForCartRepositoryTest extends TestCase
         (new TestContainer())->add(ShippingProfileForCart::class, DefaultShippingProfileForCart::class);
     }
 
-    /** @test */
-    public function it_can_find_profiles_for_cart()
+    public function test_it_can_find_profiles_for_cart()
     {
         $shippingProfile = $this->createShippingProfile();
 
@@ -43,8 +42,7 @@ class ShippingProfileForCartRepositoryTest extends TestCase
         }
     }
 
-    /** @test */
-    public function it_can_find_profiles_for_cart_with_matching_countries()
+    public function test_it_can_find_profiles_for_cart_with_matching_countries()
     {
         $shippingProfile = $this->createShippingProfile();
         $shippingProfile->addCountry(CountryId::fromString('BE'));

@@ -5,38 +5,38 @@ namespace Thinktomorrow\Trader\Domain\Common\Price;
 
 use Money\Money;
 use Thinktomorrow\Trader\Domain\Common\Cash\Cash;
-use Thinktomorrow\Trader\Domain\Common\Taxes\TaxableTotal;
-use Thinktomorrow\Trader\Domain\Common\Taxes\TaxRateTotals;
+use Thinktomorrow\Trader\Domain\Common\Vat\VatApplicableTotal;
+use Thinktomorrow\Trader\Domain\Common\Vat\VatTotals;
 
 trait PriceTotalValue
 {
     private Money $money;
-    private TaxRateTotals $taxRateTotals;
+    private VatTotals $vatTotals;
     private bool $includesVat;
 
-    private function __construct(Money $money, TaxRateTotals $taxRateTotals, bool $includesVat)
+    private function __construct(Money $money, VatTotals $vatTotals, bool $includesVat)
     {
         if ($money->isNegative()) {
             throw new PriceCannotBeNegative('Price money amount cannot be negative: ' . $money->getAmount() . ' is given.');
         }
 
         $this->money = $money;
-        $this->taxRateTotals = $taxRateTotals;
+        $this->vatTotals = $vatTotals;
         $this->includesVat = $includesVat;
     }
 
-    public static function make(Money $money, TaxRateTotals $taxRateTotals, bool $includesVat): static
+    public static function make(Money $money, VatTotals $vatTotals, bool $includesVat): static
     {
         return new static(
             $money,
-            $taxRateTotals,
+            $vatTotals,
             $includesVat
         );
     }
 
     public static function zero(): static
     {
-        return new static(Cash::zero(),TaxRateTotals::fromTaxables([]),true);
+        return new static(Cash::zero(), VatTotals::fromVatApplicables([]), true);
     }
 
     public function getIncludingVat(): Money
@@ -46,7 +46,7 @@ trait PriceTotalValue
         }
 
         return $this->money->add(
-            $this->taxRateTotals->getTaxTotal()
+            $this->vatTotals->getVatTotal()
         );
     }
 
@@ -57,7 +57,7 @@ trait PriceTotalValue
         }
 
         return $this->money->subtract(
-            $this->taxRateTotals->getTaxTotal()
+            $this->vatTotals->getVatTotal()
         );
     }
 
@@ -66,9 +66,9 @@ trait PriceTotalValue
         return $this->money;
     }
 
-    public function getTaxRateTotals(): TaxRateTotals
+    public function getVatTotals(): VatTotals
     {
-        return $this->taxRateTotals;
+        return $this->vatTotals;
     }
 
     public function includesVat(): bool
@@ -82,9 +82,9 @@ trait PriceTotalValue
             ? $otherPrice->getIncludingVat()
             : $otherPrice->getExcludingVat();
 
-        $taxRateTotals = $this->taxRateTotals->addTaxableTotal($otherPrice->getTaxRate(), $this->getTaxableTotal($otherPrice));
+        $vatTotals = $this->vatTotals->addVatApplicableTotal($otherPrice->getVatPercentage(), $this->getVatApplicableTotal($otherPrice));
 
-        return new static($this->money->add($otherMoney), $taxRateTotals, $this->includesVat);
+        return new static($this->money->add($otherMoney), $vatTotals, $this->includesVat);
     }
 
     public function subtract(Price $otherPrice): static
@@ -93,20 +93,20 @@ trait PriceTotalValue
             ? $otherPrice->getIncludingVat()
             : $otherPrice->getExcludingVat();
 
-        $taxRateTotals = $this->taxRateTotals->subtractTaxableTotal($otherPrice->getTaxRate(), $this->getTaxableTotal($otherPrice));
+        $vatTotals = $this->vatTotals->subtractVatApplicableTotal($otherPrice->getVatPercentage(), $this->getVatApplicableTotal($otherPrice));
 
-        return new static($this->money->subtract($otherMoney), $taxRateTotals, $this->includesVat);
+        return new static($this->money->subtract($otherMoney), $vatTotals, $this->includesVat);
     }
 
     /**
      * Better precision for tax calculations since percentage divisions and multiplication is in effect
      * @param Price $otherPrice
-     * @return TaxableTotal
+     * @return VatApplicableTotal
      */
-    protected function getTaxableTotal(Price $otherPrice): TaxableTotal
+    protected function getVatApplicableTotal(Price $otherPrice): VatApplicableTotal
     {
-        $exclusiveAmountAsFloat = $otherPrice->getIncludingVat()->getAmount() / ((float)$otherPrice->getTaxRate()->toPercentage()->toDecimal() + 1);
+        $exclusiveAmountAsFloat = $otherPrice->getIncludingVat()->getAmount() / ((float)$otherPrice->getVatPercentage()->toPercentage()->toDecimal() + 1);
 
-        return TaxableTotal::calculateFromFloat($exclusiveAmountAsFloat);
+        return VatApplicableTotal::calculateFromFloat($exclusiveAmountAsFloat);
     }
 }

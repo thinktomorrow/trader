@@ -46,7 +46,7 @@ class DefaultMerchantOrderEvent implements MerchantOrderEvent
         return $this->createdAt;
     }
 
-    public function getData(string $key, string $language = null, $default = null)
+    public function getData(string $key, ?string $language = null, $default = null)
     {
         return $this->data($key, $language, $default);
     }

@@ -17,25 +17,24 @@ return [
     /*
      * Default locale following the ISO 639-1 standard. The default locale is
      * mostly used for rendering the localized Money values.
-     *
-     * In case the country of the customer or order is not set yet,
-     * we use this default country as a fallback for e.g. tax logic
      */
     'locale' => 'nl-be',
 
-    /*
-     * Default tax percentage. This is the percentage as integer
-     * which is used as a default for all the global taxes
-     * such as shipping and payment costs.
+    /**
+     * The country that provides the default vat rates. e.g. BE, NL, ...
+     *
+     * This is used to determine the available vat rates for the catalog admin. Also, in case the country
+     * of the customer or order is not set yet, we use this default country as a fallback for
+     * e.g. vat logic. Make sure it is a valid country code and that at least the standard
+     * vat rate for this country exists in database.
      */
-    'default_tax_rate' => '21',
+    'primary_vat_country' => 'BE',
 
     /**
-     * All available tax_rates to select from by the webmaster. This is
+     * Fallback vat rate for when no standard vat rate can
+     * be found for the primary country from database
      */
-    'tax_rates' => [
-        '21', '6', '12',
-    ],
+    'fallback_standard_vat_rate' => '21',
 
     /**
      * When this value is true, all catalog prices as given by the merchant are considered to have

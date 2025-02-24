@@ -11,8 +11,7 @@ class CreateTaxonTest extends TaxonContext
 {
     use TaxonHelpers;
 
-    /** @test */
-    public function it_can_create_a_taxon()
+    public function test_it_can_create_a_taxon()
     {
         $taxonId = $this->taxonApplication->createTaxon(new CreateTaxon('taxon-key', 'nl', ['foo' => 'bar']));
 
@@ -24,8 +23,7 @@ class CreateTaxonTest extends TaxonContext
         $this->assertNull($taxon->getParentId());
     }
 
-    /** @test */
-    public function it_can_create_a_nested_taxon()
+    public function test_it_can_create_a_nested_taxon()
     {
         $taxonRootId = $this->taxonApplication->createTaxon(new CreateTaxon('taxon-key-root', 'nl', ['foo' => 'bar']));
         $this->taxonRepository->setNextReference('abc');
@@ -38,8 +36,7 @@ class CreateTaxonTest extends TaxonContext
         $this->assertEquals($taxonRootId, $taxon->getParentId());
     }
 
-    /** @test */
-    public function it_creates_a_unique_key_reference()
+    public function test_it_creates_a_unique_key_reference()
     {
         $this->taxonApplication->createTaxon(new CreateTaxon('taxon-key', 'nl', ['foo' => 'bar']));
 

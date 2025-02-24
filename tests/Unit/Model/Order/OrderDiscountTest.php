@@ -6,7 +6,7 @@ namespace Tests\Unit\Model\Order;
 use Money\Money;
 use Tests\Unit\TestCase;
 use Thinktomorrow\Trader\Domain\Common\Cash\Percentage;
-use Thinktomorrow\Trader\Domain\Common\Taxes\TaxRateTotals;
+use Thinktomorrow\Trader\Domain\Common\Vat\VatTotals;
 use Thinktomorrow\Trader\Domain\Model\Order\Discount\Discount;
 use Thinktomorrow\Trader\Domain\Model\Order\Discount\DiscountableId;
 use Thinktomorrow\Trader\Domain\Model\Order\Discount\DiscountableType;
@@ -32,7 +32,7 @@ class OrderDiscountTest extends TestCase
         );
 
         $this->assertEquals($discountTotal, $discount->getTotal());
-        $this->assertEquals(Percentage::fromString('50.00'), $discount->getPercentage(OrderTotal::make(Money::EUR(100), TaxRateTotals::zero(), false)));
+        $this->assertEquals(Percentage::fromString('50.00'), $discount->getPercentage(OrderTotal::make(Money::EUR(100), VatTotals::zero(), false)));
         $this->assertEquals([
             'order_id' => $orderId->get(),
             'discount_id' => $discountId->get(),
@@ -47,8 +47,7 @@ class OrderDiscountTest extends TestCase
         ], $discount->getMappedData());
     }
 
-    /** @test */
-    public function it_can_add_a_discount()
+    public function test_it_can_add_a_discount()
     {
         $order = $this->createDefaultOrder();
 
@@ -57,8 +56,7 @@ class OrderDiscountTest extends TestCase
         $this->assertCount(2, $order->getChildEntities()[Discount::class]);
     }
 
-    /** @test */
-    public function it_can_add_a_discount_to_payment()
+    public function test_it_can_add_a_discount_to_payment()
     {
         $order = $this->createDefaultOrder();
         $order->getPayments()[0]->addDiscount($this->createOrderPaymentDiscount(['promo_discount_id' => 'qqq', 'discount_id' => 'defgh'], $order->getMappedData()));
@@ -66,8 +64,7 @@ class OrderDiscountTest extends TestCase
         $this->assertCount(1, $order->getPayments()[0]->getDiscounts());
     }
 
-    /** @test */
-    public function it_cannot_add_same_applied_discount_twice()
+    public function test_it_cannot_add_same_applied_discount_twice()
     {
         $this->expectException(\InvalidArgumentException::class);
 
@@ -78,8 +75,7 @@ class OrderDiscountTest extends TestCase
         $this->assertCount(1, $order->getChildEntities()[Discount::class]);
     }
 
-    /** @test */
-    public function it_cannot_add_same_promo_discount_twice()
+    public function test_it_cannot_add_same_promo_discount_twice()
     {
         $this->expectException(\InvalidArgumentException::class);
 
@@ -90,8 +86,7 @@ class OrderDiscountTest extends TestCase
         $this->assertCount(1, $order->getChildEntities()[Discount::class]);
     }
 
-    /** @test */
-    public function it_cannot_add_discount_with_discountable_type_mismatch()
+    public function test_it_cannot_add_discount_with_discountable_type_mismatch()
     {
         $this->expectException(\InvalidArgumentException::class);
 
@@ -102,8 +97,7 @@ class OrderDiscountTest extends TestCase
         $this->assertCount(1, $order->getChildEntities()[Discount::class]);
     }
 
-    /** @test */
-    public function it_cannot_add_discount_with_discountable_id_mismatch()
+    public function test_it_cannot_add_discount_with_discountable_id_mismatch()
     {
         $this->expectException(\InvalidArgumentException::class);
 
@@ -114,8 +108,7 @@ class OrderDiscountTest extends TestCase
         $this->assertCount(1, $order->getChildEntities()[Discount::class]);
     }
 
-    /** @test */
-    public function it_can_delete_a_discount()
+    public function test_it_can_delete_a_discount()
     {
         $order = $this->createDefaultOrder();
 

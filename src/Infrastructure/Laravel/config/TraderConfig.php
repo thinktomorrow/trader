@@ -24,14 +24,37 @@ class TraderConfig implements \Thinktomorrow\Trader\TraderConfig
         return config('trader.currency');
     }
 
-    public function getDefaultTaxRate(): string
+    /**
+     * The country that provides the default vat rates.
+     * returns a country id like BE, NL, ...
+     *
+     * This is used to determine the default available vat rates for the catalog.
+     * Make sure it is a valid country code and that vat rates for this country exist in database.
+     */
+    public function getPrimaryVatCountry(): string
     {
-        return config('trader.default_tax_rate');
+        return config('trader.primary_vat_country');
     }
 
+    public function getFallBackStandardVatRate(): string
+    {
+        return config('trader.fallback_standard_vat_rate');
+    }
+
+    /**
+     * @deprecated Use getPrimaryVatRate instead
+     */
+    public function getDefaultTaxRate(): string
+    {
+        throw new \Exception('Deprecated method getDefaultTaxRate. Use getPrimaryVatRate instead.');
+    }
+
+    /**
+     * @deprecated Use getPrimaryVatCountry instead to fetch all available tax rates.
+     */
     public function getAvailableTaxRates(): array
     {
-        return config('trader.tax_rates');
+        throw new \Exception('Deprecated method getAvailableTaxRates. Use getPrimaryVatCountry instead to fetch all available tax rates.');
     }
 
     public function doesPriceInputIncludesVat(): bool

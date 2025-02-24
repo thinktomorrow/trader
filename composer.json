@@ -15,7 +15,7 @@
     ],
     "require": {
         "php" : ">=8.2",
-        "moneyphp/money": "^4.1.0",
+        "moneyphp/money": "^4.3.0",
         "beberlei/assert": "^3.3.2",
         "ext-bcmath": "*",
         "ext-intl": "*",
@@ -31,7 +31,7 @@
         "orchestra/testbench": "^7.22.0",
         "nesbot/carbon": "^2.66",
         "qossmic/deptrac-shim": "^1.0.2",
-        "infection/infection": "^0.26.19"
+        "infection/infection": "^0.29.10"
     },
     "autoload": {
         "psr-4": {

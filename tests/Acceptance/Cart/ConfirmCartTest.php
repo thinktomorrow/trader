@@ -12,8 +12,7 @@ use Thinktomorrow\Trader\Domain\Model\Order\State\DefaultOrderState;
 
 class ConfirmCartTest extends CartContext
 {
-    /** @test */
-    public function it_can_complete_a_cart()
+    public function test_it_can_complete_a_cart()
     {
         $this->givenThereIsAProductWhichCostsEur('aaa', 5);
         $this->whenIAddTheVariantToTheCart('aaa-123', 2);
@@ -29,8 +28,7 @@ class ConfirmCartTest extends CartContext
         $this->assertSame(DefaultOrderState::cart_completed, $order->getOrderState());
     }
 
-    /** @test */
-    public function it_can_confirm_a_cart()
+    public function test_it_can_confirm_a_cart()
     {
         $this->givenThereIsAProductWhichCostsEur('aaa', 5);
         $this->whenIAddTheVariantToTheCart('aaa-123', 2);
@@ -46,8 +44,7 @@ class ConfirmCartTest extends CartContext
         $this->assertSame(DefaultOrderState::confirmed, $order->getOrderState());
     }
 
-    /** @test */
-    public function it_can_confirm_a_completed_cart()
+    public function test_it_can_confirm_a_completed_cart()
     {
         $this->givenThereIsAProductWhichCostsEur('aaa', 5);
         $this->whenIAddTheVariantToTheCart('aaa-123', 2);
@@ -64,8 +61,7 @@ class ConfirmCartTest extends CartContext
         $this->assertSame(DefaultOrderState::confirmed, $order->getOrderState());
     }
 
-    /** @test */
-    public function it_cannot_confirm_a_cart_when_state_not_allows_it()
+    public function test_it_cannot_confirm_a_cart_when_state_not_allows_it()
     {
         $this->givenThereIsAProductWhichCostsEur('aaa', 5);
         $this->whenIAddTheVariantToTheCart('aaa-123', 2);
@@ -76,8 +72,7 @@ class ConfirmCartTest extends CartContext
         $this->cartApplication->confirmCart(new ConfirmCart('xxx'));
     }
 
-    /** @test */
-    public function a_confirmed_cart_is_no_longer_retrievable_via_cart_repo()
+    public function test_a_confirmed_cart_is_no_longer_retrievable_via_cart_repo()
     {
         $this->givenThereIsAProductWhichCostsEur('aaa', 5);
         $this->whenIAddTheVariantToTheCart('aaa-123', 2);

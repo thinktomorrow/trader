@@ -4,6 +4,7 @@ namespace Tests;
 
 use Illuminate\Contracts\Debug\ExceptionHandler;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Str;
 use Money\Money;
 use Thinktomorrow\Trader\Application\Product\CreateProduct;
 use Thinktomorrow\Trader\Application\Product\CreateVariant;
@@ -12,7 +13,7 @@ use Thinktomorrow\Trader\Application\Taxon\CreateTaxon;
 use Thinktomorrow\Trader\Application\Taxon\TaxonApplication;
 use Thinktomorrow\Trader\Domain\Common\Email;
 use Thinktomorrow\Trader\Domain\Common\Locale;
-use Thinktomorrow\Trader\Domain\Common\Taxes\TaxRate;
+use Thinktomorrow\Trader\Domain\Common\Vat\VatPercentage;
 use Thinktomorrow\Trader\Domain\Model\Country\Country;
 use Thinktomorrow\Trader\Domain\Model\Country\CountryId;
 use Thinktomorrow\Trader\Domain\Model\Customer\Customer;
@@ -60,6 +61,9 @@ use Thinktomorrow\Trader\Domain\Model\Promo\PromoState;
 use Thinktomorrow\Trader\Domain\Model\ShippingProfile\ShippingProfile;
 use Thinktomorrow\Trader\Domain\Model\ShippingProfile\ShippingProfileState;
 use Thinktomorrow\Trader\Domain\Model\ShippingProfile\Tariff;
+use Thinktomorrow\Trader\Domain\Model\VatRate\BaseRate;
+use Thinktomorrow\Trader\Domain\Model\VatRate\VatRate;
+use Thinktomorrow\Trader\Domain\Model\VatRate\VatRateState;
 use Throwable;
 
 trait TestHelpers
@@ -70,9 +74,11 @@ trait TestHelpers
             public function __construct()
             {
             }
+
             public function report(\Throwable $e)
             {
             }
+
             public function render($request, \Throwable $e)
             {
                 throw $e;
@@ -323,6 +329,32 @@ trait TestHelpers
         ]);
     }
 
+    protected function createVatRateWithoutBaseRates(array $values = []): VatRate
+    {
+        return $this->createVatRate($values, [], false);
+    }
+
+    protected function createVatRate(array $values = [], array $baseRateValues = [], bool $withBaseRates = true): VatRate
+    {
+        return VatRate::fromMappedData(array_merge([
+            'vat_rate_id' => 'vatRate-' . Str::random(10),
+            'country_id' => 'BE',
+            'rate' => '21',
+            'is_standard' => false,
+            'state' => VatRateState::online->value,
+            'data' => json_encode([]),
+        ], $values), [
+            BaseRate::class => $withBaseRates ? [
+                array_merge([
+                    'base_rate_id' => 'baseRate-' . Str::random(10),
+                    'origin_vat_rate_id' => 'originVatRate-123',
+                    'target_vat_rate_id' => 'ppp',
+                    'rate' => '10',
+                ], $baseRateValues),
+            ] : [],
+        ]);
+    }
+
     protected function createCountry(array $values = []): Country
     {
         return Country::fromMappedData(array_merge([
@@ -485,10 +517,10 @@ trait TestHelpers
             VariantId::fromString('yyy'),
             VariantUnitPrice::fromMoney(
                 Money::EUR(10),
-                TaxRate::fromString('20'),
+                VatPercentage::fromString('20'),
                 false
             ),
-            VariantSalePrice::fromMoney(Money::EUR(8), TaxRate::fromString('20'), false),
+            VariantSalePrice::fromMoney(Money::EUR(8), VatPercentage::fromString('20'), false),
             'fake-sku',
         );
 
@@ -518,9 +550,9 @@ trait TestHelpers
         $taxonId = $taxonApplication->createTaxon(new CreateTaxon('foobar', 'nl', ['title' => ['nl' => 'foobar nl']]));
         $taxonChildId = $taxonApplication->createTaxon(new CreateTaxon('foobar-child', 'nl', ['title' => ['nl' => 'foobar child nl']], $taxonId->get()));
 
-        $productId = $productApplication->createProduct(new CreateProduct([$taxonId->get()], "100", "6", 'sku', ['title' => ['nl' => 'product one']], [ 'title' => ['nl' => 'variant title one'] ]));
-        $product2Id = $productApplication->createProduct(new CreateProduct([$taxonChildId->get()], "250", "12", 'sku-2', ['title' => ['nl' => 'product two']], [ 'title' => ['nl' => 'variant title two'] ]));
-        $product3Id = $productApplication->createProduct(new CreateProduct([], "500", "21", 'sku-3', ['title' => ['nl' => 'product three']], [ 'title' => ['nl' => 'variant title three'] ]));
+        $productId = $productApplication->createProduct(new CreateProduct([$taxonId->get()], "100", "6", 'sku', ['title' => ['nl' => 'product one']], ['title' => ['nl' => 'variant title one']]));
+        $product2Id = $productApplication->createProduct(new CreateProduct([$taxonChildId->get()], "250", "12", 'sku-2', ['title' => ['nl' => 'product two']], ['title' => ['nl' => 'variant title two']]));
+        $product3Id = $productApplication->createProduct(new CreateProduct([], "500", "21", 'sku-3', ['title' => ['nl' => 'product three']], ['title' => ['nl' => 'variant title three']]));
 
         // Force order for consistent testing assertions
         DB::table('trader_products')->where('product_id', $productId->get())->update(['order_column' => 0]);

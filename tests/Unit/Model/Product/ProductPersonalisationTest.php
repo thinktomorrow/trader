@@ -10,8 +10,7 @@ use Thinktomorrow\Trader\Domain\Model\Product\Personalisation\PersonalisationTyp
 
 class ProductPersonalisationTest extends TestCase
 {
-    /** @test */
-    public function it_can_add_personalisation()
+    public function test_it_can_add_personalisation()
     {
         $product = $this->createProduct();
 
@@ -27,8 +26,7 @@ class ProductPersonalisationTest extends TestCase
         ], $product->getChildEntities()[Personalisation::class]);
     }
 
-    /** @test */
-    public function it_cannot_add_same_personalisation_twice()
+    public function test_it_cannot_add_same_personalisation_twice()
     {
         $product = $this->createProduct();
 
@@ -38,8 +36,7 @@ class ProductPersonalisationTest extends TestCase
         $this->assertCount(1, $product->getChildEntities()[Personalisation::class]);
     }
 
-    /** @test */
-    public function it_can_update_personalisation_values()
+    public function test_it_can_update_personalisation_values()
     {
         $product = $this->createProduct();
 
@@ -55,8 +52,7 @@ class ProductPersonalisationTest extends TestCase
         ], $product->getChildEntities()[Personalisation::class]);
     }
 
-    /** @test */
-    public function it_can_rearrange_personalisations()
+    public function test_it_can_rearrange_personalisations()
     {
         $product = $this->createProductWithPersonalisations();
 
@@ -82,8 +78,7 @@ class ProductPersonalisationTest extends TestCase
         ], $product->getChildEntities()[Personalisation::class]);
     }
 
-    /** @test */
-    public function it_can_get_all_personalisations()
+    public function test_it_can_get_all_personalisations()
     {
         $product = $this->createProductWithPersonalisations();
 

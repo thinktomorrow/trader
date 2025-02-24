@@ -87,7 +87,7 @@ class Payment implements ChildAggregate, Discountable
             'payment_method_id' => $this->paymentMethodId?->get(),
             'payment_state' => $this->paymentState->value,
             'cost' => $this->paymentCost->getMoney()->getAmount(),
-            'tax_rate' => $this->paymentCost->getTaxRate()->toPercentage()->get(),
+            'tax_rate' => $this->paymentCost->getVatPercentage()->get(),
             'includes_vat' => $this->paymentCost->includesVat(),
             'data' => json_encode($data),
         ];
@@ -104,7 +104,7 @@ class Payment implements ChildAggregate, Discountable
     {
         $payment = new static();
 
-        if (! $state['payment_state'] instanceof  PaymentState) {
+        if (! $state['payment_state'] instanceof PaymentState) {
             throw new \InvalidArgumentException('Payment state is expected to be instance of PaymentState. Instead ' . gettype($state['payment_state']) . ' is passed.');
         }
 

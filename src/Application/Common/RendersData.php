@@ -6,7 +6,7 @@ trait RendersData
 {
     use HasLocale;
 
-    protected function data(string $key, string $language = null, $default = null, array $data = null)
+    protected function data(string $key, ?string $language = null, $default = null, ?array $data = null)
     {
         if (! $language) {
             $language = $this->getLocale()->getLanguage();
@@ -15,7 +15,7 @@ trait RendersData
         return DataRenderer::get($data ?? ($this->data ?? []), $key, $language, $default);
     }
 
-    protected function dataAsPrimitive(string $key, string $language = null, $default = null, array $data = null)
+    protected function dataAsPrimitive(string $key, ?string $language = null, $default = null, ?array $data = null)
     {
         $result = $this->data($key, $language, $default, $data);
 

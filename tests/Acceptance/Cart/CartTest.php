@@ -8,8 +8,7 @@ use Thinktomorrow\Trader\Application\Cart\UpdateBillingAddress;
 
 class CartTest extends CartContext
 {
-    /** @test */
-    public function in_order_to_buy_products_as_a_visitor__i_need_to_be_able_to_put_products_in_my_cart()
+    public function test_in_order_to_buy_products_as_a_visitor__i_need_to_be_able_to_put_products_in_my_cart()
     {
         $this->givenThereIsAProductWhichCostsEur('lightsaber', 5);
         $this->whenIAddTheVariantToTheCart('lightsaber-123', 2);
@@ -17,16 +16,14 @@ class CartTest extends CartContext
         $this->thenTheOverallCartPriceShouldBeEur(10);
     }
 
-    /** @test */
-    public function in_order_to_buy_a_product_as_a_visitor_the_order_is_created_when__i_add_a_first_item_in_my_cart()
+    public function test_in_order_to_buy_a_product_as_a_visitor_the_order_is_created_when__i_add_a_first_item_in_my_cart()
     {
         $this->givenThereIsAProductWhichCostsEur('lightsaber', 5);
         $this->whenIAddTheFirstVariantToTheCart('lightsaber-123', 1);
         $this->thenIShouldHaveProductInTheCart(1, 1, 'xxx-123');
     }
 
-    /** @test */
-    public function in_order_to_buy_products_in_quantity_as_a_visitor__i_need_to_be_able_to_put_same_product_in_my_cart_multiple_times()
+    public function test_in_order_to_buy_products_in_quantity_as_a_visitor__i_need_to_be_able_to_put_same_product_in_my_cart_multiple_times()
     {
         $this->givenThereIsAProductWhichCostsEur('lightsaber', 5);
         $this->whenIAddTheVariantToTheCart('lightsaber-123', 1, ['foo' => 'bar']);
@@ -35,8 +32,7 @@ class CartTest extends CartContext
         $this->thenIShouldHaveProductInTheCart(2, 1);
     }
 
-    /** @test */
-    public function in_order_to_choose_my_quantity_as_a_visitor__i_need_to_be_able_to_change_quantity_of_a_product()
+    public function test_in_order_to_choose_my_quantity_as_a_visitor__i_need_to_be_able_to_change_quantity_of_a_product()
     {
         $this->givenThereIsAProductWhichCostsEur('lightsaber', 5);
         $this->whenIAddTheVariantToTheCart('lightsaber-123', 2);
@@ -47,8 +43,7 @@ class CartTest extends CartContext
         $this->thenTheOverallCartPriceShouldBeEur(15);
     }
 
-    /** @test */
-    public function in_order_to_be_in_control_as_a_visitor__i_need_to_be_able_to_remove_a_product()
+    public function test_in_order_to_be_in_control_as_a_visitor__i_need_to_be_able_to_remove_a_product()
     {
         $this->givenThereIsAProductWhichCostsEur('lightsaber', 5);
         $this->whenIAddTheVariantToTheCart('lightsaber-123', 2);
@@ -59,8 +54,7 @@ class CartTest extends CartContext
         $this->thenTheOverallCartPriceShouldBeEur(0);
     }
 
-    /** @test */
-    public function in_order_to_buy_multiple_products_as_a_visitor__i_need_to_be_able_to_put_multiple_products_in_my_cart()
+    public function test_in_order_to_buy_multiple_products_as_a_visitor__i_need_to_be_able_to_put_multiple_products_in_my_cart()
     {
         $this->givenThereIsAProductWhichCostsEur('lightsaber', 5);
         $this->givenThereIsAProductWhichCostsEur('kenobi scarf', 7);
@@ -74,8 +68,7 @@ class CartTest extends CartContext
         $this->thenTheOverallCartPriceShouldBeEur(12);
     }
 
-    /** @test */
-    public function shipping_cost_should_be_added_when_buying_under_ten_euro()
+    public function test_shipping_cost_should_be_added_when_buying_under_ten_euro()
     {
         $this->givenOrderHasAShippingCountry('BE');
         $this->givenShippingCostsForAPurchaseOfEur(2, 0, 10);
@@ -89,16 +82,14 @@ class CartTest extends CartContext
         $this->thenTheOverallCartPriceShouldBeEur(7);
     }
 
-    /** @test */
-    public function shipping_address_can_be_added()
+    public function test_shipping_address_can_be_added()
     {
         $this->whenIAddShippingAddress('NL', 'example 12', 'bus 2', '1000', 'Amsterdam');
 
         $this->assertEquals(['NL', 'example 12', 'bus 2', '1000', 'Amsterdam'], array_values($this->getOrder()->getShippingAddress()->getAddress()->toArray()));
     }
 
-    /** @test */
-    public function billing_address_can_be_added()
+    public function test_billing_address_can_be_added()
     {
         $address = ['NL', 'example 12', 'bus 2', '1000', 'Amsterdam'];
 

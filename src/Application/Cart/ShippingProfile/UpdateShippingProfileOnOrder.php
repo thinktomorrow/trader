@@ -4,8 +4,8 @@ declare(strict_types=1);
 namespace Thinktomorrow\Trader\Application\Cart\ShippingProfile;
 
 use Psr\Container\ContainerInterface;
+use Thinktomorrow\Trader\Application\VatRate\FindVatRateForOrder;
 use Thinktomorrow\Trader\Domain\Common\Cash\Cash;
-use Thinktomorrow\Trader\Domain\Common\Taxes\TaxRate;
 use Thinktomorrow\Trader\Domain\Model\Order\Order;
 use Thinktomorrow\Trader\Domain\Model\Order\OrderRepository;
 use Thinktomorrow\Trader\Domain\Model\Order\Shipping\Shipping;
@@ -22,13 +22,15 @@ class UpdateShippingProfileOnOrder
     private TraderConfig $config;
     private OrderRepository $orderRepository;
     private ShippingProfileRepository $shippingProfileRepository;
+    private FindVatRateForOrder $findVatRateForOrder;
 
-    public function __construct(ContainerInterface $container, TraderConfig $config, OrderRepository $orderRepository, ShippingProfileRepository $shippingProfileRepository)
+    public function __construct(ContainerInterface $container, TraderConfig $config, OrderRepository $orderRepository, ShippingProfileRepository $shippingProfileRepository, FindVatRateForOrder $findVatRateForOrder)
     {
         $this->container = $container;
         $this->config = $config;
         $this->orderRepository = $orderRepository;
         $this->shippingProfileRepository = $shippingProfileRepository;
+        $this->findVatRateForOrder = $findVatRateForOrder;
     }
 
     public function handle(Order $order, ShippingProfileId $shippingProfileId): void
@@ -46,8 +48,7 @@ class UpdateShippingProfileOnOrder
             $this->removeAllShippingsFromOrder($order);
 
             return;
-        }
-        // If shipping country does not match the allowed countries, we bail out.
+        } // If shipping country does not match the allowed countries, we bail out.
         elseif ($shippingCountryId && ! $shippingProfile->hasCountry($shippingCountryId)) {
             $this->removeAllShippingsFromOrder($order);
 
@@ -59,7 +60,7 @@ class UpdateShippingProfileOnOrder
 
         $shippingCost = ShippingCost::fromMoney(
             $tariff ? $tariff->getRate() : Cash::zero(),
-            TaxRate::fromString($this->config->getDefaultTaxRate()),
+            $this->findVatRateForOrder->findForShippingCost($order),
             $this->config->doesTariffInputIncludesVat()
         );
 

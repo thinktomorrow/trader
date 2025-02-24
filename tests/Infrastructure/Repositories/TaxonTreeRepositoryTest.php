@@ -25,8 +25,7 @@ final class TaxonTreeRepositoryTest extends TestCase
         parent::tearDown();
     }
 
-    /** @test */
-    public function it_can_get_the_entire_tree()
+    public function test_it_can_get_the_entire_tree()
     {
         $this->createDefaultTaxons();
 
@@ -37,8 +36,7 @@ final class TaxonTreeRepositoryTest extends TestCase
         }
     }
 
-    /** @test */
-    public function it_can_find_taxon_by_key()
+    public function test_it_can_find_taxon_by_key()
     {
         $this->createDefaultTaxons();
 

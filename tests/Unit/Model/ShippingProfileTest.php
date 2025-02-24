@@ -16,8 +16,7 @@ use Thinktomorrow\Trader\Domain\Model\ShippingProfile\TariffId;
 
 class ShippingProfileTest extends TestCase
 {
-    /** @test */
-    public function it_can_create_a_shipping_profile()
+    public function test_it_can_create_a_shipping_profile()
     {
         $shippingProfile = ShippingProfile::create(
             $shippingProfileId = ShippingProfileId::fromString('yyy'),
@@ -39,8 +38,7 @@ class ShippingProfileTest extends TestCase
         ], $shippingProfile->getChildEntities());
     }
 
-    /** @test */
-    public function it_can_be_build_from_raw_data()
+    public function test_it_can_be_build_from_raw_data()
     {
         $shippingProfile = $this->createdShippingProfile();
 
@@ -61,8 +59,7 @@ class ShippingProfileTest extends TestCase
         $this->assertCount(2, $shippingProfile->getChildEntities()[CountryId::class]);
     }
 
-    /** @test */
-    public function it_can_update_provider()
+    public function test_it_can_update_provider()
     {
         $shippingProfile = $this->createdShippingProfile();
 
@@ -71,8 +68,7 @@ class ShippingProfileTest extends TestCase
         $this->assertEquals($updatedProviderId, $shippingProfile->getProvider());
     }
 
-    /** @test */
-    public function it_can_add_a_tariff()
+    public function test_it_can_add_a_tariff()
     {
         $shippingProfile = $this->createdShippingProfile();
 
@@ -89,8 +85,7 @@ class ShippingProfileTest extends TestCase
         $this->assertCount(3, $shippingProfile->getChildEntities()[Tariff::class]);
     }
 
-    /** @test */
-    public function it_can_update_countries()
+    public function test_it_can_update_countries()
     {
         $shippingProfile = $this->createdShippingProfile();
 
@@ -110,8 +105,7 @@ class ShippingProfileTest extends TestCase
         $this->assertFalse($shippingProfile->hasCountry(CountryId::fromString('BE')));
     }
 
-    /** @test */
-    public function it_can_add_country()
+    public function test_it_can_add_country()
     {
         $shippingProfile = $this->createdShippingProfile();
 
@@ -125,8 +119,7 @@ class ShippingProfileTest extends TestCase
         ], $shippingProfile->getCountryIds());
     }
 
-    /** @test */
-    public function it_can_delete_country()
+    public function test_it_can_delete_country()
     {
         $shippingProfile = $this->createdShippingProfile();
 
@@ -138,8 +131,7 @@ class ShippingProfileTest extends TestCase
         ], $shippingProfile->getCountryIds());
     }
 
-    /** @test */
-    public function it_can_check_if_tariff_is_within_range()
+    public function test_it_can_check_if_tariff_is_within_range()
     {
         $tariff = Tariff::create(TariffId::fromString('xxx'), ShippingProfileId::fromString('yyy'), Cash::make(100), Cash::make(10), Cash::make(1000));
         $this->assertTrue($tariff->withinRange(Cash::make(10)));

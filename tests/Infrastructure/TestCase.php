@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace Tests\Infrastructure;
 
+use Illuminate\Support\Facades\DB;
 use Money\Money;
 use Tests\TestHelpers;
 use Thinktomorrow\Trader\Application\Cart\Read\Cart;
@@ -32,7 +33,7 @@ use Thinktomorrow\Trader\Application\Product\ProductDetail\ProductDetail;
 use Thinktomorrow\Trader\Application\Taxon\Tree\TaxonNode;
 use Thinktomorrow\Trader\Domain\Common\Email;
 use Thinktomorrow\Trader\Domain\Common\Locale;
-use Thinktomorrow\Trader\Domain\Common\Taxes\TaxRate;
+use Thinktomorrow\Trader\Domain\Common\Vat\VatPercentage;
 use Thinktomorrow\Trader\Domain\Model\Country\Country;
 use Thinktomorrow\Trader\Domain\Model\Country\CountryId;
 use Thinktomorrow\Trader\Domain\Model\Country\CountryRepository;
@@ -88,6 +89,7 @@ use Thinktomorrow\Trader\Infrastructure\Test\Repositories\InMemoryProductReposit
 use Thinktomorrow\Trader\Infrastructure\Test\Repositories\InMemoryPromoRepository;
 use Thinktomorrow\Trader\Infrastructure\Test\Repositories\InMemoryTaxonRepository;
 use Thinktomorrow\Trader\Infrastructure\Test\Repositories\InMemoryVariantRepository;
+use Thinktomorrow\Trader\Infrastructure\Test\Repositories\InMemoryVatRateRepository;
 use Thinktomorrow\Trader\Infrastructure\Test\TestContainer;
 use Thinktomorrow\Trader\Infrastructure\Test\TestTraderConfig;
 
@@ -114,7 +116,7 @@ abstract class TestCase extends \Orchestra\Testbench\TestCase
     {
         parent::setUp();
 
-        DiscountPriceDefaults::setDiscountTaxRate(TaxRate::fromString('21'));
+        DiscountPriceDefaults::setDiscountTaxRate(VatPercentage::fromString('21'));
         DiscountPriceDefaults::setDiscountIncludeTax(true);
 
         // States
@@ -174,6 +176,7 @@ abstract class TestCase extends \Orchestra\Testbench\TestCase
         InMemoryTaxonRepository::clear();
         InMemoryPromoRepository::clear();
         InMemoryCountryRepository::clear();
+        InMemoryVatRateRepository::clear();
 
         parent::tearDown();
     }

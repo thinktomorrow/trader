@@ -77,8 +77,7 @@ final class CustomerRepositoryTest extends TestCase
         $this->assertEquals(count(iterator_to_array($this->repositories())), $customersNotFound);
     }
 
-    /** @test */
-    public function it_can_generate_a_next_reference()
+    public function test_it_can_generate_a_next_reference()
     {
         foreach ($this->repositories() as $repository) {
             $this->assertInstanceOf(CustomerId::class, $repository->nextReference());

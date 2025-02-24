@@ -107,7 +107,7 @@ final class Line implements ChildAggregate, Discountable
             'line_id' => $this->lineId->get(),
             'variant_id' => $this->variantId?->get(),
             'line_price' => $this->linePrice->getMoney()->getAmount(),
-            'tax_rate' => $this->linePrice->getTaxRate()->toPercentage()->get(),
+            'tax_rate' => $this->linePrice->getVatPercentage()->get(),
             'includes_vat' => $this->linePrice->includesVat(),
             'total' => $this->getTotal()->getMoney()->getAmount(),
             'tax_total' => $this->getTaxTotal()->getAmount(),

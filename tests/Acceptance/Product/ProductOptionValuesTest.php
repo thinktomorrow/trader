@@ -11,8 +11,7 @@ class ProductOptionValuesTest extends ProductContext
 {
     use TestHelpers;
 
-    /** @test */
-    public function it_can_compose_a_simple_option_array_for_select_field_rendering()
+    public function test_it_can_compose_a_simple_option_array_for_select_field_rendering()
     {
         $repo = new InMemoryProductRepository();
 

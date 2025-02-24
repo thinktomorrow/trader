@@ -5,7 +5,7 @@ namespace Tests\Unit\Model\Order;
 
 use Money\Money;
 use PHPUnit\Framework\TestCase;
-use Thinktomorrow\Trader\Domain\Common\Taxes\TaxRate;
+use Thinktomorrow\Trader\Domain\Common\Vat\VatPercentage;
 use Thinktomorrow\Trader\Domain\Model\Order\Discount\DiscountPriceDefaults;
 use Thinktomorrow\Trader\Domain\Model\Order\Discount\DiscountTotal;
 
@@ -15,7 +15,7 @@ class DiscountTotalTest extends TestCase
     {
         parent::setUp();
 
-        DiscountPriceDefaults::setDiscountTaxRate(TaxRate::fromString('10'));
+        DiscountPriceDefaults::setDiscountTaxRate(VatPercentage::fromString('10'));
         DiscountPriceDefaults::setDiscountIncludeTax(true);
     }
 
@@ -57,7 +57,7 @@ class DiscountTotalTest extends TestCase
         $this->expectException(\DomainException::class);
 
         DiscountPriceDefaults::clear();
-        DiscountPriceDefaults::setDiscountTaxRate(TaxRate::fromString('10'));
+        DiscountPriceDefaults::setDiscountTaxRate(VatPercentage::fromString('10'));
 
         DiscountTotal::fromDefault(Money::EUR(50));
     }

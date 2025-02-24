@@ -5,7 +5,7 @@ namespace Tests\Unit\Model\Order;
 
 use Money\Money;
 use Tests\Unit\TestCase;
-use Thinktomorrow\Trader\Domain\Common\Taxes\TaxRate;
+use Thinktomorrow\Trader\Domain\Common\Vat\VatPercentage;
 use Thinktomorrow\Trader\Domain\Model\Order\Events\LineAdded;
 use Thinktomorrow\Trader\Domain\Model\Order\Events\LineDeleted;
 use Thinktomorrow\Trader\Domain\Model\Order\Events\LineUpdated;
@@ -21,8 +21,7 @@ use Thinktomorrow\Trader\Domain\Model\Product\Variant\VariantId;
 
 class OrderLineTest extends TestCase
 {
-    /** @test */
-    public function it_can_add_a_line()
+    public function test_it_can_add_a_line()
     {
         $order = $this->createDefaultOrder();
 
@@ -45,8 +44,7 @@ class OrderLineTest extends TestCase
         ], $order->releaseEvents());
     }
 
-    /** @test */
-    public function it_can_update_a_line()
+    public function test_it_can_update_a_line()
     {
         $order = $this->createDefaultOrder();
 
@@ -80,8 +78,7 @@ class OrderLineTest extends TestCase
         ], $order->releaseEvents());
     }
 
-    /** @test */
-    public function it_can_delete_a_line()
+    public function test_it_can_delete_a_line()
     {
         $order = $this->createDefaultOrder();
 
@@ -128,7 +125,7 @@ class OrderLineTest extends TestCase
         $order = $this->createDefaultOrder();
         $line = $order->getLines()[0];
 
-        $order->updateLinePrice($line->lineId, $price = LinePrice::fromMoney(Money::EUR(30), TaxRate::fromString('10'), false));
+        $order->updateLinePrice($line->lineId, $price = LinePrice::fromMoney(Money::EUR(30), VatPercentage::fromString('10'), false));
         $this->assertEquals($price, $line->getLinePrice());
     }
 
@@ -183,12 +180,12 @@ class OrderLineTest extends TestCase
         $line = $order->getLines()[0];
         $lineTotal = $line->getTotal();
 
-        $this->assertEquals(LinePrice::fromMoney(Money::EUR(400), $lineTotal->getTaxRate(), $lineTotal->includesVat()), $line->getTotal());
+        $this->assertEquals(LinePrice::fromMoney(Money::EUR(400), $lineTotal->getVatPercentage(), $lineTotal->includesVat()), $line->getTotal());
 
         $line->addDiscount($this->createOrderLineDiscount(['promo_discount_id' => 'qqq', 'discount_id' => 'defgh'], $order->getMappedData()));
 
         $this->assertCount(1, $line->getDiscounts());
 
-        $this->assertEquals(LinePrice::fromMoney(Money::EUR(370), $lineTotal->getTaxRate(), $lineTotal->includesVat()), $line->getTotal());
+        $this->assertEquals(LinePrice::fromMoney(Money::EUR(370), $lineTotal->getVatPercentage(), $lineTotal->includesVat()), $line->getTotal());
     }
 }

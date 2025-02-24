@@ -19,16 +19,14 @@ class InvoiceRepositoryTest extends TestCase
     use RefreshDatabase;
     use PrepareWorld;
 
-    /** @test */
-    public function it_can_generate_a_next_invoice_reference()
+    public function test_it_can_generate_a_next_invoice_reference()
     {
         foreach ($this->orderRepositories() as $orderRepository) {
             $this->assertInstanceOf(InvoiceReference::class, $orderRepository->nextInvoiceReference());
         }
     }
 
-    /** @test */
-    public function it_can_get_last_invoice_reference()
+    public function test_it_can_get_last_invoice_reference()
     {
         $order = $this->createOrder(['order_id' => 'yyy', 'order_ref' => 'yy-ref', 'invoice_ref' => '2208001'], [], [], [], [], null, null, $this->createOrderShopper(['shopper_id' => 'sss']));
 

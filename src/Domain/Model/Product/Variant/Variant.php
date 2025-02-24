@@ -108,7 +108,7 @@ final class Variant implements ChildEntity
             'state' => $this->state->value,
             'unit_price' => $this->unitPrice->getMoney()->getAmount(),
             'sale_price' => $this->salePrice->getMoney()->getAmount(),
-            'tax_rate' => $this->unitPrice->getTaxRate()->toPercentage()->get(),
+            'tax_rate' => $this->unitPrice->getVatPercentage()->get(),
             'includes_vat' => $this->unitPrice->includesVat(),
             'sku' => $this->sku,
             'ean' => $this->ean,
@@ -129,7 +129,7 @@ final class Variant implements ChildEntity
         $variant->salePrice = VariantSalePrice::fromScalars($state['sale_price'], $state['tax_rate'], $state['includes_vat']);
         $variant->sku = $state['sku'];
         $variant->ean = $state['ean'] ?? null;
-        $variant->show_in_grid = $state['show_in_grid'] ? (bool) $state['show_in_grid'] : false;
+        $variant->show_in_grid = $state['show_in_grid'] ? (bool)$state['show_in_grid'] : false;
         $variant->data = json_decode($state['data'], true);
 
         $variant->optionValueIds = array_map(fn ($optionValueState) => OptionValueId::fromString($optionValueState), $state['option_value_ids']);

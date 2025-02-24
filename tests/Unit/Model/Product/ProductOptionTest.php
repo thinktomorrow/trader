@@ -14,8 +14,7 @@ use Thinktomorrow\Trader\Domain\Model\Product\ProductId;
 
 class ProductOptionTest extends TestCase
 {
-    /** @test */
-    public function it_can_add_option()
+    public function test_it_can_add_option()
     {
         $product = $this->createProduct();
 
@@ -36,8 +35,7 @@ class ProductOptionTest extends TestCase
         ], $product->getChildEntities()[Option::class]);
     }
 
-    /** @test */
-    public function it_cannot_add_same_option_twice()
+    public function test_it_cannot_add_same_option_twice()
     {
         $product = $this->createProduct();
 
@@ -60,8 +58,7 @@ class ProductOptionTest extends TestCase
         $this->assertCount(0, $product->getVariants()[0]->getOptionValueIds());
     }
 
-    /** @test */
-    public function it_can_update_option_values()
+    public function test_it_can_update_option_values()
     {
         $product = $this->createProduct();
 
@@ -99,8 +96,7 @@ class ProductOptionTest extends TestCase
         ], $product->getChildEntities()[Option::class]);
     }
 
-    /** @test */
-    public function it_can_rearrange_options()
+    public function test_it_can_rearrange_options()
     {
         $product = $this->createProductWithOptions();
 
@@ -126,8 +122,7 @@ class ProductOptionTest extends TestCase
         ], $product->getChildEntities()[Option::class]);
     }
 
-    /** @test */
-    public function it_can_rearrange_option_values()
+    public function test_it_can_rearrange_option_values()
     {
         $product = $this->createProductWithOptions();
 
@@ -162,8 +157,7 @@ class ProductOptionTest extends TestCase
         ], $product->getChildEntities()[Option::class]);
     }
 
-    /** @test */
-    public function it_can_get_all_options()
+    public function test_it_can_get_all_options()
     {
         $product = $this->createProductWithOptions();
 

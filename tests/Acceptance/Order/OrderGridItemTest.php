@@ -13,8 +13,7 @@ class OrderGridItemTest extends TestCase
 {
     use TestHelpers;
 
-    /** @test */
-    public function it_can_create_a_order_grid_item()
+    public function test_it_can_create_a_order_grid_item()
     {
         $gridItem = DefaultOrderGridItem::fromMappedData(array_merge($this->createDefaultOrder()->getMappedData(), [
         ]), []);
@@ -30,8 +29,7 @@ class OrderGridItemTest extends TestCase
         $this->assertEquals('/admin/orders/xxx', $gridItem->getUrl());
     }
 
-    /** @test */
-    public function it_can_get_important_timestamps()
+    public function test_it_can_get_important_timestamps()
     {
         $gridItem = DefaultOrderGridItem::fromMappedData(array_merge($this->createDefaultOrder()->getMappedData(), [
             'confirmed_at' => $confirmed_at = '2022-02-02 10:10:10',
@@ -44,8 +42,7 @@ class OrderGridItemTest extends TestCase
         $this->assertEquals(new DateTime($delivered_at), $gridItem->getDeliveredAt());
     }
 
-    /** @test */
-    public function it_can_get_shopper_details()
+    public function test_it_can_get_shopper_details()
     {
         $gridItem = DefaultOrderGridItem::fromMappedData(array_merge($this->createDefaultOrder()->getMappedData(), [
         ]), [

@@ -49,6 +49,8 @@ class AdjustLines implements Adjuster
                 $line->updatePrice(LinePrice::fromPrice($variant->getSalePrice()));
             }
 
+            // AdjustTax
+
             $this->adjustLine->adjust($order, $line);
         }
 

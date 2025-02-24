@@ -13,13 +13,12 @@ class DeletePaymentMethodTest extends PaymentMethodContext
 {
     use TestHelpers;
 
-    /** @test */
-    public function it_can_delete_a_method()
+    public function test_it_can_delete_a_method()
     {
         $paymentMethodId = $this->paymentMethodApplication->createPaymentMethod(new CreatePaymentMethod(
             'pay-after-invoice',
             "10",
-            ['BE','NL'],
+            ['BE', 'NL'],
             ['foo' => 'bar']
         ));
 

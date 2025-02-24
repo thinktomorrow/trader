@@ -31,40 +31,35 @@ class OrderGridRepositoryTest extends TestCase
         (new TestContainer())->get(MysqlOrderRepository::class)->save($this->order);
     }
 
-    /** @test */
-    public function it_fetches_grid_orders()
+    public function test_it_fetches_grid_orders()
     {
         $gridItems = $this->getMysqlGridRepository()->getResults();
 
         $this->assertCount(1, $gridItems);
     }
 
-    /** @test */
-    public function it_can_return_ids()
+    public function test_it_can_return_ids()
     {
         $gridItems = $this->getMysqlGridRepository()->getOrderIds();
 
         $this->assertCount(1, $gridItems);
     }
 
-    /** @test */
-    public function it_can_filter_by_order_reference()
+    public function test_it_can_filter_by_order_reference()
     {
         $gridItems = $this->getMysqlGridRepository()->filterByOrderReference('xx')->getResults();
 
         $this->assertCount(1, $gridItems);
     }
 
-    /** @test */
-    public function it_can_filter_by_shopper_email()
+    public function test_it_can_filter_by_shopper_email()
     {
         $gridItems = $this->getMysqlGridRepository()->filterByShopperEmail('ben@think')->getResults();
 
         $this->assertCount(1, $gridItems);
     }
 
-    /** @test */
-    public function it_can_filter_by_customer_id()
+    public function test_it_can_filter_by_customer_id()
     {
         $gridItems = $this->getMysqlGridRepository()->filterByCustomerId('ccc-123')->getResults();
         $this->assertCount(1, $gridItems);
@@ -72,15 +67,13 @@ class OrderGridRepositoryTest extends TestCase
         $this->assertCount(0, $this->getMysqlGridRepository()->filterByCustomerId('ccc')->getResults());
     }
 
-    /** @test */
-    public function it_can_filter_by_order_states()
+    public function test_it_can_filter_by_order_states()
     {
         $this->assertCount(1, $this->getMysqlGridRepository()->filterByStates([DefaultOrderState::cart_revived->value])->getResults());
         $this->assertCount(0, $this->getMysqlGridRepository()->filterByStates([DefaultOrderState::cancelled->value])->getResults());
     }
 
-    /** @test */
-    public function it_can_filter_by_confirmed_at()
+    public function test_it_can_filter_by_confirmed_at()
     {
         $this->assertCount(0, $this->getMysqlGridRepository()->filterByConfirmedAt(now()->subDay()->toDateString(), now()->addDay()->toDateString())->getResults());
 
@@ -93,8 +86,7 @@ class OrderGridRepositoryTest extends TestCase
         $this->assertCount(0, $this->getMysqlGridRepository()->filterByConfirmedAt(null, now()->subDay()->toDateTimeString())->getResults());
     }
 
-    /** @test */
-    public function it_can_filter_by_delivered_at()
+    public function test_it_can_filter_by_delivered_at()
     {
         $this->assertCount(0, $this->getMysqlGridRepository()->filterByDeliveredAt(now()->subDay()->toDateString(), now()->addDay()->toDateString())->getResults());
 
@@ -107,26 +99,22 @@ class OrderGridRepositoryTest extends TestCase
         $this->assertCount(0, $this->getMysqlGridRepository()->filterByDeliveredAt(null, now()->subDay()->toDateTimeString())->getResults());
     }
 
-    /** @test */
-    public function it_can_sort_by_confirmed_at()
+    public function test_it_can_sort_by_confirmed_at()
     {
         $this->runTestSortingByDate('confirmed_at', 'sortByConfirmedAt', 'getConfirmedAt');
     }
 
-    /** @test */
-    public function it_can_sort_descending_by_confirmed_at()
+    public function test_it_can_sort_descending_by_confirmed_at()
     {
         $this->runTestSortingByDate('confirmed_at', 'sortByConfirmedAtDesc', 'getConfirmedAt');
     }
 
-    /** @test */
-    public function it_can_sort_by_delivered_at()
+    public function test_it_can_sort_by_delivered_at()
     {
         $this->runTestSortingByDate('delivered_at', 'sortByDeliveredAt', 'getDeliveredAt');
     }
 
-    /** @test */
-    public function it_can_sort_descending_by_delivered_at()
+    public function test_it_can_sort_descending_by_delivered_at()
     {
         $this->runTestSortingByDate('delivered_at', 'sortByDeliveredAtDesc', 'getDeliveredAt');
     }

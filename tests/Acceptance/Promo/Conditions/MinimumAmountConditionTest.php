@@ -23,8 +23,7 @@ class MinimumAmountConditionTest extends PromoContext
         ]);
     }
 
-    /** @test */
-    public function it_can_create_condition_via_factory()
+    public function test_it_can_create_condition_via_factory()
     {
         $condition = $this->factory->make('minimum_amount', [
             'data' => json_encode(['amount' => '50']),
@@ -33,8 +32,7 @@ class MinimumAmountConditionTest extends PromoContext
         $this->assertInstanceOf(MinimumAmountOrderCondition::class, $condition);
     }
 
-    /** @test */
-    public function it_can_check_condition()
+    public function test_it_can_check_condition()
     {
         $order = $this->createDefaultOrder();
 
