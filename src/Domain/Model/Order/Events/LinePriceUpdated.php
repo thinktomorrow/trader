@@ -14,7 +14,6 @@ final class LinePriceUpdated
         public readonly LineId    $lineId,
         public readonly LinePrice $formerPrice,
         public readonly LinePrice $newPrice
-    )
-    {
+    ) {
     }
 }
