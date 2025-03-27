@@ -40,7 +40,7 @@ class ViesVatNumberValidator implements VatNumberValidator
             // Faulty input
             if ($e->getMessage() == "INVALID_INPUT") {
                 return new VatNumberValidation($vatNumber, VatNumberValidationState::invalid, [
-                    'message' => 'Invalid VAT number'
+                    'message' => 'Invalid VAT number',
                 ]);
             }
 

@@ -51,7 +51,7 @@ class VatNumber
 
     private function validate(string $countryCode, string $number)
     {
-        if (strlen($countryCode) !== 2 || !ctype_alpha($countryCode)) {
+        if (strlen($countryCode) !== 2 || ! ctype_alpha($countryCode)) {
             throw new InvalidVatNumber('Invalid country code [' . $countryCode . ']');
         }
 
@@ -59,7 +59,7 @@ class VatNumber
          * Basic validation. A vat number consists usually of 9 or 10
          * but at least of eight characters + iso country code (2 chars)
          */
-        if (!$number || strlen($number) < 8) {
+        if (! $number || strlen($number) < 8) {
             throw new InvalidVatNumber('Invalid vat number [' . $number . ']');
         }
 
