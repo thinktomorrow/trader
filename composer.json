@@ -14,18 +14,19 @@
         }
     ],
     "require": {
-        "php" : ">=8.2",
+        "php": ">=8.2",
         "moneyphp/money": "^4.3.0",
         "beberlei/assert": "^3.3.2",
         "ext-bcmath": "*",
         "ext-intl": "*",
+        "ext-soap": "*",
         "psr/container": "^2.0.2",
         "laravel/ui": "^4.2",
         "thinktomorrow/vine": "^0.4.11",
         "ramsey/uuid": "^4.7.3"
     },
     "require-dev": {
-        "phpunit/phpunit" : "^9.6.3",
+        "phpunit/phpunit": "^9.6.3",
         "phpstan/phpstan": "^1.9.17",
         "illuminate/database": "^9.0",
         "orchestra/testbench": "^7.22.0",
@@ -37,17 +38,17 @@
         "psr-4": {
             "Thinktomorrow\\Trader\\": "src/"
         },
-      "classmap":[]
+        "classmap": []
     },
-  "autoload-dev": {
-      "psr-4": {
-          "Tests\\": "tests/"
-      },
-      "files": [
-          "src/helpers.php"
-      ],
-      "classmap":[]
-  },
+    "autoload-dev": {
+        "psr-4": {
+            "Tests\\": "tests/"
+        },
+        "files": [
+            "src/helpers.php"
+        ],
+        "classmap": []
+    },
     "scripts": {
         "test": "phpunit"
     },

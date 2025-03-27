@@ -1,0 +1,29 @@
+<?php
+declare(strict_types=1);
+
+namespace Thinktomorrow\Trader\Application\VatRate;
+
+use Thinktomorrow\Trader\Domain\Model\Country\CountryId;
+use Thinktomorrow\Trader\Domain\Model\VatRate\VatNumber;
+
+class ValidateVatNumber
+{
+    private string $countryId;
+    private string $vatNumber;
+
+    public function __construct(string $countryId, string $vatNumber)
+    {
+        $this->countryId = $countryId;
+        $this->vatNumber = $vatNumber;
+    }
+
+    public function getVatNumber(): VatNumber
+    {
+        return VatNumber::make($this->getCountryId(), $this->vatNumber);
+    }
+
+    private function getCountryId(): CountryId
+    {
+        return CountryId::fromString($this->countryId);
+    }
+}
