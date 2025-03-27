@@ -30,7 +30,7 @@ class ViesClient
     {
         return $this->client->checkVat([
             'countryCode' => $countryCode,
-            'vatNumber' => $vatNumber
+            'vatNumber' => $vatNumber,
         ]);
     }
 
@@ -47,7 +47,7 @@ class ViesClient
             'encoding' => 'UTF-8',
             'exceptions' => true,
             'features' => SOAP_SINGLE_ELEMENT_ARRAYS,
-            'compression' => SOAP_COMPRESSION_ACCEPT | SOAP_COMPRESSION_GZIP
+            'compression' => SOAP_COMPRESSION_ACCEPT | SOAP_COMPRESSION_GZIP,
         ]);
     }
 }

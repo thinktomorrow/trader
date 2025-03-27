@@ -11,7 +11,7 @@ class VatNumberValidation
     public function __construct(
         public readonly VatNumber                $vatNumber,
         public readonly VatNumberValidationState $state,
-        public readonly array                    $data)
-    {
+        public readonly array                    $data
+    ) {
     }
 }
