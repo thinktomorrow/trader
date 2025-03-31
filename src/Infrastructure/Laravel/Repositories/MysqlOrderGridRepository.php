@@ -93,11 +93,11 @@ final class MysqlOrderGridRepository implements OrderGridRepository
 
     private function filterByDate(string $column, string $startAt = null, string $endAt = null): static
     {
-        if (!is_null($startAt)) {
+        if (! is_null($startAt)) {
             $this->builder->where(static::$orderTable . '.' . $column, '>=', Carbon::parse($startAt)->toDateTimeString());
         }
 
-        if (!is_null($endAt)) {
+        if (! is_null($endAt)) {
             $this->builder->where(static::$orderTable . '.' . $column, '<=', Carbon::parse($endAt)->toDateTimeString());
         }
 
@@ -170,7 +170,7 @@ final class MysqlOrderGridRepository implements OrderGridRepository
     public function getResults(): LengthAwarePaginator
     {
         // Default ordering if no ordering has been applied yet.
-        if (!$this->builder->orders || count($this->builder->orders) < 1) {
+        if (! $this->builder->orders || count($this->builder->orders) < 1) {
             $this->sortByDefault();
         }
 
@@ -178,8 +178,8 @@ final class MysqlOrderGridRepository implements OrderGridRepository
 
         return $results->setCollection(
             $results->getCollection()
-                ->map(fn($state) => get_object_vars($state))
-                ->map(fn($state) => $this->container->get(OrderGridItem::class)::fromMappedData($state, [
+                ->map(fn ($state) => get_object_vars($state))
+                ->map(fn ($state) => $this->container->get(OrderGridItem::class)::fromMappedData($state, [
                     'email' => $state['shopper_email'],
                     'is_business' => $state['is_business'],
                     'data' => $state['shopper_data'],
@@ -191,7 +191,7 @@ final class MysqlOrderGridRepository implements OrderGridRepository
     public function getOrderIds(): array
     {
         // Default ordering if no ordering has been applied yet.
-        if (!$this->builder->orders || count($this->builder->orders) < 1) {
+        if (! $this->builder->orders || count($this->builder->orders) < 1) {
             $this->sortByDefault();
         }
 

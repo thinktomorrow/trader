@@ -126,17 +126,17 @@ class DefaultOrderGridItem implements OrderGridItem
 
     public function isBusiness(): bool
     {
-        return !!$this->shopperData['is_business'];
+        return ! ! $this->shopperData['is_business'];
     }
 
     public function hasCustomer(): bool
     {
-        return !is_null($this->customer_id);
+        return ! is_null($this->customer_id);
     }
 
     public function getCustomerUrl(): ?string
     {
-        if (!$this->customer_id) {
+        if (! $this->customer_id) {
             return null;
         }
 
