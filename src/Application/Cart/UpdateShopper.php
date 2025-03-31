@@ -5,9 +5,7 @@ namespace Thinktomorrow\Trader\Application\Cart;
 
 use Thinktomorrow\Trader\Domain\Common\Email;
 use Thinktomorrow\Trader\Domain\Common\Locale;
-use Thinktomorrow\Trader\Domain\Model\Country\CountryId;
 use Thinktomorrow\Trader\Domain\Model\Order\OrderId;
-use Thinktomorrow\Trader\Domain\Model\VatRate\VatNumber;
 
 class UpdateShopper
 {
@@ -46,7 +44,7 @@ class UpdateShopper
 
     public function getVatNumber(): ?string
     {
-        if (!$this->vatNumber) {
+        if (! $this->vatNumber) {
             return null;
         }
 

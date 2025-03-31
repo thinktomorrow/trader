@@ -3,7 +3,6 @@ declare(strict_types=1);
 
 namespace Thinktomorrow\Trader\Application\Order\Merchant;
 
-use Thinktomorrow\Trader\Application\Cart\VerifyCartVatNumber;
 use Thinktomorrow\Trader\Application\VatRate\ValidateVatNumber;
 use Thinktomorrow\Trader\Application\VatRate\VatNumberApplication;
 use Thinktomorrow\Trader\Application\VatRate\VatNumberValidation;
@@ -89,7 +88,7 @@ class MerchantOrderApplication
 
         $billingAddressCountryId = $order->getBillingAddress()?->getAddress()->countryId;
 
-        if (!$billingAddressCountryId) {
+        if (! $billingAddressCountryId) {
             throw new \Exception('No billing address found for order ' . $order->orderId);
         }
 
@@ -165,14 +164,14 @@ class MerchantOrderApplication
     {
         $updatedValues = [];
 
-        if (!$command->getEmail()->equals($shopper->getEmail())) {
+        if (! $command->getEmail()->equals($shopper->getEmail())) {
             $updatedValues['email'] = [
                 'old' => $shopper->getEmail()->get(),
                 'new' => $command->getEmail()->get(),
             ];
         }
 
-        if (!$command->getLocale()->equals($shopper->getLocale())) {
+        if (! $command->getLocale()->equals($shopper->getLocale())) {
             $updatedValues['locale'] = [
                 'old' => $shopper->getLocale()->get(),
                 'new' => $command->getLocale()->get(),

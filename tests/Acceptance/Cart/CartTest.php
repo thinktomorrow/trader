@@ -6,7 +6,6 @@ namespace Tests\Acceptance\Cart;
 use Thinktomorrow\Trader\Application\Cart\ClearCheckoutData;
 use Thinktomorrow\Trader\Application\Cart\UpdateBillingAddress;
 use Thinktomorrow\Trader\Application\Cart\VerifyCartVatNumber;
-use Thinktomorrow\Trader\Application\Order\Merchant\VerifyVatNumber;
 use Thinktomorrow\Trader\Application\VatRate\VatNumberValidation;
 use Thinktomorrow\Trader\Domain\Model\VatRate\VatNumberValidationState;
 

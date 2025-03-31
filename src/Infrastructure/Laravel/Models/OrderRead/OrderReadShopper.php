@@ -53,12 +53,12 @@ abstract class OrderReadShopper
 
     public function isCustomer(): bool
     {
-        return !is_null($this->customer_id);
+        return ! is_null($this->customer_id);
     }
 
     public function isGuest(): bool
     {
-        return !$this->isCustomer();
+        return ! $this->isCustomer();
     }
 
     public function isBusiness(): bool
@@ -78,12 +78,12 @@ abstract class OrderReadShopper
 
     public function isVatNumberValid(): bool
     {
-        return !!$this->dataAsPrimitive('vat_number_valid');
+        return ! ! $this->dataAsPrimitive('vat_number_valid');
     }
 
     public function getVatNumberState(): VatNumberValidationState
     {
-        if (!$state = $this->dataAsPrimitive('vat_number_state')) {
+        if (! $state = $this->dataAsPrimitive('vat_number_state')) {
             return VatNumberValidationState::unknown;
         }
 

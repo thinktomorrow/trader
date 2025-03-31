@@ -51,7 +51,7 @@ class UpdateAddressTest extends CartContext
 
         $order = $this->orderRepository->find($order->orderId);
 
-        $this->assertEquals(new Address(CountryId::fromString('NL'), 'line-1 updated', 'line-2', 'postal-code', 'city',), $order->getShippingAddress()->getAddress());
+        $this->assertEquals(new Address(CountryId::fromString('NL'), 'line-1 updated', 'line-2', 'postal-code', 'city', ), $order->getShippingAddress()->getAddress());
 
         $this->assertEquals(new ShippingAddressUpdatedByMerchant($order->orderId, [
             'country_id' => ['old' => 'BE', 'new' => 'NL'], 'line1' => ['old' => 'line-1', 'new' => 'line-1 updated'],
@@ -89,7 +89,7 @@ class UpdateAddressTest extends CartContext
 
         $order = $this->orderRepository->find($order->orderId);
 
-        $this->assertEquals(new Address(CountryId::fromString('NL'), 'line-1 updated', 'line-2', 'postal-code', 'city',), $order->getBillingAddress()->getAddress());
+        $this->assertEquals(new Address(CountryId::fromString('NL'), 'line-1 updated', 'line-2', 'postal-code', 'city', ), $order->getBillingAddress()->getAddress());
 
         $this->assertEquals(new BillingAddressUpdatedByMerchant($order->orderId, [
             'country_id' => ['old' => 'BE', 'new' => 'NL'], 'line1' => ['old' => 'line-1', 'new' => 'line-1 updated'],

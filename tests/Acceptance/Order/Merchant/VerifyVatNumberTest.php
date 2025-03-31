@@ -4,10 +4,8 @@ declare(strict_types=1);
 namespace Tests\Acceptance\Order\Merchant;
 
 use Tests\Acceptance\Cart\CartContext;
-use Thinktomorrow\Trader\Application\Order\Merchant\UpdateShopper;
 use Thinktomorrow\Trader\Application\Order\Merchant\VerifyVatNumber;
 use Thinktomorrow\Trader\Application\VatRate\VatNumberValidation;
-use Thinktomorrow\Trader\Domain\Model\Order\Events\Merchant\ShopperUpdatedByMerchant;
 use Thinktomorrow\Trader\Domain\Model\VatRate\VatNumberValidationState;
 use Thinktomorrow\Trader\Infrastructure\Test\Repositories\InMemoryOrderRepository;
 

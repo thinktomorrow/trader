@@ -14,8 +14,7 @@ class VatNumberValidation
         public readonly string                   $vatNumber,
         public readonly VatNumberValidationState $state,
         public readonly array                    $data
-    )
-    {
+    ) {
     }
 
     public static function fromException(string $countryCode, string $vatNumber, \Exception $exception): self

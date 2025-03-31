@@ -35,10 +35,6 @@ use Thinktomorrow\Trader\Domain\Model\Order\State\OrderState;
 use Thinktomorrow\Trader\Domain\Model\Order\State\OrderStateMachine;
 use Thinktomorrow\Trader\Domain\Model\Product\Personalisation\PersonalisationId;
 use Thinktomorrow\Trader\Domain\Model\ShippingProfile\ShippingProfileRepository;
-use Thinktomorrow\Trader\Domain\Model\VatRate\Exceptions\InvalidVatNumber;
-use Thinktomorrow\Trader\Domain\Model\VatRate\Exceptions\VatNumberCountryMismatch;
-use Thinktomorrow\Trader\Domain\Model\VatRate\VatNumber;
-use Thinktomorrow\Trader\Domain\Model\VatRate\VatNumberValidationState;
 use Thinktomorrow\Trader\TraderConfig;
 
 final class CartApplication
@@ -71,8 +67,7 @@ final class CartApplication
         CustomerRepository           $customerRepository,
         EventDispatcher              $eventDispatcher,
         VatNumberApplication         $vatNumberApplication,
-    )
-    {
+    ) {
         $this->findVariantDetailsForCart = $findVariantDetailsForCart;
         $this->adjustLine = $adjustLine;
         $this->orderRepository = $orderRepository;
@@ -158,7 +153,7 @@ final class CartApplication
                 }
             }
 
-            if (!$originalPersonalisation) {
+            if (! $originalPersonalisation) {
                 throw new \InvalidArgumentException('No personalisation found for variant [' . $addLine->getVariantId()->get() . '] by personalisation id [' . $personalisation_id . '].');
             }
 
@@ -369,11 +364,11 @@ final class CartApplication
         $shopper->addData($customer->getData());
         $order->updateShopper($shopper);
 
-        if (!$order->getBillingAddress() && $billingAddress = $customer->getBillingAddress()) {
+        if (! $order->getBillingAddress() && $billingAddress = $customer->getBillingAddress()) {
             $this->chooseCustomerBillingAddress($order, $billingAddress);
         }
 
-        if (!$order->getShippingAddress() && $shippingAddress = $customer->getShippingAddress()) {
+        if (! $order->getShippingAddress() && $shippingAddress = $customer->getShippingAddress()) {
             $this->chooseCustomerShippingAddress($order, $shippingAddress);
         }
 

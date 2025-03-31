@@ -12,7 +12,6 @@ use Thinktomorrow\Trader\Application\Cart\ShippingProfile\UpdateShippingProfileO
 use Thinktomorrow\Trader\Application\Order\State\OrderStateApplication;
 use Thinktomorrow\Trader\Application\VatRate\FindVatRateForOrder;
 use Thinktomorrow\Trader\Application\VatRate\VatNumberApplication;
-use Thinktomorrow\Trader\Application\VatRate\VatNumberValidation;
 use Thinktomorrow\Trader\Domain\Model\Order\Payment\DefaultPaymentState;
 use Thinktomorrow\Trader\Domain\Model\Order\Payment\PaymentStateMachine;
 use Thinktomorrow\Trader\Domain\Model\Order\Shipping\DefaultShippingState;
@@ -107,7 +106,7 @@ abstract class StateContext extends TestCase
 
     protected function assertPaymentStateTransition(string $transitionMethod, DefaultPaymentState $currentState, DefaultPaymentState $newState, ?DefaultOrderState $orderState = null, ?DefaultOrderState $newOrderState = null)
     {
-        if (!$orderState) {
+        if (! $orderState) {
             $orderState = DefaultOrderState::confirmed;
         }
 
@@ -129,7 +128,7 @@ abstract class StateContext extends TestCase
 
     protected function assertShippingStateTransition(string $transitionMethod, DefaultShippingState $currentState, DefaultShippingState $newState, ?DefaultOrderState $orderState = null, ?DefaultOrderState $newOrderState = null)
     {
-        if (!$orderState) {
+        if (! $orderState) {
             $orderState = DefaultOrderState::confirmed;
         }
 
