@@ -4,6 +4,10 @@ Important changes will be notified in this file
 
 ## unreleased
 
+## 2025-03-31 - 0.7.2
+
+- Added: `OrderGridItem::isBusiness()' method to check if the order is a business order.
+
 ## 2025-03-31 - 0.7.1
 
 - Added: Vies vat number validation.

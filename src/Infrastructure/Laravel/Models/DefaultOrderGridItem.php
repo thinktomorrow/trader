@@ -48,6 +48,7 @@ class DefaultOrderGridItem implements OrderGridItem
 
         $gridItem->shopperData = [
             'email' => $shopperState['email'] ?? null,
+            'is_business' => $shopperState['is_business'] ?? false,
             ...(isset($shopperState['data']) ? json_decode($shopperState['data'], true) : []),
         ];
         $gridItem->customer_id = $shopperState['customer_id'] ?? null;
@@ -123,14 +124,19 @@ class DefaultOrderGridItem implements OrderGridItem
         return $this->shopperData['email'];
     }
 
+    public function isBusiness(): bool
+    {
+        return !!$this->shopperData['is_business'];
+    }
+
     public function hasCustomer(): bool
     {
-        return ! is_null($this->customer_id);
+        return !is_null($this->customer_id);
     }
 
     public function getCustomerUrl(): ?string
     {
-        if (! $this->customer_id) {
+        if (!$this->customer_id) {
             return null;
         }
 

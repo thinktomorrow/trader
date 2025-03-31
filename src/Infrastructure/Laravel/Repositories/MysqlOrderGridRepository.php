@@ -33,25 +33,26 @@ final class MysqlOrderGridRepository implements OrderGridRepository
 
         // Basic builder query
         $this->builder = DB::table(static::$orderTable)
-            ->leftJoin(static::$shopperTable, static::$orderTable.'.order_id', '=', static::$shopperTable.'.order_id')
+            ->leftJoin(static::$shopperTable, static::$orderTable . '.order_id', '=', static::$shopperTable . '.order_id')
             ->select([
-                static::$orderTable.'.*',
-                static::$shopperTable.'.email AS shopper_email',
-                static::$shopperTable.'.data AS shopper_data',
-                static::$shopperTable.'.customer_id AS shopper_customer_id',
+                static::$orderTable . '.*',
+                static::$shopperTable . '.email AS shopper_email',
+                static::$shopperTable . '.is_business AS is_business',
+                static::$shopperTable . '.data AS shopper_data',
+                static::$shopperTable . '.customer_id AS shopper_customer_id',
             ]);
     }
 
     public function filterByOrderReference(string $orderReference): static
     {
-        $this->builder->where('order_ref', 'LIKE', '%'.$orderReference .'%');
+        $this->builder->where('order_ref', 'LIKE', '%' . $orderReference . '%');
 
         return $this;
     }
 
     public function filterByShopperEmail(string $shopperEmail): static
     {
-        $this->builder->where(static::$shopperTable.'.email', 'LIKE', '%'.$shopperEmail .'%');
+        $this->builder->where(static::$shopperTable . '.email', 'LIKE', '%' . $shopperEmail . '%');
 
         return $this;
     }
@@ -59,7 +60,7 @@ final class MysqlOrderGridRepository implements OrderGridRepository
     public function filterByShopperTerm(string $shopperTerm): static
     {
         $this->builder->where(function ($query) use ($shopperTerm) {
-            $query->where(static::$shopperTable.'.email', 'LIKE', '%'.$shopperTerm .'%')
+            $query->where(static::$shopperTable . '.email', 'LIKE', '%' . $shopperTerm . '%')
                 ->orWhereRaw("JSON_SEARCH(LOWER(`trader_order_shoppers`.`data`), 'all', ?) IS NOT NULL", ["%" . strtolower($shopperTerm) . "%"]);
         });
 
@@ -68,14 +69,14 @@ final class MysqlOrderGridRepository implements OrderGridRepository
 
     public function filterByCustomerId(string $customerId): static
     {
-        $this->builder->where(static::$shopperTable.'.customer_id', $customerId);
+        $this->builder->where(static::$shopperTable . '.customer_id', $customerId);
 
         return $this;
     }
 
     public function filterByStates(array $states): static
     {
-        $this->builder->whereIn(static::$orderTable.'.order_state', $states);
+        $this->builder->whereIn(static::$orderTable . '.order_state', $states);
 
         return $this;
     }
@@ -92,11 +93,11 @@ final class MysqlOrderGridRepository implements OrderGridRepository
 
     private function filterByDate(string $column, string $startAt = null, string $endAt = null): static
     {
-        if (! is_null($startAt)) {
+        if (!is_null($startAt)) {
             $this->builder->where(static::$orderTable . '.' . $column, '>=', Carbon::parse($startAt)->toDateTimeString());
         }
 
-        if (! is_null($endAt)) {
+        if (!is_null($endAt)) {
             $this->builder->where(static::$orderTable . '.' . $column, '<=', Carbon::parse($endAt)->toDateTimeString());
         }
 
@@ -169,7 +170,7 @@ final class MysqlOrderGridRepository implements OrderGridRepository
     public function getResults(): LengthAwarePaginator
     {
         // Default ordering if no ordering has been applied yet.
-        if (! $this->builder->orders || count($this->builder->orders) < 1) {
+        if (!$this->builder->orders || count($this->builder->orders) < 1) {
             $this->sortByDefault();
         }
 
@@ -177,9 +178,10 @@ final class MysqlOrderGridRepository implements OrderGridRepository
 
         return $results->setCollection(
             $results->getCollection()
-                ->map(fn ($state) => get_object_vars($state))
-                ->map(fn ($state) => $this->container->get(OrderGridItem::class)::fromMappedData($state, [
+                ->map(fn($state) => get_object_vars($state))
+                ->map(fn($state) => $this->container->get(OrderGridItem::class)::fromMappedData($state, [
                     'email' => $state['shopper_email'],
+                    'is_business' => $state['is_business'],
                     'data' => $state['shopper_data'],
                     'customer_id' => $state['shopper_customer_id'],
                 ]))
@@ -189,11 +191,11 @@ final class MysqlOrderGridRepository implements OrderGridRepository
     public function getOrderIds(): array
     {
         // Default ordering if no ordering has been applied yet.
-        if (! $this->builder->orders || count($this->builder->orders) < 1) {
+        if (!$this->builder->orders || count($this->builder->orders) < 1) {
             $this->sortByDefault();
         }
 
-        return $this->builder->select(static::$orderTable. '.order_id')->get()->pluck('order_id')->toArray();
+        return $this->builder->select(static::$orderTable . '.order_id')->get()->pluck('order_id')->toArray();
     }
 
     private function sortByDefault(): void
