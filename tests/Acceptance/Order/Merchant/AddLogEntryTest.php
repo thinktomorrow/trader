@@ -5,24 +5,15 @@ namespace Tests\Acceptance\Order\Merchant;
 
 use Tests\Acceptance\Cart\CartContext;
 use Thinktomorrow\Trader\Application\Order\Merchant\AddLogEntry;
-use Thinktomorrow\Trader\Application\Order\Merchant\MerchantOrderApplication;
-use Thinktomorrow\Trader\Infrastructure\Test\EventDispatcherSpy;
 use Thinktomorrow\Trader\Infrastructure\Test\Repositories\InMemoryOrderRepository;
 
 class AddLogEntryTest extends CartContext
 {
-    private MerchantOrderApplication $merchantOrderApplication;
-
     protected function setUp(): void
     {
         parent::setUp();
 
         $this->orderRepository = new InMemoryOrderRepository();
-
-        $this->merchantOrderApplication = new MerchantOrderApplication(
-            $this->orderRepository,
-            new EventDispatcherSpy(),
-        );
     }
 
     public function test_merchant_can_change_shipping_data()

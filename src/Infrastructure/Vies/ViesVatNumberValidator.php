@@ -34,18 +34,18 @@ class ViesVatNumberValidator implements VatNumberValidator
 
             $state = $result->valid ? VatNumberValidationState::valid : VatNumberValidationState::invalid;
 
-            return new VatNumberValidation($vatNumber, $state, []);
+            return new VatNumberValidation($vatNumber->getCountryCode(), $vatNumber->getNumber(), $state, []);
         } catch (SoapFault $e) {
 
             // Faulty input
             if ($e->getMessage() == "INVALID_INPUT") {
-                return new VatNumberValidation($vatNumber, VatNumberValidationState::invalid, [
-                    'message' => 'Invalid VAT number',
+                return new VatNumberValidation($vatNumber->getCountryCode(), $vatNumber->getNumber(), VatNumberValidationState::invalid, [
+                    'error' => 'Invalid VAT number',
                 ]);
             }
 
-            return new VatNumberValidation($vatNumber, VatNumberValidationState::service_error, [
-                'message' => 'VIES service is currently unavailable. Reason: [' . $e->getMessage() . ']',
+            return new VatNumberValidation($vatNumber->getCountryCode(), $vatNumber->getNumber(), VatNumberValidationState::service_error, [
+                'error' => 'VIES service is currently unavailable. Reason: [' . $e->getMessage() . ']',
             ]);
         }
     }

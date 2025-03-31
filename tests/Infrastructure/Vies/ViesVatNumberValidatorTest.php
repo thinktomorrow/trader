@@ -63,8 +63,8 @@ class ViesVatNumberValidatorTest extends TestCase
         $result = $this->validator->validate($vatNumber);
 
         $this->assertEquals(VatNumberValidationState::invalid, $result->state);
-        $this->assertArrayHasKey('message', $result->data);
-        $this->assertEquals('Invalid VAT number', $result->data['message']);
+        $this->assertArrayHasKey('error', $result->data);
+        $this->assertEquals('Invalid VAT number', $result->data['error']);
     }
 
     public function test_it_handles_vies_service_unavailable()
@@ -78,7 +78,7 @@ class ViesVatNumberValidatorTest extends TestCase
         $result = $this->validator->validate($vatNumber);
 
         $this->assertEquals(VatNumberValidationState::service_error, $result->state);
-        $this->assertArrayHasKey('message', $result->data);
-        $this->assertStringContainsString('VIES service is currently unavailable', $result->data['message']);
+        $this->assertArrayHasKey('error', $result->data);
+        $this->assertStringContainsString('VIES service is currently unavailable', $result->data['error']);
     }
 }

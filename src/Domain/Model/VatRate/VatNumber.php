@@ -4,6 +4,7 @@ namespace Thinktomorrow\Trader\Domain\Model\VatRate;
 
 use Thinktomorrow\Trader\Domain\Model\Country\CountryId;
 use Thinktomorrow\Trader\Domain\Model\VatRate\Exceptions\InvalidVatNumber;
+use Thinktomorrow\Trader\Domain\Model\VatRate\Exceptions\VatNumberCountryMismatch;
 
 class VatNumber
 {
@@ -17,6 +18,16 @@ class VatNumber
 
         $this->countryCode = $countryCode;
         $this->number = self::split($countryCode, $number)[1];
+    }
+
+    public static function fromString(string $vatNumber): self
+    {
+        $vatNumber = self::cleanup($vatNumber);
+
+        $countryCode = substr($vatNumber, 0, 2);
+        $number = substr($vatNumber, 2);
+
+        return new static($countryCode, $number);
     }
 
     public static function make(CountryId $countryCode, string $vatNumber): self
@@ -51,7 +62,7 @@ class VatNumber
 
     private function validate(string $countryCode, string $number)
     {
-        if (strlen($countryCode) !== 2 || ! ctype_alpha($countryCode)) {
+        if (strlen($countryCode) !== 2 || !ctype_alpha($countryCode)) {
             throw new InvalidVatNumber('Invalid country code [' . $countryCode . ']');
         }
 
@@ -59,12 +70,12 @@ class VatNumber
          * Basic validation. A vat number consists usually of 9 or 10
          * but at least of eight characters + iso country code (2 chars)
          */
-        if (! $number || strlen($number) < 8) {
+        if (!$number || strlen($number) < 8) {
             throw new InvalidVatNumber('Invalid vat number [' . $number . ']');
         }
 
         if (($includedCountryCode = self::findIncludedCountryCode($number)) && $includedCountryCode !== $countryCode) {
-            throw new InvalidVatNumber('Invalid vat number [' . $number . ']. Included country code [' . $includedCountryCode . '] does not match given country code [' . $countryCode . ']');
+            throw new VatNumberCountryMismatch('Invalid vat number [' . $number . ']. Included country code [' . $includedCountryCode . '] does not match given country code [' . $countryCode . ']');
         }
     }
 

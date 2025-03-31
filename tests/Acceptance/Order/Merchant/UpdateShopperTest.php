@@ -4,27 +4,17 @@ declare(strict_types=1);
 namespace Tests\Acceptance\Order\Merchant;
 
 use Tests\Acceptance\Cart\CartContext;
-use Thinktomorrow\Trader\Application\Order\Merchant\MerchantOrderApplication;
 use Thinktomorrow\Trader\Application\Order\Merchant\UpdateShopper;
 use Thinktomorrow\Trader\Domain\Model\Order\Events\Merchant\ShopperUpdatedByMerchant;
-use Thinktomorrow\Trader\Infrastructure\Test\EventDispatcherSpy;
 use Thinktomorrow\Trader\Infrastructure\Test\Repositories\InMemoryOrderRepository;
 
 class UpdateShopperTest extends CartContext
 {
-    private MerchantOrderApplication $merchantOrderApplication;
-    private EventDispatcherSpy $eventDispatcherSpy;
-
     protected function setUp(): void
     {
         parent::setUp();
 
         $this->orderRepository = new InMemoryOrderRepository();
-
-        $this->merchantOrderApplication = new MerchantOrderApplication(
-            $this->orderRepository,
-            $this->eventDispatcherSpy = new EventDispatcherSpy(),
-        );
     }
 
     public function test_merchant_can_change_shopper()
@@ -66,6 +56,6 @@ class UpdateShopperTest extends CartContext
             'locale' => ['old' => 'en-gb', 'new' => 'nl'],
             'foo' => ['old' => 'bar', 'new' => 'baz'],
             'foz' => ['old' => null, 'new' => 'boss'],
-        ], []), $this->eventDispatcherSpy->releaseDispatchedEvents()[1]);
+        ], []), $this->eventDispatcher->releaseDispatchedEvents()[1]);
     }
 }

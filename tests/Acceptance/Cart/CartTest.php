@@ -5,6 +5,10 @@ namespace Tests\Acceptance\Cart;
 
 use Thinktomorrow\Trader\Application\Cart\ClearCheckoutData;
 use Thinktomorrow\Trader\Application\Cart\UpdateBillingAddress;
+use Thinktomorrow\Trader\Application\Cart\VerifyCartVatNumber;
+use Thinktomorrow\Trader\Application\Order\Merchant\VerifyVatNumber;
+use Thinktomorrow\Trader\Application\VatRate\VatNumberValidation;
+use Thinktomorrow\Trader\Domain\Model\VatRate\VatNumberValidationState;
 
 class CartTest extends CartContext
 {
@@ -99,6 +103,53 @@ class CartTest extends CartContext
         ));
 
         $this->assertEquals($address, array_values($this->getOrder()->getBillingAddress()->getAddress()->toArray()));
+    }
+
+    public function test_it_can_verify_vat_number(): void
+    {
+        $this->givenThereIsAProductWhichCostsEur('lightsaber', 5);
+        $this->whenIAddTheVariantToTheCart('lightsaber-123', 2);
+        $this->whenIAddBillingAddress('BE', 'example 13', 'bus 2', '1200', 'Brussel');
+        $this->whenIEnterShopperDetails('ben@tt.be');
+
+        $this->vatNumberValidator->setExpectedResult(new VatNumberValidation('BE', '0123456789', VatNumberValidationState::invalid, []));
+
+        $this->cartApplication->verifyVatNumber(new VerifyCartVatNumber(
+            $this->getOrder()->orderId->get(),
+            '0123456789',
+        ));
+
+        $cart = $this->cartRepository->findCart($this->getOrder()->orderId);
+        $shopper = $cart->getShopper();
+
+        // public function getVatNumber(): ?string
+        //    {
+        //        return $this->dataAsPrimitive('vat_number');
+        //    }
+        //
+        //    public function getVatNumberCountry(): ?string
+        //    {
+        //        return $this->dataAsPrimitive('vat_number_country');
+        //    }
+        //
+        //    public function isVatNumberValid(): bool
+        //    {
+        //        return !!$this->dataAsPrimitive('vat_number_valid');
+        //    }
+        //
+        //    public function getVatNumberState(): VatNumberValidationState
+        //    {
+        //        if (!$state = $this->dataAsPrimitive('vat_number_state')) {
+        //            return VatNumberValidationState::unknown;
+        //        }
+        //
+        //        return VatNumberValidationState::from($state);
+        //    }
+
+        $this->assertEquals('0123456789', $shopper->getVatNumber());
+        $this->assertEquals('BE', $shopper->getVatNumberCountry());
+        $this->assertEquals(false, $shopper->isVatNumberValid());
+        $this->assertEquals(VatNumberValidationState::invalid, $shopper->getVatNumberState());
     }
 
     public function test_it_can_remove_cart_details()

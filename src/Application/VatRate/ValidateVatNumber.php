@@ -17,12 +17,12 @@ class ValidateVatNumber
         $this->vatNumber = $vatNumber;
     }
 
-    public function getVatNumber(): VatNumber
+    public function getVatNumber(): string
     {
-        return VatNumber::make($this->getCountryId(), $this->vatNumber);
+        return $this->vatNumber;
     }
 
-    private function getCountryId(): CountryId
+    public function getCountryId(): CountryId
     {
         return CountryId::fromString($this->countryId);
     }

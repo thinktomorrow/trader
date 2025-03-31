@@ -5,22 +5,26 @@ namespace Thinktomorrow\Trader\Application\Cart;
 
 use Thinktomorrow\Trader\Domain\Common\Email;
 use Thinktomorrow\Trader\Domain\Common\Locale;
+use Thinktomorrow\Trader\Domain\Model\Country\CountryId;
 use Thinktomorrow\Trader\Domain\Model\Order\OrderId;
+use Thinktomorrow\Trader\Domain\Model\VatRate\VatNumber;
 
 class UpdateShopper
 {
     private string $orderId;
     private string $email;
-    private bool $is_business;
+    private bool $isBusiness;
+    private ?string $vatNumber;
     private string $locale;
     private array $data;
 
-    public function __construct(string $orderId, string $email, bool $is_business, string $locale, array $data)
+    public function __construct(string $orderId, string $email, bool $isBusiness, ?string $vatNumber, string $locale, array $data)
     {
         $this->orderId = $orderId;
 
         $this->email = $email;
-        $this->is_business = $is_business;
+        $this->isBusiness = $isBusiness;
+        $this->vatNumber = $vatNumber;
         $this->locale = $locale;
         $this->data = $data;
     }
@@ -37,7 +41,16 @@ class UpdateShopper
 
     public function isBusiness(): bool
     {
-        return $this->is_business;
+        return $this->isBusiness;
+    }
+
+    public function getVatNumber(): ?string
+    {
+        if (!$this->vatNumber) {
+            return null;
+        }
+
+        return $this->vatNumber;
     }
 
     public function getLocale(): Locale

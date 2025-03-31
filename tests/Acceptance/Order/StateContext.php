@@ -11,6 +11,8 @@ use Thinktomorrow\Trader\Application\Cart\RefreshCart\RefreshCartAction;
 use Thinktomorrow\Trader\Application\Cart\ShippingProfile\UpdateShippingProfileOnOrder;
 use Thinktomorrow\Trader\Application\Order\State\OrderStateApplication;
 use Thinktomorrow\Trader\Application\VatRate\FindVatRateForOrder;
+use Thinktomorrow\Trader\Application\VatRate\VatNumberApplication;
+use Thinktomorrow\Trader\Application\VatRate\VatNumberValidation;
 use Thinktomorrow\Trader\Domain\Model\Order\Payment\DefaultPaymentState;
 use Thinktomorrow\Trader\Domain\Model\Order\Payment\PaymentStateMachine;
 use Thinktomorrow\Trader\Domain\Model\Order\Shipping\DefaultShippingState;
@@ -19,6 +21,7 @@ use Thinktomorrow\Trader\Domain\Model\Order\State\DefaultOrderState;
 use Thinktomorrow\Trader\Domain\Model\Order\State\OrderStateMachine;
 use Thinktomorrow\Trader\Infrastructure\Laravel\Models\Cart\DefaultAdjustLine;
 use Thinktomorrow\Trader\Infrastructure\Laravel\Models\PaymentMethod\DefaultVerifyPaymentMethodForCart;
+use Thinktomorrow\Trader\Infrastructure\Test\DummyVatNumberValidator;
 use Thinktomorrow\Trader\Infrastructure\Test\EventDispatcherSpy;
 use Thinktomorrow\Trader\Infrastructure\Test\Repositories\InMemoryCustomerRepository;
 use Thinktomorrow\Trader\Infrastructure\Test\Repositories\InMemoryOrderRepository;
@@ -40,6 +43,7 @@ abstract class StateContext extends TestCase
     protected EventDispatcherSpy $eventDispatcher;
     protected OrderStateMachine $orderStateMachine;
     protected CartApplication $cartApplication;
+    protected VatNumberApplication $vatNumberApplication;
 
     protected function setUp(): void
     {
@@ -58,6 +62,8 @@ abstract class StateContext extends TestCase
             $this->eventDispatcher = new EventDispatcherSpy()
         );
 
+        $this->vatNumberApplication = new VatNumberApplication(new DummyVatNumberValidator());
+
         // TODO: unify this instantiation in the test container
         $this->cartApplication = new CartApplication(
             new TestTraderConfig(),
@@ -72,6 +78,7 @@ abstract class StateContext extends TestCase
             new UpdatePaymentMethodOnOrder(new TestContainer(), new TestTraderConfig(), $this->orderRepository, new DefaultVerifyPaymentMethodForCart(), new InMemoryPaymentMethodRepository(), new FindVatRateForOrder(new TestTraderConfig(), new InMemoryVatRateRepository(new TestTraderConfig()))),
             new InMemoryCustomerRepository(),
             $this->eventDispatcher,
+            $this->vatNumberApplication,
         );
     }
 
@@ -100,7 +107,7 @@ abstract class StateContext extends TestCase
 
     protected function assertPaymentStateTransition(string $transitionMethod, DefaultPaymentState $currentState, DefaultPaymentState $newState, ?DefaultOrderState $orderState = null, ?DefaultOrderState $newOrderState = null)
     {
-        if (! $orderState) {
+        if (!$orderState) {
             $orderState = DefaultOrderState::confirmed;
         }
 
@@ -122,7 +129,7 @@ abstract class StateContext extends TestCase
 
     protected function assertShippingStateTransition(string $transitionMethod, DefaultShippingState $currentState, DefaultShippingState $newState, ?DefaultOrderState $orderState = null, ?DefaultOrderState $newOrderState = null)
     {
-        if (! $orderState) {
+        if (!$orderState) {
             $orderState = DefaultOrderState::confirmed;
         }
 

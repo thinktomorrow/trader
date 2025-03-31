@@ -18,6 +18,9 @@ use Thinktomorrow\Trader\Application\Cart\RefreshCart\RefreshCart;
 use Thinktomorrow\Trader\Application\Cart\RefreshCart\RefreshCartAction;
 use Thinktomorrow\Trader\Application\Cart\ShippingProfile\UpdateShippingProfileOnOrder;
 use Thinktomorrow\Trader\Application\Cart\VariantForCart\VariantForCartRepository;
+use Thinktomorrow\Trader\Application\VatRate\ValidateVatNumber;
+use Thinktomorrow\Trader\Application\VatRate\VatNumberApplication;
+use Thinktomorrow\Trader\Application\VatRate\VatNumberValidation;
 use Thinktomorrow\Trader\Domain\Common\Event\EventDispatcher;
 use Thinktomorrow\Trader\Domain\Model\Customer\CustomerRepository;
 use Thinktomorrow\Trader\Domain\Model\Order\Address\BillingAddress;
@@ -32,6 +35,10 @@ use Thinktomorrow\Trader\Domain\Model\Order\State\OrderState;
 use Thinktomorrow\Trader\Domain\Model\Order\State\OrderStateMachine;
 use Thinktomorrow\Trader\Domain\Model\Product\Personalisation\PersonalisationId;
 use Thinktomorrow\Trader\Domain\Model\ShippingProfile\ShippingProfileRepository;
+use Thinktomorrow\Trader\Domain\Model\VatRate\Exceptions\InvalidVatNumber;
+use Thinktomorrow\Trader\Domain\Model\VatRate\Exceptions\VatNumberCountryMismatch;
+use Thinktomorrow\Trader\Domain\Model\VatRate\VatNumber;
+use Thinktomorrow\Trader\Domain\Model\VatRate\VatNumberValidationState;
 use Thinktomorrow\Trader\TraderConfig;
 
 final class CartApplication
@@ -48,6 +55,7 @@ final class CartApplication
     private UpdateShippingProfileOnOrder $updateShippingProfileOnOrder;
     private UpdatePaymentMethodOnOrder $updatePaymentMethodOnOrder;
     private OrderStateMachine $orderStateMachine;
+    private VatNumberApplication $vatNumberApplication;
 
     public function __construct(
         TraderConfig                 $config,
@@ -61,8 +69,10 @@ final class CartApplication
         UpdateShippingProfileOnOrder $updateShippingProfileOnOrder,
         UpdatePaymentMethodOnOrder   $updatePaymentMethodOnOrder,
         CustomerRepository           $customerRepository,
-        EventDispatcher              $eventDispatcher
-    ) {
+        EventDispatcher              $eventDispatcher,
+        VatNumberApplication         $vatNumberApplication,
+    )
+    {
         $this->findVariantDetailsForCart = $findVariantDetailsForCart;
         $this->adjustLine = $adjustLine;
         $this->orderRepository = $orderRepository;
@@ -75,6 +85,7 @@ final class CartApplication
         $this->refreshCartAction = $refreshCartAction;
         $this->container = $container;
         $this->orderStateMachine = $orderStateMachine;
+        $this->vatNumberApplication = $vatNumberApplication;
     }
 
     public function refresh(RefreshCart $refreshCart): void
@@ -147,7 +158,7 @@ final class CartApplication
                 }
             }
 
-            if (! $originalPersonalisation) {
+            if (!$originalPersonalisation) {
                 throw new \InvalidArgumentException('No personalisation found for variant [' . $addLine->getVariantId()->get() . '] by personalisation id [' . $personalisation_id . '].');
             }
 
@@ -298,6 +309,42 @@ final class CartApplication
         $this->orderRepository->save($order);
 
         $this->eventDispatcher->dispatchAll($order->releaseEvents());
+
+        /** Add EU Vies validation result to shopper data */
+        if ($updateShopper->isBusiness() && $updateShopper->getVatNumber()) {
+            $this->verifyVatNumber(new VerifyCartVatNumber(
+                $updateShopper->getOrderId()->get(),
+                $updateShopper->getVatNumber()
+            ));
+        }
+    }
+
+    public function verifyVatNumber(VerifyCartVatNumber $command): void
+    {
+        $order = $this->orderRepository->findForCart($command->getOrderId());
+        $shopper = $order->getShopper();
+
+        $billingAddressCountryId = $order->getBillingAddress()?->getAddress()->countryId;
+
+        try {
+            $vatNumberValidation = $this->vatNumberApplication->validate(new ValidateVatNumber(
+                $billingAddressCountryId->get(),
+                $command->getVatNumber()
+            ));
+
+            $this->vatNumberApplication->addVatNumberValidationToShopper($order->getShopper(), $vatNumberValidation);
+
+        } catch (\Exception $e) {
+            $this->vatNumberApplication->addVatNumberValidationToShopper(
+                $order->getShopper(),
+                VatNumberValidation::fromException($billingAddressCountryId->get(), $command->getVatNumber(), $e)
+            );
+        }
+
+        $order->updateShopper($shopper);
+        $this->orderRepository->save($order);
+
+        $this->eventDispatcher->dispatchAll($order->releaseEvents());
     }
 
     public function chooseCustomer(ChooseCustomer $chooseCustomer): void
@@ -322,11 +369,11 @@ final class CartApplication
         $shopper->addData($customer->getData());
         $order->updateShopper($shopper);
 
-        if (! $order->getBillingAddress() && $billingAddress = $customer->getBillingAddress()) {
+        if (!$order->getBillingAddress() && $billingAddress = $customer->getBillingAddress()) {
             $this->chooseCustomerBillingAddress($order, $billingAddress);
         }
 
-        if (! $order->getShippingAddress() && $shippingAddress = $customer->getShippingAddress()) {
+        if (!$order->getShippingAddress() && $shippingAddress = $customer->getShippingAddress()) {
             $this->chooseCustomerShippingAddress($order, $shippingAddress);
         }
 

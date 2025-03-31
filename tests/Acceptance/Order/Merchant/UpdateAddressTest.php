@@ -4,31 +4,21 @@ declare(strict_types=1);
 namespace Tests\Acceptance\Order\Merchant;
 
 use Tests\Acceptance\Cart\CartContext;
-use Thinktomorrow\Trader\Application\Order\Merchant\MerchantOrderApplication;
 use Thinktomorrow\Trader\Application\Order\Merchant\UpdateBillingAddress;
 use Thinktomorrow\Trader\Application\Order\Merchant\UpdateShippingAddress;
 use Thinktomorrow\Trader\Domain\Common\Address\Address;
 use Thinktomorrow\Trader\Domain\Model\Country\CountryId;
 use Thinktomorrow\Trader\Domain\Model\Order\Events\Merchant\BillingAddressUpdatedByMerchant;
 use Thinktomorrow\Trader\Domain\Model\Order\Events\Merchant\ShippingAddressUpdatedByMerchant;
-use Thinktomorrow\Trader\Infrastructure\Test\EventDispatcherSpy;
 use Thinktomorrow\Trader\Infrastructure\Test\Repositories\InMemoryOrderRepository;
 
 class UpdateAddressTest extends CartContext
 {
-    private MerchantOrderApplication $merchantOrderApplication;
-    private EventDispatcherSpy $eventDispatcherSpy;
-
     protected function setUp(): void
     {
         parent::setUp();
 
         $this->orderRepository = new InMemoryOrderRepository();
-
-        $this->merchantOrderApplication = new MerchantOrderApplication(
-            $this->orderRepository,
-            $this->eventDispatcherSpy = new EventDispatcherSpy(),
-        );
     }
 
     public function test_merchant_can_change_shipping_address()
@@ -61,11 +51,11 @@ class UpdateAddressTest extends CartContext
 
         $order = $this->orderRepository->find($order->orderId);
 
-        $this->assertEquals(new Address(CountryId::fromString('NL'), 'line-1 updated', 'line-2', 'postal-code', 'city', ), $order->getShippingAddress()->getAddress());
+        $this->assertEquals(new Address(CountryId::fromString('NL'), 'line-1 updated', 'line-2', 'postal-code', 'city',), $order->getShippingAddress()->getAddress());
 
         $this->assertEquals(new ShippingAddressUpdatedByMerchant($order->orderId, [
             'country_id' => ['old' => 'BE', 'new' => 'NL'], 'line1' => ['old' => 'line-1', 'new' => 'line-1 updated'],
-        ], []), $this->eventDispatcherSpy->releaseDispatchedEvents()[2]);
+        ], []), $this->eventDispatcher->releaseDispatchedEvents()[2]);
     }
 
     public function test_merchant_can_change_billing_address()
@@ -99,11 +89,11 @@ class UpdateAddressTest extends CartContext
 
         $order = $this->orderRepository->find($order->orderId);
 
-        $this->assertEquals(new Address(CountryId::fromString('NL'), 'line-1 updated', 'line-2', 'postal-code', 'city', ), $order->getBillingAddress()->getAddress());
+        $this->assertEquals(new Address(CountryId::fromString('NL'), 'line-1 updated', 'line-2', 'postal-code', 'city',), $order->getBillingAddress()->getAddress());
 
         $this->assertEquals(new BillingAddressUpdatedByMerchant($order->orderId, [
             'country_id' => ['old' => 'BE', 'new' => 'NL'], 'line1' => ['old' => 'line-1', 'new' => 'line-1 updated'],
-        ], []), $this->eventDispatcherSpy->releaseDispatchedEvents()[2]);
+        ], []), $this->eventDispatcher->releaseDispatchedEvents()[2]);
     }
 
     public function test_if_shipping_address_is_not_changed_no_event_is_triggered()
@@ -130,6 +120,6 @@ class UpdateAddressTest extends CartContext
             ...array_values($values)
         ), []);
 
-        $this->assertCount(0, $this->eventDispatcherSpy->releaseDispatchedEvents());
+        $this->assertCount(0, $this->eventDispatcher->releaseDispatchedEvents());
     }
 }

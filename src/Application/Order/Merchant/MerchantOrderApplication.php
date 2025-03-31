@@ -3,6 +3,10 @@ declare(strict_types=1);
 
 namespace Thinktomorrow\Trader\Application\Order\Merchant;
 
+use Thinktomorrow\Trader\Application\Cart\VerifyCartVatNumber;
+use Thinktomorrow\Trader\Application\VatRate\ValidateVatNumber;
+use Thinktomorrow\Trader\Application\VatRate\VatNumberApplication;
+use Thinktomorrow\Trader\Application\VatRate\VatNumberValidation;
 use Thinktomorrow\Trader\Domain\Common\Address\Address;
 use Thinktomorrow\Trader\Domain\Common\Event\EventDispatcher;
 use Thinktomorrow\Trader\Domain\Model\Order\Address\BillingAddress;
@@ -18,11 +22,13 @@ class MerchantOrderApplication
 {
     private OrderRepository $orderRepository;
     private EventDispatcher $eventDispatcher;
+    private VatNumberApplication $vatNumberApplication;
 
-    public function __construct(OrderRepository $orderRepository, EventDispatcher $eventDispatcher)
+    public function __construct(OrderRepository $orderRepository, EventDispatcher $eventDispatcher, VatNumberApplication $vatNumberApplication)
     {
         $this->orderRepository = $orderRepository;
         $this->eventDispatcher = $eventDispatcher;
+        $this->vatNumberApplication = $vatNumberApplication;
     }
 
     public function addLogEntry(AddLogEntry $command): void
@@ -76,6 +82,39 @@ class MerchantOrderApplication
         $this->eventDispatcher->dispatchAll([...$order->releaseEvents(), new ShopperUpdatedByMerchant($order->orderId, $updatedShopperValues, $contextData)]);
     }
 
+    public function verifyVatNumber(VerifyVatNumber $command): void
+    {
+        $order = $this->orderRepository->find($command->getOrderId());
+        $shopper = $order->getShopper();
+
+        $billingAddressCountryId = $order->getBillingAddress()?->getAddress()->countryId;
+
+        if (!$billingAddressCountryId) {
+            throw new \Exception('No billing address found for order ' . $order->orderId);
+        }
+
+        try {
+
+            $vatNumberValidation = $this->vatNumberApplication->validate(new ValidateVatNumber(
+                $billingAddressCountryId->get(),
+                $command->getVatNumber()
+            ));
+
+            $this->vatNumberApplication->addVatNumberValidationToShopper($order->getShopper(), $vatNumberValidation);
+
+        } catch (\Exception $e) {
+            $this->vatNumberApplication->addVatNumberValidationToShopper(
+                $order->getShopper(),
+                VatNumberValidation::fromException($billingAddressCountryId->get(), $command->getVatNumber(), $e)
+            );
+        }
+
+        $order->updateShopper($shopper);
+        $this->orderRepository->save($order);
+
+        $this->eventDispatcher->dispatchAll($order->releaseEvents());
+    }
+
     public function updateShippingAddress(UpdateShippingAddress $command, array $contextData): void
     {
         $order = $this->orderRepository->find($command->getOrderId());
@@ -126,14 +165,14 @@ class MerchantOrderApplication
     {
         $updatedValues = [];
 
-        if (! $command->getEmail()->equals($shopper->getEmail())) {
+        if (!$command->getEmail()->equals($shopper->getEmail())) {
             $updatedValues['email'] = [
                 'old' => $shopper->getEmail()->get(),
                 'new' => $command->getEmail()->get(),
             ];
         }
 
-        if (! $command->getLocale()->equals($shopper->getLocale())) {
+        if (!$command->getLocale()->equals($shopper->getLocale())) {
             $updatedValues['locale'] = [
                 'old' => $shopper->getLocale()->get(),
                 'new' => $command->getLocale()->get(),

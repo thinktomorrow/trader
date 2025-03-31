@@ -5,6 +5,7 @@ namespace Tests\Unit\Model;
 use Tests\Unit\TestCase;
 use Thinktomorrow\Trader\Domain\Model\Country\CountryId;
 use Thinktomorrow\Trader\Domain\Model\VatRate\Exceptions\InvalidVatNumber;
+use Thinktomorrow\Trader\Domain\Model\VatRate\Exceptions\VatNumberCountryMismatch;
 use Thinktomorrow\Trader\Domain\Model\VatRate\VatNumber;
 
 class VatNumberTest extends TestCase
@@ -46,7 +47,7 @@ class VatNumberTest extends TestCase
 
     public function test_it_throws_an_exception_when_country_code_in_number_does_not_match()
     {
-        $this->expectException(InvalidVatNumber::class);
+        $this->expectException(VatNumberCountryMismatch::class);
         $this->expectExceptionMessage('Invalid vat number [FR0123456789]. Included country code [FR] does not match given country code [BE]');
 
         VatNumber::make(CountryId::fromString('BE'), 'FR0123456789');
