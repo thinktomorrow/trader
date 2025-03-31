@@ -4,11 +4,16 @@ Important changes will be notified in this file
 
 ## unreleased
 
+## 2025-03-31 - 0.7.1
+
+- Added: Vies vat number validation.
 - Removed: Old Locale class.
+
+## 2025-02- - 0.7.0
 
 #### Vat rates removed from config
 
-Vat rates are no longer kept in config but rather managed via admin. Only thing to to determine in config is the primary
+Vat rates are no longer kept in config but rather managed via admin. Only thing to determine in config is the primary
 vat country.
 
 - Removed from config: `getDefaultTaxRate()` and `getAvailableTaxRates()` methods. Use `getPrimaryVatRate()` and
