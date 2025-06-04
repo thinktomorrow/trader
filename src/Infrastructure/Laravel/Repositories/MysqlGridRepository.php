@@ -101,22 +101,22 @@ class MysqlGridRepository implements GridRepository
         // Fallback vat percentage is fine because we only want to filter on price, not calculate it.
         $fallbackVatPercentage = VatPercentage::fromString($this->traderConfig->getFallBackStandardVatRate())->toPercentage();
 
-        if (!is_null($minimumPriceAmount)) {
+        if (! is_null($minimumPriceAmount)) {
             // Match input with expected vat inclusion
-            $minimumPriceAmount = ($this->traderConfig->doesPriceInputIncludesVat() && !$this->traderConfig->includeVatInPrices())
+            $minimumPriceAmount = ($this->traderConfig->doesPriceInputIncludesVat() && ! $this->traderConfig->includeVatInPrices())
                 ? Cash::from($minimumPriceAmount)->addPercentage($fallbackVatPercentage)->getAmount()
-                : ((!$this->traderConfig->doesPriceInputIncludesVat() && $this->traderConfig->includeVatInPrices())
+                : ((! $this->traderConfig->doesPriceInputIncludesVat() && $this->traderConfig->includeVatInPrices())
                     ? Cash::from($minimumPriceAmount)->subtractTaxPercentage($fallbackVatPercentage)->getAmount()
                     : $minimumPriceAmount);
 
             $this->builder->where(static::$variantTable . '.sale_price', '>=', $minimumPriceAmount);
         }
 
-        if (!is_null($maximumPriceAmount)) {
+        if (! is_null($maximumPriceAmount)) {
             // Match input with expected vat inclusion
-            $maximumPriceAmount = ($this->traderConfig->doesPriceInputIncludesVat() && !$this->traderConfig->includeVatInPrices())
+            $maximumPriceAmount = ($this->traderConfig->doesPriceInputIncludesVat() && ! $this->traderConfig->includeVatInPrices())
                 ? Cash::from($maximumPriceAmount)->addPercentage($fallbackVatPercentage)->getAmount()
-                : ((!$this->traderConfig->doesPriceInputIncludesVat() && $this->traderConfig->includeVatInPrices())
+                : ((! $this->traderConfig->doesPriceInputIncludesVat() && $this->traderConfig->includeVatInPrices())
                     ? Cash::from($maximumPriceAmount)->subtractTaxPercentage($fallbackVatPercentage)->getAmount()
                     : $maximumPriceAmount);
 
@@ -195,7 +195,7 @@ class MysqlGridRepository implements GridRepository
     public function getResults(): LengthAwarePaginator
     {
         // Default ordering if no ordering has been applied yet.
-        if (!$this->builder->orders || count($this->builder->orders) < 1) {
+        if (! $this->builder->orders || count($this->builder->orders) < 1) {
             $this->builder->orderBy(static::$productTable . '.order_column', 'ASC');
         }
 
@@ -210,12 +210,12 @@ class MysqlGridRepository implements GridRepository
 
         return $results->setCollection(
             $results->getCollection()
-                ->map(fn($state) => get_object_vars($state))
-                ->map(fn($state) => $this->container->get(GridItem::class)::fromMappedData(array_merge($state, [
+                ->map(fn ($state) => get_object_vars($state))
+                ->map(fn ($state) => $this->container->get(GridItem::class)::fromMappedData(array_merge($state, [
                     'includes_vat' => (bool)$state['includes_vat'],
                     'taxon_ids' => $state['taxon_ids'] ? explode(',', $state['taxon_ids']) : [],
                 ]), $this->locale))
-                ->each(fn(GridItem $gridItem) => $gridItem->setLocale($this->locale))
+                ->each(fn (GridItem $gridItem) => $gridItem->setLocale($this->locale))
         );
     }
 
