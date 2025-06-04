@@ -14,6 +14,7 @@ use Thinktomorrow\Trader\Application\Product\Grid\GridRepository;
 use Thinktomorrow\Trader\Domain\Common\Cash\Cash;
 use Thinktomorrow\Trader\Domain\Common\Cash\Percentage;
 use Thinktomorrow\Trader\Domain\Common\Locale;
+use Thinktomorrow\Trader\Domain\Common\Vat\VatPercentage;
 use Thinktomorrow\Trader\Domain\Model\Product\ProductState;
 use Thinktomorrow\Trader\Domain\Model\Product\Variant\VariantState;
 use Thinktomorrow\Trader\TraderConfig;
@@ -47,14 +48,13 @@ class MysqlGridRepository implements GridRepository
             ->where(static::$variantTable . '.show_in_grid', true)
             ->whereIn(static::$productTable . '.state', ProductState::onlineStates())
             ->whereIn(static::$variantTable . '.state', VariantState::availableStates())
-
-            ->leftJoin(static::$taxonPivotTable, static::$variantTable.'.product_id', '=', static::$taxonPivotTable.'.product_id')
-            ->groupBy(static::$variantTable.'.variant_id', 'product_data', 'product_order_column')
+            ->leftJoin(static::$taxonPivotTable, static::$variantTable . '.product_id', '=', static::$taxonPivotTable . '.product_id')
+            ->groupBy(static::$variantTable . '.variant_id', 'product_data', 'product_order_column')
             ->select([
                 static::$variantTable . '.*',
                 static::$productTable . '.data AS product_data',
                 static::$productTable . '.order_column AS product_order_column',
-                DB::raw('GROUP_CONCAT('.static::$taxonPivotTable.'.taxon_id) AS taxon_ids'),
+                DB::raw('GROUP_CONCAT(' . static::$taxonPivotTable . '.taxon_id) AS taxon_ids'),
             ]);
     }
 
@@ -91,30 +91,33 @@ class MysqlGridRepository implements GridRepository
 
     public function filterByProductIds(array $product_ids): static
     {
-        $this->builder->whereIn(static::$productTable.'.product_id', $product_ids);
+        $this->builder->whereIn(static::$productTable . '.product_id', $product_ids);
 
         return $this;
     }
 
     public function filterByPrice(?string $minimumPriceAmount = null, ?string $maximumPriceAmount = null): static
     {
-        if (! is_null($minimumPriceAmount)) {
+        // Fallback vat percentage is fine because we only want to filter on price, not calculate it.
+        $fallbackVatPercentage = VatPercentage::fromString($this->traderConfig->getFallBackStandardVatRate())->toPercentage();
+
+        if (!is_null($minimumPriceAmount)) {
             // Match input with expected vat inclusion
-            $minimumPriceAmount = ($this->traderConfig->doesPriceInputIncludesVat() && ! $this->traderConfig->includeVatInPrices())
-                ? Cash::from($minimumPriceAmount)->addPercentage(Percentage::fromString($this->traderConfig->getDefaultTaxRate()))->getAmount()
-                : ((! $this->traderConfig->doesPriceInputIncludesVat() && $this->traderConfig->includeVatInPrices())
-                    ? Cash::from($minimumPriceAmount)->subtractTaxPercentage(Percentage::fromString($this->traderConfig->getDefaultTaxRate()))->getAmount()
+            $minimumPriceAmount = ($this->traderConfig->doesPriceInputIncludesVat() && !$this->traderConfig->includeVatInPrices())
+                ? Cash::from($minimumPriceAmount)->addPercentage($fallbackVatPercentage)->getAmount()
+                : ((!$this->traderConfig->doesPriceInputIncludesVat() && $this->traderConfig->includeVatInPrices())
+                    ? Cash::from($minimumPriceAmount)->subtractTaxPercentage($fallbackVatPercentage)->getAmount()
                     : $minimumPriceAmount);
 
             $this->builder->where(static::$variantTable . '.sale_price', '>=', $minimumPriceAmount);
         }
 
-        if (! is_null($maximumPriceAmount)) {
+        if (!is_null($maximumPriceAmount)) {
             // Match input with expected vat inclusion
-            $maximumPriceAmount = ($this->traderConfig->doesPriceInputIncludesVat() && ! $this->traderConfig->includeVatInPrices())
-                ? Cash::from($maximumPriceAmount)->addPercentage(Percentage::fromString($this->traderConfig->getDefaultTaxRate()))->getAmount()
-                : ((! $this->traderConfig->doesPriceInputIncludesVat() && $this->traderConfig->includeVatInPrices())
-                    ? Cash::from($maximumPriceAmount)->subtractTaxPercentage(Percentage::fromString($this->traderConfig->getDefaultTaxRate()))->getAmount()
+            $maximumPriceAmount = ($this->traderConfig->doesPriceInputIncludesVat() && !$this->traderConfig->includeVatInPrices())
+                ? Cash::from($maximumPriceAmount)->addPercentage($fallbackVatPercentage)->getAmount()
+                : ((!$this->traderConfig->doesPriceInputIncludesVat() && $this->traderConfig->includeVatInPrices())
+                    ? Cash::from($maximumPriceAmount)->subtractTaxPercentage($fallbackVatPercentage)->getAmount()
                     : $maximumPriceAmount);
 
             $this->builder->where(static::$variantTable . '.sale_price', '<=', $maximumPriceAmount);
@@ -136,8 +139,8 @@ class MysqlGridRepository implements GridRepository
     protected function addSortByLabel($order = 'ASC'): static
     {
         $this->builder->addSelect(
-            DB::raw('LOWER(json_extract('.static::$productTable.'.data, "$.title.'.$this->locale->get().'")) AS product_title'),
-            DB::raw('LOWER(json_extract('.static::$variantTable.'.data, "$.title.'.$this->locale->get().'")) AS variant_title')
+            DB::raw('LOWER(json_extract(' . static::$productTable . '.data, "$.title.' . $this->locale->get() . '")) AS product_title'),
+            DB::raw('LOWER(json_extract(' . static::$variantTable . '.data, "$.title.' . $this->locale->get() . '")) AS variant_title')
         );
 
         $this->builder->orderBy('variant_title', $order);
@@ -192,7 +195,7 @@ class MysqlGridRepository implements GridRepository
     public function getResults(): LengthAwarePaginator
     {
         // Default ordering if no ordering has been applied yet.
-        if (! $this->builder->orders || count($this->builder->orders) < 1) {
+        if (!$this->builder->orders || count($this->builder->orders) < 1) {
             $this->builder->orderBy(static::$productTable . '.order_column', 'ASC');
         }
 
@@ -207,12 +210,12 @@ class MysqlGridRepository implements GridRepository
 
         return $results->setCollection(
             $results->getCollection()
-                ->map(fn ($state) => get_object_vars($state))
-                ->map(fn ($state) => $this->container->get(GridItem::class)::fromMappedData(array_merge($state, [
-                    'includes_vat' => (bool) $state['includes_vat'],
+                ->map(fn($state) => get_object_vars($state))
+                ->map(fn($state) => $this->container->get(GridItem::class)::fromMappedData(array_merge($state, [
+                    'includes_vat' => (bool)$state['includes_vat'],
                     'taxon_ids' => $state['taxon_ids'] ? explode(',', $state['taxon_ids']) : [],
                 ]), $this->locale))
-                ->each(fn (GridItem $gridItem) => $gridItem->setLocale($this->locale))
+                ->each(fn(GridItem $gridItem) => $gridItem->setLocale($this->locale))
         );
     }
 
@@ -240,7 +243,7 @@ class MysqlGridRepository implements GridRepository
         $this->builder->where(function ($builder) use ($value, $keys) {
             foreach ([static::$productTable, static::$variantTable] as $table) {
                 foreach ($keys[$table] as $key) {
-                    $builder->orWhereRaw('LOWER(json_extract(`'.$table.'`.`data`, "$.'.$key.'")) LIKE ?', '%'. $value . '%');
+                    $builder->orWhereRaw('LOWER(json_extract(`' . $table . '`.`data`, "$.' . $key . '")) LIKE ?', '%' . $value . '%');
                 }
             }
         });
