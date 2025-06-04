@@ -13,7 +13,7 @@ Important changes will be notified in this file
 - Added: Vies vat number validation.
 - Removed: Old Locale class.
 
-## 2025-02- - 0.7.0
+## 2025-02-01 - 0.7.0
 
 #### Vat rates removed from config
 
