@@ -135,7 +135,7 @@ class CartTest extends CartContext
         $this->whenIAddBillingAddress('NL', 'example 13', 'bus 2', '1200 BK', 'Brussel');
         $this->whenIEnterShopperDetails('ben@tt.be', true);
 
-//        $this->vatNumberValidator->setExpectedResult(new VatNumberValidation('NL', '0123456789', VatNumberValidationState::valid, []));
+        //        $this->vatNumberValidator->setExpectedResult(new VatNumberValidation('NL', '0123456789', VatNumberValidationState::valid, []));
 
         $this->cartApplication->verifyCartVatExemption(new VerifyCartVatExemption(
             $this->getOrder()->orderId->get(),

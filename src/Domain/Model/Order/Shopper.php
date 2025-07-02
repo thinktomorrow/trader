@@ -94,12 +94,12 @@ class Shopper implements ChildEntity, HasVatNumber
 
     public function isVatNumberValid(): bool
     {
-        return !!$this->getData('vat_number_valid');
+        return ! ! $this->getData('vat_number_valid');
     }
 
     public function getVatNumberState(): VatNumberValidationState
     {
-        if (!$state = $this->getData('vat_number_state')) {
+        if (! $state = $this->getData('vat_number_state')) {
             return VatNumberValidationState::unknown;
         }
 
@@ -113,7 +113,7 @@ class Shopper implements ChildEntity, HasVatNumber
 
     public function registerAfterCheckout(): bool
     {
-        return $this->registerAfterCheckout && !is_null($this->customerId);
+        return $this->registerAfterCheckout && ! is_null($this->customerId);
     }
 
     public function deleteCustomerId(): void
