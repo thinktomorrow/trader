@@ -297,14 +297,14 @@ final class Order implements Aggregate, Discountable
     public function getChildEntities(): array
     {
         return [
-            Line::class => array_map(fn($line) => $line->getMappedData(), $this->lines),
-            Discount::class => array_map(fn($discount) => $discount->getMappedData(), $this->discounts),
-            Shipping::class => array_map(fn($shipping) => $shipping->getMappedData(), $this->shippings),
-            Payment::class => array_map(fn($payment) => $payment->getMappedData(), $this->payments),
+            Line::class => array_map(fn ($line) => $line->getMappedData(), $this->lines),
+            Discount::class => array_map(fn ($discount) => $discount->getMappedData(), $this->discounts),
+            Shipping::class => array_map(fn ($shipping) => $shipping->getMappedData(), $this->shippings),
+            Payment::class => array_map(fn ($payment) => $payment->getMappedData(), $this->payments),
             ShippingAddress::class => $this->shippingAddress?->getMappedData(),
             BillingAddress::class => $this->billingAddress?->getMappedData(),
             Shopper::class => $this->shopper?->getMappedData(),
-            OrderEvent::class => array_map(fn($orderEvent) => $orderEvent->getMappedData(), $this->orderEvents),
+            OrderEvent::class => array_map(fn ($orderEvent) => $orderEvent->getMappedData(), $this->orderEvents),
         ];
     }
 
@@ -312,7 +312,7 @@ final class Order implements Aggregate, Discountable
     {
         $order = new static();
 
-        if (!$state['order_state'] instanceof OrderState) {
+        if (! $state['order_state'] instanceof OrderState) {
             throw new \InvalidArgumentException('Order state is expected to be instance of OrderState. Instead ' . gettype($state['order_state']) . ' is passed.');
         }
 
@@ -320,20 +320,20 @@ final class Order implements Aggregate, Discountable
         $order->orderReference = OrderReference::fromString($state['order_ref']);
         $order->invoiceReference = $state['invoice_ref'] ? InvoiceReference::fromString($state['invoice_ref']) : null;
         $order->orderState = $state['order_state'];
-        $order->discounts = array_map(fn($discountState) => Discount::fromMappedData($discountState, $state), $childEntities[Discount::class]);
+        $order->discounts = array_map(fn ($discountState) => Discount::fromMappedData($discountState, $state), $childEntities[Discount::class]);
 
-        $order->lines = array_map(fn($lineState) => Line::fromMappedData($lineState, $state, [
+        $order->lines = array_map(fn ($lineState) => Line::fromMappedData($lineState, $state, [
             Discount::class => $lineState[Discount::class],
             LinePersonalisation::class => $lineState[LinePersonalisation::class],
         ]), $childEntities[Line::class]);
-        $order->shippings = array_map(fn($shippingState) => Shipping::fromMappedData($shippingState, $state, [Discount::class => $shippingState[Discount::class]]), $childEntities[Shipping::class]);
-        $order->payments = array_map(fn($paymentState) => Payment::fromMappedData($paymentState, $state, [Discount::class => $paymentState[Discount::class]]), $childEntities[Payment::class]);
+        $order->shippings = array_map(fn ($shippingState) => Shipping::fromMappedData($shippingState, $state, [Discount::class => $shippingState[Discount::class]]), $childEntities[Shipping::class]);
+        $order->payments = array_map(fn ($paymentState) => Payment::fromMappedData($paymentState, $state, [Discount::class => $paymentState[Discount::class]]), $childEntities[Payment::class]);
         $order->shippingAddress = $childEntities[ShippingAddress::class] ? ShippingAddress::fromMappedData($childEntities[ShippingAddress::class], $state) : null;
         $order->billingAddress = $childEntities[BillingAddress::class] ? BillingAddress::fromMappedData($childEntities[BillingAddress::class], $state) : null;
         $order->shopper = $childEntities[Shopper::class] ? Shopper::fromMappedData($childEntities[Shopper::class], $state) : null;
 
         $order->data = json_decode($state['data'], true);
-        $order->orderEvents = array_map(fn($orderEventState) => OrderEvent::fromMappedData($orderEventState, $state), $childEntities[OrderEvent::class]);
+        $order->orderEvents = array_map(fn ($orderEventState) => OrderEvent::fromMappedData($orderEventState, $state), $childEntities[OrderEvent::class]);
 
         return $order;
     }

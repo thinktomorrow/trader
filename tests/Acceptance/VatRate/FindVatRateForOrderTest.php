@@ -2,8 +2,8 @@
 
 namespace Tests\Acceptance\VatRate;
 
-use Thinktomorrow\Trader\Application\VatRate\VatExemptionApplication;
 use Thinktomorrow\Trader\Application\VatRate\FindVatRateForOrder;
+use Thinktomorrow\Trader\Application\VatRate\VatExemptionApplication;
 use Thinktomorrow\Trader\Domain\Common\Email;
 use Thinktomorrow\Trader\Domain\Common\Locale;
 use Thinktomorrow\Trader\Domain\Common\Vat\VatPercentage;

@@ -88,7 +88,7 @@ class MerchantOrderApplication
 
         $billingAddressCountryId = $order->getBillingAddress()?->getAddress()->countryId;
 
-        if (!$billingAddressCountryId) {
+        if (! $billingAddressCountryId) {
             throw new \Exception('No billing address found for order ' . $order->orderId);
         }
 
@@ -164,14 +164,14 @@ class MerchantOrderApplication
     {
         $updatedValues = [];
 
-        if (!$command->getEmail()->equals($shopper->getEmail())) {
+        if (! $command->getEmail()->equals($shopper->getEmail())) {
             $updatedValues['email'] = [
                 'old' => $shopper->getEmail()->get(),
                 'new' => $command->getEmail()->get(),
             ];
         }
 
-        if (!$command->getLocale()->equals($shopper->getLocale())) {
+        if (! $command->getLocale()->equals($shopper->getLocale())) {
             $updatedValues['locale'] = [
                 'old' => $shopper->getLocale()->get(),
                 'new' => $command->getLocale()->get(),

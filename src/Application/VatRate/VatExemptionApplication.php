@@ -18,15 +18,15 @@ class VatExemptionApplication
      */
     public function verifyForOrder(Order $order): bool
     {
-        if (!$this->config->isVatExemptionAllowed()) {
+        if (! $this->config->isVatExemptionAllowed()) {
             return false;
         }
 
-        if (!$order->getShopper() || !$order->getShopper()->isBusiness()) {
+        if (! $order->getShopper() || ! $order->getShopper()->isBusiness()) {
             return false;
         }
 
-        if (!$order->getShopper()->isVatNumberValid()) {
+        if (! $order->getShopper()->isVatNumberValid()) {
             return false;
         }
 
@@ -37,6 +37,6 @@ class VatExemptionApplication
 
         $merchantCountryIds = [$this->config->getPrimaryVatCountry()];
 
-        return !in_array($order->getShopper()->getVatNumberCountry(), $merchantCountryIds);
+        return ! in_array($order->getShopper()->getVatNumberCountry(), $merchantCountryIds);
     }
 }

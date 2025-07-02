@@ -110,7 +110,7 @@ abstract class StateContext extends TestCase
 
     protected function assertPaymentStateTransition(string $transitionMethod, DefaultPaymentState $currentState, DefaultPaymentState $newState, ?DefaultOrderState $orderState = null, ?DefaultOrderState $newOrderState = null)
     {
-        if (!$orderState) {
+        if (! $orderState) {
             $orderState = DefaultOrderState::confirmed;
         }
 
@@ -132,7 +132,7 @@ abstract class StateContext extends TestCase
 
     protected function assertShippingStateTransition(string $transitionMethod, DefaultShippingState $currentState, DefaultShippingState $newState, ?DefaultOrderState $orderState = null, ?DefaultOrderState $newOrderState = null)
     {
-        if (!$orderState) {
+        if (! $orderState) {
             $orderState = DefaultOrderState::confirmed;
         }
 
