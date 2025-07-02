@@ -4,7 +4,7 @@ Important changes will be notified in this file
 
 ## unreleased
 
-## 2025-06-01 - 0.7.3
+## 2025-06-02 - 0.7.3
 
 - Added: vat exemption handling for international business orders.
 
