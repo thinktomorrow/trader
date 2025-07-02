@@ -8,8 +8,10 @@ use Thinktomorrow\Trader\Domain\Common\Entity\ChildEntity;
 use Thinktomorrow\Trader\Domain\Common\Entity\HasData;
 use Thinktomorrow\Trader\Domain\Common\Locale;
 use Thinktomorrow\Trader\Domain\Model\Customer\CustomerId;
+use Thinktomorrow\Trader\Domain\Model\VatNumber\HasVatNumber;
+use Thinktomorrow\Trader\Domain\Model\VatNumber\VatNumberValidationState;
 
-class Shopper implements ChildEntity
+class Shopper implements ChildEntity, HasVatNumber
 {
     use HasData;
 
@@ -80,6 +82,30 @@ class Shopper implements ChildEntity
         return $this->isBusiness;
     }
 
+    public function getVatNumber(): ?string
+    {
+        return $this->getData('vat_number');
+    }
+
+    public function getVatNumberCountry(): ?string
+    {
+        return $this->getData('vat_number_country');
+    }
+
+    public function isVatNumberValid(): bool
+    {
+        return !!$this->getData('vat_number_valid');
+    }
+
+    public function getVatNumberState(): VatNumberValidationState
+    {
+        if (!$state = $this->getData('vat_number_state')) {
+            return VatNumberValidationState::unknown;
+        }
+
+        return VatNumberValidationState::from($state);
+    }
+
     public function updateRegisterAfterCheckout(bool $registerAfterCheckout): void
     {
         $this->registerAfterCheckout = $registerAfterCheckout;
@@ -87,7 +113,7 @@ class Shopper implements ChildEntity
 
     public function registerAfterCheckout(): bool
     {
-        return $this->registerAfterCheckout && ! is_null($this->customerId);
+        return $this->registerAfterCheckout && !is_null($this->customerId);
     }
 
     public function deleteCustomerId(): void

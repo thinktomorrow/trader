@@ -18,9 +18,10 @@ use Thinktomorrow\Trader\Application\Cart\RefreshCart\RefreshCart;
 use Thinktomorrow\Trader\Application\Cart\RefreshCart\RefreshCartAction;
 use Thinktomorrow\Trader\Application\Cart\ShippingProfile\UpdateShippingProfileOnOrder;
 use Thinktomorrow\Trader\Application\Cart\VariantForCart\VariantForCartRepository;
-use Thinktomorrow\Trader\Application\VatRate\ValidateVatNumber;
-use Thinktomorrow\Trader\Application\VatRate\VatNumberApplication;
-use Thinktomorrow\Trader\Application\VatRate\VatNumberValidation;
+use Thinktomorrow\Trader\Application\VatNumber\ValidateVatNumber;
+use Thinktomorrow\Trader\Application\VatNumber\VatNumberApplication;
+use Thinktomorrow\Trader\Application\VatNumber\VatNumberValidation;
+use Thinktomorrow\Trader\Application\VatRate\VatExemptionApplication;
 use Thinktomorrow\Trader\Domain\Common\Event\EventDispatcher;
 use Thinktomorrow\Trader\Domain\Model\Customer\CustomerRepository;
 use Thinktomorrow\Trader\Domain\Model\Order\Address\BillingAddress;
@@ -52,6 +53,7 @@ final class CartApplication
     private UpdatePaymentMethodOnOrder $updatePaymentMethodOnOrder;
     private OrderStateMachine $orderStateMachine;
     private VatNumberApplication $vatNumberApplication;
+    private VatExemptionApplication $vatExemptionApplication;
 
     public function __construct(
         TraderConfig                 $config,
@@ -67,7 +69,9 @@ final class CartApplication
         CustomerRepository           $customerRepository,
         EventDispatcher              $eventDispatcher,
         VatNumberApplication         $vatNumberApplication,
-    ) {
+        VatExemptionApplication      $vatExemptionApplication
+    )
+    {
         $this->findVariantDetailsForCart = $findVariantDetailsForCart;
         $this->adjustLine = $adjustLine;
         $this->orderRepository = $orderRepository;
@@ -81,6 +85,8 @@ final class CartApplication
         $this->container = $container;
         $this->orderStateMachine = $orderStateMachine;
         $this->vatNumberApplication = $vatNumberApplication;
+        $this->vatExemptionApplication = $vatExemptionApplication;
+
     }
 
     public function refresh(RefreshCart $refreshCart): void
@@ -153,7 +159,7 @@ final class CartApplication
                 }
             }
 
-            if (! $originalPersonalisation) {
+            if (!$originalPersonalisation) {
                 throw new \InvalidArgumentException('No personalisation found for variant [' . $addLine->getVariantId()->get() . '] by personalisation id [' . $personalisation_id . '].');
             }
 
@@ -312,6 +318,11 @@ final class CartApplication
                 $updateShopper->getVatNumber()
             ));
         }
+
+        // Verify VAT exemption after updating shopper details
+        $this->verifyCartVatExemption(new VerifyCartVatExemption(
+            $updateShopper->getOrderId()->get()
+        ));
     }
 
     public function verifyVatNumber(VerifyCartVatNumber $command): void
@@ -319,7 +330,9 @@ final class CartApplication
         $order = $this->orderRepository->findForCart($command->getOrderId());
         $shopper = $order->getShopper();
 
-        $billingAddressCountryId = $order->getBillingAddress()?->getAddress()->countryId;
+        if (!$billingAddressCountryId = $order->getBillingAddress()?->getAddress()->countryId) {
+            return;
+        }
 
         try {
             $vatNumberValidation = $this->vatNumberApplication->validate(new ValidateVatNumber(
@@ -337,6 +350,19 @@ final class CartApplication
         }
 
         $order->updateShopper($shopper);
+        $this->orderRepository->save($order);
+
+        $this->eventDispatcher->dispatchAll($order->releaseEvents());
+    }
+
+    public function verifyCartVatExemption(VerifyCartVatExemption $command): void
+    {
+        $order = $this->orderRepository->findForCart($command->getOrderId());
+
+        $result = $this->vatExemptionApplication->verifyForOrder($order);
+
+        $order->setVatExempt($result);
+
         $this->orderRepository->save($order);
 
         $this->eventDispatcher->dispatchAll($order->releaseEvents());
@@ -364,11 +390,11 @@ final class CartApplication
         $shopper->addData($customer->getData());
         $order->updateShopper($shopper);
 
-        if (! $order->getBillingAddress() && $billingAddress = $customer->getBillingAddress()) {
+        if (!$order->getBillingAddress() && $billingAddress = $customer->getBillingAddress()) {
             $this->chooseCustomerBillingAddress($order, $billingAddress);
         }
 
-        if (! $order->getShippingAddress() && $shippingAddress = $customer->getShippingAddress()) {
+        if (!$order->getShippingAddress() && $shippingAddress = $customer->getShippingAddress()) {
             $this->chooseCustomerShippingAddress($order, $shippingAddress);
         }
 

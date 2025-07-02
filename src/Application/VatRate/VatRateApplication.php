@@ -114,4 +114,22 @@ class VatRateApplication
 
         $this->eventDispatcher->dispatchAll($vatRate->releaseEvents());
     }
+
+    public function addVatExemptionToOrder(AddVatExemptionToOrder $command): void
+    {
+        $order = $this->vatRateRepository->findOrder($command->getOrderId());
+
+        if ($order->isVatExempt()) {
+            return; // Already vat exempt, nothing to do.
+        }
+
+        $order->addData([
+            'is_vat_exempt' => true,
+            'vat_exemption_reason' => $command->getReason(),
+        ]);
+
+        $this->vatRateRepository->save($order);
+
+        $this->eventDispatcher->dispatchAll($order->releaseEvents());
+    }
 }

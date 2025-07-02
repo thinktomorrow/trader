@@ -4,8 +4,9 @@ declare(strict_types=1);
 namespace Thinktomorrow\Trader\Application\Order\MerchantOrder;
 
 use Thinktomorrow\Trader\Domain\Common\Locale;
+use Thinktomorrow\Trader\Domain\Model\VatNumber\HasVatNumber;
 
-interface MerchantOrderShopper
+interface MerchantOrderShopper extends HasVatNumber
 {
     public static function fromMappedData(array $state, array $cartState): static;
 
@@ -23,6 +24,8 @@ interface MerchantOrderShopper
 
     /** Does the shopper have a business profile */
     public function isBusiness(): bool;
+
+    public function isVatExempt(): bool;
 
     public function getShopperLocale(): Locale;
 }

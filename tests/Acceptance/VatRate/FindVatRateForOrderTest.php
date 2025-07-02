@@ -2,7 +2,10 @@
 
 namespace Tests\Acceptance\VatRate;
 
+use Thinktomorrow\Trader\Application\VatRate\VatExemptionApplication;
 use Thinktomorrow\Trader\Application\VatRate\FindVatRateForOrder;
+use Thinktomorrow\Trader\Domain\Common\Email;
+use Thinktomorrow\Trader\Domain\Common\Locale;
 use Thinktomorrow\Trader\Domain\Common\Vat\VatPercentage;
 use Thinktomorrow\Trader\Domain\Model\Country\CountryId;
 use Thinktomorrow\Trader\Domain\Model\Order\Address\BillingAddress;
@@ -10,6 +13,8 @@ use Thinktomorrow\Trader\Domain\Model\Order\Exceptions\CouldNotFindOrder;
 use Thinktomorrow\Trader\Domain\Model\Order\Order;
 use Thinktomorrow\Trader\Domain\Model\Order\OrderId;
 use Thinktomorrow\Trader\Domain\Model\Order\OrderReference;
+use Thinktomorrow\Trader\Domain\Model\Order\Shopper;
+use Thinktomorrow\Trader\Domain\Model\Order\ShopperId;
 use Thinktomorrow\Trader\Domain\Model\Order\State\DefaultOrderState;
 use Thinktomorrow\Trader\Domain\Model\VatRate\BaseRate;
 use Thinktomorrow\Trader\Domain\Model\VatRate\VatRate;
@@ -23,13 +28,13 @@ class FindVatRateForOrderTest extends VatRateContext
     {
         parent::setUp();
 
-        $this->findVatRateForOrder = new FindVatRateForOrder(new TestTraderConfig(), $this->vatRateRepository);
+        $this->findVatRateForOrder = new FindVatRateForOrder(new TestTraderConfig(), new VatExemptionApplication(new TestTraderConfig()), $this->vatRateRepository);
     }
 
     public function tearDown(): void
     {
         $this->orderRepository->clear();
-        $this->findVatRateForOrder = new FindVatRateForOrder(new TestTraderConfig(), $this->vatRateRepository);
+        $this->findVatRateForOrder = new FindVatRateForOrder(new TestTraderConfig(), new VatExemptionApplication(new TestTraderConfig()), $this->vatRateRepository);
 
         parent::tearDown();
     }
@@ -144,9 +149,49 @@ class FindVatRateForOrderTest extends VatRateContext
         $this->assertEquals($vatRate2->getRate(), $result);
     }
 
+    public function test_it_should_return_zero_vat_when_vat_exemption_applies()
+    {
+        $vatRate = $this->createVatRate('BE', '10');
+        $variantVatPercentage = VatPercentage::fromString('21');
+
+        $order = $this->getOrder('NL');
+        $shopper = Shopper::create(ShopperId::fromString('xxxx'), Email::fromString('foo@bar.com'), true, Locale::fromString('nl'));
+        $shopper->addData([
+            'vat_number' => 'BE1234567890',
+            'vat_number_valid' => true,
+            'vat_number_state' => 'valid',
+            'vat_number_country' => 'NL',
+        ]);
+        $order->updateShopper($shopper);
+
+        $result = $this->findVatRateForOrder->findForLine($order, $variantVatPercentage);
+        $resultShippingCost = $this->findVatRateForOrder->findForShippingCost($order);
+        $resultPaymentCost = $this->findVatRateForOrder->findForPaymentCost($order);
+
+        $this->assertEquals(VatPercentage::zero(), $result);
+        $this->assertEquals(VatPercentage::zero(), $resultShippingCost);
+        $this->assertEquals(VatPercentage::zero(), $resultPaymentCost);
+    }
 
     private function getOrder(string $billingCountryId = 'BE'): Order
     {
+        $order = Order::create(
+            OrderId::fromString('xxx'),
+            OrderReference::fromString('xx-ref'),
+            DefaultOrderState::cart_pending,
+        );
+
+        $order->updateBillingAddress(BillingAddress::fromMappedData([
+            'country_id' => $billingCountryId,
+            'line_1' => 'street 123',
+            'line_2' => 'bus 456',
+            'postal_code' => '2200',
+            'city' => 'Herentals',
+            'data' => json_encode([]),
+        ], ['order_id' => 'xxx']));
+
+        return $order;
+
         // Create an order if not already
         try {
             return $this->orderRepository->find(OrderId::fromString('xxx'));

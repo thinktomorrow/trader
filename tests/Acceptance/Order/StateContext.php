@@ -10,8 +10,9 @@ use Thinktomorrow\Trader\Application\Cart\PaymentMethod\UpdatePaymentMethodOnOrd
 use Thinktomorrow\Trader\Application\Cart\RefreshCart\RefreshCartAction;
 use Thinktomorrow\Trader\Application\Cart\ShippingProfile\UpdateShippingProfileOnOrder;
 use Thinktomorrow\Trader\Application\Order\State\OrderStateApplication;
+use Thinktomorrow\Trader\Application\VatNumber\VatNumberApplication;
 use Thinktomorrow\Trader\Application\VatRate\FindVatRateForOrder;
-use Thinktomorrow\Trader\Application\VatRate\VatNumberApplication;
+use Thinktomorrow\Trader\Application\VatRate\VatExemptionApplication;
 use Thinktomorrow\Trader\Domain\Model\Order\Payment\DefaultPaymentState;
 use Thinktomorrow\Trader\Domain\Model\Order\Payment\PaymentStateMachine;
 use Thinktomorrow\Trader\Domain\Model\Order\Shipping\DefaultShippingState;
@@ -43,6 +44,7 @@ abstract class StateContext extends TestCase
     protected OrderStateMachine $orderStateMachine;
     protected CartApplication $cartApplication;
     protected VatNumberApplication $vatNumberApplication;
+    protected VatExemptionApplication $vatExemptionApplication;
 
     protected function setUp(): void
     {
@@ -52,6 +54,7 @@ abstract class StateContext extends TestCase
         $this->orderStateMachine = new OrderStateMachine(DefaultOrderState::cases(), DefaultOrderState::getTransitions());
         $this->paymentStateMachine = new PaymentStateMachine(DefaultPaymentState::cases(), DefaultPaymentState::getTransitions());
         $this->shippingStateMachine = new ShippingStateMachine(DefaultShippingState::cases(), DefaultShippingState::getTransitions());
+        $this->vatExemptionApplication = new VatExemptionApplication(new TestTraderConfig());
 
         $this->orderStateApplication = new OrderStateApplication(
             $this->orderRepository,
@@ -73,11 +76,12 @@ abstract class StateContext extends TestCase
             $this->orderStateMachine,
             new RefreshCartAction(),
             new InMemoryShippingProfileRepository(),
-            new UpdateShippingProfileOnOrder(new TestContainer(), new TestTraderConfig(), $this->orderRepository, new InMemoryShippingProfileRepository(), new FindVatRateForOrder(new TestTraderConfig(), new InMemoryVatRateRepository(new TestTraderConfig()))),
-            new UpdatePaymentMethodOnOrder(new TestContainer(), new TestTraderConfig(), $this->orderRepository, new DefaultVerifyPaymentMethodForCart(), new InMemoryPaymentMethodRepository(), new FindVatRateForOrder(new TestTraderConfig(), new InMemoryVatRateRepository(new TestTraderConfig()))),
+            new UpdateShippingProfileOnOrder(new TestContainer(), new TestTraderConfig(), $this->orderRepository, new InMemoryShippingProfileRepository(), new FindVatRateForOrder(new TestTraderConfig(), $this->vatExemptionApplication, new InMemoryVatRateRepository(new TestTraderConfig()))),
+            new UpdatePaymentMethodOnOrder(new TestContainer(), new TestTraderConfig(), $this->orderRepository, new DefaultVerifyPaymentMethodForCart(), new InMemoryPaymentMethodRepository(), new FindVatRateForOrder(new TestTraderConfig(), $this->vatExemptionApplication, new InMemoryVatRateRepository(new TestTraderConfig()))),
             new InMemoryCustomerRepository(),
             $this->eventDispatcher,
             $this->vatNumberApplication,
+            $this->vatExemptionApplication,
         );
     }
 
@@ -106,7 +110,7 @@ abstract class StateContext extends TestCase
 
     protected function assertPaymentStateTransition(string $transitionMethod, DefaultPaymentState $currentState, DefaultPaymentState $newState, ?DefaultOrderState $orderState = null, ?DefaultOrderState $newOrderState = null)
     {
-        if (! $orderState) {
+        if (!$orderState) {
             $orderState = DefaultOrderState::confirmed;
         }
 
@@ -128,7 +132,7 @@ abstract class StateContext extends TestCase
 
     protected function assertShippingStateTransition(string $transitionMethod, DefaultShippingState $currentState, DefaultShippingState $newState, ?DefaultOrderState $orderState = null, ?DefaultOrderState $newOrderState = null)
     {
-        if (! $orderState) {
+        if (!$orderState) {
             $orderState = DefaultOrderState::confirmed;
         }
 

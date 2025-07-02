@@ -3,7 +3,9 @@ declare(strict_types=1);
 
 namespace Thinktomorrow\Trader\Application\Cart\Read;
 
-interface CartShopper
+use Thinktomorrow\Trader\Domain\Model\VatNumber\HasVatNumber;
+
+interface CartShopper extends HasVatNumber
 {
     public static function fromMappedData(array $state, array $cartState): static;
 

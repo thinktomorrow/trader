@@ -5,7 +5,7 @@ namespace Thinktomorrow\Trader\Infrastructure\Laravel\Models\OrderRead;
 
 use Thinktomorrow\Trader\Application\Common\RendersData;
 use Thinktomorrow\Trader\Domain\Common\Locale;
-use Thinktomorrow\Trader\Domain\Model\VatRate\VatNumberValidationState;
+use Thinktomorrow\Trader\Domain\Model\VatNumber\VatNumberValidationState;
 
 abstract class OrderReadShopper
 {
@@ -53,17 +53,22 @@ abstract class OrderReadShopper
 
     public function isCustomer(): bool
     {
-        return ! is_null($this->customer_id);
+        return !is_null($this->customer_id);
     }
 
     public function isGuest(): bool
     {
-        return ! $this->isCustomer();
+        return !$this->isCustomer();
     }
 
     public function isBusiness(): bool
     {
         return $this->is_business;
+    }
+
+    public function isVatExempt(): bool
+    {
+        return $this->dataAsPrimitive('is_vat_exempt', null, false);
     }
 
     public function getVatNumber(): ?string
@@ -78,12 +83,12 @@ abstract class OrderReadShopper
 
     public function isVatNumberValid(): bool
     {
-        return ! ! $this->dataAsPrimitive('vat_number_valid');
+        return !!$this->dataAsPrimitive('vat_number_valid');
     }
 
     public function getVatNumberState(): VatNumberValidationState
     {
-        if (! $state = $this->dataAsPrimitive('vat_number_state')) {
+        if (!$state = $this->dataAsPrimitive('vat_number_state')) {
             return VatNumberValidationState::unknown;
         }
 

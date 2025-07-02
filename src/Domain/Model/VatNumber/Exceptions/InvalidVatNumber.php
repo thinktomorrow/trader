@@ -1,6 +1,6 @@
 <?php
 
-namespace Thinktomorrow\Trader\Domain\Model\VatRate\Exceptions;
+namespace Thinktomorrow\Trader\Domain\Model\VatNumber\Exceptions;
 
 class InvalidVatNumber extends \InvalidArgumentException
 {

@@ -244,4 +244,32 @@ class MerchantOrderTest extends CartContext
         $this->assertEquals('foobar', $personalisation->getValue());
         $this->assertEquals(PersonalisationType::TEXT, $personalisation->getType());
     }
+
+    public function test_as_a_merchant_i_need_to_be_able_to_see_if_order_is_vat_exempt()
+    {
+        $this->givenThereIsAProductWhichCostsEur('lightsaber', 5);
+        $this->whenIAddBillingAddress('NL', 'molenstraat 146', null, '3000', 'Antwerp');
+        $this->whenIAddTheVariantToTheCart('lightsaber-123', 2);
+
+        // Update shopper triggers vat number and vat exemption verification
+        $this->whenIEnterShopperDetails('foo@example.com', true);
+
+        $merchantOrder = $this->merchantOrderRepository->findMerchantOrder(OrderId::fromString('xxx'));
+
+        $this->assertTrue($merchantOrder->isVatExempt());
+    }
+
+    public function test_as_a_merchant_i_need_to_be_able_to_see_if_order_is_not_vat_exempt()
+    {
+        $this->givenThereIsAProductWhichCostsEur('lightsaber', 5);
+        $this->whenIAddTheVariantToTheCart('lightsaber-123', 2);
+        $this->whenIAddBillingAddress('BE', 'molenstraat 146', null, '3000', 'Antwerp');
+
+        // Update shopper triggers vat number and vat exemption verification
+        $this->whenIEnterShopperDetails('foo@example.com', true);
+
+        $merchantOrder = $this->merchantOrderRepository->findMerchantOrder(OrderId::fromString('xxx'));
+
+        $this->assertFalse($merchantOrder->isVatExempt());
+    }
 }

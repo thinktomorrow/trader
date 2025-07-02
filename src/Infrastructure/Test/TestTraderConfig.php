@@ -62,6 +62,11 @@ class TestTraderConfig implements TraderConfig
         return true;
     }
 
+    public function isVatExemptionAllowed(): bool
+    {
+        return $this->overwrites['allow_vat_exemption'] ?? true;
+    }
+
     public function getCategoryRootId(): ?string
     {
         return $this->overwrites['category_root_id'] ?? null;

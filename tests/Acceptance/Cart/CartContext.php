@@ -36,9 +36,10 @@ use Thinktomorrow\Trader\Application\Promo\OrderPromo\Discounts\FixedAmountOrder
 use Thinktomorrow\Trader\Application\Promo\OrderPromo\Discounts\PercentageOffOrderDiscount;
 use Thinktomorrow\Trader\Application\Promo\OrderPromo\OrderConditionFactory;
 use Thinktomorrow\Trader\Application\Promo\OrderPromo\OrderDiscountFactory;
+use Thinktomorrow\Trader\Application\VatNumber\VatNumberApplication;
+use Thinktomorrow\Trader\Application\VatNumber\VatNumberValidator;
 use Thinktomorrow\Trader\Application\VatRate\FindVatRateForOrder;
-use Thinktomorrow\Trader\Application\VatRate\VatNumberApplication;
-use Thinktomorrow\Trader\Application\VatRate\VatNumberValidator;
+use Thinktomorrow\Trader\Application\VatRate\VatExemptionApplication;
 use Thinktomorrow\Trader\Domain\Common\Cash\Cash;
 use Thinktomorrow\Trader\Domain\Common\Email;
 use Thinktomorrow\Trader\Domain\Common\Locale;
@@ -122,6 +123,7 @@ abstract class CartContext extends TestCase
     protected VatNumberApplication $vatNumberApplication;
     protected VatNumberValidator $vatNumberValidator;
     protected MerchantOrderApplication $merchantOrderApplication;
+    protected VatExemptionApplication $vatExemptionApplication;
 
 
     protected function setUp(): void
@@ -138,7 +140,8 @@ abstract class CartContext extends TestCase
         $this->cartRepository = new InMemoryCartRepository();
         $this->merchantOrderRepository = new InMemoryMerchantOrderRepository();
         $this->vatRateRepository = new InMemoryVatRateRepository(new TestTraderConfig());
-        $this->findVatRateForOrder = new FindVatRateForOrder(new TestTraderConfig(), $this->vatRateRepository);
+        $this->vatExemptionApplication = new VatExemptionApplication(new TestTraderConfig());
+        $this->findVatRateForOrder = new FindVatRateForOrder(new TestTraderConfig(), $this->vatExemptionApplication, $this->vatRateRepository);
         $this->promoRepository = new InMemoryPromoRepository(
             new DiscountFactory([
                 FixedAmountDiscount::class,
@@ -159,7 +162,7 @@ abstract class CartContext extends TestCase
         (new TestContainer())->add(ApplyPromoToOrder::class, new ApplyPromoToOrder($this->orderRepository));
         (new TestContainer())->add(AdjustLine::class, new DefaultAdjustLine());
         (new TestContainer())->add(AdjustLines::class, new AdjustLines(new InMemoryVariantRepository(), TestContainer::make(AdjustLine::class)));
-        (new TestContainer())->add(AdjustTaxRates::class, new AdjustTaxRates($this->variantRepository, new FindVatRateForOrder(new TestTraderConfig(), $this->vatRateRepository)));
+        (new TestContainer())->add(AdjustTaxRates::class, new AdjustTaxRates($this->variantRepository, new FindVatRateForOrder(new TestTraderConfig(), new VatExemptionApplication(new TestTraderConfig()), $this->vatRateRepository)));
         (new TestContainer())->add(AdjustDiscounts::class, new AdjustDiscounts($this->promoRepository, (new TestContainer())->get(ApplyPromoToOrder::class)));
         (new TestContainer())->add(OrderStateMachine::class, new OrderStateMachine([
             ...DefaultOrderState::customerStates(), DefaultOrderState::confirmed,
@@ -185,6 +188,7 @@ abstract class CartContext extends TestCase
             $this->customerRepository = new InMemoryCustomerRepository(),
             $this->eventDispatcher = new EventDispatcherSpy(),
             $this->vatNumberApplication,
+            $this->vatExemptionApplication,
         );
 
         $this->productApplication = new ProductApplication(
@@ -242,7 +246,7 @@ abstract class CartContext extends TestCase
 
     protected function resetMemoizedVatPercentages(): void
     {
-        $this->findVatRateForOrder = new FindVatRateForOrder(new TestTraderConfig(), $this->vatRateRepository);
+        $this->findVatRateForOrder = new FindVatRateForOrder(new TestTraderConfig(), $this->vatExemptionApplication, $this->vatRateRepository);
     }
 
     protected function givenThereIsAProductWhichCostsEur($productTitle, $price)
@@ -405,7 +409,7 @@ abstract class CartContext extends TestCase
             }
         }
 
-        if (! $checkFlag) {
+        if (!$checkFlag) {
             throw new \Exception('Cartitem presence check failed. No line found by ' . $productVariantId);
         }
     }
@@ -431,7 +435,7 @@ abstract class CartContext extends TestCase
             }
         }
 
-        if (! $checkFlag) {
+        if (!$checkFlag) {
             throw new \Exception('Cartitem presence check failed. No line found by ' . $productVariantId);
         }
     }
@@ -587,7 +591,7 @@ abstract class CartContext extends TestCase
             }
         }
 
-        if (! $line) {
+        if (!$line) {
             throw new \Exception('No line found by ' . $productVariantId);
         }
 

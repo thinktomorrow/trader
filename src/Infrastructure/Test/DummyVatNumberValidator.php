@@ -2,10 +2,10 @@
 
 namespace Thinktomorrow\Trader\Infrastructure\Test;
 
-use Thinktomorrow\Trader\Application\VatRate\VatNumberValidation;
-use Thinktomorrow\Trader\Application\VatRate\VatNumberValidator;
-use Thinktomorrow\Trader\Domain\Model\VatRate\VatNumber;
-use Thinktomorrow\Trader\Domain\Model\VatRate\VatNumberValidationState;
+use Thinktomorrow\Trader\Application\VatNumber\VatNumberValidation;
+use Thinktomorrow\Trader\Application\VatNumber\VatNumberValidator;
+use Thinktomorrow\Trader\Domain\Model\VatNumber\VatNumber;
+use Thinktomorrow\Trader\Domain\Model\VatNumber\VatNumberValidationState;
 
 class DummyVatNumberValidator implements VatNumberValidator
 {

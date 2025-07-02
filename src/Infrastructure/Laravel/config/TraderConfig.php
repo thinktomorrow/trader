@@ -72,6 +72,11 @@ class TraderConfig implements \Thinktomorrow\Trader\TraderConfig
         return config('trader.include_vat_in_prices');
     }
 
+    public function isVatExemptionAllowed(): bool
+    {
+        return config('trader.allow_vat_exemption', true);
+    }
+
     public function getCategoryRootId(): ?string
     {
         return config('trader.category_root_id');

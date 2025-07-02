@@ -1,11 +1,11 @@
 <?php
 declare(strict_types=1);
 
-namespace Thinktomorrow\Trader\Application\VatRate;
+namespace Thinktomorrow\Trader\Application\VatNumber;
 
-use Thinktomorrow\Trader\Domain\Model\VatRate\Exceptions\InvalidVatNumber;
-use Thinktomorrow\Trader\Domain\Model\VatRate\Exceptions\VatNumberCountryMismatch;
-use Thinktomorrow\Trader\Domain\Model\VatRate\VatNumberValidationState;
+use Thinktomorrow\Trader\Domain\Model\VatNumber\Exceptions\InvalidVatNumber;
+use Thinktomorrow\Trader\Domain\Model\VatNumber\Exceptions\VatNumberCountryMismatch;
+use Thinktomorrow\Trader\Domain\Model\VatNumber\VatNumberValidationState;
 
 class VatNumberValidation
 {
@@ -14,7 +14,8 @@ class VatNumberValidation
         public readonly string                   $vatNumber,
         public readonly VatNumberValidationState $state,
         public readonly array                    $data
-    ) {
+    )
+    {
     }
 
     public static function fromException(string $countryCode, string $vatNumber, \Exception $exception): self

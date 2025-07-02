@@ -7,14 +7,14 @@ return [
      */
     'environment-prefix' => env('APP_ENV') == 'production' ? null : env('APP_ENV'),
 
-    /*
+    /**
      * Currency code that should be used in your application. e.g. EUR, USD, CAD
      * This should be set once in the beginning and never to be touched again
      * to avoid the risk of currency collisions against historical data.
      */
     'currency' => 'EUR',
 
-    /*
+    /**
      * Default locale following the ISO 639-1 standard. The default locale is
      * mostly used for rendering the localized Money values.
      */
@@ -52,10 +52,17 @@ return [
     /**
      * Prices on the shop will be calculated including or excluding vat. This makes sure that calculations are correct
      * and don't cause any rounding errors - which could occur when calculating excluding vat and including the vat
-     * afterwards. This can be set according to the visitor demands (b2b or b2c). This also determines how the
+     * afterward. This can be set according to the visitor demands (b2b or b2c). This also determines how the
      * catalog prices are displayed.
      */
     'include_vat_in_prices' => true,
+
+    /**
+     * If this is true, the shop allows vat exemption for international business shoppers.
+     * This means that if a shopper is a business and has a valid vat number, they are
+     * eligible for vat exemption if their country is different from the primary vat country.
+     */
+    'allow_vat_exemption' => true,
 
     /**
      * Which taxon subtree represents the main category of the catalog. The main category taxon

@@ -18,6 +18,11 @@ class VatPercentage
         return new static(Percentage::fromString($rate));
     }
 
+    public static function zero(): self
+    {
+        return new static(Percentage::zero());
+    }
+
     public function toPercentage(): Percentage
     {
         return $this->percentage;

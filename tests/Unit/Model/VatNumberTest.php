@@ -4,9 +4,9 @@ namespace Tests\Unit\Model;
 
 use Tests\Unit\TestCase;
 use Thinktomorrow\Trader\Domain\Model\Country\CountryId;
-use Thinktomorrow\Trader\Domain\Model\VatRate\Exceptions\InvalidVatNumber;
-use Thinktomorrow\Trader\Domain\Model\VatRate\Exceptions\VatNumberCountryMismatch;
-use Thinktomorrow\Trader\Domain\Model\VatRate\VatNumber;
+use Thinktomorrow\Trader\Domain\Model\VatNumber\Exceptions\InvalidVatNumber;
+use Thinktomorrow\Trader\Domain\Model\VatNumber\Exceptions\VatNumberCountryMismatch;
+use Thinktomorrow\Trader\Domain\Model\VatNumber\VatNumber;
 
 class VatNumberTest extends TestCase
 {

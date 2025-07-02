@@ -60,7 +60,7 @@ abstract class OrderRead
     {
         $order = new static();
 
-        if (! $state['order_state'] instanceof OrderState) {
+        if (!$state['order_state'] instanceof OrderState) {
             throw new \InvalidArgumentException('Order state is expected to be instance of OrderState. Instead ' . gettype($state['order_state']) . ' is passed.');
         }
 
@@ -122,12 +122,17 @@ abstract class OrderRead
 
     public function getQuantity(): int
     {
-        return array_reduce((array)$this->getLines(), fn ($carry, $line) => $carry + $line->getQuantity(), 0);
+        return array_reduce((array)$this->getLines(), fn($carry, $line) => $carry + $line->getQuantity(), 0);
     }
 
     public function includeTax(bool $includeTax = true): void
     {
         $this->include_tax = $includeTax;
+    }
+
+    public function isVatExempt(): bool
+    {
+        return $this->dataAsPrimitive('is_vat_exempt') ?? false;
     }
 
     public function getTotalPrice(?bool $includeTax = null): string
@@ -162,7 +167,7 @@ abstract class OrderRead
 
     public function getShippingCost(?bool $includeTax = null): ?string
     {
-        if (! $this->shippingCost->getMoney()->isPositive()) {
+        if (!$this->shippingCost->getMoney()->isPositive()) {
             return null;
         }
 
@@ -181,7 +186,7 @@ abstract class OrderRead
 
     public function getPaymentCost(?bool $includeTax = null): ?string
     {
-        if (! $this->paymentCost->getMoney()->isPositive()) {
+        if (!$this->paymentCost->getMoney()->isPositive()) {
             return null;
         }
 
@@ -200,7 +205,7 @@ abstract class OrderRead
 
     public function getDiscountPrice(?bool $includeTax = null): ?string
     {
-        if (! $this->discountTotal->getMoney()->isPositive()) {
+        if (!$this->discountTotal->getMoney()->isPositive()) {
             return null;
         }
 

@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 
-namespace Thinktomorrow\Trader\Domain\Model\VatRate;
+namespace Thinktomorrow\Trader\Domain\Model\VatNumber;
 
 enum VatNumberValidationState: string
 {

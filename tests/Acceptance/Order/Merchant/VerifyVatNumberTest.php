@@ -5,8 +5,8 @@ namespace Tests\Acceptance\Order\Merchant;
 
 use Tests\Acceptance\Cart\CartContext;
 use Thinktomorrow\Trader\Application\Order\Merchant\VerifyVatNumber;
-use Thinktomorrow\Trader\Application\VatRate\VatNumberValidation;
-use Thinktomorrow\Trader\Domain\Model\VatRate\VatNumberValidationState;
+use Thinktomorrow\Trader\Application\VatNumber\VatNumberValidation;
+use Thinktomorrow\Trader\Domain\Model\VatNumber\VatNumberValidationState;
 use Thinktomorrow\Trader\Infrastructure\Test\Repositories\InMemoryOrderRepository;
 
 class VerifyVatNumberTest extends CartContext

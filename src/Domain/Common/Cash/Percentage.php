@@ -22,6 +22,11 @@ class Percentage
         return new static($percent);
     }
 
+    public static function zero(): self
+    {
+        return new static("0");
+    }
+
     public function get(): string
     {
         return $this->value;

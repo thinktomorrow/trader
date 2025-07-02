@@ -1,8 +1,8 @@
 <?php
 
-namespace Thinktomorrow\Trader\Application\VatRate;
+namespace Thinktomorrow\Trader\Application\VatNumber;
 
-use Thinktomorrow\Trader\Domain\Model\VatRate\VatNumber;
+use Thinktomorrow\Trader\Domain\Model\VatNumber\VatNumber;
 
 interface VatNumberValidator
 {

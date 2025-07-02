@@ -193,4 +193,20 @@ class OrderTest extends TestCase
         $this->assertCount(2, $order->getOrderEvents());
         $this->assertEquals($logEntry->getMappedData(), $order->getChildEntities()[OrderEvent::class][1]);
     }
+
+    public function test_it_can_set_vat_exempt(): void
+    {
+        $order = $this->createDefaultOrder();
+
+        $order->setVatExempt(true);
+
+        $this->assertTrue($order->isVatExempt());
+
+        $this->assertTrue(json_decode($order->getMappedData()['data'], true)['is_vat_exempt']);
+
+        $order->setVatExempt(false);
+
+        $this->assertFalse($order->isVatExempt());
+        $this->assertFalse(json_decode($order->getMappedData()['data'], true)['is_vat_exempt']);
+    }
 }

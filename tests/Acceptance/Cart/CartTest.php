@@ -5,9 +5,10 @@ namespace Tests\Acceptance\Cart;
 
 use Thinktomorrow\Trader\Application\Cart\ClearCheckoutData;
 use Thinktomorrow\Trader\Application\Cart\UpdateBillingAddress;
+use Thinktomorrow\Trader\Application\Cart\VerifyCartVatExemption;
 use Thinktomorrow\Trader\Application\Cart\VerifyCartVatNumber;
-use Thinktomorrow\Trader\Application\VatRate\VatNumberValidation;
-use Thinktomorrow\Trader\Domain\Model\VatRate\VatNumberValidationState;
+use Thinktomorrow\Trader\Application\VatNumber\VatNumberValidation;
+use Thinktomorrow\Trader\Domain\Model\VatNumber\VatNumberValidationState;
 
 class CartTest extends CartContext
 {
@@ -121,34 +122,42 @@ class CartTest extends CartContext
         $cart = $this->cartRepository->findCart($this->getOrder()->orderId);
         $shopper = $cart->getShopper();
 
-        // public function getVatNumber(): ?string
-        //    {
-        //        return $this->dataAsPrimitive('vat_number');
-        //    }
-        //
-        //    public function getVatNumberCountry(): ?string
-        //    {
-        //        return $this->dataAsPrimitive('vat_number_country');
-        //    }
-        //
-        //    public function isVatNumberValid(): bool
-        //    {
-        //        return !!$this->dataAsPrimitive('vat_number_valid');
-        //    }
-        //
-        //    public function getVatNumberState(): VatNumberValidationState
-        //    {
-        //        if (!$state = $this->dataAsPrimitive('vat_number_state')) {
-        //            return VatNumberValidationState::unknown;
-        //        }
-        //
-        //        return VatNumberValidationState::from($state);
-        //    }
-
         $this->assertEquals('0123456789', $shopper->getVatNumber());
         $this->assertEquals('BE', $shopper->getVatNumberCountry());
         $this->assertEquals(false, $shopper->isVatNumberValid());
         $this->assertEquals(VatNumberValidationState::invalid, $shopper->getVatNumberState());
+    }
+
+    public function test_it_can_verify_vat_exemption(): void
+    {
+        $this->givenThereIsAProductWhichCostsEur('lightsaber', 5);
+        $this->whenIAddTheVariantToTheCart('lightsaber-123', 2);
+        $this->whenIAddBillingAddress('NL', 'example 13', 'bus 2', '1200 BK', 'Brussel');
+        $this->whenIEnterShopperDetails('ben@tt.be', true);
+
+//        $this->vatNumberValidator->setExpectedResult(new VatNumberValidation('NL', '0123456789', VatNumberValidationState::valid, []));
+
+        $this->cartApplication->verifyCartVatExemption(new VerifyCartVatExemption(
+            $this->getOrder()->orderId->get(),
+        ));
+
+        $cart = $this->cartRepository->findCart($this->getOrder()->orderId);
+
+        $this->assertTrue($cart->isVatExempt());
+    }
+
+    public function test_it_does_not_have_vat_exemption_by_default(): void
+    {
+        $this->givenThereIsAProductWhichCostsEur('lightsaber', 5);
+        $this->whenIAddTheVariantToTheCart('lightsaber-123', 2);
+
+        $this->cartApplication->verifyCartVatExemption(new VerifyCartVatExemption(
+            $this->getOrder()->orderId->get(),
+        ));
+
+        $cart = $this->cartRepository->findCart($this->getOrder()->orderId);
+
+        $this->assertFalse($cart->isVatExempt());
     }
 
     public function test_it_can_remove_cart_details()

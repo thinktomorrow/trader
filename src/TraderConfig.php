@@ -18,7 +18,9 @@ interface TraderConfig
      * returns a country id like BE, NL, ...
      *
      * This is used to determine the default available vat rates for the catalog.
-     * Make sure it is a valid country code and that vat rates for this country exist in database.
+     * This also determines whether an international business shopper is
+     * eligible for vat exemption. Make sure it is a valid country
+     * code and that vat rates for this country exist in database.
      */
     public function getPrimaryVatCountry(): string;
 
@@ -50,6 +52,13 @@ interface TraderConfig
      * @return bool
      */
     public function includeVatInPrices(): bool;
+
+    /**
+     * If this is true, the shop allows vat exemption for international business shoppers.
+     * This means that if a shopper is a business and has a valid vat number, they are
+     * eligible for vat exemption if their country is different from the primary vat country.
+     */
+    public function isVatExemptionAllowed(): bool;
 
     public function getCategoryRootId(): ?string;
 

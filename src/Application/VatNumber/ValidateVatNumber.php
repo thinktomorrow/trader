@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 
-namespace Thinktomorrow\Trader\Application\VatRate;
+namespace Thinktomorrow\Trader\Application\VatNumber;
 
 use Thinktomorrow\Trader\Domain\Model\Country\CountryId;
 

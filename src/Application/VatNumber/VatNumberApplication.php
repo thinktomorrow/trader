@@ -1,12 +1,12 @@
 <?php
 declare(strict_types=1);
 
-namespace Thinktomorrow\Trader\Application\VatRate;
+namespace Thinktomorrow\Trader\Application\VatNumber;
 
 use Thinktomorrow\Trader\Domain\Model\Order\Shopper;
-use Thinktomorrow\Trader\Domain\Model\VatRate\Exceptions\InvalidVatNumber;
-use Thinktomorrow\Trader\Domain\Model\VatRate\Exceptions\VatNumberCountryMismatch;
-use Thinktomorrow\Trader\Domain\Model\VatRate\VatNumber;
+use Thinktomorrow\Trader\Domain\Model\VatNumber\Exceptions\InvalidVatNumber;
+use Thinktomorrow\Trader\Domain\Model\VatNumber\Exceptions\VatNumberCountryMismatch;
+use Thinktomorrow\Trader\Domain\Model\VatNumber\VatNumber;
 
 class VatNumberApplication
 {

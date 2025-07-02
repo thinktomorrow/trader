@@ -4,10 +4,10 @@ namespace Tests\Infrastructure\Vies;
 
 use SoapFault;
 use Tests\Infrastructure\TestCase;
-use Thinktomorrow\Trader\Application\VatRate\VatNumberValidation;
+use Thinktomorrow\Trader\Application\VatNumber\VatNumberValidation;
 use Thinktomorrow\Trader\Domain\Model\Country\CountryId;
-use Thinktomorrow\Trader\Domain\Model\VatRate\VatNumber;
-use Thinktomorrow\Trader\Domain\Model\VatRate\VatNumberValidationState;
+use Thinktomorrow\Trader\Domain\Model\VatNumber\VatNumber;
+use Thinktomorrow\Trader\Domain\Model\VatNumber\VatNumberValidationState;
 use Thinktomorrow\Trader\Infrastructure\Vies\ViesClient;
 use Thinktomorrow\Trader\Infrastructure\Vies\ViesVatNumberValidator;
 

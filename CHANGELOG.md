@@ -4,6 +4,10 @@ Important changes will be notified in this file
 
 ## unreleased
 
+## 2025-06-01 - 0.7.3
+
+- Added: vat exemption handling for international business orders.
+
 ## 2025-03-31 - 0.7.2
 
 - Added: `OrderGridItem::isBusiness()' method to check if the order is a business order.
