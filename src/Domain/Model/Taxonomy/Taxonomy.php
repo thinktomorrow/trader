@@ -140,4 +140,3 @@ class Taxonomy implements Aggregate
         return $object;
     }
 }
-

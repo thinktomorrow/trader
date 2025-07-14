@@ -3,7 +3,6 @@ declare(strict_types=1);
 
 namespace Thinktomorrow\Trader\Domain\Model\Taxonomy\Events;
 
-
 use Thinktomorrow\Trader\Domain\Model\Taxonomy\TaxonomyId;
 
 final class TaxonomyDeleted

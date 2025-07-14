@@ -112,10 +112,12 @@ final class TaxonApplication
 
     private function checkTaxonBelongsToDifferentTaxonomy(TaxonomyId $taxonomyId, ?TaxonId $targetTaxonId = null): bool
     {
-        if (!$targetTaxonId) return false;
+        if (! $targetTaxonId) {
+            return false;
+        }
 
         $targetTaxon = $this->taxonRepository->find($targetTaxonId);
 
-        return !$targetTaxon->taxonomyId->equals($taxonomyId);
+        return ! $targetTaxon->taxonomyId->equals($taxonomyId);
     }
 }

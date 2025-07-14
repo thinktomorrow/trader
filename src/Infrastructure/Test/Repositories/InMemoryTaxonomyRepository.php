@@ -26,7 +26,7 @@ final class InMemoryTaxonomyRepository implements TaxonomyRepository
 
     public function find(TaxonomyId $taxonomyId): Taxonomy
     {
-        if (!isset(self::$taxonomies[$taxonomyId->get()])) {
+        if (! isset(self::$taxonomies[$taxonomyId->get()])) {
             throw new CouldNotFindTaxonomy('No taxonomy found by id ' . $taxonomyId);
         }
 
@@ -35,7 +35,7 @@ final class InMemoryTaxonomyRepository implements TaxonomyRepository
 
     public function delete(TaxonomyId $taxonomyId): void
     {
-        if (!isset(self::$taxonomies[$taxonomyId->get()])) {
+        if (! isset(self::$taxonomies[$taxonomyId->get()])) {
             throw new CouldNotFindTaxonomy('No taxonomy found by id ' . $taxonomyId);
         }
 
@@ -60,7 +60,7 @@ final class InMemoryTaxonomyRepository implements TaxonomyRepository
     private function existsByKey(TaxonomyKeyId $taxonKeyId, TaxonomyId $allowedTaxonomyId): bool
     {
         foreach (self::$taxonomies as $taxonomy) {
-            if (!$taxonomy->taxonomyId->equals($allowedTaxonomyId) && $taxonomy->hasTaxonomyKeyId($taxonKeyId)) {
+            if (! $taxonomy->taxonomyId->equals($allowedTaxonomyId) && $taxonomy->hasTaxonomyKeyId($taxonKeyId)) {
                 return true;
             }
         }
