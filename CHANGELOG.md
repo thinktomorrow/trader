@@ -4,6 +4,20 @@ Important changes will be notified in this file
 
 ## unreleased
 
+- Changed: now requires PHP 8.4 and Laravel 12
+
+### Introducing Taxonomy & Taxon setup
+
+A Taxon now belongs to a Taxonomy. This allows for more flexible and structured categorization of products.
+
+Available taxonomy types are:
+
+- property: product properties like brand, vendor, gtin, ...
+- variant property: color, size, ...
+- category: product categories like clothing, electronics, ...
+- google_category: google product categories like apparel, electronics, ...
+- tag: product tags like sale, new, ...
+
 ## 2025-06-02 - 0.7.3
 
 - Added: vat exemption handling for international business orders.

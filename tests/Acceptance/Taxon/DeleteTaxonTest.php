@@ -15,7 +15,7 @@ class DeleteTaxonTest extends TaxonContext
 
     public function test_it_can_delete_taxon()
     {
-        $taxonId = $this->taxonApplication->createTaxon(new CreateTaxon('taxon-key', 'nl', []));
+        $taxonId = $this->taxonApplication->createTaxon(new CreateTaxon('bbb', 'taxon-key', 'nl', []));
 
         $this->taxonApplication->deleteTaxon(new DeleteTaxon($taxonId->get()));
 
@@ -29,12 +29,12 @@ class DeleteTaxonTest extends TaxonContext
 
     public function test_deleting_taxon_moves_child_taxa_to_level_above()
     {
-        $taxonRootId = $this->taxonApplication->createTaxon(new CreateTaxon('taxon-key-root', 'nl', []));
+        $taxonRootId = $this->taxonApplication->createTaxon(new CreateTaxon('bbb', 'taxon-key-root', 'nl', []));
         $this->taxonRepository->setNextReference('abc');
-        $taxonId = $this->taxonApplication->createTaxon(new CreateTaxon('taxon-key', 'nl', [], $taxonRootId->get()));
+        $taxonId = $this->taxonApplication->createTaxon(new CreateTaxon('bbb', 'taxon-key', 'nl', [], $taxonRootId->get()));
 
         $this->taxonRepository->setNextReference('def');
-        $nestedTaxonId = $this->taxonApplication->createTaxon(new CreateTaxon('taxon-key-nested', 'fr', [], $taxonId->get()));
+        $nestedTaxonId = $this->taxonApplication->createTaxon(new CreateTaxon('bbb', 'taxon-key-nested', 'fr', [], $taxonId->get()));
 
         $this->taxonApplication->deleteTaxon(new DeleteTaxon($taxonId->get()));
 

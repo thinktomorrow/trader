@@ -5,10 +5,13 @@ namespace Thinktomorrow\Trader\Application\Taxon;
 
 use Thinktomorrow\Trader\Domain\Common\Event\EventDispatcher;
 use Thinktomorrow\Trader\Domain\Model\Taxon\Events\TaxonDeleted;
+use Thinktomorrow\Trader\Domain\Model\Taxon\Exceptions\CouldNotCreateTaxon;
+use Thinktomorrow\Trader\Domain\Model\Taxon\Exceptions\CouldNotMoveTaxon;
 use Thinktomorrow\Trader\Domain\Model\Taxon\Taxon;
 use Thinktomorrow\Trader\Domain\Model\Taxon\TaxonId;
 use Thinktomorrow\Trader\Domain\Model\Taxon\TaxonKey;
 use Thinktomorrow\Trader\Domain\Model\Taxon\TaxonRepository;
+use Thinktomorrow\Trader\Domain\Model\Taxonomy\TaxonomyId;
 use Thinktomorrow\Trader\TraderConfig;
 
 final class TaxonApplication
@@ -29,8 +32,16 @@ final class TaxonApplication
         $taxonId = $this->taxonRepository->nextReference();
         $taxonKeyId = $this->taxonRepository->uniqueKeyReference($createTaxon->getTaxonKeyId(), $taxonId);
 
+        if ($this->checkTaxonBelongsToDifferentTaxonomy($createTaxon->getTaxonomyId(), $createTaxon->getParentTaxonId())) {
+            throw CouldNotCreateTaxon::becauseParentDoesNotBelongToSameTaxonomy(
+                $createTaxon->getParentTaxonId()->get(),
+                $createTaxon->getTaxonomyId()->get()
+            );
+        }
+
         $taxon = Taxon::create(
             $taxonId,
+            $createTaxon->getTaxonomyId(),
             $createTaxon->getParentTaxonId()
         );
 
@@ -63,6 +74,14 @@ final class TaxonApplication
         $taxon = $this->taxonRepository->find($moveTaxon->getTaxonId());
 
         if ($moveTaxon->hasParentTaxonId()) {
+
+            if ($this->checkTaxonBelongsToDifferentTaxonomy($taxon->taxonomyId, $moveTaxon->getParentTaxonId())) {
+                throw CouldNotMoveTaxon::becauseTargetDoesNotBelongToSameTaxonomy(
+                    $moveTaxon->getParentTaxonId()->get(),
+                    $taxon->taxonomyId->get()
+                );
+            }
+
             $taxon->changeParent($moveTaxon->getParentTaxonId());
         } else {
             $taxon->moveToRoot();
@@ -89,5 +108,14 @@ final class TaxonApplication
         $this->eventDispatcher->dispatchAll([
             new TaxonDeleted($deleteTaxon->getTaxonId()),
         ]);
+    }
+
+    private function checkTaxonBelongsToDifferentTaxonomy(TaxonomyId $taxonomyId, ?TaxonId $targetTaxonId = null): bool
+    {
+        if (!$targetTaxonId) return false;
+
+        $targetTaxon = $this->taxonRepository->find($targetTaxonId);
+
+        return !$targetTaxon->taxonomyId->equals($taxonomyId);
     }
 }

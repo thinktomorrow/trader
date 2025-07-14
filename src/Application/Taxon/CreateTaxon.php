@@ -6,20 +6,28 @@ namespace Thinktomorrow\Trader\Application\Taxon;
 use Thinktomorrow\Trader\Domain\Common\Locale;
 use Thinktomorrow\Trader\Domain\Model\Taxon\TaxonId;
 use Thinktomorrow\Trader\Domain\Model\Taxon\TaxonKeyId;
+use Thinktomorrow\Trader\Domain\Model\Taxonomy\TaxonomyId;
 
 final class CreateTaxon
 {
+    private string $taxonomyId;
     private string $taxonKeyId;
     private string $taxonKeyLocale;
     private array $data;
     private ?string $parent_taxon_id;
 
-    public function __construct(string $taxonKeyId, string $taxonKeyLocale, array $data, ?string $parent_taxon_id = null)
+    public function __construct(string $taxonomyId, string $taxonKeyId, string $taxonKeyLocale, array $data, ?string $parent_taxon_id = null)
     {
+        $this->taxonomyId = $taxonomyId;
         $this->taxonKeyId = $taxonKeyId;
         $this->taxonKeyLocale = $taxonKeyLocale;
         $this->data = $data;
         $this->parent_taxon_id = $parent_taxon_id;
+    }
+
+    public function getTaxonomyId(): TaxonomyId
+    {
+        return TaxonomyId::fromString($this->taxonomyId);
     }
 
     public function getTaxonKeyId(): TaxonKeyId

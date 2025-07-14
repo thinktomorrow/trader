@@ -13,6 +13,7 @@ use Thinktomorrow\Trader\Domain\Model\Taxon\TaxonId;
 use Thinktomorrow\Trader\Domain\Model\Taxon\TaxonKey;
 use Thinktomorrow\Trader\Domain\Model\Taxon\TaxonKeyId;
 use Thinktomorrow\Trader\Domain\Model\Taxon\TaxonState;
+use Thinktomorrow\Trader\Domain\Model\Taxonomy\TaxonomyId;
 
 class TaxonTest extends TestCase
 {
@@ -20,6 +21,7 @@ class TaxonTest extends TestCase
     {
         $taxon = Taxon::create(
             TaxonId::fromString('aaa'),
+            TaxonomyId::fromString('bbb'),
             TaxonId::fromString('parent-aaa'),
         );
 
@@ -30,6 +32,7 @@ class TaxonTest extends TestCase
 
         $this->assertEquals([
             'taxon_id' => 'aaa',
+            'taxonomy_id' => 'bbb',
             'state' => TaxonState::online->value,
             'order' => 0,
             'parent_id' => 'parent-aaa',
@@ -43,6 +46,7 @@ class TaxonTest extends TestCase
     {
         $taxon = Taxon::create(
             TaxonId::fromString('aaa'),
+            TaxonomyId::fromString('bbb'),
         );
 
         $this->assertNull($taxon->getMappedData()['parent_id']);
@@ -52,6 +56,7 @@ class TaxonTest extends TestCase
     {
         $taxon = Taxon::create(
             TaxonId::fromString('aaa'),
+            TaxonomyId::fromString('bbb'),
         );
 
         $taxon->changeParent(TaxonId::fromString('bbb'));
@@ -63,7 +68,8 @@ class TaxonTest extends TestCase
     {
         $taxon = Taxon::create(
             TaxonId::fromString('aaa'),
-            TaxonId::fromString('bbb')
+            TaxonomyId::fromString('bbb'),
+            TaxonId::fromString('ccc')
         );
 
         $taxon->moveToRoot();
@@ -77,6 +83,7 @@ class TaxonTest extends TestCase
 
         Taxon::create(
             TaxonId::fromString('aaa'),
+            TaxonomyId::fromString('bbb'),
             TaxonId::fromString('aaa'),
         );
     }
@@ -85,7 +92,8 @@ class TaxonTest extends TestCase
     {
         $taxon = Taxon::create(
             TaxonId::fromString('aaa'),
-            TaxonId::fromString('bbb')
+            TaxonomyId::fromString('bbb'),
+            TaxonId::fromString('ccc')
         );
 
         $taxon->changeState(TaxonState::offline);
@@ -98,9 +106,11 @@ class TaxonTest extends TestCase
         $taxon = $this->createdTaxon();
 
         $this->assertEquals(TaxonId::fromString('yyy'), $taxon->taxonId);
+        $this->assertEquals(TaxonomyId::fromString('bbb'), $taxon->taxonomyId);
 
         $this->assertEquals([
             'taxon_id' => 'yyy',
+            'taxonomy_id' => 'bbb',
             'state' => TaxonState::offline->value,
             'order' => 5,
             'parent_id' => 'parent-yyy',
@@ -184,6 +194,7 @@ class TaxonTest extends TestCase
     {
         return Taxon::fromMappedData([
             'taxon_id' => 'yyy',
+            'taxonomy_id' => 'bbb',
             'state' => TaxonState::offline->value,
             'order' => 5,
             'parent_id' => 'parent-yyy',

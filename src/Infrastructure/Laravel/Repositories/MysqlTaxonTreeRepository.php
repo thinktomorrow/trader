@@ -45,9 +45,9 @@ class MysqlTaxonTreeRepository implements TaxonTreeRepository, CategoryRepositor
     public function findTaxonById(string $taxonId): TaxonNode
     {
         /** @var TaxonNode $taxonNode */
-        $taxonNode = $this->getTree()->find(fn (TaxonNode $taxonNode) => $taxonNode->getId() == $taxonId);
+        $taxonNode = $this->getTree()->find(fn(TaxonNode $taxonNode) => $taxonNode->getId() == $taxonId);
 
-        if (! $taxonNode) {
+        if (!$taxonNode) {
             throw new CouldNotFindTaxon('No taxon record found by id ' . $taxonId);
         }
 
@@ -64,9 +64,9 @@ class MysqlTaxonTreeRepository implements TaxonTreeRepository, CategoryRepositor
     public function findTaxonByKey(string $key): TaxonNode
     {
         /** @var TaxonNode $taxonNode */
-        $taxonNode = $this->getTree()->find(fn (TaxonNode $taxonNode) => $taxonNode->getKey() == $key);
+        $taxonNode = $this->getTree()->find(fn(TaxonNode $taxonNode) => $taxonNode->getKey() == $key);
 
-        if (! $taxonNode) {
+        if (!$taxonNode) {
             throw new CouldNotFindTaxon('No taxon record found by key ' . $key);
         }
 
@@ -81,10 +81,9 @@ class MysqlTaxonTreeRepository implements TaxonTreeRepository, CategoryRepositor
             return $this->trees[$localeKey];
         }
 
-        $this->trees[$localeKey] = (new TaxonTree((new NodeCollectionFactory)->strict()->fromSource(
-            new TaxonSource($this->getTaxonNodes())
-        )->all()))
-        ->eachRecursive(fn (TaxonNode $node) => $node->setLocale($this->locale));
+        $this->trees[$localeKey] = TaxonTree::fromIterable($this->getTaxonNodes())
+            ->sort('order')
+            ->eachRecursive(fn(TaxonNode $node) => $node->setLocale($this->locale));
 
         return $this->trees[$localeKey];
     }
@@ -102,11 +101,11 @@ class MysqlTaxonTreeRepository implements TaxonTreeRepository, CategoryRepositor
             ->select(static::$taxonTable . '.*')
             ->addSelect(DB::raw('GROUP_CONCAT(trader_taxa_products.product_id) AS product_ids'))
             ->addSelect(DB::raw('GROUP_CONCAT(trader_products.product_id) AS online_product_ids'))
-            ->groupBy(static::$taxonTable.'.taxon_id')
-            ->orderBy(static::$taxonTable.'.order')
+            ->groupBy(static::$taxonTable . '.taxon_id')
+            ->orderBy(static::$taxonTable . '.order')
             ->get()
             ->map(function ($item) use ($taxonKeyResults) {
-                $keys = $taxonKeyResults->filter(fn ($taxonKeyResult) => $taxonKeyResult->taxon_id == $item->taxon_id);
+                $keys = $taxonKeyResults->filter(fn($taxonKeyResult) => $taxonKeyResult->taxon_id == $item->taxon_id);
                 $item->keys = $keys->values()->toJson();
 
                 return $item;
@@ -115,7 +114,7 @@ class MysqlTaxonTreeRepository implements TaxonTreeRepository, CategoryRepositor
         $taxonNodeClass = $this->container->get(TaxonNode::class);
 
         return TaxonNodes::fromType(
-            $results->map(fn ($row) => $taxonNodeClass::fromMappedData((array) $row))->all()
+            $results->map(fn($row) => $taxonNodeClass::fromMappedData((array)$row))->all()
         );
     }
 }

@@ -12,6 +12,7 @@ use Thinktomorrow\Trader\Domain\Model\Taxon\TaxonId;
 use Thinktomorrow\Trader\Domain\Model\Taxon\TaxonKey;
 use Thinktomorrow\Trader\Domain\Model\Taxon\TaxonKeyId;
 use Thinktomorrow\Trader\Domain\Model\Taxon\TaxonState;
+use Thinktomorrow\Trader\Domain\Model\Taxonomy\TaxonomyId;
 use Thinktomorrow\Trader\Infrastructure\Laravel\Repositories\MysqlTaxonRepository;
 use Thinktomorrow\Trader\Infrastructure\Test\Repositories\InMemoryTaxonRepository;
 
@@ -91,8 +92,10 @@ final class TaxonRepositoryTest extends TestCase
     {
         $taxon = Taxon::create(
             TaxonId::fromString('xxx'),
+            TaxonomyId::fromString('bbb'),
             TaxonId::fromString('parent'),
         );
+
         $taxon->updateTaxonKeys([
             TaxonKey::create($taxon->taxonId, TaxonKeyId::fromString('taxon-key'), Locale::fromString('nl')),
         ]);
@@ -103,6 +106,7 @@ final class TaxonRepositoryTest extends TestCase
 
         $taxon = Taxon::create(
             TaxonId::fromString('xxx'),
+            TaxonomyId::fromString('bbb'),
             TaxonId::fromString('parent'),
         );
 
@@ -121,6 +125,7 @@ final class TaxonRepositoryTest extends TestCase
         // As Root
         $taxon = Taxon::create(
             TaxonId::fromString('xxx'),
+            TaxonomyId::fromString('bbb'),
         );
 
         $taxon->updateTaxonKeys([

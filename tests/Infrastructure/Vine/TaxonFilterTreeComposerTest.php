@@ -12,6 +12,7 @@ use Thinktomorrow\Trader\Domain\Model\Taxon\TaxonId;
 use Thinktomorrow\Trader\Domain\Model\Taxon\TaxonKey;
 use Thinktomorrow\Trader\Domain\Model\Taxon\TaxonKeyId;
 use Thinktomorrow\Trader\Domain\Model\Taxon\TaxonState;
+use Thinktomorrow\Trader\Domain\Model\Taxonomy\TaxonomyId;
 use Thinktomorrow\Trader\Infrastructure\Laravel\Repositories\MysqlTaxonTreeRepository;
 use Thinktomorrow\Trader\Infrastructure\Test\Repositories\InMemoryTaxonRepository;
 use Thinktomorrow\Trader\Infrastructure\Test\Repositories\InMemoryTaxonTreeRepository;
@@ -84,7 +85,7 @@ final class TaxonFilterTreeComposerTest extends TestCase
         }
 
         $this->createTaxon(
-            Taxon::create(TaxonId::fromString('first')),
+            Taxon::create(TaxonId::fromString('first'), TaxonomyId::fromString('brand')),
             ['aaa', 'bbb', 'ccc', 'ddd']
         );
 
@@ -113,21 +114,21 @@ final class TaxonFilterTreeComposerTest extends TestCase
         (new InMemoryTaxonRepository())->setOnlineProductIds(TaxonId::fromString('first'), ['aaa']);
         (new InMemoryTaxonRepository())->setOnlineProductIds(TaxonId::fromString('second'), ['bbb']);
 
-        $taxon = Taxon::create(TaxonId::fromString('first'));
+        $taxon = Taxon::create(TaxonId::fromString('first'), TaxonomyId::fromString('brand'));
         $taxon->updateTaxonKeys([TaxonKey::create($taxon->taxonId, TaxonKeyId::fromString('taxon-first'), Locale::fromString('nl'))]);
         $this->createTaxon($taxon, ['aaa']);
 
-        $taxon = Taxon::create(TaxonId::fromString('second'), TaxonId::fromString('first'));
+        $taxon = Taxon::create(TaxonId::fromString('second'), TaxonomyId::fromString('brand'), TaxonId::fromString('first'));
         $taxon->updateTaxonKeys([TaxonKey::create($taxon->taxonId, TaxonKeyId::fromString('taxon-second'), Locale::fromString('nl'))]);
         $this->createTaxon($taxon, ['bbb']);
 
         // No product
-        $taxon = Taxon::create(TaxonId::fromString('third'), TaxonId::fromString('first'));
+        $taxon = Taxon::create(TaxonId::fromString('third'), TaxonomyId::fromString('brand'), TaxonId::fromString('first'));
         $taxon->updateTaxonKeys([TaxonKey::create($taxon->taxonId, TaxonKeyId::fromString('taxon-third'), Locale::fromString('nl'))]);
         $this->createTaxon($taxon, []);
 
         // Offline product
-        $taxon = Taxon::create(TaxonId::fromString('fourth'), TaxonId::fromString('first'));
+        $taxon = Taxon::create(TaxonId::fromString('fourth'), TaxonomyId::fromString('brand'), TaxonId::fromString('first'));
         $taxon->updateTaxonKeys([TaxonKey::create($taxon->taxonId, TaxonKeyId::fromString('taxon-fourth'), Locale::fromString('nl'))]);
         $this->createTaxon($taxon, ['ccc']);
 
@@ -147,16 +148,16 @@ final class TaxonFilterTreeComposerTest extends TestCase
         (new InMemoryTaxonRepository())->setOnlineProductIds(TaxonId::fromString('first'), ['aaa']);
         (new InMemoryTaxonRepository())->setOnlineProductIds(TaxonId::fromString('second'), ['aaa']);
 
-        $taxon = Taxon::create(TaxonId::fromString('main'));
+        $taxon = Taxon::create(TaxonId::fromString('main'), TaxonomyId::fromString('brand'));
         $taxon->updateTaxonKeys([TaxonKey::create($taxon->taxonId, TaxonKeyId::fromString('taxon-main'), Locale::fromString('nl'))]);
         $this->createTaxon($taxon, ['aaa']);
 
-        $first = Taxon::create(TaxonId::fromString('first'), TaxonId::fromString('main'));
+        $first = Taxon::create(TaxonId::fromString('first'), TaxonomyId::fromString('brand'), TaxonId::fromString('main'));
         $first->changeOrder(3);
         $first->updateTaxonKeys([TaxonKey::create($first->taxonId, TaxonKeyId::fromString('taxon-first'), Locale::fromString('nl'))]);
         $this->createTaxon($first, ['aaa']);
 
-        $second = Taxon::create(TaxonId::fromString('second'), TaxonId::fromString('main'));
+        $second = Taxon::create(TaxonId::fromString('second'), TaxonomyId::fromString('brand'), TaxonId::fromString('main'));
         $second->changeOrder(1);
         $second->updateTaxonKeys([TaxonKey::create($second->taxonId, TaxonKeyId::fromString('taxon-second'), Locale::fromString('nl'))]);
         $this->createTaxon($second, ['aaa']);
@@ -178,11 +179,11 @@ final class TaxonFilterTreeComposerTest extends TestCase
         (new InMemoryTaxonRepository())->setOnlineProductIds(TaxonId::fromString('first'), ['aaa']);
         (new InMemoryTaxonRepository())->setOnlineProductIds(TaxonId::fromString('second'), ['aaa']);
 
-        $taxon = Taxon::create(TaxonId::fromString('first'));
+        $taxon = Taxon::create(TaxonId::fromString('first'), TaxonomyId::fromString('brand'));
         $taxon->updateTaxonKeys([TaxonKey::create($taxon->taxonId, TaxonKeyId::fromString('taxon-first'), Locale::fromString('nl'))]);
         $this->createTaxon($taxon, ['aaa']);
 
-        $taxon = Taxon::create(TaxonId::fromString('second'), TaxonId::fromString('first'));
+        $taxon = Taxon::create(TaxonId::fromString('second'), TaxonomyId::fromString('brand'), TaxonId::fromString('first'));
         $taxon->changeState(TaxonState::offline);
         $taxon->updateTaxonKeys([TaxonKey::create($taxon->taxonId, TaxonKeyId::fromString('taxon-second'), Locale::fromString('nl'))]);
         $this->createTaxon($taxon, ['aaa']);
@@ -203,15 +204,15 @@ final class TaxonFilterTreeComposerTest extends TestCase
         (new InMemoryTaxonRepository())->setOnlineProductIds(TaxonId::fromString('second'), ['aaa']);
         (new InMemoryTaxonRepository())->setOnlineProductIds(TaxonId::fromString('third'), ['aaa']);
 
-        $taxon = Taxon::create(TaxonId::fromString('first'));
+        $taxon = Taxon::create(TaxonId::fromString('first'), TaxonomyId::fromString('brand'));
         $taxon->updateTaxonKeys([TaxonKey::create($taxon->taxonId, TaxonKeyId::fromString('taxon-first'), Locale::fromString('nl'))]);
         $this->createTaxon($taxon, ['aaa']);
 
-        $taxon2 = Taxon::create(TaxonId::fromString('second'), TaxonId::fromString('first'));
+        $taxon2 = Taxon::create(TaxonId::fromString('second'), TaxonomyId::fromString('brand'), TaxonId::fromString('first'));
         $taxon2->updateTaxonKeys([TaxonKey::create($taxon2->taxonId, TaxonKeyId::fromString('taxon-second'), Locale::fromString('nl'))]);
         $this->createTaxon($taxon2, ['aaa']);
 
-        $taxon3 = Taxon::create(TaxonId::fromString('third'));
+        $taxon3 = Taxon::create(TaxonId::fromString('third'), TaxonomyId::fromString('brand'));
         $taxon3->updateTaxonKeys([TaxonKey::create($taxon3->taxonId, TaxonKeyId::fromString('taxon-third'), Locale::fromString('nl'))]);
         $this->createTaxon($taxon3, ['aaa']);
 

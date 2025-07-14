@@ -68,7 +68,7 @@ use Throwable;
 
 trait TestHelpers
 {
-    protected function disableExceptionHandling()
+    protected function disableExceptionHandling(): void
     {
         $this->app->instance(ExceptionHandler::class, new class implements ExceptionHandler {
             public function __construct()
@@ -96,7 +96,7 @@ trait TestHelpers
         });
     }
 
-    protected function createOrder(array $orderValues = [], array $lines = [], array $discounts = [], array $shippings = [], array $payments = [], ?ShippingAddress $shippingAddress = null, ?BillingAddress $billingAddress = null, ?Shopper $shopper = null, array $logEntries = []): Order
+    protected static function createOrder(array $orderValues = [], array $lines = [], array $discounts = [], array $shippings = [], array $payments = [], ?ShippingAddress $shippingAddress = null, ?BillingAddress $billingAddress = null, ?Shopper $shopper = null, array $logEntries = []): Order
     {
         return Order::fromMappedData(array_merge([
             'order_id' => 'xxx',
@@ -105,37 +105,37 @@ trait TestHelpers
             'order_state' => DefaultOrderState::cart_revived,
             'data' => "[]",
         ], $orderValues), [
-            Line::class => array_map(fn (Line $line) => [
+            Line::class => array_map(fn(Line $line) => [
                 ...$line->getMappedData(),
-                Discount::class => array_map(fn (Discount $discount) => $discount->getMappedData(), $line->getDiscounts()),
-                LinePersonalisation::class => array_map(fn (LinePersonalisation $linePersonalisation) => $linePersonalisation->getMappedData(), $line->getPersonalisations()),
+                Discount::class => array_map(fn(Discount $discount) => $discount->getMappedData(), $line->getDiscounts()),
+                LinePersonalisation::class => array_map(fn(LinePersonalisation $linePersonalisation) => $linePersonalisation->getMappedData(), $line->getPersonalisations()),
             ], $lines),
-            Shipping::class => array_map(fn (Shipping $shipping) => [...array_merge($shipping->getMappedData(), ['shipping_state' => $shipping->getShippingState()]), Discount::class => array_map(fn (Discount $discount) => $discount->getMappedData(), $shipping->getDiscounts())], $shippings),
-            Payment::class => array_map(fn (Payment $payment) => [...array_merge($payment->getMappedData(), ['payment_state' => $payment->getPaymentState()]), Discount::class => array_map(fn (Discount $discount) => $discount->getMappedData(), $payment->getDiscounts())], $payments),
+            Shipping::class => array_map(fn(Shipping $shipping) => [...array_merge($shipping->getMappedData(), ['shipping_state' => $shipping->getShippingState()]), Discount::class => array_map(fn(Discount $discount) => $discount->getMappedData(), $shipping->getDiscounts())], $shippings),
+            Payment::class => array_map(fn(Payment $payment) => [...array_merge($payment->getMappedData(), ['payment_state' => $payment->getPaymentState()]), Discount::class => array_map(fn(Discount $discount) => $discount->getMappedData(), $payment->getDiscounts())], $payments),
             ShippingAddress::class => $shippingAddress?->getMappedData(),
             BillingAddress::class => $billingAddress?->getMappedData(),
             Shopper::class => $shopper?->getMappedData(),
-            Discount::class => array_map(fn (Discount $discount) => $discount->getMappedData(), $discounts),
-            OrderEvent::class => array_map(fn (OrderEvent $logEntry) => $logEntry->getMappedData(), $logEntries),
+            Discount::class => array_map(fn(Discount $discount) => $discount->getMappedData(), $discounts),
+            OrderEvent::class => array_map(fn(OrderEvent $logEntry) => $logEntry->getMappedData(), $logEntries),
         ]);
     }
 
-    protected function createDefaultOrder(array $orderValues = []): Order
+    protected static function createDefaultOrder(array $orderValues = []): Order
     {
-        return $this->createOrder(
+        return static::createOrder(
             $orderValues,
-            [$this->createLine()],
-            [$this->createOrderDiscount()],
-            [$this->createOrderShipping()],
-            [$this->createOrderPayment()],
-            $this->createOrderShippingAddress(),
-            $this->createOrderBillingAddress(),
-            $this->createOrderShopper(),
-            [$this->createLogEntry()],
+            [static::createLine()],
+            [static::createOrderDiscount()],
+            [static::createOrderShipping()],
+            [static::createOrderPayment()],
+            static::createOrderShippingAddress(),
+            static::createOrderBillingAddress(),
+            static::createOrderShopper(),
+            [static::createLogEntry()],
         );
     }
 
-    protected function createLine(array $values = [], array $aggregateState = [], array $discounts = [], array $personalisations = []): Line
+    protected static function createLine(array $values = [], array $aggregateState = [], array $discounts = [], array $personalisations = []): Line
     {
         return Line::fromMappedData(array_merge([
             'line_id' => 'abc',
@@ -149,12 +149,12 @@ trait TestHelpers
         ], $values), array_merge([
             'order_id' => 'xxx',
         ], $aggregateState), [
-            Discount::class => array_map(fn (Discount $discount) => $discount->getMappedData(), $discounts),
-            LinePersonalisation::class => array_map(fn (LinePersonalisation $linePersonalisation) => $linePersonalisation->getMappedData(), $personalisations),
+            Discount::class => array_map(fn(Discount $discount) => $discount->getMappedData(), $discounts),
+            LinePersonalisation::class => array_map(fn(LinePersonalisation $linePersonalisation) => $linePersonalisation->getMappedData(), $personalisations),
         ]);
     }
 
-    protected function createOrderShipping(array $values = [], array $aggregateState = [], array $discounts = []): Shipping
+    protected static function createOrderShipping(array $values = [], array $aggregateState = [], array $discounts = []): Shipping
     {
         return Shipping::fromMappedData(array_merge([
             'order_id' => 'xxx',
@@ -168,11 +168,11 @@ trait TestHelpers
         ], $values), array_merge([
             'order_id' => 'xxx',
         ], $aggregateState), [
-            Discount::class => array_map(fn (Discount $discount) => $discount->getMappedData(), $discounts),
+            Discount::class => array_map(fn(Discount $discount) => $discount->getMappedData(), $discounts),
         ]);
     }
 
-    protected function createOrderPayment(array $values = [], array $aggregateState = [], array $discounts = []): Payment
+    protected static function createOrderPayment(array $values = [], array $aggregateState = [], array $discounts = []): Payment
     {
         return Payment::fromMappedData(array_merge([
             'payment_id' => 'ppppp',
@@ -185,11 +185,11 @@ trait TestHelpers
         ], $values), array_merge([
             'order_id' => 'xxx',
         ], $aggregateState), [
-            Discount::class => array_map(fn (Discount $discount) => $discount->getMappedData(), $discounts),
+            Discount::class => array_map(fn(Discount $discount) => $discount->getMappedData(), $discounts),
         ]);
     }
 
-    protected function createOrderShippingAddress(array $values = [], array $aggregateState = []): ShippingAddress
+    protected static function createOrderShippingAddress(array $values = [], array $aggregateState = []): ShippingAddress
     {
         return ShippingAddress::fromMappedData(array_merge([
             'country_id' => 'BE',
@@ -203,7 +203,7 @@ trait TestHelpers
         ], $aggregateState));
     }
 
-    protected function createOrderBillingAddress(array $values = [], array $aggregateState = []): BillingAddress
+    protected static function createOrderBillingAddress(array $values = [], array $aggregateState = []): BillingAddress
     {
         return BillingAddress::fromMappedData(array_merge([
             'country_id' => 'NL',
@@ -217,7 +217,7 @@ trait TestHelpers
         ], $aggregateState));
     }
 
-    protected function createOrderShopper(array $values = [], array $aggregateState = []): Shopper
+    protected static function createOrderShopper(array $values = [], array $aggregateState = []): Shopper
     {
         return Shopper::fromMappedData(array_merge([
             'shopper_id' => 'abcdef',
@@ -232,7 +232,7 @@ trait TestHelpers
         ], $aggregateState));
     }
 
-    protected function createLogEntry(array $values = [], array $aggregateState = []): OrderEvent
+    protected static function createLogEntry(array $values = [], array $aggregateState = []): OrderEvent
     {
         return OrderEvent::fromMappedData(array_merge([
             'entry_id' => 'abc',
@@ -244,7 +244,7 @@ trait TestHelpers
         ], $aggregateState));
     }
 
-    protected function createOrderDiscount(array $data = [], array $aggregateState = []): Discount
+    protected static function createOrderDiscount(array $data = [], array $aggregateState = []): Discount
     {
         return Discount::fromMappedData(array_merge([
             'discount_id' => 'order-discount-abc',
@@ -261,34 +261,34 @@ trait TestHelpers
         ], $aggregateState));
     }
 
-    protected function createOrderLineDiscount(array $data = [], array $aggregateState = []): Discount
+    protected static function createOrderLineDiscount(array $data = [], array $aggregateState = []): Discount
     {
-        return $this->createOrderDiscount(array_merge([
+        return static::createOrderDiscount(array_merge([
             'discount_id' => 'line-abc',
             'discountable_type' => DiscountableType::line->value,
             'discountable_id' => 'abc',
         ], $data));
     }
 
-    protected function createOrderShippingDiscount(array $data = [], array $aggregateState = []): Discount
+    protected static function createOrderShippingDiscount(array $data = [], array $aggregateState = []): Discount
     {
-        return $this->createOrderDiscount(array_merge([
+        return static::createOrderDiscount(array_merge([
             'discount_id' => 'shipping-uuu',
             'discountable_type' => DiscountableType::shipping->value,
             'discountable_id' => 'sss',
         ], $data));
     }
 
-    protected function createOrderPaymentDiscount(array $data = [], array $aggregateState = []): Discount
+    protected static function createOrderPaymentDiscount(array $data = [], array $aggregateState = []): Discount
     {
-        return $this->createOrderDiscount(array_merge([
+        return static::createOrderDiscount(array_merge([
             'discount_id' => 'shipping-mmm',
             'discountable_type' => DiscountableType::payment->value,
             'discountable_id' => 'ppppp',
         ], $data));
     }
 
-    protected function createCustomer(): Customer
+    protected static function createCustomer(): Customer
     {
         return Customer::fromMappedData([
             'customer_id' => 'ccc-123',
@@ -302,7 +302,7 @@ trait TestHelpers
         ]);
     }
 
-    protected function createPaymentMethod(array $values = []): PaymentMethod
+    protected static function createPaymentMethod(array $values = []): PaymentMethod
     {
         return PaymentMethod::fromMappedData(array_merge([
             'payment_method_id' => 'mmm',
@@ -315,7 +315,7 @@ trait TestHelpers
         ]);
     }
 
-    protected function createShippingProfile(array $values = []): ShippingProfile
+    protected static function createShippingProfile(array $values = []): ShippingProfile
     {
         return ShippingProfile::fromMappedData(array_merge([
             'shipping_profile_id' => 'ppp',
@@ -329,12 +329,12 @@ trait TestHelpers
         ]);
     }
 
-    protected function createVatRateWithoutBaseRates(array $values = []): VatRate
+    protected static function createVatRateWithoutBaseRates(array $values = []): VatRate
     {
-        return $this->createVatRate($values, [], false);
+        return static::createVatRate($values, [], false);
     }
 
-    protected function createVatRate(array $values = [], array $baseRateValues = [], bool $withBaseRates = true): VatRate
+    protected static function createVatRate(array $values = [], array $baseRateValues = [], bool $withBaseRates = true): VatRate
     {
         return VatRate::fromMappedData(array_merge([
             'vat_rate_id' => 'vatRate-' . Str::random(10),
@@ -355,7 +355,7 @@ trait TestHelpers
         ]);
     }
 
-    protected function createCountry(array $values = []): Country
+    protected static function createCountry(array $values = []): Country
     {
         return Country::fromMappedData(array_merge([
             'country_id' => 'BE',
@@ -363,7 +363,7 @@ trait TestHelpers
         ], $values));
     }
 
-    protected function createCustomerLogin(): CustomerLogin
+    protected static function createCustomerLogin(): CustomerLogin
     {
         return CustomerLogin::fromMappedData([
             'customer_id' => 'ccc-123',
@@ -372,7 +372,7 @@ trait TestHelpers
         ]);
     }
 
-    protected function createACustomerLogin(): Customer
+    protected static function createACustomerLogin(): Customer
     {
         $customer = Customer::create(
             $customerId = CustomerId::fromString('azerty'),
@@ -394,7 +394,7 @@ trait TestHelpers
         return $customer;
     }
 
-    protected function createProduct(): Product
+    protected static function createProduct(): Product
     {
         $product = Product::create(ProductId::fromString('xxx'));
         $product->updateState(ProductState::online);
@@ -402,7 +402,7 @@ trait TestHelpers
         return $product;
     }
 
-    protected function createOfflineProduct(): Product
+    protected static function createOfflineProduct(): Product
     {
         $product = Product::create(ProductId::fromString('xxx'));
         $product->updateState(ProductState::offline);
@@ -410,9 +410,9 @@ trait TestHelpers
         return $product;
     }
 
-    protected function createProductWithPersonalisations(): Product
+    protected static function createProductWithPersonalisations(): Product
     {
-        $product = $this->createProductWithVariant();
+        $product = static::createProductWithVariant();
 
         $product->updatePersonalisations([
             Personalisation::create(
@@ -426,9 +426,9 @@ trait TestHelpers
         return $product;
     }
 
-    protected function createProductWithOptions(): Product
+    protected static function createProductWithOptions(): Product
     {
-        $product = $this->createProduct();
+        $product = static::createProduct();
 
         $product->updateOptions([
             $option = Option::create($product->productId, OptionId::fromString('ooo'), ['foo' => 'bar']),
@@ -471,7 +471,7 @@ trait TestHelpers
             ]),
         ]);
 
-        $variant = $this->createVariantWithOption();
+        $variant = static::createVariantWithOption();
 
         // TODO: how/where to protect from duplicates (multiple values from same option). In create/updateVariant of product
         $variant->updateOptionValueIds([
@@ -483,34 +483,34 @@ trait TestHelpers
         return $product;
     }
 
-    protected function createProductWithVariant(): Product
+    protected static function createProductWithVariant(): Product
     {
-        $product = $this->createProduct();
+        $product = static::createProduct();
 
-        return $this->withVariant($product);
+        return static::withVariant($product);
     }
 
-    protected function createOfflineProductWithVariant(): Product
+    protected static function createOfflineProductWithVariant(): Product
     {
-        $product = $this->createOfflineProduct();
+        $product = static::createOfflineProduct();
 
-        return $this->withVariant($product);
+        return static::withVariant($product);
     }
 
-    private function withVariant(Product $product): Product
+    private static function withVariant(Product $product): Product
     {
         $product->updateOptions([Option::create($product->productId, OptionId::fromString('ooo'), ['foo' => 'bar'])]);
         $product->updateOptionValues(OptionId::fromString('ooo'), [
             OptionValue::create(OptionId::fromString('ooo'), OptionValueId::fromString('ppp'), ['foo' => 'bar']),
         ]);
-        $variant = $this->createVariantWithOption();
+        $variant = static::createVariantWithOption();
 
         $product->createVariant($variant);
 
         return $product;
     }
 
-    protected function createVariantWithOption(): Variant
+    protected static function createVariantWithOption(): Variant
     {
         $variant = Variant::create(
             ProductId::fromString('xxx'),
@@ -531,24 +531,24 @@ trait TestHelpers
         return $variant;
     }
 
-    protected function createStockItem(): Product
+    protected static function createStockItem(): Product
     {
-        $product = $this->createProduct();
+        $product = static::createProduct();
         $product->updateOptions([Option::create($product->productId, OptionId::fromString('ooo'), ['foo' => 'bar'])]);
         $product->updateOptionValues(OptionId::fromString('ooo'), [
             OptionValue::create(OptionId::fromString('ooo'), OptionValueId::fromString('ppp'), ['foo' => 'bar']),
         ]);
-        $variant = $this->createVariantWithOption();
+        $variant = static::createVariantWithOption();
 
         $product->createVariant($variant);
 
         return $product;
     }
 
-    protected function createCatalog(TaxonApplication $taxonApplication, ProductApplication $productApplication, ProductRepository $productRepository)
+    protected static function createCatalog(TaxonApplication $taxonApplication, ProductApplication $productApplication, ProductRepository $productRepository)
     {
-        $taxonId = $taxonApplication->createTaxon(new CreateTaxon('foobar', 'nl', ['title' => ['nl' => 'foobar nl']]));
-        $taxonChildId = $taxonApplication->createTaxon(new CreateTaxon('foobar-child', 'nl', ['title' => ['nl' => 'foobar child nl']], $taxonId->get()));
+        $taxonId = $taxonApplication->createTaxon(new CreateTaxon('brand', 'foobar', 'nl', ['title' => ['nl' => 'foobar nl']]));
+        $taxonChildId = $taxonApplication->createTaxon(new CreateTaxon('brand', 'foobar-child', 'nl', ['title' => ['nl' => 'foobar child nl']], $taxonId->get()));
 
         $productId = $productApplication->createProduct(new CreateProduct([$taxonId->get()], "100", "6", 'sku', ['title' => ['nl' => 'product one']], ['title' => ['nl' => 'variant title one']]));
         $product2Id = $productApplication->createProduct(new CreateProduct([$taxonChildId->get()], "250", "12", 'sku-2', ['title' => ['nl' => 'product two']], ['title' => ['nl' => 'variant title two']]));
@@ -570,7 +570,7 @@ trait TestHelpers
         $productApplication->createVariant(new CreateVariant($productId->get(), "120", "6", 'sku-4', ['title' => ['nl' => 'product one - variant two']], []));
     }
 
-    protected function createPromo(array $mappedData = [], array $discounts = []): Promo
+    protected static function createPromo(array $mappedData = [], array $discounts = []): Promo
     {
         return Promo::fromMappedData(array_merge([
             'promo_id' => 'abc',
@@ -583,7 +583,7 @@ trait TestHelpers
         ], $mappedData), [\Thinktomorrow\Trader\Domain\Model\Promo\Discount::class => $discounts]);
     }
 
-    protected function createDiscount(array $mappedData = [], array $conditions = [])
+    protected static function createDiscount(array $mappedData = [], array $conditions = [])
     {
         return FixedAmountDiscount::fromMappedData(array_merge([
             'discount_id' => 'ddd',
@@ -595,7 +595,7 @@ trait TestHelpers
         ]);
     }
 
-    protected function createCondition(array $mappedData = [])
+    protected static function createCondition(array $mappedData = [])
     {
         return MinimumLinesQuantity::fromMappedData(array_merge([
             'data' => json_encode(['minimum_quantity' => 5]),
@@ -611,7 +611,7 @@ trait TestHelpers
         $this->assertEquals(array_keys($expected), array_keys($actual), 'Keys do not match: ' . $message);
 
         foreach ($expected as $expectedKey => $expectedValue) {
-            if (is_array($expectedValue) && ! is_array($actual[$expectedKey])) {
+            if (is_array($expectedValue) && !is_array($actual[$expectedKey])) {
                 $this->assertEquals($expectedValue, $actual[$expectedKey], $message);
             }
 
