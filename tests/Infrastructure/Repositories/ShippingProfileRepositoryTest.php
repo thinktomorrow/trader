@@ -90,17 +90,17 @@ class ShippingProfileRepositoryTest extends TestCase
         }
     }
 
-    private function repositories(): \Generator
+    private static function repositories(): \Generator
     {
         yield new InMemoryShippingProfileRepository();
         yield new MysqlShippingProfileRepository(new TestContainer());
     }
 
-    public function shippingProfiles(): \Generator
+    public static function shippingProfiles(): \Generator
     {
-        yield [$this->createShippingProfile()];
+        yield [static::createShippingProfile()];
 
-        $profile = $this->createShippingProfile();
+        $profile = static::createShippingProfile();
         $profile->addCountry(CountryId::fromString('BE'));
         $profile->addTariff(Tariff::create(TariffId::fromString('xxx'), $profile->shippingProfileId, Money::EUR(10), Money::EUR(20), Money::EUR(30)));
 

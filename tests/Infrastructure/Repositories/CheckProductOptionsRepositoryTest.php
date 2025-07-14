@@ -33,7 +33,7 @@ final class CheckProductOptionsRepositoryTest extends TestCase
         }
     }
 
-    private function repositories(): \Generator
+    private static function repositories(): \Generator
     {
         yield new MysqlCheckProductOptionsRepository();
     }

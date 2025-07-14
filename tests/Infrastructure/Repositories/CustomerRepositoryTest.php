@@ -104,9 +104,9 @@ final class CustomerRepositoryTest extends TestCase
         yield new MysqlCustomerRepository(new TestContainer());
     }
 
-    public function customers(): \Generator
+    public static function customers(): \Generator
     {
-        yield [$this->createCustomer()];
+        yield [static::createCustomer()];
 
         yield [Customer::create(
             CustomerId::fromString('xxx-1'),

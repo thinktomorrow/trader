@@ -60,7 +60,7 @@ class StockItemRepositoryTest extends TestCase
         yield new MysqlProductRepository(new MysqlVariantRepository(new TestContainer()));
     }
 
-    public function items(): \Generator
+    public static function items(): \Generator
     {
         yield [
             StockItem::fromMappedData([

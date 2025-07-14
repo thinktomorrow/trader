@@ -92,13 +92,13 @@ final class ProductDetailRepositoryTest extends TestCase
         yield new MysqlProductDetailRepository(new TestContainer());
     }
 
-    public function products(): \Generator
+    public static function products(): \Generator
     {
-        yield [$this->createProductWithVariant()];
+        yield [static::createProductWithVariant()];
     }
 
-    public function offlineProducts(): \Generator
+    public static function offlineProducts(): \Generator
     {
-        yield [$this->createOfflineProductWithVariant()];
+        yield [static::createOfflineProductWithVariant()];
     }
 }

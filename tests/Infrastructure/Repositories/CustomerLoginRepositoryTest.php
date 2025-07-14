@@ -51,14 +51,14 @@ final class CustomerLoginRepositoryTest extends TestCase
         }
     }
 
-    private function repositories(): \Generator
+    private static function repositories(): \Generator
     {
         yield new MysqlCustomerLoginRepository();
     }
 
-    public function entities(): \Generator
+    public static function entities(): \Generator
     {
-        yield [$this->createCustomerLogin()];
+        yield [static::createCustomerLogin()];
 
         yield [CustomerLogin::create(
             CustomerId::fromString('ccc-123'),

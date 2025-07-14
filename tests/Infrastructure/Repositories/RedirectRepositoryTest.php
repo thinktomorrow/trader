@@ -89,7 +89,7 @@ final class RedirectRepositoryTest extends TestCase
         }
     }
 
-    private function repositories(): \Generator
+    private static function repositories(): \Generator
     {
         yield new MysqlRedirectRepository();
     }

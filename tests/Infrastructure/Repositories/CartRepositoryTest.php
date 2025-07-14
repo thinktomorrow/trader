@@ -133,13 +133,13 @@ final class CartRepositoryTest extends TestCase
         $this->assertEquals(2, $calls);
     }
 
-    private function orderRepositories(): \Generator
+    private static function orderRepositories(): \Generator
     {
         yield new InMemoryOrderRepository();
         yield (new TestContainer())->get(MysqlOrderRepository::class);
     }
 
-    private function cartRepositories(): \Generator
+    private static function cartRepositories(): \Generator
     {
         yield new InMemoryCartRepository();
         yield new MysqlCartRepository(new TestContainer(), (new TestContainer())->get(MysqlOrderRepository::class));

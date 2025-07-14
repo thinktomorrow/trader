@@ -60,16 +60,16 @@ final class ProductRepositoryTest extends TestCase
         }
     }
 
-    private function repositories(): \Generator
+    private static function repositories(): \Generator
     {
         yield new InMemoryProductRepository();
         yield new MysqlProductRepository(new MysqlVariantRepository(new TestContainer()));
     }
 
-    public function products(): \Generator
+    public static function products(): \Generator
     {
-        yield [$this->createProduct()];
-        yield [$this->createProductWithPersonalisations()];
-        yield [$this->createProductWithVariant()];
+        yield [static::createProduct()];
+        yield [static::createProductWithPersonalisations()];
+        yield [static::createProductWithVariant()];
     }
 }

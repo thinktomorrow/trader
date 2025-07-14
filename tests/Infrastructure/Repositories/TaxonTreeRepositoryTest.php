@@ -45,7 +45,7 @@ final class TaxonTreeRepositoryTest extends TestCase
         }
     }
 
-    private function repositories(): \Generator
+    private static function repositories(): \Generator
     {
         yield new InMemoryTaxonTreeRepository(new TestContainer(), new TestTraderConfig());
         yield $mysqlTaxonTreeRepo = new MysqlTaxonTreeRepository(new TestContainer(), new TestTraderConfig());

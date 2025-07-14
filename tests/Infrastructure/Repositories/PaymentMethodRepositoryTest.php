@@ -59,14 +59,14 @@ class PaymentMethodRepositoryTest extends TestCase
         }
     }
 
-    private function repositories(): \Generator
+    private static function repositories(): \Generator
     {
         yield new InMemoryPaymentMethodRepository();
         yield new MysqlPaymentMethodRepository(new TestContainer());
     }
 
-    public function paymentMethods(): \Generator
+    public static function paymentMethods(): \Generator
     {
-        yield [$this->createPaymentMethod()];
+        yield [static::createPaymentMethod()];
     }
 }

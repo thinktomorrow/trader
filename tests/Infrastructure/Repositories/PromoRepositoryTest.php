@@ -125,7 +125,7 @@ final class PromoRepositoryTest extends TestCase
         }
     }
 
-    private function repositories(): \Generator
+    private static function repositories(): \Generator
     {
         $factories = [
             new DiscountFactory([
@@ -147,15 +147,15 @@ final class PromoRepositoryTest extends TestCase
         yield new MysqlPromoRepository(...$factories);
     }
 
-    public function promos(): \Generator
+    public static function promos(): \Generator
     {
-        yield [$this->createPromo([], [
-            $this->createDiscount(['discount_id' => 'abc'], [$this->createCondition()]),
-            $this->createDiscount(['discount_id' => 'def']),
+        yield [static::createPromo([], [
+            static::createDiscount(['discount_id' => 'abc'], [static::createCondition()]),
+            static::createDiscount(['discount_id' => 'def']),
         ])];
-        yield [$this->createPromo()];
-        yield [$this->createPromo(['coupon_code' => 'foobar'], [$this->createDiscount()])];
-        yield [$this->createPromo(['start_at' => '2022-02-02 10:10:10']), [$this->createDiscount([], [$this->createCondition()])]];
-        yield [$this->createPromo(['end_at' => '2022-02-02 10:10:10'], [$this->createDiscount([], [$this->createCondition()])])];
+        yield [static::createPromo()];
+        yield [static::createPromo(['coupon_code' => 'foobar'], [static::createDiscount()])];
+        yield [static::createPromo(['start_at' => '2022-02-02 10:10:10']), [static::createDiscount([], [static::createCondition()])]];
+        yield [static::createPromo(['end_at' => '2022-02-02 10:10:10'], [static::createDiscount([], [static::createCondition()])])];
     }
 }

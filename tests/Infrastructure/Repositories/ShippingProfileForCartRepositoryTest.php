@@ -57,7 +57,7 @@ class ShippingProfileForCartRepositoryTest extends TestCase
         }
     }
 
-    private function repositories(): \Generator
+    private static function repositories(): \Generator
     {
         yield new InMemoryShippingProfileRepository();
         yield new MysqlShippingProfileRepository(new TestContainer());

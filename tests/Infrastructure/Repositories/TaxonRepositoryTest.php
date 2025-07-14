@@ -87,7 +87,7 @@ final class TaxonRepositoryTest extends TestCase
         yield new MysqlTaxonRepository();
     }
 
-    public function taxons(): \Generator
+    public static function taxons(): \Generator
     {
         $taxon = Taxon::create(
             TaxonId::fromString('xxx'),

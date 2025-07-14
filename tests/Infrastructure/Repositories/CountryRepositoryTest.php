@@ -79,17 +79,17 @@ class CountryRepositoryTest extends TestCase
         }
     }
 
-    private function repositories(): \Generator
+    private static function repositories(): \Generator
     {
         yield new InMemoryCountryRepository();
         yield new MysqlCountryRepository();
     }
 
-    public function countries(): \Generator
+    public static function countries(): \Generator
     {
-        yield [$this->createCountry()];
+        yield [static::createCountry()];
 
-        $country = $this->createCountry(['data' => json_encode(['foo' => 'bar'])]);
+        $country = static::createCountry(['data' => json_encode(['foo' => 'bar'])]);
         yield [$country];
     }
 }

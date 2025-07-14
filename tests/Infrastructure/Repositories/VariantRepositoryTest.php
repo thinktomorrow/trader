@@ -29,7 +29,7 @@ final class VariantRepositoryTest extends TestCase
             $repository->save($variant);
 
             $variantStates = $repository->getStatesByProduct($variant->productId);
-            $this->assertEquals([$variant], array_map(fn ($variantState) => Variant::fromMappedData($variantState, ['product_id' => 'xxx']), $variantStates));
+            $this->assertEquals([$variant], array_map(fn($variantState) => Variant::fromMappedData($variantState, ['product_id' => 'xxx']), $variantStates));
         }
     }
 
@@ -112,16 +112,16 @@ final class VariantRepositoryTest extends TestCase
         ];
     }
 
-    public function variants(): \Generator
+    public static function variants(): \Generator
     {
-        $product = $this->createProductWithVariant();
+        $product = static::createProductWithVariant();
 
         yield [
             $product,
             $product->getVariants()[0],
         ];
 
-        $product = $this->createProductWithPersonalisations();
+        $product = static::createProductWithPersonalisations();
 
         yield [
             $product,

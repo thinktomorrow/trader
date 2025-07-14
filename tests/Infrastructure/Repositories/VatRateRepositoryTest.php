@@ -191,15 +191,15 @@ class VatRateRepositoryTest extends TestCase
         }
     }
 
-    private function repositories(): \Generator
+    private static function repositories(): \Generator
     {
         yield new InMemoryVatRateRepository(new TestTraderConfig());
         yield new MysqlVatRateRepository(new TestContainer());
     }
 
-    public function vatRates(): \Generator
+    public static function vatRates(): \Generator
     {
-        yield [$this->createVatRate([], ['rate' => '20']), $this->createVatRate(['vat_rate_id' => 'originVatRate-123', 'country_id' => 'NL', 'rate' => '20'])];
-        yield [$this->createVatRate(['country_id' => 'BE', 'rate' => '30', 'is_standard' => true], ['rate' => '20']), $this->createVatRate(['vat_rate_id' => 'originVatRate-123', 'country_id' => 'NL', 'rate' => '20'])];
+        yield [static::createVatRate([], ['rate' => '20']), static::createVatRate(['vat_rate_id' => 'originVatRate-123', 'country_id' => 'NL', 'rate' => '20'])];
+        yield [static::createVatRate(['country_id' => 'BE', 'rate' => '30', 'is_standard' => true], ['rate' => '20']), static::createVatRate(['vat_rate_id' => 'originVatRate-123', 'country_id' => 'NL', 'rate' => '20'])];
     }
 }
