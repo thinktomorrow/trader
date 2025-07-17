@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Thinktomorrow\Trader\Infrastructure\Laravel;
@@ -94,6 +95,7 @@ use Thinktomorrow\Trader\Domain\Model\Promo\PromoRepository;
 use Thinktomorrow\Trader\Domain\Model\ShippingProfile\ShippingProfileRepository;
 use Thinktomorrow\Trader\Domain\Model\Stock\StockItemRepository;
 use Thinktomorrow\Trader\Domain\Model\Taxon\TaxonRepository;
+use Thinktomorrow\Trader\Domain\Model\Taxonomy\TaxonomyRepository;
 use Thinktomorrow\Trader\Domain\Model\VatRate\VatRateRepository;
 use Thinktomorrow\Trader\Infrastructure\Laravel\Models\Cart\DefaultAdjustLine;
 use Thinktomorrow\Trader\Infrastructure\Laravel\Models\Cart\DefaultCart;
@@ -143,6 +145,7 @@ use Thinktomorrow\Trader\Infrastructure\Laravel\Repositories\MysqlProductReposit
 use Thinktomorrow\Trader\Infrastructure\Laravel\Repositories\MysqlPromoRepository;
 use Thinktomorrow\Trader\Infrastructure\Laravel\Repositories\MysqlRedirectRepository;
 use Thinktomorrow\Trader\Infrastructure\Laravel\Repositories\MysqlShippingProfileRepository;
+use Thinktomorrow\Trader\Infrastructure\Laravel\Repositories\MysqlTaxonomyRepository;
 use Thinktomorrow\Trader\Infrastructure\Laravel\Repositories\MysqlTaxonRepository;
 use Thinktomorrow\Trader\Infrastructure\Laravel\Repositories\MysqlTaxonTreeRepository;
 use Thinktomorrow\Trader\Infrastructure\Laravel\Repositories\MysqlVariantRepository;
@@ -171,6 +174,7 @@ class TraderServiceProvider extends ServiceProvider
         $this->app->bind(StockItemRepository::class, MysqlVariantRepository::class);
         $this->app->bind(CheckProductOptionsRepository::class, MysqlCheckProductOptionsRepository::class);
         $this->app->bind(TaxonRepository::class, MysqlTaxonRepository::class);
+        $this->app->bind(TaxonomyRepository::class, MysqlTaxonomyRepository::class);
         $this->app->bind(TaxonTreeRepository::class, MysqlTaxonTreeRepository::class);
         $this->app->bind(CategoryRepository::class, MysqlTaxonTreeRepository::class);
         $this->app->bind(TaxonIdOptionsComposer::class, VineTaxonIdOptionsComposer::class);
@@ -196,7 +200,6 @@ class TraderServiceProvider extends ServiceProvider
         $this->app->bind(VatNumberValidator::class, function () {
             return new ViesVatNumberValidator(ViesClient::createDefault());
         });
-
 
         // Customer repositories
         $this->app->bind(CustomerRepository::class, MysqlCustomerRepository::class);
@@ -251,11 +254,11 @@ class TraderServiceProvider extends ServiceProvider
     public function boot()
     {
         // Config
-        $this->publishes([__DIR__ . '/config/config.php' => config_path('trader.php')]);
-        $this->mergeConfigFrom(__DIR__ . '/config/config.php', 'trader');
+        $this->publishes([__DIR__.'/config/config.php' => config_path('trader.php')]);
+        $this->mergeConfigFrom(__DIR__.'/config/config.php', 'trader');
 
         // Migrations
-        $this->loadMigrationsFrom(__DIR__ . '/database/migrations');
+        $this->loadMigrationsFrom(__DIR__.'/database/migrations');
 
         // Discount vat rate
         $standardPrimaryVatPercentage = Schema::hasTable('trader_vat_rates')
@@ -275,7 +278,7 @@ class TraderServiceProvider extends ServiceProvider
          * expects that localized content is always formatted as <key>.<language>. We always
          * first try to find localized content before fetching the defaults.
          */
-        DataRenderer::setDataResolver(function (array $data, string $key, string $language = null, $default = null) {
+        DataRenderer::setDataResolver(function (array $data, string $key, ?string $language = null, $default = null) {
             $defaultLanguage = $this->app->make(TraderConfig::class)
                 ->getDefaultLocale()
                 ->get();
@@ -286,10 +289,10 @@ class TraderServiceProvider extends ServiceProvider
 
             $value = Arr::get(
                 $data,
-                $key . '.' . $language,
+                $key.'.'.$language,
                 Arr::get(
                     $data,
-                    $key . '.' . $defaultLanguage,
+                    $key.'.'.$defaultLanguage,
                     Arr::get($data, $key, $default)
                 )
             );
