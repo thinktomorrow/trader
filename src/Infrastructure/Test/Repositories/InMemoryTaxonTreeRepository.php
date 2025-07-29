@@ -11,9 +11,7 @@ use Thinktomorrow\Trader\Application\Taxon\Tree\TaxonTree;
 use Thinktomorrow\Trader\Application\Taxon\Tree\TaxonTreeRepository;
 use Thinktomorrow\Trader\Domain\Common\Locale;
 use Thinktomorrow\Trader\Domain\Model\Taxon\TaxonId;
-use Thinktomorrow\Trader\Infrastructure\Vine\TaxonSource;
 use Thinktomorrow\Trader\TraderConfig;
-use Thinktomorrow\Vine\NodeCollectionFactory;
 
 final class InMemoryTaxonTreeRepository implements TaxonTreeRepository, CategoryRepository
 {
@@ -38,17 +36,17 @@ final class InMemoryTaxonTreeRepository implements TaxonTreeRepository, Category
     {
         return TaxonTree::fromIterable($this->getTaxonNodes())
             ->sort('order')
-            ->eachRecursive(fn($node) => $node->setLocale($this->locale));
+            ->eachRecursive(fn ($node) => $node->setLocale($this->locale));
     }
 
     public function findTaxonById(string $id): TaxonNode
     {
-        return $this->getTree()->find(fn(TaxonNode $taxonNode) => $taxonNode->getId() == $id);
+        return $this->getTree()->find(fn (TaxonNode $taxonNode) => $taxonNode->getId() == $id);
     }
 
     public function findTaxonByKey(string $key): TaxonNode
     {
-        return $this->getTree()->find(fn(TaxonNode $taxonNode) => $taxonNode->getKey() == $key);
+        return $this->getTree()->find(fn (TaxonNode $taxonNode) => $taxonNode->getKey() == $key);
     }
 
     private function getTaxonNodes(): TaxonNodes
@@ -66,7 +64,7 @@ final class InMemoryTaxonTreeRepository implements TaxonTreeRepository, Category
                 'order' => $taxon->getMappedData()['order'],
                 'product_ids' => $this->getCommaSeparatedProductIds($taxon->taxonId),
                 'online_product_ids' => $this->getCommaSeparatedOnlineProductIds($taxon->taxonId),
-                'keys' => json_encode(array_map(fn($taxonKey) => $taxonKey->getMappedData(), $taxon->getTaxonKeys())),
+                'keys' => json_encode(array_map(fn ($taxonKey) => $taxonKey->getMappedData(), $taxon->getTaxonKeys())),
             ]);
         }
 
@@ -75,7 +73,7 @@ final class InMemoryTaxonTreeRepository implements TaxonTreeRepository, Category
 
     private function getCommaSeparatedProductIds(TaxonId $taxonId): string
     {
-        if (!isset(InMemoryTaxonRepository::$productIds[$taxonId->get()])) {
+        if (! isset(InMemoryTaxonRepository::$productIds[$taxonId->get()])) {
             return '';
         }
 
@@ -84,7 +82,7 @@ final class InMemoryTaxonTreeRepository implements TaxonTreeRepository, Category
 
     private function getCommaSeparatedOnlineProductIds(TaxonId $taxonId): string
     {
-        if (!isset(InMemoryTaxonRepository::$onlineProductIds[$taxonId->get()])) {
+        if (! isset(InMemoryTaxonRepository::$onlineProductIds[$taxonId->get()])) {
             return '';
         }
 

@@ -7,8 +7,6 @@ use Tests\Infrastructure\Vine\TaxonHelpers;
 use Thinktomorrow\Trader\Application\Taxon\CreateTaxon;
 use Thinktomorrow\Trader\Domain\Common\Locale;
 use Thinktomorrow\Trader\Domain\Model\Taxon\Exceptions\CouldNotCreateTaxon;
-use Thinktomorrow\Trader\Domain\Model\Taxon\Exceptions\CouldNotFindTaxon;
-use Thinktomorrow\Trader\Domain\Model\Taxon\TaxonId;
 
 class CreateTaxonTest extends TaxonContext
 {

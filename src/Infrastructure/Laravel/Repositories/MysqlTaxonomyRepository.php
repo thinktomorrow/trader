@@ -18,7 +18,7 @@ class MysqlTaxonomyRepository implements TaxonomyRepository
     {
         $state = $taxonomy->getMappedData();
 
-        if (!$this->exists($taxonomy->taxonomyId)) {
+        if (! $this->exists($taxonomy->taxonomyId)) {
             DB::table(static::$taxonomyTable)->insert($state);
         } else {
             DB::table(static::$taxonomyTable)->where('taxonomy_id', $taxonomy->taxonomyId->get())->update($state);
@@ -36,7 +36,7 @@ class MysqlTaxonomyRepository implements TaxonomyRepository
             ->where(static::$taxonomyTable . '.taxonomy_id', $taxonomyId->get())
             ->first();
 
-        if (!$taxonomyState) {
+        if (! $taxonomyState) {
             throw new CouldNotFindTaxonomy('No taxonomy found by id [' . $taxonomyId->get() . ']');
         }
 

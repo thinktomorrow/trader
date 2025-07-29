@@ -8,8 +8,7 @@ class CouldNotCreateTaxon extends \RuntimeException
     public static function becauseParentDoesNotBelongToSameTaxonomy(
         string $parentTaxonId,
         string $taxonomyId,
-    ): self
-    {
+    ): self {
         return new self(sprintf(
             'Could not create taxon because parent taxon "%s" does not belong to the same taxonomy "%s".',
             $parentTaxonId,
