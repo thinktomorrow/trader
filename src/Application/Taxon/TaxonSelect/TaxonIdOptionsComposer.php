@@ -5,15 +5,9 @@ namespace Thinktomorrow\Trader\Application\Taxon\TaxonSelect;
 
 interface TaxonIdOptionsComposer
 {
-    public function getOptions(): array;
+    public function getTaxaAsOptions(string $taxonomyId): array;
 
-    public function getRoots(): array;
+    public function getTaxaAsOptionsForMultiselect(string $taxonomyId): array;
 
-    public function getOptionsForMultiselect(): array;
-
-    public function exclude(array|string $excludeTaxonIds): static;
-
-    public function include(array|string $includeTaxonRootIds): static;
-
-    public function includeRoots(bool $includeRoots = true): static;
+    public function excludeTaxa(array|string $excludeTaxonIds): static;
 }

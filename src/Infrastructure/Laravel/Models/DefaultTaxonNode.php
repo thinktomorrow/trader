@@ -15,6 +15,7 @@ class DefaultTaxonNode extends DefaultNode implements TaxonNode
     use RendersData;
 
     public readonly string $id;
+    public readonly string $taxonomyId;
 
     /** @var array */
     protected array $keys;
@@ -27,9 +28,10 @@ class DefaultTaxonNode extends DefaultNode implements TaxonNode
     protected ?string $parentId;
     protected iterable $images;
 
-    private function __construct(string $id, TaxonState $taxonState, int $order, array $data, array $product_ids, array $online_product_ids, array $keys, ?string $parentId = null)
+    private function __construct(string $id, string $taxonomyId, TaxonState $taxonState, int $order, array $data, array $product_ids, array $online_product_ids, array $keys, ?string $parentId = null)
     {
         $this->id = $id;
+        $this->taxonomyId = $taxonomyId;
         $this->taxonState = $taxonState;
         $this->order = $order;
         $this->data = $data;
@@ -50,6 +52,7 @@ class DefaultTaxonNode extends DefaultNode implements TaxonNode
     {
         return new static(
             $state['taxon_id'],
+            $state['taxonomy_id'],
             TaxonState::from($state['state']),
             $state['order'],
             $state['data'] ? json_decode($state['data'], true) : [],
@@ -75,6 +78,11 @@ class DefaultTaxonNode extends DefaultNode implements TaxonNode
         return $this->id;
     }
 
+    public function getTaxonomyId(): string
+    {
+        return $this->taxonomyId;
+    }
+
     public function getKey(?string $locale = null): ?string
     {
         if (count($this->keys) < 1) {
@@ -89,7 +97,7 @@ class DefaultTaxonNode extends DefaultNode implements TaxonNode
             }
         }
 
-        if (! isset($this->keys[0])) {
+        if (!isset($this->keys[0])) {
             return null;
         }
 
@@ -140,7 +148,7 @@ class DefaultTaxonNode extends DefaultNode implements TaxonNode
     {
         $label = $this->getLabel($locale);
 
-        if (! $this->isRootNode()) {
+        if (!$this->isRootNode()) {
             $label = array_reduce(array_reverse($this->getBreadCrumbs()), function ($carry, $taxon) use ($withoutRoot, $locale) {
                 if ($taxon->isRootNode()) {
                     return $withoutRoot ? $carry : $taxon->getLabel($locale) . ': ' . $carry;

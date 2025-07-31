@@ -9,7 +9,6 @@ Important changes will be notified in this file
 ### Introducing Taxonomy & Taxon setup
 
 A Taxon now belongs to a Taxonomy. This allows for more flexible and structured categorization of products.
-
 Available taxonomy types are:
 
 - property: product properties like brand, vendor, gtin, ...
@@ -17,6 +16,16 @@ Available taxonomy types are:
 - category: product categories like clothing, electronics, ...
 - google_category: google product categories like apparel, electronics, ...
 - tag: product tags like sale, new, ...
+
+- Bumped: `thinktomorrow/vine` to 0.5.1
+- Added: `TaxonNode::getTaxonomyId()` to retrieve the taxonomy id of a taxon.
+- Added: `TaxonTreeRepository::getTreeByTaxonomyId(string $taxonomyId)` to retrieve the taxon tree by taxonomy id.
+- Changed: `TaxonIdOptionsComposer::getOptions()` hernoemd naar `getTaxaAsOptions(string $taxonomyId)`.
+- Changed: `TaxonIdOptionsComposer::getOptionsForMultiselect()` hernoemd naar
+  `getTaxaAsOptionsForMultiselect(string $taxonomyId)`.
+- Changed: `TaxonIdOptionsComposer::exclude()` hernoemd naar `excludeTaxa(array|string $excludeTaxonIds)`.
+- Removed: `TaxonIdOptionsComposer::getRoots()`, `TaxonIdOptionsComposer::includeRoots()` and
+  `TaxonIdOptionsComposer::include()`.
 
 ## 2025-06-02 - 0.7.3
 

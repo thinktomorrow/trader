@@ -31,8 +31,26 @@ final class TaxonTreeRepositoryTest extends TestCase
 
         foreach ($this->repositories() as $repository) {
             $this->assertContainsOnlyInstancesOf(TaxonNode::class, $repository->getTree());
-            $this->assertEquals(2, $repository->getTree()->count());
-            $this->assertEquals(6, $repository->getTree()->total());
+            $this->assertEquals(3, $repository->getTree()->count());
+            $this->assertEquals(8, $repository->getTree()->total());
+        }
+    }
+
+    public function test_it_can_get_the_tree_per_taxonomy()
+    {
+        $this->createDefaultTaxons();
+
+        foreach ($this->repositories() as $repository) {
+            $this->assertContainsOnlyInstancesOf(TaxonNode::class, $repository->getTreeByTaxonomy('bbb'));
+
+            if ($repository->getTreeByTaxonomy('bbb')->count() === 3) {
+                dd($repository::class, $repository->getTreeByTaxonomy('bbb'));
+            }
+
+            $this->assertEquals(2, $repository->getTreeByTaxonomy('bbb')->count());
+            $this->assertEquals(6, $repository->getTreeByTaxonomy('bbb')->total());
+            $this->assertEquals(1, $repository->getTreeByTaxonomy('ccc')->count());
+            $this->assertEquals(2, $repository->getTreeByTaxonomy('ccc')->total());
         }
     }
 

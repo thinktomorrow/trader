@@ -12,15 +12,25 @@ use Thinktomorrow\Trader\Domain\Model\Taxon\Taxon;
 use Thinktomorrow\Trader\Domain\Model\Taxon\TaxonId;
 use Thinktomorrow\Trader\Domain\Model\Taxon\TaxonKey;
 use Thinktomorrow\Trader\Domain\Model\Taxon\TaxonKeyId;
+use Thinktomorrow\Trader\Domain\Model\Taxonomy\Taxonomy;
 use Thinktomorrow\Trader\Domain\Model\Taxonomy\TaxonomyId;
+use Thinktomorrow\Trader\Domain\Model\Taxonomy\TaxonomyType;
 use Thinktomorrow\Trader\Infrastructure\Laravel\Repositories\MysqlProductRepository;
+use Thinktomorrow\Trader\Infrastructure\Laravel\Repositories\MysqlTaxonomyRepository;
 use Thinktomorrow\Trader\Infrastructure\Laravel\Repositories\MysqlTaxonRepository;
 use Thinktomorrow\Trader\Infrastructure\Laravel\Repositories\MysqlVariantRepository;
+use Thinktomorrow\Trader\Infrastructure\Test\Repositories\InMemoryTaxonomyRepository;
 use Thinktomorrow\Trader\Infrastructure\Test\Repositories\InMemoryTaxonRepository;
 use Thinktomorrow\Trader\Infrastructure\Test\TestContainer;
 
 trait TaxonHelpers
 {
+    protected function createDefaultTaxonomies()
+    {
+        $taxonomy = Taxonomy::create(TaxonomyId::fromString('bbb'), TaxonomyType::category);
+        $this->createTaxonomy($taxonomy);
+    }
+
     protected function createDefaultTaxons()
     {
         $taxon = Taxon::create(TaxonId::fromString('first'), TaxonomyId::fromString('bbb'));
@@ -62,6 +72,18 @@ trait TaxonHelpers
         $taxon6->addData(['title' => 'Taxon sixth']);
         $taxon6->changeOrder(5);
         $this->createTaxon($taxon6, ['fff']);
+
+        $taxon7 = Taxon::create(TaxonId::fromString('seventh'), TaxonomyId::fromString('ccc'));
+        $taxon7->updateTaxonKeys([TaxonKey::create($taxon7->taxonId, TaxonKeyId::fromString('taxon-seventh'), Locale::fromString('nl'))]);
+        $taxon7->addData(['title' => 'Taxon seventh']);
+        $taxon7->changeOrder(4);
+        $this->createTaxon($taxon7, ['eee']);
+
+        $taxon8 = Taxon::create(TaxonId::fromString('eight'), TaxonomyId::fromString('ccc'), TaxonId::fromString('seventh'));
+        $taxon8->updateTaxonKeys([TaxonKey::create($taxon8->taxonId, TaxonKeyId::fromString('taxon-eight'), Locale::fromString('nl'))]);
+        $taxon8->addData(['title' => 'Taxon eight']);
+        $taxon8->changeOrder(5);
+        $this->createTaxon($taxon8, ['fff']);
     }
 
     private function createTaxon(Taxon $taxon, array $productIds = [])
@@ -89,6 +111,13 @@ trait TaxonHelpers
         }
     }
 
+    private function createTaxonomy(Taxonomy $taxonomy)
+    {
+        foreach ($this->entityTaxonomyRepositories() as $taxonomyRepository) {
+            $taxonomyRepository->save($taxonomy);
+        }
+    }
+
     protected function createProductInMysql($productId, bool $online = true)
     {
         $product = Product::create(ProductId::fromString($productId));
@@ -100,6 +129,12 @@ trait TaxonHelpers
     {
         yield new InMemoryTaxonRepository();
         yield new MysqlTaxonRepository();
+    }
+
+    private function entityTaxonomyRepositories(): \Generator
+    {
+        yield new InMemoryTaxonomyRepository();
+        yield new MysqlTaxonomyRepository();
     }
 
     private function mysqlProductRepository()

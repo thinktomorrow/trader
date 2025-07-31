@@ -43,9 +43,9 @@ class MysqlTaxonTreeRepository implements TaxonTreeRepository, CategoryRepositor
     public function findTaxonById(string $taxonId): TaxonNode
     {
         /** @var TaxonNode $taxonNode */
-        $taxonNode = $this->getTree()->find(fn (TaxonNode $taxonNode) => $taxonNode->getId() == $taxonId);
+        $taxonNode = $this->getTree()->find(fn(TaxonNode $taxonNode) => $taxonNode->getId() == $taxonId);
 
-        if (! $taxonNode) {
+        if (!$taxonNode) {
             throw new CouldNotFindTaxon('No taxon record found by id ' . $taxonId);
         }
 
@@ -62,9 +62,9 @@ class MysqlTaxonTreeRepository implements TaxonTreeRepository, CategoryRepositor
     public function findTaxonByKey(string $key): TaxonNode
     {
         /** @var TaxonNode $taxonNode */
-        $taxonNode = $this->getTree()->find(fn (TaxonNode $taxonNode) => $taxonNode->getKey() == $key);
+        $taxonNode = $this->getTree()->find(fn(TaxonNode $taxonNode) => $taxonNode->getKey() == $key);
 
-        if (! $taxonNode) {
+        if (!$taxonNode) {
             throw new CouldNotFindTaxon('No taxon record found by key ' . $key);
         }
 
@@ -73,24 +73,37 @@ class MysqlTaxonTreeRepository implements TaxonTreeRepository, CategoryRepositor
 
     public function getTree(): TaxonTree
     {
-        $localeKey = $this->locale->get();
-
-        if (isset($this->trees[$localeKey])) {
-            return $this->trees[$localeKey];
-        }
-
-        $this->trees[$localeKey] = TaxonTree::fromIterable($this->getTaxonNodes())
-            ->sort('order')
-            ->eachRecursive(fn (TaxonNode $node) => $node->setLocale($this->locale));
-
-        return $this->trees[$localeKey];
+        return $this->composeTree();
     }
 
-    private function getTaxonNodes(): TaxonNodes
+    public function getTreeByTaxonomy(string $taxonomyId): TaxonTree
+    {
+        return $this->composeTree($taxonomyId);
+    }
+
+    private function composeTree(?string $taxonomyId = null): TaxonTree
+    {
+        $memoizeKey = $this->locale->get() . ($taxonomyId ? '_' . $taxonomyId : '');
+
+        if (isset($this->trees[$memoizeKey])) {
+            return $this->trees[$memoizeKey];
+        }
+
+        $this->trees[$memoizeKey] = TaxonTree::fromIterable($this->getTaxonNodes($taxonomyId))
+            ->sort('order')
+            ->eachRecursive(fn(TaxonNode $node) => $node->setLocale($this->locale));
+
+        return $this->trees[$memoizeKey];
+    }
+
+    private function getTaxonNodes(?string $taxonomyId = null): TaxonNodes
     {
         $taxonKeyResults = DB::table(static::$taxonKeysTable)->get();
 
         $results = DB::table(static::$taxonTable)
+            ->when($taxonomyId, function ($query) use ($taxonomyId) {
+                return $query->where('taxonomy_id', $taxonomyId);
+            })
             ->leftJoin('trader_taxa_products', 'trader_taxa.taxon_id', 'trader_taxa_products.taxon_id')
             ->leftJoin('trader_products', function ($join) {
                 $join->on('trader_taxa_products.product_id', '=', 'trader_products.product_id')
@@ -103,7 +116,7 @@ class MysqlTaxonTreeRepository implements TaxonTreeRepository, CategoryRepositor
             ->orderBy(static::$taxonTable . '.order')
             ->get()
             ->map(function ($item) use ($taxonKeyResults) {
-                $keys = $taxonKeyResults->filter(fn ($taxonKeyResult) => $taxonKeyResult->taxon_id == $item->taxon_id);
+                $keys = $taxonKeyResults->filter(fn($taxonKeyResult) => $taxonKeyResult->taxon_id == $item->taxon_id);
                 $item->keys = $keys->values()->toJson();
 
                 return $item;
@@ -112,7 +125,7 @@ class MysqlTaxonTreeRepository implements TaxonTreeRepository, CategoryRepositor
         $taxonNodeClass = $this->container->get(TaxonNode::class);
 
         return TaxonNodes::fromType(
-            $results->map(fn ($row) => $taxonNodeClass::fromMappedData((array)$row))->all()
+            $results->map(fn($row) => $taxonNodeClass::fromMappedData((array)$row))->all()
         );
     }
 }

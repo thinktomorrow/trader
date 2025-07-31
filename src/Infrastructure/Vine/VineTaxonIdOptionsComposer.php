@@ -13,30 +13,17 @@ class VineTaxonIdOptionsComposer implements TaxonIdOptionsComposer
     private TaxonTreeRepository $taxonTreeRepository;
 
     private array $excludeTaxonIds = [];
-    private array $includeTaxonRootIds = [];
-    private bool $includeRoots = false;
 
     public function __construct(TaxonTreeRepository $taxonTreeRepository)
     {
         $this->taxonTreeRepository = $taxonTreeRepository;
     }
 
-    public function getRoots(): array
-    {
-        $result = [];
-
-        foreach ($this->getFlattened() as ['root' => $root]) {
-            $result[$root->getId()] = $root->getLabel();
-        }
-
-        return $result;
-    }
-
-    public function getOptions(): array
+    public function getTaxaAsOptions(string $taxonomyId): array
     {
         $grouped = [];
 
-        collect($this->getFlattened())->each(function ($item) use (&$grouped) {
+        collect($this->getFlattened($taxonomyId))->each(function ($item) use (&$grouped) {
             // First item should be toplevel so it is selectable as well (since group labels aren't selectable)
             $values = array_merge($this->composeLabels([$item['root']]), $item['values']);
             $grouped[$item['root']->getKey()] = ['label' => $item['root']->getLabel(), 'options' => $values];
@@ -46,9 +33,9 @@ class VineTaxonIdOptionsComposer implements TaxonIdOptionsComposer
         return array_values($grouped);
     }
 
-    public function getOptionsForMultiselect(): array
+    public function getTaxaAsOptionsForMultiselect(string $taxonomyId): array
     {
-        $options = $this->getOptions();
+        $options = $this->getTaxaAsOptions($taxonomyId);
 
         return array_map(function ($group) {
             foreach ($group['options'] as $id => $value) {
@@ -61,30 +48,16 @@ class VineTaxonIdOptionsComposer implements TaxonIdOptionsComposer
         }, $options);
     }
 
-    public function exclude(array|string $excludeTaxonIds): static
+    public function excludeTaxa(array|string $excludeTaxonIds): static
     {
-        $this->excludeTaxonIds = (array) $excludeTaxonIds;
+        $this->excludeTaxonIds = (array)$excludeTaxonIds;
 
         return $this;
     }
 
-    public function include(array|string $includeTaxonRootIds): static
+    private function getFlattened(string $taxonomyId): array
     {
-        $this->includeTaxonRootIds = (array) $includeTaxonRootIds;
-
-        return $this;
-    }
-
-    public function includeRoots(bool $includeRoots = true): static
-    {
-        $this->includeRoots = $includeRoots;
-
-        return $this;
-    }
-
-    private function getFlattened(): array
-    {
-        $rootTaxa = $this->getFilteredTree()->all();
+        $rootTaxa = $this->getFilteredTree($taxonomyId)->all();
 
         $taxaPerRoot = [];
 
@@ -92,9 +65,7 @@ class VineTaxonIdOptionsComposer implements TaxonIdOptionsComposer
             $taxaPerRoot[] = [
                 'root' => $rootTaxon,
                 'values' => $this->composeLabels(
-                    $this->includeRoots
-                        ? array_merge([$rootTaxon], $rootTaxon->getChildNodes()->flatten()->all())
-                        : $rootTaxon->getChildNodes()->flatten()->all()
+                    array_merge([$rootTaxon], $rootTaxon->getChildNodes()->flatten()->all()),
                 ),
             ];
         }
@@ -102,14 +73,13 @@ class VineTaxonIdOptionsComposer implements TaxonIdOptionsComposer
         return $taxaPerRoot;
     }
 
-    private function getFilteredTree(): TaxonTree
+    private function getFilteredTree(string $taxonomyId): TaxonTree
     {
         return $this->taxonTreeRepository->getTree()
+            ->remove(function (TaxonNode $node) use ($taxonomyId) {
+                return $node->getTaxonomyId() !== $taxonomyId;
+            })
             ->remove(function (TaxonNode $node) {
-                if ($node->isRootNode() && ! empty($this->includeTaxonRootIds)) {
-                    return ! in_array($node->getId(), $this->includeTaxonRootIds);
-                }
-
                 return in_array($node->getId(), $this->excludeTaxonIds);
             });
     }
