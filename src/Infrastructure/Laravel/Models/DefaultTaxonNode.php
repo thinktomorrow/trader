@@ -97,7 +97,7 @@ class DefaultTaxonNode extends DefaultNode implements TaxonNode
             }
         }
 
-        if (!isset($this->keys[0])) {
+        if (! isset($this->keys[0])) {
             return null;
         }
 
@@ -148,7 +148,7 @@ class DefaultTaxonNode extends DefaultNode implements TaxonNode
     {
         $label = $this->getLabel($locale);
 
-        if (!$this->isRootNode()) {
+        if (! $this->isRootNode()) {
             $label = array_reduce(array_reverse($this->getBreadCrumbs()), function ($carry, $taxon) use ($withoutRoot, $locale) {
                 if ($taxon->isRootNode()) {
                     return $withoutRoot ? $carry : $taxon->getLabel($locale) . ': ' . $carry;
