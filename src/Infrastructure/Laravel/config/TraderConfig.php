@@ -77,9 +77,9 @@ class TraderConfig implements \Thinktomorrow\Trader\TraderConfig
         return config('trader.allow_vat_exemption', true);
     }
 
-    public function getCategoryRootId(): ?string
+    public function getMainCategoryTaxonomyId(): ?string
     {
-        return config('trader.category_root_id');
+        return config('trader.category_taxonomy_id');
     }
 
     public function getClassMap(): array

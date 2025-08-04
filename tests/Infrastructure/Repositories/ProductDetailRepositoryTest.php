@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace Tests\Infrastructure\Repositories;
 
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use PHPUnit\Framework\Attributes\DataProvider;
 use Tests\Infrastructure\TestCase;
 use Thinktomorrow\Trader\Application\Product\ProductDetail\ProductDetail;
 use Thinktomorrow\Trader\Domain\Model\Product\Exceptions\CouldNotFindVariant;
@@ -19,11 +20,8 @@ final class ProductDetailRepositoryTest extends TestCase
 {
     use RefreshDatabase;
 
-    /**
-     * @test
-     * @dataProvider products
-     */
-    public function it_can_find_a_product(Product $product)
+    #[DataProvider('products')]
+    public function test_it_can_find_a_product(Product $product)
     {
         foreach ($this->repositories() as $i => $repository) {
             $productRepository = iterator_to_array($this->productRepositories())[$i];
@@ -34,11 +32,8 @@ final class ProductDetailRepositoryTest extends TestCase
         }
     }
 
-    /**
-     * @test
-     * @dataProvider offlineProducts
-     */
-    public function it_cannot_find_an_offline_productdetail(Product $product)
+    #[DataProvider('products')]
+    public function test_it_cannot_find_an_offline_productdetail(Product $product)
     {
         $productsNotFound = 0;
 
@@ -57,11 +52,8 @@ final class ProductDetailRepositoryTest extends TestCase
         $this->assertEquals(count(iterator_to_array($this->repositories())), $productsNotFound);
     }
 
-    /**
-     * @test
-     * @dataProvider offlineProducts
-     */
-    public function it_can_find_an_offline_product_if_offline_is_allowed(Product $product)
+    #[DataProvider('offlineProducts')]
+    public function test_it_can_find_an_offline_product_if_offline_is_allowed(Product $product)
     {
         $productsNotFound = 0;
 

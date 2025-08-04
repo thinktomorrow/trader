@@ -29,6 +29,10 @@ final class InMemoryVariantRepository implements VariantRepository, VariantForCa
         static::$variants[$variant->variantId->get()] = $variant;
     }
 
+    /**
+     * @return array with two entries: [0 => state data, 1 => child entities].
+     * Used internally by product repository to fetch all variants.
+     */
     public function getStatesByProduct(ProductId $productId): array
     {
         $result = [];
@@ -36,7 +40,7 @@ final class InMemoryVariantRepository implements VariantRepository, VariantForCa
         /** @var Variant $variant */
         foreach (static::$variants as $variant) {
             if ($variant->productId->equals($productId)) {
-                $result[] = $variant->getMappedData();
+                $result[] = [$variant->getMappedData(), $variant->getChildEntities()];
             }
         }
 
@@ -45,7 +49,7 @@ final class InMemoryVariantRepository implements VariantRepository, VariantForCa
 
     public function delete(VariantId $variantId): void
     {
-        if (! isset(static::$variants[$variantId->get()])) {
+        if (!isset(static::$variants[$variantId->get()])) {
             throw new CouldNotFindVariant('No variant found by id ' . $variantId);
         }
 

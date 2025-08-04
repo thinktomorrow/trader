@@ -23,10 +23,7 @@ final class OrderRepositoryTest extends TestCase
     use RefreshDatabase;
     use PrepareWorld;
 
-    /**
-     * @test
-     */
-    public function it_can_save_and_find_an_order()
+    public function test_it_can_save_and_find_an_order()
     {
         foreach ($this->orders() as $order) {
             foreach ($this->orderRepositories() as $i => $orderRepository) {
@@ -43,10 +40,7 @@ final class OrderRepositoryTest extends TestCase
         }
     }
 
-    /**
-     * @test
-     */
-    public function it_can_delete_an_order()
+    public function test_it_can_delete_an_order()
     {
         foreach ($this->orders() as $order) {
             $ordersNotFound = 0;

@@ -12,7 +12,7 @@ class ProductDetailTest extends ProductContext
 
     public function test_it_can_get_a_product_detail()
     {
-        $product = $this->createProductWithOptions();
+        $product = $this->createProductWithProductVariantProperties();
         $product->updateTaxonIds([
             TaxonId::fromString('1'),
             TaxonId::fromString('2'),
@@ -72,7 +72,7 @@ class ProductDetailTest extends ProductContext
 
     public function test_if_variant_title_is_empty_it_uses_product_title()
     {
-        $product = $this->createProductWithOptions();
+        $product = $this->createProductWithProductVariantProperties();
         $product->addData([
             'title' => [
                 'nl' => 'product title nl',
@@ -88,7 +88,7 @@ class ProductDetailTest extends ProductContext
 
     public function test_if_variant_title_is_empty_it_uses_product_title_and_option_title()
     {
-        $product = $this->createProductWithOptions();
+        $product = $this->createProductWithProductVariantProperties();
         $product->addData([
             'title' => [
                 'nl' => 'product title nl',
@@ -113,7 +113,7 @@ class ProductDetailTest extends ProductContext
 
     public function test_it_can_add_images()
     {
-        $product = $this->createProductWithOptions();
+        $product = $this->createProductWithProductVariantProperties();
         $this->productRepository->save($product);
 
         $productDetail = $this->productDetailRepository->findProductDetail($product->getVariants()[0]->variantId);

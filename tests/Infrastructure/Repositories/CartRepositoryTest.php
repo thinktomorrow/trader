@@ -24,10 +24,7 @@ final class CartRepositoryTest extends TestCase
     use RefreshDatabase;
     use PrepareWorld;
 
-    /**
-     * @test
-     */
-    public function it_can_find_a_cart()
+    public function test_it_can_find_a_cart()
     {
         $order = $this->createDefaultOrder();
 

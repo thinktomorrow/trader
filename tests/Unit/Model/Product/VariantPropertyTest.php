@@ -6,16 +6,18 @@ namespace Tests\Unit\Model\Product;
 use Money\Money;
 use PHPUnit\Framework\TestCase;
 use Thinktomorrow\Trader\Domain\Common\Vat\VatPercentage;
-use Thinktomorrow\Trader\Domain\Model\Product\Option\OptionValueId;
 use Thinktomorrow\Trader\Domain\Model\Product\ProductId;
 use Thinktomorrow\Trader\Domain\Model\Product\Variant\Variant;
 use Thinktomorrow\Trader\Domain\Model\Product\Variant\VariantId;
 use Thinktomorrow\Trader\Domain\Model\Product\Variant\VariantSalePrice;
 use Thinktomorrow\Trader\Domain\Model\Product\Variant\VariantUnitPrice;
+use Thinktomorrow\Trader\Domain\Model\Product\VariantTaxa\VariantTaxon;
+use Thinktomorrow\Trader\Domain\Model\Taxon\TaxonId;
+use Thinktomorrow\Trader\Domain\Model\Taxonomy\TaxonomyId;
 
-class OptionTest extends TestCase
+class VariantPropertyTest extends TestCase
 {
-    public function test_a_variant_can_have_option_values()
+    public function test_a_variant_can_have_variant_properties()
     {
         $variant = Variant::create(
             $productId = ProductId::fromString('xxx'),
@@ -29,12 +31,18 @@ class OptionTest extends TestCase
             'sku',
         );
 
-        $variant->updateOptionValueIds([
-            OptionValueId::fromString('def'),
+        $variantProperty = VariantTaxon::create(
+            $variantId,
+            $taxonomyId = TaxonomyId::fromString('aaa'),
+            $taxonId = TaxonId::fromString('bbb')
+        );
+
+        $variant->updateVariantTaxa([
+            $variantProperty,
         ]);
 
         $this->assertEquals([
-            'def',
-        ], $variant->getMappedData()['option_value_ids']);
+            $variantProperty,
+        ], $variant->getVariantTaxa());
     }
 }

@@ -4,7 +4,7 @@ declare(strict_types=1);
 namespace Tests\Acceptance\Product;
 
 use Tests\TestHelpers;
-use Thinktomorrow\Trader\Application\Product\VariantLinks\ProductOptionValues;
+use Thinktomorrow\Trader\Application\Product\VariantLinks\ProductOptionsAndValues;
 use Thinktomorrow\Trader\Infrastructure\Test\Repositories\InMemoryProductRepository;
 
 class ProductOptionValuesTest extends ProductContext
@@ -15,10 +15,10 @@ class ProductOptionValuesTest extends ProductContext
     {
         $repo = new InMemoryProductRepository();
 
-        $product = $this->createProductWithOptions();
+        $product = $this->createProductWithProductVariantProperties();
         $repo->save($product);
 
-        $values = (new ProductOptionValues($repo))->get($product->productId->get());
+        $values = (new ProductOptionsAndValues($repo))->get($product->productId->get());
 
         $this->assertCount(2, $values);
         $this->assertEquals([

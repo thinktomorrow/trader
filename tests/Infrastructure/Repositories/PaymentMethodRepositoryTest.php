@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace Tests\Infrastructure\Repositories;
 
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use PHPUnit\Framework\Attributes\DataProvider;
 use Tests\Infrastructure\TestCase;
 use Thinktomorrow\Trader\Domain\Model\PaymentMethod\Exceptions\CouldNotFindPaymentMethod;
 use Thinktomorrow\Trader\Domain\Model\PaymentMethod\PaymentMethod;
@@ -16,11 +17,8 @@ class PaymentMethodRepositoryTest extends TestCase
 {
     use RefreshDatabase;
 
-    /**
-     * @test
-     * @dataProvider paymentMethods
-     */
-    public function it_can_save_and_find_a_method(PaymentMethod $paymentMethod)
+    #[DataProvider('paymentMethods')]
+    public function test_it_can_save_and_find_a_method(PaymentMethod $paymentMethod)
     {
         foreach ($this->repositories() as $repository) {
             $repository->save($paymentMethod);
@@ -30,11 +28,8 @@ class PaymentMethodRepositoryTest extends TestCase
         }
     }
 
-    /**
-     * @test
-     * @dataProvider paymentMethods
-     */
-    public function it_can_delete_a_product(PaymentMethod $paymentMethod)
+    #[DataProvider('paymentMethods')]
+    public function test_it_can_delete_a_product(PaymentMethod $paymentMethod)
     {
         $methodsNotFound = 0;
 

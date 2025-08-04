@@ -33,7 +33,7 @@ final class TaxonomyApplication
         );
 
         $taxonomy->showAsGridFilter($createTaxonomy->showsAsGridFilter());
-        $taxonomy->showOnListing($createTaxonomy->showsOnListing());
+        $taxonomy->showInGrid($createTaxonomy->showsOnListing());
         $taxonomy->allowMultipleValues($createTaxonomy->allowsMultipleValues());
         $taxonomy->addData($createTaxonomy->getData());
 

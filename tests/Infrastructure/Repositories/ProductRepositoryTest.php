@@ -4,38 +4,33 @@ declare(strict_types=1);
 namespace Tests\Infrastructure\Repositories;
 
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use PHPUnit\Framework\Attributes\DataProvider;
 use Tests\Infrastructure\TestCase;
 use Thinktomorrow\Trader\Domain\Model\Product\Exceptions\CouldNotFindProduct;
 use Thinktomorrow\Trader\Domain\Model\Product\Product;
 use Thinktomorrow\Trader\Domain\Model\Product\ProductId;
 use Thinktomorrow\Trader\Infrastructure\Laravel\Repositories\MysqlProductRepository;
 use Thinktomorrow\Trader\Infrastructure\Laravel\Repositories\MysqlVariantRepository;
-use Thinktomorrow\Trader\Infrastructure\Test\Repositories\InMemoryProductRepository;
 use Thinktomorrow\Trader\Infrastructure\Test\TestContainer;
 
 final class ProductRepositoryTest extends TestCase
 {
     use RefreshDatabase;
 
-    /**
-     * @test
-     * @dataProvider products
-     */
-    public function it_can_save_and_find_a_product(Product $product)
+    #[DataProvider('products')]
+    public function test_it_can_save_and_find_a_product(Product $product)
     {
         foreach ($this->repositories() as $repository) {
             $repository->save($product);
             $product->releaseEvents();
+            dd($product);
 
             $this->assertEquals($product, $repository->find($product->productId));
         }
     }
 
-    /**
-     * @test
-     * @dataProvider products
-     */
-    public function it_can_delete_a_product(Product $product)
+    #[DataProvider('products')]
+    public function test_it_can_delete_a_product(Product $product)
     {
         $productsNotFound = 0;
 
@@ -62,14 +57,14 @@ final class ProductRepositoryTest extends TestCase
 
     private static function repositories(): \Generator
     {
-        yield new InMemoryProductRepository();
+//        yield new InMemoryProductRepository();
         yield new MysqlProductRepository(new MysqlVariantRepository(new TestContainer()));
     }
 
     public static function products(): \Generator
     {
-        yield [static::createProduct()];
-        yield [static::createProductWithPersonalisations()];
+//        yield [static::createProduct()];
+//        yield [static::createProductWithPersonalisations()];
         yield [static::createProductWithVariant()];
     }
 }

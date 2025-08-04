@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace Tests\Infrastructure\Repositories;
 
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use PHPUnit\Framework\Attributes\DataProvider;
 use Tests\Infrastructure\TestCase;
 use Thinktomorrow\Trader\Domain\Model\Country\CountryId;
 use Thinktomorrow\Trader\Domain\Model\VatRate\Exceptions\CouldNotFindVatRate;
@@ -28,11 +29,8 @@ class VatRateRepositoryTest extends TestCase
         parent::setUp();
     }
 
-    /**
-     * @test
-     * @dataProvider vatRates
-     */
-    public function it_can_save_and_find_a_vat_rate(VatRate $vatRate, ?VatRate $originVatRate = null)
+    #[DataProvider('vatRates')]
+    public function test_it_can_save_and_find_a_vat_rate(VatRate $vatRate, ?VatRate $originVatRate = null)
     {
         foreach ($this->repositories() as $i => $repository) {
             $this->prepareCountries($i);
@@ -49,11 +47,8 @@ class VatRateRepositoryTest extends TestCase
         }
     }
 
-    /**
-     * @test
-     * @dataProvider vatRates
-     */
-    public function it_can_delete_a_vat_rate(VatRate $vatRate, ?VatRate $originVatRate = null)
+    #[DataProvider('vatRates')]
+    public function test_it_can_delete_a_vat_rate(VatRate $vatRate, ?VatRate $originVatRate = null)
     {
         $vatRatesNotFound = 0;
 

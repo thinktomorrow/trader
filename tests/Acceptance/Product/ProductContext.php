@@ -5,11 +5,11 @@ namespace Tests\Acceptance\Product;
 
 use PHPUnit\Framework\Assert;
 use Tests\Acceptance\TestCase;
-use Thinktomorrow\Trader\Application\Product\CheckProductOptions\MissingOptionCombinations;
+use Thinktomorrow\Trader\Application\Product\CheckProductVariantProperties\MissingVariantPropertyCombinations;
 use Thinktomorrow\Trader\Application\Product\CreateProduct;
 use Thinktomorrow\Trader\Application\Product\CreateVariant;
 use Thinktomorrow\Trader\Application\Product\ProductApplication;
-use Thinktomorrow\Trader\Application\Product\VariantLinks\ProductOptionValues;
+use Thinktomorrow\Trader\Application\Product\VariantLinks\ProductOptionsAndValues;
 use Thinktomorrow\Trader\Application\Product\VariantLinks\VariantLink;
 use Thinktomorrow\Trader\Application\Product\VariantLinks\VariantLinksComposer;
 use Thinktomorrow\Trader\Domain\Model\Product\Events\ProductCreated;
@@ -22,6 +22,7 @@ use Thinktomorrow\Trader\Infrastructure\Laravel\Models\DefaultVariantLink;
 use Thinktomorrow\Trader\Infrastructure\Test\EventDispatcherSpy;
 use Thinktomorrow\Trader\Infrastructure\Test\Repositories\InMemoryProductDetailRepository;
 use Thinktomorrow\Trader\Infrastructure\Test\Repositories\InMemoryProductRepository;
+use Thinktomorrow\Trader\Infrastructure\Test\Repositories\InMemoryProductTaxonRepository;
 use Thinktomorrow\Trader\Infrastructure\Test\Repositories\InMemoryVariantRepository;
 use Thinktomorrow\Trader\Infrastructure\Test\TestContainer;
 use Thinktomorrow\Trader\Infrastructure\Test\TestTraderConfig;
@@ -34,7 +35,7 @@ abstract class ProductContext extends TestCase
     protected EventDispatcherSpy $eventDispatcher;
     protected VariantLinksComposer $productOptionsComposer;
     protected InMemoryProductDetailRepository $productDetailRepository;
-    protected MissingOptionCombinations $missingOptionCombinations;
+    protected MissingVariantPropertyCombinations $missingOptionCombinations;
 
     protected function setUp(): void
     {
@@ -56,8 +57,9 @@ abstract class ProductContext extends TestCase
 
         $this->productDetailRepository = new InMemoryProductDetailRepository();
 
-        $this->missingOptionCombinations = new MissingOptionCombinations(
-            new ProductOptionValues(new InMemoryProductRepository())
+        $this->missingOptionCombinations = new MissingVariantPropertyCombinations(
+            new InMemoryProductTaxonRepository(),
+            new ProductOptionsAndValues(new InMemoryProductRepository())
         );
     }
 

@@ -4,14 +4,31 @@ declare(strict_types=1);
 namespace Tests\Acceptance\Product;
 
 use Tests\TestHelpers;
+use Thinktomorrow\Trader\Infrastructure\Test\Repositories\InMemoryProductTaxonRepository;
 
-class MissingOptionCombinationsTest extends ProductContext
+class MissingVariantPropertyCombinationsTest extends ProductContext
 {
     use TestHelpers;
 
+    protected function setUp(): void
+    {
+        parent::setUp();
+
+        InMemoryProductTaxonRepository::$productTaxonLookup = [
+
+        ];
+    }
+
+    public function tearDown(): void
+    {
+        InMemoryProductTaxonRepository::clear();
+
+        parent::tearDown();
+    }
+
     public function test_it_can_check_missing_combos()
     {
-        $product = $this->createProductWithOptions();
+        $product = $this->createProductWithProductVariantProperties();
         $this->productRepository->save($product);
 
         $missingCombos = $this->missingOptionCombinations->get($product);
@@ -23,7 +40,7 @@ class MissingOptionCombinationsTest extends ProductContext
 
     public function test_it_can_render_missing_combos_with_labels()
     {
-        $product = $this->createProductWithOptions();
+        $product = $this->createProductWithProductVariantProperties();
         $this->productRepository->save($product);
 
         $missingComboLabels = $this->missingOptionCombinations->getAsLabels($product, 'foo', 'value.nl');

@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace Tests\Infrastructure\Repositories;
 
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use PHPUnit\Framework\Attributes\DataProvider;
 use Tests\Infrastructure\TestCase;
 use Thinktomorrow\Trader\Domain\Model\Country\Country;
 use Thinktomorrow\Trader\Domain\Model\Country\CountryId;
@@ -15,11 +16,8 @@ class CountryRepositoryTest extends TestCase
 {
     use RefreshDatabase;
 
-    /**
-     * @test
-     * @dataProvider countries
-     */
-    public function it_can_save_and_find_a_country(Country $country)
+    #[DataProvider('countries')]
+    public function test_it_can_save_and_find_a_country(Country $country)
     {
         foreach ($this->repositories() as $repository) {
             $repository->save($country);
@@ -29,11 +27,8 @@ class CountryRepositoryTest extends TestCase
         }
     }
 
-    /**
-     * @test
-     * @dataProvider countries
-     */
-    public function it_can_delete_a_country(Country $country)
+    #[DataProvider('countries')]
+    public function test_it_can_delete_a_country(Country $country)
     {
         $countrysNotFound = 0;
 

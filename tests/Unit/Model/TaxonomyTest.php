@@ -25,8 +25,9 @@ class TaxonomyTest extends TestCase
             'type' => 'property',
             'state' => 'online',
             'shows_as_grid_filter' => false,
-            'shows_on_listing' => false,
+            'shows_in_grid' => false,
             'allows_multiple_values' => false,
+            'allows_nestable_values' => false,
             'order' => 0,
             'data' => json_encode(['foo' => 'bar']),
         ], $taxonomy->getMappedData());
@@ -66,11 +67,11 @@ class TaxonomyTest extends TestCase
         $taxonomy = $this->createdTaxonomy();
 
         $taxonomy->showAsGridFilter(true);
-        $taxonomy->showOnListing(true);
+        $taxonomy->showInGrid(true);
         $taxonomy->allowMultipleValues(true);
 
         $this->assertTrue($taxonomy->showsAsGridFilter());
-        $this->assertTrue($taxonomy->showsOnListing());
+        $this->assertTrue($taxonomy->showsInGrid());
         $this->assertTrue($taxonomy->allowsMultipleValues());
     }
 
@@ -81,8 +82,9 @@ class TaxonomyTest extends TestCase
             'type' => 'variant_property',
             'state' => 'offline',
             'shows_as_grid_filter' => true,
-            'shows_on_listing' => false,
+            'shows_in_grid' => false,
             'allows_multiple_values' => true,
+            'allows_nestable_values' => true,
             'order' => 3,
             'data' => json_encode(['foo' => 'bar']),
         ], [
@@ -92,8 +94,12 @@ class TaxonomyTest extends TestCase
         $this->assertEquals('tax-999', $taxonomy->getMappedData()['taxonomy_id']);
         $this->assertEquals('variant_property', $taxonomy->getMappedData()['type']);
         $this->assertEquals(true, $taxonomy->showsAsGridFilter());
-        $this->assertEquals(false, $taxonomy->showsOnListing());
+        $this->assertEquals(false, $taxonomy->showsInGrid());
         $this->assertEquals(true, $taxonomy->allowsMultipleValues());
+        $this->assertEquals(true, $taxonomy->allowsNestableValues());
+        $this->assertEquals(3, $taxonomy->getOrder());
+        $this->assertEquals(['foo' => 'bar'], json_decode($taxonomy->getMappedData()['data'], true));
+        $this->assertEquals(TaxonomyState::offline, $taxonomy->getState());
     }
 
     private function createdTaxonomy(): Taxonomy
@@ -103,7 +109,7 @@ class TaxonomyTest extends TestCase
             'type' => 'property',
             'state' => 'online',
             'shows_as_grid_filter' => false,
-            'shows_on_listing' => false,
+            'shows_in_grid' => false,
             'allows_multiple_values' => false,
             'order' => 0,
             'data' => json_encode([]),

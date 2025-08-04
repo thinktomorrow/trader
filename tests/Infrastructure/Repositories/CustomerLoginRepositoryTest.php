@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace Tests\Infrastructure\Repositories;
 
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use PHPUnit\Framework\Attributes\DataProvider;
 use Tests\Infrastructure\TestCase;
 use Thinktomorrow\Trader\Domain\Common\Email;
 use Thinktomorrow\Trader\Domain\Model\Customer\CustomerId;
@@ -17,11 +18,8 @@ final class CustomerLoginRepositoryTest extends TestCase
     use RefreshDatabase;
     use PrepareWorld;
 
-    /**
-     * @test
-     * @dataProvider entities
-     */
-    public function it_can_save_an_customer(CustomerLogin $customerLogin)
+    #[DataProvider('entities')]
+    public function test_it_can_save_an_customer(CustomerLogin $customerLogin)
     {
         (new MysqlCustomerRepository(new TestContainer()))->save($this->createCustomer());
 
@@ -34,11 +32,8 @@ final class CustomerLoginRepositoryTest extends TestCase
         }
     }
 
-    /**
-     * @test
-     * @dataProvider entities
-     */
-    public function it_can_find_an_customer_login(CustomerLogin $customerLogin)
+    #[DataProvider('entities')]
+    public function test_it_can_find_an_customer_login(CustomerLogin $customerLogin)
     {
         (new MysqlCustomerRepository(new TestContainer()))->save($this->createCustomer());
 

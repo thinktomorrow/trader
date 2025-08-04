@@ -3,37 +3,72 @@
 namespace Thinktomorrow\Trader\Application\Product\ProductDetail;
 
 use Money\Money;
+use Thinktomorrow\Trader\Application\Product\ProductTaxa\ProductTaxonRead;
+use Thinktomorrow\Trader\Application\Product\ProductTaxa\VariantTaxonRead;
 use Thinktomorrow\Trader\Application\Stock\Read\Stockable;
 use Thinktomorrow\Trader\Domain\Model\Product\Variant\VariantSalePrice;
 use Thinktomorrow\Trader\Domain\Model\Product\Variant\VariantUnitPrice;
 
 interface ProductDetail extends Stockable
 {
-    public static function fromMappedData(array $state): static;
+    public static function fromMappedData(array $state, array $taxaState): static;
 
     public function getVariantId(): string;
+
     public function getProductId(): string;
-    public function getTaxonIds(): array;
+
+    /**
+     * All related VariantTaxon and ProductTaxon objects.
+     * @return array<VariantTaxonRead|ProductTaxonRead>
+     */
+    public function getTaxa(): array;
+
+    public function getCategories(): array;
+
+    public function getGoogleCategories(): array;
+
+    public function getProductProperties(): array;
+
+    public function getVariantProperties(): array;
+
+    public function getCollections(): array;
+
+    public function getTags(): array;
+
     public function isAvailable(): bool;
 
     public function getUnitPrice(): string;
+
     public function getSalePrice(): string;
+
     public function getUnitPriceAsMoney(): Money;
+
     public function getSalePriceAsMoney(): Money;
+
     public function getUnitPriceAsPrice(): VariantUnitPrice;
+
     public function getSalePriceAsPrice(): VariantSalePrice;
+
     public function getTaxRateAsString(): string;
+
     public function onSale(): bool;
+
     public function getSaleDiscount(): string;
 
     public function getTitle(?string $locale = null): string;
+
     public function getIntro(?string $locale = null): string;
+
     public function getContent(?string $locale = null): string;
+
     public function getUrl(?string $locale = null): string;
+
     public function getSku(): string;
+
     public function getEan(): ?string;
 
     public function setImages(iterable $images): void;
+
     public function getImages(): iterable;
 
     /**

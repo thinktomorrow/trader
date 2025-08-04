@@ -60,7 +60,7 @@ interface TraderConfig
      */
     public function isVatExemptionAllowed(): bool;
 
-    public function getCategoryRootId(): ?string;
+    public function getMainCategoryTaxonomyId(): ?string;
 
     public function getClassMap(): array;
 

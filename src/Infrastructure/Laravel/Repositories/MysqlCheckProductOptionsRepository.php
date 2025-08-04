@@ -4,7 +4,7 @@ declare(strict_types=1);
 namespace Thinktomorrow\Trader\Infrastructure\Laravel\Repositories;
 
 use Illuminate\Support\Facades\DB;
-use Thinktomorrow\Trader\Application\Product\CheckProductOptions\CheckProductOptionsRepository;
+use Thinktomorrow\Trader\Application\Product\CheckProductVariantProperties\CheckProductOptionsRepository;
 
 class MysqlCheckProductOptionsRepository implements CheckProductOptionsRepository
 {
@@ -21,10 +21,10 @@ class MysqlCheckProductOptionsRepository implements CheckProductOptionsRepositor
         $bindings = $this->prepareBindings($option_value_ids, $excluded_variant_id);
 
         if (count($option_value_ids) < 2) {
-            $statement = "SELECT A.variant_id, count(distinct A.option_value_id) AS count FROM ".static::$variantOptionValueLookupTable." A WHERE A.option_value_id = $optionIdPlaceholders";
+            $statement = "SELECT A.variant_id, count(distinct A.option_value_id) AS count FROM " . static::$variantOptionValueLookupTable . " A WHERE A.option_value_id = $optionIdPlaceholders";
             $statement .= ($excluded_variant_id ? ' AND A.variant_id <> ?' : '');
         } else {
-            $statement = "SELECT A.variant_id, count(distinct A.option_value_id) AS count FROM ".static::$variantOptionValueLookupTable." A INNER JOIN ".static::$variantOptionValueLookupTable." B ON A.variant_id = B.variant_id AND A.option_value_id IN ($optionIdPlaceholders) AND B.option_value_id IN ($optionIdPlaceholders) AND A.option_value_id <> B.option_value_id";
+            $statement = "SELECT A.variant_id, count(distinct A.option_value_id) AS count FROM " . static::$variantOptionValueLookupTable . " A INNER JOIN " . static::$variantOptionValueLookupTable . " B ON A.variant_id = B.variant_id AND A.option_value_id IN ($optionIdPlaceholders) AND B.option_value_id IN ($optionIdPlaceholders) AND A.option_value_id <> B.option_value_id";
             $statement .= ($excluded_variant_id ? ' WHERE A.variant_id <> ?' : '');
         }
 

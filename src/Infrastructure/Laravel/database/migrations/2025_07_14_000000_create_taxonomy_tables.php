@@ -14,8 +14,9 @@ return new class extends Migration {
             $table->string('type');
             $table->string('state')->default(\Thinktomorrow\Trader\Domain\Model\Taxonomy\TaxonomyState::online->value);
             $table->boolean('shows_as_grid_filter')->default(false);
-            $table->boolean('shows_on_listing')->default(false);
+            $table->boolean('shows_in_grid')->default(false);
             $table->boolean('allows_multiple_values')->default(false);
+            $table->boolean('allows_nestable_values')->default(false);
             $table->json('data')->nullable();
             $table->unsignedInteger('order')->default(0);
             $table->timestamps();
@@ -25,24 +26,22 @@ return new class extends Migration {
             $table->char('taxonomy_id', 36)->after('taxon_id');
         });
 
-        Schema::create(static::PREFIX . 'taxonomy_products', function (Blueprint $table) {
+        Schema::table(static::PREFIX . 'taxa_products', function (Blueprint $table) {
             $table->char('taxonomy_id', 36);
-            $table->char('product_id', 36);
-            $table->char('taxon_id', 36);
-
-            $table->primary(['taxonomy_id', 'product_id', 'taxon_id']);
+            $table->unsignedInteger('order_column')->default(0);
 
             $table->foreign('taxonomy_id')->references('taxonomy_id')->on(static::PREFIX . 'taxonomies')->onDelete('cascade');
-            $table->foreign('product_id')->references('product_id')->on(static::PREFIX . 'products')->onDelete('cascade');
-            $table->foreign('taxon_id')->references('taxon_id')->on(static::PREFIX . 'taxa')->onDelete('cascade');
         });
 
-        Schema::create(static::PREFIX . 'taxon_variants', function (Blueprint $table) {
+        Schema::create(static::PREFIX . 'taxa_variants', function (Blueprint $table) {
             $table->char('taxon_id', 36);
             $table->char('variant_id', 36);
+            $table->char('taxonomy_id', 36);
+            $table->unsignedInteger('order_column')->default(0);
 
             $table->primary(['taxon_id', 'variant_id']);
 
+            $table->foreign('taxonomy_id')->references('taxonomy_id')->on(static::PREFIX . 'taxonomies')->onDelete('cascade');
             $table->foreign('taxon_id')->references('taxon_id')->on(static::PREFIX . 'taxa')->onDelete('cascade');
             $table->foreign('variant_id')->references('variant_id')->on(static::PREFIX . 'product_variants')->onDelete('cascade');
         });

@@ -16,7 +16,7 @@ final class CheckProductOptionsRepositoryTest extends TestCase
 
     public function test_it_can_check_if_option_combination_is_already_used()
     {
-        $product = $this->createProductWithOptions();
+        $product = $this->createProductWithProductVariantProperties();
         (new MysqlProductRepository(new MysqlVariantRepository(new TestContainer())))->save($product);
 
         $variant = $product->getVariants()[0];

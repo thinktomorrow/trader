@@ -8,14 +8,14 @@ use Thinktomorrow\Trader\Domain\Common\Locale;
 
 interface TaxonFilterTreeComposer
 {
-    public function getAvailableFilters(Locale $locale, string $mainTaxonFilterKey): TaxonTree;
+    public function getAvailableFilters(Locale $locale, array $rootTaxonKeys): TaxonTree;
 
-    public function getActiveFilters(Locale $locale, string $mainTaxonFilterKey, array $activeKeys): TaxonTree;
+    public function getActiveFilters(Locale $locale, array $rootTaxonKeys, array $activeKeys): TaxonTree;
 
     /**
      * Get all product ids belonging to this taxon filter and all its children
      */
-    public function getProductIds(string $taxonId): array;
+    public function getProductIds(array $taxonIds): array;
 
-    public function getOnlineProductIds(string $taxonId): array;
+    public function getOnlineProductIds(array $taxonIds): array;
 }

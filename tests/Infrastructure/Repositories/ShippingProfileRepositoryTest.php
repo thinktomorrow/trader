@@ -5,6 +5,7 @@ namespace Tests\Infrastructure\Repositories;
 
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Money\Money;
+use PHPUnit\Framework\Attributes\DataProvider;
 use Tests\Infrastructure\TestCase;
 use Thinktomorrow\Trader\Domain\Model\Country\CountryId;
 use Thinktomorrow\Trader\Domain\Model\ShippingProfile\Exceptions\CouldNotFindShippingProfile;
@@ -28,11 +29,8 @@ class ShippingProfileRepositoryTest extends TestCase
         parent::setUp();
     }
 
-    /**
-     * @test
-     * @dataProvider shippingProfiles
-     */
-    public function it_can_save_and_find_a_profile(ShippingProfile $shippingProfile)
+    #[DataProvider('shippingProfiles')]
+    public function test_it_can_save_and_find_a_profile(ShippingProfile $shippingProfile)
     {
         foreach ($this->repositories() as $i => $repository) {
             $this->prepareCountries($i);
@@ -44,11 +42,8 @@ class ShippingProfileRepositoryTest extends TestCase
         }
     }
 
-    /**
-     * @test
-     * @dataProvider shippingProfiles
-     */
-    public function it_can_delete_a_profile(ShippingProfile $shippingProfile)
+    #[DataProvider('shippingProfiles')]
+    public function test_it_can_delete_a_profile(ShippingProfile $shippingProfile)
     {
         $profilesNotFound = 0;
 

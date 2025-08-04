@@ -8,7 +8,7 @@ use Thinktomorrow\Trader\Application\Product\UpdateProduct\UpdateProductOptions;
 use Thinktomorrow\Trader\Domain\Model\Product\Events\OptionsUpdated;
 use Thinktomorrow\Trader\Domain\Model\Product\Option\Option;
 
-class UpdateProductOptionsTest extends ProductContext
+class UpdateProductOptionsTestOld extends ProductContext
 {
     use TestHelpers;
 
@@ -129,7 +129,7 @@ class UpdateProductOptionsTest extends ProductContext
 
     public function test_it_can_remove_existing_options()
     {
-        $product = $this->createProductWithOptions();
+        $product = $this->createProductWithProductVariantProperties();
         $this->productRepository->save($product);
 
         $this->productApplication->updateProductOptions(new UpdateProductOptions($product->productId->get(), []));

@@ -6,7 +6,6 @@ namespace Tests\Infrastructure\Vine;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\Infrastructure\TestCase;
 use Thinktomorrow\Trader\Domain\Common\Locale;
-use Thinktomorrow\Trader\Domain\Model\Product\Product;
 use Thinktomorrow\Trader\Domain\Model\Taxon\Taxon;
 use Thinktomorrow\Trader\Domain\Model\Taxon\TaxonId;
 use Thinktomorrow\Trader\Domain\Model\Taxon\TaxonKey;
@@ -45,7 +44,7 @@ final class TaxonFilterTreeComposerTest extends TestCase
         foreach ($this->repositories() as $repository) {
             $composer = new VineTaxonFilterTreeComposer(new TestTraderConfig(), $repository);
 
-            $taxonFilterTree = $composer->getAvailableFilters(Locale::fromString('nl'), 'taxon-first');
+            $taxonFilterTree = $composer->getAvailableFilters(Locale::fromString('nl'), ['taxon-first']);
 
             // Top level
             $this->assertEquals(1, $taxonFilterTree->count());
@@ -67,7 +66,7 @@ final class TaxonFilterTreeComposerTest extends TestCase
         foreach ($this->repositories() as $repository) {
             $composer = new VineTaxonFilterTreeComposer(new TestTraderConfig(), $repository);
 
-            $productIds = $composer->getProductIds('first');
+            $productIds = $composer->getProductIds(['first']);
 
             $this->assertEquals([
                 'aaa', 'bbb', 'ccc', 'ddd',
@@ -98,11 +97,11 @@ final class TaxonFilterTreeComposerTest extends TestCase
 
             $this->assertEquals([
                 'ccc', 'ddd',
-            ], $composer->getOnlineProductIds('first'));
+            ], $composer->getOnlineProductIds(['first']));
 
             $this->assertEquals([
                 'aaa', 'bbb', 'ccc', 'ddd',
-            ], $composer->getProductIds('first'));
+            ], $composer->getProductIds(['first']));
         }
     }
 
@@ -135,7 +134,7 @@ final class TaxonFilterTreeComposerTest extends TestCase
         foreach ($this->repositories() as $repository) {
             $composer = new VineTaxonFilterTreeComposer(new TestTraderConfig(), $repository);
 
-            $taxonFilterTree = $composer->getAvailableFilters(Locale::fromString('nl'), 'taxon-first');
+            $taxonFilterTree = $composer->getAvailableFilters(Locale::fromString('nl'), ['taxon-first']);
             $this->assertEquals(1, $taxonFilterTree->count());
             $this->assertEquals('second', $taxonFilterTree[0]->getChildNodes()[0]->id);
         }
@@ -165,7 +164,7 @@ final class TaxonFilterTreeComposerTest extends TestCase
         foreach ($this->repositories() as $i => $repository) {
             $composer = new VineTaxonFilterTreeComposer(new TestTraderConfig(), $repository);
 
-            $taxonFilterTree = $composer->getAvailableFilters(Locale::fromString('nl'), 'taxon-main');
+            $taxonFilterTree = $composer->getAvailableFilters(Locale::fromString('nl'), ['taxon-main']);
 
             $this->assertCount(2, $taxonFilterTree[0]->getChildNodes());
             $this->assertEquals('taxon-second', $taxonFilterTree[0]->getChildNodes()[0]->getKey());
@@ -191,13 +190,13 @@ final class TaxonFilterTreeComposerTest extends TestCase
         foreach ($this->repositories() as $repository) {
             $composer = new VineTaxonFilterTreeComposer(new TestTraderConfig(), $repository);
 
-            $taxonFilterTree = $composer->getAvailableFilters(Locale::fromString('nl'), 'taxon-first');
+            $taxonFilterTree = $composer->getAvailableFilters(Locale::fromString('nl'), ['taxon-first']);
             $this->assertEquals(1, $taxonFilterTree->count());
             $this->assertFalse($taxonFilterTree[0]->hasChildNodes());
         }
     }
 
-    public function test_it_excludes_filters_that_are_categories_but_are_not_in_same_main_category_group()
+    public function test_it_fetches_filters_for_multiple_taxa()
     {
         $this->createProductInMysql('aaa');
         (new InMemoryTaxonRepository())->setOnlineProductIds(TaxonId::fromString('first'), ['aaa']);
@@ -212,25 +211,55 @@ final class TaxonFilterTreeComposerTest extends TestCase
         $taxon2->updateTaxonKeys([TaxonKey::create($taxon2->taxonId, TaxonKeyId::fromString('taxon-second'), Locale::fromString('nl'))]);
         $this->createTaxon($taxon2, ['aaa']);
 
-        $taxon3 = Taxon::create(TaxonId::fromString('third'), TaxonomyId::fromString('brand'));
+        $taxon3 = Taxon::create(TaxonId::fromString('third'), TaxonomyId::fromString('xxx'));
         $taxon3->updateTaxonKeys([TaxonKey::create($taxon3->taxonId, TaxonKeyId::fromString('taxon-third'), Locale::fromString('nl'))]);
         $this->createTaxon($taxon3, ['aaa']);
 
         foreach ($this->repositories() as $repository) {
-            $composer = new VineTaxonFilterTreeComposer(new TestTraderConfig(['category_root_id' => $taxon->taxonId->get()]), $repository);
+            $composer = new VineTaxonFilterTreeComposer(new TestTraderConfig(), $repository);
 
-            $taxonFilterTree = $composer->getAvailableFilters(Locale::fromString('nl'), 'taxon-first');
+            $taxonFilterTree = $composer->getAvailableFilters(Locale::fromString('nl'), ['taxon-first', 'taxon-third']);
             $this->assertEquals(2, $taxonFilterTree->count());
+            $this->assertEquals(3, $taxonFilterTree->total());
 
             $this->assertEquals($taxon->taxonId, $taxonFilterTree->first()->getNodeId());
             $this->assertEquals($taxon3->taxonId, $taxonFilterTree[1]->getNodeId());
         }
     }
 
+    public function test_it_excludes_filters_that_dont_belong_to_same_taxonomy()
+    {
+        $this->createProductInMysql('aaa');
+        (new InMemoryTaxonRepository())->setOnlineProductIds(TaxonId::fromString('first'), ['aaa']);
+        (new InMemoryTaxonRepository())->setOnlineProductIds(TaxonId::fromString('second'), ['aaa']);
+        (new InMemoryTaxonRepository())->setOnlineProductIds(TaxonId::fromString('third'), ['aaa']);
+
+        $taxon = Taxon::create(TaxonId::fromString('first'), TaxonomyId::fromString('brand'));
+        $taxon->updateTaxonKeys([TaxonKey::create($taxon->taxonId, TaxonKeyId::fromString('taxon-first'), Locale::fromString('nl'))]);
+        $this->createTaxon($taxon, ['aaa']);
+
+        $taxon2 = Taxon::create(TaxonId::fromString('second'), TaxonomyId::fromString('brand'), TaxonId::fromString('first'));
+        $taxon2->updateTaxonKeys([TaxonKey::create($taxon2->taxonId, TaxonKeyId::fromString('taxon-second'), Locale::fromString('nl'))]);
+        $this->createTaxon($taxon2, ['aaa']);
+
+        $taxon3 = Taxon::create(TaxonId::fromString('third'), TaxonomyId::fromString('xxx'));
+        $taxon3->updateTaxonKeys([TaxonKey::create($taxon3->taxonId, TaxonKeyId::fromString('taxon-third'), Locale::fromString('nl'))]);
+        $this->createTaxon($taxon3, ['aaa']);
+
+        foreach ($this->repositories() as $repository) {
+            $composer = new VineTaxonFilterTreeComposer(new TestTraderConfig(), $repository);
+
+            $taxonFilterTree = $composer->getAvailableFilters(Locale::fromString('nl'), ['taxon-first']);
+            $this->assertEquals(1, $taxonFilterTree->count());
+
+            $this->assertEquals($taxon->taxonId, $taxonFilterTree->first()->getNodeId());
+        }
+    }
+
     public function test_it_returns_empty_filter_if_taxon_key_does_not_exist()
     {
         foreach ($this->repositories() as $repository) {
-            $taxonFilterTree = (new VineTaxonFilterTreeComposer(new TestTraderConfig(), $repository))->getAvailableFilters(Locale::fromString('nl'), 'xxx');
+            $taxonFilterTree = (new VineTaxonFilterTreeComposer(new TestTraderConfig(), $repository))->getAvailableFilters(Locale::fromString('nl'), ['xxx']);
             $this->assertCount(0, $taxonFilterTree);
         }
     }
@@ -240,7 +269,7 @@ final class TaxonFilterTreeComposerTest extends TestCase
         $this->createDefaultTaxons();
 
         foreach ($this->repositories() as $repository) {
-            $taxonFilterTree = (new VineTaxonFilterTreeComposer(new TestTraderConfig(), $repository))->getActiveFilters(Locale::fromString('nl'), 'taxon-first', [
+            $taxonFilterTree = (new VineTaxonFilterTreeComposer(new TestTraderConfig(), $repository))->getActiveFilters(Locale::fromString('nl'), ['taxon-first'], [
                 'taxon-third',
             ]);
 
@@ -254,7 +283,7 @@ final class TaxonFilterTreeComposerTest extends TestCase
         $this->createDefaultTaxons();
 
         foreach ($this->repositories() as $repository) {
-            $taxonFilterTree = (new VineTaxonFilterTreeComposer(new TestTraderConfig(), $repository))->getActiveFilters(Locale::fromString('nl'), 'taxon-first', [
+            $taxonFilterTree = (new VineTaxonFilterTreeComposer(new TestTraderConfig(), $repository))->getActiveFilters(Locale::fromString('nl'), ['taxon-first'], [
 
             ]);
 
@@ -268,7 +297,7 @@ final class TaxonFilterTreeComposerTest extends TestCase
         $this->createDefaultTaxons();
 
         foreach ($this->repositories() as $repository) {
-            $taxonFilterTree = (new VineTaxonFilterTreeComposer(new TestTraderConfig(), $repository))->getActiveFilters(Locale::fromString('nl'), 'taxon-first', [
+            $taxonFilterTree = (new VineTaxonFilterTreeComposer(new TestTraderConfig(), $repository))->getActiveFilters(Locale::fromString('nl'), ['taxon-first'], [
                 'taxon-second',
                 'taxon-fifth',
             ]);
@@ -284,7 +313,7 @@ final class TaxonFilterTreeComposerTest extends TestCase
         $this->createDefaultTaxons();
 
         foreach ($this->repositories() as $repository) {
-            $taxonFilterTree = (new VineTaxonFilterTreeComposer(new TestTraderConfig(), $repository))->getActiveFilters(Locale::fromString('nl'), 'taxon-first', [
+            $taxonFilterTree = (new VineTaxonFilterTreeComposer(new TestTraderConfig(), $repository))->getActiveFilters(Locale::fromString('nl'), ['taxon-first'], [
                 'taxon-fifth',
             ]);
 
@@ -297,7 +326,7 @@ final class TaxonFilterTreeComposerTest extends TestCase
     public function test_it_returns_empty_active_filter_if_taxon_key_does_not_exist()
     {
         foreach ($this->repositories() as $repository) {
-            $taxonFilterTree = (new VineTaxonFilterTreeComposer(new TestTraderConfig(), $repository))->getActiveFilters(Locale::fromString('nl'), 'xxx', ['taxon-first']);
+            $taxonFilterTree = (new VineTaxonFilterTreeComposer(new TestTraderConfig(), $repository))->getActiveFilters(Locale::fromString('nl'), ['xxx'], ['taxon-first']);
             $this->assertCount(0, $taxonFilterTree);
         }
     }

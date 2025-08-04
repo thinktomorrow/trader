@@ -18,7 +18,7 @@ class CreateTaxonomyTest extends TaxonomyContext
         $this->assertEquals(TaxonomyType::from('property'), $taxonomy->getType());
         $this->assertEquals(TaxonomyState::online, $taxonomy->getState());
         $this->assertEquals(true, $taxonomy->showsAsGridFilter());
-        $this->assertEquals(false, $taxonomy->showsOnListing());
+        $this->assertEquals(false, $taxonomy->showsInGrid());
         $this->assertEquals(false, $taxonomy->allowsMultipleValues());
         $this->assertEquals(['foo' => 'bar'], $taxonomy->getData());
     }

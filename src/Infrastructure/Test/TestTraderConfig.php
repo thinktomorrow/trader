@@ -67,9 +67,9 @@ class TestTraderConfig implements TraderConfig
         return $this->overwrites['allow_vat_exemption'] ?? true;
     }
 
-    public function getCategoryRootId(): ?string
+    public function getMainCategoryTaxonomyId(): ?string
     {
-        return $this->overwrites['category_root_id'] ?? null;
+        return $this->overwrites['category_taxonomy_id'] ?? null;
     }
 
     public function getClassMap(): array

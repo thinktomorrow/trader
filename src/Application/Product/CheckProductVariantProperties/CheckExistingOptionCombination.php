@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 
-namespace Thinktomorrow\Trader\Application\Product\CheckProductOptions;
+namespace Thinktomorrow\Trader\Application\Product\CheckProductVariantProperties;
 
 class CheckExistingOptionCombination
 {

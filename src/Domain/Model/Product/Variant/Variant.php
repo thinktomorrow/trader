@@ -3,25 +3,23 @@ declare(strict_types=1);
 
 namespace Thinktomorrow\Trader\Domain\Model\Product\Variant;
 
-use Assert\Assertion;
-use Thinktomorrow\Trader\Domain\Common\Entity\ChildEntity;
+use Thinktomorrow\Trader\Domain\Common\Entity\ChildAggregate;
 use Thinktomorrow\Trader\Domain\Common\Entity\HasData;
-use Thinktomorrow\Trader\Domain\Model\Product\Option\OptionValueId;
 use Thinktomorrow\Trader\Domain\Model\Product\Personalisation\Personalisation;
 use Thinktomorrow\Trader\Domain\Model\Product\ProductId;
+use Thinktomorrow\Trader\Domain\Model\Product\VariantTaxa\HasVariantTaxa;
+use Thinktomorrow\Trader\Domain\Model\Product\VariantTaxa\VariantTaxon;
 
-final class Variant implements ChildEntity
+final class Variant implements ChildAggregate
 {
     use HasData;
+    use HasVariantTaxa;
 
     public readonly ProductId $productId;
     public readonly VariantId $variantId;
     private VariantState $state;
     private VariantUnitPrice $unitPrice;
     private VariantSalePrice $salePrice; // bedrag, btw perc, bool includes_tax?
-
-    /** @var OptionValueId[] */
-    private array $optionValueIds = [];
 
     /** @var Personalisation[] */
     private array $personalisations = [];
@@ -88,18 +86,6 @@ final class Variant implements ChildEntity
         $this->show_in_grid = $show_in_grid;
     }
 
-    public function updateOptionValueIds(array $optionValueIds): void
-    {
-        Assertion::allIsInstanceOf($optionValueIds, OptionValueId::class);
-
-        $this->optionValueIds = $optionValueIds;
-    }
-
-    public function getOptionValueIds(): array
-    {
-        return $this->optionValueIds;
-    }
-
     public function getMappedData(): array
     {
         return [
@@ -112,13 +98,22 @@ final class Variant implements ChildEntity
             'includes_vat' => $this->unitPrice->includesVat(),
             'sku' => $this->sku,
             'ean' => $this->ean,
-            'option_value_ids' => array_map(fn ($optionValueId) => $optionValueId->get(), $this->optionValueIds),
             'show_in_grid' => $this->show_in_grid,
             'data' => json_encode($this->data),
         ];
     }
 
-    public static function fromMappedData(array $state, array $aggregateState): static
+    public function getChildEntities(): array
+    {
+        return [
+            VariantTaxon::class => array_map(
+                fn(VariantTaxon $option) => array_merge($option->getMappedData()),
+                array_values($this->variantProperties),
+            ),
+        ];
+    }
+
+    public static function fromMappedData(array $state, array $aggregateState, array $childEntities = []): static
     {
         $variant = new static();
 
@@ -132,7 +127,13 @@ final class Variant implements ChildEntity
         $variant->show_in_grid = $state['show_in_grid'] ? (bool)$state['show_in_grid'] : false;
         $variant->data = json_decode($state['data'], true);
 
-        $variant->optionValueIds = array_map(fn ($optionValueState) => OptionValueId::fromString($optionValueState), $state['option_value_ids']);
+        if (array_key_exists(VariantTaxon::class, $childEntities)) {
+            foreach ($childEntities[VariantTaxon::class] as $childState) {
+                $variant->variantProperties[] = VariantTaxon::fromMappedData($childState, $state);
+            }
+        }
+
+//        $variant->optionValueIds = array_map(fn($optionValueState) => OptionValueId::fromString($optionValueState), $state['option_value_ids']);
 
         return $variant;
     }

@@ -17,8 +17,9 @@ class Taxonomy implements Aggregate
     private TaxonomyState $state;
 
     private bool $showsAsGridFilter;
-    private bool $showsOnListing;
+    private bool $showsInGrid;
     private bool $allowsMultipleValues;
+    private bool $allowsNestableValues;
     private int $order;
 
     private function __construct(TaxonomyId $taxonomyId, TaxonomyType $type, TaxonomyState $state)
@@ -33,8 +34,12 @@ class Taxonomy implements Aggregate
         $object = new self($taxonomyId, $type, TaxonomyState::online);
 
         $object->showsAsGridFilter = false;
-        $object->showsOnListing = false;
+        $object->showsInGrid = false;
         $object->allowsMultipleValues = false;
+        $object->allowsNestableValues = in_array($type, [
+            TaxonomyType::category,
+        ]);
+
         $object->order = 0;
 
         $object->recordEvent(new TaxonomyCreated($object->taxonomyId));
@@ -62,14 +67,19 @@ class Taxonomy implements Aggregate
         return $this->showsAsGridFilter;
     }
 
-    public function showsOnListing(): bool
+    public function showsInGrid(): bool
     {
-        return $this->showsOnListing;
+        return $this->showsInGrid;
     }
 
     public function allowsMultipleValues(): bool
     {
         return $this->allowsMultipleValues;
+    }
+
+    public function allowsNestableValues(): bool
+    {
+        return $this->allowsNestableValues;
     }
 
     public function changeType(TaxonomyType $type): void
@@ -92,14 +102,19 @@ class Taxonomy implements Aggregate
         $this->showsAsGridFilter = $showsAsGridFilter;
     }
 
-    public function showOnListing(bool $showsOnListing = true): void
+    public function showInGrid(bool $showsInGrid = true): void
     {
-        $this->showsOnListing = $showsOnListing;
+        $this->showsInGrid = $showsInGrid;
     }
 
     public function allowMultipleValues(bool $allowsMultipleValues = true): void
     {
         $this->allowsMultipleValues = $allowsMultipleValues;
+    }
+
+    public function allowNestableValues(bool $allowsNestableValues = true): void
+    {
+        $this->allowsNestableValues = $allowsNestableValues;
     }
 
     public function getMappedData(): array
@@ -109,8 +124,9 @@ class Taxonomy implements Aggregate
             'type' => $this->type?->value ?? null,
             'state' => $this->state->value,
             'shows_as_grid_filter' => $this->showsAsGridFilter,
-            'shows_on_listing' => $this->showsOnListing,
+            'shows_in_grid' => $this->showsInGrid,
             'allows_multiple_values' => $this->allowsMultipleValues,
+            'allows_nestable_values' => $this->allowsNestableValues,
             'order' => $this->order,
             'data' => json_encode($this->data),
         ];
@@ -132,8 +148,9 @@ class Taxonomy implements Aggregate
         );
 
         $object->showsAsGridFilter = (bool)$state['shows_as_grid_filter'];
-        $object->showsOnListing = (bool)$state['shows_on_listing'];
+        $object->showsInGrid = (bool)$state['shows_in_grid'];
         $object->allowsMultipleValues = (bool)$state['allows_multiple_values'];
+        $object->allowsNestableValues = (bool)$state['allows_nestable_values'];
         $object->order = (int)$state['order'];
         $object->data = json_decode($state['data'], true);
 

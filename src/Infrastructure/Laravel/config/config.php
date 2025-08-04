@@ -69,7 +69,7 @@ return [
      * determines which of the products taxa to use for the breadcrumb tree and structure.
      * If left blank, by default the first taxon subtree found will be used.
      */
-    'category_root_id' => null,
+    'category_taxonomy_id' => null,
 
     /**
      * The mail address that will be used to send

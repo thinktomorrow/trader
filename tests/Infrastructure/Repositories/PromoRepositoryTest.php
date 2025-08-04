@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace Tests\Infrastructure\Repositories;
 
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use PHPUnit\Framework\Attributes\DataProvider;
 use Tests\Infrastructure\TestCase;
 use Thinktomorrow\Trader\Application\Promo\OrderPromo\Discounts\FixedAmountOrderDiscount;
 use Thinktomorrow\Trader\Application\Promo\OrderPromo\Discounts\PercentageOffOrderDiscount;
@@ -26,11 +27,8 @@ final class PromoRepositoryTest extends TestCase
 {
     use RefreshDatabase;
 
-    /**
-     * @test
-     * @dataProvider promos
-     */
-    public function it_can_save_and_find_a_promo(Promo $promo)
+    #[DataProvider('promos')]
+    public function test_it_can_save_and_find_a_promo(Promo $promo)
     {
         foreach ($this->repositories() as $repository) {
             $repository->save($promo);
@@ -40,11 +38,8 @@ final class PromoRepositoryTest extends TestCase
         }
     }
 
-    /**
-     * @test
-     * @dataProvider promos
-     */
-    public function it_can_delete_a_promo(Promo $promo)
+    #[DataProvider('promos')]
+    public function test_it_can_delete_a_promo(Promo $promo)
     {
         $promosNotFound = 0;
 

@@ -26,7 +26,7 @@ trait TaxonControllerAssistant
         try {
             $taxonNode = $this->categoryRepository->setLocale($locale)->findTaxonByKey($taxonKey);
 
-            if (! $taxonNode->showOnline()) {
+            if (!$taxonNode->showOnline()) {
                 throw new CouldNotFindTaxon('Taxon ' . $taxonKey . ' is offline.');
             }
 
@@ -42,15 +42,15 @@ trait TaxonControllerAssistant
 
     protected function getTaxonUrl(Locale $locale, string $taxon_key): string
     {
-        return $locale->get() .'/'. $taxon_key;
+        return $locale->get() . '/' . $taxon_key;
     }
 
     protected function getProducts(TaxonNode $taxon, Request $request): LengthAwarePaginator
     {
         if ($request->anyFilled('price-from', 'price-to')) {
             $priceRanges = [
-                $request->input('price-from') ? (string) IntegerConverter::convertDecimalToInteger($request->input('price-from')) : null,
-                $request->input('price-to') ? (string) IntegerConverter::convertDecimalToInteger($request->input('price-to')) : null,
+                $request->input('price-from') ? (string)IntegerConverter::convertDecimalToInteger($request->input('price-from')) : null,
+                $request->input('price-to') ? (string)IntegerConverter::convertDecimalToInteger($request->input('price-to')) : null,
             ];
 
             // Sort in ascending order when both prices are filled in.
@@ -85,6 +85,6 @@ trait TaxonControllerAssistant
             return $this->activeTaxons;
         }
 
-        return $this->activeTaxons = $this->taxonFilterTreeComposer->getActiveFilters($this->currentLocale->get(), $taxon->getKey(), $taxonKeys);
+        return $this->activeTaxons = $this->taxonFilterTreeComposer->getActiveFilters($this->currentLocale->get(), [$taxon->getKey()], $taxonKeys);
     }
 }

@@ -36,7 +36,6 @@ class VariantTest extends TestCase
             'unit_price' => $productUnitPrice->getExcludingVat()->getAmount(),
             'sale_price' => $productSalePrice->getExcludingVat()->getAmount(),
             'tax_rate' => $productUnitPrice->getVatPercentage()->toPercentage()->get(),
-            'option_value_ids' => [],
             'includes_vat' => false,
             'sku' => $sku,
             'ean' => null,
@@ -124,7 +123,6 @@ class VariantTest extends TestCase
             'unit_price' => 100,
             'sale_price' => 80,
             'tax_rate' => '20',
-            'option_value_ids' => ['option-value-id'],
             'includes_vat' => false,
             'sku' => 'sku',
             'ean' => 'ean',
@@ -143,7 +141,6 @@ class VariantTest extends TestCase
         $this->assertEquals(false, $variant->getMappedData()['includes_vat']);
         $this->assertEquals('sku', $variant->getMappedData()['sku']);
         $this->assertEquals('ean', $variant->getMappedData()['ean']);
-        $this->assertEquals(['option-value-id'], $variant->getMappedData()['option_value_ids']);
         $this->assertEquals(json_encode(['foo' => 'bar']), $variant->getMappedData()['data']);
         $this->assertEquals(true, $variant->getMappedData()['show_in_grid']);
     }

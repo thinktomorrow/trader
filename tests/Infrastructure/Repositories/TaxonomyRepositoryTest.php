@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace Tests\Infrastructure\Repositories;
 
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use PHPUnit\Framework\Attributes\DataProvider;
 use Tests\Infrastructure\TestCase;
 use Thinktomorrow\Trader\Domain\Model\Taxonomy\Exceptions\CouldNotFindTaxonomy;
 use Thinktomorrow\Trader\Domain\Model\Taxonomy\Taxonomy;
@@ -17,11 +18,8 @@ final class TaxonomyRepositoryTest extends TestCase
 {
     use RefreshDatabase;
 
-    /**
-     * @test
-     * @dataProvider taxonomies
-     */
-    public function it_can_save_and_find_a_taxonomy(Taxonomy $taxonomy)
+    #[DataProvider('taxonomies')]
+    public function test_it_can_save_and_find_a_taxonomy(Taxonomy $taxonomy)
     {
         foreach ($this->taxonRepositories() as $taxonomyRepository) {
             $taxonomyRepository->save($taxonomy);
@@ -31,11 +29,8 @@ final class TaxonomyRepositoryTest extends TestCase
         }
     }
 
-    /**
-     * @test
-     * @dataProvider taxonomies
-     */
-    public function it_can_delete_a_taxonomy(Taxonomy $taxonomy)
+    #[DataProvider('taxonomies')]
+    public function test_it_can_delete_a_taxonomy(Taxonomy $taxonomy)
     {
         $taxonomiesNotFound = 0;
 
@@ -53,10 +48,7 @@ final class TaxonomyRepositoryTest extends TestCase
         $this->assertEquals(count(iterator_to_array($this->taxonRepositories())), $taxonomiesNotFound);
     }
 
-    /**
-     * @test
-     */
-    public function it_can_generate_a_next_reference()
+    public function test_it_can_generate_a_next_reference()
     {
         foreach ($this->taxonRepositories() as $taxonomyRepository) {
             $this->assertInstanceOf(TaxonomyId::class, $taxonomyRepository->nextReference());

@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace Tests\Infrastructure\Repositories;
 
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use PHPUnit\Framework\Attributes\DataProvider;
 use Tests\Infrastructure\TestCase;
 use Thinktomorrow\Trader\Application\Customer\Read\CustomerRead;
 use Thinktomorrow\Trader\Domain\Common\Address\Address;
@@ -24,11 +25,8 @@ final class CustomerRepositoryTest extends TestCase
     use RefreshDatabase;
     use PrepareWorld;
 
-    /**
-     * @test
-     * @dataProvider customers
-     */
-    public function it_can_save_and_find_a_customer(Customer $customer)
+    #[DataProvider('customers')]
+    public function test_it_can_save_and_find_a_customer(Customer $customer)
     {
         foreach ($this->repositories() as $i => $repository) {
             $this->prepareCountries($i);
@@ -39,11 +37,8 @@ final class CustomerRepositoryTest extends TestCase
         }
     }
 
-    /**
-     * @test
-     * @dataProvider customers
-     */
-    public function it_can_save_and_find_a_customer_by_email(Customer $customer)
+    #[DataProvider('customers')]
+    public function test_it_can_save_and_find_a_customer_by_email(Customer $customer)
     {
         foreach ($this->repositories() as $i => $repository) {
             $this->prepareCountries($i);
@@ -54,11 +49,8 @@ final class CustomerRepositoryTest extends TestCase
         }
     }
 
-    /**
-     * @test
-     * @dataProvider customers
-     */
-    public function it_can_delete_a_customer(Customer $customer)
+    #[DataProvider('customers')]
+    public function test_it_can_delete_a_customer(Customer $customer)
     {
         $customersNotFound = 0;
 

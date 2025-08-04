@@ -1,6 +1,6 @@
 <?php
 
-namespace Thinktomorrow\Trader\Application\Product\CheckProductOptions;
+namespace Thinktomorrow\Trader\Application\Product\CheckProductVariantProperties;
 
 interface CheckProductOptionsRepository
 {

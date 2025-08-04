@@ -25,7 +25,7 @@ class DefaultProductDetail implements ProductDetail
     private VariantId $variantId;
     private ProductId $productId;
     private VariantState $state;
-    private array $taxon_ids;
+    private array $taxa;
     private string $sku;
     private ?string $ean;
     private array $data;
@@ -35,14 +35,13 @@ class DefaultProductDetail implements ProductDetail
     {
     }
 
-    public static function fromMappedData(array $state): static
+    public static function fromMappedData(array $state, array $taxaState): static
     {
         $item = new static();
 
         $item->variantId = VariantId::fromString($state['variant_id']);
         $item->productId = ProductId::fromString($state['product_id']);
         $item->state = VariantState::from($state['state']);
-        $item->taxon_ids = $state['taxon_ids'];
         $item->salePrice = VariantSalePrice::fromScalars($state['sale_price'], $state['tax_rate'], $state['includes_vat']);
         $item->unitPrice = VariantUnitPrice::fromScalars($state['unit_price'], $state['tax_rate'], $state['includes_vat']);
         $item->sku = $state['sku'] ?? $state['variant_id'];
@@ -54,7 +53,9 @@ class DefaultProductDetail implements ProductDetail
         );
 
         $item->stock_level = $state['stock_level'];
-        $item->ignore_out_of_stock = (bool) $state['ignore_out_of_stock'];
+        $item->ignore_out_of_stock = (bool)$state['ignore_out_of_stock'];
+
+        dd($taxaState);
 
         return $item;
     }
@@ -67,11 +68,6 @@ class DefaultProductDetail implements ProductDetail
     public function getProductId(): string
     {
         return $this->productId->get();
-    }
-
-    public function getTaxonIds(): array
-    {
-        return $this->taxon_ids;
     }
 
     public function isAvailable(): bool
@@ -89,14 +85,14 @@ class DefaultProductDetail implements ProductDetail
             return $variantTitle;
         }
 
-        if (! $variantOptionTitle || $productTitle == $variantOptionTitle) {
+        if (!$variantOptionTitle || $productTitle == $variantOptionTitle) {
             return $productTitle;
         }
-        if (! $productTitle) {
+        if (!$productTitle) {
             return $variantOptionTitle;
         }
 
-        return $productTitle.' '.$variantOptionTitle;
+        return $productTitle . ' ' . $variantOptionTitle;
     }
 
     public function getIntro(?string $locale = null): string
@@ -121,7 +117,7 @@ class DefaultProductDetail implements ProductDetail
 
     public function getUrl(?string $locale = null): string
     {
-        return '/'.$this->getVariantId();
+        return '/' . $this->getVariantId();
     }
 
     public function setImages(iterable $images): void
@@ -137,5 +133,40 @@ class DefaultProductDetail implements ProductDetail
     public static function stateSelect(): array
     {
         return [];
+    }
+
+    public function getTaxa(): array
+    {
+        // TODO: Implement getTaxa() method.
+    }
+
+    public function getCategories(): array
+    {
+        // TODO: Implement getCategories() method.
+    }
+
+    public function getGoogleCategories(): array
+    {
+        // TODO: Implement getGoogleCategories() method.
+    }
+
+    public function getProductProperties(): array
+    {
+        // TODO: Implement getProductProperties() method.
+    }
+
+    public function getVariantProperties(): array
+    {
+        // TODO: Implement getVariantProperties() method.
+    }
+
+    public function getCollections(): array
+    {
+        // TODO: Implement getCollections() method.
+    }
+
+    public function getTags(): array
+    {
+        // TODO: Implement getTags() method.
     }
 }

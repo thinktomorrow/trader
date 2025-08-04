@@ -77,7 +77,7 @@ class DefaultVariantForCart implements VariantForCart
 
         $productTitle = $this->data('title', $locale, '', $this->productData);
 
-        return ($productTitle ? $productTitle .' ' : '') . $this->dataAsPrimitive('option_title', $locale, '');
+        return ($productTitle ? $productTitle . ' ' : '') . $this->dataAsPrimitive('option_title', $locale, '');
     }
 
     public function getPersonalisations(): array

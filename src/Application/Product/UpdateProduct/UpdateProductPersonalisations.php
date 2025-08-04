@@ -28,9 +28,9 @@ class UpdateProductPersonalisations
     {
         return array_map(function ($personalisation) {
             if (
-                ! array_key_exists('personalisation_id', $personalisation) ||
-                ! array_key_exists('personalisation_type', $personalisation) ||
-                ! array_key_exists('data', $personalisation)
+                !array_key_exists('personalisation_id', $personalisation) ||
+                !array_key_exists('personalisation_type', $personalisation) ||
+                !array_key_exists('data', $personalisation)
             ) {
                 throw new \InvalidArgumentException('Invalid payload. Personalisation payload should contain personalisation_id, personalisation_type and data properties');
             }

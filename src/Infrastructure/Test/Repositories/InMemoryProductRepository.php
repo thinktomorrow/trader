@@ -3,12 +3,10 @@ declare(strict_types=1);
 
 namespace Thinktomorrow\Trader\Infrastructure\Test\Repositories;
 
-use Thinktomorrow\Trader\Application\Cart\VariantForCart\VariantForCart;
 use Thinktomorrow\Trader\Domain\Model\Product\Exceptions\CouldNotFindProduct;
 use Thinktomorrow\Trader\Domain\Model\Product\Product;
 use Thinktomorrow\Trader\Domain\Model\Product\ProductId;
 use Thinktomorrow\Trader\Domain\Model\Product\ProductRepository;
-use Thinktomorrow\Trader\Domain\Model\Product\Variant\VariantId;
 
 final class InMemoryProductRepository implements ProductRepository
 {
@@ -29,7 +27,7 @@ final class InMemoryProductRepository implements ProductRepository
 
     public function find(ProductId $productId): Product
     {
-        if (! isset(static::$products[$productId->get()])) {
+        if (!isset(static::$products[$productId->get()])) {
             throw new CouldNotFindProduct('No product found by id ' . $productId);
         }
 
@@ -38,7 +36,7 @@ final class InMemoryProductRepository implements ProductRepository
 
     public function delete(ProductId $productId): void
     {
-        if (! isset(static::$products[$productId->get()])) {
+        if (!isset(static::$products[$productId->get()])) {
             throw new CouldNotFindProduct('No product found by id ' . $productId);
         }
 

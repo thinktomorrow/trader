@@ -75,7 +75,7 @@ class DefaultGridItem implements GridItem
 
     public function getUrl(): string
     {
-        return '/'.$this->getVariantId();
+        return '/' . $this->getVariantId();
     }
 
     public function setImages(iterable $images): void

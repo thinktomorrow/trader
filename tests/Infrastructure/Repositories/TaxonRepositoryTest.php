@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace Tests\Infrastructure\Repositories;
 
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use PHPUnit\Framework\Attributes\DataProvider;
 use Tests\Infrastructure\TestCase;
 use Thinktomorrow\Trader\Domain\Common\Locale;
 use Thinktomorrow\Trader\Domain\Model\Taxon\Exceptions\CouldNotFindTaxon;
@@ -20,11 +21,8 @@ final class TaxonRepositoryTest extends TestCase
 {
     use RefreshDatabase;
 
-    /**
-     * @test
-     * @dataProvider taxons
-     */
-    public function it_can_save_and_find_a_taxon(Taxon $taxon)
+    #[DataProvider('taxons')]
+    public function test_it_can_save_and_find_a_taxon(Taxon $taxon)
     {
         foreach ($this->taxonRepositories() as $taxonRepository) {
             $taxonRepository->save($taxon);
@@ -34,11 +32,8 @@ final class TaxonRepositoryTest extends TestCase
         }
     }
 
-    /**
-     * @test
-     * @dataProvider taxons
-     */
-    public function it_can_save_and_find_a_taxon_by_key(Taxon $taxon)
+    #[DataProvider('taxons')]
+    public function test_it_can_save_and_find_a_taxon_by_key(Taxon $taxon)
     {
         foreach ($this->taxonRepositories() as $taxonRepository) {
             $taxonRepository->save($taxon);
@@ -50,11 +45,8 @@ final class TaxonRepositoryTest extends TestCase
         }
     }
 
-    /**
-     * @test
-     * @dataProvider taxons
-     */
-    public function it_can_delete_a_taxon(Taxon $taxon)
+    #[DataProvider('taxons')]
+    public function test_it_can_delete_a_taxon(Taxon $taxon)
     {
         $taxonsNotFound = 0;
 
@@ -72,10 +64,7 @@ final class TaxonRepositoryTest extends TestCase
         $this->assertEquals(count(iterator_to_array($this->taxonRepositories())), $taxonsNotFound);
     }
 
-    /**
-     * @test
-     */
-    public function it_can_generate_a_next_reference()
+    public function test_it_can_generate_a_next_reference()
     {
         foreach ($this->taxonRepositories() as $taxonRepository) {
             $this->assertInstanceOf(TaxonId::class, $taxonRepository->nextReference());

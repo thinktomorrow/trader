@@ -12,7 +12,7 @@ class UpdateVariantOptionsTest extends ProductContext
 
     public function test_it_can_update_option_values()
     {
-        $product = $this->createProductWithOptions();
+        $product = $this->createProductWithProductVariantProperties();
         $this->productRepository->save($product);
 
         $variant = $product->getVariants()[0];
