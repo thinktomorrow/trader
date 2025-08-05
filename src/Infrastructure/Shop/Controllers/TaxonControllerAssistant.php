@@ -26,7 +26,7 @@ trait TaxonControllerAssistant
         try {
             $taxonNode = $this->categoryRepository->setLocale($locale)->findTaxonByKey($taxonKey);
 
-            if (!$taxonNode->showOnline()) {
+            if (! $taxonNode->showOnline()) {
                 throw new CouldNotFindTaxon('Taxon ' . $taxonKey . ' is offline.');
             }
 

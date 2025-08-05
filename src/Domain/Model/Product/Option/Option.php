@@ -90,7 +90,7 @@ class Option implements ChildAggregate
         Assertion::allIsInstanceOf($optionValues, OptionValue::class);
 
         foreach ($optionValues as $optionValue) {
-            if (!$this->optionId->equals($optionValue->optionId)) {
+            if (! $this->optionId->equals($optionValue->optionId)) {
                 throw new \InvalidArgumentException('Cannot add option value. You are trying to add an option value with option id [' . $optionValue->optionId->get() . '] to option with id [' . $this->optionId->get() . ']');
             }
         }
@@ -101,7 +101,7 @@ class Option implements ChildAggregate
     public function getChildEntities(): array
     {
         return [
-            OptionValue::class => array_map(fn($optionValue) => $optionValue->getMappedData(), $this->optionValues),
+            OptionValue::class => array_map(fn ($optionValue) => $optionValue->getMappedData(), $this->optionValues),
         ];
     }
 
@@ -120,7 +120,7 @@ class Option implements ChildAggregate
 
         $option->productId = ProductId::fromString($aggregateState['product_id']);
         $option->optionId = OptionId::fromString($state['option_id']);
-        $option->optionValues = array_map(fn($optionValueState) => OptionValue::fromMappedData($optionValueState, $state), $childEntities[OptionValue::class] ?? []);
+        $option->optionValues = array_map(fn ($optionValueState) => OptionValue::fromMappedData($optionValueState, $state), $childEntities[OptionValue::class] ?? []);
         $option->data = $state['data'] ? json_decode($state['data'], true) : [];
 
         return $option;

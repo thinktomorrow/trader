@@ -35,6 +35,6 @@ class UpdateVariantOptionValues
      */
     public function getOptionValueIds(): array
     {
-        return array_map(fn($value_id) => OptionValueId::fromString($value_id), $this->optionValueIds);
+        return array_map(fn ($value_id) => OptionValueId::fromString($value_id), $this->optionValueIds);
     }
 }

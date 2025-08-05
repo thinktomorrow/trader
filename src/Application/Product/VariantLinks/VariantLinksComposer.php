@@ -103,7 +103,7 @@ class VariantLinksComposer
 
     private function findVariantByOptionValues(\Thinktomorrow\Trader\Domain\Model\Product\Product $product, array $mergedVariantOptions): ?\Thinktomorrow\Trader\Domain\Model\Product\Variant\Variant
     {
-        $mergedVariantOptionValueIds = array_map(fn(\Thinktomorrow\Trader\Domain\Model\Product\Option\OptionValue $optionValue) => $optionValue->optionValueId, $mergedVariantOptions);
+        $mergedVariantOptionValueIds = array_map(fn (\Thinktomorrow\Trader\Domain\Model\Product\Option\OptionValue $optionValue) => $optionValue->optionValueId, $mergedVariantOptions);
 
         foreach ($product->getVariants() as $variant) {
             if ($this->hasExactOptionsMatch($variant->getOptionValueIds(), $mergedVariantOptionValueIds)) {

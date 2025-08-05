@@ -44,7 +44,7 @@ final class VariantRepositoryTest extends TestCase
 
             $variantStates = $repository->getStatesByProduct($variant->productId);
 
-            $this->assertEquals([$variant], array_map(fn($variantState) => Variant::fromMappedData($variantState[0], ['product_id' => 'xxx'], $variantState[1]), $variantStates));
+            $this->assertEquals([$variant], array_map(fn ($variantState) => Variant::fromMappedData($variantState[0], ['product_id' => 'xxx'], $variantState[1]), $variantStates));
         }
     }
 

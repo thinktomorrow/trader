@@ -107,7 +107,7 @@ final class Variant implements ChildAggregate
     {
         return [
             VariantTaxon::class => array_map(
-                fn(VariantTaxon $option) => array_merge($option->getMappedData()),
+                fn (VariantTaxon $option) => array_merge($option->getMappedData()),
                 array_values($this->variantTaxa),
             ),
         ];
@@ -133,7 +133,7 @@ final class Variant implements ChildAggregate
             }
         }
 
-//        $variant->optionValueIds = array_map(fn($optionValueState) => OptionValueId::fromString($optionValueState), $state['option_value_ids']);
+        //        $variant->optionValueIds = array_map(fn($optionValueState) => OptionValueId::fromString($optionValueState), $state['option_value_ids']);
 
         return $variant;
     }

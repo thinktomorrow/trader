@@ -27,7 +27,7 @@ final class InMemoryProductRepository implements ProductRepository
 
     public function find(ProductId $productId): Product
     {
-        if (!isset(static::$products[$productId->get()])) {
+        if (! isset(static::$products[$productId->get()])) {
             throw new CouldNotFindProduct('No product found by id ' . $productId);
         }
 
@@ -36,7 +36,7 @@ final class InMemoryProductRepository implements ProductRepository
 
     public function delete(ProductId $productId): void
     {
-        if (!isset(static::$products[$productId->get()])) {
+        if (! isset(static::$products[$productId->get()])) {
             throw new CouldNotFindProduct('No product found by id ' . $productId);
         }
 

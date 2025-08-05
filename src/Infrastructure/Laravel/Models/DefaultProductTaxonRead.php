@@ -40,7 +40,7 @@ class DefaultProductTaxonRead implements ProductTaxonRead
 
     public static function fromMappedData(array $state): static
     {
-        if (!isset($state['taxonomy_type'])) {
+        if (! isset($state['taxonomy_type'])) {
             dd($state);
         }
 

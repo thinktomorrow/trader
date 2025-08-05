@@ -45,7 +45,7 @@ class GetRootCategories
 
     public function get(): ?TaxonTree
     {
-        if (!$categoryTaxonomyId = $this->traderConfig->getMainCategoryTaxonomyId()) {
+        if (! $categoryTaxonomyId = $this->traderConfig->getMainCategoryTaxonomyId()) {
             return new TaxonTree();
         }
 

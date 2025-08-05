@@ -49,7 +49,7 @@ final class InMemoryVariantRepository implements VariantRepository, VariantForCa
 
     public function delete(VariantId $variantId): void
     {
-        if (!isset(static::$variants[$variantId->get()])) {
+        if (! isset(static::$variants[$variantId->get()])) {
             throw new CouldNotFindVariant('No variant found by id ' . $variantId);
         }
 

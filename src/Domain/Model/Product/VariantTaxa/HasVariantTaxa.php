@@ -26,7 +26,7 @@ trait HasVariantTaxa
     public function getVariantTaxonIds(): array
     {
         return array_map(
-            fn(VariantTaxon $variantProperty) => $variantProperty->taxonId,
+            fn (VariantTaxon $variantProperty) => $variantProperty->taxonId,
             $this->variantTaxa
         );
     }

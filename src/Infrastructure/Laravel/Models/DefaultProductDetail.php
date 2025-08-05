@@ -85,10 +85,10 @@ class DefaultProductDetail implements ProductDetail
             return $variantTitle;
         }
 
-        if (!$variantOptionTitle || $productTitle == $variantOptionTitle) {
+        if (! $variantOptionTitle || $productTitle == $variantOptionTitle) {
             return $productTitle;
         }
-        if (!$productTitle) {
+        if (! $productTitle) {
             return $variantOptionTitle;
         }
 

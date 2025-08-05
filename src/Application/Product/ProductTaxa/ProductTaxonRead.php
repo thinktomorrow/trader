@@ -22,7 +22,7 @@ interface ProductTaxonRead
     /** Display this info on the grid listing item */
     public function showsInGrid(): bool;
 
-//    public function getKey(?string $locale = null): ?string;
+    //    public function getKey(?string $locale = null): ?string;
 
     public function getLabel(?string $locale = null): string;
 }

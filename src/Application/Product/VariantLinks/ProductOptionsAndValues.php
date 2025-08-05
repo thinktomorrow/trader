@@ -24,7 +24,7 @@ class ProductOptionsAndValues
     {
         $product = $this->productRepository->find(ProductId::fromString($product_id));
 
-        return array_map(fn($option) => $this->convertToArrayItem($option), $product->getOptions());
+        return array_map(fn ($option) => $this->convertToArrayItem($option), $product->getOptions());
     }
 
     private function convertToArrayItem(Option $option): array

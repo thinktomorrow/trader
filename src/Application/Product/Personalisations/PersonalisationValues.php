@@ -20,7 +20,7 @@ class PersonalisationValues
     {
         $product = $this->productRepository->find(ProductId::fromString($product_id));
 
-        return array_map(fn($personalisation) => $this->convertToArrayItem($personalisation), $product->getPersonalisations());
+        return array_map(fn ($personalisation) => $this->convertToArrayItem($personalisation), $product->getPersonalisations());
     }
 
     private function convertToArrayItem(Personalisation $personalisation): array

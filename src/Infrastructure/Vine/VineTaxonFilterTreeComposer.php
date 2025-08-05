@@ -25,16 +25,16 @@ class VineTaxonFilterTreeComposer implements TaxonFilterTreeComposer
     {
         /** @var TaxonTree $rootTaxa */
         $rootTaxa = $this->taxonTreeRepository->setLocale($locale)->getTree()
-            ->findMany(fn(TaxonNode $node) => in_array($node->getKey(), $rootTaxonKeys));
+            ->findMany(fn (TaxonNode $node) => in_array($node->getKey(), $rootTaxonKeys));
 
         //        /** @var TaxonNode $mainTaxonNode */
-//        $mainTaxonNode = $this->taxonTreeRepository->setLocale($locale)->getTree()->find(fn(TaxonNode $node) => $node->getKey() == $mainTaxonFilterKey);
+        //        $mainTaxonNode = $this->taxonTreeRepository->setLocale($locale)->getTree()->find(fn(TaxonNode $node) => $node->getKey() == $mainTaxonFilterKey);
 
-//        if (!$mainTaxonNode) {
-//            return new TaxonTree();
-//        }
+        //        if (!$mainTaxonNode) {
+        //            return new TaxonTree();
+        //        }
 
-//        $categoryRootId = $this->traderConfig->getCategoryTaxonomyId();
+        //        $categoryRootId = $this->traderConfig->getCategoryTaxonomyId();
 
         $rootTaxonIds = $rootTaxa->pluck('id');
         $productIds = $this->getOnlineProductIds($rootTaxonIds);
@@ -46,13 +46,13 @@ class VineTaxonFilterTreeComposer implements TaxonFilterTreeComposer
          */
         $taxonTree = $this->taxonTreeRepository->getTree()
             // For the category taxa, only return the taxa that belong to one of the given main taxa
-            ->shake(fn(TaxonNode $node) => count(array_intersect($rootTaxonIds, [$node->getNodeId(), ...$node->pluckAncestorNodes('id')])) > 0)
+            ->shake(fn (TaxonNode $node) => count(array_intersect($rootTaxonIds, [$node->getNodeId(), ...$node->pluckAncestorNodes('id')])) > 0)
 
             // Only fetch taxa that are related to the given listing of products
-            ->shake(fn(TaxonNode $node) => count(array_intersect($node->getOnlineProductIds(), $productIds)) > 0)
+            ->shake(fn (TaxonNode $node) => count(array_intersect($node->getOnlineProductIds(), $productIds)) > 0)
 
             // Remove offline taxa
-            ->remove(fn(TaxonNode $node) => !$node->showOnline());
+            ->remove(fn (TaxonNode $node) => ! $node->showOnline());
 
         // For a better filter representation, we want to start from the given taxon as the root - and not the 'real' root.
         // Therefor we exclude all ancestors from the given taxon which allows to only show the
@@ -60,13 +60,13 @@ class VineTaxonFilterTreeComposer implements TaxonFilterTreeComposer
 
         // TODO: Get any ancestor nodes of the main taxa, so we can prune the tree to only show the main taxon and its children, not any of the ancestors
 
-//        if (!$mainTaxonNode->isRootNode() && ($ancestorIds = $mainTaxonNode->pluckAncestorNodes('id'))) {
-//            // Keep the root node in the filter in order to keep our structure intact
-//            array_pop($ancestorIds);
-//
-//            $taxonTree = $taxonTree
-//                ->prune(fn($node) => !in_array($node->getNodeId(), [$mainTaxonNode->getNodeId(), ...$ancestorIds]));
-//        }
+        //        if (!$mainTaxonNode->isRootNode() && ($ancestorIds = $mainTaxonNode->pluckAncestorNodes('id'))) {
+        //            // Keep the root node in the filter in order to keep our structure intact
+        //            array_pop($ancestorIds);
+        //
+        //            $taxonTree = $taxonTree
+        //                ->prune(fn($node) => !in_array($node->getNodeId(), [$mainTaxonNode->getNodeId(), ...$ancestorIds]));
+        //        }
 
         return $taxonTree;
     }
@@ -75,13 +75,13 @@ class VineTaxonFilterTreeComposer implements TaxonFilterTreeComposer
     {
         /** @var TaxonTree $rootTaxa */
         $rootTaxa = $this->taxonTreeRepository->setLocale($locale)->getTree()
-            ->findMany(fn(TaxonNode $node) => in_array($node->getKey(), $rootTaxonKeys));
+            ->findMany(fn (TaxonNode $node) => in_array($node->getKey(), $rootTaxonKeys));
 
-//        $mainTaxonNode = $this->taxonTreeRepository->setLocale($locale)->getTree()->find(fn($node) => $node->getKey() == $mainTaxonFilterKey);
-//
-//        if (!$mainTaxonNode) {
-//            return new TaxonTree();
-//        }
+        //        $mainTaxonNode = $this->taxonTreeRepository->setLocale($locale)->getTree()->find(fn($node) => $node->getKey() == $mainTaxonFilterKey);
+        //
+        //        if (!$mainTaxonNode) {
+        //            return new TaxonTree();
+        //        }
 
         // The main category is always considered 'active' as a grid filter, with or without any other filtering active
         $taxonTree = $rootTaxa;
@@ -89,7 +89,7 @@ class VineTaxonFilterTreeComposer implements TaxonFilterTreeComposer
         /** Used filters from current request */
         if (count($activeKeys) > 0) {
             $selectedTaxa = $this->taxonTreeRepository->getTree()
-                ->findMany(fn($node) => in_array($node->getKey(), $activeKeys));
+                ->findMany(fn ($node) => in_array($node->getKey(), $activeKeys));
 
             // Remove any parents where the child taxon is present in the payload.
             // We want to filter on the more specific child taxon - and not in combination with its parent.
@@ -134,7 +134,7 @@ class VineTaxonFilterTreeComposer implements TaxonFilterTreeComposer
      */
     public function getProductIds(array $taxonIds, bool $onlineOnly = false): array
     {
-        $nodes = $this->taxonTreeRepository->getTree()->findMany(fn(TaxonNode $node) => in_array($node->getId(), $taxonIds));
+        $nodes = $this->taxonTreeRepository->getTree()->findMany(fn (TaxonNode $node) => in_array($node->getId(), $taxonIds));
 
         $productIds = [];
 
