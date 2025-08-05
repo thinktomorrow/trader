@@ -4,8 +4,10 @@ declare(strict_types=1);
 namespace Tests\Infrastructure\Repositories;
 
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use PHPUnit\Framework\Attributes\DataProvider;
 use Tests\Infrastructure\TestCase;
 use Thinktomorrow\Trader\Domain\Common\Locale;
+use Thinktomorrow\Trader\Domain\Model\Product\Product;
 use Thinktomorrow\Trader\Domain\Model\Product\ProductTaxa\ProductTaxon;
 use Thinktomorrow\Trader\Domain\Model\Taxon\Taxon;
 use Thinktomorrow\Trader\Domain\Model\Taxon\TaxonId;
@@ -14,30 +16,25 @@ use Thinktomorrow\Trader\Domain\Model\Taxon\TaxonKeyId;
 use Thinktomorrow\Trader\Domain\Model\Taxonomy\Taxonomy;
 use Thinktomorrow\Trader\Domain\Model\Taxonomy\TaxonomyId;
 use Thinktomorrow\Trader\Domain\Model\Taxonomy\TaxonomyType;
+use Thinktomorrow\Trader\Infrastructure\Laravel\Repositories\MysqlProductDetailRepository;
 use Thinktomorrow\Trader\Infrastructure\Laravel\Repositories\MysqlProductRepository;
 use Thinktomorrow\Trader\Infrastructure\Laravel\Repositories\MysqlTaxonomyRepository;
 use Thinktomorrow\Trader\Infrastructure\Laravel\Repositories\MysqlTaxonRepository;
 use Thinktomorrow\Trader\Infrastructure\Laravel\Repositories\MysqlVariantRepository;
+use Thinktomorrow\Trader\Infrastructure\Test\Repositories\InMemoryProductDetailRepository;
 use Thinktomorrow\Trader\Infrastructure\Test\Repositories\InMemoryProductRepository;
-use Thinktomorrow\Trader\Infrastructure\Test\Repositories\InMemoryProductTaxonRepository;
 use Thinktomorrow\Trader\Infrastructure\Test\Repositories\InMemoryTaxonomyRepository;
 use Thinktomorrow\Trader\Infrastructure\Test\Repositories\InMemoryTaxonRepository;
 use Thinktomorrow\Trader\Infrastructure\Test\TestContainer;
 
-final class ProductTaxonRepositoryTest extends TestCase
+final class ProductDetailRepositoryTaxaTest extends TestCase
 {
     use RefreshDatabase;
 
-    protected function setUp(): void
+    #[DataProvider('products')]
+    public function test_it_can_get_product_taxa(Product $product)
     {
-        parent::setUp();
-
-        InMemoryProductTaxonRepository::clear();
-    }
-
-    public function test_it_can_get_product_taxa_by_taxon_ids()
-    {
-        foreach ($this->productTaxonRepositories() as $i => $taxonRepository) {
+        foreach ($this->repositories() as $i => $repository) {
 
             // Create test data
             $taxonomy = Taxonomy::create(TaxonomyId::fromString('ooo'), TaxonomyType::property);
@@ -54,19 +51,17 @@ final class ProductTaxonRepositoryTest extends TestCase
             $this->taxonomyRepositories()[$i]->save($taxonomy);
             $this->taxonRepositories()[$i]->save($taxon);
 
-            $product = static::createProduct();
             $product->updateProductTaxa([
-                ProductTaxon::create($product->productId, $taxonomy->taxonomyId, $taxon->taxonId),
+                ProductTaxon::create($product->productId, $taxonomy->taxonomyId, $taxonomy->getType(), $taxon->taxonId),
             ]);
 
-            $this->productRepositories()[$i]->save($product);
+            $productRepository = iterator_to_array($this->productRepositories())[$i];
+            $productRepository->save($product);
+            $product->releaseEvents();
 
-            // Account for in-memory repositories
-            InMemoryProductTaxonRepository::$productTaxonLookup[$product->productId->get()] = [
-                $taxon->taxonId->get(),
-            ];
-
-            $result = $taxonRepository->getTaxaByProduct($product->productId->get());
+            $result = $repository
+                ->findProductDetail($product->getVariants()[0]->variantId)
+                ->getProductTaxa();
 
             $this->assertCount(1, $result);
 
@@ -79,14 +74,19 @@ final class ProductTaxonRepositoryTest extends TestCase
 
             $this->assertEquals('Taxon title', $result[0]->getLabel('nl'));
             $this->assertEquals('Titre du taxon', $result[0]->getLabel('fr'));
-
         }
     }
 
-    private function productTaxonRepositories(): \Generator
+    private function productRepositories(): \Generator
     {
-        yield new InMemoryProductTaxonRepository();
+        yield new InMemoryProductRepository();
         yield new MysqlProductRepository(new MysqlVariantRepository(new TestContainer()));
+    }
+
+    private function repositories(): \Generator
+    {
+        yield new InMemoryProductDetailRepository();
+        yield new MysqlProductDetailRepository(new TestContainer());
     }
 
     private function taxonomyRepositories(): array
@@ -105,11 +105,8 @@ final class ProductTaxonRepositoryTest extends TestCase
         ];
     }
 
-    private function productRepositories(): array
+    public static function products(): \Generator
     {
-        return [
-            new InMemoryProductRepository(),
-            new MysqlProductRepository(new MysqlVariantRepository(new TestContainer())),
-        ];
+        yield [static::createProductWithVariant()];
     }
 }

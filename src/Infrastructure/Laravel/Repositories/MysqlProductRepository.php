@@ -15,7 +15,6 @@ use Thinktomorrow\Trader\Domain\Model\Product\ProductTaxa\ProductTaxon;
 use Thinktomorrow\Trader\Domain\Model\Product\Variant\Variant;
 use Thinktomorrow\Trader\Domain\Model\Product\VariantRepository;
 use Thinktomorrow\Trader\Domain\Model\Product\VariantTaxa\ProductVariantProperty;
-use Thinktomorrow\Trader\Domain\Model\Taxonomy\TaxonomyType;
 
 class MysqlProductRepository implements ProductRepository
 {
@@ -97,42 +96,9 @@ class MysqlProductRepository implements ProductRepository
                     'product_id' => $product->productId->get(),
                     'taxonomy_id' => $taxonState['taxonomy_id'],
                     'taxon_id' => $taxonState['taxon_id'],
-                ], array_merge($taxonState, ['order_column' => $i]));
+                    'order_column' => $i,
+                ]);
         }
-
-//
-//
-//
-//
-//
-//
-//        // TODO: allow to set custom labels for each product-taxon relation...
-//        $changedTaxonIds = collect($taxon_ids);
-//
-//        // Get all existing taxon ids
-//        $existingTaxonIds = DB::table(static::$productTaxonLookupTable)
-//            ->where('product_id', $productId)
-//            ->select('taxon_id')
-//            ->get()
-//            ->pluck('taxon_id');
-//
-//        // Remove the ones that are not in the new list
-//        $detachTaxonIds = $existingTaxonIds->diff($changedTaxonIds);
-//        if ($detachTaxonIds->count() > 0) {
-//            DB::table(static::$productTaxonLookupTable)
-//                ->where('product_id', $productId)
-//                ->whereIn('taxon_id', $detachTaxonIds->all())
-//                ->delete();
-//        }
-//
-//        // Insert the new taxon ids
-//        $attachTaxonIds = $changedTaxonIds->diff($existingTaxonIds);
-//
-//        $insertData = $attachTaxonIds->map(function ($taxon_id) use ($productId) {
-//            return ['product_id' => $productId->get(), 'taxon_id' => $taxon_id, 'taxonomy_id' => ];
-//        })->all();
-//
-//        DB::table(static::$productTaxonLookupTable)->insert($insertData);
     }
 
     private function exists(ProductId $productId): bool
@@ -170,14 +136,10 @@ class MysqlProductRepository implements ProductRepository
             ->toArray();
 
         $productTaxa = $this->getTaxaStates($productId->get());
-        $productVariantProperties = collect($productTaxa)
-            ->filter(fn($taxonState) => $taxonState['taxonomy_type'] === TaxonomyType::variant_property->value)
-            ->all();
 
         return Product::fromMappedData($productState, [
             Variant::class => $variantStates,
             ProductTaxon::class => $productTaxa,
-            ProductVariantProperty::class => $productVariantProperties,
             Personalisation::class => $personalisationStates,
         ]);
     }

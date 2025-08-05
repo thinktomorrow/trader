@@ -9,9 +9,18 @@ use Tests\Infrastructure\TestCase;
 use Thinktomorrow\Trader\Domain\Model\Product\Product;
 use Thinktomorrow\Trader\Domain\Model\Product\Variant\Variant;
 use Thinktomorrow\Trader\Domain\Model\Product\Variant\VariantId;
+use Thinktomorrow\Trader\Domain\Model\Taxon\Taxon;
+use Thinktomorrow\Trader\Domain\Model\Taxon\TaxonId;
+use Thinktomorrow\Trader\Domain\Model\Taxonomy\Taxonomy;
+use Thinktomorrow\Trader\Domain\Model\Taxonomy\TaxonomyId;
+use Thinktomorrow\Trader\Domain\Model\Taxonomy\TaxonomyType;
 use Thinktomorrow\Trader\Infrastructure\Laravel\Repositories\MysqlProductRepository;
+use Thinktomorrow\Trader\Infrastructure\Laravel\Repositories\MysqlTaxonomyRepository;
+use Thinktomorrow\Trader\Infrastructure\Laravel\Repositories\MysqlTaxonRepository;
 use Thinktomorrow\Trader\Infrastructure\Laravel\Repositories\MysqlVariantRepository;
 use Thinktomorrow\Trader\Infrastructure\Test\Repositories\InMemoryProductRepository;
+use Thinktomorrow\Trader\Infrastructure\Test\Repositories\InMemoryTaxonomyRepository;
+use Thinktomorrow\Trader\Infrastructure\Test\Repositories\InMemoryTaxonRepository;
 use Thinktomorrow\Trader\Infrastructure\Test\Repositories\InMemoryVariantRepository;
 use Thinktomorrow\Trader\Infrastructure\Test\TestContainer;
 
@@ -23,6 +32,13 @@ final class VariantRepositoryTest extends TestCase
     public function test_it_can_save_and_find_an_variant(Product $product, Variant $variant)
     {
         foreach ($this->repositories() as $i => $repository) {
+
+            // Create taxon data
+            $taxonomy = Taxonomy::create(TaxonomyId::fromString('ooo'), TaxonomyType::variant_property);
+            $taxon = Taxon::create(TaxonId::fromString('xxx'), TaxonomyId::fromString('ooo'));
+            $this->taxonomyRepositories()[$i]->save($taxonomy);
+            $this->taxonRepositories()[$i]->save($taxon);
+
             $this->productRepositories()[$i]->save($product);
             $repository->save($variant);
 
@@ -36,6 +52,13 @@ final class VariantRepositoryTest extends TestCase
     public function test_it_can_update_variant_properties(Product $product, Variant $variant)
     {
         foreach ($this->repositories() as $i => $repository) {
+
+            // Create taxon data
+            $taxonomy = Taxonomy::create(TaxonomyId::fromString('ooo'), TaxonomyType::variant_property);
+            $taxon = Taxon::create(TaxonId::fromString('xxx'), TaxonomyId::fromString('ooo'));
+            $this->taxonomyRepositories()[$i]->save($taxonomy);
+            $this->taxonRepositories()[$i]->save($taxon);
+
             $this->productRepositories()[$i]->save($product);
             $repository->save($variant);
 
@@ -65,11 +88,8 @@ final class VariantRepositoryTest extends TestCase
         }
     }
 
-    /**
-     * @test
-     * @dataProvider variants
-     */
-    public function it_can_find_variant_for_cart(Product $product, Variant $variant)
+    #[DataProvider('variants')]
+    public function test_it_can_find_variant_for_cart(Product $product, Variant $variant)
     {
         foreach ($this->repositories() as $i => $repository) {
             $this->productRepositories()[$i]->save($product);
@@ -78,11 +98,8 @@ final class VariantRepositoryTest extends TestCase
         }
     }
 
-    /**
-     * @test
-     * @dataProvider variants
-     */
-    public function it_can_find_all_variants_for_cart(Product $product, Variant $variant)
+    #[DataProvider('variants')]
+    public function test_it_can_find_all_variants_for_cart(Product $product, Variant $variant)
     {
         foreach ($this->repositories() as $i => $repository) {
             $this->productRepositories()[$i]->save($product);
@@ -102,6 +119,22 @@ final class VariantRepositoryTest extends TestCase
         return [
             new InMemoryProductRepository(),
             new MysqlProductRepository(new MysqlVariantRepository(new TestContainer())),
+        ];
+    }
+
+    private function taxonomyRepositories(): array
+    {
+        return [
+            new InMemoryTaxonomyRepository(),
+            new MysqlTaxonomyRepository(),
+        ];
+    }
+
+    private function taxonRepositories(): array
+    {
+        return [
+            new InMemoryTaxonRepository(),
+            new MysqlTaxonRepository(),
         ];
     }
 

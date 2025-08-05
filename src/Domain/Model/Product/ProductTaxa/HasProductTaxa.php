@@ -23,23 +23,25 @@ trait HasProductTaxa
     {
         Assertion::allIsInstanceOf($productTaxa, ProductTaxon::class);
 
+        $existingAvailableVariantProperties = $this->getAvailableVariantProperties();
+
         $this->productTaxa = $this->enforceUniqueProductTaxa($productTaxa);
 
-        $this->cleanupRemovedVariantPropertiesOnVariants($this->productVariantProperties, $this->getAvailableVariantProperties());
+        $this->cleanupRemovedVariantPropertiesOnVariants($existingAvailableVariantProperties, $this->getAvailableVariantProperties());
 
         $this->recordEvent(new ProductTaxaUpdated($this->productId));
     }
 
-    private function cleanupRemovedVariantPropertiesOnVariants(array $existingProductVariantProperties, array $newProductVariantProperties)
+    private function cleanupRemovedVariantPropertiesOnVariants(array $existingAvailableVariantProperties, array $newAvailableVariantProperties)
     {
-        $newTaxonIds = array_map(fn(ProductVariantProperty $productVariantProperty) => $productVariantProperty->taxonId, $newProductVariantProperties);
+        $newTaxonIds = array_map(fn(ProductTaxon $prod) => $prod->taxonId, $newAvailableVariantProperties);
 
-        foreach ($existingProductVariantProperties as $existingVariantProperty) {
+        foreach ($existingAvailableVariantProperties as $existingVariantProperty) {
             if (in_array($existingVariantProperty->taxonId, $newTaxonIds)) {
                 continue;
             }
 
-            $existingTaxonIds = array_map(fn(ProductVariantProperty $prop) => $prop->taxonId, $existingProductVariantProperties);
+            $existingTaxonIds = array_map(fn(ProductTaxon $prop) => $prop->taxonId, $existingAvailableVariantProperties);
 
             foreach ($this->getVariants() as $variant) {
                 $variantProperties = $variant->getVariantTaxa();

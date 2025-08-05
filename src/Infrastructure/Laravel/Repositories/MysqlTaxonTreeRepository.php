@@ -102,7 +102,7 @@ class MysqlTaxonTreeRepository implements TaxonTreeRepository, CategoryRepositor
 
         $results = DB::table(static::$taxonTable)
             ->when($taxonomyId, function ($query) use ($taxonomyId) {
-                return $query->where('taxonomy_id', $taxonomyId);
+                return $query->where(static::$taxonTable . '.taxonomy_id', $taxonomyId);
             })
             ->leftJoin('trader_taxa_products', 'trader_taxa.taxon_id', 'trader_taxa_products.taxon_id')
             ->leftJoin('trader_products', function ($join) {

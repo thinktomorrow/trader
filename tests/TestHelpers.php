@@ -471,7 +471,7 @@ trait TestHelpers
     private static function withVariant(Product $product): Product
     {
         $product->updateProductTaxa([
-            ProductTaxon::create($product->productId, TaxonomyId::fromString('aaa'), TaxonomyType::variant_property, TaxonId::fromString('bbb'))
+            ProductTaxon::create($product->productId, TaxonomyId::fromString('ooo'), TaxonomyType::variant_property, TaxonId::fromString('xxx'))
         ]);
 
         $variant = static::createVariantWithVariantProperty();
@@ -498,9 +498,9 @@ trait TestHelpers
         $variant->updateVariantTaxa([
             VariantTaxon::create(
                 $variant->variantId,
-                TaxonomyId::fromString('aaa'),
+                TaxonomyId::fromString('ooo'),
                 TaxonomyType::variant_property,
-                TaxonId::fromString('bbb')
+                TaxonId::fromString('xxx')
             )
         ]);
 

@@ -108,7 +108,7 @@ final class Variant implements ChildAggregate
         return [
             VariantTaxon::class => array_map(
                 fn(VariantTaxon $option) => array_merge($option->getMappedData()),
-                array_values($this->variantProperties),
+                array_values($this->variantTaxa),
             ),
         ];
     }
@@ -129,7 +129,7 @@ final class Variant implements ChildAggregate
 
         if (array_key_exists(VariantTaxon::class, $childEntities)) {
             foreach ($childEntities[VariantTaxon::class] as $childState) {
-                $variant->variantProperties[] = VariantTaxon::fromMappedData($childState, $state);
+                $variant->variantTaxa[] = VariantTaxon::fromMappedData($childState, $state);
             }
         }
 
