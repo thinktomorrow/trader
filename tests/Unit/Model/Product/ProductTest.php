@@ -8,7 +8,6 @@ use Tests\Unit\TestCase;
 use Thinktomorrow\Trader\Domain\Common\Vat\VatPercentage;
 use Thinktomorrow\Trader\Domain\Model\Product\Events\ProductCreated;
 use Thinktomorrow\Trader\Domain\Model\Product\Events\ProductTaxaUpdated;
-use Thinktomorrow\Trader\Domain\Model\Product\Events\ProductVariantPropertiesUpdated;
 use Thinktomorrow\Trader\Domain\Model\Product\Events\VariantCreated;
 use Thinktomorrow\Trader\Domain\Model\Product\Events\VariantDeleted;
 use Thinktomorrow\Trader\Domain\Model\Product\Exceptions\CouldNotDeleteVariant;
@@ -19,9 +18,6 @@ use Thinktomorrow\Trader\Domain\Model\Product\Variant\Variant;
 use Thinktomorrow\Trader\Domain\Model\Product\Variant\VariantId;
 use Thinktomorrow\Trader\Domain\Model\Product\Variant\VariantSalePrice;
 use Thinktomorrow\Trader\Domain\Model\Product\Variant\VariantUnitPrice;
-use Thinktomorrow\Trader\Domain\Model\Product\VariantTaxa\ProductVariantProperty;
-use Thinktomorrow\Trader\Domain\Model\Taxon\TaxonId;
-use Thinktomorrow\Trader\Domain\Model\Taxonomy\TaxonomyId;
 
 class ProductTest extends TestCase
 {
@@ -54,12 +50,10 @@ class ProductTest extends TestCase
             'product_id' => 'xxx',
             'state' => ProductState::offline->value,
             'data' => $data,
-            'taxon_ids' => ['1', '2'],
         ]);
 
         $this->assertEquals(ProductId::fromString('xxx'), $product->getMappedData()['product_id']);
         $this->assertEquals(ProductState::offline, $product->getState());
-        $this->assertEquals(['1', '2'], $product->getMappedData()['taxon_ids']);
         $this->assertEquals([
             'nl' => 'title nl',
             'en' => 'title en',
@@ -76,44 +70,13 @@ class ProductTest extends TestCase
         $this->assertEquals(ProductState::archived->value, $product->getMappedData()['state']);
     }
 
-
-    public function test_it_can_add_taxon()
-    {
-        $product = $this->createProduct();
-
-        $product->updateTaxonIds([TaxonId::fromString('zzz')]);
-
-        $this->assertEquals([
-            new ProductCreated(ProductId::fromString('xxx')),
-            new ProductTaxaUpdated(ProductId::fromString('xxx')),
-        ], $product->releaseEvents());
-
-        $this->assertEquals(['zzz'], $product->getMappedData()['taxon_ids']);
-    }
-
-    public function test_it_can_add_product_variant_property(): void
-    {
-        $product = $this->createProduct();
-
-        $product->updateProductTaxa([
-            $productVariantProperty = ProductVariantProperty::create($product->productId, TaxonomyId::fromString('ooo'), TaxonId::fromString('ppp')),
-        ]);
-
-        $this->assertEquals([
-            new ProductCreated(ProductId::fromString('xxx')),
-            new ProductVariantPropertiesUpdated(ProductId::fromString('xxx')),
-        ], $product->releaseEvents());
-
-        $this->assertEquals([$productVariantProperty->getMappedData()], $product->getChildEntities()[ProductVariantProperty::class]);
-    }
-
     public function test_it_can_add_variant()
     {
         $product = $this->createProductWithVariant();
 
         $this->assertEquals([
             new ProductCreated(ProductId::fromString('xxx')),
-            new ProductVariantPropertiesUpdated(ProductId::fromString('xxx')),
+            new ProductTaxaUpdated(ProductId::fromString('xxx')),
             new VariantCreated(ProductId::fromString('xxx'), VariantId::fromString('yyy')),
         ], $product->releaseEvents());
     }
@@ -161,7 +124,7 @@ class ProductTest extends TestCase
 
         $this->assertEquals([
             new ProductCreated(ProductId::fromString('xxx')),
-            new ProductVariantPropertiesUpdated(ProductId::fromString('xxx')),
+            new ProductTaxaUpdated(ProductId::fromString('xxx')),
             new VariantCreated(ProductId::fromString('xxx'), VariantId::fromString('yyy')),
             new VariantCreated(ProductId::fromString('xxx'), VariantId::fromString('zzz')),
             new VariantDeleted(ProductId::fromString('xxx'), VariantId::fromString('zzz')),

@@ -14,6 +14,7 @@ use Thinktomorrow\Trader\Domain\Model\Product\Variant\VariantUnitPrice;
 use Thinktomorrow\Trader\Domain\Model\Product\VariantTaxa\VariantTaxon;
 use Thinktomorrow\Trader\Domain\Model\Taxon\TaxonId;
 use Thinktomorrow\Trader\Domain\Model\Taxonomy\TaxonomyId;
+use Thinktomorrow\Trader\Domain\Model\Taxonomy\TaxonomyType;
 
 class VariantPropertyTest extends TestCase
 {
@@ -34,6 +35,7 @@ class VariantPropertyTest extends TestCase
         $variantProperty = VariantTaxon::create(
             $variantId,
             $taxonomyId = TaxonomyId::fromString('aaa'),
+            $taxonomyType = TaxonomyType::variant_property,
             $taxonId = TaxonId::fromString('bbb')
         );
 

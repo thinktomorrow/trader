@@ -13,14 +13,14 @@ use Thinktomorrow\Trader\Domain\Model\Taxon\TaxonId;
 use Thinktomorrow\Trader\Domain\Model\Taxonomy\TaxonomyId;
 use Thinktomorrow\Trader\Domain\Model\Taxonomy\TaxonomyType;
 
-class ProductVariantPropertyTest extends TestCase
+class ProductTaxonTest extends TestCase
 {
-    public function test_it_can_add_product_variant_property()
+    public function test_it_can_update_product_taxa(): void
     {
         $product = $this->createProduct();
 
         $product->updateProductTaxa([
-            $productVariantProperty = ProductVariantProperty::create($product->productId, TaxonomyId::fromString('aaa'), TaxonomyType::variant_property, TaxonId::fromString('bbb')),
+            $productTaxon = ProductTaxon::create($product->productId, TaxonomyId::fromString('ooo'), TaxonomyType::variant_property, TaxonId::fromString('ppp')),
         ]);
 
         $this->assertEquals([
@@ -28,9 +28,7 @@ class ProductVariantPropertyTest extends TestCase
             new ProductTaxaUpdated(ProductId::fromString('xxx')),
         ], $product->releaseEvents());
 
-        $this->assertEquals([
-            $productVariantProperty->getMappedData(),
-        ], $product->getChildEntities()[ProductVariantProperty::class]);
+        $this->assertEquals([$productTaxon->getMappedData()], $product->getChildEntities()[ProductTaxon::class]);
     }
 
     public function test_it_cannot_add_same_product_variant_property_twice()
