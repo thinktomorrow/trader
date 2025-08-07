@@ -111,6 +111,7 @@ class TaxonomyTest extends TestCase
             'shows_as_grid_filter' => false,
             'shows_in_grid' => false,
             'allows_multiple_values' => false,
+            'allows_nestable_values' => false,
             'order' => 0,
             'data' => json_encode([]),
         ], [
