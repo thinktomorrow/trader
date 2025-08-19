@@ -92,7 +92,9 @@ class DefaultProductTaxonItem implements ProductTaxonItem
 
     public function getLabel(?string $locale = null): string
     {
-        return $this->dataAsPrimitive('title', $locale,
+        return $this->dataAsPrimitive(
+            'title',
+            $locale,
             $this->dataAsPrimitive('taxon_data.title', $locale, '')
         );
     }
