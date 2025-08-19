@@ -1,0 +1,309 @@
+<?php
+declare(strict_types=1);
+
+namespace Tests\Acceptance\Product;
+
+use Tests\TestHelpers;
+use Thinktomorrow\Trader\Application\Product\ProductTaxa\ProductTaxonItem;
+use Thinktomorrow\Trader\Domain\Model\Product\ProductTaxa\ProductTaxon;
+use Thinktomorrow\Trader\Domain\Model\Taxon\TaxonId;
+use Thinktomorrow\Trader\Domain\Model\Taxon\TaxonState;
+use Thinktomorrow\Trader\Domain\Model\Taxonomy\TaxonomyId;
+use Thinktomorrow\Trader\Domain\Model\Taxonomy\TaxonomyType;
+
+class ProductTaxaTest extends ProductContext
+{
+    use TestHelpers;
+
+    public function test_it_can_get_a_product_taxon_item()
+    {
+        [$taxonomies, $taxa] = $this->createTaxonomiesAndTaxa();
+
+        foreach ($taxonomies as $taxonomy) {
+            $this->taxonomyRepository->save($taxonomy);
+        }
+
+        foreach ($taxa as $taxon) {
+            $this->taxonRepository->save($taxon);
+        }
+
+        $product = $this->createProductWithProductVariantProperties();
+        $this->productRepository->save($product);
+
+        $variantId = $product->getVariants()[0]->variantId;
+        $productDetail = $this->productDetailRepository->findProductDetail($variantId);
+
+        $taxa = $productDetail->getTaxa();
+
+        $this->assertCount(5, $taxa);
+        $this->assertCount(5, $productDetail->getVariantProperties());
+        $this->assertCount(0, $productDetail->getProductProperties());
+        $this->assertCount(0, $productDetail->getCategories());
+        $this->assertCount(0, $productDetail->getGoogleCategories());
+        $this->assertCount(0, $productDetail->getTags());
+        $this->assertCount(0, $productDetail->getCollections());
+    }
+
+    public function test_it_can_get_a_product_property()
+    {
+        // Create a category taxonomy and taxon
+        $taxonomyId = TaxonomyId::fromString('ooo');
+        $taxonId = TaxonId::fromString('xxx');
+
+        $taxonomy = \Thinktomorrow\Trader\Domain\Model\Taxonomy\Taxonomy::create($taxonomyId, TaxonomyType::property);
+        $taxon = \Thinktomorrow\Trader\Domain\Model\Taxon\Taxon::create($taxonId, $taxonomyId);
+        $this->taxonomyRepository->save($taxonomy);
+        $this->taxonRepository->save($taxon);
+
+        // Create a product and assign the product property taxon
+        $product = static::createProductWithVariant();
+        $product->updateProductTaxa([
+            ProductTaxon::create($product->productId, $taxonomyId, TaxonomyType::property, $taxonId),
+        ]);
+
+        $this->productRepository->save($product);
+
+        $variantId = $product->getVariants()[0]->variantId;
+        $productDetail = $this->productDetailRepository->findProductDetail($variantId);
+
+        $taxa = $productDetail->getTaxa();
+
+        $this->assertCount(1, $taxa);
+        $this->assertCount(1, $productDetail->getProductProperties());
+        $this->assertCount(0, $productDetail->getCategories());
+        $this->assertCount(0, $productDetail->getVariantProperties());
+        $this->assertCount(0, $productDetail->getGoogleCategories());
+        $this->assertCount(0, $productDetail->getTags());
+        $this->assertCount(0, $productDetail->getCollections());
+    }
+
+    public function test_it_can_get_a_product_category()
+    {
+        // Create a category taxonomy and taxon
+        $taxonomyId = TaxonomyId::fromString('ooo');
+        $taxonId = TaxonId::fromString('xxx');
+
+        $taxonomy = \Thinktomorrow\Trader\Domain\Model\Taxonomy\Taxonomy::create($taxonomyId, TaxonomyType::category);
+        $taxon = \Thinktomorrow\Trader\Domain\Model\Taxon\Taxon::create($taxonId, $taxonomyId);
+        $this->taxonomyRepository->save($taxonomy);
+        $this->taxonRepository->save($taxon);
+
+        // Create a product and assign the category taxon
+        $product = static::createProductWithVariant();
+        $product->updateProductTaxa([
+            ProductTaxon::create($product->productId, $taxonomyId, TaxonomyType::category, $taxonId),
+        ]);
+
+        $this->productRepository->save($product);
+
+        $variantId = $product->getVariants()[0]->variantId;
+        $productDetail = $this->productDetailRepository->findProductDetail($variantId);
+
+        $taxa = $productDetail->getTaxa();
+
+        $this->assertCount(1, $taxa);
+        $this->assertCount(1, $productDetail->getCategories());
+        $this->assertCount(0, $productDetail->getVariantProperties());
+        $this->assertCount(0, $productDetail->getProductProperties());
+        $this->assertCount(0, $productDetail->getGoogleCategories());
+        $this->assertCount(0, $productDetail->getTags());
+        $this->assertCount(0, $productDetail->getCollections());
+    }
+
+    public function test_it_can_get_collection_or_tag_or_google_category()
+    {
+        // Create a collection taxon
+        foreach (['collection', 'tag', 'google_category'] as $taxonomyType) {
+            $taxonomyId = TaxonomyId::fromString('ooo_' . $taxonomyType);
+            $taxonId = TaxonId::fromString('xxx_' . $taxonomyType);
+            $taxonomy = \Thinktomorrow\Trader\Domain\Model\Taxonomy\Taxonomy::create($taxonomyId, TaxonomyType::from($taxonomyType));
+            $taxon = \Thinktomorrow\Trader\Domain\Model\Taxon\Taxon::create($taxonId, $taxonomyId);
+            $this->taxonomyRepository->save($taxonomy);
+            $this->taxonRepository->save($taxon);
+
+            // Create a product and assign the taxon
+            $product = static::createProductWithVariant();
+            $product->updateProductTaxa([
+                ProductTaxon::create($product->productId, $taxonomyId, TaxonomyType::from($taxonomyType), $taxonId),
+            ]);
+
+            $this->productRepository->save($product);
+
+            $variantId = $product->getVariants()[0]->variantId;
+            $productDetail = $this->productDetailRepository->findProductDetail($variantId);
+
+            $taxa = $productDetail->getTaxa();
+
+            $this->assertCount(1, $taxa);
+            if ($taxonomyType === 'collection') {
+                $this->assertCount(1, $productDetail->getCollections());
+                $this->assertCount(0, $productDetail->getTags());
+                $this->assertCount(0, $productDetail->getGoogleCategories());
+            } elseif ($taxonomyType === 'tag') {
+                $this->assertCount(0, $productDetail->getCollections());
+                $this->assertCount(1, $productDetail->getTags());
+                $this->assertCount(0, $productDetail->getGoogleCategories());
+            } else {
+                // google_category
+                $this->assertCount(0, $productDetail->getCollections());
+                $this->assertCount(0, $productDetail->getTags());
+                $this->assertCount(1, $productDetail->getGoogleCategories());
+            }
+        }
+    }
+
+    public function test_it_can_get_details_of_taxon_item(): void
+    {
+        // Create a category taxonomy and taxon
+        $taxonomyId = TaxonomyId::fromString('ooo');
+        $taxonId = TaxonId::fromString('xxx');
+
+        $taxonomy = \Thinktomorrow\Trader\Domain\Model\Taxonomy\Taxonomy::create($taxonomyId, TaxonomyType::property);
+        $taxon = \Thinktomorrow\Trader\Domain\Model\Taxon\Taxon::create($taxonId, $taxonomyId);
+        $this->taxonomyRepository->save($taxonomy);
+        $this->taxonRepository->save($taxon);
+
+        // Create a product and assign the product property taxon
+        $product = static::createProductWithVariant();
+        $product->updateProductTaxa([
+            ProductTaxon::create($product->productId, $taxonomyId, TaxonomyType::property, $taxonId),
+        ]);
+
+        $this->productRepository->save($product);
+
+        $variantId = $product->getVariants()[0]->variantId;
+        $productDetail = $this->productDetailRepository->findProductDetail($variantId);
+
+        /** @var ProductTaxonItem $taxon */
+        $taxon = $productDetail->getProductProperties()[0];
+
+        $this->assertEquals($product->productId->get(), $taxon->getProductId());
+        $this->assertEquals($taxonId->get(), $taxon->getTaxonId());
+        $this->assertEquals($taxonomyId->get(), $taxon->getTaxonomyId());
+        $this->assertEquals(TaxonomyType::property->value, $taxon->getTaxonomyType());
+        $this->assertEquals('', $taxon->getLabel());
+        $this->assertFalse($taxon->showsInGrid());
+        $this->assertTrue($taxon->showOnline());
+    }
+
+    // Test label, override label with custom relation title, showsInGrid, showOnline
+    public function test_it_can_get_label(): void
+    {
+        // Create a category taxonomy and taxon
+        $taxonomyId = TaxonomyId::fromString('ooo');
+        $taxonId = TaxonId::fromString('xxx');
+
+        $taxonomy = \Thinktomorrow\Trader\Domain\Model\Taxonomy\Taxonomy::create($taxonomyId, TaxonomyType::property);
+        $taxon = \Thinktomorrow\Trader\Domain\Model\Taxon\Taxon::create($taxonId, $taxonomyId);
+        $taxon->addData(['title' => ['nl' => 'Test Label nl', 'en' => 'Test Label en']]);
+        $this->taxonomyRepository->save($taxonomy);
+        $this->taxonRepository->save($taxon);
+
+        // Create a product and assign the product property taxon
+        $product = static::createProductWithVariant();
+        $product->updateProductTaxa([
+            ProductTaxon::create($product->productId, $taxonomyId, TaxonomyType::property, $taxonId),
+        ]);
+
+        $this->productRepository->save($product);
+
+        $variantId = $product->getVariants()[0]->variantId;
+        $productDetail = $this->productDetailRepository->findProductDetail($variantId);
+
+        /** @var ProductTaxonItem $taxon */
+        $taxon = $productDetail->getProductProperties()[0];
+
+        $this->assertEquals('Test Label nl', $taxon->getLabel());
+        $this->assertEquals('Test Label nl', $taxon->getLabel('nl'));
+        $this->assertEquals('Test Label en', $taxon->getLabel('en'));
+    }
+
+    public function test_it_can_get_custom_label_per_product(): void
+    {
+        // Create a category taxonomy and taxon
+        $taxonomyId = TaxonomyId::fromString('ooo');
+        $taxonId = TaxonId::fromString('xxx');
+
+        $taxonomy = \Thinktomorrow\Trader\Domain\Model\Taxonomy\Taxonomy::create($taxonomyId, TaxonomyType::property);
+        $taxon = \Thinktomorrow\Trader\Domain\Model\Taxon\Taxon::create($taxonId, $taxonomyId);
+        $taxon->addData(['title' => ['nl' => 'Test Label nl', 'en' => 'Test Label en']]);
+        $this->taxonomyRepository->save($taxonomy);
+        $this->taxonRepository->save($taxon);
+
+        // Create a product and assign the product property taxon
+        $product = static::createProductWithVariant();
+
+        $productTaxon = ProductTaxon::create($product->productId, $taxonomyId, TaxonomyType::property, $taxonId);
+        $productTaxon->addData(['title' => ['nl' => 'Custom Label nl', 'en' => 'Custom Label en']]);
+
+        $product->updateProductTaxa([$productTaxon]);
+
+        $this->productRepository->save($product);
+
+        $variantId = $product->getVariants()[0]->variantId;
+        $productDetail = $this->productDetailRepository->findProductDetail($variantId);
+
+        /** @var ProductTaxonItem $taxon */
+        $taxon = $productDetail->getProductProperties()[0];
+
+        $this->assertEquals('Custom Label nl', $taxon->getLabel());
+        $this->assertEquals('Custom Label nl', $taxon->getLabel('nl'));
+        $this->assertEquals('Custom Label en', $taxon->getLabel('en'));
+    }
+
+    public function test_it_can_get_show_online_state(): void
+    {
+        // Create a category taxonomy and taxon
+        $taxonomyId = TaxonomyId::fromString('ooo');
+        $taxonId = TaxonId::fromString('xxx');
+
+        $taxonomy = \Thinktomorrow\Trader\Domain\Model\Taxonomy\Taxonomy::create($taxonomyId, TaxonomyType::property);
+        $taxon = \Thinktomorrow\Trader\Domain\Model\Taxon\Taxon::create($taxonId, $taxonomyId);
+        $taxon->changeState(TaxonState::online);
+        $this->taxonomyRepository->save($taxonomy);
+        $this->taxonRepository->save($taxon);
+
+        // Create a product and assign the product property taxon
+        $product = static::createProductWithVariant();
+
+        $productTaxon = ProductTaxon::create($product->productId, $taxonomyId, TaxonomyType::property, $taxonId);
+        $product->updateProductTaxa([$productTaxon]);
+        $this->productRepository->save($product);
+
+        $variantId = $product->getVariants()[0]->variantId;
+        $productDetail = $this->productDetailRepository->findProductDetail($variantId);
+
+        /** @var ProductTaxonItem $taxon */
+        $taxon = $productDetail->getProductProperties()[0];
+
+        $this->assertTrue($taxon->showOnline());
+    }
+
+    public function test_it_can_get_show_in_grid_flag(): void
+    {
+        // Create a category taxonomy and taxon
+        $taxonomyId = TaxonomyId::fromString('ooo');
+        $taxonId = TaxonId::fromString('xxx');
+
+        $taxonomy = \Thinktomorrow\Trader\Domain\Model\Taxonomy\Taxonomy::create($taxonomyId, TaxonomyType::property);
+        $taxon = \Thinktomorrow\Trader\Domain\Model\Taxon\Taxon::create($taxonId, $taxonomyId);
+        $taxonomy->showInGrid();
+        $this->taxonomyRepository->save($taxonomy);
+        $this->taxonRepository->save($taxon);
+
+        // Create a product and assign the product property taxon
+        $product = static::createProductWithVariant();
+
+        $productTaxon = ProductTaxon::create($product->productId, $taxonomyId, TaxonomyType::property, $taxonId);
+        $product->updateProductTaxa([$productTaxon]);
+        $this->productRepository->save($product);
+
+        $variantId = $product->getVariants()[0]->variantId;
+        $productDetail = $this->productDetailRepository->findProductDetail($variantId);
+
+        /** @var ProductTaxonItem $taxon */
+        $taxon = $productDetail->getProductProperties()[0];
+
+        $this->assertTrue($taxon->showsInGrid());
+    }
+}

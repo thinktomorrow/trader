@@ -2,7 +2,7 @@
 
 namespace Thinktomorrow\Trader\Application\Product\ProductTaxa;
 
-interface VariantTaxonRead extends ProductTaxonRead
+interface VariantTaxonItem extends ProductTaxonItem
 {
     public function getVariantId(): string;
 }

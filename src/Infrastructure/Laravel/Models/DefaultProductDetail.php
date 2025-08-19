@@ -8,12 +8,14 @@ use Thinktomorrow\Trader\Application\Common\HasLocale;
 use Thinktomorrow\Trader\Application\Common\RendersData;
 use Thinktomorrow\Trader\Application\Common\RendersVariantPrices;
 use Thinktomorrow\Trader\Application\Product\ProductDetail\ProductDetail;
+use Thinktomorrow\Trader\Application\Product\ProductTaxa\ProductTaxonItem;
 use Thinktomorrow\Trader\Application\Stock\Read\StockableDefault;
 use Thinktomorrow\Trader\Domain\Model\Product\ProductId;
 use Thinktomorrow\Trader\Domain\Model\Product\Variant\VariantId;
 use Thinktomorrow\Trader\Domain\Model\Product\Variant\VariantSalePrice;
 use Thinktomorrow\Trader\Domain\Model\Product\Variant\VariantState;
 use Thinktomorrow\Trader\Domain\Model\Product\Variant\VariantUnitPrice;
+use Thinktomorrow\Trader\Domain\Model\Taxonomy\TaxonomyType;
 
 class DefaultProductDetail implements ProductDetail
 {
@@ -35,7 +37,7 @@ class DefaultProductDetail implements ProductDetail
     {
     }
 
-    public static function fromMappedData(array $state, array $taxaState): static
+    public static function fromMappedData(array $state, array $taxa): static
     {
         $item = new static();
 
@@ -55,7 +57,13 @@ class DefaultProductDetail implements ProductDetail
         $item->stock_level = $state['stock_level'];
         $item->ignore_out_of_stock = (bool)$state['ignore_out_of_stock'];
 
-        dd($taxaState);
+        foreach ($taxa as $taxon) {
+            if (!($taxon instanceof ProductTaxonItem)) {
+                throw new \InvalidArgumentException('Taxa must be instances of ProductTaxonItem or VariantTaxonItem');
+            }
+        }
+
+        $item->taxa = $taxa;
 
         return $item;
     }
@@ -85,10 +93,10 @@ class DefaultProductDetail implements ProductDetail
             return $variantTitle;
         }
 
-        if (! $variantOptionTitle || $productTitle == $variantOptionTitle) {
+        if (!$variantOptionTitle || $productTitle == $variantOptionTitle) {
             return $productTitle;
         }
-        if (! $productTitle) {
+        if (!$productTitle) {
             return $variantOptionTitle;
         }
 
@@ -137,36 +145,48 @@ class DefaultProductDetail implements ProductDetail
 
     public function getTaxa(): array
     {
-        // TODO: Implement getTaxa() method.
+        return $this->taxa;
     }
 
     public function getCategories(): array
     {
-        // TODO: Implement getCategories() method.
+        return array_filter($this->taxa, function ($taxon) {
+            return $taxon->getTaxonomyType() === TaxonomyType::category->value;
+        });
     }
 
     public function getGoogleCategories(): array
     {
-        // TODO: Implement getGoogleCategories() method.
+        return array_filter($this->taxa, function ($taxon) {
+            return $taxon->getTaxonomyType() === TaxonomyType::google_category->value;
+        });
     }
 
     public function getProductProperties(): array
     {
-        // TODO: Implement getProductProperties() method.
+        return array_filter($this->taxa, function ($taxon) {
+            return $taxon->getTaxonomyType() === TaxonomyType::property->value;
+        });
     }
 
     public function getVariantProperties(): array
     {
-        // TODO: Implement getVariantProperties() method.
+        return array_filter($this->taxa, function ($taxon) {
+            return $taxon->getTaxonomyType() === TaxonomyType::variant_property->value;
+        });
     }
 
     public function getCollections(): array
     {
-        // TODO: Implement getCollections() method.
+        return array_filter($this->taxa, function ($taxon) {
+            return $taxon->getTaxonomyType() === TaxonomyType::collection->value;
+        });
     }
 
     public function getTags(): array
     {
-        // TODO: Implement getTags() method.
+        return array_filter($this->taxa, function ($taxon) {
+            return $taxon->getTaxonomyType() === TaxonomyType::tag->value;
+        });
     }
 }

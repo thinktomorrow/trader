@@ -9,6 +9,8 @@ use Thinktomorrow\Trader\Domain\Model\Product\ProductState;
 use Thinktomorrow\Trader\Domain\Model\Product\Variant\VariantId;
 use Thinktomorrow\Trader\Domain\Model\Stock\StockItem;
 use Thinktomorrow\Trader\Infrastructure\Laravel\Models\DefaultProductDetail;
+use Thinktomorrow\Trader\Infrastructure\Laravel\Models\DefaultProductTaxonItem;
+use Thinktomorrow\Trader\Infrastructure\Laravel\Models\DefaultVariantTaxonItem;
 
 final class InMemoryProductDetailRepository implements ProductDetailRepository
 {
@@ -23,13 +25,62 @@ final class InMemoryProductDetailRepository implements ProductDetailRepository
             'stock_data' => json_encode([]),
         ]);
 
-        if (! $allowOffline && ! in_array($product->getState(), ProductState::onlineStates())) {
-            throw new CouldNotFindVariant('No online variant found by id [' . $variantId->get(). ']');
+        if (!$allowOffline && !in_array($product->getState(), ProductState::onlineStates())) {
+            throw new CouldNotFindVariant('No online variant found by id [' . $variantId->get() . ']');
+        }
+
+        // Convert each taxon to the read model
+        $taxa = [];
+
+        $taxonomyRepo = new InMemoryTaxonomyRepository();
+        $taxonRepo = new InMemoryTaxonRepository();
+
+        foreach ($product->getProductTaxa() as $i => $productTaxon) {
+            $taxonomy = $taxonomyRepo->find($productTaxon->taxonomyId);
+            $taxon = $taxonRepo->find($productTaxon->taxonId);
+
+            $taxa[] = new DefaultProductTaxonItem(
+                $product->productId->get(),
+                $productTaxon->taxonId->get(),
+                $productTaxon->taxonomyId->get(),
+                $productTaxon->taxonomyType,
+                $taxonomy->showsInGrid(),
+                $taxon->getState(),
+                [
+                    'taxonomy_data' => $taxonomy->getData(),
+                    'taxon_data' => $taxon->getData(),
+                    ...$productTaxon->getData(),
+                ]
+            );
+        }
+
+        foreach ($product->getVariants() as $variant) {
+            if ($variant->variantId->get() === $variantId->get()) {
+
+                foreach ($variant->getVariantTaxa() as $variantTaxon) {
+                    $taxonomy = $taxonomyRepo->find($productTaxon->taxonomyId);
+                    $taxon = $taxonRepo->find($productTaxon->taxonId);
+
+                    $taxa[] = new DefaultVariantTaxonItem(
+                        $variant->variantId->get(),
+                        $product->productId->get(),
+                        $variantTaxon->taxonId->get(),
+                        $variantTaxon->taxonomyId->get(),
+                        $variantTaxon->taxonomyType,
+                        $taxonomy->showsInGrid(),
+                        $taxon->getState(),
+                        [
+                            'taxonomy_data' => $taxonomy->getData(),
+                            'taxon_data' => $taxon->getData(),
+                            ...$variantTaxon->getData(),
+                        ]
+                    );
+                }
+            }
         }
 
         return DefaultProductDetail::fromMappedData(array_merge(($stock->getMappedData()), $variant->getMappedData(), [
             'product_data' => json_encode($product->getData()),
-            'taxon_ids' => array_map(fn ($taxonId) => $taxonId->get(), $product->getTaxonIds()),
-        ]));
+        ]), $taxa);
     }
 }

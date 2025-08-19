@@ -4,8 +4,8 @@ declare(strict_types=1);
 namespace Thinktomorrow\Trader\Application\Product\Grid;
 
 use Money\Money;
-use Thinktomorrow\Trader\Application\Product\ProductTaxa\ProductTaxonRead;
-use Thinktomorrow\Trader\Application\Product\ProductTaxa\VariantTaxonRead;
+use Thinktomorrow\Trader\Application\Product\ProductTaxa\ProductTaxonItem;
+use Thinktomorrow\Trader\Application\Product\ProductTaxa\VariantTaxonItem;
 
 /**
  * A grid item a product variant for the grid. If a variant is set to be show_in_grid,
@@ -21,7 +21,7 @@ interface GridItem
 
     /**
      * All related VariantTaxon and ProductTaxon objects.
-     * @return array<VariantTaxonRead|ProductTaxonRead>
+     * @return array<VariantTaxonItem|ProductTaxonItem>
      */
     public function getTaxa(): array;
 

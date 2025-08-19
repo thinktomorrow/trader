@@ -2,7 +2,7 @@
 
 namespace Thinktomorrow\Trader\Application\Product\ProductTaxa;
 
-interface ProductTaxonRead
+interface ProductTaxonItem
 {
     public static function fromMappedData(array $state): static;
 
@@ -13,8 +13,6 @@ interface ProductTaxonRead
     public function getTaxonomyType(): string;
 
     public function getTaxonId(): string;
-
-    public function getOrder(): int;
 
     /** Taxon|Taxonomy can be set offline or such */
     public function showOnline(): bool;

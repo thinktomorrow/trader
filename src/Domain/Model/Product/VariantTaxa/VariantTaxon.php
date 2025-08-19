@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace Thinktomorrow\Trader\Domain\Model\Product\VariantTaxa;
 
 use Thinktomorrow\Trader\Domain\Common\Entity\ChildEntity;
+use Thinktomorrow\Trader\Domain\Common\Entity\HasData;
 use Thinktomorrow\Trader\Domain\Model\Product\Variant\VariantId;
 use Thinktomorrow\Trader\Domain\Model\Taxon\TaxonId;
 use Thinktomorrow\Trader\Domain\Model\Taxonomy\TaxonomyId;
@@ -11,6 +12,8 @@ use Thinktomorrow\Trader\Domain\Model\Taxonomy\TaxonomyType;
 
 class VariantTaxon implements ChildEntity
 {
+    use HasData;
+
     public readonly VariantId $variantId;
     public readonly TaxonId $taxonId;
     public readonly TaxonomyId $taxonomyId;
@@ -39,6 +42,7 @@ class VariantTaxon implements ChildEntity
             'taxonomy_id' => $this->taxonomyId->get(),
             'taxonomy_type' => $this->taxonomyType->value,
             'taxon_id' => $this->taxonId->get(),
+            'data' => json_encode($this->data),
         ];
     }
 
@@ -50,6 +54,7 @@ class VariantTaxon implements ChildEntity
         $object->taxonomyId = TaxonomyId::fromString($state['taxonomy_id']);
         $object->taxonomyType = TaxonomyType::from($state['taxonomy_type']);
         $object->taxonId = TaxonId::fromString($state['taxon_id']);
+        $object->data = json_decode($state['data'], true);
 
         return $object;
     }

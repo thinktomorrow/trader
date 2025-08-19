@@ -4,7 +4,7 @@ declare(strict_types=1);
 namespace Thinktomorrow\Trader\Infrastructure\Test\Repositories;
 
 use Thinktomorrow\Trader\Application\Product\ProductTaxa\ProductTaxonRepository;
-use Thinktomorrow\Trader\Infrastructure\Laravel\Models\DefaultProductTaxonRead;
+use Thinktomorrow\Trader\Infrastructure\Laravel\Models\DefaultProductTaxonItem;
 
 final class InMemoryProductTaxonRepository implements ProductTaxonRepository
 {
@@ -24,7 +24,7 @@ final class InMemoryProductTaxonRepository implements ProductTaxonRepository
             if (isset($taxa[$taxonId])) {
                 $taxon = $taxa[$taxonId];
 
-                $result[] = DefaultProductTaxonRead::fromMappedData([
+                $result[] = DefaultProductTaxonItem::fromMappedData([
                     'product_id' => $productId,
                     'taxon_id' => $taxon->taxonId->get(),
                     'taxonomy_id' => $taxon->taxonomyId->get(),
@@ -32,7 +32,7 @@ final class InMemoryProductTaxonRepository implements ProductTaxonRepository
                     'shows_in_grid' => $taxonomies[$taxon->taxonomyId->get()]->showsInGrid(),
                     'state' => $taxon->getMappedData()['state'],
                     'order' => $taxon->getMappedData()['order'],
-                    'keys' => json_encode(array_map(fn ($taxonKey) => $taxonKey->getMappedData(), $taxon->getTaxonKeys())),
+                    'keys' => json_encode(array_map(fn($taxonKey) => $taxonKey->getMappedData(), $taxon->getTaxonKeys())),
                     'data' => json_encode($taxon->getData()),
                 ]);
             }

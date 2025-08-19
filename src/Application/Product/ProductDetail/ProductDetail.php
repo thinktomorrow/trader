@@ -3,15 +3,20 @@
 namespace Thinktomorrow\Trader\Application\Product\ProductDetail;
 
 use Money\Money;
-use Thinktomorrow\Trader\Application\Product\ProductTaxa\ProductTaxonRead;
-use Thinktomorrow\Trader\Application\Product\ProductTaxa\VariantTaxonRead;
+use Thinktomorrow\Trader\Application\Product\ProductTaxa\ProductTaxonItem;
+use Thinktomorrow\Trader\Application\Product\ProductTaxa\VariantTaxonItem;
 use Thinktomorrow\Trader\Application\Stock\Read\Stockable;
 use Thinktomorrow\Trader\Domain\Model\Product\Variant\VariantSalePrice;
 use Thinktomorrow\Trader\Domain\Model\Product\Variant\VariantUnitPrice;
 
 interface ProductDetail extends Stockable
 {
-    public static function fromMappedData(array $state, array $taxaState): static;
+    /**
+     * @param array $state
+     * @param array<VariantTaxonItem|ProductTaxonItem> $taxa
+     * @return static
+     */
+    public static function fromMappedData(array $state, array $taxa): static;
 
     public function getVariantId(): string;
 
@@ -19,7 +24,7 @@ interface ProductDetail extends Stockable
 
     /**
      * All related VariantTaxon and ProductTaxon objects.
-     * @return array<VariantTaxonRead|ProductTaxonRead>
+     * @return array<VariantTaxonItem|ProductTaxonItem>
      */
     public function getTaxa(): array;
 

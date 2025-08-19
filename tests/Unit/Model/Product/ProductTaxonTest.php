@@ -35,7 +35,7 @@ class ProductTaxonTest extends TestCase
         $product = $this->createProduct();
 
         $product->updateProductTaxa([
-            $productVariantProperty = ProductTaxon::create($product->productId, TaxonomyId::fromString('aaa'), TaxonomyType::variant_property, TaxonId::fromString('bbb')),
+            ProductTaxon::create($product->productId, TaxonomyId::fromString('aaa'), TaxonomyType::variant_property, TaxonId::fromString('bbb')),
             ProductTaxon::create($product->productId, TaxonomyId::fromString('aaa'), TaxonomyType::variant_property, TaxonId::fromString('bbb')),
         ]);
 

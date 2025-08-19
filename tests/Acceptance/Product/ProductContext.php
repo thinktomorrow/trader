@@ -12,6 +12,8 @@ use Thinktomorrow\Trader\Application\Product\ProductApplication;
 use Thinktomorrow\Trader\Application\Product\VariantLinks\ProductOptionsAndValues;
 use Thinktomorrow\Trader\Application\Product\VariantLinks\VariantLink;
 use Thinktomorrow\Trader\Application\Product\VariantLinks\VariantLinksComposer;
+use Thinktomorrow\Trader\Application\Taxon\TaxonApplication;
+use Thinktomorrow\Trader\Application\Taxonomy\TaxonomyApplication;
 use Thinktomorrow\Trader\Domain\Model\Product\Events\ProductCreated;
 use Thinktomorrow\Trader\Domain\Model\Product\Events\ProductDataUpdated;
 use Thinktomorrow\Trader\Domain\Model\Product\Events\ProductTaxaUpdated;
@@ -22,17 +24,22 @@ use Thinktomorrow\Trader\Infrastructure\Laravel\Models\DefaultVariantLink;
 use Thinktomorrow\Trader\Infrastructure\Test\EventDispatcherSpy;
 use Thinktomorrow\Trader\Infrastructure\Test\Repositories\InMemoryProductDetailRepository;
 use Thinktomorrow\Trader\Infrastructure\Test\Repositories\InMemoryProductRepository;
-use Thinktomorrow\Trader\Infrastructure\Test\Repositories\InMemoryProductTaxonRepository;
+use Thinktomorrow\Trader\Infrastructure\Test\Repositories\InMemoryTaxonomyRepository;
+use Thinktomorrow\Trader\Infrastructure\Test\Repositories\InMemoryTaxonRepository;
 use Thinktomorrow\Trader\Infrastructure\Test\Repositories\InMemoryVariantRepository;
 use Thinktomorrow\Trader\Infrastructure\Test\TestContainer;
 use Thinktomorrow\Trader\Infrastructure\Test\TestTraderConfig;
 
 abstract class ProductContext extends TestCase
 {
+    protected EventDispatcherSpy $eventDispatcher;
+    protected TaxonomyApplication $taxonomyApplication;
+    protected TaxonApplication $taxonApplication;
+    protected InMemoryTaxonRepository $taxonRepository;
+    protected InMemoryTaxonomyRepository $taxonomyRepository;
     protected ProductApplication $productApplication;
     protected InMemoryProductRepository $productRepository;
     protected InMemoryVariantRepository $variantRepository;
-    protected EventDispatcherSpy $eventDispatcher;
     protected VariantLinksComposer $productOptionsComposer;
     protected InMemoryProductDetailRepository $productDetailRepository;
     protected MissingVariantPropertyCombinations $missingOptionCombinations;
@@ -41,11 +48,23 @@ abstract class ProductContext extends TestCase
     {
         parent::setUp();
 
-        $this->productApplication = new ProductApplication(
+        $this->taxonomyApplication = new TaxonomyApplication(
             new TestTraderConfig(),
             $this->eventDispatcher = new EventDispatcherSpy(),
+            $this->taxonomyRepository = new InMemoryTaxonomyRepository(),
+        );
+
+        $this->taxonApplication = new TaxonApplication(
+            new TestTraderConfig(),
+            $this->eventDispatcher,
+            $this->taxonRepository = new InMemoryTaxonRepository(),
+        );
+
+        $this->productApplication = new ProductApplication(
+            new TestTraderConfig(),
+            $this->eventDispatcher,
             $this->productRepository = new InMemoryProductRepository(),
-            $this->variantRepository = new InMemoryVariantRepository($this->productRepository),
+            $this->variantRepository = new InMemoryVariantRepository(),
         );
 
         (new TestContainer())->add(VariantLink::class, DefaultVariantLink::class);
@@ -58,7 +77,6 @@ abstract class ProductContext extends TestCase
         $this->productDetailRepository = new InMemoryProductDetailRepository();
 
         $this->missingOptionCombinations = new MissingVariantPropertyCombinations(
-            new InMemoryProductTaxonRepository(),
             new ProductOptionsAndValues(new InMemoryProductRepository())
         );
     }
