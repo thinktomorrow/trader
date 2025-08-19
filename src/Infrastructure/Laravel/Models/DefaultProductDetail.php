@@ -58,7 +58,7 @@ class DefaultProductDetail implements ProductDetail
         $item->ignore_out_of_stock = (bool)$state['ignore_out_of_stock'];
 
         foreach ($taxa as $taxon) {
-            if (!($taxon instanceof ProductTaxonItem)) {
+            if (! ($taxon instanceof ProductTaxonItem)) {
                 throw new \InvalidArgumentException('Taxa must be instances of ProductTaxonItem or VariantTaxonItem');
             }
         }
@@ -93,10 +93,10 @@ class DefaultProductDetail implements ProductDetail
             return $variantTitle;
         }
 
-        if (!$variantOptionTitle || $productTitle == $variantOptionTitle) {
+        if (! $variantOptionTitle || $productTitle == $variantOptionTitle) {
             return $productTitle;
         }
-        if (!$productTitle) {
+        if (! $productTitle) {
             return $variantOptionTitle;
         }
 

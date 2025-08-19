@@ -32,7 +32,7 @@ final class InMemoryProductTaxonRepository implements ProductTaxonRepository
                     'shows_in_grid' => $taxonomies[$taxon->taxonomyId->get()]->showsInGrid(),
                     'state' => $taxon->getMappedData()['state'],
                     'order' => $taxon->getMappedData()['order'],
-                    'keys' => json_encode(array_map(fn($taxonKey) => $taxonKey->getMappedData(), $taxon->getTaxonKeys())),
+                    'keys' => json_encode(array_map(fn ($taxonKey) => $taxonKey->getMappedData(), $taxon->getTaxonKeys())),
                     'data' => json_encode($taxon->getData()),
                 ]);
             }
