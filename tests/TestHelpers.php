@@ -479,23 +479,34 @@ trait TestHelpers
     {
         $product = static::createProduct();
 
-        return static::withVariant($product);
+        return static::withVariant($product, false);
+    }
+
+    protected static function createProductWithVariantAndTaxon(): Product
+    {
+        $product = static::createProduct();
+
+        return static::withVariant($product, true);
     }
 
     protected static function createOfflineProductWithVariant(): Product
     {
         $product = static::createOfflineProduct();
 
-        return static::withVariant($product);
+        return static::withVariant($product, false);
     }
 
-    private static function withVariant(Product $product): Product
+    private static function withVariant(Product $product, bool $withDefaultTaxon = true): Product
     {
-        $product->updateProductTaxa([
-            ProductTaxon::create($product->productId, TaxonomyId::fromString('ooo'), TaxonomyType::variant_property, TaxonId::fromString('xxx')),
-        ]);
+        if ($withDefaultTaxon) {
+            $product->updateProductTaxa([
+                ProductTaxon::create($product->productId, TaxonomyId::fromString('ooo'), TaxonomyType::variant_property, TaxonId::fromString('xxx')),
+            ]);
 
-        $variant = static::createVariantWithVariantProperty();
+            $variant = static::createVariantWithVariantProperty();
+        } else {
+            $variant = static::createVariant();
+        }
 
         $product->createVariant($variant);
 
@@ -503,6 +514,11 @@ trait TestHelpers
     }
 
     protected static function createVariantWithVariantProperty(): Variant
+    {
+        return static::createVariant(true);
+    }
+
+    protected static function createVariant(bool $withVariantProperty = false): Variant
     {
         $variant = Variant::create(
             ProductId::fromString('xxx'),
@@ -516,14 +532,16 @@ trait TestHelpers
             'fake-sku',
         );
 
-        $variant->updateVariantTaxa([
-            VariantTaxon::create(
-                $variant->variantId,
-                TaxonomyId::fromString('ooo'),
-                TaxonomyType::variant_property,
-                TaxonId::fromString('xxx')
-            ),
-        ]);
+        if ($withVariantProperty) {
+            $variant->updateVariantTaxa([
+                VariantTaxon::create(
+                    $variant->variantId,
+                    TaxonomyId::fromString('ooo'),
+                    TaxonomyType::variant_property,
+                    TaxonId::fromString('xxx')
+                ),
+            ]);
+        }
 
         return $variant;
     }

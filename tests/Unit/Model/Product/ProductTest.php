@@ -7,7 +7,6 @@ use Money\Money;
 use Tests\Unit\TestCase;
 use Thinktomorrow\Trader\Domain\Common\Vat\VatPercentage;
 use Thinktomorrow\Trader\Domain\Model\Product\Events\ProductCreated;
-use Thinktomorrow\Trader\Domain\Model\Product\Events\ProductTaxaUpdated;
 use Thinktomorrow\Trader\Domain\Model\Product\Events\VariantCreated;
 use Thinktomorrow\Trader\Domain\Model\Product\Events\VariantDeleted;
 use Thinktomorrow\Trader\Domain\Model\Product\Exceptions\CouldNotDeleteVariant;
@@ -76,7 +75,6 @@ class ProductTest extends TestCase
 
         $this->assertEquals([
             new ProductCreated(ProductId::fromString('xxx')),
-            new ProductTaxaUpdated(ProductId::fromString('xxx')),
             new VariantCreated(ProductId::fromString('xxx'), VariantId::fromString('yyy')),
         ], $product->releaseEvents());
     }
@@ -124,7 +122,6 @@ class ProductTest extends TestCase
 
         $this->assertEquals([
             new ProductCreated(ProductId::fromString('xxx')),
-            new ProductTaxaUpdated(ProductId::fromString('xxx')),
             new VariantCreated(ProductId::fromString('xxx'), VariantId::fromString('yyy')),
             new VariantCreated(ProductId::fromString('xxx'), VariantId::fromString('zzz')),
             new VariantDeleted(ProductId::fromString('xxx'), VariantId::fromString('zzz')),

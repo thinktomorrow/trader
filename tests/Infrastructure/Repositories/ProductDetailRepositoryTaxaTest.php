@@ -61,19 +61,20 @@ final class ProductDetailRepositoryTaxaTest extends TestCase
 
             $result = $repository
                 ->findProductDetail($product->getVariants()[0]->variantId)
-                ->getProductTaxa();
+                ->getTaxa();
 
             $this->assertCount(1, $result);
 
-            $this->assertEquals($product->productId->get(), $result[0]->getProductId());
-            $this->assertEquals($taxon->taxonId->get(), $result[0]->getTaxonId());
-            $this->assertEquals($taxon->taxonomyId->get(), $result[0]->getTaxonomyId());
-            $this->assertEquals($taxonomy->getType()->value, $result[0]->getTaxonomyType());
-            $this->assertTrue($result[0]->showsInGrid());
-            $this->assertEquals(2, $result[0]->getOrder());
+            $taxonItem = $result[0];
 
-            $this->assertEquals('Taxon title', $result[0]->getLabel('nl'));
-            $this->assertEquals('Titre du taxon', $result[0]->getLabel('fr'));
+            $this->assertEquals($product->productId->get(), $taxonItem->getProductId());
+            $this->assertEquals($taxon->taxonId->get(), $taxonItem->getTaxonId());
+            $this->assertEquals($taxon->taxonomyId->get(), $taxonItem->getTaxonomyId());
+            $this->assertEquals($taxonomy->getType()->value, $taxonItem->getTaxonomyType());
+            $this->assertTrue($taxonItem->showsInGrid());
+
+            $this->assertEquals('Taxon title', $taxonItem->getLabel('nl'));
+            $this->assertEquals('Titre du taxon', $taxonItem->getLabel('fr'));
         }
     }
 

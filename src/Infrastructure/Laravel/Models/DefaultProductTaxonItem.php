@@ -7,6 +7,7 @@ use Thinktomorrow\Trader\Application\Common\HasLocale;
 use Thinktomorrow\Trader\Application\Common\RendersData;
 use Thinktomorrow\Trader\Application\Product\ProductTaxa\ProductTaxonItem;
 use Thinktomorrow\Trader\Domain\Model\Taxon\TaxonState;
+use Thinktomorrow\Trader\Domain\Model\Taxonomy\TaxonomyState;
 use Thinktomorrow\Trader\Domain\Model\Taxonomy\TaxonomyType;
 
 class DefaultProductTaxonItem implements ProductTaxonItem
@@ -43,13 +44,30 @@ class DefaultProductTaxonItem implements ProductTaxonItem
             $state['taxonomy_id'],
             TaxonomyType::from($state['taxonomy_type']),
             (bool)$state['shows_in_grid'],
-            TaxonState::from($state['state']),
+            self::determineStateFlag($state),
             array_merge(
                 ['taxonomy_data' => json_decode($state['taxonomy_data'], true)],
                 ['taxon_data' => json_decode($state['taxon_data'], true)],
-                json_decode($state['data'], true),
+                ($state['data'] ? json_decode($state['data'], true) : []),
             )
         );
+    }
+
+    private static function determineStateFlag(array $state): TaxonState
+    {
+        $productTaxonState = TaxonState::from($state['state']);
+        $taxonState = TaxonState::from($state['taxon_state']);
+        $taxonomyState = TaxonomyState::from($state['taxonomy_state']);
+        $state = TaxonState::online;
+
+        if (!in_array($productTaxonState, TaxonState::onlineStates())) {
+            $state = $productTaxonState;
+        } elseif (!in_array($taxonState, TaxonState::onlineStates())) {
+            $state = $taxonState;
+        } elseif (!in_array($taxonomyState, TaxonomyState::onlineStates())) {
+            $state = TaxonState::offline;
+        }
+        return $state;
     }
 
     public function getProductId(): string

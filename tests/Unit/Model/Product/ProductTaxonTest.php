@@ -42,9 +42,9 @@ class ProductTaxonTest extends TestCase
         $this->assertCount(1, $product->getChildEntities()[ProductTaxon::class]);
     }
 
-    public function test_when_removing_properties_all_corresponding_properties_on_variants_are_removed_as_well()
+    public function test_when_removing_taxa_all_corresponding_taxa_on_variants_are_removed_as_well()
     {
-        $product = $this->createProductWithVariant();
+        $product = $this->createProductWithVariantAndTaxon();
 
         $this->assertCount(1, $product->getProductTaxa());
         $this->assertCount(1, $product->getVariants()[0]->getVariantTaxa());

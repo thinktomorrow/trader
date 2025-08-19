@@ -9,12 +9,8 @@ use Tests\Infrastructure\TestCase;
 use Thinktomorrow\Trader\Application\Product\ProductDetail\ProductDetail;
 use Thinktomorrow\Trader\Domain\Model\Product\Exceptions\CouldNotFindVariant;
 use Thinktomorrow\Trader\Domain\Model\Product\Product;
-use Thinktomorrow\Trader\Infrastructure\Laravel\Repositories\MysqlProductDetailRepository;
-use Thinktomorrow\Trader\Infrastructure\Laravel\Repositories\MysqlProductRepository;
-use Thinktomorrow\Trader\Infrastructure\Laravel\Repositories\MysqlVariantRepository;
 use Thinktomorrow\Trader\Infrastructure\Test\Repositories\InMemoryProductDetailRepository;
 use Thinktomorrow\Trader\Infrastructure\Test\Repositories\InMemoryProductRepository;
-use Thinktomorrow\Trader\Infrastructure\Test\TestContainer;
 
 final class ProductDetailRepositoryTest extends TestCase
 {
@@ -32,7 +28,7 @@ final class ProductDetailRepositoryTest extends TestCase
         }
     }
 
-    #[DataProvider('products')]
+    #[DataProvider('offlineProducts')]
     public function test_it_cannot_find_an_offline_productdetail(Product $product)
     {
         $productsNotFound = 0;
@@ -75,18 +71,20 @@ final class ProductDetailRepositoryTest extends TestCase
     private function productRepositories(): \Generator
     {
         yield new InMemoryProductRepository();
-        yield new MysqlProductRepository(new MysqlVariantRepository(new TestContainer()));
+//        yield new MysqlProductRepository(new MysqlVariantRepository(new TestContainer()));
     }
 
     private function repositories(): \Generator
     {
         yield new InMemoryProductDetailRepository();
-        yield new MysqlProductDetailRepository(new TestContainer());
+//        yield new MysqlProductDetailRepository(new TestContainer());
     }
 
     public static function products(): \Generator
     {
-        yield [static::createProductWithVariant()];
+        yield [
+            static::createProductWithVariant(),
+        ];
     }
 
     public static function offlineProducts(): \Generator

@@ -150,43 +150,43 @@ class DefaultProductDetail implements ProductDetail
 
     public function getCategories(): array
     {
-        return array_filter($this->taxa, function ($taxon) {
-            return $taxon->getTaxonomyType() === TaxonomyType::category->value;
+        return array_filter($this->taxa, function (ProductTaxonItem $taxon) {
+            return $taxon->getTaxonomyType() === TaxonomyType::category->value && $taxon->showOnline();
         });
     }
 
     public function getGoogleCategories(): array
     {
-        return array_filter($this->taxa, function ($taxon) {
-            return $taxon->getTaxonomyType() === TaxonomyType::google_category->value;
+        return array_filter($this->taxa, function (ProductTaxonItem $taxon) {
+            return $taxon->getTaxonomyType() === TaxonomyType::google_category->value && $taxon->showOnline();
         });
     }
 
     public function getProductProperties(): array
     {
-        return array_filter($this->taxa, function ($taxon) {
-            return $taxon->getTaxonomyType() === TaxonomyType::property->value;
+        return array_filter($this->taxa, function (ProductTaxonItem $taxon) {
+            return $taxon->getTaxonomyType() === TaxonomyType::property->value && $taxon->showOnline();
         });
     }
 
     public function getVariantProperties(): array
     {
-        return array_filter($this->taxa, function ($taxon) {
-            return $taxon->getTaxonomyType() === TaxonomyType::variant_property->value;
+        return array_filter($this->taxa, function (ProductTaxonItem $taxon) {
+            return $taxon->getTaxonomyType() === TaxonomyType::variant_property->value && $taxon->showOnline();
         });
     }
 
     public function getCollections(): array
     {
-        return array_filter($this->taxa, function ($taxon) {
-            return $taxon->getTaxonomyType() === TaxonomyType::collection->value;
+        return array_filter($this->taxa, function (ProductTaxonItem $taxon) {
+            return $taxon->getTaxonomyType() === TaxonomyType::collection->value && $taxon->showOnline();
         });
     }
 
     public function getTags(): array
     {
-        return array_filter($this->taxa, function ($taxon) {
-            return $taxon->getTaxonomyType() === TaxonomyType::tag->value;
+        return array_filter($this->taxa, function (ProductTaxonItem $taxon) {
+            return $taxon->getTaxonomyType() === TaxonomyType::tag->value && $taxon->showOnline();
         });
     }
 }

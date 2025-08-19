@@ -28,8 +28,9 @@ return new class extends Migration {
 
         Schema::table(static::PREFIX . 'taxa_products', function (Blueprint $table) {
             $table->char('taxonomy_id', 36);
+            $table->string('state')->default(\Thinktomorrow\Trader\Domain\Model\Taxon\TaxonState::online->value);
+            $table->json('data')->nullable();
             $table->unsignedInteger('order_column')->default(0);
-
             $table->foreign('taxonomy_id')->references('taxonomy_id')->on(static::PREFIX . 'taxonomies')->onDelete('cascade');
         });
 
@@ -37,6 +38,8 @@ return new class extends Migration {
             $table->char('taxon_id', 36);
             $table->char('variant_id', 36);
             $table->char('taxonomy_id', 36);
+            $table->string('state')->default(\Thinktomorrow\Trader\Domain\Model\Taxon\TaxonState::online->value);
+            $table->json('data')->nullable();
             $table->unsignedInteger('order_column')->default(0);
 
             $table->primary(['taxon_id', 'variant_id']);

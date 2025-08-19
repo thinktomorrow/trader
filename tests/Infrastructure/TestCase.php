@@ -3,7 +3,6 @@ declare(strict_types=1);
 
 namespace Tests\Infrastructure;
 
-use Illuminate\Support\Facades\DB;
 use Money\Money;
 use Tests\TestHelpers;
 use Thinktomorrow\Trader\Application\Cart\Read\Cart;
@@ -30,6 +29,8 @@ use Thinktomorrow\Trader\Application\Order\MerchantOrder\MerchantOrderShipping;
 use Thinktomorrow\Trader\Application\Order\MerchantOrder\MerchantOrderShippingAddress;
 use Thinktomorrow\Trader\Application\Order\MerchantOrder\MerchantOrderShopper;
 use Thinktomorrow\Trader\Application\Product\ProductDetail\ProductDetail;
+use Thinktomorrow\Trader\Application\Product\ProductTaxa\ProductTaxonItem;
+use Thinktomorrow\Trader\Application\Product\ProductTaxa\VariantTaxonItem;
 use Thinktomorrow\Trader\Application\Taxon\Tree\TaxonNode;
 use Thinktomorrow\Trader\Domain\Common\Email;
 use Thinktomorrow\Trader\Domain\Common\Locale;
@@ -68,8 +69,10 @@ use Thinktomorrow\Trader\Infrastructure\Laravel\Models\CustomerRead\DefaultCusto
 use Thinktomorrow\Trader\Infrastructure\Laravel\Models\CustomerRead\DefaultCustomerRead;
 use Thinktomorrow\Trader\Infrastructure\Laravel\Models\CustomerRead\DefaultCustomerShippingAddress;
 use Thinktomorrow\Trader\Infrastructure\Laravel\Models\DefaultProductDetail;
+use Thinktomorrow\Trader\Infrastructure\Laravel\Models\DefaultProductTaxonItem;
 use Thinktomorrow\Trader\Infrastructure\Laravel\Models\DefaultTaxonNode;
 use Thinktomorrow\Trader\Infrastructure\Laravel\Models\DefaultVariantForCart;
+use Thinktomorrow\Trader\Infrastructure\Laravel\Models\DefaultVariantTaxonItem;
 use Thinktomorrow\Trader\Infrastructure\Laravel\Models\MerchantOrder\DefaultMerchantOrder;
 use Thinktomorrow\Trader\Infrastructure\Laravel\Models\MerchantOrder\DefaultMerchantOrderBillingAddress;
 use Thinktomorrow\Trader\Infrastructure\Laravel\Models\MerchantOrder\DefaultMerchantOrderDiscount;
@@ -125,6 +128,9 @@ abstract class TestCase extends \Orchestra\Testbench\TestCase
         (new TestContainer())->add(PaymentState::class, DefaultPaymentState::class);
 
         (new TestContainer())->add(ProductDetail::class, DefaultProductDetail::class);
+        (new TestContainer())->add(ProductTaxonItem::class, DefaultProductTaxonItem::class);
+        (new TestContainer())->add(VariantTaxonItem::class, DefaultVariantTaxonItem::class);
+
         (new TestContainer())->add(TaxonNode::class, DefaultTaxonNode::class);
         (new TestContainer())->add(VariantForCart::class, DefaultVariantForCart::class);
 
