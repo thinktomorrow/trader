@@ -13,7 +13,7 @@ use Thinktomorrow\Trader\Application\Product\ProductTaxa\VariantTaxonItem;
  */
 interface GridItem
 {
-    public static function fromMappedData(array $state): static;
+    public static function fromMappedData(array $state, array $taxa): static;
 
     public function getVariantId(): string;
 

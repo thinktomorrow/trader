@@ -7,11 +7,13 @@ use Thinktomorrow\Trader\Application\Common\HasLocale;
 use Thinktomorrow\Trader\Application\Common\RendersData;
 use Thinktomorrow\Trader\Application\Common\RendersVariantPrices;
 use Thinktomorrow\Trader\Application\Product\Grid\GridItem;
+use Thinktomorrow\Trader\Application\Product\ProductTaxa\ProductTaxonItem;
 use Thinktomorrow\Trader\Domain\Model\Product\ProductId;
 use Thinktomorrow\Trader\Domain\Model\Product\Variant\VariantId;
 use Thinktomorrow\Trader\Domain\Model\Product\Variant\VariantSalePrice;
 use Thinktomorrow\Trader\Domain\Model\Product\Variant\VariantState;
 use Thinktomorrow\Trader\Domain\Model\Product\Variant\VariantUnitPrice;
+use Thinktomorrow\Trader\Domain\Model\Taxonomy\TaxonomyType;
 
 class DefaultGridItem implements GridItem
 {
@@ -19,24 +21,23 @@ class DefaultGridItem implements GridItem
     use RendersData;
     use HasLocale;
 
-    private VariantId $variantId;
-    private ProductId $productId;
-    private VariantState $state;
-    private array $data;
-    private iterable $images;
-    protected array $taxonIds;
+    protected VariantId $variantId;
+    protected ProductId $productId;
+    protected VariantState $state;
+    protected array $data;
+    protected iterable $images;
+    protected array $taxa;
 
     final private function __construct()
     {
     }
 
-    public static function fromMappedData(array $state): static
+    public static function fromMappedData(array $state, array $taxa): static
     {
         $item = new static();
 
         $item->variantId = VariantId::fromString($state['variant_id']);
         $item->productId = ProductId::fromString($state['product_id']);
-        $item->taxonIds = $state['taxon_ids'] ?: [];
         $item->state = VariantState::from($state['state']);
         $item->salePrice = VariantSalePrice::fromScalars($state['sale_price'], $state['tax_rate'], $state['includes_vat']);
         $item->unitPrice = VariantUnitPrice::fromScalars($state['unit_price'], $state['tax_rate'], $state['includes_vat']);
@@ -44,6 +45,14 @@ class DefaultGridItem implements GridItem
             ['product_data' => json_decode($state['product_data'], true)],
             json_decode($state['data'], true),
         );
+
+        foreach ($taxa as $taxon) {
+            if (!($taxon instanceof ProductTaxonItem)) {
+                throw new \InvalidArgumentException('Taxa must be instances of ProductTaxonItem or VariantTaxonItem');
+            }
+        }
+
+        $item->taxa = $taxa;
 
         return $item;
     }
@@ -56,11 +65,6 @@ class DefaultGridItem implements GridItem
     public function getProductId(): string
     {
         return $this->productId->get();
-    }
-
-    public function getTaxonIds(): array
-    {
-        return $this->taxonIds;
     }
 
     public function isAvailable(): bool
@@ -86,5 +90,45 @@ class DefaultGridItem implements GridItem
     public function getImages(): iterable
     {
         return $this->images;
+    }
+
+    public function getTaxa(): array
+    {
+        return $this->taxa;
+    }
+
+    public function getGridCategories(): array
+    {
+        return array_filter($this->taxa, function (ProductTaxonItem $taxon) {
+            return $taxon->getTaxonomyType() === TaxonomyType::category->value && $taxon->showOnline();
+        });
+    }
+
+    public function getGridProductProperties(): array
+    {
+        return array_filter($this->taxa, function (ProductTaxonItem $taxon) {
+            return $taxon->getTaxonomyType() === TaxonomyType::property->value && $taxon->showOnline();
+        });
+    }
+
+    public function getGridVariantProperties(): array
+    {
+        return array_filter($this->taxa, function (ProductTaxonItem $taxon) {
+            return $taxon->getTaxonomyType() === TaxonomyType::variant_property->value && $taxon->showOnline();
+        });
+    }
+
+    public function getGridCollections(): array
+    {
+        return array_filter($this->taxa, function (ProductTaxonItem $taxon) {
+            return $taxon->getTaxonomyType() === TaxonomyType::collection->value && $taxon->showOnline();
+        });
+    }
+
+    public function getGridTags(): array
+    {
+        return array_filter($this->taxa, function (ProductTaxonItem $taxon) {
+            return $taxon->getTaxonomyType() === TaxonomyType::tag->value && $taxon->showOnline();
+        });
     }
 }

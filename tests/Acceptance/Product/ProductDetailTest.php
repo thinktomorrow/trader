@@ -48,15 +48,6 @@ class ProductDetailTest extends ProductContext
         $this->assertEquals(['1', '2'], $productDetail->getTaxonIds());
     }
 
-    public function test_it_can_get_product_taxa(): void
-    {
-        // Get product taxa
-        // Get per taxonomy type:
-        // ->getCategories(), ->getTags(), ->getProperties(), ->getVariantProperties(), ->getCollections
-
-        // These TaxonReads should have urls, keys, labels and everything to be represented in the views
-    }
-
     public function test_it_can_get_sku_and_ean()
     {
         $product = $this->createProductWithVariant();
