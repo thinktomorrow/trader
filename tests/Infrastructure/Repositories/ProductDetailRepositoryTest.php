@@ -71,13 +71,13 @@ final class ProductDetailRepositoryTest extends TestCase
     private function productRepositories(): \Generator
     {
         yield new InMemoryProductRepository();
-//        yield new MysqlProductRepository(new MysqlVariantRepository(new TestContainer()));
+        //        yield new MysqlProductRepository(new MysqlVariantRepository(new TestContainer()));
     }
 
     private function repositories(): \Generator
     {
         yield new InMemoryProductDetailRepository();
-//        yield new MysqlProductDetailRepository(new TestContainer());
+        //        yield new MysqlProductDetailRepository(new TestContainer());
     }
 
     public static function products(): \Generator
