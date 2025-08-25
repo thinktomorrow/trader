@@ -75,7 +75,7 @@ final class ProductTaxonRepositoryTest extends TestCase
     public static function products(): \Generator
     {
         yield [static::createProductWithProductVariantProperties()];
-//        yield [static::createProduct()];
+        //        yield [static::createProduct()];
     }
 
     private function taxonomyRepositories(): array

@@ -26,13 +26,13 @@ class UpdateProductTaxaTest extends ProductContext
             [
                 'product_id' => $productId->get(),
                 'taxon_id' => '1',
-                'data' => json_encode([])
+                'data' => json_encode([]),
             ],
             [
                 'product_id' => $productId->get(),
                 'taxon_id' => '3',
-                'data' => json_encode([])
-            ]
+                'data' => json_encode([]),
+            ],
         ], $product->getChildEntities()[ProductTaxon::class]);
 
         $this->assertEquals([
