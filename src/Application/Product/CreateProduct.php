@@ -3,6 +3,8 @@ declare(strict_types=1);
 
 namespace Thinktomorrow\Trader\Application\Product;
 
+use Thinktomorrow\Trader\Domain\Model\Product\ProductId;
+use Thinktomorrow\Trader\Domain\Model\Product\ProductTaxa\ProductTaxon;
 use Thinktomorrow\Trader\Domain\Model\Product\Variant\VariantSalePrice;
 use Thinktomorrow\Trader\Domain\Model\Product\Variant\VariantUnitPrice;
 use Thinktomorrow\Trader\Domain\Model\Taxon\TaxonId;
@@ -26,9 +28,16 @@ class CreateProduct
         $this->variantData = $variantData;
     }
 
-    public function getTaxonIds(): array
+    public function getProductTaxa(ProductId $productId): array
     {
-        return array_map(fn ($taxonId) => TaxonId::fromString($taxonId), $this->taxonIds);
+        return array_map(function ($taxonId) use ($productId) {
+            return ProductTaxon::create($productId, $taxonId);
+        }, $this->getTaxonIds());
+    }
+
+    private function getTaxonIds(): array
+    {
+        return array_map(fn($taxonId) => TaxonId::fromString($taxonId), $this->taxonIds);
     }
 
     public function getUnitPrice(bool $doesPriceInputIncludesVat): VariantUnitPrice

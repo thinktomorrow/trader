@@ -12,11 +12,10 @@ use Thinktomorrow\Trader\Domain\Model\Product\Product;
 use Thinktomorrow\Trader\Domain\Model\Product\ProductId;
 use Thinktomorrow\Trader\Domain\Model\Product\ProductRepository;
 use Thinktomorrow\Trader\Domain\Model\Product\ProductTaxa\ProductTaxon;
-use Thinktomorrow\Trader\Domain\Model\Product\ProductTaxa\ProductTaxonRepository;
 use Thinktomorrow\Trader\Domain\Model\Product\Variant\Variant;
 use Thinktomorrow\Trader\Domain\Model\Product\VariantRepository;
 
-class MysqlProductRepository implements ProductRepository, ProductTaxonRepository
+class MysqlProductRepository implements ProductRepository
 {
     private VariantRepository $variantRepository;
 
@@ -94,9 +93,10 @@ class MysqlProductRepository implements ProductRepository, ProductTaxonRepositor
             DB::table(static::$productTaxonLookupTable)
                 ->updateOrInsert([
                     'product_id' => $product->productId->get(),
-                    'taxonomy_id' => $taxonState['taxonomy_id'],
                     'taxon_id' => $taxonState['taxon_id'],
+                    'data' => $taxonState['data'],
                     'order_column' => $i,
+                    'state' => $taxonState['state'],
                 ]);
         }
     }
@@ -111,8 +111,15 @@ class MysqlProductRepository implements ProductRepository, ProductTaxonRepositor
         $productState = DB::table(static::$productTable)
             ->select([
                 static::$productTable . '.*',
+                DB::raw(
+                    'GROUP_CONCAT(DISTINCT trader_taxonomies.taxonomy_id || ":" || trader_taxonomies.type || ":" || trader_taxa.taxon_id || ":" || trader_taxa_products.state || ":" || trader_taxa_products.data) AS taxa',
+                ),
             ])
             ->where(static::$productTable . '.product_id', $productId->get())
+            ->leftJoin(static::$productTaxonLookupTable, static::$productTable . '.product_id', '=', static::$productTaxonLookupTable . '.product_id')
+            ->leftJoin('trader_taxa', static::$productTaxonLookupTable . '.taxon_id', '=', 'trader_taxa.taxon_id')
+            ->leftJoin('trader_taxonomies', 'trader_taxa.taxonomy_id', '=', 'trader_taxonomies.taxonomy_id')
+            ->groupBy(static::$productTable . '.product_id')
             ->first();
 
         // Handle a bug in laravel where raw group concat statement would return a record with falsy null values
@@ -135,7 +142,7 @@ class MysqlProductRepository implements ProductRepository, ProductTaxonRepositor
             ->map(fn($item) => (array)$item)
             ->toArray();
 
-        $productTaxa = $this->getProductTaxonStatesByProduct($productId->get());
+        $productTaxa = $this->getProductTaxonStatesByProduct($productState);
 
         return Product::fromMappedData($productState, [
             Variant::class => $variantStates,
@@ -144,61 +151,54 @@ class MysqlProductRepository implements ProductRepository, ProductTaxonRepositor
         ]);
     }
 
-    public function getProductTaxonStatesByProduct(string $productId): array
+    private function getProductTaxonStatesByProduct(array $state): array
     {
-        return DB::table(static::$productTaxonLookupTable)
-            ->join('trader_taxa', 'trader_taxa.taxon_id', '=', static::$productTaxonLookupTable . '.taxon_id')
-            ->join('trader_taxonomies', 'trader_taxonomies.taxonomy_id', '=', static::$productTaxonLookupTable . '.taxonomy_id')
-            ->where(static::$productTaxonLookupTable . '.product_id', $productId)
-            ->select([
-                static::$productTaxonLookupTable . '.*',
-                'trader_taxonomies.taxonomy_id',
-                'trader_taxonomies.type as taxonomy_type',
-                'trader_taxonomies.shows_in_grid',
-                'trader_taxonomies.state as taxonomy_state',
-                'trader_taxa.state',
-                'trader_taxa.order',
-                'trader_taxa.data',
-            ])
-            ->get()
-            ->map(function ($item) {
-                // Extend the ProductTaxon with other methods and properties to enhance usage.
-                return [
-                    'taxonomy_type' => $item->taxonomy_type,
-                    'product_id' => $item->product_id,
-                    'taxon_id' => $item->taxon_id,
-                    'taxonomy_id' => $item->taxonomy_id,
-                    'data' => $item->data,
-                ];
-            })
-            ->all();
+        if (empty($state['taxa'])) {
+            return [];
+        }
+
+        $pairs = [];
+
+        foreach (explode(',', $state['taxa']) as $pair) {
+            [$taxonomyId, $taxonomyType, $taxonId, $taxonState, $taxonData] = explode(':', $pair);
+            $pairs[] = [
+                'product_id' => $state['product_id'],
+                'taxonomy_type' => $taxonomyType,
+                'taxonomy_id' => $taxonomyId,
+                'taxon_id' => $taxonId,
+                'state' => $taxonState,
+                'data' => $taxonData,
+            ];
+        }
+
+        return $pairs;
     }
 
-    public function getProductTaxaByTaxonIds(string $productId, array $taxonIds): array
-    {
-        return DB::table('trader_taxa')
-            ->join('trader_taxonomies', 'trader_taxonomies.taxonomy_id', '=', 'trader_taxa.taxonomy_id')
-            ->whereIn('trader_taxa.taxon_id', $taxonIds)
-            ->select([
-                'trader_taxa.*',
-                'trader_taxonomies.taxonomy_id',
-                'trader_taxonomies.type as taxonomy_type',
-                'trader_taxonomies.shows_in_grid',
-                'trader_taxonomies.state as taxonomy_state',
-            ])
-            ->get()
-            ->map(function ($item) {
-                // Extend the ProductTaxon with other methods and properties to enhance usage.
-                return [
-                    'taxonomy_type' => $item->taxonomy_type,
-                    'taxon_id' => $item->taxon_id,
-                    'taxonomy_id' => $item->taxonomy_id,
-                    'data' => $item->data,
-                ];
-            })
-            ->map(fn($item) => ProductTaxon::fromMappedData($item, ['product_id' => $productId]))
-            ->all();
-    }
+//    public function getProductTaxaByTaxonIds(string $productId, array $taxonIds): array
+//    {
+//        return DB::table('trader_taxa')
+//            ->join('trader_taxonomies', 'trader_taxonomies.taxonomy_id', '=', 'trader_taxa.taxonomy_id')
+//            ->whereIn('trader_taxa.taxon_id', $taxonIds)
+//            ->select([
+//                'trader_taxa.*',
+//                'trader_taxonomies.taxonomy_id',
+//                'trader_taxonomies.type as taxonomy_type',
+//                'trader_taxonomies.shows_in_grid',
+//                'trader_taxonomies.state as taxonomy_state',
+//            ])
+//            ->get()
+//            ->map(function ($item) {
+//                // Extend the ProductTaxon with other methods and properties to enhance usage.
+//                return [
+//                    'taxonomy_type' => $item->taxonomy_type,
+//                    'taxon_id' => $item->taxon_id,
+//                    'taxonomy_id' => $item->taxonomy_id,
+//                    'data' => $item->data,
+//                ];
+//            })
+//            ->map(fn($item) => ProductTaxon::fromMappedData($item, ['product_id' => $productId]))
+//            ->all();
+//    }
 
     public function delete(ProductId $productId): void
     {

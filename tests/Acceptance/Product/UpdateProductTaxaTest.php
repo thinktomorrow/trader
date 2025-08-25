@@ -6,6 +6,7 @@ namespace Tests\Acceptance\Product;
 use Tests\TestHelpers;
 use Thinktomorrow\Trader\Application\Product\UpdateProduct\UpdateProductTaxa;
 use Thinktomorrow\Trader\Domain\Model\Product\Events\ProductTaxaUpdated;
+use Thinktomorrow\Trader\Domain\Model\Product\ProductTaxa\ProductTaxon;
 
 class UpdateProductTaxaTest extends ProductContext
 {
@@ -19,7 +20,20 @@ class UpdateProductTaxaTest extends ProductContext
 
         $product = $this->productRepository->find($productId);
 
-        $this->assertEquals(['1', '3'], $product->getMappedData()['taxon_ids']);
+        $this->assertContainsOnlyInstancesOf(ProductTaxon::class, $product->getProductTaxa());
+        $this->assertCount(2, $product->getChildEntities()[ProductTaxon::class]);
+        $this->assertEquals([
+            [
+                'product_id' => $productId->get(),
+                'taxon_id' => '1',
+                'data' => json_encode([])
+            ],
+            [
+                'product_id' => $productId->get(),
+                'taxon_id' => '3',
+                'data' => json_encode([])
+            ]
+        ], $product->getChildEntities()[ProductTaxon::class]);
 
         $this->assertEquals([
             new ProductTaxaUpdated($productId),
@@ -34,7 +48,7 @@ class UpdateProductTaxaTest extends ProductContext
 
         $product = $this->productRepository->find($productId);
 
-        $this->assertEquals([], $product->getMappedData()['taxon_ids']);
+        $this->assertCount(0, $product->getChildEntities()[ProductTaxon::class]);
 
         $this->assertEquals([
             new ProductTaxaUpdated($productId),

@@ -7,8 +7,7 @@ use Thinktomorrow\Trader\Domain\Common\Entity\ChildEntity;
 use Thinktomorrow\Trader\Domain\Common\Entity\HasData;
 use Thinktomorrow\Trader\Domain\Model\Product\Variant\VariantId;
 use Thinktomorrow\Trader\Domain\Model\Taxon\TaxonId;
-use Thinktomorrow\Trader\Domain\Model\Taxonomy\TaxonomyId;
-use Thinktomorrow\Trader\Domain\Model\Taxonomy\TaxonomyType;
+use Thinktomorrow\Trader\Domain\Model\Taxon\TaxonState;
 
 class VariantTaxon implements ChildEntity
 {
@@ -16,32 +15,39 @@ class VariantTaxon implements ChildEntity
 
     public readonly VariantId $variantId;
     public readonly TaxonId $taxonId;
-    public readonly TaxonomyId $taxonomyId;
-    public readonly TaxonomyType $taxonomyType;
+    private TaxonState $state;
 
     private function __construct()
     {
     }
 
-    public static function create(VariantId $variantId, TaxonomyId $taxonomyId, TaxonomyType $taxonomyType, TaxonId $taxonId): static
+    public static function create(VariantId $variantId, TaxonId $taxonId): static
     {
         $object = new static();
 
         $object->variantId = $variantId;
-        $object->taxonomyId = $taxonomyId;
-        $object->taxonomyType = $taxonomyType;
         $object->taxonId = $taxonId;
+        $object->state = TaxonState::online;
 
         return $object;
+    }
+
+    public function changeState(TaxonState $state): void
+    {
+        $this->state = $state;
+    }
+
+    public function getState(): TaxonState
+    {
+        return $this->state;
     }
 
     public function getMappedData(): array
     {
         return [
             'variant_id' => $this->variantId->get(),
-            'taxonomy_id' => $this->taxonomyId->get(),
-            'taxonomy_type' => $this->taxonomyType->value,
             'taxon_id' => $this->taxonId->get(),
+            'state' => $this->state->value,
             'data' => json_encode($this->data),
         ];
     }
@@ -51,9 +57,8 @@ class VariantTaxon implements ChildEntity
         $object = new static();
 
         $object->variantId = VariantId::fromString($aggregateState['variant_id']);
-        $object->taxonomyId = TaxonomyId::fromString($state['taxonomy_id']);
-        $object->taxonomyType = TaxonomyType::from($state['taxonomy_type']);
         $object->taxonId = TaxonId::fromString($state['taxon_id']);
+        $object->state = TaxonState::from($state['state']);
         $object->data = json_decode($state['data'], true);
 
         return $object;

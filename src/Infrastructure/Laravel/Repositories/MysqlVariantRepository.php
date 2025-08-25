@@ -62,13 +62,13 @@ class MysqlVariantRepository implements VariantRepository, VariantForCartReposit
             ->whereNotIn('taxon_id', $taxonIds)
             ->delete();
 
-        foreach ($variant->getChildEntities()[VariantTaxon::class] as $i => $taxonState) {
+        foreach ($variant->getChildEntities()[VariantTaxon::class] as $i => $variantTaxonState) {
             DB::table(static::$variantTaxaLookupTable)
                 ->updateOrInsert([
                     'variant_id' => $variant->variantId->get(),
-                    'taxonomy_id' => $taxonState['taxonomy_id'],
-                    'taxon_id' => $taxonState['taxon_id'],
-                    'data' => $taxonState['data'],
+                    'taxon_id' => $variantTaxonState['taxon_id'],
+                    'data' => $variantTaxonState['data'],
+                    'state' => $variantTaxonState['state'],
                     'order_column' => $i,
                 ]);
         }
@@ -80,12 +80,13 @@ class MysqlVariantRepository implements VariantRepository, VariantForCartReposit
             ->select([
                 static::$variantTable . '.*',
                 DB::raw(
-                    'GROUP_CONCAT(DISTINCT trader_taxonomies.taxonomy_id || ":" || type || ":" || taxon_id || ":" || trader_taxa_variants.data) AS taxa',
+                    'GROUP_CONCAT(DISTINCT trader_taxonomies.taxonomy_id || ":" || trader_taxonomies.type || ":" || trader_taxa.taxon_id || ":" || trader_taxa_variants.state || ":" || trader_taxa_variants.data) AS taxa',
                 ),
             ])
             ->where(static::$variantTable . '.product_id', $productId->get())
             ->leftJoin(static::$variantTaxaLookupTable, static::$variantTable . '.variant_id', '=', static::$variantTaxaLookupTable . '.variant_id')
-            ->leftJoin('trader_taxonomies', static::$variantTaxaLookupTable . '.taxonomy_id', '=', 'trader_taxonomies.taxonomy_id')
+            ->leftJoin('trader_taxa', static::$variantTaxaLookupTable . '.taxon_id', '=', 'trader_taxa.taxon_id')
+            ->leftJoin('trader_taxonomies', 'trader_taxa.taxonomy_id', '=', 'trader_taxonomies.taxonomy_id')
             ->groupBy(static::$variantTable . '.variant_id')
             ->orderBy(static::$variantTable . '.order_column')
             ->get()
@@ -97,12 +98,13 @@ class MysqlVariantRepository implements VariantRepository, VariantForCartReposit
                 $pairs = [];
                 if (!empty($item['taxa'])) {
                     foreach (explode(',', $item['taxa']) as $pair) {
-                        [$taxonomyId, $taxonomyType, $taxonId, $taxonData] = explode(':', $pair);
+                        [$taxonomyId, $taxonomyType, $taxonId, $taxonState, $taxonData] = explode(':', $pair);
                         $pairs[] = [
                             'variant_id' => $item['variant_id'],
                             'taxonomy_type' => $taxonomyType,
                             'taxonomy_id' => $taxonomyId,
                             'taxon_id' => $taxonId,
+                            'state' => $taxonState,
                             'data' => $taxonData,
                         ];
                     }

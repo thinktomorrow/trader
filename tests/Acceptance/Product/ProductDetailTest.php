@@ -4,6 +4,8 @@ declare(strict_types=1);
 namespace Tests\Acceptance\Product;
 
 use Tests\TestHelpers;
+use Thinktomorrow\Trader\Application\Product\ProductTaxa\ProductTaxonItem;
+use Thinktomorrow\Trader\Domain\Model\Product\ProductTaxa\ProductTaxon;
 use Thinktomorrow\Trader\Domain\Model\Taxon\TaxonId;
 
 class ProductDetailTest extends ProductContext
@@ -12,11 +14,23 @@ class ProductDetailTest extends ProductContext
 
     public function test_it_can_get_a_product_detail()
     {
+        [$taxonomies, $taxa] = $this->createTaxonomiesAndTaxa();
+
+        foreach ($taxonomies as $taxonomy) {
+            $this->taxonomyRepository->save($taxonomy);
+        }
+
+        foreach ($taxa as $taxon) {
+            $this->taxonRepository->save($taxon);
+        }
+
         $product = $this->createProductWithProductVariantProperties();
-        $product->updateTaxonIds([
-            TaxonId::fromString('1'),
-            TaxonId::fromString('2'),
+
+        $product->updateProductTaxa([
+            ProductTaxon::create($product->productId, TaxonId::fromString('xxx')),
+            ProductTaxon::create($product->productId, TaxonId::fromString('yyy')),
         ]);
+
         $product->addData([
             'title' => [
                 'nl' => 'product title nl',
@@ -45,7 +59,9 @@ class ProductDetailTest extends ProductContext
         $this->assertEquals('€ 0,10', $productDetail->getSalePrice(true));
         $this->assertEquals('€ 0,08', $productDetail->getSalePrice(false));
         $this->assertEquals('variant title nl', $productDetail->getTitle());
-        $this->assertEquals(['1', '2'], $productDetail->getTaxonIds());
+
+        $this->assertCount(4, $productDetail->getTaxa());
+        $this->assertContainsOnlyInstancesOf(ProductTaxonItem::class, $productDetail->getTaxa());
     }
 
     public function test_it_can_get_sku_and_ean()

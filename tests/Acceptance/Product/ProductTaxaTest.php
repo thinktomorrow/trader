@@ -58,7 +58,7 @@ class ProductTaxaTest extends ProductContext
         // Create a product and assign the product property taxon
         $product = static::createProductWithVariant();
         $product->updateProductTaxa([
-            ProductTaxon::create($product->productId, $taxonomyId, TaxonomyType::property, $taxonId),
+            ProductTaxon::create($product->productId, $taxonId),
         ]);
 
         $this->productRepository->save($product);
@@ -94,7 +94,7 @@ class ProductTaxaTest extends ProductContext
         // Create a product and assign the product property taxon
         $product = static::createProductWithVariant();
         $product->updateProductTaxa([
-            ProductTaxon::create($product->productId, $taxonomyId, TaxonomyType::property, $taxonId),
+            ProductTaxon::create($product->productId, $taxonId),
         ]);
 
         $this->productRepository->save($product);
@@ -125,7 +125,7 @@ class ProductTaxaTest extends ProductContext
         // Create a product and assign the product property taxon
         $product = static::createProductWithVariant();
 
-        $productTaxon = ProductTaxon::create($product->productId, $taxonomyId, TaxonomyType::property, $taxonId);
+        $productTaxon = ProductTaxon::create($product->productId, $taxonId);
         $productTaxon->addData(['title' => ['nl' => 'Custom Label nl', 'en' => 'Custom Label en']]);
 
         $product->updateProductTaxa([$productTaxon]);
@@ -158,7 +158,7 @@ class ProductTaxaTest extends ProductContext
         // Create a product and assign the product property taxon
         $product = static::createProductWithVariant();
 
-        $productTaxon = ProductTaxon::create($product->productId, $taxonomyId, TaxonomyType::property, $taxonId);
+        $productTaxon = ProductTaxon::create($product->productId, $taxonId);
         $product->updateProductTaxa([$productTaxon]);
         $this->productRepository->save($product);
 
@@ -186,7 +186,7 @@ class ProductTaxaTest extends ProductContext
         // Create a product and assign the product property taxon
         $product = static::createProductWithVariant();
 
-        $productTaxon = ProductTaxon::create($product->productId, $taxonomyId, TaxonomyType::property, $taxonId);
+        $productTaxon = ProductTaxon::create($product->productId, $taxonId);
         $product->updateProductTaxa([$productTaxon]);
         $this->productRepository->save($product);
 
@@ -218,8 +218,8 @@ class ProductTaxaTest extends ProductContext
             // Create a product and assign the taxon
             $product = static::createProductWithVariant();
             $product->updateProductTaxa([
-                ProductTaxon::create($product->productId, $taxonomyId, TaxonomyType::from($taxonomyType), $taxonId),
-                ProductTaxon::create($product->productId, $taxonomyId, TaxonomyType::from($taxonomyType), $taxonOfflineId),
+                ProductTaxon::create($product->productId, $taxonId),
+                ProductTaxon::create($product->productId, $taxonOfflineId),
             ]);
 
             $this->productRepository->save($product);

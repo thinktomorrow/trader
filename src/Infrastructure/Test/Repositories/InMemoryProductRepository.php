@@ -8,9 +8,8 @@ use Thinktomorrow\Trader\Domain\Model\Product\Product;
 use Thinktomorrow\Trader\Domain\Model\Product\ProductId;
 use Thinktomorrow\Trader\Domain\Model\Product\ProductRepository;
 use Thinktomorrow\Trader\Domain\Model\Product\ProductTaxa\ProductTaxon;
-use Thinktomorrow\Trader\Domain\Model\Product\ProductTaxa\ProductTaxonRepository;
 
-final class InMemoryProductRepository implements ProductRepository, ProductTaxonRepository
+final class InMemoryProductRepository implements ProductRepository
 {
     public static array $products = [];
 
@@ -84,13 +83,18 @@ final class InMemoryProductRepository implements ProductRepository, ProductTaxon
 
     public function getProductTaxaByTaxonIds(string $productId, array $taxonIds): array
     {
-        if (!isset(static::$products[$productId])) {
-            throw new CouldNotFindProduct('No product found by id ' . $productId);
-        }
+        $taxa = InMemoryTaxonRepository::$taxons;
 
-        return array_filter(
-            static::$products[$productId]->getProductTaxa() ?? [],
-            fn(ProductTaxon $productTaxon) => in_array($productTaxon->taxonId->get(), $taxonIds)
-        );
+        $taxa = array_filter($taxa, fn($taxon) => in_array($taxon->taxonId->get(), $taxonIds));
+
+        return array_map(fn($taxon) => ProductTaxon::fromMappedData(
+            [
+                'taxon_id' => $taxon->taxonId->get(),
+                'data' => '{}',
+            ],
+            [
+                'product_id' => $productId,
+            ],
+        ), $taxa);
     }
 }

@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace Thinktomorrow\Trader\Application\Product\UpdateProduct;
 
 use Thinktomorrow\Trader\Domain\Model\Product\ProductId;
+use Thinktomorrow\Trader\Domain\Model\Product\ProductTaxa\ProductTaxon;
 use Thinktomorrow\Trader\Domain\Model\Taxon\TaxonId;
 
 class UpdateProductTaxa
@@ -24,7 +25,9 @@ class UpdateProductTaxa
 
     public function getProductTaxa(): array
     {
-        return array_map(fn($taxon_id) => TaxonId::fromString($taxon_id), $this->taxonIds);
+        return array_map(function ($taxonId) {
+            return ProductTaxon::create($this->getProductId(), $taxonId);
+        }, $this->getTaxonIds());
     }
 
     public function getTaxonIds(): array

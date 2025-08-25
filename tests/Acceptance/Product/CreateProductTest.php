@@ -3,6 +3,8 @@ declare(strict_types=1);
 
 namespace Tests\Acceptance\Product;
 
+use Thinktomorrow\Trader\Domain\Model\Product\ProductTaxa\ProductTaxon;
+
 class CreateProductTest extends ProductContext
 {
     public function test_it_can_create_a_product()
@@ -14,8 +16,9 @@ class CreateProductTest extends ProductContext
         // Title
         $this->assertEquals(json_encode(['title' => ['nl' => 'foobar nl']]), $product->getMappedData()['data']);
 
-        // Taxon ids
-        $this->assertEquals(['1', '2'], $product->getMappedData()['taxon_ids']);
+        // Taxa
+        $this->assertCount(2, $product->getProductTaxa());
+        $this->assertContainsOnlyInstancesOf(ProductTaxon::class, $product->getProductTaxa());
 
         // Auto created variant
         $variants = $product->getVariants();

@@ -11,6 +11,8 @@ use Thinktomorrow\Trader\Application\Product\CreateVariant;
 use Thinktomorrow\Trader\Application\Product\ProductApplication;
 use Thinktomorrow\Trader\Application\Taxon\CreateTaxon;
 use Thinktomorrow\Trader\Application\Taxon\TaxonApplication;
+use Thinktomorrow\Trader\Application\Taxonomy\CreateTaxonomy;
+use Thinktomorrow\Trader\Application\Taxonomy\TaxonomyApplication;
 use Thinktomorrow\Trader\Domain\Common\Email;
 use Thinktomorrow\Trader\Domain\Common\Locale;
 use Thinktomorrow\Trader\Domain\Common\Vat\VatPercentage;
@@ -110,18 +112,18 @@ trait TestHelpers
             'order_state' => DefaultOrderState::cart_revived,
             'data' => "[]",
         ], $orderValues), [
-            Line::class => array_map(fn (Line $line) => [
+            Line::class => array_map(fn(Line $line) => [
                 ...$line->getMappedData(),
-                Discount::class => array_map(fn (Discount $discount) => $discount->getMappedData(), $line->getDiscounts()),
-                LinePersonalisation::class => array_map(fn (LinePersonalisation $linePersonalisation) => $linePersonalisation->getMappedData(), $line->getPersonalisations()),
+                Discount::class => array_map(fn(Discount $discount) => $discount->getMappedData(), $line->getDiscounts()),
+                LinePersonalisation::class => array_map(fn(LinePersonalisation $linePersonalisation) => $linePersonalisation->getMappedData(), $line->getPersonalisations()),
             ], $lines),
-            Shipping::class => array_map(fn (Shipping $shipping) => [...array_merge($shipping->getMappedData(), ['shipping_state' => $shipping->getShippingState()]), Discount::class => array_map(fn (Discount $discount) => $discount->getMappedData(), $shipping->getDiscounts())], $shippings),
-            Payment::class => array_map(fn (Payment $payment) => [...array_merge($payment->getMappedData(), ['payment_state' => $payment->getPaymentState()]), Discount::class => array_map(fn (Discount $discount) => $discount->getMappedData(), $payment->getDiscounts())], $payments),
+            Shipping::class => array_map(fn(Shipping $shipping) => [...array_merge($shipping->getMappedData(), ['shipping_state' => $shipping->getShippingState()]), Discount::class => array_map(fn(Discount $discount) => $discount->getMappedData(), $shipping->getDiscounts())], $shippings),
+            Payment::class => array_map(fn(Payment $payment) => [...array_merge($payment->getMappedData(), ['payment_state' => $payment->getPaymentState()]), Discount::class => array_map(fn(Discount $discount) => $discount->getMappedData(), $payment->getDiscounts())], $payments),
             ShippingAddress::class => $shippingAddress?->getMappedData(),
             BillingAddress::class => $billingAddress?->getMappedData(),
             Shopper::class => $shopper?->getMappedData(),
-            Discount::class => array_map(fn (Discount $discount) => $discount->getMappedData(), $discounts),
-            OrderEvent::class => array_map(fn (OrderEvent $logEntry) => $logEntry->getMappedData(), $logEntries),
+            Discount::class => array_map(fn(Discount $discount) => $discount->getMappedData(), $discounts),
+            OrderEvent::class => array_map(fn(OrderEvent $logEntry) => $logEntry->getMappedData(), $logEntries),
         ]);
     }
 
@@ -154,8 +156,8 @@ trait TestHelpers
         ], $values), array_merge([
             'order_id' => 'xxx',
         ], $aggregateState), [
-            Discount::class => array_map(fn (Discount $discount) => $discount->getMappedData(), $discounts),
-            LinePersonalisation::class => array_map(fn (LinePersonalisation $linePersonalisation) => $linePersonalisation->getMappedData(), $personalisations),
+            Discount::class => array_map(fn(Discount $discount) => $discount->getMappedData(), $discounts),
+            LinePersonalisation::class => array_map(fn(LinePersonalisation $linePersonalisation) => $linePersonalisation->getMappedData(), $personalisations),
         ]);
     }
 
@@ -173,7 +175,7 @@ trait TestHelpers
         ], $values), array_merge([
             'order_id' => 'xxx',
         ], $aggregateState), [
-            Discount::class => array_map(fn (Discount $discount) => $discount->getMappedData(), $discounts),
+            Discount::class => array_map(fn(Discount $discount) => $discount->getMappedData(), $discounts),
         ]);
     }
 
@@ -190,7 +192,7 @@ trait TestHelpers
         ], $values), array_merge([
             'order_id' => 'xxx',
         ], $aggregateState), [
-            Discount::class => array_map(fn (Discount $discount) => $discount->getMappedData(), $discounts),
+            Discount::class => array_map(fn(Discount $discount) => $discount->getMappedData(), $discounts),
         ]);
     }
 
@@ -436,16 +438,16 @@ trait TestHelpers
         $product = static::createProduct();
 
         $product->updateProductTaxa([
-            ProductTaxon::create($product->productId, TaxonomyId::fromString('ooo'), TaxonomyType::variant_property, TaxonId::fromString('xxx')),
-            ProductTaxon::create($product->productId, TaxonomyId::fromString('ooo'), TaxonomyType::variant_property, TaxonId::fromString('yyy')),
-            ProductTaxon::create($product->productId, TaxonomyId::fromString('ppp'), TaxonomyType::variant_property, TaxonId::fromString('zzz')),
+            ProductTaxon::create($product->productId, TaxonId::fromString('xxx')),
+            ProductTaxon::create($product->productId, TaxonId::fromString('yyy')),
+            ProductTaxon::create($product->productId, TaxonId::fromString('zzz')),
         ]);
 
         $variant = static::createVariantWithVariantProperty();
 
         $variant->updateVariantTaxa([
-            VariantTaxon::create($variant->variantId, TaxonomyId::fromString('ooo'), TaxonomyType::variant_property, TaxonId::fromString('xxx')),
-            VariantTaxon::create($variant->variantId, TaxonomyId::fromString('ppp'), TaxonomyType::variant_property, TaxonId::fromString('zzz')),
+            VariantTaxon::create($variant->variantId, TaxonId::fromString('xxx')),
+            VariantTaxon::create($variant->variantId, TaxonId::fromString('zzz')),
         ]);
 
         $product->createVariant($variant);
@@ -500,7 +502,7 @@ trait TestHelpers
     {
         if ($withDefaultTaxon) {
             $product->updateProductTaxa([
-                ProductTaxon::create($product->productId, TaxonomyId::fromString('ooo'), TaxonomyType::variant_property, TaxonId::fromString('xxx')),
+                ProductTaxon::create($product->productId, TaxonId::fromString('xxx')),
             ]);
 
             $variant = static::createVariantWithVariantProperty();
@@ -536,8 +538,6 @@ trait TestHelpers
             $variant->updateVariantTaxa([
                 VariantTaxon::create(
                     $variant->variantId,
-                    TaxonomyId::fromString('ooo'),
-                    TaxonomyType::variant_property,
                     TaxonId::fromString('xxx')
                 ),
             ]);
@@ -560,10 +560,12 @@ trait TestHelpers
         return $product;
     }
 
-    protected static function createCatalog(TaxonApplication $taxonApplication, ProductApplication $productApplication, ProductRepository $productRepository)
+    protected static function createCatalog(TaxonomyApplication $taxonomyApplication, TaxonApplication $taxonApplication, ProductApplication $productApplication, ProductRepository $productRepository)
     {
-        $taxonId = $taxonApplication->createTaxon(new CreateTaxon('brand', 'foobar', 'nl', ['title' => ['nl' => 'foobar nl']]));
-        $taxonChildId = $taxonApplication->createTaxon(new CreateTaxon('brand', 'foobar-child', 'nl', ['title' => ['nl' => 'foobar child nl']], $taxonId->get()));
+        $taxonomyId = $taxonomyApplication->createTaxonomy(new CreateTaxonomy(TaxonomyType::property->value, true, true, true, ['title' => ['nl' => 'Brand']]));
+
+        $taxonId = $taxonApplication->createTaxon(new CreateTaxon($taxonomyId, 'foobar', 'nl', ['title' => ['nl' => 'foobar nl']]));
+        $taxonChildId = $taxonApplication->createTaxon(new CreateTaxon($taxonomyId, 'foobar-child', 'nl', ['title' => ['nl' => 'foobar child nl']], $taxonId->get()));
 
         $productId = $productApplication->createProduct(new CreateProduct([$taxonId->get()], "100", "6", 'sku', ['title' => ['nl' => 'product one']], ['title' => ['nl' => 'variant title one']]));
         $product2Id = $productApplication->createProduct(new CreateProduct([$taxonChildId->get()], "250", "12", 'sku-2', ['title' => ['nl' => 'product two']], ['title' => ['nl' => 'variant title two']]));
@@ -577,6 +579,7 @@ trait TestHelpers
         // Set every product online
         foreach ([$productId, $product2Id, $product3Id] as $prodId) {
             $product = $productRepository->find($prodId);
+
             $product->updateState(ProductState::online);
 
             $productRepository->save($product);
@@ -626,7 +629,7 @@ trait TestHelpers
         $this->assertEquals(array_keys($expected), array_keys($actual), 'Keys do not match: ' . $message);
 
         foreach ($expected as $expectedKey => $expectedValue) {
-            if (is_array($expectedValue) && ! is_array($actual[$expectedKey])) {
+            if (is_array($expectedValue) && !is_array($actual[$expectedKey])) {
                 $this->assertEquals($expectedValue, $actual[$expectedKey], $message);
             }
 

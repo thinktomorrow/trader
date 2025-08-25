@@ -27,24 +27,20 @@ return new class extends Migration {
         });
 
         Schema::table(static::PREFIX . 'taxa_products', function (Blueprint $table) {
-            $table->char('taxonomy_id', 36);
             $table->string('state')->default(\Thinktomorrow\Trader\Domain\Model\Taxon\TaxonState::online->value);
             $table->json('data')->nullable();
             $table->unsignedInteger('order_column')->default(0);
-            $table->foreign('taxonomy_id')->references('taxonomy_id')->on(static::PREFIX . 'taxonomies')->onDelete('cascade');
         });
 
         Schema::create(static::PREFIX . 'taxa_variants', function (Blueprint $table) {
             $table->char('taxon_id', 36);
             $table->char('variant_id', 36);
-            $table->char('taxonomy_id', 36);
             $table->string('state')->default(\Thinktomorrow\Trader\Domain\Model\Taxon\TaxonState::online->value);
             $table->json('data')->nullable();
             $table->unsignedInteger('order_column')->default(0);
 
             $table->primary(['taxon_id', 'variant_id']);
 
-            $table->foreign('taxonomy_id')->references('taxonomy_id')->on(static::PREFIX . 'taxonomies')->onDelete('cascade');
             $table->foreign('taxon_id')->references('taxon_id')->on(static::PREFIX . 'taxa')->onDelete('cascade');
             $table->foreign('variant_id')->references('variant_id')->on(static::PREFIX . 'product_variants')->onDelete('cascade');
         });

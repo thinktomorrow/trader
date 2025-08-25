@@ -25,7 +25,7 @@ final class InMemoryProductDetailRepository implements ProductDetailRepository
             'stock_data' => json_encode([]),
         ]);
 
-        if (! $allowOffline && ! in_array($product->getState(), ProductState::onlineStates())) {
+        if (!$allowOffline && !in_array($product->getState(), ProductState::onlineStates())) {
             throw new CouldNotFindVariant('No online variant found by id [' . $variantId->get() . ']');
         }
 
@@ -36,14 +36,14 @@ final class InMemoryProductDetailRepository implements ProductDetailRepository
         $taxonRepo = new InMemoryTaxonRepository();
 
         foreach ($product->getProductTaxa() as $i => $productTaxon) {
-            $taxonomy = $taxonomyRepo->find($productTaxon->taxonomyId);
             $taxon = $taxonRepo->find($productTaxon->taxonId);
+            $taxonomy = $taxonomyRepo->find($taxon->taxonomyId);
 
             $taxa[] = new DefaultProductTaxonItem(
                 $product->productId->get(),
                 $productTaxon->taxonId->get(),
-                $productTaxon->taxonomyId->get(),
-                $productTaxon->taxonomyType,
+                $taxonomy->taxonomyId->get(),
+                $taxonomy->getType(),
                 $taxonomy->showsInGrid(),
                 $taxon->getState(),
                 [
@@ -58,15 +58,15 @@ final class InMemoryProductDetailRepository implements ProductDetailRepository
             if ($variant->variantId->get() === $variantId->get()) {
 
                 foreach ($variant->getVariantTaxa() as $variantTaxon) {
-                    $taxonomy = $taxonomyRepo->find($productTaxon->taxonomyId);
                     $taxon = $taxonRepo->find($productTaxon->taxonId);
+                    $taxonomy = $taxonomyRepo->find($taxon->taxonomyId);
 
                     $taxa[] = new DefaultVariantTaxonItem(
                         $variant->variantId->get(),
                         $product->productId->get(),
                         $variantTaxon->taxonId->get(),
-                        $variantTaxon->taxonomyId->get(),
-                        $variantTaxon->taxonomyType,
+                        $taxonomy->taxonomyId->get(),
+                        $taxonomy->getType(),
                         $taxonomy->showsInGrid(),
                         $taxon->getState(),
                         [
