@@ -16,6 +16,7 @@ use Thinktomorrow\Trader\Domain\Model\Product\Personalisation\Personalisation;
 use Thinktomorrow\Trader\Domain\Model\Product\Product;
 use Thinktomorrow\Trader\Domain\Model\Product\ProductId;
 use Thinktomorrow\Trader\Domain\Model\Product\ProductRepository;
+use Thinktomorrow\Trader\Domain\Model\Product\ProductTaxa\ProductTaxon;
 use Thinktomorrow\Trader\Domain\Model\Product\Variant\Variant;
 use Thinktomorrow\Trader\Domain\Model\Product\Variant\VariantId;
 use Thinktomorrow\Trader\Domain\Model\Product\VariantRepository;
@@ -42,7 +43,13 @@ class ProductApplication
 
         $product = Product::create($productId);
 
-        $product->updateTaxonIds($createProduct->getTaxonIds());
+        // Create ProductTaxon objects per taxonId and add them to the product
+        $productTaxa = array_map(function ($taxonId) use ($productId) {
+            return ProductTaxon::create($productId, $taxonId);
+        }, $createProduct->getTaxonIds());
+
+        $product->updateProductTaxa($createProduct->getTaxonIds());
+        TaxonIds($createProduct->getTaxonIds());
         $product->addData($createProduct->getData());
 
         $variant = Variant::create(

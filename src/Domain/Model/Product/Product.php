@@ -72,13 +72,13 @@ class Product implements Aggregate
     public function getChildEntities(): array
     {
         return [
-            Variant::class => array_map(fn (Variant $variant) => $variant->getMappedData(), $this->variants),
+            Variant::class => array_map(fn(Variant $variant) => $variant->getMappedData(), $this->variants),
             ProductTaxon::class => array_map(
-                fn (ProductTaxon $prop) => array_merge($prop->getMappedData()),
+                fn(ProductTaxon $prop) => array_merge($prop->getMappedData()),
                 array_values($this->productTaxa),
             ),
             Personalisation::class => array_map(
-                fn (Personalisation $personalisation) => $personalisation->getMappedData(),
+                fn(Personalisation $personalisation) => $personalisation->getMappedData(),
                 array_values($this->personalisations)
             ),
         ];
@@ -91,9 +91,9 @@ class Product implements Aggregate
         $product->state = ProductState::from($state['state']);
 
         if (array_key_exists(Variant::class, $childEntities)) {
-            $product->variants = array_map(fn ($variantState) => Variant::fromMappedData($variantState[0], $state, $variantState[1]), $childEntities[Variant::class]);
+            $product->variants = array_map(fn($variantState) => Variant::fromMappedData($variantState[0], $state, $variantState[1]), $childEntities[Variant::class]);
         }
-
+    
         if (array_key_exists(ProductTaxon::class, $childEntities)) {
             foreach ($childEntities[ProductTaxon::class] as $childState) {
                 $product->productTaxa[] = ProductTaxon::fromMappedData($childState, $state);

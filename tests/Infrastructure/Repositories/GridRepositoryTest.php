@@ -38,6 +38,8 @@ class GridRepositoryTest extends TestCase
         /** @var GridItem $gridItem */
         $gridItem = $gridItems->first();
 
+        dd($gridItem);
+
         $this->assertNotEmpty($gridItem->getSalePrice());
         $this->assertNotEmpty($gridItem->getUnitPrice());
         $this->assertNotEmpty($gridItem->getUrl());
@@ -150,7 +152,7 @@ class GridRepositoryTest extends TestCase
 
         $this->assertCount(3, $gridItems);
 
-        $titles = $gridItems->map(fn ($gridItem) => $gridItem->getTitle());
+        $titles = $gridItems->map(fn($gridItem) => $gridItem->getTitle());
 
         $expected = $titles->toArray();
         natcasesort($expected);
@@ -164,7 +166,7 @@ class GridRepositoryTest extends TestCase
 
         $this->assertCount(3, $gridItems);
 
-        $titles = $gridItems->map(fn ($gridItem) => $gridItem->getTitle());
+        $titles = $gridItems->map(fn($gridItem) => $gridItem->getTitle());
 
         $expected = $titles->toArray();
         natcasesort($expected);

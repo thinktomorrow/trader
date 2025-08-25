@@ -7,8 +7,10 @@ use Thinktomorrow\Trader\Domain\Model\Product\Exceptions\CouldNotFindProduct;
 use Thinktomorrow\Trader\Domain\Model\Product\Product;
 use Thinktomorrow\Trader\Domain\Model\Product\ProductId;
 use Thinktomorrow\Trader\Domain\Model\Product\ProductRepository;
+use Thinktomorrow\Trader\Domain\Model\Product\ProductTaxa\ProductTaxon;
+use Thinktomorrow\Trader\Domain\Model\Product\ProductTaxa\ProductTaxonRepository;
 
-final class InMemoryProductRepository implements ProductRepository
+final class InMemoryProductRepository implements ProductRepository, ProductTaxonRepository
 {
     public static array $products = [];
 
@@ -27,7 +29,7 @@ final class InMemoryProductRepository implements ProductRepository
 
     public function find(ProductId $productId): Product
     {
-        if (! isset(static::$products[$productId->get()])) {
+        if (!isset(static::$products[$productId->get()])) {
             throw new CouldNotFindProduct('No product found by id ' . $productId);
         }
 
@@ -36,7 +38,7 @@ final class InMemoryProductRepository implements ProductRepository
 
     public function delete(ProductId $productId): void
     {
-        if (! isset(static::$products[$productId->get()])) {
+        if (!isset(static::$products[$productId->get()])) {
             throw new CouldNotFindProduct('No product found by id ' . $productId);
         }
 
@@ -71,4 +73,24 @@ final class InMemoryProductRepository implements ProductRepository
     //            }
     //        }
     //    }
+    public function getProductTaxonStatesByProduct(string $productId): array
+    {
+        if (!isset(static::$products[$productId])) {
+            throw new CouldNotFindProduct('No product found by id ' . $productId);
+        }
+
+        return static::$products[$productId]->getChildEntities()[ProductTaxon::class] ?? [];
+    }
+
+    public function getProductTaxaByTaxonIds(string $productId, array $taxonIds): array
+    {
+        if (!isset(static::$products[$productId])) {
+            throw new CouldNotFindProduct('No product found by id ' . $productId);
+        }
+
+        return array_filter(
+            static::$products[$productId]->getProductTaxa() ?? [],
+            fn(ProductTaxon $productTaxon) => in_array($productTaxon->taxonId->get(), $taxonIds)
+        );
+    }
 }
