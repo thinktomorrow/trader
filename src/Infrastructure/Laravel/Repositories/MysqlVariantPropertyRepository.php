@@ -4,7 +4,7 @@ declare(strict_types=1);
 namespace Thinktomorrow\Trader\Infrastructure\Laravel\Repositories;
 
 use Illuminate\Support\Facades\DB;
-use Thinktomorrow\Trader\Application\Product\VariantPropertyCombination\VariantPropertyRepository;
+use Thinktomorrow\Trader\Application\Product\VariantProperties\VariantPropertyRepository;
 
 class MysqlVariantPropertyRepository implements VariantPropertyRepository
 {

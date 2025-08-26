@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 
-namespace Thinktomorrow\Trader\Application\Product\VariantPropertyCombination;
+namespace Thinktomorrow\Trader\Application\Product\VariantProperties;
 
 use Illuminate\Support\Collection;
 use Thinktomorrow\Trader\Application\Product\VariantLinks\ProductOptionsAndValues;
@@ -23,7 +23,7 @@ class MissingVariantPropertyCombinations
     {
         $productVariantProperties = $product->getProductVariantProperties();
         dd($productVariantProperties, $this->productTaxonRepository->getTaxaByProduct(
-            array_map(fn ($prop) => $prop->taxonId->get(), $productVariantProperties),
+            array_map(fn($prop) => $prop->taxonId->get(), $productVariantProperties),
         ));
         //        $options = $this->productOptionValues->get($product->productId->get());
 
@@ -47,7 +47,7 @@ class MissingVariantPropertyCombinations
                     $optionLabel = $option->getData($optionLabelKey);
                     $optionValueLabel = $optionValue->getData($optionValueLabelKey);
 
-                    if (! is_string($optionLabel) || ! is_string($optionValueLabel)) {
+                    if (!is_string($optionLabel) || !is_string($optionValueLabel)) {
                         return null;
                     }
 
@@ -65,7 +65,7 @@ class MissingVariantPropertyCombinations
         //        $options = $this->productOptionValues->get($product->productId->get());
 
         /** @var Collection<ProductVariantProperty> $groupedByTaxonomy */
-        $groupedByTaxonomy = collect($product->getProductVariantProperties())->groupBy(fn (ProductVariantProperty $val) => $val->taxonomyId->get());
+        $groupedByTaxonomy = collect($product->getProductVariantProperties())->groupBy(fn(ProductVariantProperty $val) => $val->taxonomyId->get());
 
         //        foreach ($productVariantProperties as $productVariantProperty) {
         //            $groupedByTaxonomy[] = array_map(fn(ProductVariantProperty $val) => $val->taxonId, $productVariantProperties);
@@ -78,8 +78,8 @@ class MissingVariantPropertyCombinations
         $matrix = $this->createMatrix($groupedByTaxonomy);
 
         $existingIdCombinations = collect($product->getVariants())
-            ->reject(fn (Variant $variant) => count($variant->getVariantTaxonIds()) < 1)
-            ->map(fn (Variant $variant) => array_map(fn (TaxonId $taxonId) => $taxonId->get(), $variant->getVariantTaxonIds()));
+            ->reject(fn(Variant $variant) => count($variant->getVariantTaxonIds()) < 1)
+            ->map(fn(Variant $variant) => array_map(fn(TaxonId $taxonId) => $taxonId->get(), $variant->getVariantTaxonIds()));
 
         foreach ($matrix as $index => $availableIdCombination) {
             foreach ($existingIdCombinations as $existingIdCombination) {
@@ -103,14 +103,14 @@ class MissingVariantPropertyCombinations
     {
         $firstTaxonomyId = $groupedByTaxonomy->keys()->first();
 
-        $matrix = $groupedByTaxonomy->first()->map(fn ($prop) => $prop->taxonId->get());
+        $matrix = $groupedByTaxonomy->first()->map(fn($prop) => $prop->taxonId->get());
 
         foreach ($groupedByTaxonomy as $taxonomyId => $productVariantProperties) {
             if ($firstTaxonomyId === $taxonomyId) {
                 continue;
             }
 
-            $matrix = $this->join($matrix, $productVariantProperties->map(fn ($prop) => $prop->taxonId->get())->all());
+            $matrix = $this->join($matrix, $productVariantProperties->map(fn($prop) => $prop->taxonId->get())->all());
         }
 
         return $matrix;

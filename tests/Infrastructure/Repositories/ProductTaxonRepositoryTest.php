@@ -8,6 +8,7 @@ use PHPUnit\Framework\Attributes\DataProvider;
 use Tests\Infrastructure\TestCase;
 use Thinktomorrow\Trader\Domain\Model\Product\Product;
 use Thinktomorrow\Trader\Domain\Model\Product\ProductTaxa\ProductTaxon;
+use Thinktomorrow\Trader\Domain\Model\Product\ProductTaxa\VariantProperty;
 use Thinktomorrow\Trader\Domain\Model\Taxon\Taxon;
 use Thinktomorrow\Trader\Domain\Model\Taxon\TaxonId;
 use Thinktomorrow\Trader\Domain\Model\Taxonomy\Taxonomy;
@@ -54,6 +55,60 @@ final class ProductTaxonRepositoryTest extends TestCase
         }
     }
 
+    #[DataProvider('products')]
+    public function test_it_can_get_variant_properties_by_product(Product $product)
+    {
+        $count = count($product->getVariantProperties());
+
+        foreach ($this->repositories() as $i => $repository) {
+
+            // Create taxon data
+            $taxonomy = Taxonomy::create(TaxonomyId::fromString('ooo'), TaxonomyType::variant_property);
+            $taxonomy2 = Taxonomy::create(TaxonomyId::fromString('ppp'), TaxonomyType::property);
+            $taxon = Taxon::create(TaxonId::fromString('xxx'), TaxonomyId::fromString('ooo'));
+            $taxon2 = Taxon::create(TaxonId::fromString('yyy'), TaxonomyId::fromString('ooo'));
+            $taxon3 = Taxon::create(TaxonId::fromString('zzz'), TaxonomyId::fromString('ooo'));
+            $this->taxonomyRepositories()[$i]->save($taxonomy);
+            $this->taxonomyRepositories()[$i]->save($taxonomy2);
+            $this->taxonRepositories()[$i]->save($taxon);
+            $this->taxonRepositories()[$i]->save($taxon2);
+            $this->taxonRepositories()[$i]->save($taxon3);
+
+            $repository->save($product);
+            $product->releaseEvents();
+            $product = $repository->find($product->productId);
+
+            $this->assertCount($count, $product->getVariantProperties());
+            $this->assertContainsOnlyInstancesOf(VariantProperty::class, $product->getVariantProperties());
+        }
+    }
+
+    #[DataProvider('products')]
+    public function test_it_can_get_variant_properties_by_variant(Product $product, int $count)
+    {
+        foreach ($this->repositories() as $i => $repository) {
+
+            // Create taxon data
+            $taxonomy = Taxonomy::create(TaxonomyId::fromString('ooo'), TaxonomyType::variant_property);
+            $taxonomy2 = Taxonomy::create(TaxonomyId::fromString('ppp'), TaxonomyType::property);
+            $taxon = Taxon::create(TaxonId::fromString('xxx'), TaxonomyId::fromString('ooo'));
+            $taxon2 = Taxon::create(TaxonId::fromString('yyy'), TaxonomyId::fromString('ooo'));
+            $taxon3 = Taxon::create(TaxonId::fromString('zzz'), TaxonomyId::fromString('ooo'));
+            $this->taxonomyRepositories()[$i]->save($taxonomy);
+            $this->taxonomyRepositories()[$i]->save($taxonomy2);
+            $this->taxonRepositories()[$i]->save($taxon);
+            $this->taxonRepositories()[$i]->save($taxon2);
+            $this->taxonRepositories()[$i]->save($taxon3);
+
+            $repository->save($product);
+            $product->releaseEvents();
+            $variant = $repository->find($product->productId)->getVariants()[0];
+
+            $this->assertCount($count, $variant->getVariantProperties());
+            $this->assertContainsOnlyInstancesOf(\Thinktomorrow\Trader\Domain\Model\Product\VariantTaxa\VariantProperty::class, $variant->getVariantProperties());
+        }
+    }
+
     private static function repositories(): \Generator
     {
         yield new InMemoryProductRepository();
@@ -62,8 +117,8 @@ final class ProductTaxonRepositoryTest extends TestCase
 
     public static function products(): \Generator
     {
-        yield [static::createProductWithProductVariantProperties()];
-        yield [static::createProduct()];
+        yield [static::createProductWithProductVariantProperties(), 2];
+        yield [static::createProductWithVariant(), 0];
     }
 
     private function taxonomyRepositories(): array

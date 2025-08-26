@@ -27,6 +27,11 @@ Available taxonomy types are:
 - Removed: `TaxonIdOptionsComposer::getRoots()`, `TaxonIdOptionsComposer::includeRoots()` and
   `TaxonIdOptionsComposer::include()`.
 
+- Added: Product::getProductTaxa() and updateProductTaxa(). Also Product::getVariantProperties() as subset of the
+  product taxa to allow for specific behavior around the variant properties.
+- Added: Variant::getVariantTaxa() and updateVariantTaxa(), Variant::getVariantProperties() as subset of the variant
+  taxa.
+
 ## 2025-06-02 - 0.7.3
 
 - Added: vat exemption handling for international business orders.

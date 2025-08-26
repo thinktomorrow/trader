@@ -1,6 +1,6 @@
 <?php
 
-namespace Thinktomorrow\Trader\Application\Product\VariantPropertyCombination;
+namespace Thinktomorrow\Trader\Application\Product\VariantProperties;
 
 interface VariantPropertyRepository
 {

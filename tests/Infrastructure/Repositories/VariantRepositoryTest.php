@@ -44,12 +44,12 @@ final class VariantRepositoryTest extends TestCase
 
             $variantStates = $repository->getStatesByProduct($variant->productId);
 
-            $this->assertEquals([$variant], array_map(fn ($variantState) => Variant::fromMappedData($variantState[0], ['product_id' => 'xxx'], $variantState[1]), $variantStates));
+            $this->assertEquals([$variant], array_map(fn($variantState) => Variant::fromMappedData($variantState[0], ['product_id' => 'xxx'], $variantState[1]), $variantStates));
         }
     }
 
     #[DataProvider('variants')]
-    public function test_it_can_update_variant_properties(Product $product, Variant $variant)
+    public function test_it_can_update_variant_taxa(Product $product, Variant $variant)
     {
         foreach ($this->repositories() as $i => $repository) {
 

@@ -5,7 +5,6 @@ namespace Thinktomorrow\Trader\Domain\Model\Product\ProductTaxa;
 
 use Assert\Assertion;
 use Thinktomorrow\Trader\Domain\Model\Product\Events\ProductTaxaUpdated;
-use Thinktomorrow\Trader\Domain\Model\Taxonomy\TaxonomyType;
 
 trait HasProductTaxa
 {
@@ -16,6 +15,12 @@ trait HasProductTaxa
     public function getProductTaxa(): array
     {
         return $this->productTaxa;
+    }
+
+    /** @return array<VariantProperty> */
+    public function getVariantProperties(): array
+    {
+        return array_filter($this->productTaxa, fn(ProductTaxon $property) => $property instanceof ProductTaxon);
     }
 
     public function updateProductTaxa(array $productTaxa): void
@@ -75,6 +80,6 @@ trait HasProductTaxa
     /** @return ProductTaxon[] */
     private function getAvailableVariantProperties(): array
     {
-        return array_filter($this->productTaxa, fn(ProductTaxon $property) => $property->taxonomyType === TaxonomyType::variant_property);
+        return $this->getVariantProperties();
     }
 }

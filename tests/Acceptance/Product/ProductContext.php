@@ -11,7 +11,8 @@ use Thinktomorrow\Trader\Application\Product\ProductApplication;
 use Thinktomorrow\Trader\Application\Product\VariantLinks\ProductOptionsAndValues;
 use Thinktomorrow\Trader\Application\Product\VariantLinks\VariantLink;
 use Thinktomorrow\Trader\Application\Product\VariantLinks\VariantLinksComposer;
-use Thinktomorrow\Trader\Application\Product\VariantPropertyCombination\MissingVariantPropertyCombinations;
+use Thinktomorrow\Trader\Application\Product\VariantProperties\CleanupRemovedVariantProperties;
+use Thinktomorrow\Trader\Application\Product\VariantProperties\MissingVariantPropertyCombinations;
 use Thinktomorrow\Trader\Application\Taxon\TaxonApplication;
 use Thinktomorrow\Trader\Application\Taxonomy\TaxonomyApplication;
 use Thinktomorrow\Trader\Domain\Model\Product\Events\ProductCreated;
@@ -65,6 +66,7 @@ abstract class ProductContext extends TestCase
             $this->eventDispatcher,
             $this->productRepository = new InMemoryProductRepository(),
             $this->variantRepository = new InMemoryVariantRepository(),
+            new CleanupRemovedVariantProperties()
         );
 
         (new TestContainer())->add(VariantLink::class, DefaultVariantLink::class);

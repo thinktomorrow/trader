@@ -8,6 +8,9 @@ use Thinktomorrow\Trader\Domain\Model\Product\Product;
 use Thinktomorrow\Trader\Domain\Model\Product\ProductId;
 use Thinktomorrow\Trader\Domain\Model\Product\ProductRepository;
 use Thinktomorrow\Trader\Domain\Model\Product\ProductTaxa\ProductTaxon;
+use Thinktomorrow\Trader\Domain\Model\Product\ProductTaxa\VariantProperty;
+use Thinktomorrow\Trader\Domain\Model\Product\Variant\Variant;
+use Thinktomorrow\Trader\Domain\Model\Taxonomy\TaxonomyType;
 
 final class InMemoryProductRepository implements ProductRepository
 {
@@ -24,11 +27,13 @@ final class InMemoryProductRepository implements ProductRepository
                 $variant->variantId->get() => $variant,
             ]);
         }
+
+        $this->extractVariantProperties($product);
     }
 
     public function find(ProductId $productId): Product
     {
-        if (! isset(static::$products[$productId->get()])) {
+        if (!isset(static::$products[$productId->get()])) {
             throw new CouldNotFindProduct('No product found by id ' . $productId);
         }
 
@@ -37,7 +42,7 @@ final class InMemoryProductRepository implements ProductRepository
 
     public function delete(ProductId $productId): void
     {
-        if (! isset(static::$products[$productId->get()])) {
+        if (!isset(static::$products[$productId->get()])) {
             throw new CouldNotFindProduct('No product found by id ' . $productId);
         }
 
@@ -74,7 +79,7 @@ final class InMemoryProductRepository implements ProductRepository
     //    }
     public function getProductTaxonStatesByProduct(string $productId): array
     {
-        if (! isset(static::$products[$productId])) {
+        if (!isset(static::$products[$productId])) {
             throw new CouldNotFindProduct('No product found by id ' . $productId);
         }
 
@@ -85,9 +90,9 @@ final class InMemoryProductRepository implements ProductRepository
     {
         $taxa = InMemoryTaxonRepository::$taxons;
 
-        $taxa = array_filter($taxa, fn ($taxon) => in_array($taxon->taxonId->get(), $taxonIds));
+        $taxa = array_filter($taxa, fn($taxon) => in_array($taxon->taxonId->get(), $taxonIds));
 
-        return array_map(fn ($taxon) => ProductTaxon::fromMappedData(
+        return array_map(fn($taxon) => ProductTaxon::fromMappedData(
             [
                 'taxon_id' => $taxon->taxonId->get(),
                 'data' => '{}',
@@ -96,5 +101,53 @@ final class InMemoryProductRepository implements ProductRepository
                 'product_id' => $productId,
             ],
         ), $taxa);
+    }
+
+    private function extractVariantProperties(Product $product): void
+    {
+        $productTaxa = [];
+
+        foreach ($product->getProductTaxa() as $i => $productTaxon) {
+            if (isset(InMemoryTaxonRepository::$taxons[$productTaxon->taxonId->get()])) {
+                $taxon = InMemoryTaxonRepository::$taxons[$productTaxon->taxonId->get()];
+                $taxonomy = InMemoryTaxonomyRepository::$taxonomies[$taxon->taxonomyId->get()] ?? null;
+
+                if ($taxonomy && $taxonomy->getType() === TaxonomyType::variant_property) {
+                    $productTaxa[$i] = VariantProperty::create($productTaxon->productId, $productTaxon->taxonId);
+
+                    continue;
+                }
+            }
+
+            $productTaxa[$i] = $productTaxon;
+        }
+
+        $product->updateProductTaxa($productTaxa);
+
+        foreach ($product->getVariants() as $variant) {
+            $this->extractVariantVariantProperties($variant);
+        }
+    }
+
+    private function extractVariantVariantProperties(Variant $variant): void
+    {
+        $variantTaxa = [];
+
+        foreach ($variant->getVariantTaxa() as $i => $variantTaxon) {
+            if (isset(InMemoryTaxonRepository::$taxons[$variantTaxon->taxonId->get()])) {
+                $taxon = InMemoryTaxonRepository::$taxons[$variantTaxon->taxonId->get()];
+                $taxonomy = InMemoryTaxonomyRepository::$taxonomies[$taxon->taxonomyId->get()] ?? null;
+
+                if ($taxonomy && $taxonomy->getType() === TaxonomyType::variant_property) {
+                    $variantTaxa[$i] = \Thinktomorrow\Trader\Domain\Model\Product\VariantTaxa\VariantProperty::create($variantTaxon->variantId, $variantTaxon->taxonId);
+
+                    continue;
+                }
+            }
+
+            $variantTaxa[$i] = $variantTaxon;
+        }
+
+        $variant->updateVariantTaxa($variantTaxa);
     }
 }

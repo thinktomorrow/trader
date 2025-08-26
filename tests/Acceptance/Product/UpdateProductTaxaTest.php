@@ -27,11 +27,13 @@ class UpdateProductTaxaTest extends ProductContext
                 'product_id' => $productId->get(),
                 'taxon_id' => '1',
                 'data' => json_encode([]),
+                'state' => 'online',
             ],
             [
                 'product_id' => $productId->get(),
                 'taxon_id' => '3',
                 'data' => json_encode([]),
+                'state' => 'online',
             ],
         ], $product->getChildEntities()[ProductTaxon::class]);
 
@@ -58,13 +60,14 @@ class UpdateProductTaxaTest extends ProductContext
     public function test_when_removing_taxa_all_corresponding_taxa_on_variants_are_removed_as_well()
     {
         $product = $this->createProductWithVariantAndTaxon();
+        $this->productRepository->save($product);
 
         $this->assertCount(1, $product->getProductTaxa());
         $this->assertCount(1, $product->getVariants()[0]->getVariantTaxa());
 
         $this->productApplication->updateProductTaxa(new UpdateProductTaxa($product->productId->get(), []));
 
-        $product = $this->productRepository->find($productId);
+        $product = $this->productRepository->find($product->productId);
 
         $this->assertCount(0, $product->getProductTaxa());
         $this->assertCount(0, $product->getVariants()[0]->getVariantTaxa());

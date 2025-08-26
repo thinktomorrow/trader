@@ -9,6 +9,7 @@ use Thinktomorrow\Trader\Domain\Model\Product\Personalisation\Personalisation;
 use Thinktomorrow\Trader\Domain\Model\Product\ProductId;
 use Thinktomorrow\Trader\Domain\Model\Product\VariantTaxa\HasVariantTaxa;
 use Thinktomorrow\Trader\Domain\Model\Product\VariantTaxa\VariantTaxon;
+use Thinktomorrow\Trader\Domain\Model\Taxonomy\TaxonomyType;
 
 final class Variant implements ChildAggregate
 {
@@ -107,7 +108,7 @@ final class Variant implements ChildAggregate
     {
         return [
             VariantTaxon::class => array_map(
-                fn (VariantTaxon $option) => array_merge($option->getMappedData()),
+                fn(VariantTaxon $option) => array_merge($option->getMappedData()),
                 array_values($this->variantTaxa),
             ),
         ];
@@ -129,7 +130,9 @@ final class Variant implements ChildAggregate
 
         if (array_key_exists(VariantTaxon::class, $childEntities)) {
             foreach ($childEntities[VariantTaxon::class] as $childState) {
-                $variant->variantTaxa[] = VariantTaxon::fromMappedData($childState, $state);
+                $variant->variantTaxa[] = (isset($childState['taxonomy_type']) && $childState['taxonomy_type'] == TaxonomyType::variant_property->value)
+                    ? \Thinktomorrow\Trader\Domain\Model\Product\VariantTaxa\VariantProperty::fromMappedData($childState, $state)
+                    : VariantTaxon::fromMappedData($childState, $state);
             }
         }
 
