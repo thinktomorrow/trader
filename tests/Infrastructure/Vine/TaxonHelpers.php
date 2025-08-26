@@ -104,7 +104,7 @@ trait TaxonHelpers
                     }
 
                     DB::table('trader_taxa_products')->insert([
-                        ['taxon_id' => $taxon->taxonId->get(), 'taxonomy_id' => $taxon->taxonomyId->get(), 'product_id' => $productId],
+                        ['taxon_id' => $taxon->taxonId->get(), 'product_id' => $productId],
                     ]);
                 }
             }

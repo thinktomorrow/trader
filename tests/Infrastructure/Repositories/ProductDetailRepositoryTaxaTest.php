@@ -52,7 +52,7 @@ final class ProductDetailRepositoryTaxaTest extends TestCase
             $this->taxonRepositories()[$i]->save($taxon);
 
             $product->updateProductTaxa([
-                ProductTaxon::create($product->productId, $taxonomy->taxonomyId, $taxonomy->getType(), $taxon->taxonId),
+                ProductTaxon::create($product->productId, $taxon->taxonId),
             ]);
 
             $productRepository = iterator_to_array($this->productRepositories())[$i];

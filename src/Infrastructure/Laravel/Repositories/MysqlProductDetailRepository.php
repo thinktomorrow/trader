@@ -41,13 +41,13 @@ class MysqlProductDetailRepository implements ProductDetailRepository
             ])
             ->addSelect($this->container->get(ProductDetail::class)::stateSelect());
 
-        if (! $allowOffline) {
+        if (!$allowOffline) {
             $builder->whereIn(static::$productTable . '.state', ProductState::onlineStates());
         }
 
         $state = $builder->first();
 
-        if (! $state) {
+        if (!$state) {
             throw new CouldNotFindVariant('No online variant found by id [' . $variantId->get() . ']');
         }
 
@@ -67,8 +67,9 @@ class MysqlProductDetailRepository implements ProductDetailRepository
             ->select([
                 static::$taxonProductLookupTable . '.*',
                 static::$taxonTable . '.data AS taxon_data',
-                static::$taxonomyTable . '.data AS taxonomy_data',
                 static::$taxonTable . '.state AS taxon_state',
+                static::$taxonomyTable . '.taxonomy_id AS taxonomy_id',
+                static::$taxonomyTable . '.data AS taxonomy_data',
                 static::$taxonomyTable . '.state AS taxonomy_state',
                 static::$taxonomyTable . '.type AS taxonomy_type',
                 static::$taxonomyTable . '.shows_in_grid AS shows_in_grid',
@@ -81,16 +82,17 @@ class MysqlProductDetailRepository implements ProductDetailRepository
             ->select([
                 static::$taxonVariantLookupTable . '.*',
                 static::$taxonTable . '.data AS taxon_data',
-                static::$taxonomyTable . '.data AS taxonomy_data',
                 static::$taxonTable . '.state AS taxon_state',
+                static::$taxonomyTable . '.taxonomy_id AS taxonomy_id',
+                static::$taxonomyTable . '.data AS taxonomy_data',
                 static::$taxonomyTable . '.state AS taxonomy_state',
                 static::$taxonomyTable . '.type AS taxonomy_type',
                 static::$taxonomyTable . '.shows_in_grid AS shows_in_grid',
             ])->get();
 
         return [
-            ...array_map(fn ($state) => $this->container->get(ProductTaxonItem::class)::fromMappedData((array)$state), $productTaxaStates->all()),
-            ...array_map(fn ($state) => $this->container->get(VariantTaxonItem::class)::fromMappedData((array)$state), $variantTaxaStates->all()),
+            ...array_map(fn($state) => $this->container->get(ProductTaxonItem::class)::fromMappedData((array)$state), $productTaxaStates->all()),
+            ...array_map(fn($state) => $this->container->get(VariantTaxonItem::class)::fromMappedData((array)$state), $variantTaxaStates->all()),
         ];
     }
 }

@@ -5,13 +5,13 @@ namespace Tests\Acceptance\Product;
 
 use PHPUnit\Framework\Assert;
 use Tests\Acceptance\TestCase;
-use Thinktomorrow\Trader\Application\Product\CheckProductVariantProperties\MissingVariantPropertyCombinations;
 use Thinktomorrow\Trader\Application\Product\CreateProduct;
 use Thinktomorrow\Trader\Application\Product\CreateVariant;
 use Thinktomorrow\Trader\Application\Product\ProductApplication;
 use Thinktomorrow\Trader\Application\Product\VariantLinks\ProductOptionsAndValues;
 use Thinktomorrow\Trader\Application\Product\VariantLinks\VariantLink;
 use Thinktomorrow\Trader\Application\Product\VariantLinks\VariantLinksComposer;
+use Thinktomorrow\Trader\Application\Product\VariantPropertyCombination\MissingVariantPropertyCombinations;
 use Thinktomorrow\Trader\Application\Taxon\TaxonApplication;
 use Thinktomorrow\Trader\Application\Taxonomy\TaxonomyApplication;
 use Thinktomorrow\Trader\Domain\Model\Product\Events\ProductCreated;

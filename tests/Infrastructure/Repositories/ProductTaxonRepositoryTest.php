@@ -29,40 +29,28 @@ final class ProductTaxonRepositoryTest extends TestCase
     #[DataProvider('products')]
     public function test_it_can_get_product_taxa_by_product(Product $product)
     {
+        $count = count($product->getProductTaxa());
+
         foreach ($this->repositories() as $i => $repository) {
 
             // Create taxon data
             $taxonomy = Taxonomy::create(TaxonomyId::fromString('ooo'), TaxonomyType::variant_property);
+            $taxonomy2 = Taxonomy::create(TaxonomyId::fromString('ppp'), TaxonomyType::property);
             $taxon = Taxon::create(TaxonId::fromString('xxx'), TaxonomyId::fromString('ooo'));
+            $taxon2 = Taxon::create(TaxonId::fromString('yyy'), TaxonomyId::fromString('ooo'));
+            $taxon3 = Taxon::create(TaxonId::fromString('zzz'), TaxonomyId::fromString('ooo'));
             $this->taxonomyRepositories()[$i]->save($taxonomy);
+            $this->taxonomyRepositories()[$i]->save($taxonomy2);
             $this->taxonRepositories()[$i]->save($taxon);
+            $this->taxonRepositories()[$i]->save($taxon2);
+            $this->taxonRepositories()[$i]->save($taxon3);
 
             $repository->save($product);
             $product->releaseEvents();
             $product = $repository->find($product->productId);
 
-            $this->assertCount(count($product->getProductTaxa()), $repository->getProductTaxonStatesByProduct($product->productId->get()));
-            $this->assertContainsOnlyArray($repository->getProductTaxonStatesByProduct($product->productId->get()));
-        }
-    }
-
-    #[DataProvider('products')]
-    public function test_it_can_get_product_taxa_by_given_taxon_ids(Product $product)
-    {
-        foreach ($this->repositories() as $i => $repository) {
-
-            // Create taxon data
-            $taxonomy = Taxonomy::create(TaxonomyId::fromString('ooo'), TaxonomyType::variant_property);
-            $taxon = Taxon::create(TaxonId::fromString('xxx'), TaxonomyId::fromString('ooo'));
-            $this->taxonomyRepositories()[$i]->save($taxonomy);
-            $this->taxonRepositories()[$i]->save($taxon);
-
-            $repository->save($product);
-            $product->releaseEvents();
-            $product = $repository->find($product->productId);
-
-            $this->assertCount(1, $repository->getProductTaxaByTaxonIds($product->productId->get(), [$taxon->taxonId->get()]));
-            $this->assertContainsOnlyInstancesOf(ProductTaxon::class, $repository->getProductTaxaByTaxonIds($product->productId->get(), [$taxon->taxonId->get()]));
+            $this->assertCount($count, $product->getProductTaxa());
+            $this->assertContainsOnlyInstancesOf(ProductTaxon::class, $product->getProductTaxa());
         }
     }
 
@@ -75,7 +63,7 @@ final class ProductTaxonRepositoryTest extends TestCase
     public static function products(): \Generator
     {
         yield [static::createProductWithProductVariantProperties()];
-//        yield [static::createProduct()];
+        yield [static::createProduct()];
     }
 
     private function taxonomyRepositories(): array
