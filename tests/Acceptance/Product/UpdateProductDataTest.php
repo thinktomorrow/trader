@@ -6,6 +6,7 @@ namespace Tests\Acceptance\Product;
 use Tests\TestHelpers;
 use Thinktomorrow\Trader\Application\Product\UpdateProduct\UpdateProductData;
 use Thinktomorrow\Trader\Domain\Model\Product\Events\ProductDataUpdated;
+use Thinktomorrow\Trader\Domain\Model\Product\Events\ProductTaxaUpdated;
 
 class UpdateProductDataTest extends ProductContext
 {
@@ -24,6 +25,7 @@ class UpdateProductDataTest extends ProductContext
 
         $this->assertEquals([
             new ProductDataUpdated($productId),
+            new ProductTaxaUpdated($productId), // because of the InMemoryRepo implementation.
         ], $this->eventDispatcher->releaseDispatchedEvents());
     }
 

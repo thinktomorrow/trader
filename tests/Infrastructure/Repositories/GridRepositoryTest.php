@@ -8,7 +8,6 @@ use Money\Money;
 use Tests\Infrastructure\TestCase;
 use Thinktomorrow\Trader\Application\Product\Grid\GridItem;
 use Thinktomorrow\Trader\Application\Product\ProductApplication;
-use Thinktomorrow\Trader\Application\Product\VariantProperties\CleanupRemovedVariantProperties;
 use Thinktomorrow\Trader\Application\Taxon\TaxonApplication;
 use Thinktomorrow\Trader\Application\Taxonomy\TaxonomyApplication;
 use Thinktomorrow\Trader\Infrastructure\Laravel\Models\DefaultGridItem;
@@ -193,7 +192,6 @@ class GridRepositoryTest extends TestCase
                 new EventDispatcherSpy(),
                 new MysqlProductRepository(new MysqlVariantRepository(new TestContainer())),
                 new MysqlVariantRepository(new TestContainer()),
-                new CleanupRemovedVariantProperties()
             ),
             new MysqlProductRepository(new MysqlVariantRepository(new TestContainer()))
         );

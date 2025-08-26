@@ -136,8 +136,6 @@ final class Variant implements ChildAggregate
             }
         }
 
-        //        $variant->optionValueIds = array_map(fn($optionValueState) => OptionValueId::fromString($optionValueState), $state['option_value_ids']);
-
         return $variant;
     }
 }

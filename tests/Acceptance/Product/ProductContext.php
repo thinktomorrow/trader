@@ -11,7 +11,6 @@ use Thinktomorrow\Trader\Application\Product\ProductApplication;
 use Thinktomorrow\Trader\Application\Product\VariantLinks\ProductOptionsAndValues;
 use Thinktomorrow\Trader\Application\Product\VariantLinks\VariantLink;
 use Thinktomorrow\Trader\Application\Product\VariantLinks\VariantLinksComposer;
-use Thinktomorrow\Trader\Application\Product\VariantProperties\CleanupRemovedVariantProperties;
 use Thinktomorrow\Trader\Application\Product\VariantProperties\MissingVariantPropertyCombinations;
 use Thinktomorrow\Trader\Application\Taxon\TaxonApplication;
 use Thinktomorrow\Trader\Application\Taxonomy\TaxonomyApplication;
@@ -66,7 +65,6 @@ abstract class ProductContext extends TestCase
             $this->eventDispatcher,
             $this->productRepository = new InMemoryProductRepository(),
             $this->variantRepository = new InMemoryVariantRepository(),
-            new CleanupRemovedVariantProperties()
         );
 
         (new TestContainer())->add(VariantLink::class, DefaultVariantLink::class);
@@ -107,6 +105,7 @@ abstract class ProductContext extends TestCase
             new ProductTaxaUpdated($productId),
             new ProductDataUpdated($productId),
             new VariantCreated($productId, $product->getVariants()[0]->variantId),
+            new ProductTaxaUpdated($productId), // because of the InMemoryRepo implementation.
         ], $this->eventDispatcher->releaseDispatchedEvents());
 
         return $productId;
@@ -126,6 +125,7 @@ abstract class ProductContext extends TestCase
 
         $this->assertEquals([
             new VariantCreated(ProductId::fromString($productId), $variantId),
+            new ProductTaxaUpdated($productId), // because of the InMemoryRepo implementation.
         ], $this->eventDispatcher->releaseDispatchedEvents());
 
         return $variantId;

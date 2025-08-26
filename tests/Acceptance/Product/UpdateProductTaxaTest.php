@@ -38,6 +38,7 @@ class UpdateProductTaxaTest extends ProductContext
         ], $product->getChildEntities()[ProductTaxon::class]);
 
         $this->assertEquals([
+            new ProductTaxaUpdated($productId), // Duplicate because of the InMemoryRepo implementation.
             new ProductTaxaUpdated($productId),
         ], $this->eventDispatcher->releaseDispatchedEvents());
     }
@@ -53,6 +54,7 @@ class UpdateProductTaxaTest extends ProductContext
         $this->assertCount(0, $product->getChildEntities()[ProductTaxon::class]);
 
         $this->assertEquals([
+            new ProductTaxaUpdated($productId), // Duplicate because of the InMemoryRepo implementation.
             new ProductTaxaUpdated($productId),
         ], $this->eventDispatcher->releaseDispatchedEvents());
     }

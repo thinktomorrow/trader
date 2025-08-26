@@ -56,10 +56,8 @@ final class ProductTaxonRepositoryTest extends TestCase
     }
 
     #[DataProvider('products')]
-    public function test_it_can_get_variant_properties_by_product(Product $product)
+    public function test_it_can_get_variant_properties_by_product(Product $product, int $count)
     {
-        $count = count($product->getVariantProperties());
-
         foreach ($this->repositories() as $i => $repository) {
 
             // Create taxon data
@@ -84,7 +82,7 @@ final class ProductTaxonRepositoryTest extends TestCase
     }
 
     #[DataProvider('products')]
-    public function test_it_can_get_variant_properties_by_variant(Product $product, int $count)
+    public function test_it_can_get_variant_properties_by_variant(Product $product, int $productCount, int $count)
     {
         foreach ($this->repositories() as $i => $repository) {
 
@@ -117,8 +115,8 @@ final class ProductTaxonRepositoryTest extends TestCase
 
     public static function products(): \Generator
     {
-        yield [static::createProductWithProductVariantProperties(), 2];
-        yield [static::createProductWithVariant(), 0];
+        yield [static::createProductWithProductVariantProperties(), 3, 2];
+        yield [static::createProductWithVariant(), 0, 0];
     }
 
     private function taxonomyRepositories(): array

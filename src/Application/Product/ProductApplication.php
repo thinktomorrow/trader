@@ -8,7 +8,6 @@ use Thinktomorrow\Trader\Application\Product\UpdateProduct\UpdateProductOptions;
 use Thinktomorrow\Trader\Application\Product\UpdateProduct\UpdateProductPersonalisations;
 use Thinktomorrow\Trader\Application\Product\UpdateProduct\UpdateProductTaxa;
 use Thinktomorrow\Trader\Application\Product\UpdateVariant\UpdateVariantOptionValues;
-use Thinktomorrow\Trader\Application\Product\VariantProperties\CleanupRemovedVariantProperties;
 use Thinktomorrow\Trader\Domain\Common\Event\EventDispatcher;
 use Thinktomorrow\Trader\Domain\Model\Product\Events\ProductDeleted;
 use Thinktomorrow\Trader\Domain\Model\Product\Option\Option;
@@ -28,15 +27,13 @@ class ProductApplication
     private EventDispatcher $eventDispatcher;
     private ProductRepository $productRepository;
     private VariantRepository $variantRepository;
-    private CleanupRemovedVariantProperties $cleanupRemovedVariantProperties;
 
-    public function __construct(TraderConfig $traderConfig, EventDispatcher $eventDispatcher, ProductRepository $productRepository, VariantRepository $variantRepository, CleanupRemovedVariantProperties $cleanupRemovedVariantProperties)
+    public function __construct(TraderConfig $traderConfig, EventDispatcher $eventDispatcher, ProductRepository $productRepository, VariantRepository $variantRepository)
     {
         $this->traderConfig = $traderConfig;
         $this->eventDispatcher = $eventDispatcher;
         $this->productRepository = $productRepository;
         $this->variantRepository = $variantRepository;
-        $this->cleanupRemovedVariantProperties = $cleanupRemovedVariantProperties;
     }
 
     public function createProduct(CreateProduct $createProduct): ProductId
@@ -98,11 +95,7 @@ class ProductApplication
     {
         $product = $this->productRepository->find($updateProductTaxa->getProductId());
 
-        $oldProductTaxa = $product->getProductTaxa();
-
         $product->updateProductTaxa($updateProductTaxa->getProductTaxa());
-        
-        $this->cleanupRemovedVariantProperties->handle($product, $oldProductTaxa);
 
         $this->productRepository->save($product);
 
