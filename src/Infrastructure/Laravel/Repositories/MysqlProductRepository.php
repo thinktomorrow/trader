@@ -37,7 +37,7 @@ class MysqlProductRepository implements ProductRepository
         $state = $product->getMappedData();
         $taxon_ids = TraderHelpers::array_remove($state, 'taxon_ids');
 
-        if (!$this->exists($product->productId)) {
+        if (! $this->exists($product->productId)) {
             DB::table(static::$productTable)->insert($state);
         } else {
             DB::table(static::$productTable)->where('product_id', $product->productId->get())->update($state);
@@ -50,7 +50,7 @@ class MysqlProductRepository implements ProductRepository
 
     private function upsertPersonalisations(Product $product): void
     {
-        $personalisation_ids = array_map(fn($personalisationState) => $personalisationState['personalisation_id'], $product->getChildEntities()[Personalisation::class]);
+        $personalisation_ids = array_map(fn ($personalisationState) => $personalisationState['personalisation_id'], $product->getChildEntities()[Personalisation::class]);
 
         DB::table(static::$personalisationTable)
             ->where('product_id', $product->productId)
@@ -68,7 +68,7 @@ class MysqlProductRepository implements ProductRepository
 
     private function upsertVariants(Product $product): void
     {
-        $variant_ids = array_map(fn($variant) => $variant->variantId->get(), $product->getVariants());
+        $variant_ids = array_map(fn ($variant) => $variant->variantId->get(), $product->getVariants());
 
         DB::table(static::$variantTable)
             ->where('product_id', $product->productId)
@@ -82,7 +82,7 @@ class MysqlProductRepository implements ProductRepository
 
     private function upsertProductTaxa(Product $product): void
     {
-        $taxonIds = array_map(fn($taxonState) => $taxonState['taxon_id'], $product->getChildEntities()[ProductTaxon::class]);
+        $taxonIds = array_map(fn ($taxonState) => $taxonState['taxon_id'], $product->getChildEntities()[ProductTaxon::class]);
 
         DB::table(static::$productTaxonLookupTable)
             ->where('product_id', $product->productId)
@@ -127,7 +127,7 @@ class MysqlProductRepository implements ProductRepository
             $productState = null;
         }
 
-        if (!$productState) {
+        if (! $productState) {
             throw new CouldNotFindProduct('No product found by id [' . $productId->get() . ']');
         }
 
@@ -139,7 +139,7 @@ class MysqlProductRepository implements ProductRepository
             ->orderBy(static::$personalisationTable . '.order_column')
             ->orderBy('order_column')
             ->get()
-            ->map(fn($item) => (array)$item)
+            ->map(fn ($item) => (array)$item)
             ->toArray();
 
         $productTaxa = $this->getProductTaxonStatesByProduct($productState);
@@ -174,31 +174,31 @@ class MysqlProductRepository implements ProductRepository
         return $pairs;
     }
 
-//    public function getProductTaxaByTaxonIds(string $productId, array $taxonIds): array
-//    {
-//        return DB::table('trader_taxa')
-//            ->join('trader_taxonomies', 'trader_taxonomies.taxonomy_id', '=', 'trader_taxa.taxonomy_id')
-//            ->whereIn('trader_taxa.taxon_id', $taxonIds)
-//            ->select([
-//                'trader_taxa.*',
-//                'trader_taxonomies.taxonomy_id',
-//                'trader_taxonomies.type as taxonomy_type',
-//                'trader_taxonomies.shows_in_grid',
-//                'trader_taxonomies.state as taxonomy_state',
-//            ])
-//            ->get()
-//            ->map(function ($item) {
-//                // Extend the ProductTaxon with other methods and properties to enhance usage.
-//                return [
-//                    'taxonomy_type' => $item->taxonomy_type,
-//                    'taxon_id' => $item->taxon_id,
-//                    'taxonomy_id' => $item->taxonomy_id,
-//                    'data' => $item->data,
-//                ];
-//            })
-//            ->map(fn($item) => ProductTaxon::fromMappedData($item, ['product_id' => $productId]))
-//            ->all();
-//    }
+    //    public function getProductTaxaByTaxonIds(string $productId, array $taxonIds): array
+    //    {
+    //        return DB::table('trader_taxa')
+    //            ->join('trader_taxonomies', 'trader_taxonomies.taxonomy_id', '=', 'trader_taxa.taxonomy_id')
+    //            ->whereIn('trader_taxa.taxon_id', $taxonIds)
+    //            ->select([
+    //                'trader_taxa.*',
+    //                'trader_taxonomies.taxonomy_id',
+    //                'trader_taxonomies.type as taxonomy_type',
+    //                'trader_taxonomies.shows_in_grid',
+    //                'trader_taxonomies.state as taxonomy_state',
+    //            ])
+    //            ->get()
+    //            ->map(function ($item) {
+    //                // Extend the ProductTaxon with other methods and properties to enhance usage.
+    //                return [
+    //                    'taxonomy_type' => $item->taxonomy_type,
+    //                    'taxon_id' => $item->taxon_id,
+    //                    'taxonomy_id' => $item->taxonomy_id,
+    //                    'data' => $item->data,
+    //                ];
+    //            })
+    //            ->map(fn($item) => ProductTaxon::fromMappedData($item, ['product_id' => $productId]))
+    //            ->all();
+    //    }
 
     public function delete(ProductId $productId): void
     {

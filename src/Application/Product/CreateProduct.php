@@ -37,7 +37,7 @@ class CreateProduct
 
     private function getTaxonIds(): array
     {
-        return array_map(fn($taxonId) => TaxonId::fromString($taxonId), $this->taxonIds);
+        return array_map(fn ($taxonId) => TaxonId::fromString($taxonId), $this->taxonIds);
     }
 
     public function getUnitPrice(bool $doesPriceInputIncludesVat): VariantUnitPrice

@@ -32,6 +32,6 @@ class UpdateProductTaxa
 
     public function getTaxonIds(): array
     {
-        return array_map(fn($taxon_id) => TaxonId::fromString($taxon_id), $this->taxonIds);
+        return array_map(fn ($taxon_id) => TaxonId::fromString($taxon_id), $this->taxonIds);
     }
 }
