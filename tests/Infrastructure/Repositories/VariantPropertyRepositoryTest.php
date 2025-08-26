@@ -25,7 +25,7 @@ final class VariantPropertyRepositoryTest extends TestCase
         foreach ($this->repositories() as $repository) {
 
             // Check if combo already exists
-            $taxonIds = array_map(fn($variantTaxonState) => $variantTaxonState['taxon_id'], $variant->getChildEntities()[VariantTaxon::class]);
+            $taxonIds = array_map(fn ($variantTaxonState) => $variantTaxonState['taxon_id'], $variant->getChildEntities()[VariantTaxon::class]);
 
             $this->assertTrue($repository->doesUniqueVariantPropertyCombinationExist($taxonIds));
 

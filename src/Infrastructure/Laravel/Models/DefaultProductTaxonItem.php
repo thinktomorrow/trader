@@ -60,11 +60,11 @@ class DefaultProductTaxonItem implements ProductTaxonItem
         $taxonomyState = TaxonomyState::from($state['taxonomy_state']);
         $state = TaxonState::online;
 
-        if (!in_array($productTaxonState, TaxonState::onlineStates())) {
+        if (! in_array($productTaxonState, TaxonState::onlineStates())) {
             $state = $productTaxonState;
-        } elseif (!in_array($taxonState, TaxonState::onlineStates())) {
+        } elseif (! in_array($taxonState, TaxonState::onlineStates())) {
             $state = $taxonState;
-        } elseif (!in_array($taxonomyState, TaxonomyState::onlineStates())) {
+        } elseif (! in_array($taxonomyState, TaxonomyState::onlineStates())) {
             $state = TaxonState::offline;
         }
 
