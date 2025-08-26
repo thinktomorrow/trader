@@ -22,26 +22,26 @@ trait HasProductTaxa
     {
         Assertion::allIsInstanceOf($productTaxa, ProductTaxon::class);
 
-        //         TODO/ move this checks to the APPLICATION so this domein is much simpler!!!!
-        //        $existingAvailableVariantProperties = $this->getAvailableVariantProperties();
+        // TODO/ move this checks to the APPLICATION so this domein is much simpler!!!!
+//        $existingAvailableVariantProperties = $this->getAvailableVariantProperties();
 
         $this->productTaxa = $this->enforceUniqueProductTaxa($productTaxa);
 
-        //        $this->cleanupRemovedVariantPropertiesOnVariants($existingAvailableVariantProperties, $this->getAvailableVariantProperties());
+//        $this->cleanupRemovedVariantPropertiesOnVariants($existingAvailableVariantProperties, $this->getAvailableVariantProperties());
 
         $this->recordEvent(new ProductTaxaUpdated($this->productId));
     }
 
     private function cleanupRemovedVariantPropertiesOnVariants(array $existingAvailableVariantProperties, array $newAvailableVariantProperties)
     {
-        $newTaxonIds = array_map(fn (ProductTaxon $prod) => $prod->taxonId, $newAvailableVariantProperties);
+        $newTaxonIds = array_map(fn(ProductTaxon $prod) => $prod->taxonId, $newAvailableVariantProperties);
 
         foreach ($existingAvailableVariantProperties as $existingVariantProperty) {
             if (in_array($existingVariantProperty->taxonId, $newTaxonIds)) {
                 continue;
             }
 
-            $existingTaxonIds = array_map(fn (ProductTaxon $prop) => $prop->taxonId, $existingAvailableVariantProperties);
+            $existingTaxonIds = array_map(fn(ProductTaxon $prop) => $prop->taxonId, $existingAvailableVariantProperties);
 
             foreach ($this->getVariants() as $variant) {
                 $variantProperties = $variant->getVariantTaxa();
@@ -64,7 +64,7 @@ trait HasProductTaxa
         $uniqueProperties = [];
 
         foreach ($productTaxa as $property) {
-            if (! isset($uniqueProperties[$property->taxonId->get()])) {
+            if (!isset($uniqueProperties[$property->taxonId->get()])) {
                 $uniqueProperties[$property->taxonId->get()] = $property;
             }
         }
@@ -75,6 +75,6 @@ trait HasProductTaxa
     /** @return ProductTaxon[] */
     private function getAvailableVariantProperties(): array
     {
-        return array_filter($this->productTaxa, fn (ProductTaxon $property) => $property->taxonomyType === TaxonomyType::variant_property);
+        return array_filter($this->productTaxa, fn(ProductTaxon $property) => $property->taxonomyType === TaxonomyType::variant_property);
     }
 }

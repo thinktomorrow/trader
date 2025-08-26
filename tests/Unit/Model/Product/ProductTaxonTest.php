@@ -9,8 +9,6 @@ use Thinktomorrow\Trader\Domain\Model\Product\Events\ProductTaxaUpdated;
 use Thinktomorrow\Trader\Domain\Model\Product\ProductId;
 use Thinktomorrow\Trader\Domain\Model\Product\ProductTaxa\ProductTaxon;
 use Thinktomorrow\Trader\Domain\Model\Taxon\TaxonId;
-use Thinktomorrow\Trader\Domain\Model\Taxonomy\TaxonomyId;
-use Thinktomorrow\Trader\Domain\Model\Taxonomy\TaxonomyType;
 
 class ProductTaxonTest extends TestCase
 {
@@ -19,7 +17,7 @@ class ProductTaxonTest extends TestCase
         $product = $this->createProduct();
 
         $product->updateProductTaxa([
-            $productTaxon = ProductTaxon::create($product->productId, TaxonomyId::fromString('ooo'), TaxonomyType::variant_property, TaxonId::fromString('ppp')),
+            $productTaxon = ProductTaxon::create($product->productId, TaxonId::fromString('ppp')),
         ]);
 
         $this->assertEquals([
@@ -35,23 +33,10 @@ class ProductTaxonTest extends TestCase
         $product = $this->createProduct();
 
         $product->updateProductTaxa([
-            ProductTaxon::create($product->productId, TaxonomyId::fromString('aaa'), TaxonomyType::variant_property, TaxonId::fromString('bbb')),
-            ProductTaxon::create($product->productId, TaxonomyId::fromString('aaa'), TaxonomyType::variant_property, TaxonId::fromString('bbb')),
+            ProductTaxon::create($product->productId, TaxonId::fromString('bbb')),
+            ProductTaxon::create($product->productId, TaxonId::fromString('bbb')),
         ]);
 
         $this->assertCount(1, $product->getChildEntities()[ProductTaxon::class]);
-    }
-
-    public function test_when_removing_taxa_all_corresponding_taxa_on_variants_are_removed_as_well()
-    {
-        $product = $this->createProductWithVariantAndTaxon();
-
-        $this->assertCount(1, $product->getProductTaxa());
-        $this->assertCount(1, $product->getVariants()[0]->getVariantTaxa());
-
-        $product->updateProductTaxa([]);
-
-        $this->assertCount(0, $product->getProductTaxa());
-        $this->assertCount(0, $product->getVariants()[0]->getVariantTaxa());
     }
 }

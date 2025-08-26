@@ -54,4 +54,19 @@ class UpdateProductTaxaTest extends ProductContext
             new ProductTaxaUpdated($productId),
         ], $this->eventDispatcher->releaseDispatchedEvents());
     }
+
+    public function test_when_removing_taxa_all_corresponding_taxa_on_variants_are_removed_as_well()
+    {
+        $product = $this->createProductWithVariantAndTaxon();
+
+        $this->assertCount(1, $product->getProductTaxa());
+        $this->assertCount(1, $product->getVariants()[0]->getVariantTaxa());
+
+        $this->productApplication->updateProductTaxa(new UpdateProductTaxa($product->productId->get(), []));
+
+        $product = $this->productRepository->find($productId);
+
+        $this->assertCount(0, $product->getProductTaxa());
+        $this->assertCount(0, $product->getVariants()[0]->getVariantTaxa());
+    }
 }
