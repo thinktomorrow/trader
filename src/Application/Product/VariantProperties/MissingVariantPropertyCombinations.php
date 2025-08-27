@@ -4,7 +4,7 @@ declare(strict_types=1);
 namespace Thinktomorrow\Trader\Application\Product\VariantProperties;
 
 use Illuminate\Support\Collection;
-use Thinktomorrow\Trader\Application\Product\VariantLinks\ProductOptionsAndValues;
+use Thinktomorrow\Trader\Application\Product\VariantLinks\VariantPropertiesForSelect;
 use Thinktomorrow\Trader\Domain\Model\Product\Product;
 use Thinktomorrow\Trader\Domain\Model\Product\Variant\Variant;
 use Thinktomorrow\Trader\Domain\Model\Product\VariantTaxa\ProductVariantProperty;
@@ -12,9 +12,9 @@ use Thinktomorrow\Trader\Domain\Model\Taxon\TaxonId;
 
 class MissingVariantPropertyCombinations
 {
-    private ProductOptionsAndValues $productOptionValues;
+    private VariantPropertiesForSelect $productOptionValues;
 
-    public function __construct(ProductOptionsAndValues $productOptionValues)
+    public function __construct(VariantPropertiesForSelect $productOptionValues)
     {
         $this->productOptionValues = $productOptionValues;
     }

@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Thinktomorrow\Trader\Infrastructure\Vine;
@@ -13,6 +14,7 @@ use Thinktomorrow\Trader\TraderConfig;
 class VineTaxonFilterTreeComposer implements TaxonFilterTreeComposer
 {
     private TaxonTreeRepository $taxonTreeRepository;
+
     private TraderConfig $traderConfig;
 
     public function __construct(TraderConfig $traderConfig, TaxonTreeRepository $taxonTreeRepository)
@@ -34,7 +36,7 @@ class VineTaxonFilterTreeComposer implements TaxonFilterTreeComposer
         //            return new TaxonTree();
         //        }
 
-        //        $categoryRootId = $this->traderConfig->getCategoryTaxonomyId();
+        //        $categoryRootId = $this->traderConfig->getMainCategoryTaxonomyId();
 
         $rootTaxonIds = $rootTaxa->pluck('id');
         $productIds = $this->getOnlineProductIds($rootTaxonIds);
@@ -110,7 +112,6 @@ class VineTaxonFilterTreeComposer implements TaxonFilterTreeComposer
                 }
             }
 
-
             $taxonTree = $taxonTree->merge($selectedTaxa);
         }
 
@@ -119,8 +120,6 @@ class VineTaxonFilterTreeComposer implements TaxonFilterTreeComposer
 
     /**
      * Get all online product ids belonging to this taxon filter and all its children
-     *
-     * @return array
      */
     public function getOnlineProductIds(array $taxonIds): array
     {
@@ -129,8 +128,6 @@ class VineTaxonFilterTreeComposer implements TaxonFilterTreeComposer
 
     /**
      * Get all product ids belonging to this taxon filter and all its children
-     *
-     * @return array
      */
     public function getProductIds(array $taxonIds, bool $onlineOnly = false): array
     {

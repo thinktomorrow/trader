@@ -108,12 +108,12 @@ class MysqlProductRepository implements ProductRepository
 
     public function find(ProductId $productId): Product
     {
+        $taxaSelect = $this->composeTaxaSelect();
+
         $productState = DB::table(static::$productTable)
             ->select([
                 static::$productTable . '.*',
-                DB::raw(
-                    'GROUP_CONCAT(DISTINCT trader_taxonomies.taxonomy_id || ":" || trader_taxonomies.type || ":" || trader_taxa.taxon_id || ":" || trader_taxa_products.state || ":" || trader_taxa_products.data) AS taxa',
-                ),
+                DB::raw("GROUP_CONCAT(DISTINCT $taxaSelect) AS taxa"),
             ])
             ->where(static::$productTable . '.product_id', $productId->get())
             ->leftJoin(static::$productTaxonLookupTable, static::$productTable . '.product_id', '=', static::$productTaxonLookupTable . '.product_id')
@@ -158,7 +158,7 @@ class MysqlProductRepository implements ProductRepository
         }
 
         $pairs = [];
-
+        dd($state['taxa']);
         foreach (explode(',', $state['taxa']) as $pair) {
             [$taxonomyId, $taxonomyType, $taxonId, $taxonState, $taxonData] = explode(':', $pair);
             $pairs[] = [
@@ -209,5 +209,20 @@ class MysqlProductRepository implements ProductRepository
     public function nextReference(): ProductId
     {
         return ProductId::fromString((string)Uuid::uuid4());
+    }
+
+    private function composeTaxaSelect(): string
+    {
+        if (DB::getDriverName() === 'sqlite') {
+            return "trader_taxonomies.taxonomy_id || ':' || trader_taxonomies.type || ':' || trader_taxa.taxon_id || ':' || trader_taxa_products.state || ':' || trader_taxa_products.data";
+        }
+
+        return "CONCAT(
+            trader_taxonomies.taxonomy_id, ':',
+            trader_taxonomies.type, ':',
+            trader_taxa.taxon_id, ':',
+            trader_taxa_products.state, ':',
+            trader_taxa_products.data
+        )";
     }
 }

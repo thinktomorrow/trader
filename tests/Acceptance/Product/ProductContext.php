@@ -8,9 +8,9 @@ use Tests\Acceptance\TestCase;
 use Thinktomorrow\Trader\Application\Product\CreateProduct;
 use Thinktomorrow\Trader\Application\Product\CreateVariant;
 use Thinktomorrow\Trader\Application\Product\ProductApplication;
-use Thinktomorrow\Trader\Application\Product\VariantLinks\ProductOptionsAndValues;
 use Thinktomorrow\Trader\Application\Product\VariantLinks\VariantLink;
 use Thinktomorrow\Trader\Application\Product\VariantLinks\VariantLinksComposer;
+use Thinktomorrow\Trader\Application\Product\VariantLinks\VariantPropertiesForSelect;
 use Thinktomorrow\Trader\Application\Product\VariantProperties\MissingVariantPropertyCombinations;
 use Thinktomorrow\Trader\Application\Taxon\TaxonApplication;
 use Thinktomorrow\Trader\Application\Taxonomy\TaxonomyApplication;
@@ -77,7 +77,7 @@ abstract class ProductContext extends TestCase
         $this->productDetailRepository = new InMemoryProductDetailRepository();
 
         $this->missingOptionCombinations = new MissingVariantPropertyCombinations(
-            new ProductOptionsAndValues(new InMemoryProductRepository())
+            new VariantPropertiesForSelect(new InMemoryProductRepository())
         );
     }
 
