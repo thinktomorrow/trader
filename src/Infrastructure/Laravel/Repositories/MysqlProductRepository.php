@@ -183,7 +183,7 @@ class MysqlProductRepository implements ProductRepository
         }
 
         $pairs = [];
-        dd($state['taxa']);
+
         foreach (explode(',', $state['taxa']) as $pair) {
             [$taxonomyId, $taxonomyType, $taxonId, $taxonState, $taxonData] = explode(':', $pair);
             $pairs[] = [
