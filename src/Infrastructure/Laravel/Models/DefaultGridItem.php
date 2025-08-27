@@ -8,6 +8,7 @@ use Thinktomorrow\Trader\Application\Common\RendersData;
 use Thinktomorrow\Trader\Application\Common\RendersVariantPrices;
 use Thinktomorrow\Trader\Application\Product\Grid\GridItem;
 use Thinktomorrow\Trader\Application\Product\ProductTaxa\ProductTaxonItem;
+use Thinktomorrow\Trader\Application\Product\ProductTaxa\VariantTaxonItem;
 use Thinktomorrow\Trader\Domain\Model\Product\ProductId;
 use Thinktomorrow\Trader\Domain\Model\Product\Variant\VariantId;
 use Thinktomorrow\Trader\Domain\Model\Product\Variant\VariantSalePrice;
@@ -26,6 +27,8 @@ class DefaultGridItem implements GridItem
     protected VariantState $state;
     protected array $data;
     protected iterable $images;
+
+    /** @var array<ProductTaxonItem|VariantTaxonItem> */
     protected array $taxa;
 
     final private function __construct()
@@ -47,7 +50,7 @@ class DefaultGridItem implements GridItem
         );
 
         foreach ($taxa as $taxon) {
-            if (! ($taxon instanceof ProductTaxonItem)) {
+            if (!($taxon instanceof ProductTaxonItem)) {
                 throw new \InvalidArgumentException('Taxa must be instances of ProductTaxonItem or VariantTaxonItem');
             }
         }
@@ -95,6 +98,20 @@ class DefaultGridItem implements GridItem
     public function getTaxa(): array
     {
         return $this->taxa;
+    }
+
+    public function getMainCategory(): ?ProductTaxonItem
+    {
+        // TODO: how to get the 'main' taxonomy? We should set this in database on a taxonomy instead of in config
+        // Then, we can fetch the main taxonomy type and return the first taxon of that type
+        // Something as main_category Perhaps? Better is to assign 'main' to a category taxonomy.
+        foreach ($this->taxa as $taxon) {
+            if ($taxon->getTaxonomyType() === TaxonomyType::category->value && $taxon->showOnline()) {
+                return $taxon;
+            }
+        }
+
+        return null;
     }
 
     public function getGridCategories(): array

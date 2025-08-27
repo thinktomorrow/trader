@@ -25,6 +25,8 @@ interface GridItem
      */
     public function getTaxa(): array;
 
+    public function getMainCategory(): ?ProductTaxonItem;
+
     public function getGridCategories(): array;
 
     public function getGridProductProperties(): array;

@@ -46,8 +46,8 @@ class DefaultProductTaxonItem implements ProductTaxonItem
             (bool)$state['shows_in_grid'],
             self::determineStateFlag($state),
             array_merge(
-                ['taxonomy_data' => json_decode($state['taxonomy_data'], true)],
-                ['taxon_data' => json_decode($state['taxon_data'], true)],
+                ['taxonomy_data' => ($state['taxonomy_data'] ? json_decode($state['taxonomy_data'], true) : [])],
+                ['taxon_data' => ($state['taxon_data'] ? json_decode($state['taxon_data'], true) : [])],
                 ($state['data'] ? json_decode($state['data'], true) : []),
             )
         );
@@ -60,11 +60,11 @@ class DefaultProductTaxonItem implements ProductTaxonItem
         $taxonomyState = TaxonomyState::from($state['taxonomy_state']);
         $state = TaxonState::online;
 
-        if (! in_array($productTaxonState, TaxonState::onlineStates())) {
+        if (!in_array($productTaxonState, TaxonState::onlineStates())) {
             $state = $productTaxonState;
-        } elseif (! in_array($taxonState, TaxonState::onlineStates())) {
+        } elseif (!in_array($taxonState, TaxonState::onlineStates())) {
             $state = $taxonState;
-        } elseif (! in_array($taxonomyState, TaxonomyState::onlineStates())) {
+        } elseif (!in_array($taxonomyState, TaxonomyState::onlineStates())) {
             $state = TaxonState::offline;
         }
 

@@ -58,7 +58,7 @@ class DefaultProductDetail implements ProductDetail
         $item->ignore_out_of_stock = (bool)$state['ignore_out_of_stock'];
 
         foreach ($taxa as $taxon) {
-            if (! ($taxon instanceof ProductTaxonItem)) {
+            if (!($taxon instanceof ProductTaxonItem)) {
                 throw new \InvalidArgumentException('Taxa must be instances of ProductTaxonItem or VariantTaxonItem');
             }
         }
@@ -93,10 +93,10 @@ class DefaultProductDetail implements ProductDetail
             return $variantTitle;
         }
 
-        if (! $variantOptionTitle || $productTitle == $variantOptionTitle) {
+        if (!$variantOptionTitle || $productTitle == $variantOptionTitle) {
             return $productTitle;
         }
-        if (! $productTitle) {
+        if (!$productTitle) {
             return $variantOptionTitle;
         }
 
@@ -146,6 +146,20 @@ class DefaultProductDetail implements ProductDetail
     public function getTaxa(): array
     {
         return $this->taxa;
+    }
+
+    public function getMainCategory(): ?ProductTaxonItem
+    {
+        // TODO: how to get the 'main' taxonomy? We should set this in database on a taxonomy instead of in config
+        // Then, we can fetch the main taxonomy type and return the first taxon of that type
+        // Something as main_category Perhaps? Better is to assign 'main' to a category taxonomy.
+        foreach ($this->taxa as $taxon) {
+            if ($taxon->getTaxonomyType() === TaxonomyType::category->value && $taxon->showOnline()) {
+                return $taxon;
+            }
+        }
+
+        return null;
     }
 
     public function getCategories(): array

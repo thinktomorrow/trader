@@ -28,6 +28,8 @@ interface ProductDetail extends Stockable
      */
     public function getTaxa(): array;
 
+    public function getMainCategory(): ?ProductTaxonItem;
+
     public function getCategories(): array;
 
     public function getGoogleCategories(): array;

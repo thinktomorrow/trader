@@ -101,6 +101,31 @@ class MysqlProductRepository implements ProductRepository
         }
     }
 
+    /**
+     * We keep a
+     */
+    private function upsertGridTaxa(Product $product): void
+    {
+        $taxonIds = array_map(fn($taxonState) => $taxonState['taxon_id'], $product->getChildEntities()[ProductTaxon::class]);
+
+        DB::table(static::$productTaxonLookupTable)
+            ->where('product_id', $product->productId)
+            ->whereNotIn('taxon_id', $taxonIds)
+            ->delete();
+
+        foreach ($product->getChildEntities()[ProductTaxon::class] as $i => $taxonState) {
+            DB::table(static::$productTaxonLookupTable)
+                ->updateOrInsert([
+                    'product_id' => $product->productId->get(),
+                    'taxon_id' => $taxonState['taxon_id'],
+                    'data' => $taxonState['data'],
+                    'order_column' => $i,
+                    'state' => $taxonState['state'],
+                ]);
+        }
+    }
+
+
     private function exists(ProductId $productId): bool
     {
         return DB::table(static::$productTable)->where('product_id', $productId->get())->exists();
