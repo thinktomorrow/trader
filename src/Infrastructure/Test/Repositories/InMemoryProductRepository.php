@@ -32,7 +32,7 @@ final class InMemoryProductRepository implements ProductRepository
 
     public function find(ProductId $productId): Product
     {
-        if (!isset(static::$products[$productId->get()])) {
+        if (! isset(static::$products[$productId->get()])) {
             throw new CouldNotFindProduct('No product found by id ' . $productId);
         }
 
@@ -41,7 +41,7 @@ final class InMemoryProductRepository implements ProductRepository
 
     public function delete(ProductId $productId): void
     {
-        if (!isset(static::$products[$productId->get()])) {
+        if (! isset(static::$products[$productId->get()])) {
             throw new CouldNotFindProduct('No product found by id ' . $productId);
         }
 
@@ -78,7 +78,7 @@ final class InMemoryProductRepository implements ProductRepository
     //    }
     public function getProductTaxonStatesByProduct(string $productId): array
     {
-        if (!isset(static::$products[$productId])) {
+        if (! isset(static::$products[$productId])) {
             throw new CouldNotFindProduct('No product found by id ' . $productId);
         }
 
@@ -89,9 +89,9 @@ final class InMemoryProductRepository implements ProductRepository
     {
         $taxa = InMemoryTaxonRepository::$taxons;
 
-        $taxa = array_filter($taxa, fn($taxon) => in_array($taxon->taxonId->get(), $taxonIds));
+        $taxa = array_filter($taxa, fn ($taxon) => in_array($taxon->taxonId->get(), $taxonIds));
 
-        return array_map(fn($taxon) => ProductTaxon::fromMappedData(
+        return array_map(fn ($taxon) => ProductTaxon::fromMappedData(
             [
                 'taxon_id' => $taxon->taxonId->get(),
                 'data' => '{}',

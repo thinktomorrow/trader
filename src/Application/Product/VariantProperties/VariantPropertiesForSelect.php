@@ -35,12 +35,12 @@ class VariantPropertiesForSelect
     public function get(string $productId): array
     {
         $product = $this->productRepository->find(ProductId::fromString($productId));
-        $taxonIds = array_map(fn(VariantProperty $prop) => $prop->taxonId->get(), $product->getVariantProperties());
+        $taxonIds = array_map(fn (VariantProperty $prop) => $prop->taxonId->get(), $product->getVariantProperties());
         $taxa = $this->taxonRepository->findMany($taxonIds);
         $taxonomies = $this->taxonomyRepository->findManyByTaxa($taxonIds);
 
         /** @var Collection<Collection<Taxon>> $groupedByTaxonomy */
-        $groupedByTaxonomy = collect($taxa)->groupBy(fn(Taxon $taxon) => $taxon->taxonomyId->get());
+        $groupedByTaxonomy = collect($taxa)->groupBy(fn (Taxon $taxon) => $taxon->taxonomyId->get());
 
         $result = [];
 
@@ -50,18 +50,18 @@ class VariantPropertiesForSelect
 
             /** @var Taxonomy $taxonomy */
             $taxonomy = collect($taxonomies)
-                ->first(fn(Taxonomy $taxonomy) => $taxonomy->taxonomyId->get() === $taxonomyId);
+                ->first(fn (Taxonomy $taxonomy) => $taxonomy->taxonomyId->get() === $taxonomyId);
 
             foreach ($taxaByTaxonomy as $taxon) {
                 $_result[] = [
                     'value' => $taxon->taxonId->get(),
-                    'label' => $taxon->getData('title.' . $this->getLocale()->getLanguage())
+                    'label' => $taxon->getData('title.' . $this->getLocale()->getLanguage()),
                 ];
             }
 
             $result[$taxonomyId] = [
                 'label' => $taxonomy->getData('title.' . $this->getLocale()->getLanguage()),
-                'options' => $_result
+                'options' => $_result,
             ];
         }
 

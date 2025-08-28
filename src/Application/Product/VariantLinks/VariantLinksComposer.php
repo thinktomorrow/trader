@@ -70,7 +70,7 @@ class VariantLinksComposer
             $variantLink->setLocale($locale);
 
             // If this option value also belongs to this current variant, we'll mark it as active
-            if (in_array($prop->taxonId, array_map(fn(VariantVariantProperty $prop) => $prop->taxonId->get(), $currentVariantProperties))) {
+            if (in_array($prop->taxonId, array_map(fn (VariantVariantProperty $prop) => $prop->taxonId->get(), $currentVariantProperties))) {
                 $variantLink->markActive();
             }
 
@@ -100,7 +100,7 @@ class VariantLinksComposer
 
     private function findVariantByProperties(\Thinktomorrow\Trader\Domain\Model\Product\Product $product, array $variantProperties): ?\Thinktomorrow\Trader\Domain\Model\Product\Variant\Variant
     {
-        $taxonIds = array_map(fn(VariantProperty|VariantVariantProperty $prop) => $prop->taxonId->get(), $variantProperties);
+        $taxonIds = array_map(fn (VariantProperty|VariantVariantProperty $prop) => $prop->taxonId->get(), $variantProperties);
 
         foreach ($product->getVariants() as $variant) {
             if ($this->hasExactVariantPropertiesMatch($variant, $taxonIds)) {
@@ -113,7 +113,7 @@ class VariantLinksComposer
 
     private function hasExactVariantPropertiesMatch(Variant $variant, array $taxonIds): bool
     {
-        $variantTaxonIds = array_map(fn($prop) => $prop->taxonId->get(), $variant->getVariantProperties());
+        $variantTaxonIds = array_map(fn ($prop) => $prop->taxonId->get(), $variant->getVariantProperties());
 
         // array_diff with empty array returns unexpected results
         if (count($variantTaxonIds) < 1 || count($taxonIds) < 1) {

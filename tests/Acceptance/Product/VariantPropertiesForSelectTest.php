@@ -27,7 +27,7 @@ class VariantPropertiesForSelectTest extends ProductContext
                     ['value' => 'xxx', 'label' => 'Taxon xxx nl'],
                     ['value' => 'yyy', 'label' => 'Taxon yyy nl'],
                     ['value' => 'zzz', 'label' => 'Taxon zzz nl'],
-                ]
+                ],
             ],
         ], $values);
     }

@@ -6,8 +6,6 @@ namespace Thinktomorrow\Trader\Infrastructure\Laravel\Models;
 use Thinktomorrow\Trader\Application\Common\HasLocale;
 use Thinktomorrow\Trader\Application\Common\RendersData;
 use Thinktomorrow\Trader\Application\Product\VariantLinks\VariantLink;
-use Thinktomorrow\Trader\Domain\Model\Product\Option\Option;
-use Thinktomorrow\Trader\Domain\Model\Product\Option\OptionValue;
 use Thinktomorrow\Trader\Domain\Model\Product\ProductTaxa\VariantProperty;
 use Thinktomorrow\Trader\Domain\Model\Product\Variant\Variant;
 use Thinktomorrow\Trader\Domain\Model\Product\Variant\VariantState;
@@ -63,7 +61,7 @@ class DefaultVariantLink implements VariantLink
 
     public function getUrl(): ?string
     {
-        if (!$this->variant) {
+        if (! $this->variant) {
             return null;
         }
 
@@ -72,7 +70,7 @@ class DefaultVariantLink implements VariantLink
 
     public function isVariantAvailable(): bool
     {
-        if (!$this->variant) {
+        if (! $this->variant) {
             return false;
         }
 

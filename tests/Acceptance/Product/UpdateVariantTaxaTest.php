@@ -51,7 +51,10 @@ class UpdateVariantTaxaTest extends ProductContext
         $variantId = $this->productRepository->find($productId)->getVariants()[0]->variantId;
 
         $this->productApplication->updateVariantTaxa(new UpdateVariantTaxa(
-            $productId->get(), $variantId->get(), []));
+            $productId->get(),
+            $variantId->get(),
+            []
+        ));
 
         $variant = $this->productRepository->find($productId)->getVariants()[0];
 

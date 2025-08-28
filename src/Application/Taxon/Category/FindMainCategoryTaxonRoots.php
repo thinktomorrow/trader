@@ -26,7 +26,7 @@ class FindMainCategoryTaxonRoots
 
     public function get(): ?TaxonTree
     {
-        if (!$categoryTaxonomyId = $this->traderConfig->getMainCategoryTaxonomyId()) {
+        if (! $categoryTaxonomyId = $this->traderConfig->getMainCategoryTaxonomyId()) {
             return new TaxonTree();
         }
 
@@ -48,12 +48,12 @@ class FindMainCategoryTaxonRoots
 
         foreach ($taxonIds as $taxonId) {
             /** @var TaxonNode $taxonNode */
-            $taxonNode = $tree->find(fn(TaxonNode $node) => $node->getId() == $taxonId);
+            $taxonNode = $tree->find(fn (TaxonNode $node) => $node->getId() == $taxonId);
 
             foreach ($categoryRootTaxa as $categoryRootTaxon) {
                 if (in_array($categoryRootTaxon->getId(), [$taxonId, $taxonNode->getRootNode()->getId()])) {
 
-                    if (!in_array($categoryRootTaxon->getId(), array_map(fn(TaxonNode $node) => $node->getId(), $result))) {
+                    if (! in_array($categoryRootTaxon->getId(), array_map(fn (TaxonNode $node) => $node->getId(), $result))) {
                         $result[] = $categoryRootTaxon;
                     }
                 }

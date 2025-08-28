@@ -25,10 +25,10 @@ class MissingVariants
 
     public function get(Product $product): array
     {
-        $taxa = $this->taxonRepository->findMany(array_map(fn(VariantProperty $prop) => $prop->taxonId->get(), $product->getVariantProperties()));
+        $taxa = $this->taxonRepository->findMany(array_map(fn (VariantProperty $prop) => $prop->taxonId->get(), $product->getVariantProperties()));
 
         /** @var Collection<Collection<Taxon>> $groupedByTaxonomy */
-        $groupedByTaxonomy = collect($taxa)->groupBy(fn(Taxon $taxon) => $taxon->taxonomyId->get());
+        $groupedByTaxonomy = collect($taxa)->groupBy(fn (Taxon $taxon) => $taxon->taxonomyId->get());
 
         if (count($groupedByTaxonomy) < 2) {
             return [];
@@ -37,8 +37,8 @@ class MissingVariants
         $matrix = $this->createMatrix($groupedByTaxonomy);
 
         $existingIdCombinations = collect($product->getVariants())
-            ->reject(fn(Variant $variant) => count($variant->getVariantProperties()) < 1)
-            ->map(fn(Variant $variant) => array_map(fn(\Thinktomorrow\Trader\Domain\Model\Product\VariantTaxa\VariantProperty $prop) => $prop->taxonId->get(), $variant->getVariantProperties()));
+            ->reject(fn (Variant $variant) => count($variant->getVariantProperties()) < 1)
+            ->map(fn (Variant $variant) => array_map(fn (\Thinktomorrow\Trader\Domain\Model\Product\VariantTaxa\VariantProperty $prop) => $prop->taxonId->get(), $variant->getVariantProperties()));
 
         foreach ($matrix as $index => $availableIdCombination) {
             foreach ($existingIdCombinations as $existingIdCombination) {
@@ -56,7 +56,7 @@ class MissingVariants
     public function getAsLabels(Product $product, string $taxonomyLabelKey, string $taxonLabelKey): array
     {
         $missingCombinations = $this->get($product);
-        $taxonIds = array_map(fn(VariantProperty $prop) => $prop->taxonId->get(), $product->getVariantProperties());
+        $taxonIds = array_map(fn (VariantProperty $prop) => $prop->taxonId->get(), $product->getVariantProperties());
         $taxa = $this->taxonRepository->findMany($taxonIds);
         $taxonomies = $this->taxonomyRepository->findManyByTaxa($taxonIds);
 
@@ -65,11 +65,11 @@ class MissingVariants
 
                 /** @var Taxon $taxon */
                 $taxon = collect($taxa)
-                    ->first(fn(Taxon $taxon) => $taxon->taxonId->get() === $taxonId);
+                    ->first(fn (Taxon $taxon) => $taxon->taxonId->get() === $taxonId);
 
                 /** @var Taxonomy $taxonomy */
                 $taxonomy = collect($taxonomies)
-                    ->first(fn(Taxonomy $taxonomy) => $taxonomy->taxonomyId->get() === $taxon->taxonomyId->get());
+                    ->first(fn (Taxonomy $taxonomy) => $taxonomy->taxonomyId->get() === $taxon->taxonomyId->get());
 
                 $label = $taxonomy->getData($taxonomyLabelKey);
                 $value = $taxon->getData($taxonLabelKey);
@@ -95,14 +95,14 @@ class MissingVariants
     {
         $firstTaxonomyId = $groupedByTaxonomy->keys()->first();
 
-        $matrix = $groupedByTaxonomy->first()->map(fn($prop) => $prop->taxonId->get());
+        $matrix = $groupedByTaxonomy->first()->map(fn ($prop) => $prop->taxonId->get());
 
         foreach ($groupedByTaxonomy as $taxonomyId => $productVariantProperties) {
             if ($firstTaxonomyId === $taxonomyId) {
                 continue;
             }
 
-            $matrix = $this->join($matrix, $productVariantProperties->map(fn($prop) => $prop->taxonId->get())->all());
+            $matrix = $this->join($matrix, $productVariantProperties->map(fn ($prop) => $prop->taxonId->get())->all());
         }
 
         return $matrix;
