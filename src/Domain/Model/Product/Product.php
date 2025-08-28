@@ -8,6 +8,7 @@ use Thinktomorrow\Trader\Domain\Common\Entity\HasData;
 use Thinktomorrow\Trader\Domain\Common\Event\RecordsEvents;
 use Thinktomorrow\Trader\Domain\Model\Product\Events\ProductCreated;
 use Thinktomorrow\Trader\Domain\Model\Product\Events\ProductDataUpdated;
+use Thinktomorrow\Trader\Domain\Model\Product\Personalisation\HasPersonalisations;
 use Thinktomorrow\Trader\Domain\Model\Product\Personalisation\Personalisation;
 use Thinktomorrow\Trader\Domain\Model\Product\ProductTaxa\HasProductTaxa;
 use Thinktomorrow\Trader\Domain\Model\Product\ProductTaxa\ProductTaxon;

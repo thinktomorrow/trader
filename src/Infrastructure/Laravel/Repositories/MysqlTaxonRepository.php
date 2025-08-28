@@ -22,7 +22,7 @@ class MysqlTaxonRepository implements TaxonRepository
     {
         $state = $taxon->getMappedData();
 
-        if (! $this->exists($taxon->taxonId)) {
+        if (!$this->exists($taxon->taxonId)) {
             DB::table(static::$taxonTable)->insert($state);
         } else {
             DB::table(static::$taxonTable)->where('taxon_id', $taxon->taxonId->get())->update($state);
@@ -33,7 +33,7 @@ class MysqlTaxonRepository implements TaxonRepository
 
     private function upsertTaxonKeys(Taxon $taxon): void
     {
-        $taxonKeyIds = array_map(fn (TaxonKey $taxonKey) => $taxonKey->taxonKeyId->get(), $taxon->getTaxonKeys());
+        $taxonKeyIds = array_map(fn(TaxonKey $taxonKey) => $taxonKey->taxonKeyId->get(), $taxon->getTaxonKeys());
 
         DB::table(static::$taxonKeysTable)
             ->where('taxon_id', $taxon->taxonId->get())
@@ -63,35 +63,63 @@ class MysqlTaxonRepository implements TaxonRepository
         $taxonKeyStates = DB::table(static::$taxonKeysTable)
             ->where(static::$taxonKeysTable . '.taxon_id', $taxonId->get())
             ->get()
-            ->map(fn ($item) => (array) $item)
+            ->map(fn($item) => (array)$item)
             ->toArray();
 
-        if (! $taxonState) {
+        if (!$taxonState) {
             throw new CouldNotFindTaxon('No taxon found by id [' . $taxonId->get() . ']');
         }
 
-        return Taxon::fromMappedData((array) $taxonState, [TaxonKey::class => $taxonKeyStates]);
+        return Taxon::fromMappedData((array)$taxonState, [TaxonKey::class => $taxonKeyStates]);
+    }
+
+    public function findMany(array $taxonIds): array
+    {
+        $taxonKeysSelect = $this->composeTaxonKeysSelect();
+
+        $taxonStates = DB::table(static::$taxonTable)
+            ->leftJoin(static::$taxonKeysTable, static::$taxonTable . '.taxon_id', '=', static::$taxonKeysTable . '.taxon_id')
+            ->select([
+                static::$taxonTable . '.*',
+                DB::raw("GROUP_CONCAT(DISTINCT $taxonKeysSelect) AS taxa"),
+            ])
+            ->whereIn(static::$taxonTable . '.taxon_id', $taxonIds)
+            ->groupBy(static::$taxonTable . '.taxon_id')
+            ->get();
+
+        return $taxonStates
+            ->map(fn($record) => Taxon::fromMappedData((array)$record, []))
+            ->toArray();
+    }
+
+    private function composeTaxonKeysSelect(): string
+    {
+        if (DB::getDriverName() === 'sqlite') {
+            return "trader_taxa_keys.key || ':' || trader_taxa_keys.locale";
+        }
+
+        return "CONCAT(trader_taxa_keys.key, ':', trader_taxa_keys.locale)";
     }
 
     public function findByKey(TaxonKeyId $taxonKeyId): Taxon
     {
         $taxonState = DB::table(static::$taxonTable)
-            ->join(static::$taxonKeysTable, static::$taxonTable.'.taxon_id', '=', static::$taxonKeysTable.'.taxon_id')
+            ->join(static::$taxonKeysTable, static::$taxonTable . '.taxon_id', '=', static::$taxonKeysTable . '.taxon_id')
             ->where(static::$taxonKeysTable . '.key', $taxonKeyId->get())
             ->select(static::$taxonTable . '.*')
             ->first();
 
-        if (! $taxonState) {
+        if (!$taxonState) {
             throw new CouldNotFindTaxon('No taxon found by key [' . $taxonKeyId->get() . ']');
         }
 
         $taxonKeyStates = DB::table(static::$taxonKeysTable)
             ->where(static::$taxonKeysTable . '.taxon_id', $taxonState->taxon_id)
             ->get()
-            ->map(fn ($item) => (array) $item)
+            ->map(fn($item) => (array)$item)
             ->toArray();
 
-        return Taxon::fromMappedData((array) $taxonState, [TaxonKey::class => $taxonKeyStates]);
+        return Taxon::fromMappedData((array)$taxonState, [TaxonKey::class => $taxonKeyStates]);
     }
 
     public function getByParentId(TaxonId $taxonId): array
@@ -101,7 +129,7 @@ class MysqlTaxonRepository implements TaxonRepository
             ->get();
 
         return $taxonStates
-            ->map(fn ($record) => Taxon::fromMappedData((array) $record, []))
+            ->map(fn($record) => Taxon::fromMappedData((array)$record, []))
             ->toArray();
     }
 
@@ -112,7 +140,7 @@ class MysqlTaxonRepository implements TaxonRepository
 
     public function nextReference(): TaxonId
     {
-        return TaxonId::fromString((string) Uuid::uuid4());
+        return TaxonId::fromString((string)Uuid::uuid4());
     }
 
     public function uniqueKeyReference(TaxonKeyId $taxonKeyId, TaxonId $allowedTaxonId): TaxonKeyId

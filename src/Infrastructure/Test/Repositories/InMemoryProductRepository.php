@@ -8,7 +8,6 @@ use Thinktomorrow\Trader\Domain\Model\Product\Product;
 use Thinktomorrow\Trader\Domain\Model\Product\ProductId;
 use Thinktomorrow\Trader\Domain\Model\Product\ProductRepository;
 use Thinktomorrow\Trader\Domain\Model\Product\ProductTaxa\ProductTaxon;
-use Thinktomorrow\Trader\Domain\Model\Product\ProductTaxa\VariantProperty;
 use Thinktomorrow\Trader\Domain\Model\Product\Variant\Variant;
 use Thinktomorrow\Trader\Domain\Model\Taxonomy\TaxonomyType;
 
@@ -113,7 +112,7 @@ final class InMemoryProductRepository implements ProductRepository
                 $taxonomy = InMemoryTaxonomyRepository::$taxonomies[$taxon->taxonomyId->get()] ?? null;
 
                 if ($taxonomy && $taxonomy->getType() === TaxonomyType::variant_property) {
-                    $productTaxa[$i] = VariantProperty::create($productTaxon->productId, $productTaxon->taxonId);
+                    $productTaxa[$i] = $productTaxon->toVariantProperty();
 
                     continue;
                 }
@@ -139,7 +138,7 @@ final class InMemoryProductRepository implements ProductRepository
                 $taxonomy = InMemoryTaxonomyRepository::$taxonomies[$taxon->taxonomyId->get()] ?? null;
 
                 if ($taxonomy && $taxonomy->getType() === TaxonomyType::variant_property) {
-                    $variantTaxa[$i] = \Thinktomorrow\Trader\Domain\Model\Product\VariantTaxa\VariantProperty::create($variantTaxon->variantId, $variantTaxon->taxonId);
+                    $variantTaxa[$i] = $variantTaxon->toVariantProperty();
 
                     continue;
                 }
@@ -148,6 +147,6 @@ final class InMemoryProductRepository implements ProductRepository
             $variantTaxa[$i] = $variantTaxon;
         }
 
-        $variant->updateVariantTaxa($variantTaxa);
+        $variant->updateVariantProperties($variantTaxa);
     }
 }

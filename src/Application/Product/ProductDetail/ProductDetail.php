@@ -3,8 +3,8 @@
 namespace Thinktomorrow\Trader\Application\Product\ProductDetail;
 
 use Money\Money;
-use Thinktomorrow\Trader\Application\Product\ProductTaxa\ProductTaxonItem;
-use Thinktomorrow\Trader\Application\Product\ProductTaxa\VariantTaxonItem;
+use Thinktomorrow\Trader\Application\Product\Taxa\ProductTaxonItem;
+use Thinktomorrow\Trader\Application\Product\Taxa\VariantTaxonItem;
 use Thinktomorrow\Trader\Application\Stock\Read\Stockable;
 use Thinktomorrow\Trader\Domain\Model\Product\Variant\VariantSalePrice;
 use Thinktomorrow\Trader\Domain\Model\Product\Variant\VariantUnitPrice;

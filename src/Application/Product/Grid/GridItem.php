@@ -4,8 +4,8 @@ declare(strict_types=1);
 namespace Thinktomorrow\Trader\Application\Product\Grid;
 
 use Money\Money;
-use Thinktomorrow\Trader\Application\Product\ProductTaxa\ProductTaxonItem;
-use Thinktomorrow\Trader\Application\Product\ProductTaxa\VariantTaxonItem;
+use Thinktomorrow\Trader\Application\Product\Taxa\ProductTaxonItem;
+use Thinktomorrow\Trader\Application\Product\Taxa\VariantTaxonItem;
 
 /**
  * A grid item a product variant for the grid. If a variant is set to be show_in_grid,

@@ -62,6 +62,7 @@ class UpdateProductTaxaTest extends ProductContext
     public function test_when_removing_taxa_all_corresponding_taxa_on_variants_are_removed_as_well()
     {
         $product = $this->createProductWithVariantAndTaxon();
+
         $this->productRepository->save($product);
 
         $this->assertCount(1, $product->getProductTaxa());

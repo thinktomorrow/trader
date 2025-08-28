@@ -52,6 +52,9 @@ final class ProductTaxonRepositoryTest extends TestCase
 
             $this->assertCount($count, $product->getProductTaxa());
             $this->assertContainsOnlyInstancesOf(ProductTaxon::class, $product->getProductTaxa());
+
+            $this->assertEquals('xxx value nl', $product->getProductTaxa()[0]->getData('title.nl'));
+            $this->assertEquals('yyy value nl', $product->getProductTaxa()[1]->getData('title.nl'));
         }
     }
 
@@ -115,8 +118,7 @@ final class ProductTaxonRepositoryTest extends TestCase
 
     public static function products(): \Generator
     {
-        yield [static::createProductWithProductVariantProperties(), 3, 2];
-        yield [static::createProductWithVariant(), 0, 0];
+        yield [static::createProductWithProductVariantProperties(), 3, 1];
     }
 
     private function taxonomyRepositories(): array

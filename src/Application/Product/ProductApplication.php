@@ -4,14 +4,11 @@ declare(strict_types=1);
 namespace Thinktomorrow\Trader\Application\Product;
 
 use Thinktomorrow\Trader\Application\Product\UpdateProduct\UpdateProductData;
-use Thinktomorrow\Trader\Application\Product\UpdateProduct\UpdateProductOptions;
 use Thinktomorrow\Trader\Application\Product\UpdateProduct\UpdateProductPersonalisations;
 use Thinktomorrow\Trader\Application\Product\UpdateProduct\UpdateProductTaxa;
-use Thinktomorrow\Trader\Application\Product\UpdateVariant\UpdateVariantOptionValues;
+use Thinktomorrow\Trader\Application\Product\UpdateProduct\UpdateVariantTaxa;
 use Thinktomorrow\Trader\Domain\Common\Event\EventDispatcher;
 use Thinktomorrow\Trader\Domain\Model\Product\Events\ProductDeleted;
-use Thinktomorrow\Trader\Domain\Model\Product\Option\Option;
-use Thinktomorrow\Trader\Domain\Model\Product\Option\OptionValue;
 use Thinktomorrow\Trader\Domain\Model\Product\Personalisation\Personalisation;
 use Thinktomorrow\Trader\Domain\Model\Product\Product;
 use Thinktomorrow\Trader\Domain\Model\Product\ProductId;
@@ -113,38 +110,12 @@ class ProductApplication
         $this->eventDispatcher->dispatchAll($product->releaseEvents());
     }
 
-    public function updateProductOptions(UpdateProductOptions $updateProductOptions): void
+    public function updateVariantTaxa(UpdateVariantTaxa $command): void
     {
-        $product = $this->productRepository->find($updateProductOptions->getProductId());
-        $options = [];
+        $product = $this->productRepository->find($command->getProductId());
+        $variant = $product->findVariant($command->getVariantId());
 
-        foreach ($updateProductOptions->getOptions() as $optionItem) {
-            $option = Option::create($product->productId, $optionItem->getOptionId() ?: $product->getNextOptionId(), $optionItem->getData());
-
-            $option->updateOptionValues(array_map(function ($value) use ($option) {
-                return OptionValue::create(
-                    $option->optionId,
-                    $value->getOptionValueId() ?: $option->getNextOptionValueId(),
-                    $value->getData(),
-                );
-            }, $optionItem->getValues()));
-
-            $options[] = $option;
-        }
-
-        $product->updateOptions($options);
-
-        $this->productRepository->save($product);
-
-        $this->eventDispatcher->dispatchAll($product->releaseEvents());
-    }
-
-    public function updateVariantOptionValues(UpdateVariantOptionValues $updateVariantOptionValues): void
-    {
-        $product = $this->productRepository->find($updateVariantOptionValues->getProductId());
-
-        $variant = $product->findVariant($updateVariantOptionValues->getVariantId());
-        $variant->updateOptionValueIds($updateVariantOptionValues->getOptionValueIds());
+        $variant->updateVariantTaxa($command->getVariantTaxa());
         $product->updateVariant($variant);
 
         $this->productRepository->save($product);

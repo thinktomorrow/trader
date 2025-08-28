@@ -1,6 +1,6 @@
 <?php
 
-namespace Thinktomorrow\Trader\Application\Product\ProductTaxa;
+namespace Thinktomorrow\Trader\Application\Product\Taxa;
 
 interface ProductTaxonItem
 {

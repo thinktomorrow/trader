@@ -5,7 +5,6 @@ namespace Thinktomorrow\Trader\Infrastructure\Laravel\Repositories;
 
 use Illuminate\Support\Facades\DB;
 use Ramsey\Uuid\Uuid;
-use Thinktomorrow\Trader\Application\Common\TraderHelpers;
 use Thinktomorrow\Trader\Domain\Model\Product\Exceptions\CouldNotFindProduct;
 use Thinktomorrow\Trader\Domain\Model\Product\Personalisation\Personalisation;
 use Thinktomorrow\Trader\Domain\Model\Product\Product;
@@ -22,9 +21,6 @@ class MysqlProductRepository implements ProductRepository
     private static string $productTable = 'trader_products';
     private static string $variantTable = 'trader_product_variants';
     private static string $productTaxonLookupTable = 'trader_taxa_products';
-
-    private static string $optionTable = 'trader_product_options';
-    private static string $optionValueTable = 'trader_product_option_values';
     private static string $personalisationTable = 'trader_product_personalisations';
 
     public function __construct(VariantRepository $variantRepository)
@@ -35,7 +31,6 @@ class MysqlProductRepository implements ProductRepository
     public function save(Product $product): void
     {
         $state = $product->getMappedData();
-        $taxon_ids = TraderHelpers::array_remove($state, 'taxon_ids');
 
         if (!$this->exists($product->productId)) {
             DB::table(static::$productTable)->insert($state);
@@ -46,38 +41,6 @@ class MysqlProductRepository implements ProductRepository
         $this->upsertProductTaxa($product);
         $this->upsertVariants($product);
         $this->upsertPersonalisations($product);
-    }
-
-    private function upsertPersonalisations(Product $product): void
-    {
-        $personalisation_ids = array_map(fn($personalisationState) => $personalisationState['personalisation_id'], $product->getChildEntities()[Personalisation::class]);
-
-        DB::table(static::$personalisationTable)
-            ->where('product_id', $product->productId)
-            ->whereNotIn('personalisation_id', $personalisation_ids)
-            ->delete();
-
-        foreach ($product->getChildEntities()[Personalisation::class] as $i => $personalisationState) {
-            DB::table(static::$personalisationTable)
-                ->updateOrInsert([
-                    'product_id' => $product->productId->get(),
-                    'personalisation_id' => $personalisationState['personalisation_id'],
-                ], array_merge($personalisationState, ['order_column' => $i]));
-        }
-    }
-
-    private function upsertVariants(Product $product): void
-    {
-        $variant_ids = array_map(fn($variant) => $variant->variantId->get(), $product->getVariants());
-
-        DB::table(static::$variantTable)
-            ->where('product_id', $product->productId)
-            ->whereNotIn('variant_id', $variant_ids)
-            ->delete();
-
-        foreach ($product->getVariants() as $variant) {
-            $this->variantRepository->save($variant);
-        }
     }
 
     private function upsertProductTaxa(Product $product): void
@@ -101,30 +64,37 @@ class MysqlProductRepository implements ProductRepository
         }
     }
 
-    /**
-     * We keep a
-     */
-    private function upsertGridTaxa(Product $product): void
+    private function upsertVariants(Product $product): void
     {
-        $taxonIds = array_map(fn($taxonState) => $taxonState['taxon_id'], $product->getChildEntities()[ProductTaxon::class]);
+        $variant_ids = array_map(fn($variant) => $variant->variantId->get(), $product->getVariants());
 
-        DB::table(static::$productTaxonLookupTable)
+        DB::table(static::$variantTable)
             ->where('product_id', $product->productId)
-            ->whereNotIn('taxon_id', $taxonIds)
+            ->whereNotIn('variant_id', $variant_ids)
             ->delete();
 
-        foreach ($product->getChildEntities()[ProductTaxon::class] as $i => $taxonState) {
-            DB::table(static::$productTaxonLookupTable)
-                ->updateOrInsert([
-                    'product_id' => $product->productId->get(),
-                    'taxon_id' => $taxonState['taxon_id'],
-                    'data' => $taxonState['data'],
-                    'order_column' => $i,
-                    'state' => $taxonState['state'],
-                ]);
+        foreach ($product->getVariants() as $variant) {
+            $this->variantRepository->save($variant);
         }
     }
 
+    private function upsertPersonalisations(Product $product): void
+    {
+        $personalisation_ids = array_map(fn($personalisationState) => $personalisationState['personalisation_id'], $product->getChildEntities()[Personalisation::class]);
+
+        DB::table(static::$personalisationTable)
+            ->where('product_id', $product->productId)
+            ->whereNotIn('personalisation_id', $personalisation_ids)
+            ->delete();
+
+        foreach ($product->getChildEntities()[Personalisation::class] as $i => $personalisationState) {
+            DB::table(static::$personalisationTable)
+                ->updateOrInsert([
+                    'product_id' => $product->productId->get(),
+                    'personalisation_id' => $personalisationState['personalisation_id'],
+                ], array_merge($personalisationState, ['order_column' => $i]));
+        }
+    }
 
     private function exists(ProductId $productId): bool
     {
@@ -185,7 +155,7 @@ class MysqlProductRepository implements ProductRepository
         $pairs = [];
 
         foreach (explode(',', $state['taxa']) as $pair) {
-            [$taxonomyId, $taxonomyType, $taxonId, $taxonState, $taxonData] = explode(':', $pair);
+            [$taxonomyId, $taxonomyType, $taxonId, $taxonState, $taxonData] = explode('::::', $pair);
             $pairs[] = [
                 'product_id' => $state['product_id'],
                 'taxonomy_type' => $taxonomyType,
@@ -195,7 +165,6 @@ class MysqlProductRepository implements ProductRepository
                 'data' => $taxonData,
             ];
         }
-
         return $pairs;
     }
 
@@ -239,14 +208,14 @@ class MysqlProductRepository implements ProductRepository
     private function composeTaxaSelect(): string
     {
         if (DB::getDriverName() === 'sqlite') {
-            return "trader_taxonomies.taxonomy_id || ':' || trader_taxonomies.type || ':' || trader_taxa.taxon_id || ':' || trader_taxa_products.state || ':' || trader_taxa_products.data";
+            return "trader_taxonomies.taxonomy_id || '::::' || trader_taxonomies.type || '::::' || trader_taxa.taxon_id || '::::' || trader_taxa_products.state || '::::' || trader_taxa_products.data";
         }
 
         return "CONCAT(
-            trader_taxonomies.taxonomy_id, ':',
-            trader_taxonomies.type, ':',
-            trader_taxa.taxon_id, ':',
-            trader_taxa_products.state, ':',
+            trader_taxonomies.taxonomy_id, '::::',
+            trader_taxonomies.type, '::::',
+            trader_taxa.taxon_id, '::::',
+            trader_taxa_products.state, '::::',
             trader_taxa_products.data
         )";
     }

@@ -12,8 +12,8 @@ use Psr\Container\ContainerInterface;
 use Thinktomorrow\Trader\Application\Product\Grid\FlattenedTaxonIdsComposer;
 use Thinktomorrow\Trader\Application\Product\Grid\GridItem;
 use Thinktomorrow\Trader\Application\Product\Grid\GridRepository;
-use Thinktomorrow\Trader\Application\Product\ProductTaxa\ProductTaxonItem;
-use Thinktomorrow\Trader\Application\Product\ProductTaxa\VariantTaxonItem;
+use Thinktomorrow\Trader\Application\Product\Taxa\ProductTaxonItem;
+use Thinktomorrow\Trader\Application\Product\Taxa\VariantTaxonItem;
 use Thinktomorrow\Trader\Domain\Common\Cash\Cash;
 use Thinktomorrow\Trader\Domain\Common\Locale;
 use Thinktomorrow\Trader\Domain\Common\Vat\VatPercentage;
@@ -197,9 +197,7 @@ class MysqlGridRepository implements GridRepository
         return $this;
     }
 
-    /**
-     * @return GridItem[]
-     */
+    /** @return LengthAwarePaginator<GridItem> */
     public function getResults(): LengthAwarePaginator
     {
         // Default ordering if no ordering has been applied yet.
@@ -216,7 +214,6 @@ class MysqlGridRepository implements GridRepository
             $results = $this->builder->paginate($this->perPage)->withQueryString();
         }
 
-        // This could be something saved in product grid state on update request cycle.
         [$productTaxa, $variantTaxa] = $this->getTaxaInBulk($results);
 
         return $results->setCollection(

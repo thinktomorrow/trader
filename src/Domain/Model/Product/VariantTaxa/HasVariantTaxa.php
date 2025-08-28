@@ -29,6 +29,17 @@ trait HasVariantTaxa
         $this->variantTaxa = $variantTaxa;
     }
 
+    public function updateVariantProperties(array $variantProperties): void
+    {
+        Assertion::allIsInstanceOf($variantProperties, VariantProperty::class);
+
+        // Remove all existing variant properties first
+        $variantTaxa = array_filter($this->variantTaxa, fn(VariantTaxon $taxon) => !($taxon instanceof VariantProperty));
+
+        // Merge with the new ones
+        $this->variantTaxa = array_merge($variantTaxa, $variantProperties);
+    }
+
     public function getVariantTaxonIds(): array
     {
         return array_map(

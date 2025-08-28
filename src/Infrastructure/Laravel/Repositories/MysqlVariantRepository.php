@@ -98,7 +98,7 @@ class MysqlVariantRepository implements VariantRepository, VariantForCartReposit
                 $pairs = [];
                 if (!empty($item['taxa'])) {
                     foreach (explode(',', $item['taxa']) as $pair) {
-                        [$taxonomyId, $taxonomyType, $taxonId, $taxonState, $taxonData] = explode(':', $pair);
+                        [$taxonomyId, $taxonomyType, $taxonId, $taxonState, $taxonData] = explode('::::', $pair);
                         $pairs[] = [
                             'variant_id' => $item['variant_id'],
                             'taxonomy_type' => $taxonomyType,
@@ -229,14 +229,14 @@ class MysqlVariantRepository implements VariantRepository, VariantForCartReposit
     private function composeTaxaSelect(): string
     {
         if (DB::getDriverName() === 'sqlite') {
-            return "trader_taxonomies.taxonomy_id || ':' || trader_taxonomies.type || ':' || trader_taxa.taxon_id || ':' || trader_taxa_variants.state || ':' || trader_taxa_variants.data";
+            return "trader_taxonomies.taxonomy_id || '::::' || trader_taxonomies.type || '::::' || trader_taxa.taxon_id || '::::' || trader_taxa_variants.state || '::::' || trader_taxa_variants.data";
         }
 
         return "CONCAT(
-            trader_taxonomies.taxonomy_id, ':',
-            trader_taxonomies.type, ':',
-            trader_taxa.taxon_id, ':',
-            trader_taxa_variants.state, ':',
+            trader_taxonomies.taxonomy_id, '::::',
+            trader_taxonomies.type, '::::',
+            trader_taxa.taxon_id, '::::',
+            trader_taxa_variants.state, '::::',
             trader_taxa_variants.data
         )";
     }

@@ -32,6 +32,18 @@ class ProductTaxon implements ChildEntity
         return $object;
     }
 
+    public function toVariantProperty(): VariantProperty
+    {
+        $variantProperty = new VariantProperty();
+
+        $variantProperty->productId = $this->productId;
+        $variantProperty->taxonId = $this->taxonId;
+        $variantProperty->state = $this->state;
+        $variantProperty->data = $this->data;
+
+        return $variantProperty;
+    }
+
     public function changeState(TaxonState $state): void
     {
         $this->state = $state;
