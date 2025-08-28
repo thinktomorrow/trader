@@ -125,13 +125,13 @@ trait TaxonHelpers
         (new MysqlProductRepository(new MysqlVariantRepository(new TestContainer())))->save($product);
     }
 
-    private function entityRepositories(): \Generator
+    protected function entityRepositories(): \Generator
     {
         yield new InMemoryTaxonRepository();
         yield new MysqlTaxonRepository();
     }
 
-    private function entityTaxonomyRepositories(): \Generator
+    protected function entityTaxonomyRepositories(): \Generator
     {
         yield new InMemoryTaxonomyRepository();
         yield new MysqlTaxonomyRepository();

@@ -4,7 +4,7 @@ declare(strict_types=1);
 namespace Thinktomorrow\Trader\Application\Product\VariantProperties;
 
 use Illuminate\Support\Collection;
-use Thinktomorrow\Trader\Domain\Common\Locale;
+use Thinktomorrow\Trader\Application\Common\HasLocale;
 use Thinktomorrow\Trader\Domain\Model\Product\ProductId;
 use Thinktomorrow\Trader\Domain\Model\Product\ProductRepository;
 use Thinktomorrow\Trader\Domain\Model\Product\ProductTaxa\VariantProperty;
@@ -19,6 +19,8 @@ use Thinktomorrow\Trader\Domain\Model\Taxonomy\TaxonomyRepository;
  */
 class VariantPropertiesForSelect
 {
+    use HasLocale;
+
     private ProductRepository $productRepository;
     private TaxonRepository $taxonRepository;
     private TaxonomyRepository $taxonomyRepository;
@@ -30,7 +32,7 @@ class VariantPropertiesForSelect
         $this->taxonomyRepository = $taxonomyRepository;
     }
 
-    public function get(string $productId, Locale $locale): array
+    public function get(string $productId): array
     {
         $product = $this->productRepository->find(ProductId::fromString($productId));
         $taxonIds = array_map(fn(VariantProperty $prop) => $prop->taxonId->get(), $product->getVariantProperties());
@@ -53,12 +55,12 @@ class VariantPropertiesForSelect
             foreach ($taxaByTaxonomy as $taxon) {
                 $_result[] = [
                     'value' => $taxon->taxonId->get(),
-                    'label' => $taxon->getData('title.' . $locale->getLanguage())
+                    'label' => $taxon->getData('title.' . $this->getLocale()->getLanguage())
                 ];
             }
 
             $result[$taxonomyId] = [
-                'label' => $taxonomy->getData('title.' . $locale->getLanguage()),
+                'label' => $taxonomy->getData('title.' . $this->getLocale()->getLanguage()),
                 'options' => $_result
             ];
         }

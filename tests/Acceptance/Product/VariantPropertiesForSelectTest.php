@@ -5,7 +5,6 @@ namespace Tests\Acceptance\Product;
 
 use Tests\TestHelpers;
 use Thinktomorrow\Trader\Application\Product\VariantProperties\VariantPropertiesForSelect;
-use Thinktomorrow\Trader\Domain\Common\Locale;
 
 class VariantPropertiesForSelectTest extends ProductContext
 {
@@ -19,7 +18,6 @@ class VariantPropertiesForSelectTest extends ProductContext
 
         $values = (new VariantPropertiesForSelect($this->productRepository, $this->taxonRepository, $this->taxonomyRepository))->get(
             $product->productId->get(),
-            Locale::fromString('nl')
         );
 
         $this->assertEquals([
