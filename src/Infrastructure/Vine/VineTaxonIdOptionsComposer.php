@@ -37,10 +37,10 @@ class VineTaxonIdOptionsComposer implements TaxonIdOptionsComposer
         });
 
         return $result;
-//        $grouped[$taxonomy->taxonomyId->get()] = ['label' => $taxonomy->getData('title.' . $this->getLocale()), 'options' => $options];
-//
-//         We remove the group key as we need to have non-assoc array for the multiselect options.
-//        return array_values($grouped);
+        //        $grouped[$taxonomy->taxonomyId->get()] = ['label' => $taxonomy->getData('title.' . $this->getLocale()), 'options' => $options];
+        //
+        //         We remove the group key as we need to have non-assoc array for the multiselect options.
+        //        return array_values($grouped);
     }
 
     public function getTaxaAsOptionsForMultiselect(string $taxonomyId): array
@@ -74,44 +74,44 @@ class VineTaxonIdOptionsComposer implements TaxonIdOptionsComposer
             });
     }
 
-//    private function composeLabels(array $taxa): array
-//    {
-//        return collect($taxa)->mapWithKeys(function (TaxonNode $taxon) {
-//            return [$taxon->getId() => $taxon->getBreadcrumbLabelWithoutRoot()];
-//        })->toArray();
-//    }
+    //    private function composeLabels(array $taxa): array
+    //    {
+    //        return collect($taxa)->mapWithKeys(function (TaxonNode $taxon) {
+    //            return [$taxon->getId() => $taxon->getBreadcrumbLabelWithoutRoot()];
+    //        })->toArray();
+    //    }
 
-//    public function get(array $taxonomyIds): array
-//    {
-//        $taxonomies = $this->taxonomyRepository->findMany($taxonomyIds);
-//        $taxaTree = $this->taxonTreeRepository->getTree();
-//
-//        /** @var Collection<Collection<Taxon>> $groupedByTaxonomy */
-//        $groupedByTaxonomy = collect($taxa)->groupBy(fn(Taxon $taxon) => $taxon->taxonomyId->get());
-//
-//        $result = [];
-//
-//        foreach ($groupedByTaxonomy as $taxonomyId => $taxaByTaxonomy) {
-//
-//            $_result = [];
-//
-//            /** @var Taxonomy $taxonomy */
-//            $taxonomy = collect($taxonomies)
-//                ->first(fn(Taxonomy $taxonomy) => $taxonomy->taxonomyId->get() === $taxonomyId);
-//
-//            foreach ($taxaByTaxonomy as $taxon) {
-//                $_result[] = [
-//                    'value' => $taxon->taxonId->get(),
-//                    'label' => $taxon->getData('title.' . $this->getLocale()->getLanguage()),
-//                ];
-//            }
-//
-//            $result[$taxonomyId] = [
-//                'label' => $taxonomy->getData('title.' . $this->getLocale()->getLanguage()),
-//                'options' => $_result,
-//            ];
-//        }
-//
-//        return $result;
-//    }
+    //    public function get(array $taxonomyIds): array
+    //    {
+    //        $taxonomies = $this->taxonomyRepository->findMany($taxonomyIds);
+    //        $taxaTree = $this->taxonTreeRepository->getTree();
+    //
+    //        /** @var Collection<Collection<Taxon>> $groupedByTaxonomy */
+    //        $groupedByTaxonomy = collect($taxa)->groupBy(fn(Taxon $taxon) => $taxon->taxonomyId->get());
+    //
+    //        $result = [];
+    //
+    //        foreach ($groupedByTaxonomy as $taxonomyId => $taxaByTaxonomy) {
+    //
+    //            $_result = [];
+    //
+    //            /** @var Taxonomy $taxonomy */
+    //            $taxonomy = collect($taxonomies)
+    //                ->first(fn(Taxonomy $taxonomy) => $taxonomy->taxonomyId->get() === $taxonomyId);
+    //
+    //            foreach ($taxaByTaxonomy as $taxon) {
+    //                $_result[] = [
+    //                    'value' => $taxon->taxonId->get(),
+    //                    'label' => $taxon->getData('title.' . $this->getLocale()->getLanguage()),
+    //                ];
+    //            }
+    //
+    //            $result[$taxonomyId] = [
+    //                'label' => $taxonomy->getData('title.' . $this->getLocale()->getLanguage()),
+    //                'options' => $_result,
+    //            ];
+    //        }
+    //
+    //        return $result;
+    //    }
 }
