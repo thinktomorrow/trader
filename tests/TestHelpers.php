@@ -461,7 +461,22 @@ trait TestHelpers
         return $product;
     }
 
-    protected static function createTaxonomiesAndTaxa(array $taxonomyIds = ['ooo', 'ppp', 'qqq'], array $taxonIds = ['xxx', 'yyy', 'zzz']): array
+    protected function createAndSaveTaxonomiesAndTaxa(array $taxonomyIds = ['ooo', 'ppp', 'qqq'], array $taxonIds = ['xxx', 'yyy', 'zzz']): array
+    {
+        [$taxonomies, $taxa] = $this->createTaxonomiesAndTaxa($taxonomyIds, $taxonIds);
+
+        foreach ($taxonomies as $taxonomy) {
+            $this->taxonomyRepository->save($taxonomy);
+        }
+
+        foreach ($taxa as $taxon) {
+            $this->taxonRepository->save($taxon);
+        }
+
+        return [$taxonomies, $taxa];
+    }
+
+    protected function createTaxonomiesAndTaxa(array $taxonomyIds = ['ooo', 'ppp', 'qqq'], array $taxonIds = ['xxx', 'yyy', 'zzz']): array
     {
         $taxonomies = [];
         $taxa = [];

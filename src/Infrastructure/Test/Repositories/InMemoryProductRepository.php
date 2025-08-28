@@ -147,6 +147,6 @@ final class InMemoryProductRepository implements ProductRepository
             $variantTaxa[$i] = $variantTaxon;
         }
 
-        $variant->updateVariantProperties($variantTaxa);
+        $variant->updateVariantTaxa($variantTaxa);
     }
 }

@@ -14,15 +14,7 @@ class ProductDetailTest extends ProductContext
 
     public function test_it_can_get_a_product_detail()
     {
-        [$taxonomies, $taxa] = $this->createTaxonomiesAndTaxa();
-
-        foreach ($taxonomies as $taxonomy) {
-            $this->taxonomyRepository->save($taxonomy);
-        }
-
-        foreach ($taxa as $taxon) {
-            $this->taxonRepository->save($taxon);
-        }
+        $this->createAndSaveTaxonomiesAndTaxa();
 
         $product = $this->createProductWithProductVariantProperties();
 
@@ -60,7 +52,7 @@ class ProductDetailTest extends ProductContext
         $this->assertEquals('€ 0,08', $productDetail->getSalePrice(false));
         $this->assertEquals('variant title nl', $productDetail->getTitle());
 
-        $this->assertCount(4, $productDetail->getTaxa());
+        $this->assertCount(2, $productDetail->getTaxa());
         $this->assertContainsOnlyInstancesOf(ProductTaxonItem::class, $productDetail->getTaxa());
     }
 

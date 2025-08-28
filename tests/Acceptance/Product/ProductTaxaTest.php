@@ -17,15 +17,7 @@ class ProductTaxaTest extends ProductContext
 
     public function test_it_can_get_a_product_taxon_item()
     {
-        [$taxonomies, $taxa] = $this->createTaxonomiesAndTaxa();
-
-        foreach ($taxonomies as $taxonomy) {
-            $this->taxonomyRepository->save($taxonomy);
-        }
-
-        foreach ($taxa as $taxon) {
-            $this->taxonRepository->save($taxon);
-        }
+        $this->createAndSaveTaxonomiesAndTaxa();
 
         $product = $this->createProductWithProductVariantProperties();
         $this->productRepository->save($product);
@@ -35,8 +27,8 @@ class ProductTaxaTest extends ProductContext
 
         $taxa = $productDetail->getTaxa();
 
-        $this->assertCount(5, $taxa);
-        $this->assertCount(5, $productDetail->getVariantProperties());
+        $this->assertCount(4, $taxa);
+        $this->assertCount(4, $productDetail->getVariantProperties());
         $this->assertCount(0, $productDetail->getProductProperties());
         $this->assertCount(0, $productDetail->getCategories());
         $this->assertCount(0, $productDetail->getGoogleCategories());

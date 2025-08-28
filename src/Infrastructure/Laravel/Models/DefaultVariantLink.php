@@ -8,8 +8,10 @@ use Thinktomorrow\Trader\Application\Common\RendersData;
 use Thinktomorrow\Trader\Application\Product\VariantLinks\VariantLink;
 use Thinktomorrow\Trader\Domain\Model\Product\Option\Option;
 use Thinktomorrow\Trader\Domain\Model\Product\Option\OptionValue;
+use Thinktomorrow\Trader\Domain\Model\Product\ProductTaxa\VariantProperty;
 use Thinktomorrow\Trader\Domain\Model\Product\Variant\Variant;
 use Thinktomorrow\Trader\Domain\Model\Product\Variant\VariantState;
+use Thinktomorrow\Trader\Domain\Model\Product\VariantTaxa\VariantProperty as VariantVariantProperty;
 
 class DefaultVariantLink implements VariantLink
 {
@@ -28,11 +30,11 @@ class DefaultVariantLink implements VariantLink
         $this->data = $data;
     }
 
-    public static function fromOption(Option $option, OptionValue $optionValue, ?Variant $variant = null): static
+    public static function fromVariantProperty(VariantProperty|VariantVariantProperty $property, ?Variant $variant = null): static
     {
-        return new static($option->optionId->get(), $variant, [
-            'group_label' => $option->getData('label'),
-            'label' => $optionValue->getData('value'),
+        return new static($property->taxonId->get(), $variant, [
+            'group_label' => $property->getData('label'),
+            'label' => $property->getData('value'),
         ]);
     }
 
@@ -61,7 +63,7 @@ class DefaultVariantLink implements VariantLink
 
     public function getUrl(): ?string
     {
-        if (! $this->variant) {
+        if (!$this->variant) {
             return null;
         }
 
@@ -70,7 +72,7 @@ class DefaultVariantLink implements VariantLink
 
     public function isVariantAvailable(): bool
     {
-        if (! $this->variant) {
+        if (!$this->variant) {
             return false;
         }
 

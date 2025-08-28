@@ -5,6 +5,7 @@ namespace Tests\Acceptance\Product;
 
 use Tests\TestHelpers;
 use Thinktomorrow\Trader\Application\Product\DeleteVariant;
+use Thinktomorrow\Trader\Domain\Model\Product\Events\ProductTaxaUpdated;
 use Thinktomorrow\Trader\Domain\Model\Product\Events\VariantDeleted;
 use Thinktomorrow\Trader\Domain\Model\Product\Exceptions\CouldNotDeleteVariant;
 
@@ -21,6 +22,7 @@ class DeleteVariantTest extends ProductContext
 
         $this->assertEquals([
             new VariantDeleted($productId, $variantId),
+            new ProductTaxaUpdated($productId), // because of the InMemoryRepo implementation.
         ], $this->eventDispatcher->releaseDispatchedEvents());
     }
 

@@ -30,14 +30,14 @@ final class Locale
 
     public function getLanguage(): string
     {
-        [$language, $region] = $this->splitInLanguageAndRegion();
+        [$language,] = $this->splitInLanguageAndRegion();
 
         return $language;
     }
 
     public function getRegion(): string
     {
-        [$language, $region] = $this->splitInLanguageAndRegion();
+        [, $region] = $this->splitInLanguageAndRegion();
 
         return $region;
     }

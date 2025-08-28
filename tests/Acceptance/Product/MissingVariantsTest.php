@@ -114,9 +114,5 @@ class MissingVariantsTest extends ProductContext
             'Taxonomy qqq nl: Taxon yyy nl',
             'Taxonomy ppp nl: Taxon aaa nl',
         ], $missingComboLabels[0]);
-
-//        $this->assertCount(2, $missingCombos);
-//        $this->assertEquals(['yyy', 'aaa'], $missingCombos[0]);
-//        $this->assertEquals(['zzz', 'aaa'], $missingCombos[1]);
     }
 }

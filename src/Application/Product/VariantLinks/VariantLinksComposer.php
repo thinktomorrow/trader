@@ -7,7 +7,10 @@ use Psr\Container\ContainerInterface;
 use Thinktomorrow\Trader\Domain\Common\Locale;
 use Thinktomorrow\Trader\Domain\Model\Product\ProductId;
 use Thinktomorrow\Trader\Domain\Model\Product\ProductRepository;
+use Thinktomorrow\Trader\Domain\Model\Product\ProductTaxa\VariantProperty;
+use Thinktomorrow\Trader\Domain\Model\Product\Variant\Variant;
 use Thinktomorrow\Trader\Domain\Model\Product\Variant\VariantId;
+use Thinktomorrow\Trader\Domain\Model\Product\VariantTaxa\VariantProperty as VariantVariantProperty;
 
 class VariantLinksComposer
 {
@@ -22,7 +25,7 @@ class VariantLinksComposer
 
     /**
      * Compose all possible option combinations relative to the passed product variant. This is the action
-     * used to determine the links behind each option on the product page, so we include an url as well.
+     * used to determine the links behind each option on the product page, so we include a url as well.
      */
     public function get(ProductId $productId, VariantId $variantId, Locale $locale): VariantLinks
     {
@@ -31,9 +34,12 @@ class VariantLinksComposer
 
         $results = VariantLinks::empty();
 
-        // When there are no options set on the product, but there are multiple variants, the variants are used as links instead.
-        // Here we use the option_title of the variant if present
-        if (count($product->getOptions()) < 1 && count($product->getVariants()) > 1) {
+        /**
+         * When there are no variant properties set on the product, but there are
+         * multiple variants, the variants themselves are used as links instead.
+         * Here we use the option_title of the variant if present
+         */
+        if (count($product->getVariantProperties()) < 1 && count($product->getVariants()) > 1) {
             foreach ($product->getVariants() as $variant) {
                 $variantLink = $this->container->get(VariantLink::class)::fromVariant($variant);
                 $variantLink->setLocale($locale);
@@ -48,36 +54,27 @@ class VariantLinksComposer
             return $results;
         }
 
-        $variantOptions = [];
-        foreach ($product->getOptions() as $option) {
-            foreach ($option->getOptionValues() as $optionValue) {
-                if (in_array($optionValue->optionValueId, $variant->getOptionValueIds())) {
-                    $variantOptions[] = $optionValue;
-                }
+        $currentVariantProperties = $variant->getVariantProperties();
+
+        // Merge all other variant properties with the current variant properties to create all possible combinations
+        foreach ($product->getVariantProperties() as $prop) {
+
+            $mergedVariantProperties = $this->mergeWithVariantProperties($currentVariantProperties, $prop);
+
+            // Create the option link - Find a variant for this combination?
+            $variantLink = $this->container->get(VariantLink::class)::fromVariantProperty(
+                $prop,
+                $this->findVariantByProperties($product, $mergedVariantProperties)
+            );
+
+            $variantLink->setLocale($locale);
+
+            // If this option value also belongs to this current variant, we'll mark it as active
+            if (in_array($prop->taxonId, array_map(fn(VariantVariantProperty $prop) => $prop->taxonId->get(), $currentVariantProperties))) {
+                $variantLink->markActive();
             }
-        }
 
-        foreach ($product->getOptions() as $option) {
-            foreach ($option->getOptionValues() as $optionValue) {
-                // Merge this one with the current variant options
-                $mergedVariantOptions = $this->addtoVariantOptions($variantOptions, $optionValue);
-
-                // Create the option link - Find a variant for this combination?
-                $variantLink = $this->container->get(VariantLink::class)::fromOption(
-                    $option,
-                    $optionValue,
-                    $this->findVariantByOptionValues($product, $mergedVariantOptions)
-                );
-
-                $variantLink->setLocale($locale);
-
-                // If this option value also belongs to this current variant, we'll mark it as active
-                if (in_array($optionValue->optionValueId, $variant->getOptionValueIds())) {
-                    $variantLink->markActive();
-                }
-
-                $results = $results->add($variantLink);
-            }
+            $results = $results->add($variantLink);
         }
 
         return $results;
@@ -88,25 +85,25 @@ class VariantLinksComposer
      * important that each option is only represented once. So a new option value will always replace
      * an option value with the same option reference.
      */
-    private function addtoVariantOptions(array $variantOptions, \Thinktomorrow\Trader\Domain\Model\Product\Option\OptionValue $optionValue): array
+    private function mergeWithVariantProperties(array $variantProperties, VariantProperty $prop): array
     {
         $result = [];
 
-        foreach ($variantOptions as $variantOption) {
-            $result[] = ($variantOption->optionId->equals($optionValue->optionId))
-                ? $optionValue
+        foreach ($variantProperties as $variantOption) {
+            $result[] = ($variantOption->taxonId->equals($prop->taxonId))
+                ? $prop
                 : $variantOption;
         }
 
         return $result;
     }
 
-    private function findVariantByOptionValues(\Thinktomorrow\Trader\Domain\Model\Product\Product $product, array $mergedVariantOptions): ?\Thinktomorrow\Trader\Domain\Model\Product\Variant\Variant
+    private function findVariantByProperties(\Thinktomorrow\Trader\Domain\Model\Product\Product $product, array $variantProperties): ?\Thinktomorrow\Trader\Domain\Model\Product\Variant\Variant
     {
-        $mergedVariantOptionValueIds = array_map(fn (\Thinktomorrow\Trader\Domain\Model\Product\Option\OptionValue $optionValue) => $optionValue->optionValueId, $mergedVariantOptions);
+        $taxonIds = array_map(fn(VariantProperty|VariantVariantProperty $prop) => $prop->taxonId->get(), $variantProperties);
 
         foreach ($product->getVariants() as $variant) {
-            if ($this->hasExactOptionsMatch($variant->getOptionValueIds(), $mergedVariantOptionValueIds)) {
+            if ($this->hasExactVariantPropertiesMatch($variant, $taxonIds)) {
                 return $variant;
             }
         }
@@ -114,13 +111,15 @@ class VariantLinksComposer
         return null;
     }
 
-    private function hasExactOptionsMatch(array $firstOptionValueIds, array $secondOptionValueIds): bool
+    private function hasExactVariantPropertiesMatch(Variant $variant, array $taxonIds): bool
     {
+        $variantTaxonIds = array_map(fn($prop) => $prop->taxonId->get(), $variant->getVariantProperties());
+
         // array_diff with empty array returns unexpected results
-        if (count($firstOptionValueIds) < 1 || count($secondOptionValueIds) < 1) {
+        if (count($variantTaxonIds) < 1 || count($taxonIds) < 1) {
             return false;
         }
 
-        return count(array_diff($firstOptionValueIds, $secondOptionValueIds)) == 0;
+        return count(array_diff($variantTaxonIds, $taxonIds)) == 0;
     }
 }
