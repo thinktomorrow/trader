@@ -28,6 +28,7 @@ trait TaxonHelpers
     protected function createDefaultTaxonomies()
     {
         $taxonomy = Taxonomy::create(TaxonomyId::fromString('bbb'), TaxonomyType::category);
+        $taxonomy->addData(['title' => ['nl' => 'Taxonomy title nl']]);
         $this->createTaxonomy($taxonomy);
     }
 

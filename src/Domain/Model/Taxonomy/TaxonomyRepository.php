@@ -9,6 +9,8 @@ interface TaxonomyRepository
 
     public function find(TaxonomyId $taxonomyId): Taxonomy;
 
+    public function findMany(array $taxonomyIds): array;
+
     public function findManyByTaxa(array $taxonIds): array;
 
     public function delete(TaxonomyId $taxonomyId): void;

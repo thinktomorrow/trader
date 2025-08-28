@@ -3,49 +3,57 @@ declare(strict_types=1);
 
 namespace Thinktomorrow\Trader\Infrastructure\Vine;
 
+use Thinktomorrow\Trader\Application\Common\HasLocale;
 use Thinktomorrow\Trader\Application\Taxon\TaxonSelect\TaxonIdOptionsComposer;
 use Thinktomorrow\Trader\Application\Taxon\Tree\TaxonNode;
 use Thinktomorrow\Trader\Application\Taxon\Tree\TaxonTree;
 use Thinktomorrow\Trader\Application\Taxon\Tree\TaxonTreeRepository;
+use Thinktomorrow\Trader\Domain\Model\Taxonomy\TaxonomyId;
+use Thinktomorrow\Trader\Domain\Model\Taxonomy\TaxonomyRepository;
 
 class VineTaxonIdOptionsComposer implements TaxonIdOptionsComposer
 {
+    use HasLocale;
+
     private TaxonTreeRepository $taxonTreeRepository;
 
     private array $excludeTaxonIds = [];
+    private TaxonomyRepository $taxonomyRepository;
 
-    public function __construct(TaxonTreeRepository $taxonTreeRepository)
+    public function __construct(TaxonomyRepository $taxonomyRepository, TaxonTreeRepository $taxonTreeRepository)
     {
         $this->taxonTreeRepository = $taxonTreeRepository;
+        $this->taxonomyRepository = $taxonomyRepository;
     }
 
     public function getTaxaAsOptions(string $taxonomyId): array
     {
-        $grouped = [];
+        $result = [];
 
-        collect($this->getFlattened($taxonomyId))->each(function ($item) use (&$grouped) {
-            // First item should be toplevel so it is selectable as well (since group labels aren't selectable)
-            $values = array_merge($this->composeLabels([$item['root']]), $item['values']);
-            $grouped[$item['root']->getKey()] = ['label' => $item['root']->getLabel(), 'options' => $values];
+        $taxonNodes = $this->getFilteredTree($taxonomyId)->flatten()->all();
+
+        collect($taxonNodes)->each(function (TaxonNode $item) use (&$result) {
+            $result[$item->getId()] = $item->getBreadCrumbLabel();
         });
 
-        // We remove the group key as we need to have non-assoc array for the multiselect options.
-        return array_values($grouped);
+        return $result;
+//        $grouped[$taxonomy->taxonomyId->get()] = ['label' => $taxonomy->getData('title.' . $this->getLocale()), 'options' => $options];
+//
+//         We remove the group key as we need to have non-assoc array for the multiselect options.
+//        return array_values($grouped);
     }
 
     public function getTaxaAsOptionsForMultiselect(string $taxonomyId): array
     {
+        $taxonomy = $this->taxonomyRepository->find(TaxonomyId::fromString($taxonomyId));
         $options = $this->getTaxaAsOptions($taxonomyId);
+        $values = [];
 
-        return array_map(function ($group) {
-            foreach ($group['options'] as $id => $value) {
-                $values[] = ['label' => $value, 'value' => $id];
-            }
+        foreach ($options as $id => $option) {
+            $values[] = ['label' => $option, 'value' => $id];
+        }
 
-            $group['options'] = $values;
-
-            return $group;
-        }, $options);
+        return ['label' => $taxonomy->getData('title.' . $this->getLocale()), 'options' => $values];
     }
 
     public function excludeTaxa(array|string $excludeTaxonIds): static
@@ -53,24 +61,6 @@ class VineTaxonIdOptionsComposer implements TaxonIdOptionsComposer
         $this->excludeTaxonIds = (array)$excludeTaxonIds;
 
         return $this;
-    }
-
-    private function getFlattened(string $taxonomyId): array
-    {
-        $rootTaxa = $this->getFilteredTree($taxonomyId)->all();
-
-        $taxaPerRoot = [];
-
-        foreach ($rootTaxa as $rootTaxon) {
-            $taxaPerRoot[] = [
-                'root' => $rootTaxon,
-                'values' => $this->composeLabels(
-                    array_merge([$rootTaxon], $rootTaxon->getChildNodes()->flatten()->all()),
-                ),
-            ];
-        }
-
-        return $taxaPerRoot;
     }
 
     private function getFilteredTree(string $taxonomyId): TaxonTree
@@ -84,10 +74,44 @@ class VineTaxonIdOptionsComposer implements TaxonIdOptionsComposer
             });
     }
 
-    private function composeLabels(array $taxa): array
-    {
-        return collect($taxa)->mapWithKeys(function (TaxonNode $taxon) {
-            return [$taxon->getId() => $taxon->getBreadcrumbLabelWithoutRoot()];
-        })->toArray();
-    }
+//    private function composeLabels(array $taxa): array
+//    {
+//        return collect($taxa)->mapWithKeys(function (TaxonNode $taxon) {
+//            return [$taxon->getId() => $taxon->getBreadcrumbLabelWithoutRoot()];
+//        })->toArray();
+//    }
+
+//    public function get(array $taxonomyIds): array
+//    {
+//        $taxonomies = $this->taxonomyRepository->findMany($taxonomyIds);
+//        $taxaTree = $this->taxonTreeRepository->getTree();
+//
+//        /** @var Collection<Collection<Taxon>> $groupedByTaxonomy */
+//        $groupedByTaxonomy = collect($taxa)->groupBy(fn(Taxon $taxon) => $taxon->taxonomyId->get());
+//
+//        $result = [];
+//
+//        foreach ($groupedByTaxonomy as $taxonomyId => $taxaByTaxonomy) {
+//
+//            $_result = [];
+//
+//            /** @var Taxonomy $taxonomy */
+//            $taxonomy = collect($taxonomies)
+//                ->first(fn(Taxonomy $taxonomy) => $taxonomy->taxonomyId->get() === $taxonomyId);
+//
+//            foreach ($taxaByTaxonomy as $taxon) {
+//                $_result[] = [
+//                    'value' => $taxon->taxonId->get(),
+//                    'label' => $taxon->getData('title.' . $this->getLocale()->getLanguage()),
+//                ];
+//            }
+//
+//            $result[$taxonomyId] = [
+//                'label' => $taxonomy->getData('title.' . $this->getLocale()->getLanguage()),
+//                'options' => $_result,
+//            ];
+//        }
+//
+//        return $result;
+//    }
 }

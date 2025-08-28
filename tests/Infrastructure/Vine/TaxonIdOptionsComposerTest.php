@@ -5,6 +5,7 @@ namespace Tests\Infrastructure\Vine;
 
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\Infrastructure\TestCase;
+use Thinktomorrow\Trader\Domain\Common\Locale;
 use Thinktomorrow\Trader\Infrastructure\Laravel\Repositories\MysqlTaxonTreeRepository;
 use Thinktomorrow\Trader\Infrastructure\Test\Repositories\InMemoryTaxonRepository;
 use Thinktomorrow\Trader\Infrastructure\Test\Repositories\InMemoryTaxonTreeRepository;
@@ -17,6 +18,14 @@ final class TaxonIdOptionsComposerTest extends TestCase
     use RefreshDatabase;
     use TaxonHelpers;
 
+    public function setUp(): void
+    {
+        parent::setUp();
+
+        $this->createDefaultTaxonomies();
+        $this->createDefaultTaxons();
+    }
+
     public function tearDown(): void
     {
         parent::tearDown();
@@ -26,68 +35,49 @@ final class TaxonIdOptionsComposerTest extends TestCase
 
     public function test_it_can_retrieve_options()
     {
-        $this->createDefaultTaxonomies();
-        $this->createDefaultTaxons();
-
-        foreach ($this->repositories() as $repository) {
-            $result = (new VineTaxonIdOptionsComposer($repository))->getTaxaAsOptions('bbb');
+        foreach ($this->repositories() as $i => $repository) {
+            $taxonomyRepo = iterator_to_array($this->entityTaxonomyRepositories())[$i];
+            $result = (new VineTaxonIdOptionsComposer($taxonomyRepo, $repository))->getTaxaAsOptions('bbb');
 
             $this->assertEquals([
-                [
-                    'label' => 'Taxon first',
-                    'options' => [
-                        'first' => 'Taxon first',
-                        'second' => 'Taxon second',
-                        'third' => 'Taxon third',
-                        'fourth' => 'Taxon third > Taxon fourth',
-                    ],
-                ],
-                [
-                    'label' => 'Taxon fifth',
-                    'options' => [
-                        'fifth' => 'Taxon fifth',
-                        'sixth' => 'Taxon sixth',
-                    ],
-                ],
+                'first' => 'Taxon first',
+                'second' => 'Taxon first: Taxon second',
+                'third' => 'Taxon first: Taxon third',
+                'fourth' => 'Taxon first: Taxon third > Taxon fourth',
+                'fifth' => 'Taxon fifth',
+                'sixth' => 'Taxon fifth: Taxon sixth',
             ], $result);
 
-            $result = (new VineTaxonIdOptionsComposer($repository))->getTaxaAsOptions('ccc');
+            $result = (new VineTaxonIdOptionsComposer($taxonomyRepo, $repository))->getTaxaAsOptions('ccc');
 
             $this->assertEquals([
-                [
-                    'label' => 'Taxon seventh',
-                    'options' => [
-                        'seventh' => 'Taxon seventh',
-                        'eight' => 'Taxon eight',
-                    ],
-                ],
+                'seventh' => 'Taxon seventh',
+                'eight' => 'Taxon seventh: Taxon eight',
             ], $result);
         }
     }
 
     public function test_it_can_retrieve_options_for_multiselect()
     {
-        $this->createDefaultTaxons();
+        foreach ($this->repositories() as $i => $repository) {
 
-        foreach ($this->repositories() as $repository) {
+            $taxonomyRepo = iterator_to_array($this->entityTaxonomyRepositories())[$i];
+
+            $result = (new VineTaxonIdOptionsComposer($taxonomyRepo, $repository))
+                ->setLocale(Locale::fromString('nl'))
+                ->getTaxaAsOptionsForMultiselect('bbb');
+
             $this->assertEquals([
-                [
-                    'label' => 'Taxon first',
-                    'options' => [
-                        ['label' => 'Taxon first', 'value' => 'first'],
-                        ['label' => 'Taxon second', 'value' => 'second'],
-                        ['label' => 'Taxon third', 'value' => 'third'],
-                        ['label' => 'Taxon third > Taxon fourth', 'value' => 'fourth'],
-                    ],
+                'label' => 'Taxonomy title nl',
+                'options' => [
+                    ['label' => 'Taxon first', 'value' => 'first'],
+                    ['label' => 'Taxon first: Taxon second', 'value' => 'second'],
+                    ['label' => 'Taxon first: Taxon third', 'value' => 'third'],
+                    ['label' => 'Taxon first: Taxon third > Taxon fourth', 'value' => 'fourth'],
+                    ['label' => 'Taxon fifth', 'value' => 'fifth'],
+                    ['label' => 'Taxon fifth: Taxon sixth', 'value' => 'sixth'],
                 ],
-                [
-                    'label' => 'Taxon fifth',
-                    'options' => [
-                        ['label' => 'Taxon fifth', 'value' => 'fifth'],
-                        ['label' => 'Taxon sixth', 'value' => 'sixth'],
-                    ],
-                ],
-            ], (new VineTaxonIdOptionsComposer($repository))->getTaxaAsOptionsForMultiselect('bbb'));
+            ], $result);
         }
     }
 
