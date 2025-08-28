@@ -16,12 +16,12 @@ class VineFlattenedTaxonIdsComposer implements FlattenedTaxonIdsComposer
         $this->taxonTreeRepository = $taxonTreeRepository;
     }
 
-    public function getGroupedByRootByKeys(array $taxonKeys): array
+    public function getGroupedByTaxonomyByKeys(array $taxonKeys): array
     {
         return $this->getNestedTaxonIds($taxonKeys);
     }
 
-    public function getGroupedByRootByIds(array $taxonIds): array
+    public function getGroupedByTaxonomyByIds(array $taxonIds): array
     {
         return $this->getNestedTaxonIds($taxonIds, false);
     }
@@ -34,26 +34,24 @@ class VineFlattenedTaxonIdsComposer implements FlattenedTaxonIdsComposer
 
         foreach ($taxonKeys as $key) {
             $node = ($passedAsKeys)
-                ? $this->taxonTreeRepository->getTree()->find(fn (TaxonNode $node) => $node->getKey() == $key)
-                : $this->taxonTreeRepository->getTree()->find(fn (TaxonNode $node) => $node->getNodeId() == $key);
+                ? $this->taxonTreeRepository->getTree()->find(fn(TaxonNode $node) => $node->getKey() == $key)
+                : $this->taxonTreeRepository->getTree()->find(fn(TaxonNode $node) => $node->getNodeId() == $key);
 
-            if (! $node) {
+            if (!$node) {
                 continue;
             }
 
-            $rootId = ($node->getAncestorNodes()->isEmpty())
-                ? $node->getNodeId()
-                : $node->getAncestorNodes()->first()->getNodeId();
+            $taxonomyId = $node->getTaxonomyId();
 
-            if (! isset($taxonIds[$rootId])) {
-                $taxonIds[$rootId] = [];
+            if (!isset($taxonIds[$taxonomyId])) {
+                $taxonIds[$taxonomyId] = [];
             }
 
-            $taxonIds[$rootId] = array_merge($taxonIds[$rootId], $node->pluckChildNodes('id', null, true));
+            $taxonIds[$taxonomyId] = array_merge($taxonIds[$taxonomyId], $node->pluckChildNodes('id', null, true));
         }
 
-        foreach ($taxonIds as $rootId => $ids) {
-            $taxonIds[$rootId] = array_unique($ids);
+        foreach ($taxonIds as $taxonomyId => $ids) {
+            $taxonIds[$taxonomyId] = array_unique($ids);
         }
 
         return $taxonIds;

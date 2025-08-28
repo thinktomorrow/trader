@@ -9,7 +9,7 @@ namespace Thinktomorrow\Trader\Application\Product\Grid;
  */
 interface FlattenedTaxonIdsComposer
 {
-    public function getGroupedByRootByKeys(array $taxonKeys): array;
+    public function getGroupedByTaxonomyByKeys(array $taxonKeys): array;
 
-    public function getGroupedByRootByIds(array $taxonIds): array;
+    public function getGroupedByTaxonomyByIds(array $taxonIds): array;
 }

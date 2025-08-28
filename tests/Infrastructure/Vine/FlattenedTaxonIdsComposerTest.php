@@ -33,16 +33,15 @@ final class FlattenedTaxonIdsComposerTest extends TestCase
         (new InMemoryTaxonRepository())->clear();
     }
 
-    public function test_it_can_retrieve_all_ids_grouped_by_root()
+    public function test_it_can_retrieve_all_ids_grouped_by_taxonomy()
     {
         $this->createDefaultTaxons();
 
         foreach ($this->repositories() as $repository) {
-            $result = (new VineFlattenedTaxonIdsComposer($repository))->getGroupedByRootByKeys(['taxon-first', 'taxon-sixth']);
+            $result = (new VineFlattenedTaxonIdsComposer($repository))->getGroupedByTaxonomyByKeys(['taxon-first', 'taxon-sixth']);
 
             $this->assertEquals([
-                'first' => ['first', 'second', 'third', 'fourth'],
-                'fifth' => ['sixth'],
+                'bbb' => ['first', 'second', 'third', 'fourth', 'sixth'],
             ], $result);
         }
     }
@@ -52,11 +51,10 @@ final class FlattenedTaxonIdsComposerTest extends TestCase
         $this->createDefaultTaxons();
 
         foreach ($this->repositories() as $repository) {
-            $result = (new VineFlattenedTaxonIdsComposer($repository))->getGroupedByRootByIds(['first', 'sixth']);
+            $result = (new VineFlattenedTaxonIdsComposer($repository))->getGroupedByTaxonomyByIds(['first', 'sixth']);
 
             $this->assertEquals([
-                'first' => ['first', 'second', 'third', 'fourth'],
-                'fifth' => ['sixth'],
+                'bbb' => ['first', 'second', 'third', 'fourth', 'sixth'],
             ], $result);
         }
     }
@@ -66,10 +64,10 @@ final class FlattenedTaxonIdsComposerTest extends TestCase
         $this->createDefaultTaxons();
 
         foreach ($this->repositories() as $repository) {
-            $result = (new VineFlattenedTaxonIdsComposer($repository))->getGroupedByRootByKeys(['taxon-first', 'taxon-second']);
+            $result = (new VineFlattenedTaxonIdsComposer($repository))->getGroupedByTaxonomyByKeys(['taxon-first', 'taxon-second']);
 
             $this->assertEquals([
-                'first' => ['first', 'second', 'third', 'fourth'],
+                'bbb' => ['first', 'second', 'third', 'fourth'],
             ], $result);
         }
     }
@@ -79,7 +77,7 @@ final class FlattenedTaxonIdsComposerTest extends TestCase
         $this->createDefaultTaxons();
 
         foreach ($this->repositories() as $repository) {
-            $result = (new VineFlattenedTaxonIdsComposer($repository))->getGroupedByRootByKeys(['xxxx']);
+            $result = (new VineFlattenedTaxonIdsComposer($repository))->getGroupedByTaxonomyByKeys(['xxxx']);
 
             $this->assertEquals([], $result);
         }
