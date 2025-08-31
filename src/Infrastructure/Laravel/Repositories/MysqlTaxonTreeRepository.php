@@ -100,8 +100,6 @@ class MysqlTaxonTreeRepository implements TaxonTreeRepository, CategoryRepositor
 
     private function getTaxonNodes(?string $taxonomyId = null): TaxonNodes
     {
-        $taxonKeyResults = DB::table(static::$taxonKeysTable)->get();
-
         $results = DB::table(static::$taxonTable)
             ->when($taxonomyId, function ($query) use ($taxonomyId) {
                 return $query->where(static::$taxonTable . '.taxonomy_id', $taxonomyId);
