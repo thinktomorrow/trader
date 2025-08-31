@@ -30,10 +30,13 @@ trait WithTaxonKeysSelection
             return [];
         }
 
+        dump($state);
+
         $pairs = [];
 
         foreach (explode(',', $state['taxon_keys']) as $pair) {
             [$key, $locale] = explode('::::', $pair);
+
             $pairs[] = TaxonKey::create(TaxonId::fromString($state['taxon_id']), TaxonKeyId::fromString($key), Locale::fromString($locale));
         }
 

@@ -276,7 +276,7 @@ class MysqlGridRepository implements GridRepository
                 static::$taxonomyTable . '.state AS taxonomy_state',
                 static::$taxonomyTable . '.type AS taxonomy_type',
                 static::$taxonomyTable . '.shows_in_grid AS shows_in_grid',
-                DB::raw("GROUP_CONCAT({$this->composeTaxonKeysSelect()}) AS taxon_keys"),
+                DB::raw("GROUP_CONCAT(DISTINCT {$this->composeTaxonKeysSelect()}) AS taxon_keys"),
             ])
             ->whereIn(static::$taxonPivotTable . '.product_id', $productIds)
             ->whereIn(static::$taxonPivotTable . '.taxon_id', $productTaxonIds)

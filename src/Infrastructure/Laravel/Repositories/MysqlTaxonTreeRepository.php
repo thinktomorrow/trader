@@ -111,7 +111,7 @@ class MysqlTaxonTreeRepository implements TaxonTreeRepository, CategoryRepositor
                     ->whereIn('trader_products.state', ProductState::onlineStates());
             })
             ->select(static::$taxonTable . '.*')
-            ->addSelect(DB::raw("GROUP_CONCAT({$this->composeTaxonKeysSelect()}) AS taxon_keys"))
+            ->addSelect(DB::raw("GROUP_CONCAT( DISTINCT {$this->composeTaxonKeysSelect()}) AS taxon_keys"))
             ->addSelect(DB::raw('GROUP_CONCAT(trader_taxa_products.product_id) AS product_ids'))
             ->addSelect(DB::raw('GROUP_CONCAT(trader_products.product_id) AS online_product_ids'))
             ->groupBy(static::$taxonTable . '.taxon_id')
