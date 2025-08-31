@@ -73,7 +73,7 @@ class GridRepositoryTest extends TestCase
         /** @var GridItem $gridItem */
         $gridItem = $gridItems->first();
 
-        $this->assertCount(1, array_filter($gridItem->getTaxa(), fn(ProductTaxonItem $taxon) => $taxon->showsInGrid()));
+        $this->assertCount(1, array_filter($gridItem->getTaxa(), fn (ProductTaxonItem $taxon) => $taxon->showsInGrid()));
         $this->assertCount(0, $gridItem->getGridCategories());
         $this->assertCount(1, $gridItem->getGridProductProperties());
         $this->assertCount(0, $gridItem->getGridVariantProperties());
@@ -188,7 +188,7 @@ class GridRepositoryTest extends TestCase
 
         $this->assertCount(3, $gridItems);
 
-        $titles = $gridItems->map(fn($gridItem) => $gridItem->getTitle());
+        $titles = $gridItems->map(fn ($gridItem) => $gridItem->getTitle());
 
         $expected = $titles->toArray();
         natcasesort($expected);
@@ -202,7 +202,7 @@ class GridRepositoryTest extends TestCase
 
         $this->assertCount(3, $gridItems);
 
-        $titles = $gridItems->map(fn($gridItem) => $gridItem->getTitle());
+        $titles = $gridItems->map(fn ($gridItem) => $gridItem->getTitle());
 
         $expected = $titles->toArray();
         natcasesort($expected);

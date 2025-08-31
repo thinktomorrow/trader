@@ -64,7 +64,7 @@ class VineTaxonIdOptionsComposer implements TaxonIdOptionsComposer
     private function getFilteredTree(string $taxonomyId): TaxonTree
     {
         return $this->taxonTreeRepository->getTree()
-            ->findMany(fn($node) => $node->getTaxonomyId() === $taxonomyId)
+            ->findMany(fn ($node) => $node->getTaxonomyId() === $taxonomyId)
             ->sort('order')
             ->remove(function (TaxonNode $node) {
                 return in_array($node->getId(), $this->excludeTaxonIds);
