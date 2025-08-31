@@ -6,6 +6,7 @@ namespace Thinktomorrow\Trader\Infrastructure\Laravel\Models;
 use Thinktomorrow\Trader\Application\Common\HasLocale;
 use Thinktomorrow\Trader\Application\Common\RendersData;
 use Thinktomorrow\Trader\Application\Taxon\Tree\TaxonNode;
+use Thinktomorrow\Trader\Domain\Model\Taxon\TaxonKey;
 use Thinktomorrow\Trader\Domain\Model\Taxon\TaxonState;
 use Thinktomorrow\Vine\DefaultNode;
 
@@ -17,7 +18,7 @@ class DefaultTaxonNode extends DefaultNode implements TaxonNode
     public readonly string $id;
     public readonly string $taxonomyId;
 
-    /** @var array */
+    /** @var TaxonKey[] */
     protected array $keys;
 
     protected TaxonState $taxonState;
@@ -37,7 +38,7 @@ class DefaultTaxonNode extends DefaultNode implements TaxonNode
         $this->data = $data;
         $this->product_ids = $product_ids;
         $this->online_product_ids = $online_product_ids;
-        $this->keys = $keys;
+        $this->keys = array_map(fn(TaxonKey $key) => $key, $keys);
         $this->parentId = $parentId;
 
         // Add node entry data so we can use it for sorting.
@@ -48,7 +49,7 @@ class DefaultTaxonNode extends DefaultNode implements TaxonNode
         ]);
     }
 
-    public static function fromMappedData(array $state): static
+    public static function fromMappedData(array $state, array $taxonKeys): static
     {
         return new static(
             $state['taxon_id'],
@@ -58,7 +59,7 @@ class DefaultTaxonNode extends DefaultNode implements TaxonNode
             $state['data'] ? json_decode($state['data'], true) : [],
             $state['product_ids'] ? explode(',', $state['product_ids']) : [],
             $state['online_product_ids'] ? explode(',', $state['online_product_ids']) : [],
-            json_decode($state['keys'], true),
+            $taxonKeys,
             $state['parent_id'],
         );
     }
@@ -85,23 +86,24 @@ class DefaultTaxonNode extends DefaultNode implements TaxonNode
 
     public function getKey(?string $locale = null): ?string
     {
-        if (count($this->keys) < 1) {
+        if (count($this->keys) < 1 || !isset($this->keys[0])) {
             return null;
         }
 
-        $localeString = $locale ?: $this->getLocale()->get();
+        $locale = $locale ?: $this->getLocale()->get();
 
         foreach ($this->keys as $key) {
-            if ($key['locale'] == $localeString) {
-                return $key['key'];
+            if ($key->getLocale()->get() == $locale) {
+                return $key->taxonKeyId->get();
             }
         }
 
-        if (! isset($this->keys[0])) {
-            return null;
-        }
+        return $this->keys[0]->taxonKeyId->get();
+    }
 
-        return $this->keys[0]['key'];
+    public function getUrl(?string $locale = null): string
+    {
+        return $this->getKey($locale) ?? '';
     }
 
     public function getLabel(?string $locale = null): string
@@ -129,11 +131,6 @@ class DefaultTaxonNode extends DefaultNode implements TaxonNode
         return $this->online_product_ids;
     }
 
-    public function getUrl(?string $locale = null): string
-    {
-        return $this->getKey();
-    }
-
     public function getBreadCrumbs(): array
     {
         return $this->getAncestorNodes()->all();
@@ -148,7 +145,7 @@ class DefaultTaxonNode extends DefaultNode implements TaxonNode
     {
         $label = $this->getLabel($locale);
 
-        if (! $this->isRootNode()) {
+        if (!$this->isRootNode()) {
             $label = array_reduce(array_reverse($this->getBreadCrumbs()), function ($carry, $taxon) use ($withoutRoot, $locale) {
                 if ($taxon->isRootNode()) {
                     return $withoutRoot ? $carry : $taxon->getLabel($locale) . ': ' . $carry;

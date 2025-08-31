@@ -10,7 +10,7 @@ interface TaxonNode extends Node
 {
     public function setLocale(Locale $locale): static;
 
-    public static function fromMappedData(array $state): static;
+    public static function fromMappedData(array $state, array $taxonKeys): static;
 
     public function getNodeId($key = null, $default = null): string;
 
