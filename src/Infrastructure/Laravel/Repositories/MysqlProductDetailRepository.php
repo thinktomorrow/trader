@@ -44,13 +44,13 @@ class MysqlProductDetailRepository implements ProductDetailRepository
             ])
             ->addSelect($this->container->get(ProductDetail::class)::stateSelect());
 
-        if (! $allowOffline) {
+        if (!$allowOffline) {
             $builder->whereIn(static::$productTable . '.state', ProductState::onlineStates());
         }
 
         $state = $builder->first();
 
-        if (! $state) {
+        if (!$state) {
             throw new CouldNotFindVariant('No online variant found by id [' . $variantId->get() . ']');
         }
 
@@ -68,9 +68,12 @@ class MysqlProductDetailRepository implements ProductDetailRepository
             ->join(static::$taxonomyTable, static::$taxonTable . '.taxonomy_id', '=', static::$taxonomyTable . '.taxonomy_id')
             ->leftJoin(static::$taxonKeysTable, static::$taxonTable . '.taxon_id', '=', static::$taxonKeysTable . '.taxon_id')
             ->where('product_id', $product_id)
-            ->groupBy(static::$taxonTable . '.taxon_id')
             ->select([
-                static::$taxonProductLookupTable . '.*',
+                static::$taxonProductLookupTable . '.product_id AS product_id',
+                static::$taxonProductLookupTable . '.taxon_id AS taxon_id',
+                static::$taxonProductLookupTable . '.state AS state',
+                static::$taxonProductLookupTable . '.data AS data',
+                static::$taxonProductLookupTable . '.order_column AS order_column',
                 static::$taxonTable . '.data AS taxon_data',
                 static::$taxonTable . '.state AS taxon_state',
                 static::$taxonomyTable . '.taxonomy_id AS taxonomy_id',
@@ -79,16 +82,34 @@ class MysqlProductDetailRepository implements ProductDetailRepository
                 static::$taxonomyTable . '.type AS taxonomy_type',
                 static::$taxonomyTable . '.shows_in_grid AS shows_in_grid',
                 DB::raw("GROUP_CONCAT({$this->composeTaxonKeysSelect()}) AS taxon_keys"),
-            ])->get();
+            ])
+            ->groupBy([
+                static::$taxonProductLookupTable . '.product_id',
+                static::$taxonProductLookupTable . '.taxon_id',
+                static::$taxonProductLookupTable . '.state',
+                static::$taxonProductLookupTable . '.data',
+                static::$taxonProductLookupTable . '.order_column',
+                static::$taxonTable . '.data',
+                static::$taxonTable . '.state',
+                static::$taxonomyTable . '.taxonomy_id',
+                static::$taxonomyTable . '.data',
+                static::$taxonomyTable . '.state',
+                static::$taxonomyTable . '.type',
+                static::$taxonomyTable . '.shows_in_grid',
+            ])
+            ->get();
 
         $variantTaxaStates = DB::table(static::$taxonVariantLookupTable)
             ->join(static::$taxonTable, static::$taxonVariantLookupTable . '.taxon_id', '=', static::$taxonTable . '.taxon_id')
             ->join(static::$taxonomyTable, static::$taxonTable . '.taxonomy_id', '=', static::$taxonomyTable . '.taxonomy_id')
             ->leftJoin(static::$taxonKeysTable, static::$taxonTable . '.taxon_id', '=', static::$taxonKeysTable . '.taxon_id')
             ->where('variant_id', $variant_id)
-            ->groupBy(static::$taxonTable . '.taxon_id')
             ->select([
-                static::$taxonVariantLookupTable . '.*',
+                static::$taxonVariantLookupTable . '.variant_id AS variant_id',
+                static::$taxonVariantLookupTable . '.taxon_id AS taxon_id',
+                static::$taxonVariantLookupTable . '.state AS state',
+                static::$taxonVariantLookupTable . '.data AS data',
+                static::$taxonVariantLookupTable . '.order_column AS order_column',
                 static::$taxonTable . '.data AS taxon_data',
                 static::$taxonTable . '.state AS taxon_state',
                 static::$taxonomyTable . '.taxonomy_id AS taxonomy_id',
@@ -97,11 +118,26 @@ class MysqlProductDetailRepository implements ProductDetailRepository
                 static::$taxonomyTable . '.type AS taxonomy_type',
                 static::$taxonomyTable . '.shows_in_grid AS shows_in_grid',
                 DB::raw("GROUP_CONCAT({$this->composeTaxonKeysSelect()}) AS taxon_keys"),
-            ])->get();
+            ])
+            ->groupBy([
+                static::$taxonVariantLookupTable . '.variant_id',
+                static::$taxonVariantLookupTable . '.taxon_id',
+                static::$taxonVariantLookupTable . '.state',
+                static::$taxonVariantLookupTable . '.data',
+                static::$taxonVariantLookupTable . '.order_column',
+                static::$taxonTable . '.data',
+                static::$taxonTable . '.state',
+                static::$taxonomyTable . '.taxonomy_id',
+                static::$taxonomyTable . '.data',
+                static::$taxonomyTable . '.state',
+                static::$taxonomyTable . '.type',
+                static::$taxonomyTable . '.shows_in_grid',
+            ])
+            ->get();
 
         return [
-            ...array_map(fn ($state) => $this->container->get(ProductTaxonItem::class)::fromMappedData((array)$state, $this->extractTaxonKeys((array)$state)), $productTaxaStates->all()),
-            ...array_map(fn ($state) => $this->container->get(VariantTaxonItem::class)::fromMappedData(array_merge((array)$state, ['product_id' => $product_id]), $this->extractTaxonKeys((array)$state)), $variantTaxaStates->all()),
+            ...array_map(fn($state) => $this->container->get(ProductTaxonItem::class)::fromMappedData((array)$state, $this->extractTaxonKeys((array)$state)), $productTaxaStates->all()),
+            ...array_map(fn($state) => $this->container->get(VariantTaxonItem::class)::fromMappedData(array_merge((array)$state, ['product_id' => $product_id]), $this->extractTaxonKeys((array)$state)), $variantTaxaStates->all()),
         ];
     }
 }

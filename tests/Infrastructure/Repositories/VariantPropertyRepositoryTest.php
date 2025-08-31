@@ -7,6 +7,8 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\Infrastructure\TestCase;
 use Thinktomorrow\Trader\Domain\Model\Product\VariantTaxa\VariantTaxon;
 use Thinktomorrow\Trader\Infrastructure\Laravel\Repositories\MysqlProductRepository;
+use Thinktomorrow\Trader\Infrastructure\Laravel\Repositories\MysqlTaxonomyRepository;
+use Thinktomorrow\Trader\Infrastructure\Laravel\Repositories\MysqlTaxonRepository;
 use Thinktomorrow\Trader\Infrastructure\Laravel\Repositories\MysqlVariantPropertyRepository;
 use Thinktomorrow\Trader\Infrastructure\Laravel\Repositories\MysqlVariantRepository;
 use Thinktomorrow\Trader\Infrastructure\Test\TestContainer;
@@ -15,8 +17,17 @@ final class VariantPropertyRepositoryTest extends TestCase
 {
     use RefreshDatabase;
 
+    public function setUp(): void
+    {
+        parent::setUp();
+
+        $this->taxonRepository = new MysqlTaxonRepository();
+        $this->taxonomyRepository = new MysqlTaxonomyRepository();
+    }
+
     public function test_it_can_check_if_variant_property_combination_exists()
     {
+        $this->createAndSaveTaxonomiesAndTaxa();
         $product = $this->createProductWithProductVariantProperties();
         (new MysqlProductRepository(new MysqlVariantRepository(new TestContainer())))->save($product);
 
@@ -25,7 +36,7 @@ final class VariantPropertyRepositoryTest extends TestCase
         foreach ($this->repositories() as $repository) {
 
             // Check if combo already exists
-            $taxonIds = array_map(fn ($variantTaxonState) => $variantTaxonState['taxon_id'], $variant->getChildEntities()[VariantTaxon::class]);
+            $taxonIds = array_map(fn($variantTaxonState) => $variantTaxonState['taxon_id'], $variant->getChildEntities()[VariantTaxon::class]);
 
             $this->assertTrue($repository->doesUniqueVariantPropertyCombinationExist($taxonIds));
 

@@ -6,6 +6,7 @@ namespace Tests\Infrastructure\Repositories;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use PHPUnit\Framework\Attributes\DataProvider;
 use Tests\Infrastructure\TestCase;
+use Thinktomorrow\Trader\Application\Common\DefaultLocale;
 use Thinktomorrow\Trader\Domain\Common\Locale;
 use Thinktomorrow\Trader\Domain\Model\Product\Product;
 use Thinktomorrow\Trader\Domain\Model\Product\ProductTaxa\ProductTaxon;
@@ -111,12 +112,14 @@ final class ProductDetailRepositoryTaxaTest extends TestCase
 
             $taxonItem = $result[0];
 
-            $this->assertEquals('key-xxx-nl', $taxonItem->getKey());
             $this->assertEquals('key-xxx-nl', $taxonItem->getKey('nl'));
             $this->assertEquals('key-xxx-fr', $taxonItem->getKey('fr'));
-            $this->assertEquals('key-xxx-nl', $taxonItem->getUrl());
             $this->assertEquals('key-xxx-nl', $taxonItem->getUrl('nl'));
             $this->assertEquals('key-xxx-fr', $taxonItem->getUrl('fr'));
+
+            DefaultLocale::set(Locale::fromString('nl'));
+            $this->assertEquals('key-xxx-nl', $taxonItem->getKey());
+            $this->assertEquals('key-xxx-nl', $taxonItem->getUrl());
         }
     }
 
