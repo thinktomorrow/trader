@@ -24,12 +24,16 @@ use Thinktomorrow\Trader\TraderConfig;
 
 class MysqlGridRepository implements GridRepository
 {
+    use WithTaxonKeysSelection;
+
     private ContainerInterface $container;
+    private TraderConfig $traderConfig;
     private FlattenedTaxonIdsComposer $flattenedTaxonIds;
 
-    private int $perPage = 20;
-    private Locale $locale;
     protected Builder $builder;
+    private Locale $locale;
+    private int $perPage = 20;
+    private ?int $limit;
 
     private static string $productTable = 'trader_products';
     private static string $variantTable = 'trader_product_variants';
@@ -37,8 +41,7 @@ class MysqlGridRepository implements GridRepository
     private static string $taxonomyTable = 'trader_taxonomies';
     private static string $taxonPivotTable = 'trader_taxa_products';
     private static string $taxonVariantPivotTable = 'trader_taxa_variants';
-    private TraderConfig $traderConfig;
-    private ?int $limit;
+    private static $taxonKeysTable = 'trader_taxa_keys';
 
     public function __construct(ContainerInterface $container, TraderConfig $traderConfig, FlattenedTaxonIdsComposer $flattenedTaxonIds)
     {
@@ -109,22 +112,22 @@ class MysqlGridRepository implements GridRepository
         // Fallback vat percentage is fine because we only want to filter on price, not calculate it.
         $fallbackVatPercentage = VatPercentage::fromString($this->traderConfig->getFallBackStandardVatRate())->toPercentage();
 
-        if (! is_null($minimumPriceAmount)) {
+        if (!is_null($minimumPriceAmount)) {
             // Match input with expected vat inclusion
-            $minimumPriceAmount = ($this->traderConfig->doesPriceInputIncludesVat() && ! $this->traderConfig->includeVatInPrices())
+            $minimumPriceAmount = ($this->traderConfig->doesPriceInputIncludesVat() && !$this->traderConfig->includeVatInPrices())
                 ? Cash::from($minimumPriceAmount)->addPercentage($fallbackVatPercentage)->getAmount()
-                : ((! $this->traderConfig->doesPriceInputIncludesVat() && $this->traderConfig->includeVatInPrices())
+                : ((!$this->traderConfig->doesPriceInputIncludesVat() && $this->traderConfig->includeVatInPrices())
                     ? Cash::from($minimumPriceAmount)->subtractTaxPercentage($fallbackVatPercentage)->getAmount()
                     : $minimumPriceAmount);
 
             $this->builder->where(static::$variantTable . '.sale_price', '>=', $minimumPriceAmount);
         }
 
-        if (! is_null($maximumPriceAmount)) {
+        if (!is_null($maximumPriceAmount)) {
             // Match input with expected vat inclusion
-            $maximumPriceAmount = ($this->traderConfig->doesPriceInputIncludesVat() && ! $this->traderConfig->includeVatInPrices())
+            $maximumPriceAmount = ($this->traderConfig->doesPriceInputIncludesVat() && !$this->traderConfig->includeVatInPrices())
                 ? Cash::from($maximumPriceAmount)->addPercentage($fallbackVatPercentage)->getAmount()
-                : ((! $this->traderConfig->doesPriceInputIncludesVat() && $this->traderConfig->includeVatInPrices())
+                : ((!$this->traderConfig->doesPriceInputIncludesVat() && $this->traderConfig->includeVatInPrices())
                     ? Cash::from($maximumPriceAmount)->subtractTaxPercentage($fallbackVatPercentage)->getAmount()
                     : $maximumPriceAmount);
 
@@ -201,7 +204,7 @@ class MysqlGridRepository implements GridRepository
     public function getResults(): LengthAwarePaginator
     {
         // Default ordering if no ordering has been applied yet.
-        if (! $this->builder->orders || count($this->builder->orders) < 1) {
+        if (!$this->builder->orders || count($this->builder->orders) < 1) {
             $this->builder->orderBy(static::$productTable . '.order_column', 'ASC');
         }
 
@@ -218,23 +221,23 @@ class MysqlGridRepository implements GridRepository
 
         return $results->setCollection(
             $results->getCollection()
-                ->map(fn ($state) => get_object_vars($state))
+                ->map(fn($state) => get_object_vars($state))
                 ->map(function (array $state) use ($productTaxa, $variantTaxa) {
 
                     // Create taxon items for corresponding product and variant taxa
                     $productTaxonItems = $productTaxa
-                        ->filter(fn ($taxonState) => $taxonState->product_id == $state['product_id'])
-                        ->map(fn ($taxonState) => $this->container->get(ProductTaxonItem::class)::fromMappedData((array)$taxonState));
+                        ->filter(fn($taxonState) => $taxonState->product_id == $state['product_id'])
+                        ->map(fn($taxonState) => $this->container->get(ProductTaxonItem::class)::fromMappedData((array)$taxonState, $this->extractTaxonKeys((array)$taxonState)));
 
                     $variantTaxonItems = $variantTaxa
-                        ->filter(fn ($taxonState) => $taxonState->variant_id == $state['variant_id'])
-                        ->map(fn ($taxonState) => $this->container->get(VariantTaxonItem::class)::fromMappedData((array)$taxonState));
+                        ->filter(fn($taxonState) => $taxonState->variant_id == $state['variant_id'])
+                        ->map(fn($taxonState) => $this->container->get(VariantTaxonItem::class)::fromMappedData((array)$taxonState, $this->extractTaxonKeys((array)$taxonState)));
 
                     return $this->container->get(GridItem::class)::fromMappedData(array_merge($state, [
                         'includes_vat' => (bool)$state['includes_vat'],
                     ]), [...$productTaxonItems, ...$variantTaxonItems]);
                 })
-                ->each(fn (GridItem $gridItem) => $gridItem->setLocale($this->locale))
+                ->each(fn(GridItem $gridItem) => $gridItem->setLocale($this->locale))
         );
     }
 
@@ -259,6 +262,7 @@ class MysqlGridRepository implements GridRepository
         $productTaxaStates = DB::table(static::$taxonPivotTable)
             ->join(static::$taxonTable, static::$taxonPivotTable . '.taxon_id', '=', static::$taxonTable . '.taxon_id')
             ->join(static::$taxonomyTable, static::$taxonTable . '.taxonomy_id', '=', static::$taxonomyTable . '.taxonomy_id')
+            ->leftJoin(static::$taxonKeysTable, static::$taxonTable . '.taxon_id', '=', static::$taxonKeysTable . '.taxon_id')
             ->select([
                 static::$taxonPivotTable . '.*',
                 static::$taxonTable . '.data AS taxon_data',
@@ -268,15 +272,18 @@ class MysqlGridRepository implements GridRepository
                 static::$taxonomyTable . '.state AS taxonomy_state',
                 static::$taxonomyTable . '.type AS taxonomy_type',
                 static::$taxonomyTable . '.shows_in_grid AS shows_in_grid',
+                DB::raw("GROUP_CONCAT({$this->composeTaxonKeysSelect()}) AS taxon_keys"),
             ])
             ->whereIn(static::$taxonPivotTable . '.product_id', $productIds)
             ->whereIn(static::$taxonPivotTable . '.taxon_id', $productTaxonIds)
-            ->whereIn(static::$taxonTable . '.state', array_map(fn (TaxonState $state) => $state->value, TaxonState::onlineStates()))
+            ->whereIn(static::$taxonTable . '.state', array_map(fn(TaxonState $state) => $state->value, TaxonState::onlineStates()))
+            ->groupBy(static::$taxonTable . '.taxon_id')
             ->get();
 
         $variantTaxaStates = DB::table(static::$taxonVariantPivotTable)
             ->join(static::$taxonTable, static::$taxonVariantPivotTable . '.taxon_id', '=', static::$taxonTable . '.taxon_id')
             ->join(static::$taxonomyTable, static::$taxonTable . '.taxonomy_id', '=', static::$taxonomyTable . '.taxonomy_id')
+            ->leftJoin(static::$taxonKeysTable, static::$taxonTable . '.taxon_id', '=', static::$taxonKeysTable . '.taxon_id')
             ->select([
                 static::$taxonVariantPivotTable . '.*',
                 static::$taxonTable . '.data AS taxon_data',
@@ -286,10 +293,12 @@ class MysqlGridRepository implements GridRepository
                 static::$taxonomyTable . '.state AS taxonomy_state',
                 static::$taxonomyTable . '.type AS taxonomy_type',
                 static::$taxonomyTable . '.shows_in_grid AS shows_in_grid',
+                DB::raw("GROUP_CONCAT({$this->composeTaxonKeysSelect()}) AS taxon_keys"),
             ])
             ->whereIn(static::$taxonVariantPivotTable . '.variant_id', $variantIds)
             ->whereIn(static::$taxonVariantPivotTable . '.taxon_id', $variantTaxonIds)
-            ->whereIn(static::$taxonTable . '.state', array_map(fn (TaxonState $state) => $state->value, TaxonState::onlineStates()))
+            ->whereIn(static::$taxonTable . '.state', array_map(fn(TaxonState $state) => $state->value, TaxonState::onlineStates()))
+            ->groupBy(static::$taxonTable . '.taxon_id')
             ->get();
 
         return [$productTaxaStates, $variantTaxaStates];

@@ -237,4 +237,29 @@ class ProductTaxaTest extends ProductContext
             }
         }
     }
+
+    public function test_it_can_get_keys_and_url_per_taxa_item(): void
+    {
+        $this->createAndSaveTaxonomiesAndTaxa();
+
+        $product = $this->createProductWithProductVariantProperties();
+        $this->productRepository->save($product);
+
+        $variantId = $product->getVariants()[0]->variantId;
+        $productDetail = $this->productDetailRepository->findProductDetail($variantId);
+
+        $taxa = $productDetail->getTaxa();
+
+        /** @var ProductTaxonItem $taxon */
+        $taxon = $taxa[0];
+
+        $this->assertEquals('key-xxx-nl', $taxon->getKey());
+        $this->assertEquals('key-xxx-nl', $taxon->getKey('nl'));
+        $this->assertEquals('key-xxx-fr', $taxon->getKey('fr'));
+        $this->assertEquals('key-xxx-nl', $taxon->getKey('de')); // fallback
+
+        $this->assertEquals('key-xxx-nl', $taxon->getUrl());
+        $this->assertEquals('key-xxx-nl', $taxon->getUrl('nl'));
+        $this->assertEquals('key-xxx-fr', $taxon->getUrl('fr'));
+    }
 }

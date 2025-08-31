@@ -152,7 +152,7 @@ class Taxonomy implements Aggregate
         $object->allowsMultipleValues = (bool)$state['allows_multiple_values'];
         $object->allowsNestableValues = (bool)$state['allows_nestable_values'];
         $object->order = (int)$state['order'];
-        $object->data = json_decode($state['data'], true);
+        $object->data = $state['data'] ? json_decode($state['data'], true) : [];
 
         return $object;
     }

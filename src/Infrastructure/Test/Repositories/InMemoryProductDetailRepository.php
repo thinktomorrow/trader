@@ -25,7 +25,7 @@ final class InMemoryProductDetailRepository implements ProductDetailRepository
             'stock_data' => json_encode([]),
         ]);
 
-        if (! $allowOffline && ! in_array($product->getState(), ProductState::onlineStates())) {
+        if (!$allowOffline && !in_array($product->getState(), ProductState::onlineStates())) {
             throw new CouldNotFindVariant('No online variant found by id [' . $variantId->get() . ']');
         }
 
@@ -39,6 +39,8 @@ final class InMemoryProductDetailRepository implements ProductDetailRepository
             $taxon = $taxonRepo->find($productTaxon->taxonId);
             $taxonomy = $taxonomyRepo->find($taxon->taxonomyId);
 
+            $keys = $taxon->getTaxonKeys();
+
             $taxa[] = new DefaultProductTaxonItem(
                 $product->productId->get(),
                 $productTaxon->taxonId->get(),
@@ -46,6 +48,7 @@ final class InMemoryProductDetailRepository implements ProductDetailRepository
                 $taxonomy->getType(),
                 $taxonomy->showsInGrid(),
                 $taxon->getState(),
+                $keys,
                 [
                     'taxonomy_data' => $taxonomy->getData(),
                     'taxon_data' => $taxon->getData(),
@@ -61,6 +64,8 @@ final class InMemoryProductDetailRepository implements ProductDetailRepository
                     $taxon = $taxonRepo->find($productTaxon->taxonId);
                     $taxonomy = $taxonomyRepo->find($taxon->taxonomyId);
 
+                    $keys = $taxon->getTaxonKeys();
+
                     $taxa[] = new DefaultVariantTaxonItem(
                         $variant->variantId->get(),
                         $product->productId->get(),
@@ -69,6 +74,7 @@ final class InMemoryProductDetailRepository implements ProductDetailRepository
                         $taxonomy->getType(),
                         $taxonomy->showsInGrid(),
                         $taxon->getState(),
+                        $keys,
                         [
                             'taxonomy_data' => $taxonomy->getData(),
                             'taxon_data' => $taxon->getData(),

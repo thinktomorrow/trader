@@ -8,6 +8,7 @@ use Money\Money;
 use Tests\Infrastructure\TestCase;
 use Thinktomorrow\Trader\Application\Product\Grid\GridItem;
 use Thinktomorrow\Trader\Application\Product\ProductApplication;
+use Thinktomorrow\Trader\Application\Product\Taxa\ProductTaxonItem;
 use Thinktomorrow\Trader\Application\Taxon\TaxonApplication;
 use Thinktomorrow\Trader\Application\Taxonomy\TaxonomyApplication;
 use Thinktomorrow\Trader\Infrastructure\Laravel\Models\DefaultGridItem;
@@ -44,9 +45,42 @@ class GridRepositoryTest extends TestCase
         $this->assertNotEmpty($gridItem->getUnitPrice());
         $this->assertNotEmpty($gridItem->getUrl());
         $this->assertNotEmpty($gridItem->getTitle());
+    }
 
-        // TODO: taxa test for grid
-        //$this->assertNotEmpty($gridItem->getTaxa());
+    public function test_it_can_fetch_taxa_per_grid_item()
+    {
+        $gridItems = $this->getMysqlGridRepository()->getResults();
+
+        /** @var GridItem $gridItem */
+        $gridItem = $gridItems->first();
+
+        $this->assertNotEmpty($gridItem->getTaxa());
+        $this->assertInstanceOf(ProductTaxonItem::class, $gridItem->getTaxa()[0]);
+
+        $this->assertEquals('foobar', $gridItem->getTaxa()[0]->getKey('nl'));
+        $this->assertEquals('foobar', $gridItem->getTaxa()[0]->getUrl('nl'));
+        $this->assertEquals('foobar nl', $gridItem->getTaxa()[0]->getLabel('nl'));
+
+        $this->assertEquals('foobar', $gridItem->getTaxa()[0]->getKey('en'));
+        $this->assertEquals('foobar', $gridItem->getTaxa()[0]->getUrl('en'));
+        $this->assertEquals('foobar en', $gridItem->getTaxa()[0]->getLabel('en'));
+    }
+
+    public function test_it_can_fetch_taxa_that_are_shown_in_grid(): void
+    {
+        $gridItems = $this->getMysqlGridRepository()->getResults();
+
+        /** @var GridItem $gridItem */
+        $gridItem = $gridItems->first();
+
+        $this->assertCount(1, array_filter($gridItem->getTaxa(), fn(ProductTaxonItem $taxon) => $taxon->showsInGrid()));
+        $this->assertCount(0, $gridItem->getGridCategories());
+        $this->assertCount(1, $gridItem->getGridProductProperties());
+        $this->assertCount(0, $gridItem->getGridVariantProperties());
+        $this->assertCount(0, $gridItem->getGridCollections());
+        $this->assertCount(0, $gridItem->getGridTags());
+
+
     }
 
     public function test_it_only_fetches_grid_products()
@@ -154,7 +188,7 @@ class GridRepositoryTest extends TestCase
 
         $this->assertCount(3, $gridItems);
 
-        $titles = $gridItems->map(fn ($gridItem) => $gridItem->getTitle());
+        $titles = $gridItems->map(fn($gridItem) => $gridItem->getTitle());
 
         $expected = $titles->toArray();
         natcasesort($expected);
@@ -168,7 +202,7 @@ class GridRepositoryTest extends TestCase
 
         $this->assertCount(3, $gridItems);
 
-        $titles = $gridItems->map(fn ($gridItem) => $gridItem->getTitle());
+        $titles = $gridItems->map(fn($gridItem) => $gridItem->getTitle());
 
         $expected = $titles->toArray();
         natcasesort($expected);

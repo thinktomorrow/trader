@@ -78,6 +78,48 @@ final class ProductDetailRepositoryTaxaTest extends TestCase
         }
     }
 
+    #[DataProvider('products')]
+    public function test_it_can_get_taxon_keys_by_product(Product $product)
+    {
+        foreach ($this->repositories() as $i => $repository) {
+
+            // Create test data
+            $taxonomy = Taxonomy::create(TaxonomyId::fromString('ooo'), TaxonomyType::property);
+            $taxonomy->showInGrid();
+
+            $taxon = Taxon::create(TaxonId::fromString('xxx'), TaxonomyId::fromString('ooo'));
+            $taxon->updateTaxonKeys([
+                TaxonKey::create($taxon->taxonId, TaxonKeyId::fromString('key-' . $taxon->taxonId->get() . '-nl'), Locale::fromString('nl')),
+                TaxonKey::create($taxon->taxonId, TaxonKeyId::fromString('key-' . $taxon->taxonId->get() . '-fr'), Locale::fromString('fr')),
+            ]);
+
+            $this->taxonomyRepositories()[$i]->save($taxonomy);
+            $this->taxonRepositories()[$i]->save($taxon);
+
+            $product->updateProductTaxa([
+                ProductTaxon::create($product->productId, $taxon->taxonId),
+            ]);
+
+            $productRepository = iterator_to_array($this->productRepositories())[$i];
+            $productRepository->save($product);
+            $product->releaseEvents();
+
+            $result = $repository
+                ->findProductDetail($product->getVariants()[0]->variantId)
+                ->getTaxa();
+            $this->assertCount(1, $result);
+
+            $taxonItem = $result[0];
+
+            $this->assertEquals('key-xxx-nl', $taxonItem->getKey());
+            $this->assertEquals('key-xxx-nl', $taxonItem->getKey('nl'));
+            $this->assertEquals('key-xxx-fr', $taxonItem->getKey('fr'));
+            $this->assertEquals('key-xxx-nl', $taxonItem->getUrl());
+            $this->assertEquals('key-xxx-nl', $taxonItem->getUrl('nl'));
+            $this->assertEquals('key-xxx-fr', $taxonItem->getUrl('fr'));
+        }
+    }
+
     private function productRepositories(): \Generator
     {
         yield new InMemoryProductRepository();

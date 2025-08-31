@@ -118,4 +118,23 @@ class TaxonomyTest extends TestCase
 
         ]);
     }
+
+    public function test_it_can_accept_null_for_data()
+    {
+        $taxonomy = Taxonomy::fromMappedData([
+            'taxonomy_id' => 'tax-999',
+            'type' => 'variant_property',
+            'state' => 'offline',
+            'shows_as_grid_filter' => true,
+            'shows_in_grid' => false,
+            'allows_multiple_values' => true,
+            'allows_nestable_values' => true,
+            'order' => 3,
+            'data' => null,
+        ], [
+
+        ]);
+
+        $this->assertEquals([], json_decode($taxonomy->getMappedData()['data'], true));
+    }
 }

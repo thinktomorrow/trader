@@ -8,7 +8,6 @@ use Thinktomorrow\Trader\Application\Taxon\TaxonSelect\TaxonIdOptionsComposer;
 use Thinktomorrow\Trader\Application\Taxon\Tree\TaxonNode;
 use Thinktomorrow\Trader\Application\Taxon\Tree\TaxonTree;
 use Thinktomorrow\Trader\Application\Taxon\Tree\TaxonTreeRepository;
-use Thinktomorrow\Trader\Domain\Model\Taxonomy\TaxonomyId;
 use Thinktomorrow\Trader\Domain\Model\Taxonomy\TaxonomyRepository;
 
 class VineTaxonIdOptionsComposer implements TaxonIdOptionsComposer
@@ -45,7 +44,6 @@ class VineTaxonIdOptionsComposer implements TaxonIdOptionsComposer
 
     public function getTaxaAsOptionsForMultiselect(string $taxonomyId): array
     {
-        $taxonomy = $this->taxonomyRepository->find(TaxonomyId::fromString($taxonomyId));
         $options = $this->getTaxaAsOptions($taxonomyId);
         $values = [];
 
@@ -53,7 +51,7 @@ class VineTaxonIdOptionsComposer implements TaxonIdOptionsComposer
             $values[] = ['label' => $option, 'value' => $id];
         }
 
-        return ['label' => $taxonomy->getData('title.' . $this->getLocale()), 'options' => $values];
+        return $values;
     }
 
     public function excludeTaxa(array|string $excludeTaxonIds): static
@@ -66,9 +64,8 @@ class VineTaxonIdOptionsComposer implements TaxonIdOptionsComposer
     private function getFilteredTree(string $taxonomyId): TaxonTree
     {
         return $this->taxonTreeRepository->getTree()
-            ->remove(function (TaxonNode $node) use ($taxonomyId) {
-                return $node->getTaxonomyId() !== $taxonomyId;
-            })
+            ->findMany(fn($node) => $node->getTaxonomyId() === $taxonomyId)
+            ->sort('order')
             ->remove(function (TaxonNode $node) {
                 return in_array($node->getId(), $this->excludeTaxonIds);
             });
