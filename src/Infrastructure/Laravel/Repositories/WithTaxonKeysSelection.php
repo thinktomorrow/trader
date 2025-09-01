@@ -30,8 +30,6 @@ trait WithTaxonKeysSelection
             return [];
         }
 
-        dump($state);
-
         $pairs = [];
 
         foreach (explode(',', $state['taxon_keys']) as $pair) {
