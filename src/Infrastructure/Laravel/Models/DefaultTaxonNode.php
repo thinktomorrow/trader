@@ -38,7 +38,7 @@ class DefaultTaxonNode extends DefaultNode implements TaxonNode
         $this->data = $data;
         $this->product_ids = $product_ids;
         $this->online_product_ids = $online_product_ids;
-        $this->keys = array_map(fn (TaxonKey $key) => $key, $keys);
+        $this->keys = array_map(fn(TaxonKey $key) => $key, $keys);
         $this->parentId = $parentId;
 
         // Add node entry data so we can use it for sorting.
@@ -57,8 +57,8 @@ class DefaultTaxonNode extends DefaultNode implements TaxonNode
             TaxonState::from($state['state']),
             $state['order'],
             $state['data'] ? json_decode($state['data'], true) : [],
-            $state['product_ids'] ? explode(',', $state['product_ids']) : [],
-            $state['online_product_ids'] ? explode(',', $state['online_product_ids']) : [],
+            $state['product_ids'] ? array_unique(explode(',', $state['product_ids'])) : [],
+            $state['online_product_ids'] ? array_unique(explode(',', $state['online_product_ids'])) : [],
             $taxonKeys,
             $state['parent_id'],
         );
@@ -86,7 +86,7 @@ class DefaultTaxonNode extends DefaultNode implements TaxonNode
 
     public function getKey(?string $locale = null): ?string
     {
-        if (count($this->keys) < 1 || ! isset($this->keys[0])) {
+        if (count($this->keys) < 1 || !isset($this->keys[0])) {
             return null;
         }
 
@@ -155,7 +155,7 @@ class DefaultTaxonNode extends DefaultNode implements TaxonNode
     {
         $label = $this->getLabel($locale);
 
-        if (! $this->isRootNode()) {
+        if (!$this->isRootNode()) {
             $label = array_reduce(array_reverse($this->getBreadCrumbs()), function ($carry, $taxon) use ($withoutRoot, $locale) {
                 if ($taxon->isRootNode()) {
                     return $withoutRoot ? $carry : $taxon->getLabel($locale) . ': ' . $carry;

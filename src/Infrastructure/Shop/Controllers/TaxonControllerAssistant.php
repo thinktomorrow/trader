@@ -16,7 +16,9 @@ use Thinktomorrow\Trader\Infrastructure\Shop\RuntimeExceptions\FoundRouteAsRedir
 
 trait TaxonControllerAssistant
 {
-    protected ?TaxonTree $activeTaxons = null;
+    protected ?TaxonTree $activeTaxa = null;
+
+    protected array $totalCategoryProductAndVariantIds = [];
 
     protected function extractTaxonFromSlug(Locale $locale, string $taxonKeys): TaxonNode
     {
@@ -74,18 +76,22 @@ trait TaxonControllerAssistant
             }
         }
 
+        $this->totalCategoryProductAndVariantIds = $this->gridRepository
+            ->filterByTaxonIds([$taxon->getNodeId()])
+            ->getResultingIds();
+
         return $this->gridRepository
-            ->filterByTaxonIds($this->getActiveTaxons($taxon, $request->input('taxon', []))->pluck('id'))
+            ->filterByTaxonIds($this->getActiveTaxa($taxon, $request->input('taxon', []))->pluck('id'))
             ->paginate(12)
             ->getResults();
     }
 
-    protected function getActiveTaxons(TaxonNode $taxon, array $taxonKeys)
+    protected function getActiveTaxa(TaxonNode $taxon, array $taxonKeys)
     {
-        if ($this->activeTaxons) {
-            return $this->activeTaxons;
+        if ($this->activeTaxa) {
+            return $this->activeTaxa;
         }
 
-        return $this->activeTaxons = $this->taxonFilterTreeComposer->getActiveFilters($this->currentLocale->get(), [$taxon->getKey()], $taxonKeys);
+        return $this->activeTaxa = $this->taxonFilterTreeComposer->getActiveFilters($this->currentLocale->get(), [$taxon->getKey()], $taxonKeys);
     }
 }
