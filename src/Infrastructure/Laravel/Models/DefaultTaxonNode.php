@@ -131,6 +131,16 @@ class DefaultTaxonNode extends DefaultNode implements TaxonNode
         return $this->online_product_ids;
     }
 
+    public function getProductCount(array $productIds): int
+    {
+        return count(array_intersect($this->online_product_ids, $productIds));
+    }
+
+    public function getProductTotal(): int
+    {
+        return count($this->online_product_ids);
+    }
+
     public function getBreadCrumbs(): array
     {
         return $this->getAncestorNodes()->all();

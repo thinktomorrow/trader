@@ -117,7 +117,7 @@ class VineTaxonFilterTreeComposer implements TaxonFilterTreeComposer
              */
             foreach ($taxonTree->all() as $rootTaxon) {
                 foreach ($selectedTaxa as $selectedTaxon) {
-                    if (in_array($selectedTaxon->getRootNode()->getNodeId(), $rootTaxa->pluck('id'))) {
+                    if (in_array($rootTaxon->getNodeId(), $selectedTaxon->pluckAncestorNodes('id'))) {
                         $taxonTree = $taxonTree->removeNode($rootTaxon);
                     }
                 }
