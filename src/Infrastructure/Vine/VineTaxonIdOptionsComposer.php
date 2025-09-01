@@ -67,7 +67,7 @@ class VineTaxonIdOptionsComposer implements TaxonIdOptionsComposer
             ->remove(function (TaxonNode $node) {
                 return in_array($node->getId(), $this->excludeTaxonIds);
             })
-            ->findMany(fn($node) => $node->getTaxonomyId() === $taxonomyId)
+            ->findMany(fn ($node) => $node->getTaxonomyId() === $taxonomyId)
             ->sort('order');
     }
 
