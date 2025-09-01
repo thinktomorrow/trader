@@ -29,7 +29,7 @@ class VineTaxonIdOptionsComposer implements TaxonIdOptionsComposer
     {
         $result = [];
 
-        $taxonNodes = $this->getFilteredTree($taxonomyId)->flatten()->all();
+        $taxonNodes = $this->getFilteredTree($taxonomyId)->all();
 
         collect($taxonNodes)->each(function (TaxonNode $item) use (&$result) {
             $result[$item->getId()] = $item->getBreadCrumbLabel();
@@ -64,11 +64,11 @@ class VineTaxonIdOptionsComposer implements TaxonIdOptionsComposer
     private function getFilteredTree(string $taxonomyId): TaxonTree
     {
         return $this->taxonTreeRepository->getTree()
-            ->findMany(fn ($node) => $node->getTaxonomyId() === $taxonomyId)
-            ->sort('order')
             ->remove(function (TaxonNode $node) {
                 return in_array($node->getId(), $this->excludeTaxonIds);
-            });
+            })
+            ->findMany(fn($node) => $node->getTaxonomyId() === $taxonomyId)
+            ->sort('order');
     }
 
     //    private function composeLabels(array $taxa): array

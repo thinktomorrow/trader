@@ -23,11 +23,16 @@ class VineTaxonFilterTreeComposer implements TaxonFilterTreeComposer
         $this->traderConfig = $traderConfig;
     }
 
-    public function getAvailableFilters(Locale $locale, array $rootTaxonKeys): TaxonTree
+    public function getAvailableFiltersExcludingRoots(Locale $locale, array $rootTaxonKeys): TaxonTree
+    {
+        return $this->getAvailableFilters($locale, $rootTaxonKeys, false);
+    }
+
+    public function getAvailableFilters(Locale $locale, array $rootTaxonKeys, bool $keepRootTaxa = true): TaxonTree
     {
         /** @var TaxonTree $rootTaxa */
         $rootTaxa = $this->taxonTreeRepository->setLocale($locale)->getTree()
-            ->findMany(fn (TaxonNode $node) => in_array($node->getKey(), $rootTaxonKeys));
+            ->findMany(fn(TaxonNode $node) => in_array($node->getKey(), $rootTaxonKeys));
 
         //        /** @var TaxonNode $mainTaxonNode */
         //        $mainTaxonNode = $this->taxonTreeRepository->setLocale($locale)->getTree()->find(fn(TaxonNode $node) => $node->getKey() == $mainTaxonFilterKey);
@@ -37,39 +42,45 @@ class VineTaxonFilterTreeComposer implements TaxonFilterTreeComposer
         //        }
 
         //        $categoryRootId = $this->traderConfig->getMainCategoryTaxonomyId();
+        $rootTaxonIds = array_map(fn($taxon) => $taxon->getNodeId(), $rootTaxa->all());
+        $rootAncestorTaxonIds = [];
+        foreach ($rootTaxa as $taxon) {
+            $rootAncestorTaxonIds = array_merge($rootAncestorTaxonIds, $taxon->pluckAncestorNodes('id'));
+        }
 
-        $rootTaxonIds = $rootTaxa->pluck('id');
         $productIds = $this->getOnlineProductIds($rootTaxonIds);
-
         /**
-         * The products belonging to the main taxon determine which taxons will
+         * The products belonging to the main taxon determine which taxa will
          * be returned as filters. Here we shake out the taxon tree so there
          * are only taxa left that match one or more of the same products
          */
         $taxonTree = $this->taxonTreeRepository->getTree()
+
+            // Remove ancestor nodes that are above the given root taxa
+            ->prune(fn(TaxonNode $node) => !in_array($node->getNodeId(), $rootAncestorTaxonIds))
+
             // For the category taxa, only return the taxa that belong to one of the given main taxa
-            ->shake(fn (TaxonNode $node) => count(array_intersect($rootTaxonIds, [$node->getNodeId(), ...$node->pluckAncestorNodes('id')])) > 0)
+            ->shake(fn(TaxonNode $node) => count(array_intersect($rootTaxonIds, [$node->getNodeId(), ...$node->pluckAncestorNodes('id')])) > 0)
 
             // Only fetch taxa that are related to the given listing of products
-            ->shake(fn (TaxonNode $node) => count(array_intersect($node->getOnlineProductIds(), $productIds)) > 0)
+            ->shake(fn(TaxonNode $node) => count(array_intersect($node->getOnlineProductIds(), $productIds)) > 0)
 
             // Remove offline taxa
-            ->remove(fn (TaxonNode $node) => ! $node->showOnline());
+            ->remove(fn(TaxonNode $node) => !$node->showOnline());
 
         // For a better filter representation, we want to start from the given taxon as the root - and not the 'real' root.
         // Therefor we exclude all ancestors from the given taxon which allows to only show the
         // nested taxa. This is purely a visual improvement for the filter.
 
-        // TODO: Get any ancestor nodes of the main taxa, so we can prune the tree to only show the main taxon and its children, not any of the ancestors
-
-        //        if (!$mainTaxonNode->isRootNode() && ($ancestorIds = $mainTaxonNode->pluckAncestorNodes('id'))) {
-        //            // Keep the root node in the filter in order to keep our structure intact
-        //            array_pop($ancestorIds);
-        //
-        //            $taxonTree = $taxonTree
-        //                ->prune(fn($node) => !in_array($node->getNodeId(), [$mainTaxonNode->getNodeId(), ...$ancestorIds]));
-        //        }
-
+//        // TODO: Get any ancestor nodes of the main taxa, so we can prune the tree to only show the main taxon and its children, not any of the ancestors
+//        if (!$keepRootTaxa) {
+//            $childrenTree = new TaxonTree();
+//            foreach ($rootTaxa as $rootTaxon) {
+//                $childrenTree = $childrenTree->merge($rootTaxon->getChildNodes());
+//            }
+//            $taxonTree = $childrenTree;
+//        }
+//        dd($taxonTree);
         return $taxonTree;
     }
 
@@ -77,7 +88,7 @@ class VineTaxonFilterTreeComposer implements TaxonFilterTreeComposer
     {
         /** @var TaxonTree $rootTaxa */
         $rootTaxa = $this->taxonTreeRepository->setLocale($locale)->getTree()
-            ->findMany(fn (TaxonNode $node) => in_array($node->getKey(), $rootTaxonKeys));
+            ->findMany(fn(TaxonNode $node) => in_array($node->getKey(), $rootTaxonKeys));
 
         //        $mainTaxonNode = $this->taxonTreeRepository->setLocale($locale)->getTree()->find(fn($node) => $node->getKey() == $mainTaxonFilterKey);
         //
@@ -91,7 +102,7 @@ class VineTaxonFilterTreeComposer implements TaxonFilterTreeComposer
         /** Used filters from current request */
         if (count($activeKeys) > 0) {
             $selectedTaxa = $this->taxonTreeRepository->getTree()
-                ->findMany(fn ($node) => in_array($node->getKey(), $activeKeys));
+                ->findMany(fn($node) => in_array($node->getKey(), $activeKeys));
 
             // Remove any parents where the child taxon is present in the payload.
             // We want to filter on the more specific child taxon - and not in combination with its parent.
@@ -131,7 +142,7 @@ class VineTaxonFilterTreeComposer implements TaxonFilterTreeComposer
      */
     public function getProductIds(array $taxonIds, bool $onlineOnly = false): array
     {
-        $nodes = $this->taxonTreeRepository->getTree()->findMany(fn (TaxonNode $node) => in_array($node->getId(), $taxonIds));
+        $nodes = $this->taxonTreeRepository->getTree()->findMany(fn(TaxonNode $node) => in_array($node->getId(), $taxonIds));
 
         $productIds = [];
 

@@ -68,15 +68,12 @@ final class TaxonIdOptionsComposerTest extends TestCase
                 ->getTaxaAsOptionsForMultiselect('bbb');
 
             $this->assertEquals([
-                'label' => 'Taxonomy title nl',
-                'options' => [
-                    ['label' => 'Taxon first', 'value' => 'first'],
-                    ['label' => 'Taxon first: Taxon second', 'value' => 'second'],
-                    ['label' => 'Taxon first: Taxon third', 'value' => 'third'],
-                    ['label' => 'Taxon first: Taxon third > Taxon fourth', 'value' => 'fourth'],
-                    ['label' => 'Taxon fifth', 'value' => 'fifth'],
-                    ['label' => 'Taxon fifth: Taxon sixth', 'value' => 'sixth'],
-                ],
+                ['label' => 'Taxon first', 'value' => 'first'],
+                ['label' => 'Taxon first: Taxon second', 'value' => 'second'],
+                ['label' => 'Taxon first: Taxon third', 'value' => 'third'],
+                ['label' => 'Taxon first: Taxon third > Taxon fourth', 'value' => 'fourth'],
+                ['label' => 'Taxon fifth', 'value' => 'fifth'],
+                ['label' => 'Taxon fifth: Taxon sixth', 'value' => 'sixth'],
             ], $result);
         }
     }
