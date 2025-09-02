@@ -131,11 +131,20 @@ class DefaultTaxonNode extends DefaultNode implements TaxonNode
         return $this->online_product_ids;
     }
 
+    /**
+     * Get the count of products that are both in this taxon
+     * and in the given array of product IDs. This allows
+     * to show the total number in a filter, for example.
+     */
     public function getProductCount(array $productIds): int
     {
         return count(array_intersect($this->online_product_ids, $productIds));
     }
 
+    /**
+     * The total number of products in this taxon,
+     * regardless of current grid or filtering.
+     */
     public function getProductTotal(): int
     {
         return count($this->online_product_ids);
