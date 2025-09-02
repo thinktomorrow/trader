@@ -27,6 +27,16 @@ class TaxonKey implements ChildEntity
         return $taxonKey;
     }
 
+    public static function temp(TaxonKeyId $key, Locale $locale): static
+    {
+        $taxonKey = new static();
+
+        $taxonKey->taxonKeyId = $key;
+        $taxonKey->locale = $locale;
+
+        return $taxonKey;
+    }
+
     public function getLocale(): Locale
     {
         return $this->locale;
