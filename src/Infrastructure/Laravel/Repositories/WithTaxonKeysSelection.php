@@ -38,6 +38,9 @@ trait WithTaxonKeysSelection
             $pairs[] = TaxonKey::create(TaxonId::fromString($state['taxon_id']), TaxonKeyId::fromString($key), Locale::fromString($locale));
         }
 
+        // Sort by locale
+        usort($pairs, fn(TaxonKey $a, TaxonKey $b) => $a->taxonKeyId->get() <=> $b->taxonKeyId->get());
+
         return $pairs;
     }
 }

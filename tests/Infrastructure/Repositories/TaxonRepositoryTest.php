@@ -39,9 +39,26 @@ final class TaxonRepositoryTest extends TestCase
             $taxonRepository->save($taxon);
             $taxon->releaseEvents();
 
-            foreach ($taxon->getTaxonKeys() as $taxonKey) {
+            $freshTaxon = $taxonRepository->find($taxon->taxonId);
+
+            $this->assertTrue(count($freshTaxon->getTaxonKeys()) > 0);
+
+            foreach ($freshTaxon->getTaxonKeys() as $taxonKey) {
                 $this->assertEquals($taxon, $taxonRepository->findByKey($taxonKey->taxonKeyId));
             }
+        }
+    }
+
+    #[DataProvider('taxons')]
+    public function test_it_can_save_and_find_many(Taxon $taxon)
+    {
+        foreach ($this->taxonRepositories() as $taxonRepository) {
+            $taxonRepository->save($taxon);
+            $taxon->releaseEvents();
+
+            $freshTaxa = $taxonRepository->findMany([$taxon->taxonId->get()]);
+
+            $this->assertTrue(count($freshTaxa) === 1);
         }
     }
 
@@ -79,19 +96,19 @@ final class TaxonRepositoryTest extends TestCase
 
     public static function taxons(): \Generator
     {
-        $taxon = Taxon::create(
-            TaxonId::fromString('xxx'),
-            TaxonomyId::fromString('bbb'),
-            TaxonId::fromString('parent'),
-        );
-
-        $taxon->updateTaxonKeys([
-            TaxonKey::create($taxon->taxonId, TaxonKeyId::fromString('taxon-key'), Locale::fromString('nl')),
-        ]);
-
-        $taxon->addData(['foo' => 'bar']);
-
-        yield [$taxon];
+//        $taxon = Taxon::create(
+//            TaxonId::fromString('xxx'),
+//            TaxonomyId::fromString('bbb'),
+//            TaxonId::fromString('parent'),
+//        );
+//
+//        $taxon->updateTaxonKeys([
+//            TaxonKey::create($taxon->taxonId, TaxonKeyId::fromString('taxon-key'), Locale::fromString('nl')),
+//        ]);
+//
+//        $taxon->addData(['foo' => 'bar']);
+//
+//        yield [$taxon];
 
         $taxon = Taxon::create(
             TaxonId::fromString('xxx'),

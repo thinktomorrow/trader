@@ -11,7 +11,7 @@ interface TaxonRepository
 
     public function findMany(array $taxonIds): array;
 
-    public function findByKey(TaxonKeyId $taxonKeyIdId): Taxon;
+    public function findByKey(TaxonKeyId $taxonKeyId): Taxon;
 
     /** @return Taxon[] */
     public function getByParentId(TaxonId $taxonId): array;
@@ -20,5 +20,5 @@ interface TaxonRepository
 
     public function nextReference(): TaxonId;
 
-    public function uniqueKeyReference(TaxonKeyId $taxonKeyIdId, TaxonId $allowedTaxonId): TaxonKeyId;
+    public function uniqueKeyReference(TaxonKeyId $taxonKeyId, TaxonId $allowedTaxonId): TaxonKeyId;
 }
