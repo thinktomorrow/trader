@@ -24,7 +24,7 @@ class MysqlTaxonRepository implements TaxonRepository
     {
         $state = $taxon->getMappedData();
 
-        if (!$this->exists($taxon->taxonId)) {
+        if (! $this->exists($taxon->taxonId)) {
             DB::table(static::$taxonTable)->insert($state);
         } else {
             DB::table(static::$taxonTable)->where('taxon_id', $taxon->taxonId->get())->update($state);
@@ -35,7 +35,7 @@ class MysqlTaxonRepository implements TaxonRepository
 
     private function upsertTaxonKeys(Taxon $taxon): void
     {
-        $taxonKeyIds = array_map(fn(TaxonKey $taxonKey) => $taxonKey->taxonKeyId->get(), $taxon->getTaxonKeys());
+        $taxonKeyIds = array_map(fn (TaxonKey $taxonKey) => $taxonKey->taxonKeyId->get(), $taxon->getTaxonKeys());
 
         DB::table(static::$taxonKeysTable)
             ->where('taxon_id', $taxon->taxonId->get())
@@ -72,7 +72,7 @@ class MysqlTaxonRepository implements TaxonRepository
 
         $taxonKeyStates = $this->extractTaxonKeys((array)$taxonState);
 
-        if (!$taxonState) {
+        if (! $taxonState) {
             throw new CouldNotFindTaxon('No taxon found by id [' . $taxonId->get() . ']');
         }
 
@@ -94,7 +94,7 @@ class MysqlTaxonRepository implements TaxonRepository
             ->get();
 
         return $taxonStates
-            ->map(fn($record) => Taxon::fromMappedData((array)$record, [TaxonKey::class => $this->extractTaxonKeys((array)$record)]))
+            ->map(fn ($record) => Taxon::fromMappedData((array)$record, [TaxonKey::class => $this->extractTaxonKeys((array)$record)]))
             ->toArray();
     }
 
@@ -117,7 +117,7 @@ class MysqlTaxonRepository implements TaxonRepository
             ->groupBy(static::$taxonTable . '.taxon_id')
             ->first();
 
-        if (!$taxonState) {
+        if (! $taxonState) {
             throw new CouldNotFindTaxon('No taxon found by key [' . $taxonKeyId->get() . ']');
         }
 
