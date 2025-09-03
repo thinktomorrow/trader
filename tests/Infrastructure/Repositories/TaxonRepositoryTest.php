@@ -96,19 +96,19 @@ final class TaxonRepositoryTest extends TestCase
 
     public static function taxons(): \Generator
     {
-//        $taxon = Taxon::create(
-//            TaxonId::fromString('xxx'),
-//            TaxonomyId::fromString('bbb'),
-//            TaxonId::fromString('parent'),
-//        );
-//
-//        $taxon->updateTaxonKeys([
-//            TaxonKey::create($taxon->taxonId, TaxonKeyId::fromString('taxon-key'), Locale::fromString('nl')),
-//        ]);
-//
-//        $taxon->addData(['foo' => 'bar']);
-//
-//        yield [$taxon];
+        //        $taxon = Taxon::create(
+        //            TaxonId::fromString('xxx'),
+        //            TaxonomyId::fromString('bbb'),
+        //            TaxonId::fromString('parent'),
+        //        );
+        //
+        //        $taxon->updateTaxonKeys([
+        //            TaxonKey::create($taxon->taxonId, TaxonKeyId::fromString('taxon-key'), Locale::fromString('nl')),
+        //        ]);
+        //
+        //        $taxon->addData(['foo' => 'bar']);
+        //
+        //        yield [$taxon];
 
         $taxon = Taxon::create(
             TaxonId::fromString('xxx'),

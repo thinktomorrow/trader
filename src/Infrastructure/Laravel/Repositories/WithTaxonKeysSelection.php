@@ -39,7 +39,7 @@ trait WithTaxonKeysSelection
         }
 
         // Sort by locale
-        usort($pairs, fn(TaxonKey $a, TaxonKey $b) => $a->taxonKeyId->get() <=> $b->taxonKeyId->get());
+        usort($pairs, fn (TaxonKey $a, TaxonKey $b) => $a->taxonKeyId->get() <=> $b->taxonKeyId->get());
 
         return $pairs;
     }
