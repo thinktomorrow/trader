@@ -36,6 +36,15 @@ interface ProductDetail extends Stockable
 
     public function getProductProperties(): array;
 
+    /**
+     * All available variant properties of the product
+     * @return array<ProductTaxonItem>
+     */
+    public function getProductVariantProperties(): array;
+
+    /**
+     * @return array<VariantTaxonItem>
+     */
     public function getVariantProperties(): array;
 
     public function getCollections(): array;

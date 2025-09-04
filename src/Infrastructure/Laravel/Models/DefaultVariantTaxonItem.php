@@ -3,11 +3,11 @@ declare(strict_types=1);
 
 namespace Thinktomorrow\Trader\Infrastructure\Laravel\Models;
 
-use Thinktomorrow\Trader\Application\Product\Taxa\ProductTaxonItem;
+use Thinktomorrow\Trader\Application\Product\Taxa\VariantTaxonItem;
 use Thinktomorrow\Trader\Domain\Model\Taxon\TaxonState;
 use Thinktomorrow\Trader\Domain\Model\Taxonomy\TaxonomyType;
 
-class DefaultVariantTaxonItem extends DefaultProductTaxonItem implements ProductTaxonItem
+class DefaultVariantTaxonItem extends DefaultProductTaxonItem implements VariantTaxonItem
 {
     protected string $variantId;
 

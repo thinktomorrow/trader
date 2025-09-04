@@ -37,7 +37,7 @@ class DefaultProductTaxonItem implements ProductTaxonItem
         $this->showsInGrid = $showsInGrid;
 
         $this->taxonState = $taxonState;
-        $this->keys = array_map(fn (TaxonKey $key) => $key, $taxonKeys);
+        $this->keys = array_map(fn(TaxonKey $key) => $key, $taxonKeys);
         $this->data = $data;
     }
 
@@ -66,11 +66,11 @@ class DefaultProductTaxonItem implements ProductTaxonItem
         $taxonomyState = TaxonomyState::from($state['taxonomy_state']);
         $state = TaxonState::online;
 
-        if (! in_array($productTaxonState, TaxonState::onlineStates())) {
+        if (!in_array($productTaxonState, TaxonState::onlineStates())) {
             $state = $productTaxonState;
-        } elseif (! in_array($taxonState, TaxonState::onlineStates())) {
+        } elseif (!in_array($taxonState, TaxonState::onlineStates())) {
             $state = $taxonState;
-        } elseif (! in_array($taxonomyState, TaxonomyState::onlineStates())) {
+        } elseif (!in_array($taxonomyState, TaxonomyState::onlineStates())) {
             $state = TaxonState::offline;
         }
 
@@ -99,7 +99,7 @@ class DefaultProductTaxonItem implements ProductTaxonItem
 
     public function getKey(?string $locale = null): ?string
     {
-        if (count($this->keys) < 1 || ! isset($this->keys[0])) {
+        if (count($this->keys) < 1 || !isset($this->keys[0])) {
             return null;
         }
 
@@ -125,6 +125,15 @@ class DefaultProductTaxonItem implements ProductTaxonItem
             'title',
             $locale,
             $this->dataAsPrimitive('taxon_data.title', $locale, '')
+        );
+    }
+
+    public function getTaxonomyLabel(?string $locale = null): string
+    {
+        return $this->dataAsPrimitive(
+            'taxonomy_data.title',
+            $locale,
+            ''
         );
     }
 

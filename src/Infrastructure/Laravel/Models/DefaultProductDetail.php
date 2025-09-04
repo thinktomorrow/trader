@@ -9,6 +9,7 @@ use Thinktomorrow\Trader\Application\Common\RendersData;
 use Thinktomorrow\Trader\Application\Common\RendersVariantPrices;
 use Thinktomorrow\Trader\Application\Product\ProductDetail\ProductDetail;
 use Thinktomorrow\Trader\Application\Product\Taxa\ProductTaxonItem;
+use Thinktomorrow\Trader\Application\Product\Taxa\VariantTaxonItem;
 use Thinktomorrow\Trader\Application\Stock\Read\StockableDefault;
 use Thinktomorrow\Trader\Domain\Model\Product\ProductId;
 use Thinktomorrow\Trader\Domain\Model\Product\Variant\VariantId;
@@ -58,7 +59,7 @@ class DefaultProductDetail implements ProductDetail
         $item->ignore_out_of_stock = (bool)$state['ignore_out_of_stock'];
 
         foreach ($taxa as $taxon) {
-            if (! ($taxon instanceof ProductTaxonItem)) {
+            if (!($taxon instanceof ProductTaxonItem)) {
                 throw new \InvalidArgumentException('Taxa must be instances of ProductTaxonItem or VariantTaxonItem');
             }
         }
@@ -93,10 +94,10 @@ class DefaultProductDetail implements ProductDetail
             return $variantTitle;
         }
 
-        if (! $variantOptionTitle || $productTitle == $variantOptionTitle) {
+        if (!$variantOptionTitle || $productTitle == $variantOptionTitle) {
             return $productTitle;
         }
-        if (! $productTitle) {
+        if (!$productTitle) {
             return $variantOptionTitle;
         }
 
@@ -183,11 +184,25 @@ class DefaultProductDetail implements ProductDetail
         });
     }
 
+    /**
+     * All available variant properties of the product
+     * @return array<ProductTaxonItem>
+     */
+    public function getProductVariantProperties(): array
+    {
+        return array_values(array_filter($this->taxa, function (ProductTaxonItem $taxon) {
+            return (!$taxon instanceof VariantTaxonItem) && $taxon->getTaxonomyType() === TaxonomyType::variant_property->value && $taxon->showOnline();
+        }));
+    }
+
+    /**
+     * @return array<VariantTaxonItem>
+     */
     public function getVariantProperties(): array
     {
-        return array_filter($this->taxa, function (ProductTaxonItem $taxon) {
-            return $taxon->getTaxonomyType() === TaxonomyType::variant_property->value && $taxon->showOnline();
-        });
+        return array_values(array_filter($this->taxa, function (ProductTaxonItem $taxon) {
+            return $taxon instanceof VariantTaxonItem && $taxon->getTaxonomyType() === TaxonomyType::variant_property->value && $taxon->showOnline();
+        }));
     }
 
     public function getCollections(): array

@@ -25,4 +25,6 @@ interface ProductTaxonItem
     public function getUrl(?string $locale = null): string;
 
     public function getLabel(?string $locale = null): string;
+
+    public function getTaxonomyLabel(?string $locale = null): string;
 }
