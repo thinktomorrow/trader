@@ -4,7 +4,9 @@ declare(strict_types=1);
 namespace Thinktomorrow\Trader\Infrastructure\Laravel\Repositories;
 
 use Illuminate\Support\Facades\DB;
+use Psr\Container\ContainerInterface;
 use Ramsey\Uuid\Uuid;
+use Thinktomorrow\Trader\Application\Taxonomy\TaxonomyItem;
 use Thinktomorrow\Trader\Domain\Model\Taxonomy\Exceptions\CouldNotFindTaxonomy;
 use Thinktomorrow\Trader\Domain\Model\Taxonomy\Taxonomy;
 use Thinktomorrow\Trader\Domain\Model\Taxonomy\TaxonomyId;
@@ -14,11 +16,18 @@ class MysqlTaxonomyRepository implements TaxonomyRepository
 {
     private static $taxonomyTable = 'trader_taxonomies';
 
+    private ContainerInterface $container;
+
+    public function __construct(ContainerInterface $container)
+    {
+        $this->container = $container;
+    }
+
     public function save(Taxonomy $taxonomy): void
     {
         $state = $taxonomy->getMappedData();
 
-        if (! $this->exists($taxonomy->taxonomyId)) {
+        if (!$this->exists($taxonomy->taxonomyId)) {
             DB::table(static::$taxonomyTable)->insert($state);
         } else {
             DB::table(static::$taxonomyTable)->where('taxonomy_id', $taxonomy->taxonomyId->get())->update($state);
@@ -36,7 +45,7 @@ class MysqlTaxonomyRepository implements TaxonomyRepository
             ->where(static::$taxonomyTable . '.taxonomy_id', $taxonomyId->get())
             ->first();
 
-        if (! $taxonomyState) {
+        if (!$taxonomyState) {
             throw new CouldNotFindTaxonomy('No taxonomy found by id [' . $taxonomyId->get() . ']');
         }
 
@@ -50,7 +59,7 @@ class MysqlTaxonomyRepository implements TaxonomyRepository
             ->orderBy('order')
             ->get();
 
-        return $taxonomyStates->map(fn ($taxonomyState) => Taxonomy::fromMappedData((array)$taxonomyState))->all();
+        return $taxonomyStates->map(fn($taxonomyState) => Taxonomy::fromMappedData((array)$taxonomyState))->all();
     }
 
     public function getForFilter(): array
@@ -60,7 +69,9 @@ class MysqlTaxonomyRepository implements TaxonomyRepository
             ->orderBy('order')
             ->get();
 
-        return $taxonomyStates->map(fn ($taxonomyState) => Taxonomy::fromMappedData((array)$taxonomyState))->all();
+        $taxonomyItem = $this->container->get(TaxonomyItem::class);
+
+        return $taxonomyStates->map(fn($state) => $taxonomyItem::fromMappedData((array)$state))->all();
     }
 
     public function findManyByTaxa(array $taxonIds): array
@@ -73,7 +84,7 @@ class MysqlTaxonomyRepository implements TaxonomyRepository
             ->distinct()
             ->get();
 
-        return $taxonomyStates->map(fn ($taxonomyState) => Taxonomy::fromMappedData((array)$taxonomyState))->all();
+        return $taxonomyStates->map(fn($taxonomyState) => Taxonomy::fromMappedData((array)$taxonomyState))->all();
     }
 
     public function delete(TaxonomyId $taxonomyId): void
