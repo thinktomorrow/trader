@@ -141,7 +141,7 @@ class MysqlTaxonTreeRepository implements TaxonTreeRepository, CategoryRepositor
                 JOIN trader_taxa t ON t.taxon_id = tp.taxon_id
                 JOIN trader_taxonomies tax ON t.taxonomy_id = tax.taxonomy_id
                 WHERE t.taxon_id = trader_taxa.taxon_id
-                  AND p.state IN (' . implode(',', array_map(fn($s) => DB::getPdo()->quote($s->value), ProductState::onlineStates())) . ')
+                  AND p.state IN (' . implode(',', array_map(fn ($s) => DB::getPdo()->quote($s->value), ProductState::onlineStates())) . ')
                     AND tax.type <> ' . DB::getPdo()->quote(TaxonomyType::variant_property->value) . '
                     AND v.show_in_grid = 1
             ) AS grid_product_ids'))
@@ -153,7 +153,7 @@ class MysqlTaxonTreeRepository implements TaxonTreeRepository, CategoryRepositor
                 JOIN trader_taxa t ON t.taxon_id = tv.taxon_id
                 JOIN trader_taxonomies tax ON t.taxonomy_id = tax.taxonomy_id
                 WHERE t.taxon_id = trader_taxa.taxon_id
-                  AND p.state IN (' . implode(',', array_map(fn($s) => DB::getPdo()->quote($s->value), ProductState::onlineStates())) . ')
+                  AND p.state IN (' . implode(',', array_map(fn ($s) => DB::getPdo()->quote($s->value), ProductState::onlineStates())) . ')
                     AND v.show_in_grid = 1
             ) AS grid_variant_ids'))
             ->addSelect(DB::raw('(

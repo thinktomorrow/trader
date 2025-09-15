@@ -95,11 +95,11 @@ class MysqlGridRepository implements GridRepository
             $this->builder->whereIn(static::$taxonPivotTable . '.taxon_id', array_unique($ids));
         }
 
-//        $this->builder->where(function ($query) use ($taxonIdsGroupedByTaxonomy) {
-//            foreach ($taxonIdsGroupedByTaxonomy as $ids) {
-//                $query->whereIn(static::$taxonPivotTable . '.taxon_id', array_unique($ids));
-//            }
-//        });
+        //        $this->builder->where(function ($query) use ($taxonIdsGroupedByTaxonomy) {
+        //            foreach ($taxonIdsGroupedByTaxonomy as $ids) {
+        //                $query->whereIn(static::$taxonPivotTable . '.taxon_id', array_unique($ids));
+        //            }
+        //        });
 
         return $this;
     }
