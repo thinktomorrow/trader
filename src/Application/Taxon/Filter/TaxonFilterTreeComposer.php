@@ -16,10 +16,12 @@ interface TaxonFilterTreeComposer
 
     public function getActiveFilters(Locale $locale, array $rootTaxonKeys, array $activeKeys): TaxonTree;
 
+    public function getFiltersFromKeys(Locale $locale, array $taxonKeys): TaxonTree;
+
     /**
      * Get all product ids belonging to this taxon filter and all its children
      */
     public function getProductIds(array $taxonIds): array;
 
-    public function getOnlineProductIds(array $taxonIds): array;
+    public function getGridProductIds(array $taxonIds): array;
 }

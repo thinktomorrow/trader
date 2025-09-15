@@ -13,6 +13,7 @@ use Thinktomorrow\Trader\Application\Taxon\Tree\TaxonTreeRepository;
 use Thinktomorrow\Trader\Domain\Common\Locale;
 use Thinktomorrow\Trader\Domain\Model\Product\ProductState;
 use Thinktomorrow\Trader\Domain\Model\Taxon\Exceptions\CouldNotFindTaxon;
+use Thinktomorrow\Trader\Domain\Model\Taxonomy\TaxonomyType;
 use Thinktomorrow\Trader\TraderConfig;
 
 class MysqlTaxonTreeRepository implements TaxonTreeRepository, CategoryRepository
@@ -118,9 +119,72 @@ class MysqlTaxonTreeRepository implements TaxonTreeRepository, CategoryRepositor
             })
             ->select(static::$taxonTable . '.*')
             ->addSelect(DB::raw("GROUP_CONCAT( DISTINCT {$this->composeTaxonKeysSelect()}) AS taxon_keys"))
-            ->addSelect(DB::raw('GROUP_CONCAT(trader_taxa_products.product_id) AS product_ids'))
-            ->addSelect(DB::raw('GROUP_CONCAT(trader_products.product_id) AS online_product_ids'))
-            ->addSelect(DB::raw('GROUP_CONCAT(trader_taxa_variants.variant_id) AS online_variant_ids'))
+            ->addSelect(DB::raw('GROUP_CONCAT(DISTINCT trader_taxa_products.product_id) AS product_ids'))
+            ->addSelect(DB::raw('GROUP_CONCAT(DISTINCT trader_products.product_id) AS online_product_ids'))
+            ->addSelect(DB::raw('GROUP_CONCAT(DISTINCT trader_taxa_variants.variant_id) AS online_variant_ids'))
+            ->groupBy(static::$taxonTable . '.taxon_id')
+            ->orderBy(static::$taxonTable . '.order')
+            ->get();
+
+        $results = DB::table(static::$taxonTable)
+            ->when($taxonomyIds, function ($query) use ($taxonomyIds) {
+                return $query->whereIn(static::$taxonTable . '.taxonomy_id', (array)$taxonomyIds);
+            })
+            ->leftJoin(static::$taxonKeysTable, static::$taxonTable . '.taxon_id', '=', static::$taxonKeysTable . '.taxon_id')
+            ->select(static::$taxonTable . '.*')
+            ->addSelect(DB::raw("GROUP_CONCAT(DISTINCT {$this->composeTaxonKeysSelect()}) AS taxon_keys"))
+            ->addSelect(DB::raw('(
+                SELECT GROUP_CONCAT(DISTINCT CONCAT_WS(":", p.product_id, v.variant_id))
+                FROM trader_products p
+                JOIN trader_product_variants v ON p.product_id = v.product_id
+                JOIN trader_taxa_products tp ON tp.product_id = p.product_id
+                JOIN trader_taxa t ON t.taxon_id = tp.taxon_id
+                JOIN trader_taxonomies tax ON t.taxonomy_id = tax.taxonomy_id
+                WHERE t.taxon_id = trader_taxa.taxon_id
+                  AND p.state IN (' . implode(',', array_map(fn($s) => DB::getPdo()->quote($s->value), ProductState::onlineStates())) . ')
+                    AND tax.type <> ' . DB::getPdo()->quote(TaxonomyType::variant_property->value) . '
+                    AND v.show_in_grid = 1
+            ) AS grid_product_ids'))
+            ->addSelect(DB::raw('(
+                SELECT GROUP_CONCAT(DISTINCT CONCAT_WS(":", v.product_id, v.variant_id))
+                FROM trader_product_variants v
+                JOIN trader_products p ON v.product_id = p.product_id
+                JOIN trader_taxa_variants tv ON tv.variant_id = v.variant_id
+                JOIN trader_taxa t ON t.taxon_id = tv.taxon_id
+                JOIN trader_taxonomies tax ON t.taxonomy_id = tax.taxonomy_id
+                WHERE t.taxon_id = trader_taxa.taxon_id
+                  AND p.state IN (' . implode(',', array_map(fn($s) => DB::getPdo()->quote($s->value), ProductState::onlineStates())) . ')
+                    AND v.show_in_grid = 1
+            ) AS grid_variant_ids'))
+            ->addSelect(DB::raw('(
+                SELECT GROUP_CONCAT(DISTINCT tp.product_id)
+                FROM trader_taxa_products tp
+                JOIN trader_taxa t ON tp.taxon_id = t.taxon_id
+                JOIN trader_taxonomies tax ON t.taxonomy_id = tax.taxonomy_id
+                WHERE tp.taxon_id = trader_taxa.taxon_id
+                  AND tax.type <> ' . DB::getPdo()->quote(TaxonomyType::variant_property->value) . '
+            ) AS product_ids'))
+//            ->addSelect(DB::raw('(
+//                SELECT GROUP_CONCAT(DISTINCT p.product_id)
+//                FROM trader_taxa_products tp
+//                JOIN trader_products p ON tp.product_id = p.product_id
+//                JOIN trader_taxa t ON tp.taxon_id = t.taxon_id
+//                JOIN trader_taxonomies tax ON t.taxonomy_id = tax.taxonomy_id
+//                WHERE tp.taxon_id = trader_taxa.taxon_id
+//                  AND p.state IN (' . implode(',', array_map(fn($state) => DB::getPdo()->quote($state->value), ProductState::onlineStates())) . ')
+//                  AND tax.type <> ' . DB::getPdo()->quote(TaxonomyType::variant_property->value) . '
+//            ) AS online_product_ids'))
+//            ->addSelect(DB::raw('(
+//                SELECT GROUP_CONCAT(DISTINCT v.variant_id)
+//                FROM trader_taxa_variants tv
+//                JOIN trader_product_variants v ON tv.variant_id = v.variant_id
+//                JOIN trader_products p ON v.product_id = p.product_id
+//                JOIN trader_taxa t ON tv.taxon_id = t.taxon_id
+//                JOIN trader_taxonomies tax ON t.taxonomy_id = tax.taxonomy_id
+//                WHERE tv.taxon_id = trader_taxa.taxon_id
+//                  AND p.state IN (' . implode(',', array_map(fn($state) => DB::getPdo()->quote($state->value), ProductState::onlineStates())) . ')
+//                  AND tax.type = ' . DB::getPdo()->quote(TaxonomyType::variant_property->value) . '
+//            ) AS online_variant_ids'))
             ->groupBy(static::$taxonTable . '.taxon_id')
             ->orderBy(static::$taxonTable . '.order')
             ->get();

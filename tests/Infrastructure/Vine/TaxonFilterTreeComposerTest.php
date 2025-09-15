@@ -97,7 +97,7 @@ final class TaxonFilterTreeComposerTest extends TestCase
 
             $this->assertEquals([
                 'ccc', 'ddd',
-            ], $composer->getOnlineProductIds(['first']));
+            ], $composer->getGridProductIds(['first']));
 
             $this->assertEquals([
                 'aaa', 'bbb', 'ccc', 'ddd',

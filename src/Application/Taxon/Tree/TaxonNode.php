@@ -30,7 +30,7 @@ interface TaxonNode extends Node
 
     public function getProductIds(): array;
 
-    public function getOnlineProductIds(): array;
+    public function getGridProductIds(): array;
 
     public function getProductCount(array $productIds): int;
 

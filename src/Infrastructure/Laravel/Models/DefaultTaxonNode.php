@@ -25,12 +25,12 @@ class DefaultTaxonNode extends DefaultNode implements TaxonNode
     public readonly int $order; // Make publicly available for sorting via vine
     protected array $data;
     protected array $product_ids;
-    protected array $online_product_ids;
-    protected array $online_variant_ids;
+    protected array $grid_product_ids;
+    protected array $grid_variant_ids;
     protected ?string $parentId;
     protected iterable $images;
 
-    private function __construct(string $id, string $taxonomyId, TaxonState $taxonState, int $order, array $data, array $product_ids, array $online_product_ids, array $online_variant_ids, array $keys, ?string $parentId = null)
+    private function __construct(string $id, string $taxonomyId, TaxonState $taxonState, int $order, array $data, array $product_ids, array $grid_product_ids, array $grid_variant_ids, array $keys, ?string $parentId = null)
     {
         $this->id = $id;
         $this->taxonomyId = $taxonomyId;
@@ -38,8 +38,8 @@ class DefaultTaxonNode extends DefaultNode implements TaxonNode
         $this->order = $order;
         $this->data = $data;
         $this->product_ids = $product_ids;
-        $this->online_product_ids = $online_product_ids;
-        $this->online_variant_ids = $online_variant_ids;
+        $this->grid_product_ids = $grid_product_ids;
+        $this->grid_variant_ids = $grid_variant_ids;
         $this->keys = array_map(fn(TaxonKey $key) => $key, $keys);
         $this->parentId = $parentId;
 
@@ -60,11 +60,24 @@ class DefaultTaxonNode extends DefaultNode implements TaxonNode
             $state['order'],
             $state['data'] ? json_decode($state['data'], true) : [],
             $state['product_ids'] ? array_unique(explode(',', $state['product_ids'])) : [],
-            $state['online_product_ids'] ? array_unique(explode(',', $state['online_product_ids'])) : [],
-            $state['online_variant_ids'] ? array_unique(explode(',', $state['online_variant_ids'])) : [],
+            $state['grid_product_ids'] ? self::decodeProductVariantPairs($state['grid_product_ids']) : [],
+            $state['grid_variant_ids'] ? self::decodeProductVariantPairs($state['grid_variant_ids']) : [],
             $taxonKeys,
             $state['parent_id'],
         );
+    }
+
+    private static function decodeProductVariantPairs(string $encodedPairs): array
+    {
+        $pairs = array_unique(explode(',', $encodedPairs));
+        $result = [];
+
+        foreach ($pairs as $pair) {
+            [$productId, $variantId] = explode(':', $pair);
+            $result[] = ['product_id' => $productId, 'variant_id' => $variantId];
+        }
+
+        return $result;
     }
 
     public function getNodeId($key = null, $default = null): string
@@ -129,14 +142,30 @@ class DefaultTaxonNode extends DefaultNode implements TaxonNode
         return $this->product_ids;
     }
 
-    public function getOnlineProductIds(): array
+    public function getGridProductIds(): array
     {
-        return $this->online_product_ids;
+        return array_unique(array_merge(
+            array_map(fn($ids) => $ids['product_id'], $this->grid_product_ids),
+            array_map(fn($ids) => $ids['product_id'], $this->grid_variant_ids)
+        ));
     }
 
-    public function getOnlineVariantIds(): array
+//    public function getInclusiveOnlineProductIds(): array
+//    {
+//        return array_map(fn($ids) => $ids['product_id'], $this->grid_product_ids);
+//    }
+
+    public function getGridVariantIds(): array
     {
-        return $this->online_variant_ids;
+        return array_unique(array_merge(
+            array_map(fn($ids) => $ids['variant_id'], $this->grid_product_ids),
+            array_map(fn($ids) => $ids['variant_id'], $this->grid_variant_ids)
+        ));
+    }
+
+    public function hasGridProduct(array $productIds): bool
+    {
+        return count(array_intersect($this->getGridProductIds(), $productIds)) > 0;
     }
 
     /**
@@ -146,7 +175,24 @@ class DefaultTaxonNode extends DefaultNode implements TaxonNode
      */
     public function getProductCount(array $productIds): int
     {
-        return count(array_intersect($this->online_product_ids, $productIds));
+        // All products in this taxon including all children and grandchildren etc.
+        $allProductIds = array_unique(
+            array_merge(
+                $this->getGridProductIds(),
+                ...$this->pluckChildNodes('getGridProductIds')
+            )
+        );
+
+        return count(array_intersect($allProductIds, $productIds));
+    }
+
+    /**
+     * Get the count of products that are in this taxon,
+     * not including products in child nodes.
+     */
+    public function getExclusiveProductCount(array $productIds): int
+    {
+        return count(array_intersect($this->grid_product_ids, $productIds));
     }
 
     /**
@@ -155,7 +201,7 @@ class DefaultTaxonNode extends DefaultNode implements TaxonNode
      */
     public function getProductTotal(): int
     {
-        return count($this->online_product_ids);
+        return count($this->grid_product_ids);
     }
 
     public function getBreadCrumbs(): array

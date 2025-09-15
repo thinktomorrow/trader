@@ -91,11 +91,26 @@ class MysqlGridRepository implements GridRepository
     {
         $taxonIdsGroupedByTaxonomy = $already_grouped ? $taxon_ids : $this->flattenedTaxonIds->getGroupedByTaxonomyByIds($taxon_ids);
 
-        $this->builder->where(function ($query) use ($taxonIdsGroupedByTaxonomy) {
-            foreach ($taxonIdsGroupedByTaxonomy as $ids) {
-                $query->orWhereIn(static::$taxonPivotTable . '.taxon_id', array_unique($ids));
-            }
-        });
+        foreach ($taxonIdsGroupedByTaxonomy as $ids) {
+            $this->builder->whereIn(static::$taxonPivotTable . '.taxon_id', array_unique($ids));
+        }
+
+//        $this->builder->where(function ($query) use ($taxonIdsGroupedByTaxonomy) {
+//            foreach ($taxonIdsGroupedByTaxonomy as $ids) {
+//                $query->whereIn(static::$taxonPivotTable . '.taxon_id', array_unique($ids));
+//            }
+//        });
+
+        return $this;
+    }
+
+    public function filterByVariantTaxonIds(array $taxon_ids, bool $already_grouped = false): static
+    {
+        $taxonIdsGroupedByTaxonomy = $already_grouped ? $taxon_ids : $this->flattenedTaxonIds->getGroupedByTaxonomyByIds($taxon_ids);
+
+        foreach ($taxonIdsGroupedByTaxonomy as $ids) {
+            $this->builder->whereIn(static::$taxonVariantPivotTable . '.taxon_id', array_unique($ids));
+        }
 
         return $this;
     }

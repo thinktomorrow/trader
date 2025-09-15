@@ -80,8 +80,17 @@ trait TaxonControllerAssistant
             ->filterByTaxonIds([$taxon->getNodeId()])
             ->getResultingIds();
 
-        return $this->gridRepository
-            ->filterByTaxonIds($this->getActiveTaxa($taxon, $request->input('taxon', []))->pluck('id'))
+        $result = $this->gridRepository;
+
+        if (count($request->input('taxon', [])) > 0) {
+            $result->filterByTaxonIds($this->taxonFilterTreeComposer->getFiltersFromKeys($this->currentLocale->get(), $request->input('taxon', []))->pluck('id'));
+        }
+
+        if (count($request->input('variant_taxon', [])) > 0) {
+            $result->filterByVariantTaxonIds($this->taxonFilterTreeComposer->getFiltersFromKeys($this->currentLocale->get(), $request->input('variant_taxon', []))->pluck('id'));
+        }
+
+        return $result
             ->paginate(12)
             ->getResults();
     }

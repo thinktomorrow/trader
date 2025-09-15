@@ -49,8 +49,7 @@ class VineTaxonFilterTreeComposer implements TaxonFilterTreeComposer
         }
 
         // All the products belonging to the scoped taxa that serve as the basis for the filter
-        $productIds = $this->getOnlineProductIds($scopedTaxonIds);
-        $variantIds = $this->getOnlineVariantIds($scopedTaxonIds);
+        $productIds = $this->getGridProductIds($scopedTaxonIds);
 
         /**
          * The products belonging to the main taxon determine which taxa will
@@ -69,13 +68,12 @@ class VineTaxonFilterTreeComposer implements TaxonFilterTreeComposer
 
             // Only fetch taxa that are related to the given listing of products
             ->shake(function (TaxonNode $node) use ($productIds) {
-                return count(array_intersect($node->getOnlineProductIds(), $productIds)) > 0;
+                return count(array_intersect($node->getGridProductIds(), $productIds)) > 0;
             })
 //            ->shake(fn(TaxonNode $node) => count(array_intersect($node->getOnlineProductIds(), $productIds)) > 0)
 
             // Remove offline taxa
             ->remove(fn(TaxonNode $node) => !$node->showOnline());
-
 
         // b591c1f6-23c6-4f71-bf11-c60df6e36a23 - large
 
@@ -93,10 +91,9 @@ class VineTaxonFilterTreeComposer implements TaxonFilterTreeComposer
                 if ($item['taxonomy']->taxonomyId->get() == $taxon->getTaxonomyId()) {
 
                     // For the taxonomy type variant_property, we want to shake on the online variants instead of products
-                    if (count($variantIds) > 0 && $item['taxonomy']->getType() == TaxonomyType::variant_property) {
-
-                        $shakenTaxa = TaxonTree::fromIterable([$taxon])->shake(function (TaxonNode $node) use ($variantIds) {
-                            return count(array_intersect($node->getOnlineVariantIds(), $variantIds)) > 0;
+                    if ($item['taxonomy']->getType() == TaxonomyType::variant_property) {
+                        $shakenTaxa = TaxonTree::fromIterable([$taxon])->shake(function (TaxonNode $node) use ($productIds) {
+                            return count(array_intersect($node->getGridProductIds(), $productIds)) > 0 && count($node->getGridVariantIds()) > 0;
                         })->all();
 
                         if (count($shakenTaxa) > 0) {
@@ -108,8 +105,6 @@ class VineTaxonFilterTreeComposer implements TaxonFilterTreeComposer
                 }
             }
         }
-
-
         // Sort by order of taxonomy,
         // sort taxa per taxonomy by order
         // Get only for taxonomy that is set to be used as filter
@@ -191,10 +186,18 @@ class VineTaxonFilterTreeComposer implements TaxonFilterTreeComposer
         return $taxonTree;
     }
 
+    public function getFiltersFromKeys(Locale $locale, array $taxonKeys): TaxonTree
+    {
+        $taxonTree = $this->taxonTreeRepository->setLocale($locale)->getTree()
+            ->findMany(fn($node) => in_array($node->getKey(), $taxonKeys));
+
+        return $taxonTree;
+    }
+
     /**
      * Get all online product ids belonging to this taxon filter and all its children
      */
-    public function getOnlineProductIds(array $taxonIds): array
+    public function getGridProductIds(array $taxonIds): array
     {
         return $this->getProductIds($taxonIds, true);
     }
@@ -209,10 +212,10 @@ class VineTaxonFilterTreeComposer implements TaxonFilterTreeComposer
         $productIds = [];
 
         foreach ($nodes as $node) {
-            $productIds = array_merge($productIds, ($onlineOnly ? $node->getOnlineProductIds() : $node->getProductIds()));
+            $productIds = array_merge($productIds, ($onlineOnly ? $node->getGridProductIds() : $node->getProductIds()));
 
             $node->getChildNodes()->flatten()->each(function ($childNode) use (&$productIds, $onlineOnly) {
-                $productIds = array_merge($productIds, ($onlineOnly ? $childNode->getOnlineProductIds() : $childNode->getProductIds()));
+                $productIds = array_merge($productIds, ($onlineOnly ? $childNode->getGridProductIds() : $childNode->getProductIds()));
             });
         }
 
@@ -224,19 +227,16 @@ class VineTaxonFilterTreeComposer implements TaxonFilterTreeComposer
         return $this->getVariantIds($taxonIds, true);
     }
 
-    private function getVariantIds(array $taxonIds, bool $onlineOnly = false): array
+    private function getVariantIds(TaxonTree $taxonTree): array
     {
-        $nodes = $this->taxonTreeRepository->getTree()->findMany(fn(TaxonNode $node) => in_array($node->getId(), $taxonIds));
-
         $variantIds = [];
-
-        foreach ($nodes as $node) {
-            $variantIds = array_merge($variantIds, ($onlineOnly ? $node->getOnlineVariantIds() : $node->getVariantIds()));
-
-            $node->getChildNodes()->flatten()->each(function ($childNode) use (&$variantIds, $onlineOnly) {
-                $variantIds = array_merge($variantIds, ($onlineOnly ? $childNode->getOnlineVariantIds() : $childNode->getVariantIds()));
-            });
-        }
+        dd($taxonTree);
+        $taxonTree->eachRecursive(function (TaxonNode $node) use (&$variantIds) {
+            if (count($node->getGridVariantIds()) > 0) {
+                dd($node->getGridVariantIds());
+            }
+            $variantIds = array_merge($variantIds, $node->getGridVariantIds());
+        });
 
         return array_values(array_unique($variantIds));
     }
