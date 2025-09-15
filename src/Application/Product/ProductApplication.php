@@ -98,13 +98,13 @@ class ProductApplication
         // WRONG, WE WANT TO LIMIT IT FOR ALL THE TAXONOMIES WE ARE UPDATING...
 
         $tree = $this->taxonTreeRepository->getTreeByTaxonomies(
-            array_map(fn($taxonomyId) => $taxonomyId->get(), $updateProductTaxa->getScopedTaxonomyIds())
+            array_map(fn ($taxonomyId) => $taxonomyId->get(), $updateProductTaxa->getScopedTaxonomyIds())
         );
 
-        $allTaxonIdsInSameTaxonomy = $tree->flatten()->pluck(fn($node) => $node->getId());
+        $allTaxonIdsInSameTaxonomy = $tree->flatten()->pluck(fn ($node) => $node->getId());
 
         // Keep all the taxa that do NOT belong to the taxonomy we are updating.
-        $productTaxa = array_filter($product->getProductTaxa(), fn($taxon) => !in_array($taxon->taxonId->get(), $allTaxonIdsInSameTaxonomy));
+        $productTaxa = array_filter($product->getProductTaxa(), fn ($taxon) => ! in_array($taxon->taxonId->get(), $allTaxonIdsInSameTaxonomy));
 
         $newProductTaxa = [...$productTaxa, ...$updateProductTaxa->getProductTaxa()];
 

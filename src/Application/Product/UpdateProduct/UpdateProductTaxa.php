@@ -32,7 +32,7 @@ class UpdateProductTaxa
      */
     public function getScopedTaxonomyIds(): array
     {
-        return array_map(fn($taxonomyId) => TaxonomyId::fromString($taxonomyId), $this->scopedTaxonomyIds);
+        return array_map(fn ($taxonomyId) => TaxonomyId::fromString($taxonomyId), $this->scopedTaxonomyIds);
     }
 
     public function getProductTaxa(): array
@@ -44,6 +44,6 @@ class UpdateProductTaxa
 
     public function getTaxonIds(): array
     {
-        return array_map(fn($taxon_id) => TaxonId::fromString($taxon_id), $this->taxonIds);
+        return array_map(fn ($taxon_id) => TaxonId::fromString($taxon_id), $this->taxonIds);
     }
 }

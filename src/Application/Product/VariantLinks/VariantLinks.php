@@ -26,7 +26,7 @@ class VariantLinks extends ArrayCollection
 
         /** @var VariantLink $item */
         foreach ($this->items as $item) {
-            if (!isset($grouped[$item->getGroupId()])) {
+            if (! isset($grouped[$item->getGroupId()])) {
                 $grouped[$item->getGroupId()] = [];
             }
             $grouped[$item->getGroupId()][] = $item;
