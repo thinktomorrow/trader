@@ -45,9 +45,9 @@ class MysqlTaxonTreeRepository implements TaxonTreeRepository, CategoryRepositor
     public function findTaxonById(string $taxonId): TaxonNode
     {
         /** @var TaxonNode $taxonNode */
-        $taxonNode = $this->getTree()->find(fn(TaxonNode $taxonNode) => $taxonNode->getId() == $taxonId);
+        $taxonNode = $this->getTree()->find(fn (TaxonNode $taxonNode) => $taxonNode->getId() == $taxonId);
 
-        if (!$taxonNode) {
+        if (! $taxonNode) {
             throw new CouldNotFindTaxon('No taxon record found by id ' . $taxonId);
         }
 
@@ -64,9 +64,9 @@ class MysqlTaxonTreeRepository implements TaxonTreeRepository, CategoryRepositor
     public function findTaxonByKey(string $key): TaxonNode
     {
         /** @var TaxonNode $taxonNode */
-        $taxonNode = $this->getTree()->find(fn(TaxonNode $taxonNode) => $taxonNode->getKey() == $key);
+        $taxonNode = $this->getTree()->find(fn (TaxonNode $taxonNode) => $taxonNode->getKey() == $key);
 
-        if (!$taxonNode) {
+        if (! $taxonNode) {
             throw new CouldNotFindTaxon('No taxon record found by key ' . $key);
         }
 
@@ -98,7 +98,7 @@ class MysqlTaxonTreeRepository implements TaxonTreeRepository, CategoryRepositor
 
         $this->trees[$memoizeKey] = TaxonTree::fromIterable($this->getTaxonNodes($taxonomyIds))
             ->sort('order')
-            ->eachRecursive(fn(TaxonNode $node) => $node->setLocale($this->locale));
+            ->eachRecursive(fn (TaxonNode $node) => $node->setLocale($this->locale));
 
         return $this->trees[$memoizeKey];
     }
@@ -128,7 +128,7 @@ class MysqlTaxonTreeRepository implements TaxonTreeRepository, CategoryRepositor
         $taxonNodeClass = $this->container->get(TaxonNode::class);
 
         return TaxonNodes::fromType(
-            $results->map(fn($row) => $taxonNodeClass::fromMappedData((array)$row, $this->extractTaxonKeys((array)$row)))->all()
+            $results->map(fn ($row) => $taxonNodeClass::fromMappedData((array)$row, $this->extractTaxonKeys((array)$row)))->all()
         );
     }
 }

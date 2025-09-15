@@ -60,7 +60,7 @@ class DefaultVariantLink implements VariantLink
 
     public function getUrl(): ?string
     {
-        if (!$this->variant) {
+        if (! $this->variant) {
             return null;
         }
 
@@ -69,7 +69,7 @@ class DefaultVariantLink implements VariantLink
 
     public function isVariantAvailable(): bool
     {
-        if (!$this->variant) {
+        if (! $this->variant) {
             return false;
         }
 
