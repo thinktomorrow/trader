@@ -29,8 +29,8 @@ trait TaxonControllerAssistant
         try {
             $taxonNode = $this->categoryRepository->setLocale($locale)->findTaxonByKey($taxonKey);
 
-            if (! $taxonNode->showOnline()) {
-                throw new CouldNotFindTaxon('Taxon '.$taxonKey.' is offline.');
+            if (!$taxonNode->showOnline()) {
+                throw new CouldNotFindTaxon('Taxon ' . $taxonKey . ' is offline.');
             }
 
             return $taxonNode;
@@ -39,21 +39,21 @@ trait TaxonControllerAssistant
                 throw (new FoundRouteAsRedirect($this->getTaxonUrl($redirect->getLocale(), $redirect->getFrom())))->setRedirect($this->getTaxonUrl($redirect->getLocale(), $redirect->getTo()));
             }
 
-            throw new NotFoundHttpException('No Taxon category found by slug '.implode('/', $taxonKeys));
+            throw new NotFoundHttpException('No Taxon category found by slug ' . implode('/', $taxonKeys));
         }
     }
 
     protected function getTaxonUrl(Locale $locale, string $taxon_key): string
     {
-        return $locale->get().'/'.$taxon_key;
+        return $locale->get() . '/' . $taxon_key;
     }
 
     protected function getProducts(TaxonNode $taxon, Request $request): LengthAwarePaginator
     {
         if ($request->anyFilled('price-from', 'price-to')) {
             $priceRanges = [
-                $request->input('price-from') ? (string) IntegerConverter::convertDecimalToInteger($request->input('price-from')) : null,
-                $request->input('price-to') ? (string) IntegerConverter::convertDecimalToInteger($request->input('price-to')) : null,
+                $request->input('price-from') ? (string)IntegerConverter::convertDecimalToInteger($request->input('price-from')) : null,
+                $request->input('price-to') ? (string)IntegerConverter::convertDecimalToInteger($request->input('price-to')) : null,
             ];
 
             // Sort in ascending order when both prices are filled in.

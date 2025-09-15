@@ -26,10 +26,11 @@ class DefaultTaxonNode extends DefaultNode implements TaxonNode
     protected array $data;
     protected array $product_ids;
     protected array $online_product_ids;
+    protected array $online_variant_ids;
     protected ?string $parentId;
     protected iterable $images;
 
-    private function __construct(string $id, string $taxonomyId, TaxonState $taxonState, int $order, array $data, array $product_ids, array $online_product_ids, array $keys, ?string $parentId = null)
+    private function __construct(string $id, string $taxonomyId, TaxonState $taxonState, int $order, array $data, array $product_ids, array $online_product_ids, array $online_variant_ids, array $keys, ?string $parentId = null)
     {
         $this->id = $id;
         $this->taxonomyId = $taxonomyId;
@@ -38,7 +39,8 @@ class DefaultTaxonNode extends DefaultNode implements TaxonNode
         $this->data = $data;
         $this->product_ids = $product_ids;
         $this->online_product_ids = $online_product_ids;
-        $this->keys = array_map(fn (TaxonKey $key) => $key, $keys);
+        $this->online_variant_ids = $online_variant_ids;
+        $this->keys = array_map(fn(TaxonKey $key) => $key, $keys);
         $this->parentId = $parentId;
 
         // Add node entry data so we can use it for sorting.
@@ -59,6 +61,7 @@ class DefaultTaxonNode extends DefaultNode implements TaxonNode
             $state['data'] ? json_decode($state['data'], true) : [],
             $state['product_ids'] ? array_unique(explode(',', $state['product_ids'])) : [],
             $state['online_product_ids'] ? array_unique(explode(',', $state['online_product_ids'])) : [],
+            $state['online_variant_ids'] ? array_unique(explode(',', $state['online_variant_ids'])) : [],
             $taxonKeys,
             $state['parent_id'],
         );
@@ -86,7 +89,7 @@ class DefaultTaxonNode extends DefaultNode implements TaxonNode
 
     public function getKey(?string $locale = null): ?string
     {
-        if (count($this->keys) < 1 || ! isset($this->keys[0])) {
+        if (count($this->keys) < 1 || !isset($this->keys[0])) {
             return null;
         }
 
@@ -131,6 +134,11 @@ class DefaultTaxonNode extends DefaultNode implements TaxonNode
         return $this->online_product_ids;
     }
 
+    public function getOnlineVariantIds(): array
+    {
+        return $this->online_variant_ids;
+    }
+
     /**
      * Get the count of products that are both in this taxon
      * and in the given array of product IDs. This allows
@@ -164,7 +172,7 @@ class DefaultTaxonNode extends DefaultNode implements TaxonNode
     {
         $label = $this->getLabel($locale);
 
-        if (! $this->isRootNode()) {
+        if (!$this->isRootNode()) {
             $label = array_reduce(array_reverse($this->getBreadCrumbs()), function ($carry, $taxon) use ($withoutRoot, $locale) {
                 if ($taxon->isRootNode()) {
                     return $withoutRoot ? $carry : $taxon->getLabel($locale) . ': ' . $carry;

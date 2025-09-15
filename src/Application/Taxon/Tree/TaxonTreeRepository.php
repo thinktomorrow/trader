@@ -14,5 +14,7 @@ interface TaxonTreeRepository
 
     public function getTreeByTaxonomy(string $taxonomyId): TaxonTree;
 
+    public function getTreeByTaxonomies(array $taxonomyIds): TaxonTree;
+
     public function setLocale(Locale $locale): static;
 }

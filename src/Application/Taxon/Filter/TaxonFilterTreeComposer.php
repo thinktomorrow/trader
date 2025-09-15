@@ -8,7 +8,11 @@ use Thinktomorrow\Trader\Domain\Common\Locale;
 
 interface TaxonFilterTreeComposer
 {
-    public function getAvailableFilters(Locale $locale, array $rootTaxonKeys): TaxonTree;
+    /**
+     * Return an array divided by taxonomy:
+     * ['taxonomy' => <Taxonomy>, 'taxa' => [<TaxonNode>, ...]]
+     */
+    public function getAvailableFilters(Locale $locale, array $scopedTaxonIds): array;
 
     public function getActiveFilters(Locale $locale, array $rootTaxonKeys, array $activeKeys): TaxonTree;
 

@@ -13,6 +13,12 @@ interface TaxonomyRepository
 
     public function findManyByTaxa(array $taxonIds): array;
 
+    /**
+     * Get all taxonomies that are set to be used
+     * as grid filter in the front-end.
+     */
+    public function getForFilter(): array;
+
     public function delete(TaxonomyId $taxonomyId): void;
 
     public function nextReference(): TaxonomyId;

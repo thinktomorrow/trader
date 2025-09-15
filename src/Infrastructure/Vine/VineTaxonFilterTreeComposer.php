@@ -9,6 +9,9 @@ use Thinktomorrow\Trader\Application\Taxon\Tree\TaxonNode;
 use Thinktomorrow\Trader\Application\Taxon\Tree\TaxonTree;
 use Thinktomorrow\Trader\Application\Taxon\Tree\TaxonTreeRepository;
 use Thinktomorrow\Trader\Domain\Common\Locale;
+use Thinktomorrow\Trader\Domain\Model\Taxonomy\Taxonomy;
+use Thinktomorrow\Trader\Domain\Model\Taxonomy\TaxonomyRepository;
+use Thinktomorrow\Trader\Domain\Model\Taxonomy\TaxonomyType;
 use Thinktomorrow\Trader\TraderConfig;
 
 class VineTaxonFilterTreeComposer implements TaxonFilterTreeComposer
@@ -16,11 +19,13 @@ class VineTaxonFilterTreeComposer implements TaxonFilterTreeComposer
     private TaxonTreeRepository $taxonTreeRepository;
 
     private TraderConfig $traderConfig;
+    private TaxonomyRepository $taxonomyRepository;
 
-    public function __construct(TraderConfig $traderConfig, TaxonTreeRepository $taxonTreeRepository)
+    public function __construct(TraderConfig $traderConfig, TaxonTreeRepository $taxonTreeRepository, TaxonomyRepository $taxonomyRepository)
     {
         $this->taxonTreeRepository = $taxonTreeRepository;
         $this->traderConfig = $traderConfig;
+        $this->taxonomyRepository = $taxonomyRepository;
     }
 
     public function getAvailableFiltersExcludingRoots(Locale $locale, array $rootTaxonKeys): TaxonTree
@@ -28,11 +33,91 @@ class VineTaxonFilterTreeComposer implements TaxonFilterTreeComposer
         return $this->getAvailableFilters($locale, $rootTaxonKeys, false);
     }
 
-    public function getAvailableFilters(Locale $locale, array $rootTaxonKeys, bool $keepRootTaxa = true): TaxonTree
+    public function getAvailableFilters(Locale $locale, array $scopedTaxonIds): array
     {
-        /** @var TaxonTree $rootTaxa */
-        $rootTaxa = $this->taxonTreeRepository->setLocale($locale)->getTree()
-            ->findMany(fn (TaxonNode $node) => in_array($node->getKey(), $rootTaxonKeys));
+        // The entire tree
+        $taxonTree = $this->taxonTreeRepository->setLocale($locale)->getTree();
+        $taxonomies = $this->taxonomyRepository->getForFilter();
+
+        // The taxa that are scoped (the main taxa selected by the user)
+        $scopedTaxa = $taxonTree->findMany(fn(TaxonNode $node) => in_array($node->getId(), $scopedTaxonIds));
+        $scopedTaxonIds = array_map(fn(TaxonNode $node) => $node->getId(), $scopedTaxa->all());
+        $scopedAncestorTaxonIds = [];
+
+        foreach ($scopedTaxa as $taxon) {
+            $scopedAncestorTaxonIds = array_merge($scopedAncestorTaxonIds, $taxon->pluckAncestorNodes('id'));
+        }
+
+        // All the products belonging to the scoped taxa that serve as the basis for the filter
+        $productIds = $this->getOnlineProductIds($scopedTaxonIds);
+        $variantIds = $this->getOnlineVariantIds($scopedTaxonIds);
+
+        /**
+         * The products belonging to the main taxon determine which taxa will
+         * be returned as filters. Here we shake out the taxon tree so there
+         * are only taxa left that match one or more of the same products
+         */
+        $taxonTree = $taxonTree
+
+            // TODO: this is only for the taxons that belong to the same taxonomy as the scoped taxa
+
+            // Remove ancestor nodes that are above the given root taxa
+//            ->prune(fn(TaxonNode $node) => !in_array($node->getNodeId(), $scopedAncestorTaxonIds))
+
+            // For the category taxa, only return the taxa that belong to one of the given main taxa
+//            ->shake(fn(TaxonNode $node) => count(array_intersect($scopedTaxonIds, [$node->getNodeId(), ...$node->pluckAncestorNodes('id')])) > 0)
+
+            // Only fetch taxa that are related to the given listing of products
+            ->shake(function (TaxonNode $node) use ($productIds) {
+                return count(array_intersect($node->getOnlineProductIds(), $productIds)) > 0;
+            })
+//            ->shake(fn(TaxonNode $node) => count(array_intersect($node->getOnlineProductIds(), $productIds)) > 0)
+
+            // Remove offline taxa
+            ->remove(fn(TaxonNode $node) => !$node->showOnline());
+
+
+        // b591c1f6-23c6-4f71-bf11-c60df6e36a23 - large
+
+        // get online variants based on scope taxa (and showed in grid)
+        // only show variant property taxonomies if there are online variants matching
+
+        $result = array_map(fn(Taxonomy $taxonomy) => [
+            'taxonomy' => $taxonomy,
+            'taxa' => []
+        ], $taxonomies);
+
+        /** @var TaxonNode $taxon */
+        foreach ($taxonTree->all() as $taxon) {
+            foreach ($result as $i => $item) {
+                if ($item['taxonomy']->taxonomyId->get() == $taxon->getTaxonomyId()) {
+
+                    // For the taxonomy type variant_property, we want to shake on the online variants instead of products
+                    if (count($variantIds) > 0 && $item['taxonomy']->getType() == TaxonomyType::variant_property) {
+
+                        $shakenTaxa = TaxonTree::fromIterable([$taxon])->shake(function (TaxonNode $node) use ($variantIds) {
+                            return count(array_intersect($node->getOnlineVariantIds(), $variantIds)) > 0;
+                        })->all();
+
+                        if (count($shakenTaxa) > 0) {
+                            $result[$i]['taxa'] = array_merge($result[$i]['taxa'], $shakenTaxa);
+                        }
+                    } else {
+                        $result[$i]['taxa'][] = $taxon;
+                    }
+                }
+            }
+        }
+
+
+        // Sort by order of taxonomy,
+        // sort taxa per taxonomy by order
+        // Get only for taxonomy that is set to be used as filter
+        // ... and only if there are products for these taxa
+
+
+//        $rootTaxa = $this->taxonTreeRepository->setLocale($locale)->getTree()
+//            ->findMany(fn(TaxonNode $node) => in_array($node->getKey(), $scopedTaxonIds));
 
         //        /** @var TaxonNode $mainTaxonNode */
         //        $mainTaxonNode = $this->taxonTreeRepository->setLocale($locale)->getTree()->find(fn(TaxonNode $node) => $node->getKey() == $mainTaxonFilterKey);
@@ -42,31 +127,8 @@ class VineTaxonFilterTreeComposer implements TaxonFilterTreeComposer
         //        }
 
         //        $categoryRootId = $this->traderConfig->getMainCategoryTaxonomyId();
-        $rootTaxonIds = array_map(fn ($taxon) => $taxon->getNodeId(), $rootTaxa->all());
-        $rootAncestorTaxonIds = [];
-        foreach ($rootTaxa as $taxon) {
-            $rootAncestorTaxonIds = array_merge($rootAncestorTaxonIds, $taxon->pluckAncestorNodes('id'));
-        }
+//        $rootTaxonIds = array_map(fn($taxon) => $taxon->getNodeId(), $rootTaxa->all());
 
-        $productIds = $this->getOnlineProductIds($rootTaxonIds);
-        /**
-         * The products belonging to the main taxon determine which taxa will
-         * be returned as filters. Here we shake out the taxon tree so there
-         * are only taxa left that match one or more of the same products
-         */
-        $taxonTree = $this->taxonTreeRepository->getTree()
-
-            // Remove ancestor nodes that are above the given root taxa
-            ->prune(fn (TaxonNode $node) => ! in_array($node->getNodeId(), $rootAncestorTaxonIds))
-
-            // For the category taxa, only return the taxa that belong to one of the given main taxa
-            ->shake(fn (TaxonNode $node) => count(array_intersect($rootTaxonIds, [$node->getNodeId(), ...$node->pluckAncestorNodes('id')])) > 0)
-
-            // Only fetch taxa that are related to the given listing of products
-            ->shake(fn (TaxonNode $node) => count(array_intersect($node->getOnlineProductIds(), $productIds)) > 0)
-
-            // Remove offline taxa
-            ->remove(fn (TaxonNode $node) => ! $node->showOnline());
 
         // For a better filter representation, we want to start from the given taxon as the root - and not the 'real' root.
         // Therefor we exclude all ancestors from the given taxon which allows to only show the
@@ -81,14 +143,14 @@ class VineTaxonFilterTreeComposer implements TaxonFilterTreeComposer
         //            $taxonTree = $childrenTree;
         //        }
         //        dd($taxonTree);
-        return $taxonTree;
+        return $result;
     }
 
     public function getActiveFilters(Locale $locale, array $rootTaxonKeys, array $activeKeys): TaxonTree
     {
         /** @var TaxonTree $rootTaxa */
         $rootTaxa = $this->taxonTreeRepository->setLocale($locale)->getTree()
-            ->findMany(fn (TaxonNode $node) => in_array($node->getKey(), $rootTaxonKeys));
+            ->findMany(fn(TaxonNode $node) => in_array($node->getKey(), $rootTaxonKeys));
 
         //        $mainTaxonNode = $this->taxonTreeRepository->setLocale($locale)->getTree()->find(fn($node) => $node->getKey() == $mainTaxonFilterKey);
         //
@@ -102,7 +164,7 @@ class VineTaxonFilterTreeComposer implements TaxonFilterTreeComposer
         /** Used filters from current request */
         if (count($activeKeys) > 0) {
             $selectedTaxa = $this->taxonTreeRepository->getTree()
-                ->findMany(fn ($node) => in_array($node->getKey(), $activeKeys));
+                ->findMany(fn($node) => in_array($node->getKey(), $activeKeys));
 
             // Remove any parents where the child taxon is present in the payload.
             // We want to filter on the more specific child taxon - and not in combination with its parent.
@@ -142,7 +204,7 @@ class VineTaxonFilterTreeComposer implements TaxonFilterTreeComposer
      */
     public function getProductIds(array $taxonIds, bool $onlineOnly = false): array
     {
-        $nodes = $this->taxonTreeRepository->getTree()->findMany(fn (TaxonNode $node) => in_array($node->getId(), $taxonIds));
+        $nodes = $this->taxonTreeRepository->getTree()->findMany(fn(TaxonNode $node) => in_array($node->getId(), $taxonIds));
 
         $productIds = [];
 
@@ -155,5 +217,27 @@ class VineTaxonFilterTreeComposer implements TaxonFilterTreeComposer
         }
 
         return array_values(array_unique($productIds));
+    }
+
+    private function getOnlineVariantIds(array $taxonIds): array
+    {
+        return $this->getVariantIds($taxonIds, true);
+    }
+
+    private function getVariantIds(array $taxonIds, bool $onlineOnly = false): array
+    {
+        $nodes = $this->taxonTreeRepository->getTree()->findMany(fn(TaxonNode $node) => in_array($node->getId(), $taxonIds));
+
+        $variantIds = [];
+
+        foreach ($nodes as $node) {
+            $variantIds = array_merge($variantIds, ($onlineOnly ? $node->getOnlineVariantIds() : $node->getVariantIds()));
+
+            $node->getChildNodes()->flatten()->each(function ($childNode) use (&$variantIds, $onlineOnly) {
+                $variantIds = array_merge($variantIds, ($onlineOnly ? $childNode->getOnlineVariantIds() : $childNode->getVariantIds()));
+            });
+        }
+
+        return array_values(array_unique($variantIds));
     }
 }

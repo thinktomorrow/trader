@@ -7,6 +7,7 @@ use Thinktomorrow\Trader\Application\Product\UpdateProduct\UpdateProductData;
 use Thinktomorrow\Trader\Application\Product\UpdateProduct\UpdateProductPersonalisations;
 use Thinktomorrow\Trader\Application\Product\UpdateProduct\UpdateProductTaxa;
 use Thinktomorrow\Trader\Application\Product\UpdateProduct\UpdateVariantTaxa;
+use Thinktomorrow\Trader\Application\Taxon\Tree\TaxonTreeRepository;
 use Thinktomorrow\Trader\Domain\Common\Event\EventDispatcher;
 use Thinktomorrow\Trader\Domain\Model\Product\Events\ProductDeleted;
 use Thinktomorrow\Trader\Domain\Model\Product\Personalisation\Personalisation;
@@ -24,13 +25,15 @@ class ProductApplication
     private EventDispatcher $eventDispatcher;
     private ProductRepository $productRepository;
     private VariantRepository $variantRepository;
+    private TaxonTreeRepository $taxonTreeRepository;
 
-    public function __construct(TraderConfig $traderConfig, EventDispatcher $eventDispatcher, ProductRepository $productRepository, VariantRepository $variantRepository)
+    public function __construct(TraderConfig $traderConfig, EventDispatcher $eventDispatcher, ProductRepository $productRepository, VariantRepository $variantRepository, TaxonTreeRepository $taxonTreeRepository)
     {
         $this->traderConfig = $traderConfig;
         $this->eventDispatcher = $eventDispatcher;
         $this->productRepository = $productRepository;
         $this->variantRepository = $variantRepository;
+        $this->taxonTreeRepository = $taxonTreeRepository;
     }
 
     public function createProduct(CreateProduct $createProduct): ProductId
@@ -92,7 +95,20 @@ class ProductApplication
     {
         $product = $this->productRepository->find($updateProductTaxa->getProductId());
 
-        $product->updateProductTaxa($updateProductTaxa->getProductTaxa());
+        // WRONG, WE WANT TO LIMIT IT FOR ALL THE TAXONOMIES WE ARE UPDATING...
+
+        $tree = $this->taxonTreeRepository->getTreeByTaxonomies(
+            array_map(fn($taxonomyId) => $taxonomyId->get(), $updateProductTaxa->getScopedTaxonomyIds())
+        );
+
+        $allTaxonIdsInSameTaxonomy = $tree->flatten()->pluck(fn($node) => $node->getId());
+
+        // Keep all the taxa that do NOT belong to the taxonomy we are updating.
+        $productTaxa = array_filter($product->getProductTaxa(), fn($taxon) => !in_array($taxon->taxonId->get(), $allTaxonIdsInSameTaxonomy));
+
+        $newProductTaxa = [...$productTaxa, ...$updateProductTaxa->getProductTaxa()];
+
+        $product->updateProductTaxa($newProductTaxa);
 
         $this->productRepository->save($product);
 
