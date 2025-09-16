@@ -39,18 +39,18 @@ class MysqlVariantPropertyRepository implements VariantPropertyRepository
 
         $rows = DB::select($sql, $bindings);
 
-        return !empty($rows);
+        return ! empty($rows);
     }
 
-//    private function prepareBindings(array $taxonIds, ?string $excludeVariantId = null): array
-//    {
-//        // Duplicate the bindings per group since each group will be set twice.
-//        $bindings = count($taxonIds) > 1 ? array_merge($taxonIds, $taxonIds) : $taxonIds;
-//
-//        $bindings = $excludeVariantId ? array_merge($bindings, [$excludeVariantId]) : $bindings;
-//
-//        return array_values($bindings);
-//    }
+    //    private function prepareBindings(array $taxonIds, ?string $excludeVariantId = null): array
+    //    {
+    //        // Duplicate the bindings per group since each group will be set twice.
+    //        $bindings = count($taxonIds) > 1 ? array_merge($taxonIds, $taxonIds) : $taxonIds;
+    //
+    //        $bindings = $excludeVariantId ? array_merge($bindings, [$excludeVariantId]) : $bindings;
+    //
+    //        return array_values($bindings);
+    //    }
 
     /**
      * @param string $productId
@@ -67,6 +67,7 @@ class MysqlVariantPropertyRepository implements VariantPropertyRepository
         }
 
         $bindings = array_merge($bindings, $taxonIds);
+
         return $bindings;
     }
 }

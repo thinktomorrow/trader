@@ -43,7 +43,7 @@ final class VariantPropertyRepositoryTest extends TestCase
         foreach ($this->repositories() as $repository) {
 
             // Check if combo already exists
-            $taxonIds = array_map(fn($variantTaxonState) => $variantTaxonState['taxon_id'], $variant->getChildEntities()[VariantTaxon::class]);
+            $taxonIds = array_map(fn ($variantTaxonState) => $variantTaxonState['taxon_id'], $variant->getChildEntities()[VariantTaxon::class]);
 
             $this->assertTrue($repository->doesUniqueVariantPropertyCombinationExist($product->productId->get(), $taxonIds));
 
@@ -66,10 +66,10 @@ final class VariantPropertyRepositoryTest extends TestCase
         $variants = $product->getVariants();
         $variantA = $variants[0];
 
-        $taxonIdsA = array_map(fn($variantTaxonState) => $variantTaxonState['taxon_id'], $variantA->getChildEntities()[VariantTaxon::class]);
+        $taxonIdsA = array_map(fn ($variantTaxonState) => $variantTaxonState['taxon_id'], $variantA->getChildEntities()[VariantTaxon::class]);
 
         // Case 1: exists but exclude self => false
-//        $this->assertFalse($repository->doesUniqueVariantPropertyCombinationExist($product->productId->get(), $taxonIdsA, $variantA->variantId->get()));
+        //        $this->assertFalse($repository->doesUniqueVariantPropertyCombinationExist($product->productId->get(), $taxonIdsA, $variantA->variantId->get()));
 
         // Maak een tweede variant met exact dezelfde set
         $product->createVariant($this->createVariantWithVariantProperty('zzz'));

@@ -26,7 +26,7 @@ final class InMemoryTaxonomyRepository implements TaxonomyRepository
 
     public function find(TaxonomyId $taxonomyId): Taxonomy
     {
-        if (!isset(self::$taxonomies[$taxonomyId->get()])) {
+        if (! isset(self::$taxonomies[$taxonomyId->get()])) {
             throw new CouldNotFindTaxonomy('No taxonomy found by id ' . $taxonomyId);
         }
 
@@ -40,20 +40,20 @@ final class InMemoryTaxonomyRepository implements TaxonomyRepository
 
     public function findMany(array $taxonomyIds): array
     {
-        return array_values(array_filter(self::$taxonomies, fn($taxonomy) => in_array($taxonomy->taxonomyId->get(), $taxonomyIds)));
+        return array_values(array_filter(self::$taxonomies, fn ($taxonomy) => in_array($taxonomy->taxonomyId->get(), $taxonomyIds)));
     }
 
     public function findManyByTaxa(array $taxonIds): array
     {
-        $taxa = array_filter(InMemoryTaxonRepository::$taxons, fn($taxon) => in_array($taxon->taxonId->get(), $taxonIds));
-        $taxonomyIds = array_map(fn($taxon) => $taxon->taxonomyId->get(), $taxa);
+        $taxa = array_filter(InMemoryTaxonRepository::$taxons, fn ($taxon) => in_array($taxon->taxonId->get(), $taxonIds));
+        $taxonomyIds = array_map(fn ($taxon) => $taxon->taxonomyId->get(), $taxa);
 
-        return array_values(array_filter(self::$taxonomies, fn($taxonomy) => in_array($taxonomy->taxonomyId->get(), $taxonomyIds)));
+        return array_values(array_filter(self::$taxonomies, fn ($taxonomy) => in_array($taxonomy->taxonomyId->get(), $taxonomyIds)));
     }
 
     public function delete(TaxonomyId $taxonomyId): void
     {
-        if (!isset(self::$taxonomies[$taxonomyId->get()])) {
+        if (! isset(self::$taxonomies[$taxonomyId->get()])) {
             throw new CouldNotFindTaxonomy('No taxonomy found by id ' . $taxonomyId);
         }
 
@@ -78,7 +78,7 @@ final class InMemoryTaxonomyRepository implements TaxonomyRepository
     private function existsByKey(TaxonomyKeyId $taxonKeyId, TaxonomyId $allowedTaxonomyId): bool
     {
         foreach (self::$taxonomies as $taxonomy) {
-            if (!$taxonomy->taxonomyId->equals($allowedTaxonomyId) && $taxonomy->hasTaxonomyKeyId($taxonKeyId)) {
+            if (! $taxonomy->taxonomyId->equals($allowedTaxonomyId) && $taxonomy->hasTaxonomyKeyId($taxonKeyId)) {
                 return true;
             }
         }
