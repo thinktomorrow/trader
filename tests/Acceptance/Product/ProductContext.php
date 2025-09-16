@@ -12,6 +12,7 @@ use Thinktomorrow\Trader\Application\Product\VariantLinks\VariantLink;
 use Thinktomorrow\Trader\Application\Product\VariantLinks\VariantLinksComposer;
 use Thinktomorrow\Trader\Application\Product\VariantProperties\MissingVariants;
 use Thinktomorrow\Trader\Application\Taxon\TaxonApplication;
+use Thinktomorrow\Trader\Application\Taxon\Tree\TaxonNode;
 use Thinktomorrow\Trader\Application\Taxonomy\TaxonomyApplication;
 use Thinktomorrow\Trader\Domain\Model\Product\Events\ProductCreated;
 use Thinktomorrow\Trader\Domain\Model\Product\Events\ProductDataUpdated;
@@ -19,12 +20,14 @@ use Thinktomorrow\Trader\Domain\Model\Product\Events\ProductTaxaUpdated;
 use Thinktomorrow\Trader\Domain\Model\Product\Events\VariantCreated;
 use Thinktomorrow\Trader\Domain\Model\Product\ProductId;
 use Thinktomorrow\Trader\Domain\Model\Product\Variant\VariantId;
+use Thinktomorrow\Trader\Infrastructure\Laravel\Models\DefaultTaxonNode;
 use Thinktomorrow\Trader\Infrastructure\Laravel\Models\DefaultVariantLink;
 use Thinktomorrow\Trader\Infrastructure\Test\EventDispatcherSpy;
 use Thinktomorrow\Trader\Infrastructure\Test\Repositories\InMemoryProductDetailRepository;
 use Thinktomorrow\Trader\Infrastructure\Test\Repositories\InMemoryProductRepository;
 use Thinktomorrow\Trader\Infrastructure\Test\Repositories\InMemoryTaxonomyRepository;
 use Thinktomorrow\Trader\Infrastructure\Test\Repositories\InMemoryTaxonRepository;
+use Thinktomorrow\Trader\Infrastructure\Test\Repositories\InMemoryTaxonTreeRepository;
 use Thinktomorrow\Trader\Infrastructure\Test\Repositories\InMemoryVariantRepository;
 use Thinktomorrow\Trader\Infrastructure\Test\TestContainer;
 use Thinktomorrow\Trader\Infrastructure\Test\TestTraderConfig;
@@ -64,16 +67,21 @@ abstract class ProductContext extends TestCase
             $this->eventDispatcher,
             $this->productRepository = new InMemoryProductRepository(),
             $this->variantRepository = new InMemoryVariantRepository(),
+            new InMemoryTaxonTreeRepository(new TestContainer(), new TestTraderConfig()),
+            new InMemoryTaxonomyRepository(),
         );
 
+        (new TestContainer())->add(TaxonNode::class, DefaultTaxonNode::class);
         (new TestContainer())->add(VariantLink::class, DefaultVariantLink::class);
+
+        $this->productDetailRepository = new InMemoryProductDetailRepository();
 
         $this->productOptionsComposer = new VariantLinksComposer(
             $this->productRepository,
+            $this->productDetailRepository,
             new TestContainer(),
         );
 
-        $this->productDetailRepository = new InMemoryProductDetailRepository();
 
         $this->missingOptionCombinations = new MissingVariants(
             $this->taxonomyRepository,

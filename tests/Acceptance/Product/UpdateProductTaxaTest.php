@@ -14,9 +14,10 @@ class UpdateProductTaxaTest extends ProductContext
 
     public function test_it_can_add_taxa()
     {
-        $productId = $this->createAProduct('50', ['1', '2'], 'sku', ['title' => ['nl' => 'foobar nl']]);
+        $this->createAndSaveTaxonomiesAndTaxa(['ooo'], ['xxx', 'yyy']);
+        $productId = $this->createAProduct('50', [], 'sku', ['title' => ['nl' => 'foobar nl']]);
 
-        $this->productApplication->updateProductTaxa(new UpdateProductTaxa($productId->get(), ['1', '3']));
+        $this->productApplication->updateProductTaxa(new UpdateProductTaxa($productId->get(), ['xxx', 'yyy'], ['ooo']));
 
         $product = $this->productRepository->find($productId);
 
@@ -25,13 +26,44 @@ class UpdateProductTaxaTest extends ProductContext
         $this->assertEquals([
             [
                 'product_id' => $productId->get(),
-                'taxon_id' => '1',
+                'taxon_id' => 'xxx',
                 'data' => json_encode([]),
                 'state' => 'online',
             ],
             [
                 'product_id' => $productId->get(),
-                'taxon_id' => '3',
+                'taxon_id' => 'yyy',
+                'data' => json_encode([]),
+                'state' => 'online',
+            ],
+        ], $product->getChildEntities()[ProductTaxon::class]);
+
+        $this->assertEquals([
+            new ProductTaxaUpdated($productId), // Duplicate because of the InMemoryRepo implementation.
+            new ProductTaxaUpdated($productId),
+        ], $this->eventDispatcher->releaseDispatchedEvents());
+    }
+
+    public function test_it_can_add_taxa_without_taxonomy_scope()
+    {
+        $productId = $this->createAProduct('50', [], 'sku', ['title' => ['nl' => 'foobar nl']]);
+
+        $this->productApplication->updateProductTaxa(new UpdateProductTaxa($productId->get(), ['xxx', 'yyy']));
+
+        $product = $this->productRepository->find($productId);
+
+        $this->assertContainsOnlyInstancesOf(ProductTaxon::class, $product->getProductTaxa());
+        $this->assertCount(2, $product->getChildEntities()[ProductTaxon::class]);
+        $this->assertEquals([
+            [
+                'product_id' => $productId->get(),
+                'taxon_id' => 'xxx',
+                'data' => json_encode([]),
+                'state' => 'online',
+            ],
+            [
+                'product_id' => $productId->get(),
+                'taxon_id' => 'yyy',
                 'data' => json_encode([]),
                 'state' => 'online',
             ],
@@ -47,7 +79,7 @@ class UpdateProductTaxaTest extends ProductContext
     {
         $productId = $this->createAProduct('50', ['1', '2'], 'sku', ['title' => ['nl' => 'foobar nl']]);
 
-        $this->productApplication->updateProductTaxa(new UpdateProductTaxa($productId->get(), []));
+        $this->productApplication->updateProductTaxa(new UpdateProductTaxa($productId->get(), [], []));
 
         $product = $this->productRepository->find($productId);
 
@@ -68,11 +100,35 @@ class UpdateProductTaxaTest extends ProductContext
         $this->assertCount(1, $product->getProductTaxa());
         $this->assertCount(1, $product->getVariants()[0]->getVariantTaxa());
 
-        $this->productApplication->updateProductTaxa(new UpdateProductTaxa($product->productId->get(), []));
+        $this->productApplication->updateProductTaxa(new UpdateProductTaxa($product->productId->get(), [], []));
 
         $product = $this->productRepository->find($product->productId);
 
         $this->assertCount(0, $product->getProductTaxa());
         $this->assertCount(0, $product->getVariants()[0]->getVariantTaxa());
+    }
+
+    public function test_when_updating_taxa_all_existing_taxa_on_variants_remain_intact(): void
+    {
+        $this->createAndSaveTaxonomiesAndTaxa(['ooo'], ['xxx', 'yyy']);
+        $product = $this->createProductWithVariantAndTaxon();
+
+        $this->productRepository->save($product);
+
+        $this->assertCount(1, $product->getProductTaxa());
+        $this->assertCount(1, $product->getVariants()[0]->getVariantTaxa());
+
+        // Add a different taxon, existing variant taxa remain intact.
+        $this->productApplication->updateProductTaxa(new UpdateProductTaxa($product->productId->get(), ['xxx', 'yyy'], []));
+
+        $product = $this->productRepository->find($product->productId);
+
+        $this->assertCount(2, $product->getProductTaxa());
+        $this->assertEquals('xxx', $product->getProductTaxa()[0]->taxonId->get());
+        $this->assertEquals('yyy', $product->getProductTaxa()[1]->taxonId->get());
+
+        // Existing variant taxa remain intact.
+        $this->assertCount(1, $product->getVariants()[0]->getVariantTaxa());
+        $this->assertEquals('xxx', $product->getVariants()[0]->getVariantTaxa()[0]->taxonId->get());
     }
 }

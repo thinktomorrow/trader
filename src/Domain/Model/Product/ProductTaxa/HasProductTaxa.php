@@ -20,7 +20,7 @@ trait HasProductTaxa
     /** @return array<VariantProperty> */
     public function getVariantProperties(): array
     {
-        return array_filter($this->productTaxa, fn (ProductTaxon $property) => $property instanceof VariantProperty);
+        return array_filter($this->productTaxa, fn(ProductTaxon $property) => $property instanceof VariantProperty);
     }
 
     public function updateProductTaxa(array $productTaxa): void
@@ -39,27 +39,31 @@ trait HasProductTaxa
 
     private function cleanupRemovedVariantPropertiesOnVariants(array $oldAvailableVariantProperties, array $newAvailableVariantProperties)
     {
-        $newTaxonIds = array_map(fn (VariantProperty $prop) => $prop->taxonId, $newAvailableVariantProperties);
+        $newTaxonIds = array_map(fn(VariantProperty $prop) => $prop->taxonId, $newAvailableVariantProperties);
 
+        // bepaal welke taxonIds zijn verdwenen
+        $removedTaxonIds = [];
         foreach ($oldAvailableVariantProperties as $oldVariantProperty) {
-            if (in_array($oldVariantProperty->taxonId, $newTaxonIds)) {
-                continue;
+            if (!in_array($oldVariantProperty->taxonId, $newTaxonIds)) {
+                $removedTaxonIds[] = $oldVariantProperty->taxonId;
+            }
+        }
+
+        if (empty($removedTaxonIds)) {
+            return; // niets verwijderd
+        }
+
+        foreach ($this->getVariants() as $variant) {
+            $variantProperties = $variant->getVariantProperties();
+
+            foreach ($variantProperties as $k => $v) {
+                if (in_array($v->taxonId, $removedTaxonIds)) {
+                    unset($variantProperties[$k]);
+                }
             }
 
-            $oldTaxonIds = array_map(fn (VariantProperty $prop) => $prop->taxonId, $oldAvailableVariantProperties);
-
-            foreach ($this->getVariants() as $variant) {
-                $variantProperties = $variant->getVariantProperties();
-
-                foreach ($variantProperties as $k => $v) {
-                    if (in_array($v->taxonId, $oldTaxonIds)) {
-                        unset($variantProperties[$k]);
-                    }
-                }
-
-                if (count($variantProperties) !== count($variant->getVariantProperties())) {
-                    $variant->updateVariantProperties(array_values($variantProperties));
-                }
+            if (count($variantProperties) !== count($variant->getVariantProperties())) {
+                $variant->updateVariantProperties(array_values($variantProperties));
             }
         }
     }
@@ -69,7 +73,7 @@ trait HasProductTaxa
         $uniqueProperties = [];
 
         foreach ($productTaxa as $property) {
-            if (! isset($uniqueProperties[$property->taxonId->get()])) {
+            if (!isset($uniqueProperties[$property->taxonId->get()])) {
                 $uniqueProperties[$property->taxonId->get()] = $property;
             }
         }

@@ -17,6 +17,9 @@ use Thinktomorrow\Trader\Domain\Model\Product\ProductRepository;
 use Thinktomorrow\Trader\Domain\Model\Product\Variant\Variant;
 use Thinktomorrow\Trader\Domain\Model\Product\Variant\VariantId;
 use Thinktomorrow\Trader\Domain\Model\Product\VariantRepository;
+use Thinktomorrow\Trader\Domain\Model\Taxonomy\Taxonomy;
+use Thinktomorrow\Trader\Domain\Model\Taxonomy\TaxonomyRepository;
+use Thinktomorrow\Trader\Domain\Model\Taxonomy\TaxonomyType;
 use Thinktomorrow\Trader\TraderConfig;
 
 class ProductApplication
@@ -26,14 +29,23 @@ class ProductApplication
     private ProductRepository $productRepository;
     private VariantRepository $variantRepository;
     private TaxonTreeRepository $taxonTreeRepository;
+    private TaxonomyRepository $taxonomyRepository;
 
-    public function __construct(TraderConfig $traderConfig, EventDispatcher $eventDispatcher, ProductRepository $productRepository, VariantRepository $variantRepository, TaxonTreeRepository $taxonTreeRepository)
+    public function __construct(
+        TraderConfig        $traderConfig,
+        EventDispatcher     $eventDispatcher,
+        ProductRepository   $productRepository,
+        VariantRepository   $variantRepository,
+        TaxonTreeRepository $taxonTreeRepository,
+        TaxonomyRepository  $taxonomyRepository,
+    )
     {
         $this->traderConfig = $traderConfig;
         $this->eventDispatcher = $eventDispatcher;
         $this->productRepository = $productRepository;
         $this->variantRepository = $variantRepository;
         $this->taxonTreeRepository = $taxonTreeRepository;
+        $this->taxonomyRepository = $taxonomyRepository;
     }
 
     public function createProduct(CreateProduct $createProduct): ProductId
@@ -96,17 +108,36 @@ class ProductApplication
         $product = $this->productRepository->find($updateProductTaxa->getProductId());
 
         // WRONG, WE WANT TO LIMIT IT FOR ALL THE TAXONOMIES WE ARE UPDATING...
+        if (count($updateProductTaxa->getScopedTaxonomyIds())) {
+            $tree = $this->taxonTreeRepository->getTreeByTaxonomies(
+                array_map(fn($taxonomyId) => $taxonomyId->get(), $updateProductTaxa->getScopedTaxonomyIds())
+            );
 
-        $tree = $this->taxonTreeRepository->getTreeByTaxonomies(
-            array_map(fn ($taxonomyId) => $taxonomyId->get(), $updateProductTaxa->getScopedTaxonomyIds())
+            $allTaxonIdsInSameTaxonomy = $tree->flatten()->pluck(fn($node) => $node->getId());
+
+            // Keep all the taxa that do NOT belong to the taxonomy we are updating.
+            $productTaxa = array_filter($product->getProductTaxa(), fn($taxon) => !in_array($taxon->taxonId->get(), $allTaxonIdsInSameTaxonomy));
+
+            $newProductTaxa = [...$productTaxa, ...$updateProductTaxa->getProductTaxa()];
+        } else {
+            $newProductTaxa = $updateProductTaxa->getProductTaxa();
+        }
+
+        $taxonomies = $this->taxonomyRepository->findManyByTaxa(
+            array_map(fn($taxon) => $taxon->taxonId->get(), $newProductTaxa)
         );
 
-        $allTaxonIdsInSameTaxonomy = $tree->flatten()->pluck(fn ($node) => $node->getId());
+        $variantTaxonomies = array_filter($taxonomies, fn(Taxonomy $taxonomy) => $taxonomy->getType() == TaxonomyType::variant_property);
+        $variantTaxonomyIds = array_map(fn(Taxonomy $taxonomy) => $taxonomy->taxonomyId->get(), $variantTaxonomies);
 
-        // Keep all the taxa that do NOT belong to the taxonomy we are updating.
-        $productTaxa = array_filter($product->getProductTaxa(), fn ($taxon) => ! in_array($taxon->taxonId->get(), $allTaxonIdsInSameTaxonomy));
+        // We need to differentiate between standard Product taxa and Variant taxa.
+        foreach ($newProductTaxa as $i => $productTaxon) {
+            $taxonNode = $this->taxonTreeRepository->findTaxonById($productTaxon->taxonId->get());
 
-        $newProductTaxa = [...$productTaxa, ...$updateProductTaxa->getProductTaxa()];
+            if (in_array($taxonNode->getTaxonomyId(), $variantTaxonomyIds)) {
+                $newProductTaxa[$i] = $productTaxon->toVariantProperty();
+            }
+        }
 
         $product->updateProductTaxa($newProductTaxa);
 

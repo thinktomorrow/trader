@@ -58,4 +58,9 @@ abstract class ArrayCollection implements Countable, IteratorAggregate, ArrayAcc
     {
         unset($this->items[$offset]);
     }
+
+    public function toArray(): array
+    {
+        return $this->items;
+    }
 }
