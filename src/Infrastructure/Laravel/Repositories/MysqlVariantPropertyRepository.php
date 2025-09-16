@@ -8,39 +8,65 @@ use Thinktomorrow\Trader\Application\Product\VariantProperties\VariantPropertyRe
 
 class MysqlVariantPropertyRepository implements VariantPropertyRepository
 {
-    public function doesUniqueVariantPropertyCombinationExist(array $taxonIds, ?string $excludeVariantId = null): bool
+    public function doesUniqueVariantPropertyCombinationExist(string $productId, array $taxonIds, ?string $excludeVariantId = null): bool
     {
-        $taxonIdPlaceholders = implode(',', array_fill(0, count($taxonIds), '?'));
-        $bindings = $this->prepareBindings($taxonIds, $excludeVariantId);
+        // No duplicate values
+        $taxonIds = array_values(array_unique($taxonIds));
 
-        if (count($taxonIds) < 2) {
-            $statement = "SELECT A.variant_id, count(distinct A.taxon_id) AS count FROM trader_taxa_variants A WHERE A.taxon_id = $taxonIdPlaceholders";
-            $statement .= ($excludeVariantId ? ' AND A.variant_id <> ?' : '');
-        } else {
-            $statement = "SELECT A.variant_id, count(distinct A.taxon_id) AS count FROM trader_taxa_variants A INNER JOIN trader_taxa_variants B ON A.variant_id = B.variant_id AND A.taxon_id IN ($taxonIdPlaceholders) AND B.taxon_id IN ($taxonIdPlaceholders) AND A.taxon_id <> B.taxon_id";
-            $statement .= ($excludeVariantId ? ' WHERE A.variant_id <> ?' : '');
+        if (empty($taxonIds)) {
+            return false;
         }
 
-        $statement .= ' GROUP BY A.variant_id';
+        $n = count($taxonIds);
+        $inPlaceholders = implode(',', array_fill(0, $n, '?'));
 
-        $result = DB::select($statement, $bindings);
+        $sql = "
+            SELECT v.variant_id AS variant_id
+            FROM trader_product_variants v
+            JOIN trader_taxa_variants t ON t.variant_id = v.variant_id
+            WHERE v.product_id = ?
+            " . ($excludeVariantId ? "AND v.variant_id <> ?\n" : "") . "
+            GROUP BY v.variant_id
+            HAVING
+                -- variant heeft precies n taxa (dus geen extra's)
+                COUNT(DISTINCT t.taxon_id) = {$n}
+                -- en die n taxa vallen exact binnen de opgegeven set
+                AND COUNT(DISTINCT CASE WHEN t.taxon_id IN ($inPlaceholders) THEN t.taxon_id END) = {$n}
+            LIMIT 1
+        ";
 
-        foreach ($result as $row) {
-            if ($row->count === count($taxonIds)) {
-                return true;
-            }
-        }
+        $bindings = $this->composeBindings($productId, $excludeVariantId, $taxonIds);
 
-        return false;
+        $rows = DB::select($sql, $bindings);
+
+        return !empty($rows);
     }
 
-    private function prepareBindings(array $taxonIds, ?string $excludeVariantId = null): array
+//    private function prepareBindings(array $taxonIds, ?string $excludeVariantId = null): array
+//    {
+//        // Duplicate the bindings per group since each group will be set twice.
+//        $bindings = count($taxonIds) > 1 ? array_merge($taxonIds, $taxonIds) : $taxonIds;
+//
+//        $bindings = $excludeVariantId ? array_merge($bindings, [$excludeVariantId]) : $bindings;
+//
+//        return array_values($bindings);
+//    }
+
+    /**
+     * @param string $productId
+     * @param string|null $excludeVariantId
+     * @param array $taxonIds
+     * @return array|string[]
+     */
+    public function composeBindings(string $productId, ?string $excludeVariantId, array $taxonIds): array
     {
-        // Duplicate the bindings per group since each group will be set twice.
-        $bindings = count($taxonIds) > 1 ? array_merge($taxonIds, $taxonIds) : $taxonIds;
+        $bindings = [$productId];
 
-        $bindings = $excludeVariantId ? array_merge($bindings, [$excludeVariantId]) : $bindings;
+        if ($excludeVariantId) {
+            $bindings[] = $excludeVariantId;
+        }
 
-        return array_values($bindings);
+        $bindings = array_merge($bindings, $taxonIds);
+        return $bindings;
     }
 }

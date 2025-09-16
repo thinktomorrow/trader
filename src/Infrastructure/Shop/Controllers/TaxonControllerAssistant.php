@@ -18,7 +18,16 @@ trait TaxonControllerAssistant
 {
     protected ?TaxonTree $activeTaxa = null;
 
-    protected array $totalCategoryProductAndVariantIds = [];
+    /**
+     * Holds the unfiltered product and variant IDs within the grid.
+     *
+     * Represents the "raw" result set after applying only basic filters
+     * such as main category (taxon), without applying additional
+     * filters like attributes, options, or other 'subfilters'.
+     *
+     * @var string[]
+     */
+    protected array $baseProductAndVariantIds = [];
 
     protected function extractTaxonFromSlug(Locale $locale, string $taxonKeys): TaxonNode
     {
@@ -29,7 +38,7 @@ trait TaxonControllerAssistant
         try {
             $taxonNode = $this->categoryRepository->setLocale($locale)->findTaxonByKey($taxonKey);
 
-            if (! $taxonNode->showOnline()) {
+            if (!$taxonNode->showOnline()) {
                 throw new CouldNotFindTaxon('Taxon ' . $taxonKey . ' is offline.');
             }
 
@@ -48,51 +57,61 @@ trait TaxonControllerAssistant
         return $locale->get() . '/' . $taxon_key;
     }
 
-    protected function getProducts(TaxonNode $taxon, Request $request): LengthAwarePaginator
+    protected function getProducts(?TaxonNode $taxon, Request $request): LengthAwarePaginator
     {
+        // Set the base product and variant IDs for the current grid context
+        $this->setBaseProductAndVariantIds($taxon);
+
+        // Filter by price range
         if ($request->anyFilled('price-from', 'price-to')) {
-            $priceRanges = [
-                $request->input('price-from') ? (string)IntegerConverter::convertDecimalToInteger($request->input('price-from')) : null,
-                $request->input('price-to') ? (string)IntegerConverter::convertDecimalToInteger($request->input('price-to')) : null,
-            ];
+            $priceFrom = $request->filled('price-from')
+                ? (string)IntegerConverter::convertDecimalToInteger($request->input('price-from'))
+                : null;
 
-            // Sort in ascending order when both prices are filled in.
-            if (isset($priceRanges[0], $priceRanges[1])) {
-                sort($priceRanges);
+            $priceTo = $request->filled('price-to')
+                ? (string)IntegerConverter::convertDecimalToInteger($request->input('price-to'))
+                : null;
+
+            if ($priceFrom !== null && $priceTo !== null && $priceFrom > $priceTo) {
+                [$priceFrom, $priceTo] = [$priceTo, $priceFrom]; // swap if needed
             }
 
-            $this->gridRepository->filterByPrice($priceRanges[0], $priceRanges[1]);
+            $this->gridRepository->filterByPrice($priceFrom, $priceTo);
         }
 
-        if ($request->filled('sort')) {
-            if ($request->input('sort') === 'priceDesc') {
-                $this->gridRepository->sortByPriceDesc();
-            } elseif ($request->input('sort') === 'priceAsc') {
-                $this->gridRepository->sortByPrice();
-            } elseif ($request->input('sort') === 'labelDesc') {
-                $this->gridRepository->sortByLabelDesc();
-            } elseif ($request->input('sort') === 'labelAsc') {
-                $this->gridRepository->sortByLabel();
-            }
+        // Sorting results
+        $sortMap = [
+            'priceDesc' => 'sortByPriceDesc',
+            'priceAsc' => 'sortByPrice',
+            'labelDesc' => 'sortByLabelDesc',
+            'labelAsc' => 'sortByLabel',
+        ];
+
+        if ($request->filled('sort') && isset($sortMap[$request->input('sort')])) {
+            $this->gridRepository->{$sortMap[$request->input('sort')]}();
         }
 
-        $this->totalCategoryProductAndVariantIds = $this->gridRepository
-            ->filterByTaxonIds([$taxon->getNodeId()])
-            ->getResultingIds();
+        $this->applyTaxonFilter($request->input('taxon', []));
+        $this->applyTaxonFilter($request->input('variant_taxon', []), true);
 
-        $result = $this->gridRepository;
-
-        if (count($request->input('taxon', [])) > 0) {
-            $result->filterByTaxonIds($this->taxonFilterTreeComposer->getFiltersFromKeys($this->currentLocale->get(), $request->input('taxon', []))->pluck('id'));
-        }
-
-        if (count($request->input('variant_taxon', [])) > 0) {
-            $result->filterByVariantTaxonIds($this->taxonFilterTreeComposer->getFiltersFromKeys($this->currentLocale->get(), $request->input('variant_taxon', []))->pluck('id'));
-        }
-
-        return $result
+        return $this->gridRepository
             ->paginate(12)
             ->getResults();
+    }
+
+    protected function applyTaxonFilter(array $keys, bool $isVariant = false): void
+    {
+        if (empty($keys)) {
+            return;
+        }
+
+        $ids = $this->taxonFilterTreeComposer
+            ->getFiltersFromKeys($this->currentLocale->get(), $keys)
+            ->pluck('id');
+
+        $isVariant
+            ? $this->gridRepository->filterByVariantTaxonIds($ids)
+            : $this->gridRepository->filterByTaxonIds($ids);
     }
 
     protected function getActiveTaxa(TaxonNode $taxon, array $taxonKeys)
@@ -102,5 +121,25 @@ trait TaxonControllerAssistant
         }
 
         return $this->activeTaxa = $this->taxonFilterTreeComposer->getActiveFilters($this->currentLocale->get(), [$taxon->getKey()], $taxonKeys);
+    }
+
+    /**
+     * Sets the unfiltered list of product and variant IDs within a grid.
+     *
+     * This represents a "raw" product count: it applies only the optional main
+     * category (taxon), but excludes further filtering like attributes,
+     * options, or other detailed characteristics.
+     *
+     * @param TaxonNode|null $taxon Optional taxon to limit the grid to a specific category.
+     */
+    protected function setBaseProductAndVariantIds(?TaxonNode $taxon): void
+    {
+        $totalResult = $this->gridRepository;
+
+        if ($taxon) {
+            $totalResult->filterByTaxonIds([$taxon->getNodeId()]);
+        }
+
+        $this->baseProductAndVariantIds = $totalResult->getResultingIds();
     }
 }
