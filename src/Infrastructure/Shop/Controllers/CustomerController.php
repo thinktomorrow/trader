@@ -11,6 +11,6 @@ class CustomerController
 
     public function index()
     {
-        return view('shop.customer.index');
+        return view('chief-trader-shop::customer.index');
     }
 }

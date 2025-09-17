@@ -7,11 +7,11 @@ use Illuminate\Foundation\Validation\ValidatesRequests;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
 use Illuminate\Support\Facades\Auth;
-use function redirect;
-use function route;
 use Thinktomorrow\Trader\Domain\Model\Customer\CustomerId;
 use Thinktomorrow\Trader\Domain\Model\Customer\Events\CustomerHasLoggedIn;
 use Thinktomorrow\Trader\Domain\Model\Customer\Events\CustomerHasLoggedOut;
+use function redirect;
+use function route;
 
 class CustomerAuthController extends Controller
 {
@@ -23,7 +23,7 @@ class CustomerAuthController extends Controller
 
     public function showLoginForm()
     {
-        return view('shop.customer.auth.login');
+        return view('chief-trader-shop::customer.auth.login');
     }
 
     public function login(Request $request, ?string $redirectAfterLogin = null)
@@ -53,7 +53,7 @@ class CustomerAuthController extends Controller
     /**
      * Log the admin out of the application.
      *
-     * @param \Illuminate\Http\Request  $request
+     * @param \Illuminate\Http\Request $request
      *
      * @return \Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector
      */

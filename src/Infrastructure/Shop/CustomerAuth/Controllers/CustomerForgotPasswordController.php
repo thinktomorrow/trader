@@ -19,7 +19,7 @@ class CustomerForgotPasswordController extends Controller
 
     public function showLinkRequestForm()
     {
-        return view('shop.customer.auth.password.request-form');
+        return view('chief-trader-shop::customer.auth.password.request-form');
     }
 
     public function broker()
