@@ -194,9 +194,9 @@ class VineTaxonFilterTreeComposer implements TaxonFilterTreeComposer
     public function getFiltersFromKeys(Locale $locale, array $taxonKeys): TaxonTree
     {
         return $this->taxonTreeRepository->setLocale($locale)->getTree()
-            ->remove(fn($node) => !in_array($node->getKey(), $taxonKeys))
+            ->remove(fn ($node) => ! in_array($node->getKey(), $taxonKeys))
             // Only get the grandchild nodes of the given keys
-            ->prune(fn(TaxonNode $node) => $node->isLeafNode());
+            ->prune(fn (TaxonNode $node) => $node->isLeafNode());
     }
 
     /**
