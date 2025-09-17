@@ -101,14 +101,12 @@ class VineTaxonFilterTreeComposer implements TaxonFilterTreeComposer
                         if (count($shakenTaxa) > 0) {
                             $result[$i]['taxa'] = array_merge($result[$i]['taxa'], $shakenTaxa);
                         }
-                    } elseif ($item['taxonomy']->getTaxonomyId() == $mainCategoryTaxonomyId) {
-                        // For a main category taxon page, we only want to show the children of the scoped taxa (if only one is selected)
-                        if (count($scopedTaxonIds) == 1 && in_array($taxon->getId(), $scopedTaxonIds)) {
-                            foreach ($taxon->getChildNodes() as $childTaxon) {
-                                $result[$i]['taxa'][] = $childTaxon;
-                            }
-                        } else {
-                            $result[$i]['taxa'][] = $taxon;
+                    }
+                    // For a main category taxon page, we only want to show the
+                    // children of the scoped taxa (if only one is selected)
+                    elseif ($item['taxonomy']->getTaxonomyId() == $mainCategoryTaxonomyId && count($scopedTaxonIds) == 1 && in_array($taxon->getId(), $scopedTaxonIds)) {
+                        foreach ($taxon->getChildNodes() as $childTaxon) {
+                            $result[$i]['taxa'][] = $childTaxon;
                         }
                     } else {
                         $result[$i]['taxa'][] = $taxon;
@@ -195,10 +193,10 @@ class VineTaxonFilterTreeComposer implements TaxonFilterTreeComposer
 
     public function getFiltersFromKeys(Locale $locale, array $taxonKeys): TaxonTree
     {
-        $taxonTree = $this->taxonTreeRepository->setLocale($locale)->getTree()
-            ->findMany(fn($node) => in_array($node->getKey(), $taxonKeys));
-
-        return $taxonTree;
+        return $this->taxonTreeRepository->setLocale($locale)->getTree()
+            ->remove(fn($node) => !in_array($node->getKey(), $taxonKeys))
+            // Only get the grandchild nodes of the given keys
+            ->prune(fn(TaxonNode $node) => $node->isLeafNode());
     }
 
     /**
