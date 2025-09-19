@@ -10,6 +10,8 @@ class TestTraderConfig implements TraderConfig
 {
     private array $overwrites;
 
+    private static ?string $mainCategoryTaxonomyId = null;
+
     public function __construct(array $overwrites = [])
     {
         $this->overwrites = $overwrites;
@@ -69,7 +71,16 @@ class TestTraderConfig implements TraderConfig
 
     public function getMainCategoryTaxonomyId(): ?string
     {
+        if (self::$mainCategoryTaxonomyId) {
+            return self::$mainCategoryTaxonomyId;
+        }
+
         return $this->overwrites['category_taxonomy_id'] ?? null;
+    }
+
+    public static function setMainCategoryTaxonomyId(string $taxonomyId): void
+    {
+        self::$mainCategoryTaxonomyId = $taxonomyId;
     }
 
     public function getClassMap(): array
@@ -85,5 +96,10 @@ class TestTraderConfig implements TraderConfig
     public function getWebmasterName(): string
     {
         return 'ben';
+    }
+
+    public static function clear(): void
+    {
+        self::$mainCategoryTaxonomyId = null;
     }
 }

@@ -19,7 +19,7 @@ use Thinktomorrow\Trader\Domain\Model\Order\Payment\PaymentId;
 use Thinktomorrow\Trader\Domain\Model\Order\Shipping\ShippingId;
 use Thinktomorrow\Trader\Domain\Model\Order\ShopperId;
 
-final class InMemoryOrderRepository implements OrderRepository, InvoiceRepository
+final class InMemoryOrderRepository implements OrderRepository, InvoiceRepository, InMemoryRepository
 {
     /** @var Order[] */
     public static array $orders = [];
@@ -38,7 +38,7 @@ final class InMemoryOrderRepository implements OrderRepository, InvoiceRepositor
 
     public function find(OrderId $orderId): Order
     {
-        if (! isset(static::$orders[$orderId->get()])) {
+        if (!isset(static::$orders[$orderId->get()])) {
             throw new CouldNotFindOrder('No order found by id ' . $orderId);
         }
 
@@ -49,7 +49,7 @@ final class InMemoryOrderRepository implements OrderRepository, InvoiceRepositor
     {
         $order = $this->find($orderId);
 
-        if (! $order->inCustomerHands()) {
+        if (!$order->inCustomerHands()) {
             throw new OrderAlreadyInMerchantHands('Cannot fetch order for cart. Order is no longer in customer hands and has already the following state: ' . $order->getOrderState()->value);
         }
 
@@ -58,7 +58,7 @@ final class InMemoryOrderRepository implements OrderRepository, InvoiceRepositor
 
     public function delete(OrderId $orderId): void
     {
-        if (! isset(static::$orders[$orderId->get()])) {
+        if (!isset(static::$orders[$orderId->get()])) {
             throw new CouldNotFindOrder('No order found by id ' . $orderId);
         }
 
@@ -82,7 +82,7 @@ final class InMemoryOrderRepository implements OrderRepository, InvoiceRepositor
     public function nextExternalReference(): OrderReference
     {
         return OrderReference::fromString(
-            date('ymdHis') . str_pad((string) mt_rand(1, 999), 3, "0")
+            date('ymdHis') . str_pad((string)mt_rand(1, 999), 3, "0")
         );
     }
 
@@ -132,12 +132,12 @@ final class InMemoryOrderRepository implements OrderRepository, InvoiceRepositor
 
     public function nextLinePersonalisationReference(): LinePersonalisationId
     {
-        return LinePersonalisationId::fromString(''.mt_rand(1, 999));
+        return LinePersonalisationId::fromString('' . mt_rand(1, 999));
     }
 
     public function nextLogEntryReference(): OrderEventId
     {
-        return OrderEventId::fromString('entry_id_'.mt_rand(1, 999));
+        return OrderEventId::fromString('entry_id_' . mt_rand(1, 999));
     }
 
     // For testing purposes only

@@ -14,7 +14,7 @@ interface TaxonFilterTreeComposer
      */
     public function getAvailableFilters(Locale $locale, array $scopedTaxonIds): array;
 
-    public function getActiveFilters(Locale $locale, array $rootTaxonKeys, array $activeKeys): TaxonTree;
+    public function getActiveFilters(Locale $locale, array $scopedTaxonKeys, array $activeTaxonKeys): TaxonTree;
 
     public function getFiltersFromKeys(Locale $locale, array $taxonKeys): TaxonTree;
 

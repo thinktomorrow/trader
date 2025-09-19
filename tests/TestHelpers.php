@@ -113,18 +113,18 @@ trait TestHelpers
             'order_state' => DefaultOrderState::cart_revived,
             'data' => "[]",
         ], $orderValues), [
-            Line::class => array_map(fn (Line $line) => [
+            Line::class => array_map(fn(Line $line) => [
                 ...$line->getMappedData(),
-                Discount::class => array_map(fn (Discount $discount) => $discount->getMappedData(), $line->getDiscounts()),
-                LinePersonalisation::class => array_map(fn (LinePersonalisation $linePersonalisation) => $linePersonalisation->getMappedData(), $line->getPersonalisations()),
+                Discount::class => array_map(fn(Discount $discount) => $discount->getMappedData(), $line->getDiscounts()),
+                LinePersonalisation::class => array_map(fn(LinePersonalisation $linePersonalisation) => $linePersonalisation->getMappedData(), $line->getPersonalisations()),
             ], $lines),
-            Shipping::class => array_map(fn (Shipping $shipping) => [...array_merge($shipping->getMappedData(), ['shipping_state' => $shipping->getShippingState()]), Discount::class => array_map(fn (Discount $discount) => $discount->getMappedData(), $shipping->getDiscounts())], $shippings),
-            Payment::class => array_map(fn (Payment $payment) => [...array_merge($payment->getMappedData(), ['payment_state' => $payment->getPaymentState()]), Discount::class => array_map(fn (Discount $discount) => $discount->getMappedData(), $payment->getDiscounts())], $payments),
+            Shipping::class => array_map(fn(Shipping $shipping) => [...array_merge($shipping->getMappedData(), ['shipping_state' => $shipping->getShippingState()]), Discount::class => array_map(fn(Discount $discount) => $discount->getMappedData(), $shipping->getDiscounts())], $shippings),
+            Payment::class => array_map(fn(Payment $payment) => [...array_merge($payment->getMappedData(), ['payment_state' => $payment->getPaymentState()]), Discount::class => array_map(fn(Discount $discount) => $discount->getMappedData(), $payment->getDiscounts())], $payments),
             ShippingAddress::class => $shippingAddress?->getMappedData(),
             BillingAddress::class => $billingAddress?->getMappedData(),
             Shopper::class => $shopper?->getMappedData(),
-            Discount::class => array_map(fn (Discount $discount) => $discount->getMappedData(), $discounts),
-            OrderEvent::class => array_map(fn (OrderEvent $logEntry) => $logEntry->getMappedData(), $logEntries),
+            Discount::class => array_map(fn(Discount $discount) => $discount->getMappedData(), $discounts),
+            OrderEvent::class => array_map(fn(OrderEvent $logEntry) => $logEntry->getMappedData(), $logEntries),
         ]);
     }
 
@@ -157,8 +157,8 @@ trait TestHelpers
         ], $values), array_merge([
             'order_id' => 'xxx',
         ], $aggregateState), [
-            Discount::class => array_map(fn (Discount $discount) => $discount->getMappedData(), $discounts),
-            LinePersonalisation::class => array_map(fn (LinePersonalisation $linePersonalisation) => $linePersonalisation->getMappedData(), $personalisations),
+            Discount::class => array_map(fn(Discount $discount) => $discount->getMappedData(), $discounts),
+            LinePersonalisation::class => array_map(fn(LinePersonalisation $linePersonalisation) => $linePersonalisation->getMappedData(), $personalisations),
         ]);
     }
 
@@ -176,7 +176,7 @@ trait TestHelpers
         ], $values), array_merge([
             'order_id' => 'xxx',
         ], $aggregateState), [
-            Discount::class => array_map(fn (Discount $discount) => $discount->getMappedData(), $discounts),
+            Discount::class => array_map(fn(Discount $discount) => $discount->getMappedData(), $discounts),
         ]);
     }
 
@@ -193,7 +193,7 @@ trait TestHelpers
         ], $values), array_merge([
             'order_id' => 'xxx',
         ], $aggregateState), [
-            Discount::class => array_map(fn (Discount $discount) => $discount->getMappedData(), $discounts),
+            Discount::class => array_map(fn(Discount $discount) => $discount->getMappedData(), $discounts),
         ]);
     }
 
@@ -402,17 +402,17 @@ trait TestHelpers
         return $customer;
     }
 
-    protected static function createProduct(): Product
+    protected static function createProduct(string $productId = 'xxx'): Product
     {
-        $product = Product::create(ProductId::fromString('xxx'));
+        $product = Product::create(ProductId::fromString($productId));
         $product->updateState(ProductState::online);
 
         return $product;
     }
 
-    protected static function createOfflineProduct(): Product
+    protected static function createOfflineProduct(string $productId = 'xxx'): Product
     {
-        $product = Product::create(ProductId::fromString('xxx'));
+        $product = Product::create(ProductId::fromString($productId));
         $product->updateState(ProductState::offline);
 
         return $product;
@@ -510,23 +510,23 @@ trait TestHelpers
         ];
     }
 
-    protected static function createProductWithVariant(): Product
+    protected static function createProductWithVariant(string $productId = 'xxx'): Product
     {
-        $product = static::createProduct();
+        $product = static::createProduct($productId);
 
         return static::withVariant($product, false);
     }
 
-    protected static function createProductWithVariantAndTaxon(): Product
+    protected static function createProductWithVariantAndTaxon(string $productId = 'xxx'): Product
     {
-        $product = static::createProduct();
+        $product = static::createProduct($productId);
 
         return static::withVariant($product, true);
     }
 
-    protected static function createOfflineProductWithVariant(): Product
+    protected static function createOfflineProductWithVariant(string $productId = 'xxx'): Product
     {
-        $product = static::createOfflineProduct();
+        $product = static::createOfflineProduct($productId);
 
         return static::withVariant($product, false);
     }
@@ -662,7 +662,7 @@ trait TestHelpers
         $this->assertEquals(array_keys($expected), array_keys($actual), 'Keys do not match: ' . $message);
 
         foreach ($expected as $expectedKey => $expectedValue) {
-            if (is_array($expectedValue) && ! is_array($actual[$expectedKey])) {
+            if (is_array($expectedValue) && !is_array($actual[$expectedKey])) {
                 $this->assertEquals($expectedValue, $actual[$expectedKey], $message);
             }
 

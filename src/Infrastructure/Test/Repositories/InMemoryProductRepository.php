@@ -11,28 +11,53 @@ use Thinktomorrow\Trader\Domain\Model\Product\ProductTaxa\ProductTaxon;
 use Thinktomorrow\Trader\Domain\Model\Product\Variant\Variant;
 use Thinktomorrow\Trader\Domain\Model\Taxonomy\TaxonomyType;
 
-final class InMemoryProductRepository implements ProductRepository
+final class InMemoryProductRepository implements ProductRepository, InMemoryRepository
 {
     public static array $products = [];
 
     private string $nextReference = 'xxx-123';
 
+    public static array $productTaxonLookup = [];
+
     public function save(Product $product): void
     {
+        $this->extractVariantProperties($product);
+
         static::$products[$product->productId->get()] = $product;
 
         foreach ($product->getVariants() as $variant) {
-            InMemoryVariantRepository::$variants = array_merge(InMemoryVariantRepository::$variants, [
-                $variant->variantId->get() => $variant,
-            ]);
+            (new InMemoryVariantRepository())->save($variant);
         }
 
-        $this->extractVariantProperties($product);
+        static::$productTaxonLookup[$product->productId->get()] = array_map(fn(ProductTaxon $productTaxon) => $productTaxon->taxonId->get(), $product->getProductTaxa());
+    }
+
+    public static function getProductsFromLookup(string $taxonId): array
+    {
+        return array_keys(array_filter(static::$productTaxonLookup, fn($taxonIds) => in_array($taxonId, $taxonIds)));
+    }
+
+    public static function getGridProductVariantPairsFromLookup(string $taxonId): array
+    {
+        $productIds = array_keys(array_filter(static::$productTaxonLookup, fn($taxonIds) => in_array($taxonId, $taxonIds)));
+
+        $pairs = [];
+
+        // Get all variant ids for these products that are set to be shown in grid
+        foreach ($productIds as $productId) {
+            foreach (InMemoryVariantRepository::$variants as $variant) {
+                if ($variant->productId->get() === $productId && $variant->showsInGrid()) {
+                    $pairs[] = ['product_id' => $productId, 'variant_id' => $variant->variantId->get()];
+                }
+            }
+        }
+
+        return $pairs;
     }
 
     public function find(ProductId $productId): Product
     {
-        if (! isset(static::$products[$productId->get()])) {
+        if (!isset(static::$products[$productId->get()])) {
             throw new CouldNotFindProduct('No product found by id ' . $productId);
         }
 
@@ -41,7 +66,7 @@ final class InMemoryProductRepository implements ProductRepository
 
     public function delete(ProductId $productId): void
     {
-        if (! isset(static::$products[$productId->get()])) {
+        if (!isset(static::$products[$productId->get()])) {
             throw new CouldNotFindProduct('No product found by id ' . $productId);
         }
 
@@ -78,7 +103,7 @@ final class InMemoryProductRepository implements ProductRepository
     //    }
     public function getProductTaxonStatesByProduct(string $productId): array
     {
-        if (! isset(static::$products[$productId])) {
+        if (!isset(static::$products[$productId])) {
             throw new CouldNotFindProduct('No product found by id ' . $productId);
         }
 
@@ -89,9 +114,9 @@ final class InMemoryProductRepository implements ProductRepository
     {
         $taxa = InMemoryTaxonRepository::$taxons;
 
-        $taxa = array_filter($taxa, fn ($taxon) => in_array($taxon->taxonId->get(), $taxonIds));
+        $taxa = array_filter($taxa, fn($taxon) => in_array($taxon->taxonId->get(), $taxonIds));
 
-        return array_map(fn ($taxon) => ProductTaxon::fromMappedData(
+        return array_map(fn($taxon) => ProductTaxon::fromMappedData(
             [
                 'taxon_id' => $taxon->taxonId->get(),
                 'data' => '{}',

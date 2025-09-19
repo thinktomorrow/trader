@@ -17,16 +17,38 @@ use Thinktomorrow\Trader\Domain\Model\Stock\StockItemId;
 use Thinktomorrow\Trader\Domain\Model\Stock\StockItemRepository;
 use Thinktomorrow\Trader\Infrastructure\Laravel\Models\DefaultVariantForCart;
 
-final class InMemoryVariantRepository implements VariantRepository, VariantForCartRepository, StockItemRepository
+final class InMemoryVariantRepository implements VariantRepository, VariantForCartRepository, StockItemRepository, InMemoryRepository
 {
     /** @var Variant[] */
     public static array $variants = [];
     public static array $stockItems = [];
     private static string $nextReference = 'xxx-123';
 
+    public static array $variantTaxonLookup = [];
+
     public function save(Variant $variant): void
     {
         static::$variants[$variant->variantId->get()] = $variant;
+
+        static::$variantTaxonLookup[$variant->variantId->get()] = array_map(fn($taxon) => $taxon->taxonId->get(), $variant->getVariantTaxa());
+    }
+
+    public static function getGridProductVariantPairsFromLookup(string $taxonId): array
+    {
+        $variantIds = array_keys(array_filter(static::$variantTaxonLookup, fn($taxonIds) => in_array($taxonId, $taxonIds)));
+
+        $pairs = [];
+
+        // Get all variant ids for these products that are set to be shown in grid
+        foreach ($variantIds as $variantId) {
+            foreach (InMemoryVariantRepository::$variants as $variant) {
+                if ($variant->variantId->get() === $variantId && $variant->showsInGrid()) {
+                    $pairs[] = ['product_id' => $variant->productId->get(), 'variant_id' => $variant->variantId->get()];
+                }
+            }
+        }
+
+        return $pairs;
     }
 
     /**
@@ -49,7 +71,7 @@ final class InMemoryVariantRepository implements VariantRepository, VariantForCa
 
     public function delete(VariantId $variantId): void
     {
-        if (! isset(static::$variants[$variantId->get()])) {
+        if (!isset(static::$variants[$variantId->get()])) {
             throw new CouldNotFindVariant('No variant found by id ' . $variantId);
         }
 

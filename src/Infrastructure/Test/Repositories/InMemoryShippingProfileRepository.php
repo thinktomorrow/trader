@@ -14,7 +14,7 @@ use Thinktomorrow\Trader\Domain\Model\ShippingProfile\ShippingProfileState;
 use Thinktomorrow\Trader\Domain\Model\ShippingProfile\TariffId;
 use Thinktomorrow\Trader\Infrastructure\Laravel\Models\DefaultShippingProfileForCart;
 
-final class InMemoryShippingProfileRepository implements ShippingProfileRepository, ShippingProfileForCartRepository, ShippingCountryRepository
+final class InMemoryShippingProfileRepository implements ShippingProfileRepository, ShippingProfileForCartRepository, ShippingCountryRepository, InMemoryRepository
 {
     /** @var ShippingProfile[] */
     private static array $shippingProfiles = [];
@@ -29,7 +29,7 @@ final class InMemoryShippingProfileRepository implements ShippingProfileReposito
 
     public function find(ShippingProfileId $shippingProfileId): ShippingProfile
     {
-        if (! isset(static::$shippingProfiles[$shippingProfileId->get()])) {
+        if (!isset(static::$shippingProfiles[$shippingProfileId->get()])) {
             throw new CouldNotFindShippingProfile('No shipping found by id ' . $shippingProfileId);
         }
 
@@ -38,7 +38,7 @@ final class InMemoryShippingProfileRepository implements ShippingProfileReposito
 
     public function delete(ShippingProfileId $shippingProfileId): void
     {
-        if (! isset(static::$shippingProfiles[$shippingProfileId->get()])) {
+        if (!isset(static::$shippingProfiles[$shippingProfileId->get()])) {
             throw new CouldNotFindShippingProfile('No available shipping found by id ' . $shippingProfileId);
         }
 
@@ -89,11 +89,11 @@ final class InMemoryShippingProfileRepository implements ShippingProfileReposito
         $activeProfiles = [];
 
         foreach (static::$shippingProfiles as $shippingProfile) {
-            if ($shippingProfile->getState() == ShippingProfileState::online && (! $countryId || $shippingProfile->hasCountry(CountryId::fromString($countryId)))) {
+            if ($shippingProfile->getState() == ShippingProfileState::online && (!$countryId || $shippingProfile->hasCountry(CountryId::fromString($countryId)))) {
                 $activeProfiles[] = $shippingProfile;
             }
         }
 
-        return array_map(fn ($shippingProfile) => DefaultShippingProfileForCart::fromMappedData($shippingProfile->getMappedData()), $activeProfiles);
+        return array_map(fn($shippingProfile) => DefaultShippingProfileForCart::fromMappedData($shippingProfile->getMappedData()), $activeProfiles);
     }
 }

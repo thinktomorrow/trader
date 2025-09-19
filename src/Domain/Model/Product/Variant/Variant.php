@@ -87,6 +87,11 @@ final class Variant implements ChildAggregate
         $this->show_in_grid = $show_in_grid;
     }
 
+    public function showsInGrid(): bool
+    {
+        return $this->show_in_grid;
+    }
+
     public function getMappedData(): array
     {
         return [
@@ -108,7 +113,7 @@ final class Variant implements ChildAggregate
     {
         return [
             VariantTaxon::class => array_map(
-                fn (VariantTaxon $option) => array_merge($option->getMappedData()),
+                fn(VariantTaxon $option) => array_merge($option->getMappedData()),
                 array_values($this->variantTaxa),
             ),
         ];

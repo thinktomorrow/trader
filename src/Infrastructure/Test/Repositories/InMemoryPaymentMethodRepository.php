@@ -12,7 +12,7 @@ use Thinktomorrow\Trader\Domain\Model\PaymentMethod\PaymentMethodRepository;
 use Thinktomorrow\Trader\Domain\Model\PaymentMethod\PaymentMethodState;
 use Thinktomorrow\Trader\Infrastructure\Laravel\Models\PaymentMethod\DefaultPaymentMethodForCart;
 
-class InMemoryPaymentMethodRepository implements PaymentMethodRepository, PaymentMethodForCartRepository
+class InMemoryPaymentMethodRepository implements PaymentMethodRepository, PaymentMethodForCartRepository, InMemoryRepository
 {
     public static array $paymentMethods = [];
 
@@ -25,7 +25,7 @@ class InMemoryPaymentMethodRepository implements PaymentMethodRepository, Paymen
 
     public function find(PaymentMethodId $paymentMethodId): PaymentMethod
     {
-        if (! isset(static::$paymentMethods[$paymentMethodId->get()])) {
+        if (!isset(static::$paymentMethods[$paymentMethodId->get()])) {
             throw new CouldNotFindPaymentMethod('No payment found by id ' . $paymentMethodId);
         }
 
@@ -34,7 +34,7 @@ class InMemoryPaymentMethodRepository implements PaymentMethodRepository, Paymen
 
     public function delete(PaymentMethodId $paymentMethodId): void
     {
-        if (! isset(static::$paymentMethods[$paymentMethodId->get()])) {
+        if (!isset(static::$paymentMethods[$paymentMethodId->get()])) {
             throw new CouldNotFindPaymentMethod('No available payment found by id ' . $paymentMethodId);
         }
 
@@ -62,11 +62,11 @@ class InMemoryPaymentMethodRepository implements PaymentMethodRepository, Paymen
         $paymentMethods = [];
 
         foreach (static::$paymentMethods as $paymentMethod) {
-            if ($paymentMethod->getState() == PaymentMethodState::online && (! $countryId || $paymentMethod->hasCountry(CountryId::fromString($countryId)))) {
+            if ($paymentMethod->getState() == PaymentMethodState::online && (!$countryId || $paymentMethod->hasCountry(CountryId::fromString($countryId)))) {
                 $paymentMethods[] = $paymentMethod;
             }
         }
 
-        return array_map(fn ($paymentMethod) => DefaultPaymentMethodForCart::fromMappedData($paymentMethod->getMappedData()), $paymentMethods);
+        return array_map(fn($paymentMethod) => DefaultPaymentMethodForCart::fromMappedData($paymentMethod->getMappedData()), $paymentMethods);
     }
 }

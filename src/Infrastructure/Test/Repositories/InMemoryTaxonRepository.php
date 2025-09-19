@@ -9,14 +9,10 @@ use Thinktomorrow\Trader\Domain\Model\Taxon\TaxonId;
 use Thinktomorrow\Trader\Domain\Model\Taxon\TaxonKeyId;
 use Thinktomorrow\Trader\Domain\Model\Taxon\TaxonRepository;
 
-final class InMemoryTaxonRepository implements TaxonRepository
+final class InMemoryTaxonRepository implements TaxonRepository, InMemoryRepository
 {
     /** @var Taxon[] */
     public static array $taxons = [];
-
-    // Lookup of 'connected' product-taxon ids
-    public static array $productIds = [];
-    public static array $onlineProductIds = [];
 
     private string $nextReference = 'ccc-123';
 
@@ -27,7 +23,7 @@ final class InMemoryTaxonRepository implements TaxonRepository
 
     public function find(TaxonId $taxonId): Taxon
     {
-        if (! isset(static::$taxons[$taxonId->get()])) {
+        if (!isset(static::$taxons[$taxonId->get()])) {
             throw new CouldNotFindTaxon('No taxon found by id ' . $taxonId);
         }
 
@@ -73,7 +69,7 @@ final class InMemoryTaxonRepository implements TaxonRepository
 
     public function delete(TaxonId $taxonId): void
     {
-        if (! isset(static::$taxons[$taxonId->get()])) {
+        if (!isset(static::$taxons[$taxonId->get()])) {
             throw new CouldNotFindTaxon('No taxon found by id ' . $taxonId);
         }
 
@@ -88,16 +84,6 @@ final class InMemoryTaxonRepository implements TaxonRepository
     public function setNextReference(string $nextReference): void
     {
         $this->nextReference = $nextReference;
-    }
-
-    public function setProductIds(TaxonId $taxonId, array $productIds): void
-    {
-        static::$productIds[$taxonId->get()] = $productIds;
-    }
-
-    public function setOnlineProductIds(TaxonId $taxonId, array $productIds): void
-    {
-        static::$onlineProductIds[$taxonId->get()] = $productIds;
     }
 
     public function uniqueKeyReference(TaxonKeyId $taxonKeyId, TaxonId $allowedTaxonId): TaxonKeyId
@@ -115,7 +101,7 @@ final class InMemoryTaxonRepository implements TaxonRepository
     private function existsByKey(TaxonKeyId $taxonKeyId, TaxonId $allowedTaxonId): bool
     {
         foreach (static::$taxons as $taxon) {
-            if (! $taxon->taxonId->equals($allowedTaxonId) && $taxon->hasTaxonKeyId($taxonKeyId)) {
+            if (!$taxon->taxonId->equals($allowedTaxonId) && $taxon->hasTaxonKeyId($taxonKeyId)) {
                 return true;
             }
         }
@@ -126,7 +112,5 @@ final class InMemoryTaxonRepository implements TaxonRepository
     public static function clear()
     {
         static::$taxons = [];
-        static::$productIds = [];
-        static::$onlineProductIds = [];
     }
 }

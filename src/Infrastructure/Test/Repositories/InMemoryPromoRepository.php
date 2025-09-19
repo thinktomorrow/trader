@@ -17,7 +17,7 @@ use Thinktomorrow\Trader\Domain\Model\Promo\PromoId;
 use Thinktomorrow\Trader\Domain\Model\Promo\PromoRepository;
 use Thinktomorrow\Trader\Domain\Model\Promo\PromoState;
 
-final class InMemoryPromoRepository implements PromoRepository, OrderPromoRepository
+final class InMemoryPromoRepository implements PromoRepository, OrderPromoRepository, InMemoryRepository
 {
     /** @var Promo[] */
     public static array $promos = [];
@@ -41,7 +41,7 @@ final class InMemoryPromoRepository implements PromoRepository, OrderPromoReposi
 
     public function find(PromoId $promoId): Promo
     {
-        if (! isset(static::$promos[$promoId->get()])) {
+        if (!isset(static::$promos[$promoId->get()])) {
             throw new CouldNotFindPromo('No promo found by id ' . $promoId);
         }
 
@@ -50,7 +50,7 @@ final class InMemoryPromoRepository implements PromoRepository, OrderPromoReposi
 
     public function delete(PromoId $promoId): void
     {
-        if (! isset(static::$promos[$promoId->get()])) {
+        if (!isset(static::$promos[$promoId->get()])) {
             throw new CouldNotFindPromo('No promo found by id ' . $promoId);
         }
 
@@ -108,7 +108,7 @@ final class InMemoryPromoRepository implements PromoRepository, OrderPromoReposi
         $result = [];
 
         foreach (static::$promos as $promo) {
-            if (! in_array($promo->getState(), PromoState::onlineStates())) {
+            if (!in_array($promo->getState(), PromoState::onlineStates())) {
                 continue;
             }
 
@@ -134,11 +134,11 @@ final class InMemoryPromoRepository implements PromoRepository, OrderPromoReposi
         return OrderPromo::fromMappedData(
             $promo->getMappedData(),
             [
-                OrderDiscount::class => array_map(fn (Discount $discount) => $this->orderDiscountFactory->make(
+                OrderDiscount::class => array_map(fn(Discount $discount) => $this->orderDiscountFactory->make(
                     $discount::getMapKey(),
                     $discount->getMappedData(),
                     $promo->getMappedData(),
-                    array_map(fn (Condition $condition) => $condition->getMappedData(), $discount->getConditions())
+                    array_map(fn(Condition $condition) => $condition->getMappedData(), $discount->getConditions())
                 ), $promo->getDiscounts()),
             ]
         );

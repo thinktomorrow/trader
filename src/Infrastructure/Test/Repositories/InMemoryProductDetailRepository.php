@@ -12,7 +12,7 @@ use Thinktomorrow\Trader\Infrastructure\Laravel\Models\DefaultProductDetail;
 use Thinktomorrow\Trader\Infrastructure\Laravel\Models\DefaultProductTaxonItem;
 use Thinktomorrow\Trader\Infrastructure\Laravel\Models\DefaultVariantTaxonItem;
 
-final class InMemoryProductDetailRepository implements ProductDetailRepository
+final class InMemoryProductDetailRepository implements ProductDetailRepository, InMemoryRepository
 {
     public function findProductDetail(VariantId $variantId, bool $allowOffline = false): DefaultProductDetail
     {
@@ -25,7 +25,7 @@ final class InMemoryProductDetailRepository implements ProductDetailRepository
             'stock_data' => json_encode([]),
         ]);
 
-        if (! $allowOffline && ! in_array($product->getState(), ProductState::onlineStates())) {
+        if (!$allowOffline && !in_array($product->getState(), ProductState::onlineStates())) {
             throw new CouldNotFindVariant('No online variant found by id [' . $variantId->get() . ']');
         }
 

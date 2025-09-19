@@ -13,7 +13,7 @@ use Thinktomorrow\Trader\Domain\Common\Locale;
 use Thinktomorrow\Trader\Domain\Model\Taxon\TaxonId;
 use Thinktomorrow\Trader\TraderConfig;
 
-final class InMemoryTaxonTreeRepository implements TaxonTreeRepository, CategoryRepository
+final class InMemoryTaxonTreeRepository implements TaxonTreeRepository, CategoryRepository, InMemoryRepository
 {
     private ContainerInterface $container;
     private Locale $locale;
@@ -36,7 +36,7 @@ final class InMemoryTaxonTreeRepository implements TaxonTreeRepository, Category
     {
         return TaxonTree::fromIterable($this->getTaxonNodes())
             ->sort('order')
-            ->eachRecursive(fn ($node) => $node->setLocale($this->locale));
+            ->eachRecursive(fn($node) => $node->setLocale($this->locale));
     }
 
     public function getTreeByTaxonomies(array $taxonomyIds): TaxonTree
@@ -49,21 +49,21 @@ final class InMemoryTaxonTreeRepository implements TaxonTreeRepository, Category
 
         return TaxonTree::fromIterable(TaxonNodes::fromType($nodes))
             ->sort('order')
-            ->eachRecursive(fn ($node) => $node->setLocale($this->locale));
+            ->eachRecursive(fn($node) => $node->setLocale($this->locale));
     }
 
     public function getTreeByTaxonomy(string $taxonomyId): TaxonTree
     {
         return TaxonTree::fromIterable($this->getTaxonNodes($taxonomyId))
             ->sort('order')
-            ->eachRecursive(fn ($node) => $node->setLocale($this->locale));
+            ->eachRecursive(fn($node) => $node->setLocale($this->locale));
     }
 
     public function findTaxonById(string $taxonId): TaxonNode
     {
-        $taxonNode = $this->getTree()->find(fn (TaxonNode $taxonNode) => $taxonNode->getId() == $taxonId);
+        $taxonNode = $this->getTree()->find(fn(TaxonNode $taxonNode) => $taxonNode->getId() == $taxonId);
 
-        if (! $taxonNode) {
+        if (!$taxonNode) {
             throw new \RuntimeException('No taxon record found by id ' . $taxonId);
         }
 
@@ -72,7 +72,7 @@ final class InMemoryTaxonTreeRepository implements TaxonTreeRepository, Category
 
     public function findTaxonByKey(string $key): TaxonNode
     {
-        return $this->getTree()->find(fn (TaxonNode $taxonNode) => $taxonNode->getKey() == $key);
+        return $this->getTree()->find(fn(TaxonNode $taxonNode) => $taxonNode->getKey() == $key);
     }
 
     private function getTaxonNodes(?string $taxonomyId = null): TaxonNodes
@@ -86,7 +86,6 @@ final class InMemoryTaxonTreeRepository implements TaxonTreeRepository, Category
             if ($taxonomyId && $taxon->taxonomyId->get() !== $taxonomyId) {
                 continue;
             }
-
             $nodes[] = $taxonNodeClass::fromMappedData([
                 'taxon_id' => $taxon->taxonId->get(),
                 'taxonomy_id' => $taxon->taxonomyId->get(),
@@ -94,29 +93,33 @@ final class InMemoryTaxonTreeRepository implements TaxonTreeRepository, Category
                 'data' => json_encode($taxon->getData()),
                 'state' => $taxon->getMappedData()['state'],
                 'order' => $taxon->getMappedData()['order'],
-                'product_ids' => $this->getCommaSeparatedProductIds($taxon->taxonId),
-                'online_product_ids' => $this->getCommaSeparatedOnlineProductIds($taxon->taxonId),
+                'product_ids' => $this->getProductIds($taxon->taxonId),
+                'grid_product_ids' => $this->getGridProductPairs($taxon->taxonId),
+                'grid_variant_ids' => $this->getGridVariantPairs($taxon->taxonId)
             ], $taxon->getTaxonKeys());
         }
 
         return TaxonNodes::fromType($nodes);
     }
 
-    private function getCommaSeparatedProductIds(TaxonId $taxonId): string
+    private function getProductIds(TaxonId $taxonId): string
     {
-        if (! isset(InMemoryTaxonRepository::$productIds[$taxonId->get()])) {
-            return '';
-        }
+        $productIds = InMemoryProductRepository::getProductsFromLookup($taxonId->get());
 
-        return implode(',', InMemoryTaxonRepository::$productIds[$taxonId->get()]);
+        return implode(',', $productIds);
     }
 
-    private function getCommaSeparatedOnlineProductIds(TaxonId $taxonId): string
+    private function getGridProductPairs(TaxonId $taxonId): string
     {
-        if (! isset(InMemoryTaxonRepository::$onlineProductIds[$taxonId->get()])) {
-            return '';
-        }
+        $pairs = InMemoryProductRepository::getGridProductVariantPairsFromLookup($taxonId->get());
 
-        return implode(',', InMemoryTaxonRepository::$onlineProductIds[$taxonId->get()]);
+        return implode(',', array_map(fn($pair) => implode(':', $pair), $pairs));
+    }
+
+    private function getGridVariantPairs(TaxonId $taxonId): string
+    {
+        $pairs = InMemoryVariantRepository::getGridProductVariantPairsFromLookup($taxonId->get());
+
+        return implode(',', array_map(fn($pair) => implode(':', $pair), $pairs));
     }
 }

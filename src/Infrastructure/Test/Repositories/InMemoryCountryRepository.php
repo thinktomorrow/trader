@@ -9,7 +9,7 @@ use Thinktomorrow\Trader\Domain\Model\Country\CountryId;
 use Thinktomorrow\Trader\Domain\Model\Country\CountryRepository;
 use Thinktomorrow\Trader\Domain\Model\Country\Exceptions\CouldNotFindCountry;
 
-class InMemoryCountryRepository implements CountryRepository, BillingCountryRepository
+class InMemoryCountryRepository implements CountryRepository, BillingCountryRepository, InMemoryRepository
 {
     public static array $countries = [];
 
@@ -20,7 +20,7 @@ class InMemoryCountryRepository implements CountryRepository, BillingCountryRepo
 
     public function find(CountryId $countryId): Country
     {
-        if (! isset(static::$countries[$countryId->get()])) {
+        if (!isset(static::$countries[$countryId->get()])) {
             throw new CouldNotFindCountry('No country found by id ' . $countryId->get());
         }
 
@@ -29,7 +29,7 @@ class InMemoryCountryRepository implements CountryRepository, BillingCountryRepo
 
     public function delete(CountryId $countryId): void
     {
-        if (! isset(static::$countries[$countryId->get()])) {
+        if (!isset(static::$countries[$countryId->get()])) {
             throw new CouldNotFindCountry('No available country found by id ' . $countryId->get());
         }
 
@@ -43,7 +43,7 @@ class InMemoryCountryRepository implements CountryRepository, BillingCountryRepo
 
     public function getAvailableBillingCountries(): iterable
     {
-        return array_values(array_map(fn ($country) => \Thinktomorrow\Trader\Application\Country\Country::fromMappedData($country->getMappedData()), static::$countries));
+        return array_values(array_map(fn($country) => \Thinktomorrow\Trader\Application\Country\Country::fromMappedData($country->getMappedData()), static::$countries));
     }
 
     public function findBillingCountry(CountryId $countryId): \Thinktomorrow\Trader\Application\Country\Country
