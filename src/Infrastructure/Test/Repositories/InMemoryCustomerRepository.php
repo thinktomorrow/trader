@@ -30,7 +30,7 @@ final class InMemoryCustomerRepository implements CustomerRepository, CustomerRe
 
     public function find(CustomerId $customerId): Customer
     {
-        if (!isset(static::$customers[$customerId->get()])) {
+        if (! isset(static::$customers[$customerId->get()])) {
             throw new CouldNotFindCustomer('No customer found by id ' . $customerId);
         }
 
@@ -67,7 +67,7 @@ final class InMemoryCustomerRepository implements CustomerRepository, CustomerRe
 
     public function delete(CustomerId $customerId): void
     {
-        if (!isset(static::$customers[$customerId->get()])) {
+        if (! isset(static::$customers[$customerId->get()])) {
             throw new CouldNotFindCustomer('No customer found by id ' . $customerId);
         }
 

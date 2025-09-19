@@ -30,13 +30,13 @@ final class InMemoryCartRepository implements CartRepository, InMemoryRepository
 {
     public function findCart(OrderId $orderId): Cart
     {
-        if (!isset(InMemoryOrderRepository::$orders[$orderId->get()])) {
+        if (! isset(InMemoryOrderRepository::$orders[$orderId->get()])) {
             throw new CouldNotFindOrder('No order found by id ' . $orderId);
         }
 
         $order = InMemoryOrderRepository::$orders[$orderId->get()];
 
-        if (!$order->inCustomerHands()) {
+        if (! $order->inCustomerHands()) {
             throw new OrderAlreadyInMerchantHands('Cannot fetch cart. Order is no longer in customer hands and has already the following state: ' . $order->getOrderState()->value);
         }
 
@@ -49,7 +49,7 @@ final class InMemoryCartRepository implements CartRepository, InMemoryRepository
             'paymentCost' => $order->getPaymentCost(),
         ]);
 
-        $lines = array_map(fn($line) => DefaultCartLine::fromMappedData(
+        $lines = array_map(fn ($line) => DefaultCartLine::fromMappedData(
             array_merge($line->getMappedData(), [
                 'total' => $line->getTotal(),
                 'taxTotal' => $line->getTaxTotal(),
@@ -57,11 +57,11 @@ final class InMemoryCartRepository implements CartRepository, InMemoryRepository
                 'linePrice' => $line->getLinePrice(),
             ]),
             $orderState,
-            array_map(fn(Discount $discount) => DefaultCartDiscount::fromMappedData(array_merge($discount->getMappedData(), [
+            array_map(fn (Discount $discount) => DefaultCartDiscount::fromMappedData(array_merge($discount->getMappedData(), [
                 'total' => $discount->getTotal(),
                 'percentage' => $discount->getPercentage($line->getSubTotal()),
             ]), $orderState), $line->getDiscounts()),
-            array_map(fn(LinePersonalisation $linePersonalisation) => DefaultCartLinePersonalisation::fromMappedData(array_merge($linePersonalisation->getMappedData(), [
+            array_map(fn (LinePersonalisation $linePersonalisation) => DefaultCartLinePersonalisation::fromMappedData(array_merge($linePersonalisation->getMappedData(), [
                 //
             ]), $line->getMappedData()), $line->getPersonalisations())
         ), $order->getLines());
@@ -76,25 +76,25 @@ final class InMemoryCartRepository implements CartRepository, InMemoryRepository
             $orderState
         ) : null;
 
-        $shippings = array_map(fn($shipping) => DefaultCartShipping::fromMappedData(
+        $shippings = array_map(fn ($shipping) => DefaultCartShipping::fromMappedData(
             array_merge($shipping->getMappedData(), [
                 'shipping_state' => $shipping->getShippingState(),
                 'cost' => $shipping->getShippingCost(),
             ]),
             $orderState,
-            array_map(fn(Discount $discount) => DefaultCartDiscount::fromMappedData(array_merge($discount->getMappedData(), [
+            array_map(fn (Discount $discount) => DefaultCartDiscount::fromMappedData(array_merge($discount->getMappedData(), [
                 'total' => $discount->getTotal(),
                 'percentage' => $discount->getPercentage($shipping->getShippingCost()),
             ]), $orderState), $shipping->getDiscounts())// TODO: cart shipping discounts
         ), $order->getShippings());
 
-        $payments = array_map(fn($payment) => DefaultCartPayment::fromMappedData(
+        $payments = array_map(fn ($payment) => DefaultCartPayment::fromMappedData(
             array_merge($payment->getMappedData(), [
                 'payment_state' => $payment->getPaymentState(),
                 'cost' => $payment->getPaymentCost(),
             ]),
             $orderState,
-            array_map(fn(Discount $discount) => DefaultCartDiscount::fromMappedData(array_merge($discount->getMappedData(), [
+            array_map(fn (Discount $discount) => DefaultCartDiscount::fromMappedData(array_merge($discount->getMappedData(), [
                 'total' => $discount->getTotal(),
                 'percentage' => $discount->getPercentage($payment->getPaymentCost()),
             ]), $orderState), $payment->getDiscounts())// TODO: cart payment discounts
@@ -115,7 +115,7 @@ final class InMemoryCartRepository implements CartRepository, InMemoryRepository
                 CartPayment::class => count($payments) ? reset($payments) : null, // In the cart we expect one payment
                 CartShopper::class => $shopper,
             ],
-            array_map(fn(Discount $discount) => DefaultCartDiscount::fromMappedData(array_merge($discount->getMappedData(), [
+            array_map(fn (Discount $discount) => DefaultCartDiscount::fromMappedData(array_merge($discount->getMappedData(), [
                 'total' => $discount->getTotal(),
                 'percentage' => $discount->getPercentage($order->getSubTotal()),
             ]), $orderState), $order->getDiscounts()), // TODO: cart discounts

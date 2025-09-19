@@ -29,17 +29,17 @@ final class InMemoryProductRepository implements ProductRepository, InMemoryRepo
             (new InMemoryVariantRepository())->save($variant);
         }
 
-        static::$productTaxonLookup[$product->productId->get()] = array_map(fn(ProductTaxon $productTaxon) => $productTaxon->taxonId->get(), $product->getProductTaxa());
+        static::$productTaxonLookup[$product->productId->get()] = array_map(fn (ProductTaxon $productTaxon) => $productTaxon->taxonId->get(), $product->getProductTaxa());
     }
 
     public static function getProductsFromLookup(string $taxonId): array
     {
-        return array_keys(array_filter(static::$productTaxonLookup, fn($taxonIds) => in_array($taxonId, $taxonIds)));
+        return array_keys(array_filter(static::$productTaxonLookup, fn ($taxonIds) => in_array($taxonId, $taxonIds)));
     }
 
     public static function getGridProductVariantPairsFromLookup(string $taxonId): array
     {
-        $productIds = array_keys(array_filter(static::$productTaxonLookup, fn($taxonIds) => in_array($taxonId, $taxonIds)));
+        $productIds = array_keys(array_filter(static::$productTaxonLookup, fn ($taxonIds) => in_array($taxonId, $taxonIds)));
 
         $pairs = [];
 
@@ -57,7 +57,7 @@ final class InMemoryProductRepository implements ProductRepository, InMemoryRepo
 
     public function find(ProductId $productId): Product
     {
-        if (!isset(static::$products[$productId->get()])) {
+        if (! isset(static::$products[$productId->get()])) {
             throw new CouldNotFindProduct('No product found by id ' . $productId);
         }
 
@@ -66,7 +66,7 @@ final class InMemoryProductRepository implements ProductRepository, InMemoryRepo
 
     public function delete(ProductId $productId): void
     {
-        if (!isset(static::$products[$productId->get()])) {
+        if (! isset(static::$products[$productId->get()])) {
             throw new CouldNotFindProduct('No product found by id ' . $productId);
         }
 
@@ -103,7 +103,7 @@ final class InMemoryProductRepository implements ProductRepository, InMemoryRepo
     //    }
     public function getProductTaxonStatesByProduct(string $productId): array
     {
-        if (!isset(static::$products[$productId])) {
+        if (! isset(static::$products[$productId])) {
             throw new CouldNotFindProduct('No product found by id ' . $productId);
         }
 
@@ -114,9 +114,9 @@ final class InMemoryProductRepository implements ProductRepository, InMemoryRepo
     {
         $taxa = InMemoryTaxonRepository::$taxons;
 
-        $taxa = array_filter($taxa, fn($taxon) => in_array($taxon->taxonId->get(), $taxonIds));
+        $taxa = array_filter($taxa, fn ($taxon) => in_array($taxon->taxonId->get(), $taxonIds));
 
-        return array_map(fn($taxon) => ProductTaxon::fromMappedData(
+        return array_map(fn ($taxon) => ProductTaxon::fromMappedData(
             [
                 'taxon_id' => $taxon->taxonId->get(),
                 'data' => '{}',

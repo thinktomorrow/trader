@@ -46,8 +46,8 @@ final class TaxonTreeWithProductCountRepositoryTest extends TestCase
             $repository->save($product);
 
             // Hardcoded in memory repository to simulate product-taxons relation
-//            (new InMemoryTaxonRepository())->setProductLookupIds(TaxonId::fromString('xxx'), [$product->productId->get()]);
-//            (new InMemoryTaxonRepository())->setGridProductAndVariantPairsOfProductLookup(TaxonId::fromString('xxx'), [$product->productId->get()]);
+            //            (new InMemoryTaxonRepository())->setProductLookupIds(TaxonId::fromString('xxx'), [$product->productId->get()]);
+            //            (new InMemoryTaxonRepository())->setGridProductAndVariantPairsOfProductLookup(TaxonId::fromString('xxx'), [$product->productId->get()]);
 
             $taxonNode = $this->taxonTreeRepositories()[$i]->findTaxonById('xxx');
 

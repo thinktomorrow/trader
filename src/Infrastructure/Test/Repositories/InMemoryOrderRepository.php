@@ -38,7 +38,7 @@ final class InMemoryOrderRepository implements OrderRepository, InvoiceRepositor
 
     public function find(OrderId $orderId): Order
     {
-        if (!isset(static::$orders[$orderId->get()])) {
+        if (! isset(static::$orders[$orderId->get()])) {
             throw new CouldNotFindOrder('No order found by id ' . $orderId);
         }
 
@@ -49,7 +49,7 @@ final class InMemoryOrderRepository implements OrderRepository, InvoiceRepositor
     {
         $order = $this->find($orderId);
 
-        if (!$order->inCustomerHands()) {
+        if (! $order->inCustomerHands()) {
             throw new OrderAlreadyInMerchantHands('Cannot fetch order for cart. Order is no longer in customer hands and has already the following state: ' . $order->getOrderState()->value);
         }
 
@@ -58,7 +58,7 @@ final class InMemoryOrderRepository implements OrderRepository, InvoiceRepositor
 
     public function delete(OrderId $orderId): void
     {
-        if (!isset(static::$orders[$orderId->get()])) {
+        if (! isset(static::$orders[$orderId->get()])) {
             throw new CouldNotFindOrder('No order found by id ' . $orderId);
         }
 
