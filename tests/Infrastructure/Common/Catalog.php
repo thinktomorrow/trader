@@ -216,7 +216,7 @@ class Catalog
     public function addPersonalisationToProduct(Product $product, Personalisation $personalisation): Product
     {
         $product->updatePersonalisations([
-            $personalisation
+            $personalisation,
         ]);
 
         return $product;
