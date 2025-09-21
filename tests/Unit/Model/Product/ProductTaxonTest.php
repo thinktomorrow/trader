@@ -51,4 +51,13 @@ class ProductTaxonTest extends TestCase
 
         $this->assertEquals([$variantProperty], $product->getVariantProperties());
     }
+
+    public function test_it_rejects_invalid_product_taxa(): void
+    {
+        $product = $this->createProduct();
+
+        $this->expectException(\InvalidArgumentException::class);
+
+        $product->updateProductTaxa([new \stdClass()]);
+    }
 }
