@@ -3,8 +3,8 @@ declare(strict_types=1);
 
 namespace Tests\Infrastructure\Vine;
 
-use Tests\Infrastructure\Common\Catalog;
 use Tests\Infrastructure\TestCase;
+use Tests\Support\Catalog;
 use Thinktomorrow\Trader\Domain\Common\Locale;
 use Thinktomorrow\Trader\Domain\Model\Taxon\TaxonState;
 use Thinktomorrow\Trader\Domain\Model\Taxonomy\TaxonomyState;

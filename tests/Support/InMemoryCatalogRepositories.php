@@ -1,8 +1,7 @@
 <?php
 
-namespace Tests\Infrastructure\Common;
+namespace Tests\Support;
 
-use Psr\Container\ContainerInterface;
 use Thinktomorrow\Trader\Application\Product\Grid\FlattenedTaxonIds;
 use Thinktomorrow\Trader\Application\Taxon\Queries\TaxaSelectOptions;
 use Thinktomorrow\Trader\Application\Taxon\Queries\TaxonFilters;
@@ -10,44 +9,56 @@ use Thinktomorrow\Trader\Application\Taxon\Tree\TaxonTreeRepository;
 use Thinktomorrow\Trader\Domain\Model\Product\ProductRepository;
 use Thinktomorrow\Trader\Domain\Model\Taxon\TaxonRepository;
 use Thinktomorrow\Trader\Domain\Model\Taxonomy\TaxonomyRepository;
-use Thinktomorrow\Trader\Infrastructure\Laravel\Repositories\MysqlProductRepository;
-use Thinktomorrow\Trader\Infrastructure\Laravel\Repositories\MysqlTaxonomyRepository;
-use Thinktomorrow\Trader\Infrastructure\Laravel\Repositories\MysqlTaxonRepository;
-use Thinktomorrow\Trader\Infrastructure\Laravel\Repositories\MysqlTaxonTreeRepository;
-use Thinktomorrow\Trader\Infrastructure\Laravel\Repositories\MysqlVariantRepository;
+use Thinktomorrow\Trader\Infrastructure\Test\Repositories\InMemoryCountryRepository;
+use Thinktomorrow\Trader\Infrastructure\Test\Repositories\InMemoryOrderRepository;
+use Thinktomorrow\Trader\Infrastructure\Test\Repositories\InMemoryProductRepository;
+use Thinktomorrow\Trader\Infrastructure\Test\Repositories\InMemoryPromoRepository;
+use Thinktomorrow\Trader\Infrastructure\Test\Repositories\InMemoryTaxonomyRepository;
+use Thinktomorrow\Trader\Infrastructure\Test\Repositories\InMemoryTaxonRepository;
+use Thinktomorrow\Trader\Infrastructure\Test\Repositories\InMemoryTaxonTreeRepository;
+use Thinktomorrow\Trader\Infrastructure\Test\Repositories\InMemoryVariantRepository;
+use Thinktomorrow\Trader\Infrastructure\Test\Repositories\InMemoryVatRateRepository;
 use Thinktomorrow\Trader\Infrastructure\Test\TestContainer;
 use Thinktomorrow\Trader\Infrastructure\Test\TestTraderConfig;
 use Thinktomorrow\Trader\Infrastructure\Vine\VineFlattenedTaxonIds;
 use Thinktomorrow\Trader\Infrastructure\Vine\VineTaxaSelectOptions;
 use Thinktomorrow\Trader\Infrastructure\Vine\VineTaxonFilters;
 
-class MysqlCatalogRepositories implements CatalogRepositories
+class InMemoryCatalogRepositories implements CatalogRepositories
 {
-    private ContainerInterface $container;
-
-    public function __construct(ContainerInterface $container)
+    public static function clear(): void
     {
-        $this->container = $container;
+        InMemoryTaxonomyRepository::clear();
+        InMemoryTaxonRepository::clear();
+        InMemoryProductRepository::clear();
+
+        InMemoryOrderRepository::clear();
+        InMemoryProductRepository::clear();
+        InMemoryVariantRepository::clear();
+        InMemoryTaxonRepository::clear();
+        InMemoryPromoRepository::clear();
+        InMemoryCountryRepository::clear();
+        InMemoryVatRateRepository::clear();
     }
 
     public function taxonomyRepository(): TaxonomyRepository
     {
-        return new MysqlTaxonomyRepository($this->container);
+        return new InMemoryTaxonomyRepository();
     }
 
     public function taxonRepository(): TaxonRepository
     {
-        return new MysqlTaxonRepository();
+        return new InMemoryTaxonRepository();
     }
 
     public function taxonTreeRepository(): TaxonTreeRepository
     {
-        return new MysqlTaxonTreeRepository(new TestContainer(), new TestTraderConfig());
+        return new InMemoryTaxonTreeRepository(new TestContainer(), new TestTraderConfig());
     }
 
     public function productRepository(): ProductRepository
     {
-        return new MysqlProductRepository(new MysqlVariantRepository(new TestContainer()));
+        return new InMemoryProductRepository();
     }
 
     public function taxonFilters(): TaxonFilters

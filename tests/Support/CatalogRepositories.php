@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\Infrastructure\Common;
+namespace Tests\Support;
 
 use Thinktomorrow\Trader\Application\Product\Grid\FlattenedTaxonIds;
 use Thinktomorrow\Trader\Application\Taxon\Queries\TaxaSelectOptions;

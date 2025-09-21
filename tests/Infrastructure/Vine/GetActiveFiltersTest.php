@@ -3,8 +3,8 @@ declare(strict_types=1);
 
 namespace Tests\Infrastructure\Vine;
 
-use Tests\Infrastructure\Common\Catalog;
 use Tests\Infrastructure\TestCase;
+use Tests\Support\Catalog;
 use Thinktomorrow\Trader\Domain\Common\Locale;
 
 final class GetActiveFiltersTest extends TestCase

@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\Infrastructure\Common;
+namespace Tests\Support;
 
 use Thinktomorrow\Trader\Application\Product\ProductDetail\ProductDetail;
 use Thinktomorrow\Trader\Application\Product\Taxa\ProductTaxonItem;

@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\Infrastructure\Common;
+namespace Tests\Support;
 
 use Thinktomorrow\Trader\Application\Cart\Read\Cart;
 use Thinktomorrow\Trader\Application\Cart\Read\CartBillingAddress;

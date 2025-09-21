@@ -5,8 +5,8 @@ namespace Tests\Infrastructure;
 
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Money\Money;
-use Tests\Infrastructure\Common\Catalog;
-use Tests\Infrastructure\Common\Shop;
+use Tests\Support\Catalog;
+use Tests\Support\Shop;
 use Tests\TestHelpers;
 use Thinktomorrow\Trader\Domain\Common\Email;
 use Thinktomorrow\Trader\Domain\Common\Locale;
