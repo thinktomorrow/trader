@@ -59,16 +59,16 @@ class VineFlattenedTaxonIds implements FlattenedTaxonIds
 
         foreach ($taxonKeys as $key) {
             $node = ($passedAsKeys)
-                ? $this->taxonTreeRepository->getTree()->find(fn(TaxonNode $node) => $node->getKey() == $key)
-                : $this->taxonTreeRepository->getTree()->find(fn(TaxonNode $node) => $node->getNodeId() == $key);
+                ? $this->taxonTreeRepository->getTree()->find(fn (TaxonNode $node) => $node->getKey() == $key)
+                : $this->taxonTreeRepository->getTree()->find(fn (TaxonNode $node) => $node->getNodeId() == $key);
 
-            if (!$node) {
+            if (! $node) {
                 continue;
             }
 
             $taxonomyId = $node->getTaxonomyId();
 
-            if (!isset($taxonIds[$taxonomyId])) {
+            if (! isset($taxonIds[$taxonomyId])) {
                 $taxonIds[$taxonomyId] = [];
             }
 
