@@ -21,4 +21,13 @@ class EmailTest extends TestCase
 
         Email::fromString('xxx');
     }
+
+    public function test_it_can_compare_email_values_for_equality()
+    {
+        $email = Email::fromString('ben@example.com');
+
+        $this->assertTrue($email->equals(Email::fromString('ben@example.com')));
+        $this->assertFalse($email->equals(Email::fromString('john@example.com')));
+        $this->assertFalse($email->equals(new \stdClass()));
+    }
 }

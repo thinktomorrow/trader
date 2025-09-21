@@ -84,4 +84,13 @@ class ProductPersonalisationTest extends TestCase
 
         $this->assertCount(1, $product->getPersonalisations());
     }
+
+    public function test_it_rejects_invalid_personalisations()
+    {
+        $product = $this->createProduct();
+
+        $this->expectException(\InvalidArgumentException::class);
+
+        $product->updatePersonalisations([new \stdClass()]);
+    }
 }
