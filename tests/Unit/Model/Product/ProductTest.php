@@ -112,16 +112,17 @@ class ProductTest extends TestCase
             ProductTaxon::class => [
                 [
                     'product_id' => 'xxx',
-                    'taxon_id' => 'regular',
+                    'taxon_id' => 'variant-prop',
                     'state' => TaxonState::online->value,
                     'data' => json_encode(['foo' => 'bar']),
+                    'taxonomy_type' => TaxonomyType::variant_property->value,
                 ],
                 [
                     'product_id' => 'xxx',
-                    'taxon_id' => 'variant-prop',
+                    'taxon_id' => 'category',
                     'state' => TaxonState::online->value,
                     'data' => json_encode(['foo' => 'baz']),
-                    'taxonomy_type' => TaxonomyType::variant_property->value,
+                    'taxonomy_type' => TaxonomyType::category->value,
                 ],
             ],
             Personalisation::class => [
@@ -136,12 +137,14 @@ class ProductTest extends TestCase
 
         $this->assertCount(1, $product->getVariants());
         $this->assertEquals(VariantId::fromString('yyy'), $product->getVariants()[0]->variantId);
+
         $this->assertCount(1, $product->getVariants()[0]->getVariantProperties());
-        $this->assertInstanceOf(VariantProperty::class, $product->getVariants()[0]->getVariantProperties()[0]);
+        $this->assertInstanceOf(VariantProperty::class, $product->getVariantProperties()[0]);
+        $this->assertInstanceOf(\Thinktomorrow\Trader\Domain\Model\Product\VariantTaxa\VariantProperty::class, $product->getVariants()[0]->getVariantProperties()[0]);
         $this->assertEquals(TaxonId::fromString('variant-prop'), $product->getVariants()[0]->getVariantProperties()[0]->taxonId);
 
         $this->assertCount(2, $product->getProductTaxa());
-        $this->assertEquals(TaxonId::fromString('regular'), $product->getProductTaxa()[0]->taxonId);
+        $this->assertEquals(TaxonId::fromString('category'), $product->getProductTaxa()[1]->taxonId);
         $this->assertCount(1, $product->getVariantProperties());
         $this->assertEquals(TaxonId::fromString('variant-prop'), $product->getVariantProperties()[0]->taxonId);
 
