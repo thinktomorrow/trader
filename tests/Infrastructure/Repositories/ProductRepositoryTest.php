@@ -81,7 +81,7 @@ final class ProductRepositoryTest extends TestCase
 
         $productWithTaxon = Product::create(ProductId::fromString('product-with-taxon'));
         $productWithTaxon->updateProductTaxa([
-            ProductTaxon::create(ProductId::fromString('product-with-taxon'), $taxon->taxonId)
+            ProductTaxon::create(ProductId::fromString('product-with-taxon'), $taxon->taxonId),
         ]);
 
         return $productWithTaxon;
