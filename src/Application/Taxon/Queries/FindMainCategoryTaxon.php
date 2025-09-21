@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Thinktomorrow\Trader\Application\Taxon\Category;
+namespace Thinktomorrow\Trader\Application\Taxon\Queries;
 
 use Thinktomorrow\Trader\Application\Common\HasLocale;
 use Thinktomorrow\Trader\Application\Taxon\Tree\TaxonNode;
@@ -26,7 +26,7 @@ class FindMainCategoryTaxon
 
     public function get(): TaxonTree
     {
-        if (! $categoryTaxonomyId = $this->traderConfig->getMainCategoryTaxonomyId()) {
+        if (!$categoryTaxonomyId = $this->traderConfig->getMainCategoryTaxonomyId()) {
             return new TaxonTree();
         }
 
@@ -44,7 +44,7 @@ class FindMainCategoryTaxon
 
             foreach ($taxonIds as $taxonId) {
                 if (in_array($taxonId, $matchingTaxonIds)) {
-                    return $taxonTree->find(fn ($node) => $node->getId() == $taxonId);
+                    return $taxonTree->find(fn($node) => $node->getId() == $taxonId);
                 }
             }
         }

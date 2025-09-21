@@ -4,7 +4,7 @@ declare(strict_types=1);
 namespace Thinktomorrow\Trader\Infrastructure\Test\Repositories;
 
 use Psr\Container\ContainerInterface;
-use Thinktomorrow\Trader\Application\Taxon\Category\CategoryRepository;
+use Thinktomorrow\Trader\Application\Taxon\Queries\CategoryRepository;
 use Thinktomorrow\Trader\Application\Taxon\Tree\TaxonNode;
 use Thinktomorrow\Trader\Application\Taxon\Tree\TaxonNodes;
 use Thinktomorrow\Trader\Application\Taxon\Tree\TaxonTree;
@@ -36,7 +36,7 @@ final class InMemoryTaxonTreeRepository implements TaxonTreeRepository, Category
     {
         return TaxonTree::fromIterable($this->getTaxonNodes())
             ->sort('order')
-            ->eachRecursive(fn ($node) => $node->setLocale($this->locale));
+            ->eachRecursive(fn($node) => $node->setLocale($this->locale));
     }
 
     public function getTreeByTaxonomies(array $taxonomyIds): TaxonTree
@@ -49,21 +49,21 @@ final class InMemoryTaxonTreeRepository implements TaxonTreeRepository, Category
 
         return TaxonTree::fromIterable(TaxonNodes::fromType($nodes))
             ->sort('order')
-            ->eachRecursive(fn ($node) => $node->setLocale($this->locale));
+            ->eachRecursive(fn($node) => $node->setLocale($this->locale));
     }
 
     public function getTreeByTaxonomy(string $taxonomyId): TaxonTree
     {
         return TaxonTree::fromIterable($this->getTaxonNodes($taxonomyId))
             ->sort('order')
-            ->eachRecursive(fn ($node) => $node->setLocale($this->locale));
+            ->eachRecursive(fn($node) => $node->setLocale($this->locale));
     }
 
     public function findTaxonById(string $taxonId): TaxonNode
     {
-        $taxonNode = $this->getTree()->find(fn (TaxonNode $taxonNode) => $taxonNode->getId() == $taxonId);
+        $taxonNode = $this->getTree()->find(fn(TaxonNode $taxonNode) => $taxonNode->getId() == $taxonId);
 
-        if (! $taxonNode) {
+        if (!$taxonNode) {
             throw new \RuntimeException('No taxon record found by id ' . $taxonId);
         }
 
@@ -72,7 +72,7 @@ final class InMemoryTaxonTreeRepository implements TaxonTreeRepository, Category
 
     public function findTaxonByKey(string $key): TaxonNode
     {
-        return $this->getTree()->find(fn (TaxonNode $taxonNode) => $taxonNode->getKey() == $key);
+        return $this->getTree()->find(fn(TaxonNode $taxonNode) => $taxonNode->getKey() == $key);
     }
 
     private function getTaxonNodes(?string $taxonomyId = null): TaxonNodes
@@ -113,13 +113,13 @@ final class InMemoryTaxonTreeRepository implements TaxonTreeRepository, Category
     {
         $pairs = InMemoryProductRepository::getGridProductVariantPairsFromLookup($taxonId->get());
 
-        return implode(',', array_map(fn ($pair) => implode(':', $pair), $pairs));
+        return implode(',', array_map(fn($pair) => implode(':', $pair), $pairs));
     }
 
     private function getGridVariantPairs(TaxonId $taxonId): string
     {
         $pairs = InMemoryVariantRepository::getGridProductVariantPairsFromLookup($taxonId->get());
 
-        return implode(',', array_map(fn ($pair) => implode(':', $pair), $pairs));
+        return implode(',', array_map(fn($pair) => implode(':', $pair), $pairs));
     }
 }

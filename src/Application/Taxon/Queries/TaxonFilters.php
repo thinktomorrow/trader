@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 
-namespace Thinktomorrow\Trader\Application\Taxon\Filter;
+namespace Thinktomorrow\Trader\Application\Taxon\Queries;
 
 use Thinktomorrow\Trader\Application\Taxon\Tree\TaxonTree;
 use Thinktomorrow\Trader\Domain\Common\Locale;

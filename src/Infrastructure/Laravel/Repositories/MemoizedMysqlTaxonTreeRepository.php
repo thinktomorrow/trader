@@ -3,7 +3,7 @@ declare(strict_types=1);
 
 namespace Thinktomorrow\Trader\Infrastructure\Laravel\Repositories;
 
-use Thinktomorrow\Trader\Application\Taxon\Category\CategoryRepository;
+use Thinktomorrow\Trader\Application\Taxon\Queries\CategoryRepository;
 use Thinktomorrow\Trader\Application\Taxon\Tree\TaxonNode;
 use Thinktomorrow\Trader\Application\Taxon\Tree\TaxonTree;
 use Thinktomorrow\Trader\Application\Taxon\Tree\TaxonTreeRepository;
@@ -37,9 +37,9 @@ class MemoizedMysqlTaxonTreeRepository implements TaxonTreeRepository, CategoryR
     public function findTaxonById(string $taxonId): TaxonNode
     {
         /** @var TaxonNode $taxonNode */
-        $taxonNode = $this->getTree()->find(fn (TaxonNode $taxonNode) => $taxonNode->getId() == $taxonId);
+        $taxonNode = $this->getTree()->find(fn(TaxonNode $taxonNode) => $taxonNode->getId() == $taxonId);
 
-        if (! $taxonNode) {
+        if (!$taxonNode) {
             throw new CouldNotFindTaxon('No taxon record found by id ' . $taxonId);
         }
 
@@ -49,9 +49,9 @@ class MemoizedMysqlTaxonTreeRepository implements TaxonTreeRepository, CategoryR
     public function findTaxonByKey(string $key): TaxonNode
     {
         /** @var TaxonNode $taxonNode */
-        $taxonNode = $this->getTree()->find(fn (TaxonNode $taxonNode) => $taxonNode->getKey() == $key);
+        $taxonNode = $this->getTree()->find(fn(TaxonNode $taxonNode) => $taxonNode->getKey() == $key);
 
-        if (! $taxonNode) {
+        if (!$taxonNode) {
             throw new CouldNotFindTaxon('No taxon record found by key ' . $key);
         }
 

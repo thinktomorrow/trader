@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Tests\Acceptance\Taxon;
 
 use Tests\Infrastructure\Vine\TaxonHelpers;
-use Thinktomorrow\Trader\Application\Taxon\Category\FindMainCategoryTaxon;
+use Thinktomorrow\Trader\Application\Taxon\Queries\FindMainCategoryTaxon;
 use Thinktomorrow\Trader\Infrastructure\Test\Repositories\InMemoryTaxonomyRepository;
 use Thinktomorrow\Trader\Infrastructure\Test\Repositories\InMemoryTaxonRepository;
 use Thinktomorrow\Trader\Infrastructure\Test\Repositories\InMemoryTaxonTreeRepository;
@@ -42,9 +42,9 @@ class FindMainCategoryTaxaTest extends TaxonContext
             new InMemoryTaxonTreeRepository(new TestContainer, new TestTraderConfig)
         );
 
-        $this->assertEquals(['fifth'], array_map(fn ($taxonnode) => $taxonnode->getId(), $finder->findFirstByTaxonIds(['sixth'])));
-        $this->assertEquals(['first'], array_map(fn ($taxonnode) => $taxonnode->getId(), $finder->findFirstByTaxonIds(['third'])));
-        $this->assertEquals(['first'], array_map(fn ($taxonnode) => $taxonnode->getId(), $finder->findFirstByTaxonIds(['first', 'second', 'third'])));
+        $this->assertEquals(['fifth'], array_map(fn($taxonnode) => $taxonnode->getId(), $finder->findFirstByTaxonIds(['sixth'])));
+        $this->assertEquals(['first'], array_map(fn($taxonnode) => $taxonnode->getId(), $finder->findFirstByTaxonIds(['third'])));
+        $this->assertEquals(['first'], array_map(fn($taxonnode) => $taxonnode->getId(), $finder->findFirstByTaxonIds(['first', 'second', 'third'])));
     }
 
     public function test_it_uses_the_first_taxon_subtree_as_default_category()
@@ -64,7 +64,7 @@ class FindMainCategoryTaxaTest extends TaxonContext
             new InMemoryTaxonTreeRepository(new TestContainer, new TestTraderConfig)
         );
 
-        $this->assertEquals(['first', 'fifth'], array_map(fn ($taxonnode) => $taxonnode->getId(), $finder->findFirstByTaxonIds(['second', 'sixth'])));
+        $this->assertEquals(['first', 'fifth'], array_map(fn($taxonnode) => $taxonnode->getId(), $finder->findFirstByTaxonIds(['second', 'sixth'])));
     }
 
     public function test_it_can_get_return_same_taxon_if_taxon_is_category_root()
@@ -74,6 +74,6 @@ class FindMainCategoryTaxaTest extends TaxonContext
             new InMemoryTaxonTreeRepository(new TestContainer, new TestTraderConfig)
         );
 
-        $this->assertEquals(['first'], array_map(fn ($taxonnode) => $taxonnode->getId(), $finder->findFirstByTaxonIds(['first'])));
+        $this->assertEquals(['first'], array_map(fn($taxonnode) => $taxonnode->getId(), $finder->findFirstByTaxonIds(['first'])));
     }
 }

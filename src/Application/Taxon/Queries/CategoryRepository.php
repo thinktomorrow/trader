@@ -1,6 +1,6 @@
 <?php
 
-namespace Thinktomorrow\Trader\Application\Taxon\Category;
+namespace Thinktomorrow\Trader\Application\Taxon\Queries;
 
 use Thinktomorrow\Trader\Application\Taxon\Tree\TaxonNode;
 
