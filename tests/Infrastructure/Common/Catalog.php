@@ -8,6 +8,9 @@ use Thinktomorrow\Trader\Application\Product\Taxa\VariantTaxonItem;
 use Thinktomorrow\Trader\Application\Taxon\Tree\TaxonNode;
 use Thinktomorrow\Trader\Application\Taxonomy\TaxonomyItem;
 use Thinktomorrow\Trader\Domain\Common\Locale;
+use Thinktomorrow\Trader\Domain\Model\Product\Personalisation\Personalisation;
+use Thinktomorrow\Trader\Domain\Model\Product\Personalisation\PersonalisationId;
+use Thinktomorrow\Trader\Domain\Model\Product\Personalisation\PersonalisationType;
 use Thinktomorrow\Trader\Domain\Model\Product\Product;
 use Thinktomorrow\Trader\Domain\Model\Product\ProductId;
 use Thinktomorrow\Trader\Domain\Model\Product\ProductState;
@@ -98,10 +101,32 @@ class Catalog
         return $taxon;
     }
 
-    public function createProduct(string $productId = 'product-aaa', string $variantId = 'variant-aaa'): Product
+    public function makeProduct(string $productId = 'product-aaa'): Product
     {
         $product = Product::create(ProductId::fromString($productId));
         $product->updateState(ProductState::online);
+
+        return $product;
+    }
+
+    public function makeVariant(string $productId = 'product-aaa', string $variantId = 'variant-aaa'): Variant
+    {
+        $variant = Variant::create(
+            ProductId::fromString($productId),
+            VariantId::fromString($variantId),
+            VariantUnitPrice::fromScalars(100, '20', false),
+            VariantSalePrice::fromScalars(80, '20', false),
+            'sku-' . $variantId
+        );
+
+        $variant->showInGrid();
+
+        return $variant;
+    }
+
+    public function createProduct(string $productId = 'product-aaa', string $variantId = 'variant-aaa'): Product
+    {
+        $product = $this->makeProduct($productId);
 
         $this->saveProduct($product);
 
@@ -115,15 +140,7 @@ class Catalog
     {
         $product = $this->repos->productRepository()->find(ProductId::fromString($productId));
 
-        $variant = Variant::create(
-            $product->productId,
-            VariantId::fromString($variantId),
-            VariantUnitPrice::fromScalars(100, '20', false),
-            VariantSalePrice::fromScalars(80, '20', false),
-            'sku-' . $variantId
-        );
-
-        $variant->showInGrid();
+        $variant = $this->makeVariant($productId, $variantId);
 
         $product->createVariant($variant);
 
@@ -170,5 +187,24 @@ class Catalog
         ]);
 
         $this->repos->productRepository()->save($product);
+    }
+
+    public function makePersonalisation(string $productId = 'product-aaa', string $personalisationId = 'personalisation-aaa'): Personalisation
+    {
+        return Personalisation::create(
+            ProductId::fromString($productId),
+            PersonalisationId::fromString($personalisationId),
+            PersonalisationType::fromString(PersonalisationType::TEXT),
+            ['foo' => 'bar']
+        );
+    }
+
+    public function addPersonalisationToProduct(Product $product, Personalisation $personalisation): Product
+    {
+        $product->updatePersonalisations([
+            $personalisation
+        ]);
+
+        return $product;
     }
 }

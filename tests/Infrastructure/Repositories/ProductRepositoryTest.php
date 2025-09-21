@@ -3,100 +3,87 @@ declare(strict_types=1);
 
 namespace Tests\Infrastructure\Repositories;
 
-use Illuminate\Foundation\Testing\RefreshDatabase;
-use PHPUnit\Framework\Attributes\DataProvider;
+use Tests\Infrastructure\Common\Catalog;
 use Tests\Infrastructure\TestCase;
 use Thinktomorrow\Trader\Domain\Model\Product\Exceptions\CouldNotFindProduct;
 use Thinktomorrow\Trader\Domain\Model\Product\Product;
 use Thinktomorrow\Trader\Domain\Model\Product\ProductId;
-use Thinktomorrow\Trader\Domain\Model\Taxon\Taxon;
-use Thinktomorrow\Trader\Domain\Model\Taxon\TaxonId;
-use Thinktomorrow\Trader\Domain\Model\Taxonomy\Taxonomy;
-use Thinktomorrow\Trader\Domain\Model\Taxonomy\TaxonomyId;
-use Thinktomorrow\Trader\Domain\Model\Taxonomy\TaxonomyType;
-use Thinktomorrow\Trader\Infrastructure\Laravel\Repositories\MysqlProductRepository;
-use Thinktomorrow\Trader\Infrastructure\Laravel\Repositories\MysqlTaxonomyRepository;
-use Thinktomorrow\Trader\Infrastructure\Laravel\Repositories\MysqlTaxonRepository;
-use Thinktomorrow\Trader\Infrastructure\Laravel\Repositories\MysqlVariantRepository;
-use Thinktomorrow\Trader\Infrastructure\Test\Repositories\InMemoryProductRepository;
-use Thinktomorrow\Trader\Infrastructure\Test\Repositories\InMemoryTaxonomyRepository;
-use Thinktomorrow\Trader\Infrastructure\Test\Repositories\InMemoryTaxonRepository;
-use Thinktomorrow\Trader\Infrastructure\Test\TestContainer;
+use Thinktomorrow\Trader\Domain\Model\Product\ProductTaxa\ProductTaxon;
 
 final class ProductRepositoryTest extends TestCase
 {
-    use RefreshDatabase;
-
-    #[DataProvider('products')]
-    public function test_it_can_save_and_find_a_product(Product $product)
+    public function test_it_can_save_and_find_a_product()
     {
-        foreach ($this->repositories() as $i => $repository) {
+        foreach (Catalog::drivers() as $catalog) {
 
-            // Create taxon data
-            $taxonomy = Taxonomy::create(TaxonomyId::fromString('ooo'), TaxonomyType::variant_property);
-            $taxon = Taxon::create(TaxonId::fromString('xxx'), TaxonomyId::fromString('ooo'));
-            $this->taxonomyRepositories()[$i]->save($taxonomy);
-            $this->taxonRepositories()[$i]->save($taxon);
+            $products = [
+                Product::create(ProductId::fromString('product-aaa')),
+                $catalog->makeProduct(), // With variant
+                $catalog->addPersonalisationToProduct(Product::create(ProductId::fromString('product-aaa')), $catalog->makePersonalisation()),
+                $this->makeProductWithTaxon($catalog),
+            ];
 
-            $repository->save($product);
-            $product->releaseEvents();
+            foreach ($products as $product) {
 
-            $this->assertEquals($product, $repository->find($product->productId));
+                // Save & find product
+                $catalog->repos->productRepository()->save($product);
+                $product->releaseEvents();
+
+                $this->assertEquals($product, $catalog->repos->productRepository()->find($product->productId));
+            }
         }
     }
 
-    #[DataProvider('products')]
-    public function test_it_can_delete_a_product(Product $product)
+    public function test_it_can_delete_a_product()
     {
         $productsNotFound = 0;
 
-        foreach ($this->repositories() as $repository) {
-            $repository->save($product);
-            $repository->delete($product->productId);
+        foreach (Catalog::drivers() as $catalog) {
 
-            try {
-                $repository->find($product->productId);
-            } catch (CouldNotFindProduct $e) {
-                $productsNotFound++;
+            $products = [
+                Product::create(ProductId::fromString('product-aaa')),
+                $catalog->makeProduct(), // With variant
+                $catalog->addPersonalisationToProduct(Product::create(ProductId::fromString('product-aaa')), $catalog->makePersonalisation()),
+                $this->makeProductWithTaxon($catalog),
+            ];
+
+            foreach ($products as $product) {
+
+                // Save & find product
+                $catalog->repos->productRepository()->save($product);
+                $product->releaseEvents();
+
+                $catalog->repos->productRepository()->delete($product->productId);
+
+                try {
+                    $catalog->repos->productRepository()->find($product->productId);
+                } catch (CouldNotFindProduct $e) {
+                    $productsNotFound++;
+                }
             }
         }
 
-        $this->assertEquals(count(iterator_to_array($this->repositories())), $productsNotFound);
+        $this->assertEquals(count(Catalog::drivers()) * 4, $productsNotFound); // 4 products per catalog driver
     }
 
     public function test_it_can_generate_a_next_reference()
     {
-        foreach ($this->repositories() as $repository) {
-            $this->assertInstanceOf(ProductId::class, $repository->nextReference());
+        foreach (Catalog::drivers() as $catalog) {
+            $this->assertInstanceOf(ProductId::class, $catalog->repos->productRepository()->nextReference());
         }
     }
 
-    private static function repositories(): \Generator
+    /** @param Catalog $catalog */
+    private function makeProductWithTaxon(mixed $catalog): Product
     {
-        yield new InMemoryProductRepository();
-        yield new MysqlProductRepository(new MysqlVariantRepository(new TestContainer()));
-    }
+        $catalog->createTaxonomy();
+        $taxon = $catalog->createTaxon();
 
-    public static function products(): \Generator
-    {
-        yield [static::createProduct()];
-        yield [static::createProductWithPersonalisations()];
-        yield [static::createProductWithVariant()];
-    }
+        $productWithTaxon = Product::create(ProductId::fromString('product-with-taxon'));
+        $productWithTaxon->updateProductTaxa([
+            ProductTaxon::create(ProductId::fromString('product-with-taxon'), $taxon->taxonId)
+        ]);
 
-    private function taxonomyRepositories(): array
-    {
-        return [
-            new InMemoryTaxonomyRepository(),
-            new MysqlTaxonomyRepository(),
-        ];
-    }
-
-    private function taxonRepositories(): array
-    {
-        return [
-            new InMemoryTaxonRepository(),
-            new MysqlTaxonRepository(),
-        ];
+        return $productWithTaxon;
     }
 }
