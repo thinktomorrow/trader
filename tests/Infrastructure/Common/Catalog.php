@@ -38,9 +38,25 @@ class Catalog
 {
     public readonly CatalogRepositories $repos;
 
+    public bool $persist = true;
+
     public function __construct(CatalogRepositories $repos)
     {
         $this->repos = $repos;
+    }
+
+    public function dontPersist(): self
+    {
+        $this->persist = false;
+
+        return $this;
+    }
+
+    public function persist(): self
+    {
+        $this->persist = true;
+
+        return $this;
     }
 
     public static function setUp(): void
@@ -101,18 +117,26 @@ class Catalog
         return $taxon;
     }
 
-    public function makeProduct(string $productId = 'product-aaa'): Product
+    public function createProduct(string $productId = 'product-aaa', string $variantId = 'variant-aaa'): Product
     {
         $product = Product::create(ProductId::fromString($productId));
         $product->updateState(ProductState::online);
 
+        if ($this->persist) {
+            $this->saveProduct($product);
+        }
+
+        $this->createVariant($product, $variantId);
+
         return $product;
     }
 
-    public function makeVariant(string $productId = 'product-aaa', string $variantId = 'variant-aaa'): Variant
+    public function createVariant(string|Product $productId = 'product-aaa', string $variantId = 'variant-aaa'): Variant
     {
+        $product = $productId instanceof Product ? $productId : $this->repos->productRepository()->find(ProductId::fromString($productId));
+
         $variant = Variant::create(
-            ProductId::fromString($productId),
+            $product->productId,
             VariantId::fromString($variantId),
             VariantUnitPrice::fromScalars(100, '20', false),
             VariantSalePrice::fromScalars(80, '20', false),
@@ -121,30 +145,11 @@ class Catalog
 
         $variant->showInGrid();
 
-        return $variant;
-    }
-
-    public function createProduct(string $productId = 'product-aaa', string $variantId = 'variant-aaa'): Product
-    {
-        $product = $this->makeProduct($productId);
-
-        $this->saveProduct($product);
-
-        $this->createVariant($product->productId->get(), $variantId);
-
-        // Updated version including variant
-        return $this->repos->productRepository()->find($product->productId);
-    }
-
-    public function createVariant(string $productId = 'product-aaa', string $variantId = 'variant-aaa'): Variant
-    {
-        $product = $this->repos->productRepository()->find(ProductId::fromString($productId));
-
-        $variant = $this->makeVariant($productId, $variantId);
-
         $product->createVariant($variant);
 
-        $this->saveProduct($product);
+        if ($this->persist) {
+            $this->saveProduct($product);
+        }
 
         return $variant;
     }
@@ -164,19 +169,24 @@ class Catalog
         $this->repos->productRepository()->save($product);
     }
 
-    public function linkProductToTaxon(string $productId, string $taxonId): void
+    public function linkProductToTaxon(string|Product $productId, string|Taxon $taxonId): Product
     {
-        $product = $this->repos->productRepository()->find(ProductId::fromString($productId));
+        $product = $productId instanceof Product ? $productId : $this->repos->productRepository()->find(ProductId::fromString($productId));
+        $taxonId = $taxonId instanceof Taxon ? $taxonId->taxonId->get() : $taxonId;
 
         $product->updateProductTaxa([
             ...$product->getProductTaxa(),
-            ProductTaxon::create(ProductId::fromString($productId), TaxonId::fromString($taxonId)),
+            ProductTaxon::create($product->productId, TaxonId::fromString($taxonId)),
         ]);
 
-        $this->repos->productRepository()->save($product);
+        if ($this->persist) {
+            $this->repos->productRepository()->save($product);
+        }
+
+        return $product;
     }
 
-    public function linkVariantToTaxon(string $productId, string $variantId, string $taxonId): void
+    public function linkVariantToTaxon(string $productId, string $variantId, string $taxonId): Product
     {
         $product = $this->repos->productRepository()->find(ProductId::fromString($productId));
         $variant = $product->findVariant(VariantId::fromString($variantId));
@@ -186,7 +196,11 @@ class Catalog
             VariantTaxon::create(VariantId::fromString($variantId), TaxonId::fromString($taxonId)),
         ]);
 
-        $this->repos->productRepository()->save($product);
+        if ($this->persist) {
+            $this->repos->productRepository()->save($product);
+        }
+
+        return $product;
     }
 
     public function makePersonalisation(string $productId = 'product-aaa', string $personalisationId = 'personalisation-aaa'): Personalisation

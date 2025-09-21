@@ -8,7 +8,6 @@ use Tests\Infrastructure\TestCase;
 use Thinktomorrow\Trader\Domain\Model\Product\Exceptions\CouldNotFindProduct;
 use Thinktomorrow\Trader\Domain\Model\Product\Product;
 use Thinktomorrow\Trader\Domain\Model\Product\ProductId;
-use Thinktomorrow\Trader\Domain\Model\Product\ProductTaxa\ProductTaxon;
 
 final class ProductRepositoryTest extends TestCase
 {
@@ -16,16 +15,10 @@ final class ProductRepositoryTest extends TestCase
     {
         foreach (Catalog::drivers() as $catalog) {
 
-            $products = [
-                Product::create(ProductId::fromString('product-aaa')),
-                $catalog->makeProduct(), // With variant
-                $catalog->addPersonalisationToProduct(Product::create(ProductId::fromString('product-aaa')), $catalog->makePersonalisation()),
-                $this->makeProductWithTaxon($catalog),
-            ];
+            $catalog->dontPersist();
 
-            foreach ($products as $product) {
+            foreach ($this->products($catalog) as $product) {
 
-                // Save & find product
                 $catalog->repos->productRepository()->save($product);
                 $product->releaseEvents();
 
@@ -40,16 +33,10 @@ final class ProductRepositoryTest extends TestCase
 
         foreach (Catalog::drivers() as $catalog) {
 
-            $products = [
-                Product::create(ProductId::fromString('product-aaa')),
-                $catalog->makeProduct(), // With variant
-                $catalog->addPersonalisationToProduct(Product::create(ProductId::fromString('product-aaa')), $catalog->makePersonalisation()),
-                $this->makeProductWithTaxon($catalog),
-            ];
+            $catalog->dontPersist();
 
-            foreach ($products as $product) {
+            foreach ($this->products($catalog) as $product) {
 
-                // Save & find product
                 $catalog->repos->productRepository()->save($product);
                 $product->releaseEvents();
 
@@ -73,17 +60,17 @@ final class ProductRepositoryTest extends TestCase
         }
     }
 
-    /** @param Catalog $catalog */
-    private function makeProductWithTaxon(mixed $catalog): Product
+    private function products(Catalog $catalog): array
     {
+        // For product with taxon
         $catalog->createTaxonomy();
         $taxon = $catalog->createTaxon();
 
-        $productWithTaxon = Product::create(ProductId::fromString('product-with-taxon'));
-        $productWithTaxon->updateProductTaxa([
-            ProductTaxon::create(ProductId::fromString('product-with-taxon'), $taxon->taxonId)
-        ]);
-
-        return $productWithTaxon;
+        return [
+            $catalog->createProduct(),
+            Product::create(ProductId::fromString('product-aaa')), // Without variant
+            $catalog->addPersonalisationToProduct($catalog->createProduct(), $catalog->makePersonalisation()),
+            $catalog->linkProductToTaxon($catalog->createProduct(), $taxon),
+        ];
     }
 }
