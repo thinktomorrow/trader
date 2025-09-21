@@ -3,15 +3,12 @@ declare(strict_types=1);
 
 namespace Tests\Infrastructure\Vine;
 
-use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\Infrastructure\Common\Catalog;
 use Tests\Infrastructure\TestCase;
 use Thinktomorrow\Trader\Domain\Common\Locale;
 
 final class GetActiveFiltersTest extends TestCase
 {
-    use RefreshDatabase;
-
     public function test_it_can_get_active_filters()
     {
         foreach (Catalog::drivers() as $catalog) {

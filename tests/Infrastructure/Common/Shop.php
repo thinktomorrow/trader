@@ -25,11 +25,6 @@ use Thinktomorrow\Trader\Application\Order\MerchantOrder\MerchantOrderPayment;
 use Thinktomorrow\Trader\Application\Order\MerchantOrder\MerchantOrderShipping;
 use Thinktomorrow\Trader\Application\Order\MerchantOrder\MerchantOrderShippingAddress;
 use Thinktomorrow\Trader\Application\Order\MerchantOrder\MerchantOrderShopper;
-use Thinktomorrow\Trader\Application\Product\ProductDetail\ProductDetail;
-use Thinktomorrow\Trader\Application\Product\Taxa\ProductTaxonItem;
-use Thinktomorrow\Trader\Application\Product\Taxa\VariantTaxonItem;
-use Thinktomorrow\Trader\Application\Taxon\Tree\TaxonNode;
-use Thinktomorrow\Trader\Application\Taxonomy\TaxonomyItem;
 use Thinktomorrow\Trader\Domain\Common\Vat\VatPercentage;
 use Thinktomorrow\Trader\Domain\Model\Order\Discount\DiscountPriceDefaults;
 use Thinktomorrow\Trader\Domain\Model\Order\Payment\DefaultPaymentState;
@@ -50,12 +45,7 @@ use Thinktomorrow\Trader\Infrastructure\Laravel\Models\Cart\DefaultCartShopper;
 use Thinktomorrow\Trader\Infrastructure\Laravel\Models\CustomerRead\DefaultCustomerBillingAddress;
 use Thinktomorrow\Trader\Infrastructure\Laravel\Models\CustomerRead\DefaultCustomerRead;
 use Thinktomorrow\Trader\Infrastructure\Laravel\Models\CustomerRead\DefaultCustomerShippingAddress;
-use Thinktomorrow\Trader\Infrastructure\Laravel\Models\DefaultProductDetail;
-use Thinktomorrow\Trader\Infrastructure\Laravel\Models\DefaultProductTaxonItem;
-use Thinktomorrow\Trader\Infrastructure\Laravel\Models\DefaultTaxonNode;
-use Thinktomorrow\Trader\Infrastructure\Laravel\Models\DefaultTaxonomyItem;
 use Thinktomorrow\Trader\Infrastructure\Laravel\Models\DefaultVariantForCart;
-use Thinktomorrow\Trader\Infrastructure\Laravel\Models\DefaultVariantTaxonItem;
 use Thinktomorrow\Trader\Infrastructure\Laravel\Models\MerchantOrder\DefaultMerchantOrder;
 use Thinktomorrow\Trader\Infrastructure\Laravel\Models\MerchantOrder\DefaultMerchantOrderBillingAddress;
 use Thinktomorrow\Trader\Infrastructure\Laravel\Models\MerchantOrder\DefaultMerchantOrderDiscount;
@@ -82,15 +72,8 @@ class Shop
         (new TestContainer())->add(ShippingState::class, DefaultShippingState::class);
         (new TestContainer())->add(PaymentState::class, DefaultPaymentState::class);
 
-        (new TestContainer())->add(ProductDetail::class, DefaultProductDetail::class);
-        (new TestContainer())->add(ProductTaxonItem::class, DefaultProductTaxonItem::class);
-        (new TestContainer())->add(VariantTaxonItem::class, DefaultVariantTaxonItem::class);
-        (new TestContainer())->add(TaxonomyItem::class, DefaultTaxonomyItem::class);
-
-        (new TestContainer())->add(TaxonNode::class, DefaultTaxonNode::class);
-        (new TestContainer())->add(VariantForCart::class, DefaultVariantForCart::class);
-
         // Cart
+        (new TestContainer())->add(VariantForCart::class, DefaultVariantForCart::class);
         (new TestContainer())->add(Cart::class, DefaultCart::class);
         (new TestContainer())->add(CartLine::class, DefaultCartLine::class);
         (new TestContainer())->add(CartLinePersonalisation::class, DefaultCartLinePersonalisation::class);
@@ -124,7 +107,6 @@ class Shop
 
     public static function tearDown(): void
     {
-        InMemoryCatalogRepositories::clear();
         TestTraderConfig::clear();
     }
 }

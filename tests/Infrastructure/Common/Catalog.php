@@ -2,6 +2,11 @@
 
 namespace Tests\Infrastructure\Common;
 
+use Thinktomorrow\Trader\Application\Product\ProductDetail\ProductDetail;
+use Thinktomorrow\Trader\Application\Product\Taxa\ProductTaxonItem;
+use Thinktomorrow\Trader\Application\Product\Taxa\VariantTaxonItem;
+use Thinktomorrow\Trader\Application\Taxon\Tree\TaxonNode;
+use Thinktomorrow\Trader\Application\Taxonomy\TaxonomyItem;
 use Thinktomorrow\Trader\Domain\Common\Locale;
 use Thinktomorrow\Trader\Domain\Model\Product\Product;
 use Thinktomorrow\Trader\Domain\Model\Product\ProductId;
@@ -19,6 +24,11 @@ use Thinktomorrow\Trader\Domain\Model\Taxon\TaxonKeyId;
 use Thinktomorrow\Trader\Domain\Model\Taxonomy\Taxonomy;
 use Thinktomorrow\Trader\Domain\Model\Taxonomy\TaxonomyId;
 use Thinktomorrow\Trader\Domain\Model\Taxonomy\TaxonomyType;
+use Thinktomorrow\Trader\Infrastructure\Laravel\Models\DefaultProductDetail;
+use Thinktomorrow\Trader\Infrastructure\Laravel\Models\DefaultProductTaxonItem;
+use Thinktomorrow\Trader\Infrastructure\Laravel\Models\DefaultTaxonNode;
+use Thinktomorrow\Trader\Infrastructure\Laravel\Models\DefaultTaxonomyItem;
+use Thinktomorrow\Trader\Infrastructure\Laravel\Models\DefaultVariantTaxonItem;
 use Thinktomorrow\Trader\Infrastructure\Test\TestContainer;
 
 class Catalog
@@ -32,12 +42,16 @@ class Catalog
 
     public static function setUp(): void
     {
-        //
+        (new TestContainer())->add(ProductDetail::class, DefaultProductDetail::class);
+        (new TestContainer())->add(ProductTaxonItem::class, DefaultProductTaxonItem::class);
+        (new TestContainer())->add(VariantTaxonItem::class, DefaultVariantTaxonItem::class);
+        (new TestContainer())->add(TaxonomyItem::class, DefaultTaxonomyItem::class);
+        (new TestContainer())->add(TaxonNode::class, DefaultTaxonNode::class);
     }
 
     public static function tearDown(): void
     {
-        //
+        InMemoryCatalogRepositories::clear();
     }
 
     public static function drivers(): array

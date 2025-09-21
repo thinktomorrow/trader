@@ -3,9 +3,7 @@ declare(strict_types=1);
 
 namespace Tests\Infrastructure\Vine;
 
-use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\Infrastructure\Common\Catalog;
-use Tests\Infrastructure\Common\InMemoryCatalogRepositories;
 use Tests\Infrastructure\TestCase;
 use Thinktomorrow\Trader\Domain\Common\Locale;
 use Thinktomorrow\Trader\Domain\Model\Taxon\TaxonState;
@@ -15,15 +13,6 @@ use Thinktomorrow\Trader\Infrastructure\Test\TestTraderConfig;
 
 final class GetAvailableFiltersTest extends TestCase
 {
-    use RefreshDatabase;
-
-    public function tearDown(): void
-    {
-        parent::tearDown();
-
-        InMemoryCatalogRepositories::clear();
-    }
-
     public function test_it_can_retrieve_an_available_taxon_filter_tree()
     {
         foreach (Catalog::drivers() as $catalog) {

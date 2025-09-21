@@ -2,7 +2,8 @@
 
 namespace Tests\Infrastructure\Common;
 
-use Thinktomorrow\Trader\Application\Taxon\Filter\TaxonFilterTreeComposer;
+use Thinktomorrow\Trader\Application\Product\Grid\FlattenedTaxonIds;
+use Thinktomorrow\Trader\Application\Taxon\Filter\TaxonFilters;
 use Thinktomorrow\Trader\Application\Taxon\Tree\TaxonTreeRepository;
 use Thinktomorrow\Trader\Domain\Model\Product\ProductRepository;
 use Thinktomorrow\Trader\Domain\Model\Taxon\TaxonRepository;
@@ -18,5 +19,7 @@ interface CatalogRepositories
 
     public function productRepository(): ProductRepository;
 
-    public function filterTreeComposer(): TaxonFilterTreeComposer;
+    public function taxonFilters(): TaxonFilters;
+
+    public function flattenedTaxonIds(): FlattenedTaxonIds;
 }

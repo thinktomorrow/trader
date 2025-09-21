@@ -2,7 +2,8 @@
 
 namespace Tests\Infrastructure\Common;
 
-use Thinktomorrow\Trader\Application\Taxon\Filter\TaxonFilterTreeComposer;
+use Thinktomorrow\Trader\Application\Product\Grid\FlattenedTaxonIds;
+use Thinktomorrow\Trader\Application\Taxon\Filter\TaxonFilters;
 use Thinktomorrow\Trader\Application\Taxon\Tree\TaxonTreeRepository;
 use Thinktomorrow\Trader\Domain\Model\Product\ProductRepository;
 use Thinktomorrow\Trader\Domain\Model\Taxon\TaxonRepository;
@@ -18,7 +19,8 @@ use Thinktomorrow\Trader\Infrastructure\Test\Repositories\InMemoryVariantReposit
 use Thinktomorrow\Trader\Infrastructure\Test\Repositories\InMemoryVatRateRepository;
 use Thinktomorrow\Trader\Infrastructure\Test\TestContainer;
 use Thinktomorrow\Trader\Infrastructure\Test\TestTraderConfig;
-use Thinktomorrow\Trader\Infrastructure\Vine\VineTaxonFilterTreeComposer;
+use Thinktomorrow\Trader\Infrastructure\Vine\VineFlattenedTaxonIds;
+use Thinktomorrow\Trader\Infrastructure\Vine\VineTaxonFilters;
 
 class InMemoryCatalogRepositories implements CatalogRepositories
 {
@@ -57,8 +59,13 @@ class InMemoryCatalogRepositories implements CatalogRepositories
         return new InMemoryProductRepository();
     }
 
-    public function filterTreeComposer(): TaxonFilterTreeComposer
+    public function taxonFilters(): TaxonFilters
     {
-        return new VineTaxonFilterTreeComposer(new TestTraderConfig(), $this->taxonTreeRepository(), $this->taxonomyRepository());
+        return new VineTaxonFilters(new TestTraderConfig(), $this->taxonTreeRepository(), $this->taxonomyRepository());
+    }
+
+    public function flattenedTaxonIds(): FlattenedTaxonIds
+    {
+        return new VineFlattenedTaxonIds($this->taxonTreeRepository());
     }
 }

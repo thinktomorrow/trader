@@ -6,7 +6,7 @@ namespace Thinktomorrow\Trader\Application\Taxon\Filter;
 use Thinktomorrow\Trader\Application\Taxon\Tree\TaxonTree;
 use Thinktomorrow\Trader\Domain\Common\Locale;
 
-interface TaxonFilterTreeComposer
+interface TaxonFilters
 {
     /**
      * Return an array divided by taxonomy:

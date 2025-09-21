@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace Tests\Infrastructure;
 
+use Illuminate\Foundation\Testing\RefreshDatabase;
 use Money\Money;
 use Tests\Infrastructure\Common\Catalog;
 use Tests\Infrastructure\Common\Shop;
@@ -29,6 +30,7 @@ use Thinktomorrow\Trader\Infrastructure\Shop\ShopServiceProvider;
 abstract class TestCase extends \Orchestra\Testbench\TestCase
 {
     use TestHelpers;
+    use RefreshDatabase;
 
     protected function getEnvironmentSetUp($app)
     {

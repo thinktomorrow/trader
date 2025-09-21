@@ -3,11 +3,16 @@ declare(strict_types=1);
 
 namespace Thinktomorrow\Trader\Infrastructure\Vine;
 
-use Thinktomorrow\Trader\Application\Product\Grid\FlattenedTaxonIdsComposer;
+use Thinktomorrow\Trader\Application\Product\Grid\FlattenedTaxonIds;
 use Thinktomorrow\Trader\Application\Taxon\Tree\TaxonNode;
 use Thinktomorrow\Trader\Application\Taxon\Tree\TaxonTreeRepository;
 
-class VineFlattenedTaxonIdsComposer implements FlattenedTaxonIdsComposer
+/**
+ * Compose a list of taxon ids including all children and grandchildren
+ * for a given list of taxon ids or keys. This is internally used
+ * for filtering the grid on taxa.
+ */
+class VineFlattenedTaxonIds implements FlattenedTaxonIds
 {
     private TaxonTreeRepository $taxonTreeRepository;
 
@@ -16,11 +21,31 @@ class VineFlattenedTaxonIdsComposer implements FlattenedTaxonIdsComposer
         $this->taxonTreeRepository = $taxonTreeRepository;
     }
 
+    /**
+     * Compose a list of taxon ids including all children and
+     * grandchildren for a given list of taxon keys.
+     *
+     * It returns an array grouped by taxonomy id:
+     * [
+     *   'taxonomyId1' => [1, 2, 3, 4],
+     *   'taxonomyId2' => [5, 6, 7],
+     * ]
+     */
     public function getGroupedByTaxonomyByKeys(array $taxonKeys): array
     {
         return $this->getNestedTaxonIds($taxonKeys);
     }
 
+    /**
+     * Compose a list of taxon ids including all children and
+     * grandchildren for a given list of taxon ids.
+     *
+     * It returns an array grouped by taxonomy id:
+     * [
+     *   'taxonomyId1' => [1, 2, 3, 4],
+     *   'taxonomyId2' => [5, 6, 7],
+     * ]
+     */
     public function getGroupedByTaxonomyByIds(array $taxonIds): array
     {
         return $this->getNestedTaxonIds($taxonIds, false);
@@ -34,16 +59,16 @@ class VineFlattenedTaxonIdsComposer implements FlattenedTaxonIdsComposer
 
         foreach ($taxonKeys as $key) {
             $node = ($passedAsKeys)
-                ? $this->taxonTreeRepository->getTree()->find(fn (TaxonNode $node) => $node->getKey() == $key)
-                : $this->taxonTreeRepository->getTree()->find(fn (TaxonNode $node) => $node->getNodeId() == $key);
+                ? $this->taxonTreeRepository->getTree()->find(fn(TaxonNode $node) => $node->getKey() == $key)
+                : $this->taxonTreeRepository->getTree()->find(fn(TaxonNode $node) => $node->getNodeId() == $key);
 
-            if (! $node) {
+            if (!$node) {
                 continue;
             }
 
             $taxonomyId = $node->getTaxonomyId();
 
-            if (! isset($taxonIds[$taxonomyId])) {
+            if (!isset($taxonIds[$taxonomyId])) {
                 $taxonIds[$taxonomyId] = [];
             }
 

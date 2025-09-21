@@ -3,7 +3,8 @@
 namespace Tests\Infrastructure\Common;
 
 use Psr\Container\ContainerInterface;
-use Thinktomorrow\Trader\Application\Taxon\Filter\TaxonFilterTreeComposer;
+use Thinktomorrow\Trader\Application\Product\Grid\FlattenedTaxonIds;
+use Thinktomorrow\Trader\Application\Taxon\Filter\TaxonFilters;
 use Thinktomorrow\Trader\Application\Taxon\Tree\TaxonTreeRepository;
 use Thinktomorrow\Trader\Domain\Model\Product\ProductRepository;
 use Thinktomorrow\Trader\Domain\Model\Taxon\TaxonRepository;
@@ -15,7 +16,8 @@ use Thinktomorrow\Trader\Infrastructure\Laravel\Repositories\MysqlTaxonTreeRepos
 use Thinktomorrow\Trader\Infrastructure\Laravel\Repositories\MysqlVariantRepository;
 use Thinktomorrow\Trader\Infrastructure\Test\TestContainer;
 use Thinktomorrow\Trader\Infrastructure\Test\TestTraderConfig;
-use Thinktomorrow\Trader\Infrastructure\Vine\VineTaxonFilterTreeComposer;
+use Thinktomorrow\Trader\Infrastructure\Vine\VineFlattenedTaxonIds;
+use Thinktomorrow\Trader\Infrastructure\Vine\VineTaxonFilters;
 
 class MysqlCatalogRepositories implements CatalogRepositories
 {
@@ -46,8 +48,13 @@ class MysqlCatalogRepositories implements CatalogRepositories
         return new MysqlProductRepository(new MysqlVariantRepository(new TestContainer()));
     }
 
-    public function filterTreeComposer(): TaxonFilterTreeComposer
+    public function taxonFilters(): TaxonFilters
     {
-        return new VineTaxonFilterTreeComposer(new TestTraderConfig(), $this->taxonTreeRepository(), $this->taxonomyRepository());
+        return new VineTaxonFilters(new TestTraderConfig(), $this->taxonTreeRepository(), $this->taxonomyRepository());
+    }
+
+    public function flattenedTaxonIds(): FlattenedTaxonIds
+    {
+        return new VineFlattenedTaxonIds($this->taxonTreeRepository());
     }
 }
