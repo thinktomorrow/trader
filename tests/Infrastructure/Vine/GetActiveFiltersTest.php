@@ -23,7 +23,7 @@ final class GetActiveFiltersTest extends TestCase
             $catalog->linkProductToTaxon($product->productId->get(), $taxon2->taxonId->get());
 
             // Fetch active filters
-            $activeFilters = $catalog->repos->filterTreeComposer()->getActiveFilters(
+            $activeFilters = $catalog->repos->taxonFilters()->getActiveFilters(
                 Locale::fromString('nl'),
                 ['taxon-1-key-nl', 'taxon-2-key-nl'],
                 []
@@ -49,7 +49,7 @@ final class GetActiveFiltersTest extends TestCase
             $catalog->linkProductToTaxon($product->productId->get(), $taxon2->taxonId->get());
 
             // Fetch active filters
-            $activeFilters = $catalog->repos->filterTreeComposer()->getActiveFilters(
+            $activeFilters = $catalog->repos->taxonFilters()->getActiveFilters(
                 Locale::fromString('nl'),
                 ['taxon-1-key-nl'],
                 ['taxon-2-key-nl']
@@ -74,7 +74,7 @@ final class GetActiveFiltersTest extends TestCase
             $catalog->linkProductToTaxon($product->productId->get(), $taxon2->taxonId->get());
 
             // Fetch active filters
-            $activeFilters = $catalog->repos->filterTreeComposer()->getActiveFilters(
+            $activeFilters = $catalog->repos->taxonFilters()->getActiveFilters(
                 Locale::fromString('nl'),
                 ['taxon-1-key-nl'],
                 ['taxon-1-key-nl', 'taxon-2-key-nl']
@@ -99,7 +99,7 @@ final class GetActiveFiltersTest extends TestCase
             $catalog->linkProductToTaxon($product->productId->get(), $taxon2->taxonId->get());
 
             // Fetch active filters
-            $activeFilters = $catalog->repos->filterTreeComposer()->getActiveFilters(
+            $activeFilters = $catalog->repos->taxonFilters()->getActiveFilters(
                 Locale::fromString('nl'),
                 ['taxon-1-key-nl'],
                 ['taxon-2-key-nl']
@@ -115,7 +115,7 @@ final class GetActiveFiltersTest extends TestCase
     {
         foreach (Catalog::drivers() as $catalog) {
 
-            $activeFilters = $catalog->repos->filterTreeComposer()->getActiveFilters(
+            $activeFilters = $catalog->repos->taxonFilters()->getActiveFilters(
                 Locale::fromString('nl'),
                 ['xxx'],
                 []
@@ -124,4 +124,84 @@ final class GetActiveFiltersTest extends TestCase
             $this->assertEquals(0, $activeFilters->total());
         }
     }
+
+    public function test_it_returns_empty_if_no_scoped_taxa_given()
+    {
+        foreach (Catalog::drivers() as $catalog) {
+            $activeFilters = $catalog->repos->taxonFilters()->getActiveFilters(
+                Locale::fromString('nl'),
+                [],
+                []
+            );
+
+            $this->assertEquals(0, $activeFilters->total());
+        }
+    }
+
+    public function test_it_returns_only_scoped_if_active_taxa_do_not_exist()
+    {
+        foreach (Catalog::drivers() as $catalog) {
+            $taxonomy = $catalog->createTaxonomy();
+            $taxon = $catalog->createTaxon('taxon-1');
+
+            $product = $catalog->createProduct();
+            $catalog->linkProductToTaxon($product->productId->get(), $taxon->taxonId->get());
+
+            $activeFilters = $catalog->repos->taxonFilters()->getActiveFilters(
+                Locale::fromString('nl'),
+                ['taxon-1-key-nl'],
+                ['nonexistent-key']
+            );
+
+            $this->assertEquals(1, $activeFilters->total());
+            $this->assertEquals('taxon-1', $activeFilters->first()->getId());
+        }
+    }
+
+    public function test_it_combines_child_and_unrelated_active_filters()
+    {
+        foreach (Catalog::drivers() as $catalog) {
+            $taxonomy = $catalog->createTaxonomy();
+            $taxon1 = $catalog->createTaxon('taxon-1');
+            $taxonChild = $catalog->createTaxon('taxon-child', $taxonomy->taxonomyId->get(), $taxon1->taxonId->get());
+            $taxonUnrelated = $catalog->createTaxon('taxon-unrelated');
+
+            $product = $catalog->createProduct();
+            $catalog->linkProductToTaxon($product->productId->get(), $taxon1->taxonId->get());
+            $catalog->linkProductToTaxon($product->productId->get(), $taxonChild->taxonId->get());
+            $catalog->linkProductToTaxon($product->productId->get(), $taxonUnrelated->taxonId->get());
+
+            $activeFilters = $catalog->repos->taxonFilters()->getActiveFilters(
+                Locale::fromString('nl'),
+                ['taxon-1-key-nl'],
+                ['taxon-child-key-nl', 'taxon-unrelated-key-nl']
+            );
+
+            $this->assertEquals(2, $activeFilters->total());
+            $this->assertEquals('taxon-child', $activeFilters->first()->getId());
+            $this->assertEquals('taxon-unrelated', $activeFilters[1]->getId());
+        }
+    }
+
+    public function test_it_deduplicates_active_filters()
+    {
+        foreach (Catalog::drivers() as $catalog) {
+            $catalog->createTaxonomy();
+            $taxon = $catalog->createTaxon('taxon-1');
+
+            $product = $catalog->createProduct();
+            $catalog->linkProductToTaxon($product->productId->get(), $taxon->taxonId->get());
+
+            $activeFilters = $catalog->repos->taxonFilters()->getActiveFilters(
+                Locale::fromString('nl'),
+                ['taxon-1-key-nl'],
+                ['taxon-1-key-nl', 'taxon-1-key-nl']
+            );
+
+            // child taxon ontbreekt, dus scoped blijft
+            $this->assertEquals(1, $activeFilters->total());
+            $this->assertEquals('taxon-1', $activeFilters->first()->getId());
+        }
+    }
+
 }

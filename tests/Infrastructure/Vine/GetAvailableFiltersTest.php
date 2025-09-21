@@ -24,7 +24,7 @@ final class GetAvailableFiltersTest extends TestCase
             $catalog->linkProductToTaxon($product->productId->get(), $taxon->taxonId->get());
 
             // Compose filter tree
-            $filters = $catalog->repos->filterTreeComposer()->getAvailableFilters(Locale::fromString('nl'), ['taxon-aaa']);
+            $filters = $catalog->repos->taxonFilters()->getAvailableFilters(Locale::fromString('nl'), ['taxon-aaa']);
 
             $this->assertCount(1, $filters);
             $this->assertCount(1, reset($filters)['taxa']);
@@ -44,7 +44,7 @@ final class GetAvailableFiltersTest extends TestCase
             $catalog->linkProductToTaxon($product->productId->get(), $taxon->taxonId->get());
             $catalog->linkProductToTaxon($product2->productId->get(), $taxon->taxonId->get());
 
-            $productIds = $catalog->repos->filterTreeComposer()->getProductIds([$taxon->taxonId->get()]);
+            $productIds = $catalog->repos->taxonFilters()->getProductIds([$taxon->taxonId->get()]);
 
             $this->assertEquals([
                 $product->productId->get(), $product2->productId->get(),
@@ -69,7 +69,7 @@ final class GetAvailableFiltersTest extends TestCase
             $catalog->linkProductToTaxon($product->productId->get(), $taxon->taxonId->get());
             $catalog->linkProductToTaxon($product2->productId->get(), $taxon->taxonId->get());
 
-            $productIds = $catalog->repos->filterTreeComposer()->getGridProductIds([$taxon->taxonId->get()]);
+            $productIds = $catalog->repos->taxonFilters()->getGridProductIds([$taxon->taxonId->get()]);
 
             $this->assertEquals([
                 $product2->productId->get(),
@@ -92,7 +92,7 @@ final class GetAvailableFiltersTest extends TestCase
 
             $catalog->linkProductToTaxon($product->productId->get(), $taxon->taxonId->get());
 
-            $filters = $catalog->repos->filterTreeComposer()->getAvailableFilters(Locale::fromString('nl'), [$taxon->taxonId->get()]);
+            $filters = $catalog->repos->taxonFilters()->getAvailableFilters(Locale::fromString('nl'), [$taxon->taxonId->get()]);
 
             $this->assertCount(1, $filters);
             $this->assertCount(0, reset($filters)['taxa']);
@@ -120,7 +120,7 @@ final class GetAvailableFiltersTest extends TestCase
             $catalog->linkProductToTaxon($product->productId->get(), $taxon2->taxonId->get());
 
             // Compose filter tree
-            $filters = $catalog->repos->filterTreeComposer()->getAvailableFilters(Locale::fromString('nl'), ['taxon-aaa']);
+            $filters = $catalog->repos->taxonFilters()->getAvailableFilters(Locale::fromString('nl'), ['taxon-aaa']);
 
             $this->assertCount(1, $filters);
             $this->assertCount(2, reset($filters)['taxa']);
@@ -146,7 +146,7 @@ final class GetAvailableFiltersTest extends TestCase
             $catalog->linkProductToTaxon($product->productId->get(), $taxon->taxonId->get());
 
             // Compose filter tree
-            $filters = $catalog->repos->filterTreeComposer()->getAvailableFilters(Locale::fromString('nl'), ['taxon-aaa']);
+            $filters = $catalog->repos->taxonFilters()->getAvailableFilters(Locale::fromString('nl'), ['taxon-aaa']);
 
             $this->assertCount(0, $filters);
         }
@@ -169,7 +169,7 @@ final class GetAvailableFiltersTest extends TestCase
             $catalog->linkProductToTaxon($product->productId->get(), $taxon->taxonId->get());
 
             // Compose filter tree
-            $filters = $catalog->repos->filterTreeComposer()->getAvailableFilters(Locale::fromString('nl'), ['taxon-aaa']);
+            $filters = $catalog->repos->taxonFilters()->getAvailableFilters(Locale::fromString('nl'), ['taxon-aaa']);
 
             $this->assertCount(1, $filters);
             $this->assertCount(0, reset($filters)['taxa']);
@@ -192,7 +192,7 @@ final class GetAvailableFiltersTest extends TestCase
             $catalog->linkProductToTaxon($product->productId->get(), $taxon2->taxonId->get());
 
             // Compose filter tree
-            $filters = $catalog->repos->filterTreeComposer()->getAvailableFilters(Locale::fromString('nl'), ['taxon-aaa']);
+            $filters = $catalog->repos->taxonFilters()->getAvailableFilters(Locale::fromString('nl'), ['taxon-aaa']);
 
             $this->assertCount(2, $filters);
             $this->assertCount(1, $filters[0]['taxa']);
@@ -207,7 +207,7 @@ final class GetAvailableFiltersTest extends TestCase
         foreach (Catalog::drivers() as $catalog) {
 
             // Compose filter tree
-            $filters = $catalog->repos->filterTreeComposer()->getAvailableFilters(Locale::fromString('nl'), ['xxx']);
+            $filters = $catalog->repos->taxonFilters()->getAvailableFilters(Locale::fromString('nl'), ['xxx']);
 
             $this->assertCount(0, $filters);
         }
@@ -216,7 +216,7 @@ final class GetAvailableFiltersTest extends TestCase
     public function test_it_returns_empty_if_no_scoped_taxa_given()
     {
         foreach (Catalog::drivers() as $catalog) {
-            $filters = $catalog->repos->filterTreeComposer()->getAvailableFilters(Locale::fromString('nl'), []);
+            $filters = $catalog->repos->taxonFilters()->getAvailableFilters(Locale::fromString('nl'), []);
             $this->assertEquals([], $filters);
         }
     }
@@ -227,7 +227,7 @@ final class GetAvailableFiltersTest extends TestCase
             $catalog->createTaxonomy();
             $taxon = $catalog->createTaxon();
 
-            $filters = $catalog->repos->filterTreeComposer()->getAvailableFilters(Locale::fromString('nl'), [$taxon->taxonId->get()]);
+            $filters = $catalog->repos->taxonFilters()->getAvailableFilters(Locale::fromString('nl'), [$taxon->taxonId->get()]);
 
             $this->assertCount(1, $filters);
             $this->assertCount(0, reset($filters)['taxa']);
@@ -246,7 +246,7 @@ final class GetAvailableFiltersTest extends TestCase
             $product = $catalog->createProduct();
             $catalog->linkProductToTaxon($product->productId->get(), $child->taxonId->get());
 
-            $filters = $catalog->repos->filterTreeComposer()->getAvailableFilters(Locale::fromString('nl'), [$parent->taxonId->get()]);
+            $filters = $catalog->repos->taxonFilters()->getAvailableFilters(Locale::fromString('nl'), [$parent->taxonId->get()]);
 
             $this->assertCount(1, $filters);
             $this->assertEquals('child', $filters[0]['taxa'][0]->getId());
@@ -263,7 +263,7 @@ final class GetAvailableFiltersTest extends TestCase
             $product = $catalog->createProduct();
             $catalog->linkVariantToTaxon($product->productId->get(), $product->getVariants()[0]->variantId->get(), $taxon->taxonId->get());
 
-            $filters = $catalog->repos->filterTreeComposer()->getAvailableFilters(Locale::fromString('nl'), [$taxon->taxonId->get()]);
+            $filters = $catalog->repos->taxonFilters()->getAvailableFilters(Locale::fromString('nl'), [$taxon->taxonId->get()]);
 
             $this->assertCount(1, $filters);
             $this->assertEquals('red', $filters[0]['taxa'][0]->getId());
@@ -281,7 +281,7 @@ final class GetAvailableFiltersTest extends TestCase
             $catalog->linkProductToTaxon($product->productId->get(), $taxon1->taxonId->get());
             $catalog->linkProductToTaxon($product->productId->get(), $taxon2->taxonId->get());
 
-            $ids = $catalog->repos->filterTreeComposer()->getProductIds([$taxon1->taxonId->get(), $taxon2->taxonId->get()]);
+            $ids = $catalog->repos->taxonFilters()->getProductIds([$taxon1->taxonId->get(), $taxon2->taxonId->get()]);
 
             $this->assertEquals([$product->productId->get()], $ids);
         }
