@@ -4,12 +4,14 @@ namespace Tests\Support;
 
 use Psr\Container\ContainerInterface;
 use Thinktomorrow\Trader\Application\Product\Grid\FlattenedTaxonIds;
+use Thinktomorrow\Trader\Application\Product\ProductDetail\ProductDetailRepository;
 use Thinktomorrow\Trader\Application\Taxon\Queries\TaxaSelectOptions;
 use Thinktomorrow\Trader\Application\Taxon\Queries\TaxonFilters;
 use Thinktomorrow\Trader\Application\Taxon\Tree\TaxonTreeRepository;
 use Thinktomorrow\Trader\Domain\Model\Product\ProductRepository;
 use Thinktomorrow\Trader\Domain\Model\Taxon\TaxonRepository;
 use Thinktomorrow\Trader\Domain\Model\Taxonomy\TaxonomyRepository;
+use Thinktomorrow\Trader\Infrastructure\Laravel\Repositories\MysqlProductDetailRepository;
 use Thinktomorrow\Trader\Infrastructure\Laravel\Repositories\MysqlProductRepository;
 use Thinktomorrow\Trader\Infrastructure\Laravel\Repositories\MysqlTaxonomyRepository;
 use Thinktomorrow\Trader\Infrastructure\Laravel\Repositories\MysqlTaxonRepository;
@@ -48,6 +50,11 @@ class MysqlCatalogRepositories implements CatalogRepositories
     public function productRepository(): ProductRepository
     {
         return new MysqlProductRepository(new MysqlVariantRepository(new TestContainer()));
+    }
+
+    public function productDetailRepository(): ProductDetailRepository
+    {
+        return new MysqlProductDetailRepository(new TestContainer());
     }
 
     public function taxonFilters(): TaxonFilters

@@ -3,6 +3,7 @@
 namespace Tests\Support;
 
 use Thinktomorrow\Trader\Application\Product\Grid\FlattenedTaxonIds;
+use Thinktomorrow\Trader\Application\Product\ProductDetail\ProductDetailRepository;
 use Thinktomorrow\Trader\Application\Taxon\Queries\TaxaSelectOptions;
 use Thinktomorrow\Trader\Application\Taxon\Queries\TaxonFilters;
 use Thinktomorrow\Trader\Application\Taxon\Tree\TaxonTreeRepository;
@@ -11,6 +12,7 @@ use Thinktomorrow\Trader\Domain\Model\Taxon\TaxonRepository;
 use Thinktomorrow\Trader\Domain\Model\Taxonomy\TaxonomyRepository;
 use Thinktomorrow\Trader\Infrastructure\Test\Repositories\InMemoryCountryRepository;
 use Thinktomorrow\Trader\Infrastructure\Test\Repositories\InMemoryOrderRepository;
+use Thinktomorrow\Trader\Infrastructure\Test\Repositories\InMemoryProductDetailRepository;
 use Thinktomorrow\Trader\Infrastructure\Test\Repositories\InMemoryProductRepository;
 use Thinktomorrow\Trader\Infrastructure\Test\Repositories\InMemoryPromoRepository;
 use Thinktomorrow\Trader\Infrastructure\Test\Repositories\InMemoryTaxonomyRepository;
@@ -59,6 +61,11 @@ class InMemoryCatalogRepositories implements CatalogRepositories
     public function productRepository(): ProductRepository
     {
         return new InMemoryProductRepository();
+    }
+
+    public function productDetailRepository(): ProductDetailRepository
+    {
+        return new InMemoryProductDetailRepository();
     }
 
     public function taxonFilters(): TaxonFilters

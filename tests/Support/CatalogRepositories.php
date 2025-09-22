@@ -3,6 +3,7 @@
 namespace Tests\Support;
 
 use Thinktomorrow\Trader\Application\Product\Grid\FlattenedTaxonIds;
+use Thinktomorrow\Trader\Application\Product\ProductDetail\ProductDetailRepository;
 use Thinktomorrow\Trader\Application\Taxon\Queries\TaxaSelectOptions;
 use Thinktomorrow\Trader\Application\Taxon\Queries\TaxonFilters;
 use Thinktomorrow\Trader\Application\Taxon\Tree\TaxonTreeRepository;
@@ -19,6 +20,8 @@ interface CatalogRepositories
     public function taxonTreeRepository(): TaxonTreeRepository;
 
     public function productRepository(): ProductRepository;
+
+    public function productDetailRepository(): ProductDetailRepository;
 
     public function taxonFilters(): TaxonFilters;
 
