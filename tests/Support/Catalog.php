@@ -172,11 +172,19 @@ class Catalog
     public function linkProductToTaxon(string|Product $productId, string|Taxon $taxonId): Product
     {
         $product = $productId instanceof Product ? $productId : $this->repos->productRepository()->find(ProductId::fromString($productId));
-        $taxonId = $taxonId instanceof Taxon ? $taxonId->taxonId->get() : $taxonId;
+        $taxon = $taxonId instanceof Taxon ? $taxonId : $this->repos->taxonRepository()->find(TaxonId::fromString($taxonId));
+
+        $productTaxon = ProductTaxon::create($product->productId, $taxon->taxonId);
+
+        // If taxonomy is of type variant_property, we need to set the relation as a VariantTaxon instead of default ProductTaxon
+        $taxonomy = $this->repos->taxonomyRepository()->find($taxon->taxonomyId);
+        if ($taxonomy->getType() == TaxonomyType::variant_property) {
+            $productTaxon = $productTaxon->toVariantProperty();
+        }
 
         $product->updateProductTaxa([
             ...$product->getProductTaxa(),
-            ProductTaxon::create($product->productId, TaxonId::fromString($taxonId)),
+            $productTaxon
         ]);
 
         if ($this->persist) {
@@ -220,5 +228,32 @@ class Catalog
         ]);
 
         return $product;
+    }
+
+    /**
+     * Data provider for tests, providing different product setups.
+     *
+     * 1. Product with variant
+     * 2. Product without variant
+     * 3. Product with personalisation
+     * 4. Product linked to taxon
+     * 5. Product linked to multiple taxons (from different taxonomies)
+     */
+    public function products(): array
+    {
+        // For product with taxon
+        $this->createTaxonomy();
+        $taxon = $this->createTaxon();
+
+        $taxonomy2 = $this->createTaxonomy('taxonomy-bbb', TaxonomyType::variant_property->value);
+        $taxon2 = $this->createTaxon('taxon-bbb', $taxonomy2->taxonomyId->get());
+
+        return [
+            $this->createProduct(),
+            Product::create(ProductId::fromString('product-aaa')), // Without variant
+            $this->addPersonalisationToProduct($this->createProduct(), $this->makePersonalisation()),
+            $this->linkProductToTaxon($this->createProduct(), $taxon),
+            $this->linkProductToTaxon($this->linkProductToTaxon($this->createProduct(), $taxon2), $taxon),
+        ];
     }
 }

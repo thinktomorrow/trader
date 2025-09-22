@@ -22,6 +22,11 @@ trait HasVariants
         return $this->variants;
     }
 
+    public function hasVariants(): bool
+    {
+        return count($this->variants) > 0;
+    }
+
     public function createVariant(Variant $variant): void
     {
         Assertion::true($variant->productId->equals($this->productId), 'Variant has a different product id [' . $variant->productId->get() . '] that the product it is being added to [' . $this->productId->get() . '].');

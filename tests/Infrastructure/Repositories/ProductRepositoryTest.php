@@ -6,7 +6,6 @@ namespace Tests\Infrastructure\Repositories;
 use Tests\Infrastructure\TestCase;
 use Tests\Support\Catalog;
 use Thinktomorrow\Trader\Domain\Model\Product\Exceptions\CouldNotFindProduct;
-use Thinktomorrow\Trader\Domain\Model\Product\Product;
 use Thinktomorrow\Trader\Domain\Model\Product\ProductId;
 
 final class ProductRepositoryTest extends TestCase
@@ -17,7 +16,7 @@ final class ProductRepositoryTest extends TestCase
 
             $catalog->dontPersist();
 
-            foreach ($this->products($catalog) as $product) {
+            foreach ($catalog->products() as $product) {
 
                 $catalog->repos->productRepository()->save($product);
                 $product->releaseEvents();
@@ -35,7 +34,7 @@ final class ProductRepositoryTest extends TestCase
 
             $catalog->dontPersist();
 
-            foreach ($this->products($catalog) as $product) {
+            foreach ($catalog->products() as $product) {
 
                 $catalog->repos->productRepository()->save($product);
                 $product->releaseEvents();
@@ -58,19 +57,5 @@ final class ProductRepositoryTest extends TestCase
         foreach (Catalog::drivers() as $catalog) {
             $this->assertInstanceOf(ProductId::class, $catalog->repos->productRepository()->nextReference());
         }
-    }
-
-    private function products(Catalog $catalog): array
-    {
-        // For product with taxon
-        $catalog->createTaxonomy();
-        $taxon = $catalog->createTaxon();
-
-        return [
-            $catalog->createProduct(),
-            Product::create(ProductId::fromString('product-aaa')), // Without variant
-            $catalog->addPersonalisationToProduct($catalog->createProduct(), $catalog->makePersonalisation()),
-            $catalog->linkProductToTaxon($catalog->createProduct(), $taxon),
-        ];
     }
 }
