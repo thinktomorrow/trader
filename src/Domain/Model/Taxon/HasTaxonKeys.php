@@ -47,7 +47,7 @@ trait HasTaxonKeys
     {
         $this->assertMatchingTaxonId($taxonKey);
 
-        if ($existingKey = $this->findTaxonKeyByLocale($taxonKey->getLocale())) {
+        if (($existingKey = $this->findTaxonKeyByLocale($taxonKey->getLocale())) && !$existingKey->getKey()->equals($taxonKey->getKey())) {
 
             $oldKeyId = $existingKey->getKey();
 
@@ -56,9 +56,7 @@ trait HasTaxonKeys
                 return $key->getLocale()->equals($taxonKey->getLocale()) ? $key->changeKey($taxonKey->getKey()) : $key;
             }, $this->taxonKeys);
 
-            if (!$existingKey->getKey()->equals($oldKeyId)) {
-                $this->recordEvent(new TaxonKeyUpdated($this->taxonId, $taxonKey->getLocale(), $oldKeyId, $taxonKey->getKey()));
-            }
+            $this->recordEvent(new TaxonKeyUpdated($this->taxonId, $taxonKey->getLocale(), $oldKeyId, $taxonKey->getKey()));
 
             return;
         }
