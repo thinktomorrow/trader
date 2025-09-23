@@ -33,7 +33,7 @@ final class InMemoryTaxonRedirectRepository implements TaxonRedirectRepository
 
         return array_values(array_filter(
             $this->items,
-            fn(Redirect $redirect) => $redirect->getLocale()->equals($locale) && $redirect->getTo() === $to
+            fn (Redirect $redirect) => $redirect->getLocale()->equals($locale) && $redirect->getTo() === $to
         ));
     }
 
@@ -46,6 +46,7 @@ final class InMemoryTaxonRedirectRepository implements TaxonRedirectRepository
         foreach ($this->getAllTo($redirect->getLocale(), $from) as $existingRedirect) {
             if ($existingRedirect->getFrom() === $to) {
                 $this->delete($existingRedirect);
+
                 continue;
             }
 
@@ -57,6 +58,7 @@ final class InMemoryTaxonRedirectRepository implements TaxonRedirectRepository
             foreach ($this->items as $key => $item) {
                 if ($item->getId() === $redirect->getId()) {
                     $this->items[$key] = $redirect;
+
                     return;
                 }
             }
@@ -76,13 +78,13 @@ final class InMemoryTaxonRedirectRepository implements TaxonRedirectRepository
 
     public function delete(Redirect $redirect): void
     {
-        if (!$redirect->getId()) {
+        if (! $redirect->getId()) {
             return;
         }
 
         $this->items = array_values(array_filter(
             $this->items,
-            fn(Redirect $item) => $item->getId() !== $redirect->getId()
+            fn (Redirect $item) => $item->getId() !== $redirect->getId()
         ));
     }
 
