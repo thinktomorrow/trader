@@ -56,7 +56,7 @@ trait HasTaxonKeys
                 return $key->getLocale()->equals($taxonKey->getLocale()) ? $key->changeKey($taxonKey->getKey()) : $key;
             }, $this->taxonKeys);
 
-            if (!$existingKey->getKey()->equals($oldKeyId)) {
+            if (! $existingKey->getKey()->equals($oldKeyId)) {
                 $this->recordEvent(new TaxonKeyUpdated($this->taxonId, $taxonKey->getLocale(), $oldKeyId, $taxonKey->getKey()));
             }
 
@@ -69,7 +69,7 @@ trait HasTaxonKeys
 
     private function assertMatchingTaxonId(TaxonKey $taxonKey): void
     {
-        if (!$taxonKey->taxonId->equals($this->taxonId)) {
+        if (! $taxonKey->taxonId->equals($this->taxonId)) {
             throw new InvalidTaxonIdOnTaxonKey(sprintf(
                 'Cannot add or update TaxonKey. Passed TaxonKey has TaxonId [%s] that doesn\'t match with TaxonId [%s].',
                 $taxonKey->taxonId->get(),
