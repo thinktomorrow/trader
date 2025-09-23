@@ -5,10 +5,10 @@ namespace Thinktomorrow\Trader\Infrastructure\Laravel\Repositories;
 
 use Illuminate\Support\Facades\DB;
 use Thinktomorrow\Trader\Application\Taxon\Redirect\Redirect;
-use Thinktomorrow\Trader\Application\Taxon\Redirect\RedirectRepository;
+use Thinktomorrow\Trader\Application\Taxon\Redirect\TaxonRedirectRepository;
 use Thinktomorrow\Trader\Domain\Common\Locale;
 
-class MysqlRedirectRepository implements RedirectRepository
+class MysqlTaxonRedirectRepository implements TaxonRedirectRepository
 {
     private static string $redirectTable = 'trader_taxa_redirects';
 
@@ -19,11 +19,11 @@ class MysqlRedirectRepository implements RedirectRepository
             ->where('from', static::sanitizeSlug($from))
             ->first();
 
-        if (! $result) {
+        if (!$result) {
             return null;
         }
 
-        return new Redirect($locale, $result->from, $result->to, (string) $result->id, \DateTime::createFromFormat('Y-m-d H:i:s', $result->created_at));
+        return new Redirect($locale, $result->from, $result->to, (string)$result->id, \DateTime::createFromFormat('Y-m-d H:i:s', $result->created_at));
     }
 
     public function getAllTo(Locale $locale, string $to): array
@@ -32,7 +32,7 @@ class MysqlRedirectRepository implements RedirectRepository
             ->where('locale', $locale->get())
             ->where('to', static::sanitizeSlug($to))
             ->get()
-            ->map(fn ($result) => new Redirect($locale, $result->from, $result->to, (string) $result->id, \DateTime::createFromFormat('Y-m-d H:i:s', $result->created_at)))
+            ->map(fn($result) => new Redirect($locale, $result->from, $result->to, (string)$result->id, \DateTime::createFromFormat('Y-m-d H:i:s', $result->created_at)))
             ->toArray();
     }
 
@@ -73,7 +73,7 @@ class MysqlRedirectRepository implements RedirectRepository
 
     public function delete(Redirect $redirect): void
     {
-        if (! $redirect->getId()) {
+        if (!$redirect->getId()) {
             return;
         }
 

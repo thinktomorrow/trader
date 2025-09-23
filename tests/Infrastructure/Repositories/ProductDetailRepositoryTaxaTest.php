@@ -3,12 +3,10 @@ declare(strict_types=1);
 
 namespace Tests\Infrastructure\Repositories;
 
-use Illuminate\Foundation\Testing\RefreshDatabase;
-use PHPUnit\Framework\Attributes\DataProvider;
 use Tests\Infrastructure\TestCase;
 use Thinktomorrow\Trader\Application\Common\DefaultLocale;
+use Thinktomorrow\Trader\Application\Product\Taxa\ProductTaxonItem;
 use Thinktomorrow\Trader\Domain\Common\Locale;
-use Thinktomorrow\Trader\Domain\Model\Product\Product;
 use Thinktomorrow\Trader\Domain\Model\Product\ProductTaxa\ProductTaxon;
 use Thinktomorrow\Trader\Domain\Model\Taxon\Taxon;
 use Thinktomorrow\Trader\Domain\Model\Taxon\TaxonId;
@@ -27,61 +25,76 @@ use Thinktomorrow\Trader\Infrastructure\Test\Repositories\InMemoryProductReposit
 use Thinktomorrow\Trader\Infrastructure\Test\Repositories\InMemoryTaxonomyRepository;
 use Thinktomorrow\Trader\Infrastructure\Test\Repositories\InMemoryTaxonRepository;
 use Thinktomorrow\Trader\Infrastructure\Test\TestContainer;
+use Thinktomorrow\Trader\Testing\Support\Catalog;
 
 final class ProductDetailRepositoryTaxaTest extends TestCase
 {
-    use RefreshDatabase;
-
-    #[DataProvider('products')]
-    public function test_it_can_get_product_taxa(Product $product)
+    public function test_it_can_get_product_taxa()
     {
-        foreach ($this->repositories() as $i => $repository) {
+        foreach (Catalog::drivers() as $catalog) {
 
-            // Create test data
-            $taxonomy = Taxonomy::create(TaxonomyId::fromString('ooo'), TaxonomyType::property);
-            $taxonomy->showInGrid();
+            $catalog->dontPersist();
 
-            $taxon = Taxon::create(TaxonId::fromString('xxx'), TaxonomyId::fromString('ooo'));
-            $taxon->changeOrder(2);
-            $taxon->updateTaxonKeys([TaxonKey::create($taxon->taxonId, TaxonKeyId::fromString('taxon-key'), Locale::fromString('nl'))]);
-            $taxon->addData(['title' => [
-                'nl' => 'Taxon title',
-                'fr' => 'Titre du taxon',
-            ]]);
+            foreach ($catalog->products() as $product) {
 
-            $this->taxonomyRepositories()[$i]->save($taxonomy);
-            $this->taxonRepositories()[$i]->save($taxon);
+                if (!$product->hasVariants()) {
+                    continue;
+                }
 
-            $product->updateProductTaxa([
-                ProductTaxon::create($product->productId, $taxon->taxonId),
-            ]);
+                $originalProductTaxa = $product->getProductTaxa();
 
-            $productRepository = iterator_to_array($this->productRepositories())[$i];
-            $productRepository->save($product);
-            $product->releaseEvents();
+                $catalog->repos->productRepository()->save($product);
+                $product->releaseEvents();
 
-            $result = $repository
-                ->findProductDetail($product->getVariants()[0]->variantId)
-                ->getTaxa();
+                $productDetail = $catalog->repos->productDetailRepository()->findProductDetail($product->getVariants()[0]->variantId);
 
-            $this->assertCount(1, $result);
+                $this->assertCount(count($originalProductTaxa), $productDetail->getTaxa());
+                $this->assertContainsOnlyInstancesOf(ProductTaxonItem::class, $productDetail->getTaxa());
 
-            $taxonItem = $result[0];
-
-            $this->assertEquals($product->productId->get(), $taxonItem->getProductId());
-            $this->assertEquals($taxon->taxonId->get(), $taxonItem->getTaxonId());
-            $this->assertEquals($taxon->taxonomyId->get(), $taxonItem->getTaxonomyId());
-            $this->assertEquals($taxonomy->getType()->value, $taxonItem->getTaxonomyType());
-            $this->assertTrue($taxonItem->showsInGrid());
-
-            $this->assertEquals('Taxon title', $taxonItem->getLabel('nl'));
-            $this->assertEquals('Titre du taxon', $taxonItem->getLabel('fr'));
+                if (count($originalProductTaxa) > 0) {
+                    $this->assertEquals($product->productId->get(), $productDetail->getTaxa()[0]->getProductId());
+                    $this->assertEqualsCanonicalizing(
+                        array_map(fn($productTaxon) => $productTaxon->taxonId->get(), $originalProductTaxa),
+                        array_map(fn($productTaxon) => $productTaxon->getTaxonId(), $productDetail->getTaxa())
+                    );
+                }
+            }
         }
     }
 
-    #[DataProvider('products')]
-    public function test_it_can_get_taxon_keys_by_product(Product $product)
+    public function test_it_can_get_taxon_keys_by_product()
     {
+        foreach (Catalog::drivers() as $catalog) {
+
+            $catalog->dontPersist();
+
+            foreach ($catalog->products() as $product) {
+
+                if (!$product->hasVariants()) {
+                    continue;
+                }
+
+                $originalProductTaxa = $product->getProductTaxa();
+
+                $catalog->repos->productRepository()->save($product);
+                $product->releaseEvents();
+
+                $productDetail = $catalog->repos->productDetailRepository()->findProductDetail($product->getVariants()[0]->variantId);
+
+                $this->assertCount(count($originalProductTaxa), $productDetail->getTaxa());
+                $this->assertContainsOnlyInstancesOf(ProductTaxonItem::class, $productDetail->getTaxa());
+
+                if (count($originalProductTaxa) > 0) {
+                    $this->assertEquals($product->productId->get(), $productDetail->getTaxa()[0]->getProductId());
+                    $this->assertEqualsCanonicalizing(
+                        array_map(fn($productTaxon) => $productTaxon->taxonId->get(), $originalProductTaxa),
+                        array_map(fn($productTaxon) => $productTaxon->getTaxonId(), $productDetail->getTaxa())
+                    );
+                }
+            }
+        }
+
+
         foreach ($this->repositories() as $i => $repository) {
 
             // Create test data

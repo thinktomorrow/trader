@@ -4,7 +4,7 @@ namespace Thinktomorrow\Trader\Application\Taxon\Redirect;
 
 use Thinktomorrow\Trader\Domain\Common\Locale;
 
-interface RedirectRepository
+interface TaxonRedirectRepository
 {
     public function find(Locale $locale, string $from): ?Redirect;
 

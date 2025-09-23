@@ -5,10 +5,10 @@ namespace Tests\Infrastructure\Repositories;
 
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\Infrastructure\TestCase;
-use Tests\Support\Catalog;
 use Thinktomorrow\Trader\Application\Product\ProductDetail\ProductDetail;
 use Thinktomorrow\Trader\Domain\Model\Product\Exceptions\CouldNotFindVariant;
 use Thinktomorrow\Trader\Domain\Model\Product\ProductState;
+use Thinktomorrow\Trader\Testing\Support\Catalog;
 
 final class ProductDetailRepositoryTest extends TestCase
 {

@@ -4,12 +4,12 @@ declare(strict_types=1);
 namespace Tests\Infrastructure\Vine;
 
 use Tests\Infrastructure\TestCase;
-use Tests\Support\Catalog;
 use Thinktomorrow\Trader\Domain\Common\Locale;
 use Thinktomorrow\Trader\Domain\Model\Taxon\TaxonState;
 use Thinktomorrow\Trader\Domain\Model\Taxonomy\TaxonomyState;
 use Thinktomorrow\Trader\Domain\Model\Taxonomy\TaxonomyType;
 use Thinktomorrow\Trader\Infrastructure\Test\TestTraderConfig;
+use Thinktomorrow\Trader\Testing\Support\Catalog;
 
 final class GetAvailableFiltersTest extends TestCase
 {

@@ -4,18 +4,15 @@ declare(strict_types=1);
 namespace Tests\Acceptance;
 
 use Illuminate\Support\Arr;
-use Thinktomorrow\Trader\Application\Cart\PaymentMethod\UpdatePaymentMethodOnOrder;
-use Thinktomorrow\Trader\Application\Cart\PaymentMethod\VerifyPaymentMethodForCart;
 use Thinktomorrow\Trader\Application\Common\DataRenderer;
 use Thinktomorrow\Trader\Application\Common\DefaultLocale;
 use Thinktomorrow\Trader\Domain\Common\Locale;
 use Thinktomorrow\Trader\Domain\Common\Vat\VatPercentage;
 use Thinktomorrow\Trader\Domain\Model\Order\Discount\DiscountPriceDefaults;
-use Thinktomorrow\Trader\Infrastructure\Laravel\Models\PaymentMethod\DefaultVerifyPaymentMethodForCart;
 use Thinktomorrow\Trader\Infrastructure\Test\Repositories\InMemoryOrderRepository;
 use Thinktomorrow\Trader\Infrastructure\Test\Repositories\InMemoryPaymentMethodRepository;
-use Thinktomorrow\Trader\Infrastructure\Test\TestContainer;
-use Thinktomorrow\Trader\Infrastructure\Test\TestTraderConfig;
+use Thinktomorrow\Trader\Testing\Support\Catalog;
+use Thinktomorrow\Trader\Testing\Support\Shop;
 
 class TestCase extends \PHPUnit\Framework\TestCase
 {
@@ -32,7 +29,7 @@ class TestCase extends \PHPUnit\Framework\TestCase
         DefaultLocale::set(Locale::fromString('nl'));
 
         DataRenderer::setDataResolver(function (array $data, string $key, ?string $language = null, ?string $default = null) {
-            if (! $language) {
+            if (!$language) {
                 $language = 'nl';
             }
 
@@ -44,6 +41,15 @@ class TestCase extends \PHPUnit\Framework\TestCase
 
             return $value === null ? $default : $value;
         });
+
+        Catalog::setUp();
+        Shop::setUp();
+    }
+
+    protected function tearDown(): void
+    {
+        Catalog::tearDown();
+        Shop::tearDown();
     }
 
     private function addInstancesToContainer()

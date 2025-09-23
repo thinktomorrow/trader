@@ -7,7 +7,7 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\Infrastructure\TestCase;
 use Thinktomorrow\Trader\Application\Taxon\Redirect\Redirect;
 use Thinktomorrow\Trader\Domain\Common\Locale;
-use Thinktomorrow\Trader\Infrastructure\Laravel\Repositories\MysqlRedirectRepository;
+use Thinktomorrow\Trader\Infrastructure\Laravel\Repositories\MysqlTaxonRedirectRepository;
 
 final class RedirectRepositoryTest extends TestCase
 {
@@ -91,6 +91,6 @@ final class RedirectRepositoryTest extends TestCase
 
     private static function repositories(): \Generator
     {
-        yield new MysqlRedirectRepository();
+        yield new MysqlTaxonRedirectRepository();
     }
 }

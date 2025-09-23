@@ -32,7 +32,8 @@
         "orchestra/testbench": "^10.3",
         "nesbot/carbon": "^3.8",
         "qossmic/deptrac-shim": "^1.0.2",
-        "infection/infection": "^0.30.3"
+        "infection/infection": "^0.30.3",
+        "thinktomorrow/trader-testing": "dev-main"
     },
     "autoload": {
         "psr-4": {

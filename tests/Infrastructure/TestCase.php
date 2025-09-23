@@ -5,8 +5,6 @@ namespace Tests\Infrastructure;
 
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Money\Money;
-use Tests\Support\Catalog;
-use Tests\Support\Shop;
 use Tests\TestHelpers;
 use Thinktomorrow\Trader\Domain\Common\Email;
 use Thinktomorrow\Trader\Domain\Common\Locale;
@@ -26,6 +24,8 @@ use Thinktomorrow\Trader\Domain\Model\ShippingProfile\ShippingProfileId;
 use Thinktomorrow\Trader\Domain\Model\ShippingProfile\ShippingProfileRepository;
 use Thinktomorrow\Trader\Infrastructure\Laravel\TraderServiceProvider;
 use Thinktomorrow\Trader\Infrastructure\Shop\ShopServiceProvider;
+use Thinktomorrow\Trader\Testing\Support\Catalog;
+use Thinktomorrow\Trader\Testing\Support\Shop;
 
 abstract class TestCase extends \Orchestra\Testbench\TestCase
 {

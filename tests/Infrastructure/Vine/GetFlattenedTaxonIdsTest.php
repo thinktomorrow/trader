@@ -4,7 +4,7 @@ declare(strict_types=1);
 namespace Tests\Infrastructure\Vine;
 
 use Tests\Infrastructure\TestCase;
-use Tests\Support\Catalog;
+use Thinktomorrow\Trader\Testing\Support\Catalog;
 
 final class GetFlattenedTaxonIdsTest extends TestCase
 {

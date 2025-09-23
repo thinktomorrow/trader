@@ -4,9 +4,9 @@ declare(strict_types=1);
 namespace Tests\Infrastructure\Repositories;
 
 use Tests\Infrastructure\TestCase;
-use Tests\Support\Catalog;
 use Thinktomorrow\Trader\Domain\Model\Product\Exceptions\CouldNotFindProduct;
 use Thinktomorrow\Trader\Domain\Model\Product\ProductId;
+use Thinktomorrow\Trader\Testing\Support\Catalog;
 
 final class ProductRepositoryTest extends TestCase
 {
