@@ -106,9 +106,11 @@ return new class extends Migration {
         });
 
         Schema::create(static::PREFIX . 'taxa_keys', function (Blueprint $table) {
-            $table->string('key', 255)->primary();
+            $table->string('key', 255);
             $table->char('taxon_id', 36)->index();
             $table->string('locale');
+
+            $table->primary(['locale', 'key']);
 
             $table->foreign('taxon_id')->references('taxon_id')->on(static::PREFIX . 'taxa')->onDelete('cascade');
         });
