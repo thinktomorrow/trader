@@ -9,7 +9,7 @@ use Thinktomorrow\Trader\Domain\Common\Locale;
 class TaxonKey implements ChildEntity
 {
     public readonly TaxonId $taxonId;
-    public readonly TaxonKeyId $taxonKeyId;
+    public TaxonKeyId $taxonKeyId;
     private Locale $locale;
 
     private function __construct()
@@ -35,6 +35,20 @@ class TaxonKey implements ChildEntity
         $taxonKey->locale = $locale;
 
         return $taxonKey;
+    }
+
+    public function getKey(): TaxonKeyId
+    {
+        return $this->taxonKeyId;
+    }
+
+    public function changeKey(TaxonKeyId $newKey): self
+    {
+        return static::create(
+            $this->taxonId,
+            $newKey,
+            $this->locale
+        );
     }
 
     public function getLocale(): Locale

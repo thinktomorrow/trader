@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace Thinktomorrow\Trader\Domain\Model\Taxon;
 
+use Thinktomorrow\Trader\Domain\Common\Locale;
 use Thinktomorrow\Trader\Domain\Model\Taxon\Events\TaxonKeyUpdated;
 use Thinktomorrow\Trader\Domain\Model\Taxon\Exceptions\InvalidTaxonIdOnTaxonKey;
 
@@ -20,7 +21,7 @@ trait HasTaxonKeys
     public function hasTaxonKeyId(TaxonKeyId $taxonKeyId): bool
     {
         foreach ($this->taxonKeys as $taxonKey) {
-            if ($taxonKey->taxonKeyId->equals($taxonKeyId)) {
+            if ($taxonKey->getKey()->equals($taxonKeyId)) {
                 return true;
             }
         }
@@ -44,22 +45,47 @@ trait HasTaxonKeys
      */
     private function addOrUpdateTaxonKey(TaxonKey $taxonKey): void
     {
-        if (! $taxonKey->taxonId->equals($this->taxonId)) {
-            throw new InvalidTaxonIdOnTaxonKey('Cannot add or update TaxonKey. Passed TaxonKey has TaxonId [' . $taxonKey->taxonId->get() . '] that doesn\'t match with TaxonId [' . $this->taxonId->get() . '].');
+        $this->assertMatchingTaxonId($taxonKey);
+
+        if ($existingKey = $this->findTaxonKeyByLocale($taxonKey->getLocale())) {
+
+            $oldKeyId = $existingKey->getKey();
+
+            // Set to array again to ensure the updated key is stored
+            $this->taxonKeys = array_map(function (TaxonKey $key) use ($taxonKey) {
+                return $key->getLocale()->equals($taxonKey->getLocale()) ? $key->changeKey($taxonKey->getKey()) : $key;
+            }, $this->taxonKeys);
+
+            if (!$existingKey->getKey()->equals($oldKeyId)) {
+                $this->recordEvent(new TaxonKeyUpdated($this->taxonId, $taxonKey->getLocale(), $oldKeyId, $taxonKey->getKey()));
+            }
+
+            return;
         }
 
-        foreach ($this->taxonKeys as $index => $existingTaxonKey) {
-            if ($existingTaxonKey->getLocale()->equals($taxonKey->getLocale())) {
-                if (! $existingTaxonKey->taxonKeyId->equals($taxonKey->taxonKeyId)) {
-                    $this->taxonKeys[$index] = $taxonKey;
+        // no existing key for this locale → add new
+        $this->taxonKeys[] = $taxonKey;
+    }
 
-                    $this->recordEvent(new TaxonKeyUpdated($this->taxonId, $taxonKey->getLocale(), $existingTaxonKey->taxonKeyId, $taxonKey->taxonKeyId));
-                }
+    private function assertMatchingTaxonId(TaxonKey $taxonKey): void
+    {
+        if (!$taxonKey->taxonId->equals($this->taxonId)) {
+            throw new InvalidTaxonIdOnTaxonKey(sprintf(
+                'Cannot add or update TaxonKey. Passed TaxonKey has TaxonId [%s] that doesn\'t match with TaxonId [%s].',
+                $taxonKey->taxonId->get(),
+                $this->taxonId->get()
+            ));
+        }
+    }
 
-                return;
+    private function findTaxonKeyByLocale(Locale $locale): ?TaxonKey
+    {
+        foreach ($this->taxonKeys as $existingTaxonKey) {
+            if ($existingTaxonKey->getLocale()->equals($locale)) {
+                return $existingTaxonKey;
             }
         }
 
-        $this->taxonKeys[] = $taxonKey;
+        return null;
     }
 }

@@ -19,7 +19,7 @@ class MysqlTaxonRedirectRepository implements TaxonRedirectRepository
             ->where('from', static::sanitizeSlug($from))
             ->first();
 
-        if (! $result) {
+        if (!$result) {
             return null;
         }
 
@@ -32,7 +32,7 @@ class MysqlTaxonRedirectRepository implements TaxonRedirectRepository
             ->where('locale', $locale->get())
             ->where('to', static::sanitizeSlug($to))
             ->get()
-            ->map(fn ($result) => new Redirect($locale, $result->from, $result->to, (string)$result->id, \DateTime::createFromFormat('Y-m-d H:i:s', $result->created_at)))
+            ->map(fn($result) => new Redirect($locale, $result->from, $result->to, (string)$result->id, \DateTime::createFromFormat('Y-m-d H:i:s', $result->created_at)))
             ->toArray();
     }
 
@@ -61,6 +61,11 @@ class MysqlTaxonRedirectRepository implements TaxonRedirectRepository
                 'from' => static::sanitizeSlug($redirect->getFrom()),
                 'to' => static::sanitizeSlug($redirect->getTo()),
             ]);
+        } elseif ($this->find($redirect->getLocale(), $from)) {
+            // If a redirect with this from already exists, we'll update it to the new target
+            DB::table(static::$redirectTable)->where('locale', $redirect->getLocale()->get())->where('from', $from)->update([
+                'to' => static::sanitizeSlug($redirect->getTo()),
+            ]);
         } else {
             DB::table(static::$redirectTable)->insert([
                 'locale' => $redirect->getLocale()->get(),
@@ -73,7 +78,7 @@ class MysqlTaxonRedirectRepository implements TaxonRedirectRepository
 
     public function delete(Redirect $redirect): void
     {
-        if (! $redirect->getId()) {
+        if (!$redirect->getId()) {
             return;
         }
 

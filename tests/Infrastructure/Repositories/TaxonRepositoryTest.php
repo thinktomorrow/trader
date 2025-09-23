@@ -44,7 +44,7 @@ final class TaxonRepositoryTest extends TestCase
             $this->assertTrue(count($freshTaxon->getTaxonKeys()) > 0);
 
             foreach ($freshTaxon->getTaxonKeys() as $taxonKey) {
-                $this->assertEquals($taxon, $taxonRepository->findByKey($taxonKey->taxonKeyId));
+                $this->assertEquals($taxon, $taxonRepository->findByKey($taxonKey->getKey()));
             }
         }
     }

@@ -185,8 +185,8 @@ class TaxonTest extends TestCase
             $taxonKey2 = TaxonKey::create($taxon->taxonId, TaxonKeyId::fromString('xxx-fr'), Locale::fromString('fr_BE')),
         ]);
 
-        $this->assertTrue($taxon->hasTaxonKeyId($taxonKey->taxonKeyId));
-        $this->assertTrue($taxon->hasTaxonKeyId($taxonKey2->taxonKeyId));
+        $this->assertTrue($taxon->hasTaxonKeyId($taxonKey->getKey()));
+        $this->assertTrue($taxon->hasTaxonKeyId($taxonKey2->getKey()));
         $this->assertFalse($taxon->hasTaxonKeyId(TaxonKeyId::fromString('invalid')));
     }
 

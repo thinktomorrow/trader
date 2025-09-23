@@ -23,8 +23,8 @@ class UpdateTaxonKeysTest extends TestCase
         $updatedTaxon = $catalog->repos->taxonRepository()->find($taxon->taxonId);
 
         $this->assertCount(2, $updatedTaxon->getTaxonKeys());
-        $this->assertEquals('new-key-nl', $updatedTaxon->getTaxonKeys()[0]->taxonKeyId);
-        $this->assertEquals('new-key-fr', $updatedTaxon->getTaxonKeys()[1]->taxonKeyId);
+        $this->assertEquals('new-key-nl', $updatedTaxon->getTaxonKeys()[0]->getKey());
+        $this->assertEquals('new-key-fr', $updatedTaxon->getTaxonKeys()[1]->getKey());
     }
 
     public function test_key_is_unique_per_locale(): void
@@ -41,7 +41,7 @@ class UpdateTaxonKeysTest extends TestCase
         $updatedTaxon = $catalog->repos->taxonRepository()->find($taxon->taxonId);
 
         $this->assertCount(2, $updatedTaxon->getTaxonKeys());
-        $this->assertEquals('new-key-xxx', $updatedTaxon->getTaxonKeys()[0]->taxonKeyId);
-        $this->assertEquals('new-key-xxx', $updatedTaxon->getTaxonKeys()[1]->taxonKeyId);
+        $this->assertEquals('new-key-xxx', $updatedTaxon->getTaxonKeys()[0]->getKey());
+        $this->assertEquals('new-key-xxx', $updatedTaxon->getTaxonKeys()[1]->getKey());
     }
 }

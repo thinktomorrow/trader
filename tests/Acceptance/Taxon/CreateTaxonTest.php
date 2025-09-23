@@ -20,7 +20,7 @@ class CreateTaxonTest extends TaxonContext
 
         $this->assertEquals('bbb', $taxon->taxonomyId->get());
         $this->assertEquals(['foo' => 'bar'], $taxon->getData());
-        $this->assertEquals('taxon-key', $taxon->getTaxonKeys()[0]->taxonKeyId->get());
+        $this->assertEquals('taxon-key', $taxon->getTaxonKeys()[0]->getKey()->get());
         $this->assertEquals(Locale::fromString('nl'), $taxon->getTaxonKeys()[0]->getLocale());
         $this->assertNull($taxon->getParentId());
     }
@@ -35,7 +35,7 @@ class CreateTaxonTest extends TaxonContext
 
         $this->assertEquals('bbb', $taxon->taxonomyId->get());
         $this->assertEquals(['foo' => 'bar'], $taxon->getData());
-        $this->assertEquals('taxon-key', $taxon->getTaxonKeys()[0]->taxonKeyId->get());
+        $this->assertEquals('taxon-key', $taxon->getTaxonKeys()[0]->getKey()->get());
         $this->assertEquals($taxonRootId, $taxon->getParentId());
     }
 
@@ -60,6 +60,6 @@ class CreateTaxonTest extends TaxonContext
 
         $taxon = $this->taxonRepository->find($taxonId);
 
-        $this->assertNotEquals('taxon-key', $taxon->getTaxonKeys()[0]->taxonKeyId->get());
+        $this->assertNotEquals('taxon-key', $taxon->getTaxonKeys()[0]->getKey()->get());
     }
 }
