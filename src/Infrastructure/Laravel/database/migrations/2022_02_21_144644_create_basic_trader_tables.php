@@ -125,6 +125,17 @@ return new class extends Migration {
             $table->foreign('product_id')->references('product_id')->on(static::PREFIX . 'products')->onDelete('cascade');
         });
 
+        Schema::create('trader_products_related', function (Blueprint $table) {
+            $table->char('product_id', 36);
+            $table->char('related_id', 36);
+            $table->unsignedSmallInteger('order')->default(0);
+
+            $table->primary(['product_id', 'related_id']);
+
+            $table->foreign('product_id')->references('product_id')->on('trader_products')->onDelete('cascade');
+            $table->foreign('related_id')->references('product_id')->on('trader_products')->onDelete('cascade');
+        });
+
         Schema::create(static::PREFIX . 'taxa_redirects', function (Blueprint $table) {
             $table->id();
             $table->string('locale');
