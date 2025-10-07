@@ -72,6 +72,11 @@ final class Variant implements ChildAggregate
         $this->salePrice = $salePrice;
     }
 
+    public function getSku(): string
+    {
+        return $this->sku;
+    }
+
     public function updateSku(string $sku): void
     {
         $this->sku = $sku;
@@ -113,7 +118,7 @@ final class Variant implements ChildAggregate
     {
         return [
             VariantTaxon::class => array_map(
-                fn (VariantTaxon $option) => array_merge($option->getMappedData()),
+                fn(VariantTaxon $option) => array_merge($option->getMappedData()),
                 array_values($this->variantTaxa),
             ),
         ];

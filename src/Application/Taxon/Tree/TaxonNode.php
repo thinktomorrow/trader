@@ -45,4 +45,6 @@ interface TaxonNode extends Node
     public function getBreadCrumbLabel(?string $locale = null, bool $withoutRoot = false): string;
 
     public function getImages(): iterable;
+
+    public function getData(?string $key = null, $default = null): mixed;
 }

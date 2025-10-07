@@ -32,7 +32,7 @@ class MysqlProductRepository implements ProductRepository
     {
         $state = $product->getMappedData();
 
-        if (! $this->exists($product->productId)) {
+        if (!$this->exists($product->productId)) {
             DB::table(static::$productTable)->insert($state);
         } else {
             DB::table(static::$productTable)->where('product_id', $product->productId->get())->update($state);
@@ -45,7 +45,7 @@ class MysqlProductRepository implements ProductRepository
 
     private function upsertProductTaxa(Product $product): void
     {
-        $taxonIds = array_map(fn ($taxonState) => $taxonState['taxon_id'], $product->getChildEntities()[ProductTaxon::class]);
+        $taxonIds = array_map(fn($taxonState) => $taxonState['taxon_id'], $product->getChildEntities()[ProductTaxon::class]);
 
         DB::table(static::$productTaxonLookupTable)
             ->where('product_id', $product->productId->get())
@@ -69,7 +69,7 @@ class MysqlProductRepository implements ProductRepository
 
     private function upsertVariants(Product $product): void
     {
-        $variant_ids = array_map(fn ($variant) => $variant->variantId->get(), $product->getVariants());
+        $variant_ids = array_map(fn($variant) => $variant->variantId->get(), $product->getVariants());
 
         DB::table(static::$variantTable)
             ->where('product_id', $product->productId)
@@ -83,7 +83,7 @@ class MysqlProductRepository implements ProductRepository
 
     private function upsertPersonalisations(Product $product): void
     {
-        $personalisation_ids = array_map(fn ($personalisationState) => $personalisationState['personalisation_id'], $product->getChildEntities()[Personalisation::class]);
+        $personalisation_ids = array_map(fn($personalisationState) => $personalisationState['personalisation_id'], $product->getChildEntities()[Personalisation::class]);
 
         DB::table(static::$personalisationTable)
             ->where('product_id', $product->productId)
@@ -111,7 +111,7 @@ class MysqlProductRepository implements ProductRepository
         $productState = DB::table(static::$productTable)
             ->select([
                 static::$productTable . '.*',
-                DB::raw("GROUP_CONCAT(DISTINCT $taxaSelect) AS taxa"),
+                DB::raw("GROUP_CONCAT(DISTINCT $taxaSelect SEPARATOR '|||') AS taxa"),
             ])
             ->where(static::$productTable . '.product_id', $productId->get())
             ->leftJoin(static::$productTaxonLookupTable, static::$productTable . '.product_id', '=', static::$productTaxonLookupTable . '.product_id')
@@ -125,7 +125,7 @@ class MysqlProductRepository implements ProductRepository
             $productState = null;
         }
 
-        if (! $productState) {
+        if (!$productState) {
             throw new CouldNotFindProduct('No product found by id [' . $productId->get() . ']');
         }
 
@@ -137,7 +137,7 @@ class MysqlProductRepository implements ProductRepository
             ->orderBy(static::$personalisationTable . '.order_column')
             ->orderBy('order_column')
             ->get()
-            ->map(fn ($item) => (array)$item)
+            ->map(fn($item) => (array)$item)
             ->toArray();
 
         $productTaxa = $this->getProductTaxonStatesByProduct($productState);
@@ -157,7 +157,7 @@ class MysqlProductRepository implements ProductRepository
 
         $pairs = [];
 
-        foreach (explode(',', $state['taxa']) as $pair) {
+        foreach (explode('|||', $state['taxa']) as $pair) {
             [$taxonomyId, $taxonomyType, $taxonId, $taxonState, $taxonData] = explode('::::', $pair);
             $pairs[] = [
                 'product_id' => $state['product_id'],
