@@ -33,7 +33,7 @@ class MysqlVatRateRepository implements VatRateRepository
     {
         $state = $vatRate->getMappedData();
 
-        if (!$this->exists($vatRate->vatRateId)) {
+        if (! $this->exists($vatRate->vatRateId)) {
             DB::table(static::$vatRateTable)->insert($state);
         } else {
             DB::table(static::$vatRateTable)->where('vat_rate_id', $vatRate->vatRateId->get())->update($state);
@@ -63,7 +63,7 @@ class MysqlVatRateRepository implements VatRateRepository
             ->where(static::$vatRateTable . '.vat_rate_id', $vatRateId->get())
             ->first();
 
-        if (!$vatRateState) {
+        if (! $vatRateState) {
             throw new CouldNotFindVatRate('No vatRate found by id [' . $vatRateId->get() . ']');
         }
 
@@ -95,7 +95,7 @@ class MysqlVatRateRepository implements VatRateRepository
             ->where(static::$baseRateTable . '.target_vat_rate_id', $vatRateId)
             ->select([static::$baseRateTable . '.*', static::$vatRateTable . '.rate'])
             ->get()
-            ->map(fn($item) => (array)$item)
+            ->map(fn ($item) => (array)$item)
             ->toArray();
 
         return VatRate::fromMappedData((array)$vatRateState, [
@@ -125,7 +125,7 @@ class MysqlVatRateRepository implements VatRateRepository
             ->orderBy('order_column', 'ASC')
             ->first();
 
-        if (!$vatRateState) {
+        if (! $vatRateState) {
             return null;
         }
 
@@ -145,7 +145,7 @@ class MysqlVatRateRepository implements VatRateRepository
 
         $standardVatRate = $this->findStandardVatRateForCountry($primaryCountryId);
 
-        if (!$standardVatRate) {
+        if (! $standardVatRate) {
             return VatPercentage::fromString(app(TraderConfig::class)->getFallBackStandardVatRate());
         }
 
