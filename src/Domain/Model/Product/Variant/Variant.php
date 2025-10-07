@@ -118,7 +118,7 @@ final class Variant implements ChildAggregate
     {
         return [
             VariantTaxon::class => array_map(
-                fn(VariantTaxon $option) => array_merge($option->getMappedData()),
+                fn (VariantTaxon $option) => array_merge($option->getMappedData()),
                 array_values($this->variantTaxa),
             ),
         ];

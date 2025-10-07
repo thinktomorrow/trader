@@ -20,7 +20,7 @@ trait HasProductTaxa
     /** @return array<VariantProperty> */
     public function getVariantProperties(): array
     {
-        return array_values(array_filter($this->productTaxa, fn(ProductTaxon $property) => $property instanceof VariantProperty));
+        return array_values(array_filter($this->productTaxa, fn (ProductTaxon $property) => $property instanceof VariantProperty));
     }
 
     public function updateProductTaxa(array $productTaxa): void
@@ -41,19 +41,19 @@ trait HasProductTaxa
         Assertion::allIsInstanceOf($variantProperties, VariantProperty::class);
 
         // Remove all existing variant properties first
-        $productTaxa = array_filter($this->productTaxa, fn(ProductTaxon $taxon) => !($taxon instanceof VariantProperty));
+        $productTaxa = array_filter($this->productTaxa, fn (ProductTaxon $taxon) => ! ($taxon instanceof VariantProperty));
 
         $this->updateProductTaxa(array_merge($productTaxa, $variantProperties));
     }
 
     private function cleanupRemovedVariantPropertiesOnVariants(array $oldAvailableVariantProperties, array $newAvailableVariantProperties)
     {
-        $newTaxonIds = array_map(fn(VariantProperty $prop) => $prop->taxonId, $newAvailableVariantProperties);
+        $newTaxonIds = array_map(fn (VariantProperty $prop) => $prop->taxonId, $newAvailableVariantProperties);
 
         // bepaal welke taxonIds zijn verdwenen
         $removedTaxonIds = [];
         foreach ($oldAvailableVariantProperties as $oldVariantProperty) {
-            if (!in_array($oldVariantProperty->taxonId, $newTaxonIds)) {
+            if (! in_array($oldVariantProperty->taxonId, $newTaxonIds)) {
                 $removedTaxonIds[] = $oldVariantProperty->taxonId;
             }
         }
@@ -82,7 +82,7 @@ trait HasProductTaxa
         $uniqueProperties = [];
 
         foreach ($productTaxa as $property) {
-            if (!isset($uniqueProperties[$property->taxonId->get()])) {
+            if (! isset($uniqueProperties[$property->taxonId->get()])) {
                 $uniqueProperties[$property->taxonId->get()] = $property;
             }
         }
