@@ -38,7 +38,7 @@ trait TaxonControllerAssistant
         try {
             $taxonNode = $this->categoryRepository->setLocale($locale)->findTaxonByKey($taxonKey);
 
-            if (! $taxonNode->showOnline()) {
+            if (!$taxonNode->showOnline()) {
                 throw new CouldNotFindTaxon('Taxon ' . $taxonKey . ' is offline.');
             }
 
@@ -105,9 +105,7 @@ trait TaxonControllerAssistant
             return;
         }
 
-        $ids = $this->taxonFilters
-            ->getFiltersFromKeys($this->currentLocale->get(), $keys)
-            ->pluck('id');
+        $ids = $this->taxonFilters->getFilterIdsFromKeys($this->currentLocale->get(), $keys);
 
         $isVariant
             ? $this->gridRepository->filterByVariantTaxonIds($ids)
@@ -120,7 +118,7 @@ trait TaxonControllerAssistant
             return $this->activeTaxa;
         }
 
-        return $this->activeTaxa = $this->taxonFilters->getActiveFilters($this->currentLocale->get(), [$taxon->getKey()], $taxonKeys);
+        return $this->activeTaxa = $this->taxonFilters->getActiveFilters($this->currentLocale->get(), [$taxon->getId()], $taxonKeys);
     }
 
     /**

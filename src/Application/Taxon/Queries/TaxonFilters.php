@@ -14,9 +14,9 @@ interface TaxonFilters
      */
     public function getAvailableFilters(Locale $locale, array $scopedTaxonIds): array;
 
-    public function getActiveFilters(Locale $locale, array $scopedTaxonKeys, array $activeTaxonKeys): TaxonTree;
+    public function getActiveFilters(Locale $locale, array $scopedTaxonIds, array $activeTaxonKeys): TaxonTree;
 
-    public function getFiltersFromKeys(Locale $locale, array $taxonKeys): TaxonTree;
+    public function getFilterIdsFromKeys(Locale $locale, array $taxonKeys): array;
 
     /**
      * Get all product ids belonging to this taxon filter and all its children
