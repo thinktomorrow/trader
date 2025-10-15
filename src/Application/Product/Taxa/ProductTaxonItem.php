@@ -27,4 +27,10 @@ interface ProductTaxonItem
     public function getLabel(?string $locale = null): string;
 
     public function getTaxonomyLabel(?string $locale = null): string;
+
+    public function setImages(iterable $images): void;
+
+    public function getImages(): iterable;
+
+    public function getData(?string $key = null, $default = null): mixed;
 }

@@ -18,6 +18,7 @@ class DefaultVariantLink implements VariantLink
     protected bool $isActive = false;
     protected ?Variant $variant;
     protected string $groupId;
+    protected iterable $images = [];
     protected array $data;
 
     private function __construct(string $groupId, ?Variant $variant, array $data)
@@ -32,14 +33,18 @@ class DefaultVariantLink implements VariantLink
         return new static($property->getTaxonomyId(), $variant, [
             'group_label' => $property->getTaxonomyLabel(),
             'label' => $property->getLabel(),
+            'taxonomy_data' => $property->getData('taxonomy_data'),
+            'taxon_data' => $property->getData('taxon_data'),
         ]);
     }
 
     public static function fromVariant(Variant $variant): static
     {
+        $label = $variant->getData('option_title', $variant->getData('title', $variant->getSku()));
+
         return new static('variants', $variant, [
             'group_label' => null,
-            'label' => $variant->getData('option_title', $variant->getData('title')),
+            'label' => $label,
         ]);
     }
 
@@ -60,7 +65,7 @@ class DefaultVariantLink implements VariantLink
 
     public function getUrl(): ?string
     {
-        if (! $this->variant) {
+        if (!$this->variant) {
             return null;
         }
 
@@ -69,7 +74,7 @@ class DefaultVariantLink implements VariantLink
 
     public function isVariantAvailable(): bool
     {
-        if (! $this->variant) {
+        if (!$this->variant) {
             return false;
         }
 
@@ -84,5 +89,20 @@ class DefaultVariantLink implements VariantLink
     public function markActive(): void
     {
         $this->isActive = true;
+    }
+
+    public function setImages(iterable $images): void
+    {
+        $this->images = $images;
+    }
+
+    public function getImages(): iterable
+    {
+        return $this->images;
+    }
+
+    public function getData(?string $key = null, $default = null): mixed
+    {
+        return $this->data($key, null, $default);
     }
 }

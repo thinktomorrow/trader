@@ -22,4 +22,10 @@ interface VariantLink
     public function isActive(): bool;
 
     public function markActive(): void;
+
+    public function setImages(iterable $images): void;
+
+    public function getImages(): iterable;
+
+    public function getData(?string $key = null, $default = null): mixed;
 }

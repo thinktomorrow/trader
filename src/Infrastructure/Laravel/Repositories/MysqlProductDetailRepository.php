@@ -44,13 +44,13 @@ class MysqlProductDetailRepository implements ProductDetailRepository
             ])
             ->addSelect($this->container->get(ProductDetail::class)::stateSelect());
 
-        if (! $allowOffline) {
+        if (!$allowOffline) {
             $builder->whereIn(static::$productTable . '.state', ProductState::onlineStates());
         }
 
         $state = $builder->first();
 
-        if (! $state) {
+        if (!$state) {
             throw new CouldNotFindVariant('No online variant found by id [' . $variantId->get() . ']');
         }
 
@@ -136,8 +136,8 @@ class MysqlProductDetailRepository implements ProductDetailRepository
             ->get();
 
         return [
-            ...array_map(fn ($state) => $this->container->get(ProductTaxonItem::class)::fromMappedData((array)$state, $this->extractTaxonKeys((array)$state)), $productTaxaStates->all()),
-            ...array_map(fn ($state) => $this->container->get(VariantTaxonItem::class)::fromMappedData(array_merge((array)$state, ['product_id' => $product_id]), $this->extractTaxonKeys((array)$state)), $variantTaxaStates->all()),
+            ...array_map(fn($state) => $this->container->get(ProductTaxonItem::class)::fromMappedData((array)$state, $this->extractTaxonKeys((array)$state)), $productTaxaStates->all()),
+            ...array_map(fn($state) => $this->container->get(VariantTaxonItem::class)::fromMappedData(array_merge((array)$state, ['product_id' => $product_id]), $this->extractTaxonKeys((array)$state)), $variantTaxaStates->all()),
         ];
     }
 }
