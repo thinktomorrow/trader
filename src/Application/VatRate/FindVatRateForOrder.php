@@ -15,18 +15,27 @@ class FindVatRateForOrder
 
     private ?VatPercentage $standardPrimaryVatRate = null;
 
+    private bool $allowVatExemption = true;
+
     public function __construct(private TraderConfig $config, private VatExemptionApplication $checkVatExemptionForOrder, private VatRateRepository $vatRateRepository)
     {
 
     }
 
+    public function allowVatExemption(bool $allowVatExemption = true): static
+    {
+        $this->allowVatExemption = $allowVatExemption;
+
+        return $this;
+    }
+
     public function findForLine(Order $order, VatPercentage $variantVatPercentage): VatPercentage
     {
-        if (! $this->doesOrderHasBillingCountryOtherThanPrimary($order)) {
+        if (!$this->doesOrderHasBillingCountryOtherThanPrimary($order)) {
             return $variantVatPercentage;
         }
 
-        if ($this->checkVatExemptionForOrder->verifyForOrder($order)) {
+        if ($this->allowVatExemption && $this->checkVatExemptionForOrder->verifyForOrder($order)) {
             return VatPercentage::zero();
         }
 
@@ -48,7 +57,7 @@ class FindVatRateForOrder
      */
     public function findForShippingCost(Order $order): VatPercentage
     {
-        if ($this->checkVatExemptionForOrder->verifyForOrder($order)) {
+        if ($this->allowVatExemption && $this->checkVatExemptionForOrder->verifyForOrder($order)) {
             return VatPercentage::zero();
         }
 
@@ -60,7 +69,7 @@ class FindVatRateForOrder
      */
     public function findForPaymentCost(Order $order): VatPercentage
     {
-        if ($this->checkVatExemptionForOrder->verifyForOrder($order)) {
+        if ($this->allowVatExemption && $this->checkVatExemptionForOrder->verifyForOrder($order)) {
             return VatPercentage::zero();
         }
 
@@ -99,15 +108,15 @@ class FindVatRateForOrder
             return $this->countryVatPerOrder[$order->orderId->get()];
         }
 
-        if (! $billingCountryId = $order->getBillingAddress()?->getAddress()?->countryId) {
+        if (!$billingCountryId = $order->getBillingAddress()?->getAddress()?->countryId) {
             return $this->countryVatPerOrder[$order->orderId->get()] = [];
         }
 
-        if (! $this->doesOrderHasBillingCountryOtherThanPrimary($order)) {
+        if (!$this->doesOrderHasBillingCountryOtherThanPrimary($order)) {
             return $this->countryVatPerOrder[$order->orderId->get()] = [];
         }
 
-        if (! $countryVatRates = $this->vatRateRepository->getVatRatesForCountry($billingCountryId)) {
+        if (!$countryVatRates = $this->vatRateRepository->getVatRatesForCountry($billingCountryId)) {
             return $this->countryVatPerOrder[$order->orderId->get()] = [];
         }
 
@@ -116,7 +125,7 @@ class FindVatRateForOrder
 
     private function doesOrderHasBillingCountryOtherThanPrimary(Order $order): bool
     {
-        if (! $billingCountryId = $order->getBillingAddress()?->getAddress()?->countryId) {
+        if (!$billingCountryId = $order->getBillingAddress()?->getAddress()?->countryId) {
             return false;
         }
 
