@@ -87,7 +87,7 @@ class DefaultVariantForCart implements VariantForCart
 
     public function getData(?string $key = null, $default = null): mixed
     {
-        if (!$key) {
+        if (! $key) {
             return $this->data;
         }
 
@@ -96,7 +96,7 @@ class DefaultVariantForCart implements VariantForCart
 
     public function getProductData(?string $key = null, $default = null): mixed
     {
-        if (!$key) {
+        if (! $key) {
             return $this->productData;
         }
 
