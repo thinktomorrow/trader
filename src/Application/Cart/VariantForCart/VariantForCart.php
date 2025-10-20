@@ -28,4 +28,8 @@ interface VariantForCart
 
     /** @return Personalisation[] */
     public function getPersonalisations(): array;
+
+    public function getData(?string $key = null, $default = null): mixed;
+
+    public function getProductData(?string $key = null, $default = null): mixed;
 }

@@ -84,4 +84,22 @@ class DefaultVariantForCart implements VariantForCart
     {
         return $this->personalisations;
     }
+
+    public function getData(?string $key = null, $default = null): mixed
+    {
+        if (!$key) {
+            return $this->data;
+        }
+
+        return $this->data($key, null, $default);
+    }
+
+    public function getProductData(?string $key = null, $default = null): mixed
+    {
+        if (!$key) {
+            return $this->productData;
+        }
+
+        return $this->data($key, null, $default, $this->productData);
+    }
 }

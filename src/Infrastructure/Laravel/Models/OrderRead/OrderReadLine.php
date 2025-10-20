@@ -200,4 +200,13 @@ abstract class OrderReadLine
     {
         return $this->personalisations;
     }
+
+    public function getData(?string $key = null, $default = null): mixed
+    {
+        if (!$key) {
+            return $this->data;
+        }
+
+        return $this->data($key, null, $default);
+    }
 }

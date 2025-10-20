@@ -71,4 +71,6 @@ interface Cart
      * @return CartDiscount[]
      */
     public function getAllDiscounts(): iterable;
+
+    public function getData(?string $key = null, $default = null): mixed;
 }
