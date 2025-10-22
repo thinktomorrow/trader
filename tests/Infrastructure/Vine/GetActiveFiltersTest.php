@@ -4,7 +4,6 @@ declare(strict_types=1);
 namespace Tests\Infrastructure\Vine;
 
 use Tests\Infrastructure\TestCase;
-use Thinktomorrow\Trader\Domain\Common\Locale;
 use Thinktomorrow\Trader\Testing\Support\Catalog;
 
 final class GetActiveFiltersTest extends TestCase
@@ -24,7 +23,6 @@ final class GetActiveFiltersTest extends TestCase
 
             // Fetch active filters
             $activeFilters = $catalog->repos->taxonFilters()->getActiveFilters(
-                Locale::fromString('nl'),
                 ['taxon-1-key-nl', 'taxon-2-key-nl'],
                 []
             );
@@ -50,7 +48,6 @@ final class GetActiveFiltersTest extends TestCase
 
             // Fetch active filters
             $activeFilters = $catalog->repos->taxonFilters()->getActiveFilters(
-                Locale::fromString('nl'),
                 ['taxon-1-key-nl'],
                 ['taxon-2-key-nl']
             );
@@ -75,7 +72,6 @@ final class GetActiveFiltersTest extends TestCase
 
             // Fetch active filters
             $activeFilters = $catalog->repos->taxonFilters()->getActiveFilters(
-                Locale::fromString('nl'),
                 ['taxon-1-key-nl'],
                 ['taxon-1-key-nl', 'taxon-2-key-nl']
             );
@@ -100,7 +96,6 @@ final class GetActiveFiltersTest extends TestCase
 
             // Fetch active filters
             $activeFilters = $catalog->repos->taxonFilters()->getActiveFilters(
-                Locale::fromString('nl'),
                 ['taxon-1-key-nl'],
                 ['taxon-2-key-nl']
             );
@@ -116,7 +111,6 @@ final class GetActiveFiltersTest extends TestCase
         foreach (Catalog::drivers() as $catalog) {
 
             $activeFilters = $catalog->repos->taxonFilters()->getActiveFilters(
-                Locale::fromString('nl'),
                 ['xxx'],
                 []
             );
@@ -129,7 +123,6 @@ final class GetActiveFiltersTest extends TestCase
     {
         foreach (Catalog::drivers() as $catalog) {
             $activeFilters = $catalog->repos->taxonFilters()->getActiveFilters(
-                Locale::fromString('nl'),
                 [],
                 []
             );
@@ -148,7 +141,6 @@ final class GetActiveFiltersTest extends TestCase
             $catalog->linkProductToTaxon($product->productId->get(), $taxon->taxonId->get());
 
             $activeFilters = $catalog->repos->taxonFilters()->getActiveFilters(
-                Locale::fromString('nl'),
                 ['taxon-1-key-nl'],
                 ['nonexistent-key']
             );
@@ -172,7 +164,6 @@ final class GetActiveFiltersTest extends TestCase
             $catalog->linkProductToTaxon($product->productId->get(), $taxonUnrelated->taxonId->get());
 
             $activeFilters = $catalog->repos->taxonFilters()->getActiveFilters(
-                Locale::fromString('nl'),
                 ['taxon-1-key-nl'],
                 ['taxon-child-key-nl', 'taxon-unrelated-key-nl']
             );
@@ -193,7 +184,6 @@ final class GetActiveFiltersTest extends TestCase
             $catalog->linkProductToTaxon($product->productId->get(), $taxon->taxonId->get());
 
             $activeFilters = $catalog->repos->taxonFilters()->getActiveFilters(
-                Locale::fromString('nl'),
                 ['taxon-1-key-nl'],
                 ['taxon-1-key-nl', 'taxon-1-key-nl']
             );

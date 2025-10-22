@@ -12,11 +12,19 @@ interface TaxonFilters
      * Return an array divided by taxonomy:
      * ['taxonomy' => <Taxonomy>, 'taxa' => [<TaxonNode>, ...]]
      */
-    public function getAvailableFilters(Locale $locale, array $scopedTaxonIds): array;
+    public function getAvailableFilters(array $scopedTaxonIds): array;
 
-    public function getActiveFilters(Locale $locale, array $scopedTaxonIds, array $activeTaxonKeys): TaxonTree;
+    public function getActiveFilters(array $scopedTaxonIds, array $activeTaxonKeys): TaxonTree;
 
-    public function getFilterIdsFromKeys(Locale $locale, array $taxonKeys): array;
+    /**
+     * Get expanded filter ids from given taxon ids (including all children)
+     */
+    public function getFilterIds(array $taxonIds): array;
+
+    /**
+     * Get expanded filter ids from given taxon keys (including all children)
+     */
+    public function getFilterIdsFromKeys(array $taxonKeys): array;
 
     /**
      * Get all product ids belonging to this taxon filter and all its children
@@ -24,4 +32,6 @@ interface TaxonFilters
     public function getProductIds(array $taxonIds): array;
 
     public function getGridProductIds(array $taxonIds): array;
+
+    public function setLocale(Locale $locale): static;
 }
