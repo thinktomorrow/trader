@@ -18,6 +18,10 @@ Route::group(['prefix' => 'you', 'middleware' => ['web']], function () {
     Route::post('password/email', [CustomerForgotPasswordController::class, 'sendResetLinkEmail'])->name('customer.password.email');
     Route::get('password/reset/{token}', [CustomerResetPasswordController::class, 'showResetForm'])->name('customer.password.reset');
     Route::post('password/reset', [CustomerResetPasswordController::class, 'reset'])->name('customer.password.reset.store');
+    
+    // Customer registration routes
+    Route::get('register', [\Thinktomorrow\Trader\Infrastructure\Shop\CustomerAuth\Controllers\CustomerRegisterController::class, 'showRegisterForm'])->name('customer.register');
+    Route::post('register', [\Thinktomorrow\Trader\Infrastructure\Shop\CustomerAuth\Controllers\CustomerRegisterController::class, 'register'])->name('customer.register.store');
 
     // Customer routes - authed
     Route::get('logout', [CustomerAuthController::class, 'logout'])->name('customer.logout')->middleware('customer-auth');

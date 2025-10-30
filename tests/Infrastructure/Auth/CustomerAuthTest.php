@@ -6,8 +6,6 @@ namespace Tests\Infrastructure\Auth;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Event;
-use function route;
-use function session;
 use Tests\Infrastructure\TestCase;
 use Thinktomorrow\Trader\Domain\Model\Customer\Events\CustomerHasLoggedIn;
 use Thinktomorrow\Trader\Domain\Model\Customer\Events\CustomerHasLoggedOut;
@@ -22,6 +20,7 @@ class CustomerAuthTest extends TestCase
         parent::setUp();
 
         $this->app['view']->addLocation(__DIR__ . '/views');
+        $this->app['view']->addNamespace('trader', __DIR__ . '/views/shop');
     }
 
     public function test_non_authenticated_are_kept_out()
