@@ -11,6 +11,8 @@ interface CartShopper extends HasVatNumber
 
     public function getShopperId(): string;
 
+    public function getCustomerId(): ?string;
+
     public function getEmail(): string;
 
     /** Shopper refers to a customer account */
@@ -21,4 +23,6 @@ interface CartShopper extends HasVatNumber
 
     /** Does the shopper have a business profile */
     public function isBusiness(): bool;
+
+    public function getData(?string $key = null, $default = null): mixed;
 }

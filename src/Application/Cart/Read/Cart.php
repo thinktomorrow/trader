@@ -13,6 +13,8 @@ interface Cart
     /** @return CartLine[] */
     public function getLines(): iterable;
 
+    public function findLine(string $lineId): ?CartLine;
+
     public function isEmpty(): bool;
 
     /** The amount of different items */

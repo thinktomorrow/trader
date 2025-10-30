@@ -42,6 +42,11 @@ abstract class OrderReadDiscount
         return $this->discount_id;
     }
 
+    public function getDiscountTotal(): DiscountTotal
+    {
+        return $this->total;
+    }
+
     public function includeTax(bool $includeTax = true): void
     {
         $this->include_tax = $includeTax;
