@@ -26,7 +26,8 @@ class VerificationController extends Controller
 
     public function __construct()
     {
-        $this->middleware('customer-auth')->only('show', 'resend');;
+        $this->middleware('customer-auth')->only('show', 'resend');
+        ;
         $this->middleware('signed')->only('verify');
         $this->middleware('throttle:6,1')->only('verify', 'resend');
     }
@@ -48,7 +49,7 @@ class VerificationController extends Controller
     {
         $customer = CustomerModel::findOrFail($request->route('id'));
 
-        if (!hash_equals((string)$request->route('hash'), sha1($customer->getEmailForVerification()))) {
+        if (! hash_equals((string)$request->route('hash'), sha1($customer->getEmailForVerification()))) {
             throw new AuthorizationException();
         }
         if ($customer->hasVerifiedEmail()) {

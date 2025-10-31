@@ -27,7 +27,7 @@ Route::group(['prefix' => 'you', 'middleware' => ['web']], function () {
     Route::get('email/verify/{id}/{hash}', [\Thinktomorrow\Trader\Infrastructure\Shop\CustomerAuth\Controllers\VerificationController::class, 'verify'])->name('customer.verification.verify');
 
     // Email Verification Routes - for logged in customers
-//    Route::get('email/verify', [\Thinktomorrow\Trader\Infrastructure\Shop\CustomerAuth\Controllers\VerificationController::class, 'show'])->name('customer.verification.show');
+    //    Route::get('email/verify', [\Thinktomorrow\Trader\Infrastructure\Shop\CustomerAuth\Controllers\VerificationController::class, 'show'])->name('customer.verification.show');
     Route::post('email/resend', [\Thinktomorrow\Trader\Infrastructure\Shop\CustomerAuth\Controllers\VerificationController::class, 'resend'])->name('customer.verification.resend');
 
     // Customer routes - authed

@@ -128,4 +128,3 @@ class CustomerEmailVerificationTest extends TestCase
         return $model;
     }
 }
-

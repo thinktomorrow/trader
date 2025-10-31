@@ -22,8 +22,7 @@ class CustomerRegisterController extends Controller
         private CustomerApplication     $customerApplication,
         private CustomerRepository      $customerRepository,
         private CustomerLoginRepository $customerLoginRepository,
-    )
-    {
+    ) {
         $this->middleware('customer-guest');
     }
 
@@ -40,24 +39,25 @@ class CustomerRegisterController extends Controller
             'lastname' => ['required', 'string', 'max:200'],
             'email' => ['required', 'string', 'email', 'max:200'],
             'password' => ['required', 'string', 'min:8', 'confirmed'],
-            'company' => ['required_if:is_business,true', 'nullable', 'max:200']
+            'company' => ['required_if:is_business,true', 'nullable', 'max:200'],
         ], [
             'company.required_if' => __('trader-auth.register.validation.company_required'),
         ]);
 
         $existingCustomer = CustomerModel::where('email', $request->email)->first();
 
-        if (!$existingCustomer) {
+        if (! $existingCustomer) {
             // Maak nieuwe klant aan
             $customerId = $this->customerApplication->registerCustomer(new RegisterCustomer(
                 $request->email,
-                !!$request->is_business,
-                app()->getLocale(), [
+                ! ! $request->is_business,
+                app()->getLocale(),
+                [
                     'firstname' => $request->firstname,
                     'lastname' => $request->lastname,
                     'company' => $request->company ?? null,
                     'vat_number' => $request->vat_number ?? null,
-                    'phone' => $request->phone ?? null
+                    'phone' => $request->phone ?? null,
                 ]
             ));
 
@@ -75,7 +75,7 @@ class CustomerRegisterController extends Controller
 
         } else {
             // Indien klant al bestaat maar nog niet geverifieerd, stuur opnieuw mail
-            if (!$existingCustomer->hasVerifiedEmail()) {
+            if (! $existingCustomer->hasVerifiedEmail()) {
                 $existingCustomer->sendEmailVerificationNotification();
             }
 
@@ -86,9 +86,9 @@ class CustomerRegisterController extends Controller
             ->route('customer.login')
             ->with('status', __('trader-auth.verify.pending_verification'));
 
-//        Auth::guard('customer')->login();
+        //        Auth::guard('customer')->login();
 
-//        event(new CustomerHasLoggedIn($customerId));
+        //        event(new CustomerHasLoggedIn($customerId));
 
         return redirect()->intended(route('customer.index'));
     }
