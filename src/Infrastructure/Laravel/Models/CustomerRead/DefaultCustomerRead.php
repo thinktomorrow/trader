@@ -51,6 +51,31 @@ class DefaultCustomerRead implements CustomerRead
         return $this->email;
     }
 
+    public function getFirstName(): ?string
+    {
+        return $this->data('firstname');
+    }
+
+    public function getLastName(): ?string
+    {
+        return $this->data('lastname');
+    }
+
+    public function getCompany(): ?string
+    {
+        return $this->data('company');
+    }
+
+    public function getVatNumber(): ?string
+    {
+        return $this->data('vat_number');
+    }
+
+    public function getPhone(): ?string
+    {
+        return $this->data('phone');
+    }
+
     public function getCustomerLocale(): Locale
     {
         return $this->locale;

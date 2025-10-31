@@ -19,6 +19,7 @@ class CustomerAuthController extends Controller
 
     public function __construct()
     {
+        $this->middleware('customer-guest')->except('logout');
     }
 
     public function showLoginForm()
@@ -47,7 +48,7 @@ class CustomerAuthController extends Controller
 
         return redirect()->back()
             ->withInput($request->only('email', 'remember_me'))
-            ->withErrors(['email' => trans('customer.login_form.failed')]);
+            ->withErrors(['email' => trans('trader-customer.login_form.failed')]);
     }
 
     /**

@@ -13,11 +13,22 @@ interface CustomerRead
 
     public function getEmail(): string;
 
+    public function getFirstName(): ?string;
+
+    public function getLastName(): ?string;
+
+    public function getCompany(): ?string;
+
+    public function getVatNumber(): ?string;
+
+    public function getPhone(): ?string;
+
     public function getCustomerLocale(): Locale;
 
     /** Does the shopper have a business profile */
     public function isBusiness(): bool;
 
     public function getShippingAddress(): ?CustomerShippingAddress;
+
     public function getBillingAddress(): ?CustomerBillingAddress;
 }

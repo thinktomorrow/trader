@@ -212,6 +212,7 @@ return new class extends Migration {
             $table->boolean('active')->default(1);
             $table->string('email')->unique();
             $table->string('password')->nullable();
+            $table->timestamp('email_verified_at')->nullable();
             $table->rememberToken();
             $table->boolean('is_business');
             $table->string('locale');
