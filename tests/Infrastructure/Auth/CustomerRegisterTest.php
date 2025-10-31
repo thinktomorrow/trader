@@ -7,10 +7,10 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Event;
+use function route;
 use Tests\Infrastructure\TestCase;
 use Thinktomorrow\Trader\Domain\Model\Customer\Events\CustomerHasLoggedIn;
 use Thinktomorrow\Trader\Infrastructure\Shop\CustomerAuth\CustomerModel;
-use function route;
 
 class CustomerRegisterTest extends TestCase
 {

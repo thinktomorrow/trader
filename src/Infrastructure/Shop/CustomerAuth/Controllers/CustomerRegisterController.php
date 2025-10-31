@@ -13,8 +13,6 @@ use Thinktomorrow\Trader\Domain\Model\Customer\CustomerRepository;
 use Thinktomorrow\Trader\Domain\Model\CustomerLogin\CustomerLogin;
 use Thinktomorrow\Trader\Domain\Model\CustomerLogin\CustomerLoginRepository;
 use Thinktomorrow\Trader\Infrastructure\Shop\CustomerAuth\CustomerModel;
-use function redirect;
-use function route;
 
 class CustomerRegisterController extends Controller
 {
