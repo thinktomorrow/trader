@@ -4,6 +4,7 @@ namespace Thinktomorrow\Trader\Application\Order\MerchantOrder;
 
 use Money\Money;
 use Thinktomorrow\Trader\Domain\Model\Order\Line\LinePrice;
+use Thinktomorrow\Trader\Domain\Model\Order\Line\PurchasableReference;
 use Thinktomorrow\Trader\Domain\Model\Product\Variant\VariantUnitPrice;
 
 interface MerchantOrderLine
@@ -11,27 +12,41 @@ interface MerchantOrderLine
     public static function fromMappedData(array $state, array $orderState, iterable $discounts, iterable $personalisations): static;
 
     public function getLineId(): string;
-    public function getVariantId(): ?string;
-    public function getProductId(): string;
+
+    public function getPurchasableReference(): PurchasableReference;
+//    public function getVariantId(): ?string;
+//    public function getProductId(): string;
 
     public function getUnitPrice(): string;
+
     public function getLinePrice(): string;
+
     public function getUnitPriceAsMoney(): Money;
+
     public function getLinePriceAsMoney(): Money;
+
     public function getUnitPriceAsPrice(): VariantUnitPrice;
+
     public function getLinePriceAsPrice(): LinePrice;
 
     public function getTotalPrice(): string;
+
     public function getSubtotalPrice(): string;
+
     public function getTaxPrice(): string;
+
     public function getDiscountPrice(): string;
+
     public function includeTax(bool $includeTax = true): void;
 
     public function getQuantity(): int;
 
     public function getTitle(): string;
+
     public function getDescription(): ?string;
+
     public function setImages(iterable $images): void;
+
     public function getImages(): iterable;
 
     /** @return MerchantOrderDiscount[] */

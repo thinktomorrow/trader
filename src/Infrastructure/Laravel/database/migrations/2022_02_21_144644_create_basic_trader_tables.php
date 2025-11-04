@@ -268,7 +268,7 @@ return new class extends Migration {
         Schema::create(static::PREFIX . 'order_lines', function (Blueprint $table) {
             $table->char('order_id', 36)->index();
             $table->char('line_id', 36)->primary();
-            $table->char('variant_id', 36)->nullable()->index(); // reference to original/current product
+            $table->string('purchasable_reference', 255)->nullable(); // reference to original/current product
             $table->integer('total')->unsigned();
             $table->integer('discount_total')->unsigned();
             $table->integer('tax_total')->unsigned();
@@ -280,7 +280,6 @@ return new class extends Migration {
             $table->json('data')->nullable(); // Contains historic product data like name
 
             $table->foreign('order_id')->references('order_id')->on(static::PREFIX . 'orders')->onDelete('cascade');
-            $table->foreign('variant_id')->references('variant_id')->on(static::PREFIX . 'product_variants')->nullOnDelete();
         });
 
         Schema::create(static::PREFIX . 'order_shoppers', function (Blueprint $table) {

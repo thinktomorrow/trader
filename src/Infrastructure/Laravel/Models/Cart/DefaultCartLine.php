@@ -10,11 +10,6 @@ class DefaultCartLine extends OrderReadLine implements CartLine
 {
     public function getUrl(): string
     {
-        return $this->getVariantId();
-    }
-
-    public function getVariantId(): string
-    {
-        return parent::getVariantId();
+        return $this->getPurchasableReference()->getId();
     }
 }

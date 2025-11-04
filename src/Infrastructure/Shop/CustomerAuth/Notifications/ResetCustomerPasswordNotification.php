@@ -41,7 +41,7 @@ class ResetCustomerPasswordNotification extends Notification implements ShouldQu
     public function toMail($notifiable)
     {
         return (new MailMessage())
-            ->subject(trans('customer.mails.reset_password.subject'))
+            ->subject(trans('trader-customer.mails.reset_password.subject'))
             ->from($this->traderConfig->getWebmasterEmail(), $this->traderConfig->getWebmasterName())
             ->view('trader::customer.auth.password.reset-mail', [
                 'reset_url' => route('customer.password.reset', $this->token),

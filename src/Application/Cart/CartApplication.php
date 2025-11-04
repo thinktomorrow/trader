@@ -26,8 +26,10 @@ use Thinktomorrow\Trader\Domain\Common\Event\EventDispatcher;
 use Thinktomorrow\Trader\Domain\Model\Customer\CustomerRepository;
 use Thinktomorrow\Trader\Domain\Model\Order\Address\BillingAddress;
 use Thinktomorrow\Trader\Domain\Model\Order\Address\ShippingAddress;
+use Thinktomorrow\Trader\Domain\Model\Order\Line\Line;
 use Thinktomorrow\Trader\Domain\Model\Order\Line\LinePrice;
 use Thinktomorrow\Trader\Domain\Model\Order\Line\Personalisations\LinePersonalisation;
+use Thinktomorrow\Trader\Domain\Model\Order\Line\PurchasableReference;
 use Thinktomorrow\Trader\Domain\Model\Order\Order;
 use Thinktomorrow\Trader\Domain\Model\Order\OrderId;
 use Thinktomorrow\Trader\Domain\Model\Order\OrderRepository;
@@ -70,7 +72,8 @@ final class CartApplication
         EventDispatcher              $eventDispatcher,
         VatNumberApplication         $vatNumberApplication,
         VatExemptionApplication      $vatExemptionApplication
-    ) {
+    )
+    {
         $this->findVariantDetailsForCart = $findVariantDetailsForCart;
         $this->adjustLine = $adjustLine;
         $this->orderRepository = $orderRepository;
@@ -123,14 +126,14 @@ final class CartApplication
     {
         $orderId = $addLine->getOrderId();
         $order = $this->orderRepository->findForCart($orderId);
+        $lineId = $this->orderRepository->nextLineReference();
 
         $variant = $this->findVariantDetailsForCart->findVariantForCart($addLine->getVariantId());
 
-        $lineId = $this->orderRepository->nextLineReference();
-
-        $order->addOrUpdateLine(
+        $line = Line::create(
+            $orderId,
             $lineId,
-            $addLine->getVariantId(),
+            new PurchasableReference('variant', $addLine->getVariantId()->get()),
             LinePrice::fromMoney(
                 $this->config->includeVatInPrices() ? $variant->getSalePrice()->getIncludingVat() : $variant->getSalePrice()->getExcludingVat(),
                 $variant->getSalePrice()->getVatPercentage(),
@@ -145,6 +148,8 @@ final class CartApplication
             ])
         );
 
+        $order->addOrUpdateLine($line);
+
         $this->adjustLine->adjust($order, $order->findLine($lineId));
 
         $linePersonalisations = [];
@@ -158,7 +163,7 @@ final class CartApplication
                 }
             }
 
-            if (! $originalPersonalisation) {
+            if (!$originalPersonalisation) {
                 throw new \InvalidArgumentException('No personalisation found for variant [' . $addLine->getVariantId()->get() . '] by personalisation id [' . $personalisation_id . '].');
             }
 
@@ -329,7 +334,7 @@ final class CartApplication
         $order = $this->orderRepository->findForCart($command->getOrderId());
         $shopper = $order->getShopper();
 
-        if (! $billingAddressCountryId = $order->getBillingAddress()?->getAddress()->countryId) {
+        if (!$billingAddressCountryId = $order->getBillingAddress()?->getAddress()->countryId) {
             return;
         }
 
@@ -389,11 +394,11 @@ final class CartApplication
         $shopper->addData($customer->getData());
         $order->updateShopper($shopper);
 
-        if (! $order->getBillingAddress() && $billingAddress = $customer->getBillingAddress()) {
+        if (!$order->getBillingAddress() && $billingAddress = $customer->getBillingAddress()) {
             $this->chooseCustomerBillingAddress($order, $billingAddress);
         }
 
-        if (! $order->getShippingAddress() && $shippingAddress = $customer->getShippingAddress()) {
+        if (!$order->getShippingAddress() && $shippingAddress = $customer->getShippingAddress()) {
             $this->chooseCustomerShippingAddress($order, $shippingAddress);
         }
 

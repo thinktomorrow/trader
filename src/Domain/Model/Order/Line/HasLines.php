@@ -7,7 +7,6 @@ use Thinktomorrow\Trader\Domain\Model\Order\Events\LineDeleted;
 use Thinktomorrow\Trader\Domain\Model\Order\Events\LinePriceUpdated;
 use Thinktomorrow\Trader\Domain\Model\Order\Events\LineUpdated;
 use Thinktomorrow\Trader\Domain\Model\Order\Line\Personalisations\LinePersonalisation;
-use Thinktomorrow\Trader\Domain\Model\Product\Variant\VariantId;
 
 trait HasLines
 {
@@ -25,7 +24,7 @@ trait HasLines
         return Quantity::fromInt(
             array_reduce(
                 $this->lines,
-                fn ($carry, Line $line) => $carry + $line->getQuantity()->asInt(),
+                fn($carry, Line $line) => $carry + $line->getQuantity()->asInt(),
                 0
             ),
         );
@@ -40,15 +39,16 @@ trait HasLines
         return $this->lines[$lineIndexToBeUpdated];
     }
 
-    public function addOrUpdateLine(LineId $lineId, VariantId $productId, LinePrice $linePrice, Quantity $quantity, array $data): void
+//    public function addOrUpdateLine(LineId $lineId, VariantId $productId, LinePrice $linePrice, Quantity $quantity, array $data): void
+    public function addOrUpdateLine(Line $line): void
     {
-        if (null !== $this->findLineIndex($lineId)) {
-            $this->updateLine($lineId, $linePrice, $quantity, $data);
+        if (null !== $this->findLineIndex($line->lineId)) {
+            $this->updateLine($line);
 
             return;
         }
 
-        $this->addLine($lineId, $productId, $linePrice, $quantity, $data);
+        $this->addLine($line);
     }
 
     public function recordLineUpdatedEvent(LineId $lineId): void
@@ -56,21 +56,23 @@ trait HasLines
         $this->recordEvent(new LineUpdated($this->orderId, $lineId));
     }
 
-    private function addLine(LineId $lineId, VariantId $variantId, LinePrice $linePrice, Quantity $quantity, array $data): void
+//    private function addLine(LineId $lineId, VariantId $variantId, LinePrice $linePrice, Quantity $quantity, array $data): void
+    private function addLine(Line $line): void
     {
-        $this->lines[] = Line::create($this->orderId, $lineId, $variantId, $linePrice, $quantity, $data);
+        $this->lines[] = $line;
 
-        $this->recordEvent(new LineAdded($this->orderId, $lineId, $variantId));
+        $this->recordEvent(new LineAdded($this->orderId, $line->lineId, $line->getPurchasableReference()));
     }
 
-    private function updateLine(LineId $lineId, LinePrice $linePrice, Quantity $quantity, $data): void
+//    private function updateLine(LineId $lineId, LinePrice $linePrice, Quantity $quantity, $data): void
+    private function updateLine(Line $line): void
     {
-        if (null !== $lineIndexToBeUpdated = $this->findLineIndex($lineId)) {
-            $this->lines[$lineIndexToBeUpdated]->updatePrice($linePrice);
-            $this->lines[$lineIndexToBeUpdated]->updateQuantity($quantity);
-            $this->lines[$lineIndexToBeUpdated]->addData($data);
+        if (null !== $lineIndexToBeUpdated = $this->findLineIndex($line->lineId)) {
+            $this->lines[$lineIndexToBeUpdated]->updatePrice($line->getLinePrice());
+            $this->lines[$lineIndexToBeUpdated]->updateQuantity($line->getQuantity());
+            $this->lines[$lineIndexToBeUpdated]->addData($line->getData());
 
-            $this->recordEvent(new LineUpdated($this->orderId, $lineId));
+            $this->recordEvent(new LineUpdated($this->orderId, $line->lineId));
         }
     }
 
@@ -128,7 +130,7 @@ trait HasLines
 
             unset($this->lines[$lineIndexToBeDeleted]);
 
-            $this->recordEvent(new LineDeleted($this->orderId, $lineToBeDeleted->lineId, $lineToBeDeleted->getVariantId()));
+            $this->recordEvent(new LineDeleted($this->orderId, $lineToBeDeleted->lineId, $lineToBeDeleted->getPurchasableReference()));
         }
     }
 

@@ -22,7 +22,8 @@ class CustomerRegisterController extends Controller
         private CustomerApplication     $customerApplication,
         private CustomerRepository      $customerRepository,
         private CustomerLoginRepository $customerLoginRepository,
-    ) {
+    )
+    {
         $this->middleware('customer-guest');
     }
 
@@ -31,7 +32,7 @@ class CustomerRegisterController extends Controller
         return view('trader::customer.auth.register');
     }
 
-    public function register(Request $request)
+    public function register(Request $request, ?string $redirect = null)
     {
         $this->validate($request, [
             'is_business' => ['sometimes', 'boolean'],
@@ -46,11 +47,11 @@ class CustomerRegisterController extends Controller
 
         $existingCustomer = CustomerModel::where('email', $request->email)->first();
 
-        if (! $existingCustomer) {
+        if (!$existingCustomer) {
             // Maak nieuwe klant aan
             $customerId = $this->customerApplication->registerCustomer(new RegisterCustomer(
                 $request->email,
-                ! ! $request->is_business,
+                !!$request->is_business,
                 app()->getLocale(),
                 [
                     'firstname' => $request->firstname,
@@ -75,21 +76,19 @@ class CustomerRegisterController extends Controller
 
         } else {
             // Indien klant al bestaat maar nog niet geverifieerd, stuur opnieuw mail
-            if (! $existingCustomer->hasVerifiedEmail()) {
+            if (!$existingCustomer->hasVerifiedEmail()) {
                 $existingCustomer->sendEmailVerificationNotification();
             }
 
             // Indien klant al verified, doen we niets — we geven gewoon dezelfde feedback
         }
 
+        if (!$redirect) {
+            $redirect = route('customer.login');
+        }
+
         return redirect()
-            ->route('customer.login')
+            ->to($redirect)
             ->with('status', __('trader-auth.verify.pending_verification'));
-
-        //        Auth::guard('customer')->login();
-
-        //        event(new CustomerHasLoggedIn($customerId));
-
-        return redirect()->intended(route('customer.index'));
     }
 }

@@ -16,7 +16,6 @@ use Thinktomorrow\Trader\Domain\Model\Order\Discount\HasDiscounts;
 use Thinktomorrow\Trader\Domain\Model\Order\Line\Personalisations\HasPersonalisations;
 use Thinktomorrow\Trader\Domain\Model\Order\Line\Personalisations\LinePersonalisation;
 use Thinktomorrow\Trader\Domain\Model\Order\OrderId;
-use Thinktomorrow\Trader\Domain\Model\Product\Variant\VariantId;
 
 final class Line implements ChildAggregate, Discountable
 {
@@ -27,7 +26,7 @@ final class Line implements ChildAggregate, Discountable
 
     public readonly OrderId $orderId;
     public readonly LineId $lineId;
-    private ?VariantId $variantId;
+    private PurchasableReference $purchasableReference;
     private LinePrice $linePrice;
     private Quantity $quantity;
 
@@ -35,13 +34,13 @@ final class Line implements ChildAggregate, Discountable
     {
     }
 
-    public static function create(OrderId $orderId, LineId $lineId, VariantId $productId, LinePrice $linePrice, Quantity $quantity, array $data): static
+    public static function create(OrderId $orderId, LineId $lineId, PurchasableReference $purchasableReference, LinePrice $linePrice, Quantity $quantity, array $data): static
     {
         $line = new static();
 
         $line->orderId = $orderId;
         $line->lineId = $lineId;
-        $line->variantId = $productId;
+        $line->purchasableReference = $purchasableReference;
         $line->linePrice = $linePrice;
         $line->quantity = $quantity;
         $line->data = $data;
@@ -64,12 +63,12 @@ final class Line implements ChildAggregate, Discountable
         $this->quantity = $quantity;
     }
 
-    public function getVariantId(): VariantId
+    public function getPurchasableReference(): PurchasableReference
     {
-        return $this->variantId;
+        return $this->purchasableReference;
     }
 
-    public function getLinePrice(): Price
+    public function getLinePrice(): LinePrice
     {
         return $this->linePrice;
     }
@@ -100,12 +99,12 @@ final class Line implements ChildAggregate, Discountable
 
     public function getMappedData(): array
     {
-        $data = $this->addDataIfNotNull(['variant_id' => $this->variantId?->get()]);
+        $data = $this->addDataIfNotNull(['purchasable_reference' => $this->purchasableReference->get()]);
 
         return [
             'order_id' => $this->orderId->get(),
             'line_id' => $this->lineId->get(),
-            'variant_id' => $this->variantId?->get(),
+            'purchasable_reference' => $this->purchasableReference->get(),
             'line_price' => $this->linePrice->getMoney()->getAmount(),
             'tax_rate' => $this->linePrice->getVatPercentage()->get(),
             'includes_vat' => $this->linePrice->includesVat(),
@@ -123,8 +122,8 @@ final class Line implements ChildAggregate, Discountable
     public function getChildEntities(): array
     {
         return [
-            LinePersonalisation::class => array_map(fn ($personalisation) => $personalisation->getMappedData(), $this->personalisations),
-            Discount::class => array_map(fn ($discount) => $discount->getMappedData(), $this->discounts),
+            LinePersonalisation::class => array_map(fn($personalisation) => $personalisation->getMappedData(), $this->personalisations),
+            Discount::class => array_map(fn($discount) => $discount->getMappedData(), $this->discounts),
         ];
     }
 
@@ -132,14 +131,20 @@ final class Line implements ChildAggregate, Discountable
     {
         $line = new static();
 
+        // variant_id is deprecated, but kept for backward compatibility and current carts
+        if (isset($state['purchasable_reference'])) {
+            $line->purchasableReference = $state['purchasable_reference'] ? PurchasableReference::fromString($state['purchasable_reference']) : null;
+        } elseif (isset($state['variant_id'])) {
+            $line->purchasableReference = $state['variant_id'] ? PurchasableReference::fromString('variant@' . $state['variant_id']) : null;
+        }
+
         $line->orderId = OrderId::fromString($aggregateState['order_id']);
         $line->lineId = LineId::fromString($state['line_id']);
-        $line->variantId = $state['variant_id'] ? VariantId::fromString($state['variant_id']) : null;
         $line->linePrice = LinePrice::fromScalars($state['line_price'], $state['tax_rate'], $state['includes_vat']);
         $line->quantity = Quantity::fromInt($state['quantity']);
         $line->reducedFromStock = $state['reduced_from_stock'];
-        $line->discounts = array_map(fn ($discountState) => Discount::fromMappedData($discountState, $state), $childEntities[Discount::class]);
-        $line->personalisations = array_map(fn ($personalisationState) => LinePersonalisation::fromMappedData($personalisationState, $state), $childEntities[LinePersonalisation::class]);
+        $line->discounts = array_map(fn($discountState) => Discount::fromMappedData($discountState, $state), $childEntities[Discount::class]);
+        $line->personalisations = array_map(fn($personalisationState) => LinePersonalisation::fromMappedData($personalisationState, $state), $childEntities[LinePersonalisation::class]);
         $line->data = json_decode($state['data'], true);
 
         return $line;

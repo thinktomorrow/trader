@@ -10,6 +10,7 @@ use Thinktomorrow\Trader\Application\Common\RendersMoney;
 use Thinktomorrow\Trader\Domain\Common\Cash\Cash;
 use Thinktomorrow\Trader\Domain\Common\Price\Price;
 use Thinktomorrow\Trader\Domain\Model\Order\Line\LinePrice;
+use Thinktomorrow\Trader\Domain\Model\Order\Line\PurchasableReference;
 use Thinktomorrow\Trader\Domain\Model\Product\Variant\VariantUnitPrice;
 
 abstract class OrderReadLine
@@ -18,8 +19,8 @@ abstract class OrderReadLine
     use RendersMoney;
 
     protected string $line_id;
-    protected ?string $variant_id;
-    protected string $product_id;
+    protected PurchasableReference $purchasableReference;
+    protected array $purchasableData;
     protected LinePrice $linePrice;
     protected VariantUnitPrice $unitPrice;
     protected Price $total;
@@ -43,8 +44,14 @@ abstract class OrderReadLine
     {
         $line = new static();
 
+        // variant_id is deprecated, but kept for backward compatibility and current carts
+        if (isset($state['purchasable_reference'])) {
+            $line->purchasableReference = $state['purchasable_reference'] ? PurchasableReference::fromString($state['purchasable_reference']) : null;
+        } elseif (isset($state['variant_id'])) {
+            $line->purchasableReference = $state['variant_id'] ? PurchasableReference::fromString('variant@' . $state['variant_id']) : null;
+        }
+
         $line->line_id = $state['line_id'];
-        $line->variant_id = $state['variant_id'] ?: null;
         $line->linePrice = $state['linePrice'];
         $line->total = $state['total'];
         $line->discountTotal = $state['discountTotal'];
@@ -55,14 +62,12 @@ abstract class OrderReadLine
         $line->personalisations = $personalisations;
         $line->images = [];
 
-
         $line->data = json_decode($state['data'], true);
+        $line->purchasableData = $line->getData('purchasable_data', []);
 
-        Assertion::keyIsset($line->data, 'product_id');
         Assertion::keyIsset($line->data, 'unit_price_excluding_vat');
         Assertion::keyIsset($line->data, 'unit_price_including_vat');
 
-        $line->product_id = $line->data('product_id');
         $line->unitPrice = VariantUnitPrice::fromMoney(
             Cash::make($line->linePrice->includesVat() ? $line->data('unit_price_including_vat') : $line->data('unit_price_excluding_vat')),
             $line->linePrice->getVatPercentage(),
@@ -79,14 +84,9 @@ abstract class OrderReadLine
         return $this->line_id;
     }
 
-    public function getVariantId(): ?string
+    public function getPurchasableReference(): PurchasableReference
     {
-        return $this->variant_id;
-    }
-
-    public function getProductId(): string
-    {
-        return $this->product_id;
+        return $this->purchasableReference;
     }
 
     public function includeTax(bool $include_tax = true): void
@@ -183,7 +183,7 @@ abstract class OrderReadLine
 
     public function getTitle(): string
     {
-        return $this->data('title', null, $this->variant_id);
+        return $this->data('title', null, '');
     }
 
     public function getDescription(): ?string
@@ -203,7 +203,7 @@ abstract class OrderReadLine
 
     public function getData(?string $key = null, $default = null): mixed
     {
-        if (! $key) {
+        if (!$key) {
             return $this->data;
         }
 
