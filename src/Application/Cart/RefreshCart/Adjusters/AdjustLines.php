@@ -25,12 +25,12 @@ class AdjustLines implements Adjuster
 
     public function adjust(Order $order): void
     {
-        $variantIds = array_map(fn(Line $line) => $line->getPurchasableId(), $order->getLines());
+        $variantIds = array_map(fn (Line $line) => $line->getPurchasableId(), $order->getLines());
         $variants = $this->variantForCartRepository->findAllVariantsForCart($variantIds);
 
         foreach ($order->getLines() as $line) {
             // No longer there? Maybe deleted.
-            if (!$variant = $this->findVariant($variants, $line->getPurchasableId())) {
+            if (! $variant = $this->findVariant($variants, $line->getPurchasableId())) {
                 $order->deleteLine($line->lineId);
 
                 // TODO: event + note
@@ -38,14 +38,14 @@ class AdjustLines implements Adjuster
             }
 
             // Variant can be no longer available due to stock or whatever...
-            if (!in_array($variant->getState(), VariantState::availableStates())) {
+            if (! in_array($variant->getState(), VariantState::availableStates())) {
                 $order->deleteLine($line->lineId);
 
                 continue;
             }
 
             // Price can be changed in the meanwhile
-            if (!$line->getLinePrice()->getExcludingVat()->equals($variant->getSalePrice()->getExcludingVat())) {
+            if (! $line->getLinePrice()->getExcludingVat()->equals($variant->getSalePrice()->getExcludingVat())) {
                 $line->updatePrice(LinePrice::fromPrice($variant->getSalePrice()));
             }
 

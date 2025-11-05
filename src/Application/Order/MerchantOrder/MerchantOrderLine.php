@@ -14,8 +14,8 @@ interface MerchantOrderLine
     public function getLineId(): string;
 
     public function getPurchasableReference(): PurchasableReference;
-//    public function getVariantId(): ?string;
-//    public function getProductId(): string;
+    //    public function getVariantId(): ?string;
+    //    public function getProductId(): string;
 
     public function getUnitPrice(): string;
 

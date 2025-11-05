@@ -24,7 +24,7 @@ trait HasLines
         return Quantity::fromInt(
             array_reduce(
                 $this->lines,
-                fn($carry, Line $line) => $carry + $line->getQuantity()->asInt(),
+                fn ($carry, Line $line) => $carry + $line->getQuantity()->asInt(),
                 0
             ),
         );
@@ -39,7 +39,7 @@ trait HasLines
         return $this->lines[$lineIndexToBeUpdated];
     }
 
-//    public function addOrUpdateLine(LineId $lineId, VariantId $productId, LinePrice $linePrice, Quantity $quantity, array $data): void
+    //    public function addOrUpdateLine(LineId $lineId, VariantId $productId, LinePrice $linePrice, Quantity $quantity, array $data): void
     public function addOrUpdateLine(Line $line): void
     {
         if (null !== $this->findLineIndex($line->lineId)) {
@@ -56,7 +56,7 @@ trait HasLines
         $this->recordEvent(new LineUpdated($this->orderId, $lineId));
     }
 
-//    private function addLine(LineId $lineId, VariantId $variantId, LinePrice $linePrice, Quantity $quantity, array $data): void
+    //    private function addLine(LineId $lineId, VariantId $variantId, LinePrice $linePrice, Quantity $quantity, array $data): void
     private function addLine(Line $line): void
     {
         $this->lines[] = $line;
@@ -64,7 +64,7 @@ trait HasLines
         $this->recordEvent(new LineAdded($this->orderId, $line->lineId, $line->getPurchasableReference()));
     }
 
-//    private function updateLine(LineId $lineId, LinePrice $linePrice, Quantity $quantity, $data): void
+    //    private function updateLine(LineId $lineId, LinePrice $linePrice, Quantity $quantity, $data): void
     private function updateLine(Line $line): void
     {
         if (null !== $lineIndexToBeUpdated = $this->findLineIndex($line->lineId)) {
