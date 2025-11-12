@@ -5,7 +5,9 @@ namespace Thinktomorrow\Trader\Application\Cart\RefreshCart\Adjusters;
 use Thinktomorrow\Trader\Application\Cart\RefreshCart\Adjuster;
 use Thinktomorrow\Trader\Application\Cart\VariantForCart\VariantForCartRepository;
 use Thinktomorrow\Trader\Application\VatRate\FindVatRateForOrder;
+use Thinktomorrow\Trader\Domain\Model\Order\Line\Line;
 use Thinktomorrow\Trader\Domain\Model\Order\Order;
+use Thinktomorrow\Trader\Domain\Model\Product\Variant\VariantId;
 
 class AdjustTaxRates implements Adjuster
 {
@@ -43,16 +45,18 @@ class AdjustTaxRates implements Adjuster
 
     private function adjustLinePrices(Order $order): void
     {
-        foreach ($order->getLines() as $line) {
+        $variantLines = array_filter($order->getLines(), fn(Line $line) => $line->getPurchasableReference()->isVariant());
+
+        foreach ($variantLines as $line) {
 
             // Get variant of line for original price
-            $variant = $this->variantForCartRepository->findVariantForCart($line->getPurchasableId());
+            $variant = $this->variantForCartRepository->findVariantForCart(VariantId::fromString($line->getPurchasableReference()->getId()));
             $originalVatPercentage = $variant->getSalePrice()->getVatPercentage();
 
             $vatPercentage = $this->findVatRateForOrder->findForLine($order, $originalVatPercentage);
             $linePrice = $line->getLinePrice();
 
-            if (! $linePrice->getVatPercentage()->equals($vatPercentage)) {
+            if (!$linePrice->getVatPercentage()->equals($vatPercentage)) {
                 $linePrice = $linePrice->changeVatPercentage($vatPercentage);
                 $order->updateLinePrice($line->lineId, $linePrice);
             }
@@ -66,7 +70,7 @@ class AdjustTaxRates implements Adjuster
 
             $shippingCost = $shipping->getShippingCost();
 
-            if (! $shippingCost->getVatPercentage()->equals($vatPercentage)) {
+            if (!$shippingCost->getVatPercentage()->equals($vatPercentage)) {
                 $shippingCost = $shippingCost->changeVatPercentage($vatPercentage);
                 $shipping->updateCost($shippingCost);
             }
@@ -81,7 +85,7 @@ class AdjustTaxRates implements Adjuster
 
             $paymentCost = $payment->getPaymentCost();
 
-            if (! $paymentCost->getVatPercentage()->equals($vatPercentage)) {
+            if (!$paymentCost->getVatPercentage()->equals($vatPercentage)) {
                 $paymentCost = $paymentCost->changeVatPercentage($vatPercentage);
                 $payment->updateCost($paymentCost);
             }

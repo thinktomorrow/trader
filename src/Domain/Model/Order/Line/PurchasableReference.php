@@ -39,6 +39,11 @@ class PurchasableReference
         return $this->type;
     }
 
+    public function isVariant(): bool
+    {
+        return $this->type === 'variant';
+    }
+
     public function get(): string
     {
         return "$this->type@$this->id";
