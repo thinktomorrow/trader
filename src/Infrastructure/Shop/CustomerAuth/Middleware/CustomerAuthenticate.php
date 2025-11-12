@@ -4,21 +4,16 @@ declare(strict_types=1);
 namespace Thinktomorrow\Trader\Infrastructure\Shop\CustomerAuth\Middleware;
 
 use Closure;
-use Illuminate\Auth\Middleware\Authenticate as Middleware;
+use Illuminate\Support\Facades\Auth;
 
-class CustomerAuthenticate extends Middleware
+class CustomerAuthenticate
 {
-    public function handle($request, Closure $next, ...$guards)
+    public function handle($request, Closure $next, ?string $redirectRoute = null)
     {
-        $this->authenticate($request, ['customer']);
+        if (!Auth::guard('customer')->check()) {
+            return redirect()->route($redirectRoute ?? 'customer.login');
+        }
 
         return $next($request);
-    }
-
-    protected function redirectTo($request)
-    {
-        if (! $request->expectsJson()) {
-            return route('customer.login');
-        }
     }
 }
