@@ -32,7 +32,7 @@ class MysqlPaymentMethodRepository implements PaymentMethodRepository, PaymentMe
     {
         $state = $paymentMethod->getMappedData();
 
-        if (! $this->exists($paymentMethod->paymentMethodId)) {
+        if (!$this->exists($paymentMethod->paymentMethodId)) {
             DB::table(static::$paymentMethodTable)->insert($state);
         } else {
             DB::table(static::$paymentMethodTable)->where('payment_method_id', $paymentMethod->paymentMethodId->get())->update($state);
@@ -48,7 +48,7 @@ class MysqlPaymentMethodRepository implements PaymentMethodRepository, PaymentMe
             ->delete();
 
         DB::table(static::$paymentMethodCountryTable)
-            ->insert(array_map(fn (string $countryId) => [
+            ->insert(array_map(fn(string $countryId) => [
                 'payment_method_id' => $paymentMethod->paymentMethodId->get(),
                 'country_id' => $countryId,
             ], $paymentMethod->getChildEntities()[CountryId::class]));
@@ -65,17 +65,17 @@ class MysqlPaymentMethodRepository implements PaymentMethodRepository, PaymentMe
             ->where(static::$paymentMethodTable . '.payment_method_id', $paymentMethodId->get())
             ->first();
 
-        if (! $paymentMethodState) {
+        if (!$paymentMethodState) {
             throw new CouldNotFindPaymentMethod('No payment method found by id [' . $paymentMethodId->get() . ']');
         }
 
         $countryStates = DB::table(static::$paymentMethodCountryTable)
-            ->join(static::$countryTable, static::$paymentMethodCountryTable.'.country_id', '=', static::$countryTable.'.country_id')
+            ->join(static::$countryTable, static::$paymentMethodCountryTable . '.country_id', '=', static::$countryTable . '.country_id')
             ->where(static::$paymentMethodCountryTable . '.payment_method_id', $paymentMethodId->get())
             ->where(static::$countryTable . '.active', '1')
-            ->select(static::$countryTable.'.country_id')
+            ->select(static::$countryTable . '.country_id')
             ->get()
-            ->map(fn ($item) => (array)$item)
+            ->map(fn($item) => (array)$item)
             ->toArray();
 
         return PaymentMethod::fromMappedData((array)$paymentMethodState, [
@@ -100,14 +100,24 @@ class MysqlPaymentMethodRepository implements PaymentMethodRepository, PaymentMe
             ->orderBy('order_column', 'ASC');
 
         if ($countryId) {
-            $builder->leftJoin(static::$paymentMethodCountryTable, static::$paymentMethodTable.'.payment_method_id', '=', static::$paymentMethodCountryTable.'.payment_method_id')
-                ->where(static::$paymentMethodCountryTable . '.country_id', $countryId)
-                ->select(static::$paymentMethodTable.'.*');
+            $builder->where(function ($query) use ($countryId) {
+                $query
+                    // payment method has matching country
+                    ->whereIn(static::$paymentMethodTable . '.payment_method_id', function ($sub) use ($countryId) {
+                        $sub->select('payment_method_id')
+                            ->from(static::$paymentMethodCountryTable)
+                            ->where('country_id', $countryId);
+                    })
+                    // payment method has no countries assigned at all - so allowed everywhere
+                    ->orWhereNotIn(static::$paymentMethodTable . '.payment_method_id', function ($sub) {
+                        $sub->select('payment_method_id')->from(static::$paymentMethodCountryTable);
+                    });
+            });
         }
 
         return $builder
             ->get()
-            ->map(fn ($paymentMethodState) => $this->container->get(PaymentMethodForCart::class)::fromMappedData((array)$paymentMethodState))
+            ->map(fn($paymentMethodState) => $this->container->get(PaymentMethodForCart::class)::fromMappedData((array)$paymentMethodState))
             ->toArray();
     }
 }
