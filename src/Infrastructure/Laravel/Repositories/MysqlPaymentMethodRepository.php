@@ -32,7 +32,7 @@ class MysqlPaymentMethodRepository implements PaymentMethodRepository, PaymentMe
     {
         $state = $paymentMethod->getMappedData();
 
-        if (!$this->exists($paymentMethod->paymentMethodId)) {
+        if (! $this->exists($paymentMethod->paymentMethodId)) {
             DB::table(static::$paymentMethodTable)->insert($state);
         } else {
             DB::table(static::$paymentMethodTable)->where('payment_method_id', $paymentMethod->paymentMethodId->get())->update($state);
@@ -48,7 +48,7 @@ class MysqlPaymentMethodRepository implements PaymentMethodRepository, PaymentMe
             ->delete();
 
         DB::table(static::$paymentMethodCountryTable)
-            ->insert(array_map(fn(string $countryId) => [
+            ->insert(array_map(fn (string $countryId) => [
                 'payment_method_id' => $paymentMethod->paymentMethodId->get(),
                 'country_id' => $countryId,
             ], $paymentMethod->getChildEntities()[CountryId::class]));
@@ -65,7 +65,7 @@ class MysqlPaymentMethodRepository implements PaymentMethodRepository, PaymentMe
             ->where(static::$paymentMethodTable . '.payment_method_id', $paymentMethodId->get())
             ->first();
 
-        if (!$paymentMethodState) {
+        if (! $paymentMethodState) {
             throw new CouldNotFindPaymentMethod('No payment method found by id [' . $paymentMethodId->get() . ']');
         }
 
@@ -75,7 +75,7 @@ class MysqlPaymentMethodRepository implements PaymentMethodRepository, PaymentMe
             ->where(static::$countryTable . '.active', '1')
             ->select(static::$countryTable . '.country_id')
             ->get()
-            ->map(fn($item) => (array)$item)
+            ->map(fn ($item) => (array)$item)
             ->toArray();
 
         return PaymentMethod::fromMappedData((array)$paymentMethodState, [
@@ -117,7 +117,7 @@ class MysqlPaymentMethodRepository implements PaymentMethodRepository, PaymentMe
 
         return $builder
             ->get()
-            ->map(fn($paymentMethodState) => $this->container->get(PaymentMethodForCart::class)::fromMappedData((array)$paymentMethodState))
+            ->map(fn ($paymentMethodState) => $this->container->get(PaymentMethodForCart::class)::fromMappedData((array)$paymentMethodState))
             ->toArray();
     }
 }
