@@ -10,7 +10,7 @@ class CustomerAuthenticate
 {
     public function handle($request, Closure $next, ?string $redirectRoute = null)
     {
-        if (!Auth::guard('customer')->check()) {
+        if (! Auth::guard('customer')->check()) {
             return redirect()->route($redirectRoute ?? 'customer.login');
         }
 
