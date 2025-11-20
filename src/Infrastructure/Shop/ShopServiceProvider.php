@@ -8,6 +8,7 @@ use Illuminate\Support\ServiceProvider;
 use Thinktomorrow\Trader\Infrastructure\Shop\CustomerAuth\CustomerModel;
 use Thinktomorrow\Trader\Infrastructure\Shop\CustomerAuth\Middleware\CustomerAuthenticate;
 use Thinktomorrow\Trader\Infrastructure\Shop\CustomerAuth\Middleware\CustomerRedirectIfAuthenticated;
+use Thinktomorrow\Trader\Infrastructure\Shop\CustomerAuth\Middleware\CustomerValidateSignature;
 use Thinktomorrow\Trader\Infrastructure\Shop\CustomerAuth\Middleware\CustomerVerified;
 
 class ShopServiceProvider extends ServiceProvider
@@ -30,6 +31,7 @@ class ShopServiceProvider extends ServiceProvider
         $this->app->make(Router::class)->aliasMiddleware('customer-auth', CustomerAuthenticate::class);
         $this->app->make(Router::class)->aliasMiddleware('customer-guest', CustomerRedirectIfAuthenticated::class);
         $this->app->make(Router::class)->aliasMiddleware('customer-verified', CustomerVerified::class);
+        $this->app->make(Router::class)->aliasMiddleware('customer-signed', CustomerValidateSignature::class);
 
         $this->app['config']["auth.providers.customer"] = [
             'driver' => 'eloquent',

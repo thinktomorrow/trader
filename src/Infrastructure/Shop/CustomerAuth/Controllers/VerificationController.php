@@ -3,7 +3,7 @@
 namespace Thinktomorrow\Trader\Infrastructure\Shop\CustomerAuth\Controllers;
 
 use Illuminate\Auth\Access\AuthorizationException;
-use Illuminate\Foundation\Auth\VerifiesEmails;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
 use Illuminate\Support\Facades\Auth;
@@ -15,19 +15,18 @@ use Thinktomorrow\Trader\Infrastructure\Shop\CustomerAuth\CustomerModel;
 |--------------------------------------------------------------------------
 |
 | This controller is responsible for handling email verification for any
-| user that recently registered with the application. Emails may also
-| be re-sent if the user didn't receive the original email message.
+| customer that has registered with the application. Emails may also
+| be re-sent if the user didn't receive the original email message
+| or when the verification link has expired.
 |
 */
 
 class VerificationController extends Controller
 {
-    use VerifiesEmails;
-
     public function __construct()
     {
-        $this->middleware('customer-auth')->only('show', 'resend');;
-        $this->middleware('signed')->only('verify');
+        $this->middleware('customer-auth')->only('show', 'resend');
+        $this->middleware('customer-signed')->only('verify');
         $this->middleware('throttle:6,1')->only('verify', 'resend');
     }
 
@@ -65,5 +64,22 @@ class VerificationController extends Controller
         return redirect()->route('customer.login')
             ->with('status', trans('trader-auth.verify.success_verified'))
             ->with('verified', true);
+    }
+
+    public function resend(Request $request)
+    {
+        $customer = Auth::guard('customer')->user();
+
+        if ($customer->hasVerifiedEmail()) {
+            return $request->wantsJson()
+                ? new JsonResponse([], 204)
+                : redirect($this->redirectPath());
+        }
+
+        $customer->sendEmailVerificationNotification();
+
+        return $request->wantsJson()
+            ? new JsonResponse([], 202)
+            : back()->with('resent', true);
     }
 }
