@@ -8,6 +8,7 @@ use Illuminate\Support\ServiceProvider;
 use Thinktomorrow\Trader\Infrastructure\Shop\CustomerAuth\CustomerModel;
 use Thinktomorrow\Trader\Infrastructure\Shop\CustomerAuth\Middleware\CustomerAuthenticate;
 use Thinktomorrow\Trader\Infrastructure\Shop\CustomerAuth\Middleware\CustomerRedirectIfAuthenticated;
+use Thinktomorrow\Trader\Infrastructure\Shop\CustomerAuth\Middleware\CustomerVerified;
 
 class ShopServiceProvider extends ServiceProvider
 {
@@ -18,7 +19,7 @@ class ShopServiceProvider extends ServiceProvider
     public function boot()
     {
         // Default setup for customer auth routes: this should be set up per project.
-        $this->loadRoutesFrom(__DIR__.'/CustomerAuth/routes.php');
+        $this->loadRoutesFrom(__DIR__ . '/CustomerAuth/routes.php');
 
         $this->bootCustomerGuard();
     }
@@ -28,6 +29,7 @@ class ShopServiceProvider extends ServiceProvider
         // Load up middleware
         $this->app->make(Router::class)->aliasMiddleware('customer-auth', CustomerAuthenticate::class);
         $this->app->make(Router::class)->aliasMiddleware('customer-guest', CustomerRedirectIfAuthenticated::class);
+        $this->app->make(Router::class)->aliasMiddleware('customer-verified', CustomerVerified::class);
 
         $this->app['config']["auth.providers.customer"] = [
             'driver' => 'eloquent',
