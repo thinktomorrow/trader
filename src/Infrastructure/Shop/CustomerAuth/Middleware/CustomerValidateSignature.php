@@ -12,7 +12,7 @@ class CustomerValidateSignature extends ValidateSignature
     {
         [$relative, $ignore] = $this->parseArguments($args);
 
-        if ($request->hasValidSignatureWhileIgnoring($ignore, !$relative)) {
+        if ($request->hasValidSignatureWhileIgnoring($ignore, ! $relative)) {
             return $next($request);
         }
 
