@@ -23,7 +23,7 @@ class OrderLineTest extends TestCase
 {
     public function test_it_can_add_a_line()
     {
-        $order = $this->createDefaultOrder();
+        $order = $this->orderContext->createDefaultOrder();
 
         $order->addOrUpdateLine(
             LineId::fromString('abcdef'),
@@ -46,7 +46,7 @@ class OrderLineTest extends TestCase
 
     public function test_it_can_update_a_line()
     {
-        $order = $this->createDefaultOrder();
+        $order = $this->orderContext->createDefaultOrder();
 
         $order->addOrUpdateLine(
             LineId::fromString('abc'),
@@ -80,7 +80,7 @@ class OrderLineTest extends TestCase
 
     public function test_it_can_delete_a_line()
     {
-        $order = $this->createDefaultOrder();
+        $order = $this->orderContext->createDefaultOrder();
 
         $this->assertCount(1, $order->getChildEntities()[Line::class]);
 
@@ -101,7 +101,7 @@ class OrderLineTest extends TestCase
 
     public function test_it_can_update_line_quantity()
     {
-        $order = $this->createDefaultOrder();
+        $order = $this->orderContext->createDefaultOrder();
         $line = $order->getLines()[0];
 
         $order->updateLineQuantity($line->lineId, $quantity = Quantity::fromInt(3));
@@ -110,7 +110,7 @@ class OrderLineTest extends TestCase
 
     public function test_it_can_mark_as_reduced_from_stock()
     {
-        $order = $this->createDefaultOrder();
+        $order = $this->orderContext->createDefaultOrder();
         $line = $order->getLines()[0];
 
         $this->assertFalse($line->reducedFromStock());
@@ -122,7 +122,7 @@ class OrderLineTest extends TestCase
 
     public function test_it_can_update_line_price()
     {
-        $order = $this->createDefaultOrder();
+        $order = $this->orderContext->createDefaultOrder();
         $line = $order->getLines()[0];
 
         $order->updateLinePrice($line->lineId, $price = LinePrice::fromMoney(Money::EUR(30), VatPercentage::fromString('10'), false));
@@ -131,7 +131,7 @@ class OrderLineTest extends TestCase
 
     public function test_it_can_update_line_personalisations()
     {
-        $order = $this->createDefaultOrder();
+        $order = $this->orderContext->createDefaultOrder();
         $line = $order->getLines()[0];
 
         $order->updateLinePersonalisations($line->lineId, [
@@ -149,7 +149,7 @@ class OrderLineTest extends TestCase
 
     public function test_it_cannot_update_line_personalisations_when_line_is_not_found()
     {
-        $order = $this->createDefaultOrder();
+        $order = $this->orderContext->createDefaultOrder();
         $line = $order->getLines()[0];
 
         $order->updateLinePersonalisations(LineId::fromString('unknown'), [
@@ -167,7 +167,7 @@ class OrderLineTest extends TestCase
 
     public function test_it_can_update_line_data()
     {
-        $order = $this->createDefaultOrder();
+        $order = $this->orderContext->createDefaultOrder();
         $line = $order->getLines()[0];
 
         $order->updateLineData($line->lineId, ['foo' => 'bar']);
@@ -176,7 +176,7 @@ class OrderLineTest extends TestCase
 
     public function test_it_can_have_a_discount()
     {
-        $order = $this->createDefaultOrder();
+        $order = $this->orderContext->createDefaultOrder();
         $line = $order->getLines()[0];
         $lineTotal = $line->getTotal();
 

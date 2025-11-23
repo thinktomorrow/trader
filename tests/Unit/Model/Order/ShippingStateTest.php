@@ -33,7 +33,7 @@ class ShippingStateTest extends TestCase
             ],
         ]);
 
-        $this->order = $this->createDefaultOrder();
+        $this->order = $this->orderContext->createDefaultOrder();
         $this->shipping = $this->order->getShippings()[0];
 
         $this->assertEquals(DefaultShippingState::none, $this->shipping->getShippingState());

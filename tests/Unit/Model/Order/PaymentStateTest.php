@@ -33,7 +33,7 @@ class PaymentStateTest extends TestCase
             ],
         ]);
 
-        $this->order = $this->createDefaultOrder();
+        $this->order = $this->orderContext->createDefaultOrder();
         $this->payment = $this->order->getPayments()[0];
 
         $this->assertEquals(DefaultPaymentState::initialized, $this->payment->getPaymentState());

@@ -47,7 +47,7 @@ class OrderStateTest extends TestCase
         parent::setUp();
 
 
-        $this->order = $this->createDefaultOrder();
+        $this->order = $this->orderContext->createDefaultOrder();
     }
 
     public function test_it_can_record_order_events()

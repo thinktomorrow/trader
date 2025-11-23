@@ -5,7 +5,6 @@ namespace Tests\Unit\Model\Order;
 
 use Money\Money;
 use Tests\Unit\TestCase;
-use Thinktomorrow\Trader\Domain\Model\Order\Discount\Discount;
 use Thinktomorrow\Trader\Domain\Model\Order\Discount\DiscountTotal;
 use Thinktomorrow\Trader\Domain\Model\Order\Events\PaymentAdded;
 use Thinktomorrow\Trader\Domain\Model\Order\Events\PaymentDeleted;
@@ -62,7 +61,7 @@ class PaymentTest extends TestCase
 
     public function test_it_can_find_a_payment()
     {
-        $order = $this->createDefaultOrder();
+        $order = $this->orderContext->createDefaultOrder();
 
         $payment = $order->findPayment($order->getPayments()[0]->paymentId);
 
@@ -73,7 +72,7 @@ class PaymentTest extends TestCase
     {
         $this->expectException(CouldNotFindPaymentOnOrder::class);
 
-        $order = $this->createDefaultOrder();
+        $order = $this->orderContext->createDefaultOrder();
         $order->findPayment(PaymentId::fromString('unknown'));
     }
 
@@ -81,13 +80,13 @@ class PaymentTest extends TestCase
     {
         $this->expectException(CouldNotFindPaymentOnOrder::class);
 
-        $order = $this->createDefaultOrder();
+        $order = $this->orderContext->createDefaultOrder();
         $order->updatePayment($this->createOrderPayment(['payment_id' => 'unknown']));
     }
 
     public function test_it_can_add_a_payment()
     {
-        $order = $this->createDefaultOrder();
+        $order = $this->orderContext->createDefaultOrder();
 
         $order->addPayment($addedPayment = $this->createOrderPayment(['payment_id' => 'hhhh']));
 
@@ -102,13 +101,13 @@ class PaymentTest extends TestCase
     {
         $this->expectException(PaymentAlreadyOnOrder::class);
 
-        $order = $this->createDefaultOrder();
+        $order = $this->orderContext->createDefaultOrder();
         $order->addPayment($this->createOrderPayment());
     }
 
     public function test_it_can_update_payment()
     {
-        $order = $this->createDefaultOrder();
+        $order = $this->orderContext->createDefaultOrder();
 
         $payment = $order->getPayments()[0];
         $payment->updateCost($cost = PaymentCost::fromScalars('23', '1', false));
@@ -125,7 +124,7 @@ class PaymentTest extends TestCase
 
     public function test_it_can_delete_a_payment()
     {
-        $order = $this->createDefaultOrder();
+        $order = $this->orderContext->createDefaultOrder();
         $paymentId = $order->getPayments()[0]->paymentId;
 
         $this->assertCount(1, $order->getPayments());
@@ -149,7 +148,7 @@ class PaymentTest extends TestCase
 
     public function test_it_can_add_a_discount_to_payment()
     {
-        $order = $this->createDefaultOrder();
+        $order = $this->orderContext->createDefaultOrder();
         $payment = $order->getPayments()[0];
         $payment->addDiscount($this->createOrderPaymentDiscount(['promo_discount_id' => 'qqq', 'discount_id' => 'defgh'], $order->getMappedData()));
 
@@ -161,7 +160,7 @@ class PaymentTest extends TestCase
 
     public function test_it_sets_discount_tax_the_same_as_discountable_tax()
     {
-        $order = $this->createDefaultOrder();
+        $order = $this->orderContext->createDefaultOrder();
         $payment = $order->getPayments()[0];
         $payment->addDiscount($this->createOrderPaymentDiscount(['promo_discount_id' => 'qqq', 'discount_id' => 'defgh'], $order->getMappedData()));
 

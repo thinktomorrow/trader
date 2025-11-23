@@ -57,7 +57,7 @@ class OrderTest extends TestCase
 
     public function test_it_can_update_shopper()
     {
-        $order = $this->createDefaultOrder();
+        $order = $this->orderContext->createDefaultOrder();
 
         $shopper = $order->getShopper();
         $shopper->updateCustomerId(CustomerId::fromString('zzz'));
@@ -75,7 +75,7 @@ class OrderTest extends TestCase
 
     public function test_it_can_add_shipping()
     {
-        $order = $this->createDefaultOrder();
+        $order = $this->orderContext->createDefaultOrder();
 
         $order->addShipping(Shipping::create(
             $order->orderId, // TODO: avoid this here or assert it is the same...
@@ -95,7 +95,7 @@ class OrderTest extends TestCase
 
     public function test_it_can_update_shipping()
     {
-        $order = $this->createDefaultOrder();
+        $order = $this->orderContext->createDefaultOrder();
 
         /** @var \Thinktomorrow\Trader\Domain\Model\Order\Shipping\Shipping $shipping */
         $shipping = $order->getShippings()[0];
@@ -113,7 +113,7 @@ class OrderTest extends TestCase
 
     public function test_it_can_update_shipping_address()
     {
-        $order = $this->createDefaultOrder();
+        $order = $this->orderContext->createDefaultOrder();
 
         $shippingAddress = ShippingAddress::fromMappedData([
             'address_id' => 'abc',
@@ -134,7 +134,7 @@ class OrderTest extends TestCase
 
     public function test_it_can_update_billing_address()
     {
-        $order = $this->createDefaultOrder();
+        $order = $this->orderContext->createDefaultOrder();
 
         $billingAddress = BillingAddress::fromMappedData([
             'address_id' => 'def',
@@ -155,7 +155,7 @@ class OrderTest extends TestCase
 
     public function test_it_can_set_invoice_ref()
     {
-        $order = $this->createDefaultOrder();
+        $order = $this->orderContext->createDefaultOrder();
 
         $order->setInvoiceReference(
             $invoiceReference = InvoiceReference::fromString('invoice-ref')
@@ -166,7 +166,7 @@ class OrderTest extends TestCase
 
     public function test_adding_data_merges_with_existing_data()
     {
-        $order = $this->createDefaultOrder();
+        $order = $this->orderContext->createDefaultOrder();
 
         $order->addData(['bar' => 'baz']);
         $order->addData(['foo' => 'bar', 'bar' => 'boo']);
@@ -176,7 +176,7 @@ class OrderTest extends TestCase
 
     public function test_it_can_delete_data()
     {
-        $order = $this->createDefaultOrder();
+        $order = $this->orderContext->createDefaultOrder();
 
         $order->addData(['foo' => 'bar', 'bar' => 'boo']);
         $order->deleteData('bar');
@@ -186,7 +186,7 @@ class OrderTest extends TestCase
 
     public function test_it_can_add_log_entry()
     {
-        $order = $this->createDefaultOrder();
+        $order = $this->orderContext->createDefaultOrder();
 
         $order->addLogEntry($logEntry = OrderEvent::create(OrderEventId::fromString('abc'), 'xxx', new \DateTime(), []));
 
@@ -196,7 +196,7 @@ class OrderTest extends TestCase
 
     public function test_it_can_set_vat_exempt(): void
     {
-        $order = $this->createDefaultOrder();
+        $order = $this->orderContext->createDefaultOrder();
 
         $order->setVatExempt(true);
 

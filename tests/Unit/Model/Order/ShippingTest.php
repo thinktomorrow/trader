@@ -62,7 +62,7 @@ class ShippingTest extends TestCase
 
     public function test_it_can_add_a_discount_to_shipping()
     {
-        $order = $this->createDefaultOrder();
+        $order = $this->orderContext->createDefaultOrder();
         $shipping = $order->getShippings()[0];
         $shipping->addDiscount($this->createOrderShippingDiscount(['promo_discount_id' => 'qqq', 'discount_id' => 'defgh'], $order->getMappedData()));
 
@@ -72,13 +72,13 @@ class ShippingTest extends TestCase
         $this->assertEquals(ShippingCost::fromMoney(Money::EUR(0), $shippingCost->getVatPercentage(), $shippingCost->includesVat()), $shipping->getShippingCostTotal());
 
         $this->assertEquals([
-            Discount::class => array_map(fn ($discount) => $discount->getMappedData(), $shipping->getDiscounts()),
+            Discount::class => array_map(fn($discount) => $discount->getMappedData(), $shipping->getDiscounts()),
         ], $shipping->getChildEntities());
     }
 
     public function test_it_sets_discount_tax_the_same_as_discountable_tax()
     {
-        $order = $this->createDefaultOrder();
+        $order = $this->orderContext->createDefaultOrder();
         $shipping = $order->getShippings()[0];
         $shipping->addDiscount($this->createOrderShippingDiscount(['promo_discount_id' => 'qqq', 'discount_id' => 'defgh'], $order->getMappedData()));
 
@@ -89,7 +89,7 @@ class ShippingTest extends TestCase
 
     public function test_it_can_find_a_shipping()
     {
-        $order = $this->createDefaultOrder();
+        $order = $this->orderContext->createDefaultOrder();
 
         $shipping = $order->findShipping($order->getShippings()[0]->shippingId);
 
@@ -100,7 +100,7 @@ class ShippingTest extends TestCase
     {
         $this->expectException(CouldNotFindShippingOnOrder::class);
 
-        $order = $this->createDefaultOrder();
+        $order = $this->orderContext->createDefaultOrder();
         $order->findShipping(ShippingId::fromString('unknown'));
     }
 
@@ -108,13 +108,13 @@ class ShippingTest extends TestCase
     {
         $this->expectException(CouldNotFindShippingOnOrder::class);
 
-        $order = $this->createDefaultOrder();
+        $order = $this->orderContext->createDefaultOrder();
         $order->updateShipping($this->createOrderShipping(['shipping_id' => 'unknown']));
     }
 
     public function test_it_can_add_a_shipping()
     {
-        $order = $this->createDefaultOrder();
+        $order = $this->orderContext->createDefaultOrder();
 
         $order->addShipping($addedShipping = $this->createOrderShipping(['shipping_id' => 'hhhh']));
 
@@ -129,13 +129,13 @@ class ShippingTest extends TestCase
     {
         $this->expectException(ShippingAlreadyOnOrder::class);
 
-        $order = $this->createDefaultOrder();
+        $order = $this->orderContext->createDefaultOrder();
         $order->addShipping($this->createOrderShipping());
     }
 
     public function test_it_can_update_shipping()
     {
-        $order = $this->createDefaultOrder();
+        $order = $this->orderContext->createDefaultOrder();
 
         $shipping = $order->getShippings()[0];
         $shipping->updateCost($cost = ShippingCost::fromScalars('23', '1', false));
@@ -152,7 +152,7 @@ class ShippingTest extends TestCase
 
     public function test_it_can_delete_a_shipping()
     {
-        $order = $this->createDefaultOrder();
+        $order = $this->orderContext->createDefaultOrder();
         $shippingId = $order->getShippings()[0]->shippingId;
 
         $this->assertCount(1, $order->getShippings());

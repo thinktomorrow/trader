@@ -16,50 +16,50 @@ class OrderDetailsTest extends TestCase
 {
     public function test_it_can_get_prices()
     {
-        $order = $this->createDefaultOrder();
+        $order = $this->orderContext->createDefaultOrder();
 
         $this->assertEquals(
-            OrderTotal::zero()->add(VariantSalePrice::fromScalars(400, '10', true)),
+            OrderTotal::zero()->add(VariantSalePrice::fromScalars(200, '21', true)),
             $order->getSubTotal()
         );
 
         $this->assertEquals(
-            ShippingCost::fromScalars(30, '10', true),
+            ShippingCost::fromScalars(50, '21', true),
             $order->getShippingCost()
         );
 
         $this->assertEquals(
-            PaymentCost::fromScalars(20, '10', true),
+            PaymentCost::fromScalars(20, '21', true),
             $order->getPaymentCost()
         );
 
         $this->assertEquals(
-            DiscountTotal::fromScalars(30, '21', true), // Default percentage
+            DiscountTotal::fromScalars(15, '21', true), // Default percentage
             $order->getDiscountTotal()
         );
 
         $this->assertEquals(
             OrderTotal::zero()
-                ->add(VariantSalePrice::fromScalars(400, '10', true))
-                ->add(ShippingCost::fromScalars(30, '10', true))
-                ->add(PaymentCost::fromScalars(20, '10', true))
-                ->subtract(DiscountTotal::fromScalars(30, '21', true)),
+                ->add(VariantSalePrice::fromScalars(200, '21', true))
+                ->add(ShippingCost::fromScalars(50, '21', true))
+                ->add(PaymentCost::fromScalars(20, '21', true))
+                ->subtract(DiscountTotal::fromScalars(15, '21', true)),
             $order->getTotal()
         );
     }
 
     public function test_it_can_get_shipping_details()
     {
-        $order = $this->createDefaultOrder();
+        $order = $this->orderContext->createDefaultOrder();
 
         $this->assertCount(1, $order->getShippings());
         $this->assertEquals(DefaultShippingState::none, $order->getShippings()[0]->getShippingState());
 
         $this->assertEquals([
-            'order_id' => 'xxx',
+            'order_id' => 'order-aaa',
             'country_id' => 'BE',
             'line_1' => 'Lierseweg 81',
-            'line_2' => null,
+            'line_2' => '',
             'postal_code' => '2200',
             'city' => 'Herentals',
             'data' => "[]",
@@ -69,13 +69,13 @@ class OrderDetailsTest extends TestCase
 
     public function test_it_can_get_payment_details()
     {
-        $order = $this->createDefaultOrder();
+        $order = $this->orderContext->createDefaultOrder();
 
         $this->assertEquals([
-            'order_id' => 'xxx',
+            'order_id' => 'order-aaa',
             'country_id' => 'NL',
-            'line_1' => 'example 12',
-            'line_2' => 'bus 2',
+            'line_1' => 'Example 12',
+            'line_2' => '',
             'postal_code' => '1000',
             'city' => 'Amsterdam',
             'data' => "[]",
