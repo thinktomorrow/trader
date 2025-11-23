@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Thinktomorrow\Trader\Infrastructure\Laravel\Repositories;
@@ -11,7 +12,7 @@ use Thinktomorrow\Trader\Domain\Common\Locale;
 use Thinktomorrow\Trader\Domain\Model\Taxon\Exceptions\CouldNotFindTaxon;
 use Thinktomorrow\Trader\TraderConfig;
 
-class MemoizedMysqlTaxonTreeRepository implements TaxonTreeRepository, CategoryRepository
+class MemoizedMysqlTaxonTreeRepository implements CategoryRepository, TaxonTreeRepository
 {
     private MysqlTaxonTreeRepository $taxonTreeRepository;
 
@@ -22,7 +23,8 @@ class MemoizedMysqlTaxonTreeRepository implements TaxonTreeRepository, CategoryR
 
     public function __construct(MysqlTaxonTreeRepository $taxonTreeRepository, TraderConfig $traderConfig)
     {
-        $this->taxonTreeRepository = $taxonTreeRepository;
+        // Dont use the memoization of the underlying repository, as we handle that ourselves here.
+        $this->taxonTreeRepository = $taxonTreeRepository->withMemoization(false);
 
         $this->locale = $traderConfig->getDefaultLocale();
     }
@@ -40,7 +42,7 @@ class MemoizedMysqlTaxonTreeRepository implements TaxonTreeRepository, CategoryR
         $taxonNode = $this->getTree()->find(fn (TaxonNode $taxonNode) => $taxonNode->getId() == $taxonId);
 
         if (! $taxonNode) {
-            throw new CouldNotFindTaxon('No taxon record found by id ' . $taxonId);
+            throw new CouldNotFindTaxon('No taxon record found by id '.$taxonId);
         }
 
         return $taxonNode;
@@ -52,7 +54,7 @@ class MemoizedMysqlTaxonTreeRepository implements TaxonTreeRepository, CategoryR
         $taxonNode = $this->getTree()->find(fn (TaxonNode $taxonNode) => $taxonNode->getKey() == $key);
 
         if (! $taxonNode) {
-            throw new CouldNotFindTaxon('No taxon record found by key ' . $key);
+            throw new CouldNotFindTaxon('No taxon record found by key '.$key);
         }
 
         return $taxonNode;
@@ -73,7 +75,7 @@ class MemoizedMysqlTaxonTreeRepository implements TaxonTreeRepository, CategoryR
 
     public function getTreeByTaxonomy(string $taxonomyId): TaxonTree
     {
-        $memoizeKey = $this->locale->get() . '_' . $taxonomyId;
+        $memoizeKey = $this->locale->get().'_'.$taxonomyId;
 
         if (isset(static::$trees[$memoizeKey])) {
             return static::$trees[$memoizeKey];
@@ -86,7 +88,7 @@ class MemoizedMysqlTaxonTreeRepository implements TaxonTreeRepository, CategoryR
 
     public function getTreeByTaxonomies(array $taxonomyIds): TaxonTree
     {
-        $memoizeKey = $this->locale->get() . '_' . implode('_', $taxonomyIds);
+        $memoizeKey = $this->locale->get().'_'.implode('_', $taxonomyIds);
 
         if (isset(static::$trees[$memoizeKey])) {
             return static::$trees[$memoizeKey];
