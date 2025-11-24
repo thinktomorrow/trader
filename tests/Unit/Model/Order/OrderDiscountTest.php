@@ -100,7 +100,7 @@ class OrderDiscountTest extends TestCase
 
         $order = $this->orderContext->createDefaultOrder();
         $discount = $this->orderContext->createDiscount('order-aaa', 'discount-bbb', [
-            'discountable_type' => DiscountableType::line->value
+            'discountable_type' => DiscountableType::line->value,
         ]);
 
         $order->addDiscount($discount);
