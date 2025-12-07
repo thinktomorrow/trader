@@ -84,7 +84,7 @@ return new class extends Migration {
 
     public function down()
     {
-        Schema::dropIfExists(static::PREFIX . 'vat_rates');
         Schema::dropIfExists(static::PREFIX . 'vat_base_rates');
+        Schema::dropIfExists(static::PREFIX . 'vat_rates');
     }
 };

@@ -426,22 +426,38 @@ return new class extends Migration {
         Schema::dropIfExists(static::PREFIX . 'order_payment');
         Schema::dropIfExists(static::PREFIX . 'order_shipping');
         Schema::dropIfExists(static::PREFIX . 'order_addresses');
-        Schema::dropIfExists(static::PREFIX . 'order_customer');
+        Schema::dropIfExists(static::PREFIX . 'order_shoppers');
+
+        Schema::dropIfExists(static::PREFIX . 'order_line_personalisations');
         Schema::dropIfExists(static::PREFIX . 'order_lines');
         Schema::dropIfExists(static::PREFIX . 'orders');
 
-        Schema::dropIfExists(static::PREFIX . 'shipping_profiles');
+        Schema::dropIfExists(static::PREFIX . 'shipping_profile_countries');
         Schema::dropIfExists(static::PREFIX . 'shipping_profile_tariffs');
+        Schema::dropIfExists(static::PREFIX . 'shipping_profiles');
+        Schema::dropIfExists(static::PREFIX . 'payment_method_countries');
         Schema::dropIfExists(static::PREFIX . 'payment_methods');
 
+        Schema::dropIfExists(static::PREFIX . 'customer_addresses');
         Schema::dropIfExists(static::PREFIX . 'customers');
 
         Schema::dropIfExists(static::PREFIX . 'taxa_products');
+        Schema::dropIfExists(static::PREFIX . 'taxa_variants');
+        Schema::dropIfExists(static::PREFIX . 'taxa_keys');
         Schema::dropIfExists(static::PREFIX . 'taxa');
+
+        // Old options pivots - should be removed in future major
+        Schema::dropIfExists(static::PREFIX . 'variant_option_values');
+        Schema::dropIfExists(static::PREFIX . 'product_option_values');
+        Schema::dropIfExists(static::PREFIX . 'product_options');
+
+        Schema::dropIfExists(static::PREFIX . 'product_personalisations');
         Schema::dropIfExists(static::PREFIX . 'product_variants');
+        Schema::dropIfExists(static::PREFIX . 'products_related');
         Schema::dropIfExists(static::PREFIX . 'products');
-        Schema::dropIfExists(static::PREFIX . 'promos');
+        Schema::dropIfExists(static::PREFIX . 'promo_discount_conditions');
         Schema::dropIfExists(static::PREFIX . 'promo_discounts');
+        Schema::dropIfExists(static::PREFIX . 'promos');
         Schema::dropIfExists(static::PREFIX . 'promo_discount_conditions');
         Schema::dropIfExists(static::PREFIX . 'countries');
     }

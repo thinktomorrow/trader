@@ -20,6 +20,8 @@ abstract class OrderReadLine
 
     protected string $line_id;
     protected PurchasableReference $purchasableReference;
+    protected ?string $variant_id;
+    protected ?string $product_id;
     protected array $purchasableData;
     protected LinePrice $linePrice;
     protected VariantUnitPrice $unitPrice;
@@ -68,6 +70,9 @@ abstract class OrderReadLine
         Assertion::keyIsset($line->data, 'unit_price_excluding_vat');
         Assertion::keyIsset($line->data, 'unit_price_including_vat');
 
+        $line->variant_id = $line->purchasableReference->isVariant() ? $line->purchasableReference->getId() : $line->data('variant_id');
+        $line->product_id = $line->data('product_id');
+
         $line->unitPrice = VariantUnitPrice::fromMoney(
             Cash::make($line->linePrice->includesVat() ? $line->data('unit_price_including_vat') : $line->data('unit_price_excluding_vat')),
             $line->linePrice->getVatPercentage(),
@@ -87,6 +92,16 @@ abstract class OrderReadLine
     public function getPurchasableReference(): PurchasableReference
     {
         return $this->purchasableReference;
+    }
+
+    public function getVariantId(): ?string
+    {
+        return $this->variant_id;
+    }
+
+    public function getProductId(): ?string
+    {
+        return $this->product_id;
     }
 
     public function includeTax(bool $include_tax = true): void
@@ -203,7 +218,7 @@ abstract class OrderReadLine
 
     public function getData(?string $key = null, $default = null): mixed
     {
-        if (! $key) {
+        if (!$key) {
             return $this->data;
         }
 
