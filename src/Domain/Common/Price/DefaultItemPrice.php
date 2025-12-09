@@ -94,7 +94,7 @@ class DefaultItemPrice implements ItemPrice
 
         $expectedPercentage = VatPercentage::fromString((string)$percentage);
 
-        if (!$expectedPercentage->equals($this->vatPercentage)) {
+        if (! $expectedPercentage->equals($this->vatPercentage)) {
             throw new \InvalidArgumentException('The provided VAT percentage [' . $this->vatPercentage->get() . '] does not match the calculated VAT [' . $expectedPercentage->get() . '] from the including and excluding amounts.');
         }
     }

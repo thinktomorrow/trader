@@ -52,13 +52,13 @@ trait HasTotals
             ->add($paymentItemPrice);
     }
 
-//    public function getTotal(): OrderTotal
-//    {
-//        return $this->getSubTotal()
-//            ->subtract($this->getDiscountTotal())
-//            ->add($this->getShippingCost())
-//            ->add($this->getPaymentCost());
-//    }
+    //    public function getTotal(): OrderTotal
+    //    {
+    //        return $this->getSubTotal()
+    //            ->subtract($this->getDiscountTotal())
+    //            ->add($this->getShippingCost())
+    //            ->add($this->getPaymentCost());
+    //    }
 
     public function getTaxTotal(): Money
     {
