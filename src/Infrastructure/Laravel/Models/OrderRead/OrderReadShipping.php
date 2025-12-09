@@ -31,7 +31,7 @@ abstract class OrderReadShipping
     {
         $shipping = new static();
 
-        if (! $state['shipping_state'] instanceof  ShippingState) {
+        if (!$state['shipping_state'] instanceof ShippingState) {
             throw new \InvalidArgumentException('Shipping state is expected to be instance of ShippingState. Instead ' . gettype($state['shipping_state']) . ' is passed.');
         }
 
@@ -87,5 +87,10 @@ abstract class OrderReadShipping
     public function getDescription(): ?string
     {
         return $this->data('description');
+    }
+
+    public function getData(string $key, $default = null): mixed
+    {
+        return $this->data($key, null, $default);
     }
 }

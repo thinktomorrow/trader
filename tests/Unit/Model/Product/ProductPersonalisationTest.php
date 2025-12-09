@@ -12,7 +12,7 @@ class ProductPersonalisationTest extends TestCase
 {
     public function test_it_can_add_personalisation()
     {
-        $product = $this->createProduct();
+        $product = $this->catalogContext->createProduct();
 
         $product->updatePersonalisations([Personalisation::create($product->productId, PersonalisationId::fromString('ooo'), PersonalisationType::fromString(PersonalisationType::TEXT), ['foo' => 'bar'])]);
 
@@ -28,7 +28,7 @@ class ProductPersonalisationTest extends TestCase
 
     public function test_it_cannot_add_same_personalisation_twice()
     {
-        $product = $this->createProduct();
+        $product = $this->catalogContext->createProduct();
 
         $product->updatePersonalisations([Personalisation::create($product->productId, PersonalisationId::fromString('ooo'), PersonalisationType::fromString(PersonalisationType::TEXT), [])]);
         $product->updatePersonalisations([Personalisation::create($product->productId, PersonalisationId::fromString('ooo'), PersonalisationType::fromString(PersonalisationType::TEXT), [])]);
@@ -38,7 +38,7 @@ class ProductPersonalisationTest extends TestCase
 
     public function test_it_can_update_personalisation_values()
     {
-        $product = $this->createProduct();
+        $product = $this->catalogContext->createProduct();
 
         $product->updatePersonalisations([$personalisation = Personalisation::create($product->productId, PersonalisationId::fromString('ooo'), PersonalisationType::fromString(PersonalisationType::TEXT), [])]);
 
@@ -87,7 +87,7 @@ class ProductPersonalisationTest extends TestCase
 
     public function test_it_rejects_invalid_personalisations()
     {
-        $product = $this->createProduct();
+        $product = $this->catalogContext->createProduct();
 
         $this->expectException(\InvalidArgumentException::class);
 

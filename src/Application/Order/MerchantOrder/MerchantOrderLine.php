@@ -60,4 +60,6 @@ interface MerchantOrderLine
 
     /** @return MerchantOrderLinePersonalisation[] */
     public function getPersonalisations(): iterable;
+
+    public function getData(?string $key = null, $default = null): mixed;
 }

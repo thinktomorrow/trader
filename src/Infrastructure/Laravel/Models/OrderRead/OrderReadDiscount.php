@@ -74,4 +74,9 @@ abstract class OrderReadDiscount
     {
         return $this->data('description');
     }
+
+    public function getData(string $key, $default = null): mixed
+    {
+        return $this->data($key, null, $default);
+    }
 }

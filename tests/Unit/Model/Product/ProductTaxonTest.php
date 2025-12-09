@@ -15,7 +15,7 @@ class ProductTaxonTest extends TestCase
 {
     public function test_it_can_update_product_taxa(): void
     {
-        $product = $this->createProduct();
+        $product = $this->catalogContext->createProduct();
 
         $product->updateProductTaxa([
             $productTaxon = ProductTaxon::create($product->productId, TaxonId::fromString('ppp')),
@@ -31,7 +31,7 @@ class ProductTaxonTest extends TestCase
 
     public function test_it_cannot_add_same_product_variant_property_twice()
     {
-        $product = $this->createProduct();
+        $product = $this->catalogContext->createProduct();
 
         $product->updateProductTaxa([
             ProductTaxon::create($product->productId, TaxonId::fromString('bbb')),
@@ -43,7 +43,7 @@ class ProductTaxonTest extends TestCase
 
     public function test_it_can_have_variant_properties(): void
     {
-        $product = $this->createProduct();
+        $product = $this->catalogContext->createProduct();
 
         $product->updateProductTaxa([
             $variantProperty = VariantProperty::create($product->productId, TaxonId::fromString('ppp')),
@@ -54,7 +54,7 @@ class ProductTaxonTest extends TestCase
 
     public function test_it_rejects_invalid_product_taxa(): void
     {
-        $product = $this->createProduct();
+        $product = $this->catalogContext->createProduct();
 
         $this->expectException(\InvalidArgumentException::class);
 

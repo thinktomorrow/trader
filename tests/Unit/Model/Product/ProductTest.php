@@ -36,7 +36,7 @@ class ProductTest extends TestCase
 {
     public function test_it_can_create_a_product()
     {
-        $product = $this->createProduct();
+        $product = $this->catalogContext->createProduct();
 
         $this->assertEquals([
             'product_id' => 'xxx',
@@ -155,7 +155,7 @@ class ProductTest extends TestCase
 
     public function test_it_can_update_state()
     {
-        $product = $this->createProduct();
+        $product = $this->catalogContext->createProduct();
 
         $product->updateState(ProductState::archived);
 
@@ -164,7 +164,7 @@ class ProductTest extends TestCase
 
     public function test_it_records_event_when_data_is_updated()
     {
-        $product = $this->createProduct();
+        $product = $this->catalogContext->createProduct();
         $product->releaseEvents();
 
         $product->addData(['title' => ['nl' => 'updated title']]);
@@ -197,7 +197,7 @@ class ProductTest extends TestCase
     {
         $this->expectException(\InvalidArgumentException::class);
 
-        $product = $this->createProduct();
+        $product = $this->catalogContext->createProduct();
 
         $product->createVariant(Variant::create(
             ProductId::fromString('false-product-id'),

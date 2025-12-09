@@ -264,11 +264,11 @@ class TraderServiceProvider extends ServiceProvider
     public function boot()
     {
         // Config
-        $this->publishes([__DIR__ . '/config/config.php' => config_path('trader.php')]);
-        $this->mergeConfigFrom(__DIR__ . '/config/config.php', 'trader');
+        $this->publishes([__DIR__.'/config/config.php' => config_path('trader.php')]);
+        $this->mergeConfigFrom(__DIR__.'/config/config.php', 'trader');
 
         // Migrations
-        $this->loadMigrationsFrom(__DIR__ . '/database/migrations');
+        $this->loadMigrationsFrom(__DIR__.'/database/migrations');
 
         // Discount vat rate
         $standardPrimaryVatPercentage = Schema::hasTable('trader_vat_rates')
@@ -299,10 +299,10 @@ class TraderServiceProvider extends ServiceProvider
 
             $value = Arr::get(
                 $data,
-                $key . '.' . $language,
+                $key.'.'.$language,
                 Arr::get(
                     $data,
-                    $key . '.' . $defaultLanguage,
+                    $key.'.'.$defaultLanguage,
                     Arr::get($data, $key, $default)
                 )
             );
@@ -313,6 +313,7 @@ class TraderServiceProvider extends ServiceProvider
 
     private function registerPromoConditionsAndDiscounts()
     {
+        // Discount and condition domain and persistence logic
         $this->app->bind(ConditionFactory::class, function () {
             return new ConditionFactory([
                 MinimumLinesQuantity::class,
@@ -330,6 +331,7 @@ class TraderServiceProvider extends ServiceProvider
             );
         });
 
+        // Discount and condition application logic
         $this->app->bind(OrderConditionFactory::class, function () {
             return new OrderConditionFactory([
                 MinimumLinesQuantityOrderCondition::class,
