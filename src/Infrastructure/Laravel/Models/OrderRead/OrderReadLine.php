@@ -218,7 +218,7 @@ abstract class OrderReadLine
 
     public function getData(?string $key = null, $default = null): mixed
     {
-        if (!$key) {
+        if (! $key) {
             return $this->data;
         }
 

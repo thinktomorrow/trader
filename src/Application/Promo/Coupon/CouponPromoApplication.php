@@ -15,8 +15,7 @@ final class CouponPromoApplication
         private EventDispatcher      $eventDispatcher,
         private OrderPromoRepository $orderPromoRepository,
         private ApplyPromoToOrder    $applyPromoToOrder,
-    )
-    {
+    ) {
     }
 
     public function enterCoupon(EnterCoupon $enterCoupon): void
@@ -24,7 +23,7 @@ final class CouponPromoApplication
         $order = $this->orderRepository->find($enterCoupon->getOrderId());
 
         // Find by coupon in active promo's
-        if (!$promo = $this->orderPromoRepository->findOrderPromoByCouponCode($enterCoupon->getCouponCode())) {
+        if (! $promo = $this->orderPromoRepository->findOrderPromoByCouponCode($enterCoupon->getCouponCode())) {
             return;
         }
 
