@@ -1,12 +1,12 @@
 <?php
 declare(strict_types=1);
 
-namespace Thinktomorrow\Trader\Domain\Common\Price;
+namespace Thinktomorrow\Trader\Domain\Common\Price\Old;
 
 use Money\Money;
 use Thinktomorrow\Trader\Domain\Common\Vat\VatPercentage;
 
-interface Price extends ConvertsToMoney
+interface Price
 {
     public static function fromScalars(string|int $amount, string $vatPercentage, bool $includesVat): static;
 
@@ -15,6 +15,12 @@ interface Price extends ConvertsToMoney
     public static function fromMoney(Money $money, VatPercentage $vatPercentage, bool $includesVat): static;
 
     public static function zero(): static;
+
+    public function getMoney(): Money;
+
+    public function getIncludingVat(): Money;
+
+    public function getExcludingVat(): Money;
 
     public function multiply(int $quantity): static;
 

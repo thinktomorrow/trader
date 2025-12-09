@@ -5,44 +5,41 @@ namespace Thinktomorrow\Trader\Domain\Common\Vat;
 
 use Money\Money;
 use Thinktomorrow\Trader\Domain\Common\Cash\Cash;
-use Thinktomorrow\Trader\Domain\Common\Cash\PreciseMoney;
 
 class VatTotal
 {
-    // Amount of decimals we will use to calculate the vat. This will ensure a better accuracy.
-    const VAT_CALCULATION_PRECISION = 4;
-
     private VatPercentage $vatPercentage;
 
-    /***
-     * Nett amount where vat should be calculated upon.
-     * The VatApplicableTotal has a more precise amount than the regular Money object
-     */
-    private VatApplicableTotal $vatApplicableTotal;
+    private Money $total;
 
-    public function __construct(VatPercentage $vatPercentage, VatApplicableTotal $vatApplicableTotal)
+    public function __construct(VatPercentage $vatPercentage, Money $total)
     {
         $this->vatPercentage = $vatPercentage;
-        $this->vatApplicableTotal = $vatApplicableTotal;
+        $this->total = $total;
+    }
+
+    public static function make(VatPercentage $vatPercentage, Money $total): static
+    {
+        return new static($vatPercentage, $total);
     }
 
     public static function zero(VatPercentage $vatPercentage): static
     {
-        return new static($vatPercentage, VatApplicableTotal::zero(static::VAT_CALCULATION_PRECISION));
+        return new static($vatPercentage, Cash::zero());
     }
 
-    public function add(VatApplicableTotal $vatApplicableTotal): static
+    public function add(Money $addedTotal): static
     {
-        return new static($this->vatPercentage, $this->vatApplicableTotal->add($vatApplicableTotal));
+        return new static($this->vatPercentage, $this->total->add($addedTotal));
     }
 
-    public function subtract(VatApplicableTotal $vatApplicableTotal): static
+    public function subtract(Money $subtractedTotal): static
     {
-        if ($vatApplicableTotal->getPreciseMoney()->greaterThanOrEqual($this->vatApplicableTotal->getPreciseMoney())) {
-            return new static($this->vatPercentage, VatApplicableTotal::zero(static::VAT_CALCULATION_PRECISION, $this->vatApplicableTotal->getMoney()->getCurrency()->getCode()));
+        if ($subtractedTotal->greaterThanOrEqual($this->total)) {
+            return new static($this->vatPercentage, Cash::zero());
         }
 
-        return new static($this->vatPercentage, $this->vatApplicableTotal->subtract($vatApplicableTotal));
+        return new static($this->vatPercentage, $this->total->subtract($subtractedTotal));
     }
 
     public function getVatPercentage(): VatPercentage
@@ -50,23 +47,8 @@ class VatTotal
         return $this->vatPercentage;
     }
 
-    public function getVatApplicableTotal(): VatApplicableTotal
+    public function getTotal(): Money
     {
-        return $this->vatApplicableTotal;
-    }
-
-    public function getVatTotal(): Money
-    {
-        $grossTotal = Cash::from($this->vatApplicableTotal->getMoney())->addPercentage($this->vatPercentage->toPercentage());
-
-        return $grossTotal->subtract($this->vatApplicableTotal->getMoney());
-    }
-
-    public function getPreciseVatTotal(): PreciseMoney
-    {
-        $grossTotalAmount = $this->vatApplicableTotal->getPreciseMoney()->getAmount() * ((float)$this->vatPercentage->toPercentage()->toDecimal() + 1);
-        $grossTotal = VatApplicableTotal::fromFloat($grossTotalAmount, static::VAT_CALCULATION_PRECISION);
-
-        return $grossTotal->subtract($this->vatApplicableTotal);
+        return $this->total;
     }
 }

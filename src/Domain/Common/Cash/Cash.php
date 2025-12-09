@@ -22,9 +22,9 @@ class Cash
         $this->money = $money;
     }
 
-    public static function from($money, $currencyCode = null): self
+    public static function from($money, ?string $currencyCode = null): self
     {
-        if (! $money instanceof Money) {
+        if (!$money instanceof Money) {
             $money = static::make($money, $currencyCode);
         }
 
@@ -39,14 +39,14 @@ class Cash
      * @param string|null $currencyCode
      * @return Money
      */
-    public static function make(string|int $amount, string $currencyCode = null): Money
+    public static function make(string|int $amount, ?string $currencyCode = null): Money
     {
         $currencyCode = $currencyCode ?: static::getDefaultCurrencyCode();
 
         return new Money($amount, new Currency($currencyCode));
     }
 
-    public static function zero(string $currencyCode = null): Money
+    public static function zero(?string $currencyCode = null): Money
     {
         $currencyCode = $currencyCode ?: static::getDefaultCurrencyCode();
 
@@ -76,7 +76,7 @@ class Cash
 
     public function asPercentage(Money $other, $precision = 2): Percentage
     {
-        if (! $this->money->isSameCurrency($other)) {
+        if (!$this->money->isSameCurrency($other)) {
             throw new \InvalidArgumentException('Money::asPercentage expects Money value of the same currency');
         }
         if ($other->getAmount() <= 0) {
@@ -91,7 +91,7 @@ class Cash
     /**
      * @return Money|int
      */
-    public function percentage(Percentage|string $percentage, int $rounding_mode = Money::ROUND_HALF_UP, bool $returnAsMoney = true, ?int $round = null)
+    public function percentage(Percentage|string $percentage, \RoundingMode $roundMethod = \RoundingMode::HalfAwayFromZero, bool $returnAsMoney = true, int $round = 0)
     {
         if ($percentage instanceof Percentage) {
             $percentage = $percentage->get();
@@ -99,23 +99,17 @@ class Cash
 
         $multiplier = (string)($percentage / 100);
 
-        $money = $this->money->multiply($multiplier, $rounding_mode);
+        $money = $this->money->multiply($multiplier);
 
-        if ($returnAsMoney) {
-            return $money;
-        }
+        $money = new Money((int)round((int)$money->getAmount(), $round, $roundMethod), $money->getCurrency());
 
-        if (! $round) {
-            $round = 0;
-        }
-
-        return (int)round((int)$money->getAmount(), $round, $rounding_mode);
+        return $returnAsMoney ? $money : $money->getAmount();
     }
 
     /**
      * Add a percentage of the amount
      */
-    public function addPercentage(Percentage|string $percentage, int $roundMethod = PHP_ROUND_HALF_UP): Money
+    public function addPercentage(Percentage|string $percentage, \RoundingMode $roundMethod = \RoundingMode::HalfAwayFromZero): Money
     {
         if ($percentage instanceof Percentage) {
             $percentage = $percentage->get();
@@ -131,7 +125,7 @@ class Cash
      * @param int $roundMethod
      * @return Money
      */
-    public function subtractPercentage($percentage, $roundMethod = PHP_ROUND_HALF_UP): Money
+    public function subtractPercentage($percentage, \RoundingMode $roundMethod = \RoundingMode::HalfAwayFromZero): Money
     {
         if ($percentage instanceof Percentage) {
             $percentage = $percentage->get();
@@ -153,7 +147,7 @@ class Cash
     public function subtractTaxPercentage(Percentage $percentage, $roundMethod = Money::ROUND_HALF_UP, $returnAsMoney = true, $round = null): Money
     {
         $tax_percentage = (string)($percentage->toDecimal() + 1);
-       
+
         return $this->money->divide($tax_percentage, $roundMethod, $returnAsMoney, $round);
     }
 
@@ -181,7 +175,7 @@ class Cash
 
     private function getFormatter(Locale $locale): MoneyFormatter
     {
-        if (! static::$formatter) {
+        if (!static::$formatter) {
             $currencies = new ISOCurrencies();
 
             $numberFormatter = new NumberFormatter($locale->toIso15897(), NumberFormatter::DECIMAL);

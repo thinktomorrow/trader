@@ -4,47 +4,71 @@ declare(strict_types=1);
 namespace Thinktomorrow\Trader\Domain\Common\Price;
 
 use Money\Money;
+use Thinktomorrow\Trader\Domain\Common\Cash\Cash;
+use Thinktomorrow\Trader\Domain\Common\Price\Exceptions\PriceCannotBeNegative;
 use Thinktomorrow\Trader\Domain\Common\Vat\VatPercentage;
 
+
 /**
- * Value object representing a calculated price with both including and excluding VAT amounts.
- * This class is immutable and avoids rounding issues by storing both amounts directly.
+ * Value object representing a calculated price where the canonical state is:
+ *   - excluding VAT amount
+ *   - VAT percentage
+ *
+ * Including VAT and VAT total are always derived from the canonical state,
+ * which avoids drift and rounding inconsistencies.
+ *
+ * This class is immutable.
  */
 class DefaultItemPrice implements ItemPrice
 {
-    private Money $includingVat;
     private Money $excludingVat;
     private VatPercentage $vatPercentage;
 
-    private function __construct(Money $includingVat, Money $excludingVat, VatPercentage $vatPercentage)
+    /**
+     * Stores the originally provided VAT-inclusive amount (when given),
+     * so we can return it without re-computing and causing rounding drift.
+     */
+    private ?Money $includingVatOriginal = null;
+
+    private function __construct(Money $excludingVat, VatPercentage $vatPercentage)
     {
-        if ($includingVat->isNegative()) {
-            throw new PriceCannotBeNegative('Including VAT money amount cannot be negative: ' . $includingVat->getAmount() . ' is given.');
-        }
-
         if ($excludingVat->isNegative()) {
-            throw new PriceCannotBeNegative('Excluding VAT money amount cannot be negative: ' . $excludingVat->getAmount() . ' is given.');
+            throw new PriceCannotBeNegative(
+                'Excluding VAT money amount cannot be negative: ' . $excludingVat->getAmount() . ' is given.'
+            );
         }
 
-        $this->includingVat = $includingVat;
         $this->excludingVat = $excludingVat;
         $this->vatPercentage = $vatPercentage;
-
-        $this->validateVatPercentage();
     }
 
-    public static function fromCalculated(Money $includingVat, Money $excludingVat, VatPercentage $vatPercentage): static
+    public static function fromExcludingVat(Money $amount, VatPercentage $vatPercentage): static
     {
-        return new static(
-            $includingVat,
-            $excludingVat,
-            $vatPercentage
-        );
+        return new static($amount, $vatPercentage);
+    }
+
+    /**
+     * Factory based on a single amount and a VAT flag.
+     * If $includesVat is true, we derive the excluding VAT amount.
+     * If false, we take the amount as excluding VAT.
+     */
+    public static function fromMoney(Money $amount, VatPercentage $vatPercentage, bool $includesVat): static
+    {
+        if ($includesVat) {
+            $excludingVat = Cash::from($amount)->subtractTaxPercentage($vatPercentage->toPercentage());
+
+            $self = new static($excludingVat, $vatPercentage);
+            $self->includingVatOriginal = $amount;
+
+            return $self;
+        }
+
+        return new static($amount, $vatPercentage);
     }
 
     public function getIncludingVat(): Money
     {
-        return $this->includingVat;
+        return $this->includingVatOriginal ?? Cash::from($this->excludingVat)->addPercentage($this->vatPercentage->toPercentage());
     }
 
     public function getExcludingVat(): Money
@@ -54,8 +78,7 @@ class DefaultItemPrice implements ItemPrice
 
     public function getVatTotal(): Money
     {
-        return $this->getIncludingVat()
-            ->subtract($this->getExcludingVat());
+        return $this->getIncludingVat()->subtract($this->excludingVat);
     }
 
     public function getVatPercentage(): VatPercentage
@@ -66,7 +89,6 @@ class DefaultItemPrice implements ItemPrice
     public function multiply(int $quantity): static
     {
         return new static(
-            $this->includingVat->multiply($quantity),
             $this->excludingVat->multiply($quantity),
             $this->vatPercentage
         );
@@ -74,28 +96,20 @@ class DefaultItemPrice implements ItemPrice
 
     public function applyDiscount(ItemDiscount $discount): static
     {
-        return new static(
-            $this->includingVat->subtract($discount->getIncludingVat()),
-            $this->excludingVat->subtract($discount->getExcludingVat()),
-            $this->vatPercentage
-        );
+        $newExcluding = $this->excludingVat->subtract($discount->getExcludingVat());
+
+        if ($newExcluding->isNegative()) {
+            throw new PriceCannotBeNegative(
+                'Applying the discount would result in a negative excluding VAT amount: ' .
+                $newExcluding->getAmount()
+            );
+        }
+
+        return new static($newExcluding, $this->vatPercentage);
     }
 
-    private function validateVatPercentage(): void
+    public function changeVatPercentage(VatPercentage $vatPercentage): static
     {
-        $vatAmount = $this->getVatTotal()->getAmount();
-        $exclAmount = $this->excludingVat->getAmount();
-
-        if ($this->excludingVat->isZero()) {
-            return;
-        }
-
-        $percentage = round(($vatAmount / $exclAmount) * 100, 0);
-
-        $expectedPercentage = VatPercentage::fromString((string)$percentage);
-
-        if (! $expectedPercentage->equals($this->vatPercentage)) {
-            throw new \InvalidArgumentException('The provided VAT percentage [' . $this->vatPercentage->get() . '] does not match the calculated VAT [' . $expectedPercentage->get() . '] from the including and excluding amounts.');
-        }
+        return new static($this->excludingVat, $vatPercentage);
     }
 }

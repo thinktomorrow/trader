@@ -8,7 +8,9 @@ use Thinktomorrow\Trader\Domain\Common\Vat\VatPercentage;
 
 interface ItemPrice
 {
-    public static function fromCalculated(Money $includingVat, Money $excludingVat, VatPercentage $vatPercentage): static;
+    public static function fromExcludingVat(Money $amount, VatPercentage $vatPercentage): static;
+
+    public static function fromMoney(Money $amount, VatPercentage $vatPercentage, bool $includesVat): static;
 
     public function getIncludingVat(): Money;
 
@@ -21,4 +23,6 @@ interface ItemPrice
     public function multiply(int $quantity): static;
 
     public function applyDiscount(ItemDiscount $discount): static;
+
+    public function changeVatPercentage(VatPercentage $vatPercentage): static;
 }

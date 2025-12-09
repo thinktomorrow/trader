@@ -5,6 +5,7 @@ namespace Thinktomorrow\Trader\Domain\Common\Price;
 
 use Money\Money;
 use Thinktomorrow\Trader\Domain\Common\Cash\Cash;
+use Thinktomorrow\Trader\Domain\Common\Price\Exceptions\PriceCannotBeNegative;
 
 class DefaultTotalPrice implements TotalPrice
 {

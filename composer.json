@@ -14,7 +14,7 @@
         }
     ],
     "require": {
-        "php": ">=8.2",
+        "php": ">=8.4",
         "moneyphp/money": "^4.3.0",
         "beberlei/assert": "^3.3.2",
         "ext-bcmath": "*",

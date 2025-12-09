@@ -80,7 +80,7 @@ class CashTest extends TestCase
         $this->assertInstanceOf(Money::class, $percentaged);
         $this->assertEquals(500, $percentaged->getAmount());
 
-        $this->assertEquals(50.00, Cash::from(Money::EUR(500))->percentage('10.0', Money::ROUND_HALF_UP, false, 2));
+        $this->assertEquals(50.00, Cash::from(Money::EUR(500))->percentage('10.0', \RoundingMode::HalfAwayFromZero, false, 2));
     }
 
     public function test_it_can_add_percentage_of_amount()

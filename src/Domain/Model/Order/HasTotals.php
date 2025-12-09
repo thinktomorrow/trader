@@ -6,7 +6,7 @@ namespace Thinktomorrow\Trader\Domain\Model\Order;
 use Money\Money;
 use Thinktomorrow\Trader\Domain\Common\Price\DefaultItemPrice;
 use Thinktomorrow\Trader\Domain\Common\Price\DefaultTotalPrice;
-use Thinktomorrow\Trader\Domain\Common\Price\PriceTotal;
+use Thinktomorrow\Trader\Domain\Common\Price\Old\PriceTotal;
 use Thinktomorrow\Trader\Domain\Common\Price\TotalPrice;
 use Thinktomorrow\Trader\Domain\Model\Order\Discount\DiscountTotal;
 use Thinktomorrow\Trader\Domain\Model\Order\Payment\Payment;
