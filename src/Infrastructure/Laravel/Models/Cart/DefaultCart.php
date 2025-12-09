@@ -14,7 +14,7 @@ use Thinktomorrow\Trader\Application\Cart\Read\CartShopper;
 use Thinktomorrow\Trader\Application\Common\RendersData;
 use Thinktomorrow\Trader\Application\Common\RendersMoney;
 use Thinktomorrow\Trader\Domain\Common\Price\Price;
-use Thinktomorrow\Trader\Domain\Common\Price\PriceTotal;
+use Thinktomorrow\Trader\Domain\Common\Price\TotalPrice;
 
 class DefaultCart implements Cart
 {
@@ -31,9 +31,9 @@ class DefaultCart implements Cart
     protected array $discounts;
     protected array $data;
 
-    protected PriceTotal $total;
+    protected TotalPrice $total;
     protected Money $taxTotal;
-    protected PriceTotal $subtotal;
+    protected TotalPrice $subtotal;
     protected Price $discountTotal;
     protected Price $shippingCost;
     protected Price $paymentCost;
@@ -50,7 +50,6 @@ class DefaultCart implements Cart
         $cart = new static();
 
         $cart->orderId = $state['order_id'];
-
         $cart->total = $state['total'];
         $cart->taxTotal = $state['taxTotal'];
         $cart->subtotal = $state['subtotal'];
@@ -93,7 +92,7 @@ class DefaultCart implements Cart
 
     public function getQuantity(): int
     {
-        return array_reduce((array)$this->getLines(), fn ($carry, $line) => $carry + $line->getQuantity(), 0);
+        return array_reduce((array)$this->getLines(), fn($carry, $line) => $carry + $line->getQuantity(), 0);
     }
 
     public function includeTax(bool $includeTax = true): void
@@ -132,13 +131,13 @@ class DefaultCart implements Cart
     public function getSubtotalPriceAsMoney(?bool $includeTax = null): Money
     {
         $includeTax = $includeTax ?? $this->include_tax;
-
+        dump($includeTax, $this->subtotal, $this->subtotal->getIncludingVat(), $this->subtotal->getExcludingVat());
         return $includeTax ? $this->subtotal->getIncludingVat() : $this->subtotal->getExcludingVat();
     }
 
     public function getShippingCost(?bool $includeTax = null): ?string
     {
-        if (! $this->shippingCost->getMoney()->isPositive()) {
+        if (!$this->shippingCost->getMoney()->isPositive()) {
             return null;
         }
 
@@ -157,7 +156,7 @@ class DefaultCart implements Cart
 
     public function getPaymentCost(?bool $includeTax = null): ?string
     {
-        if (! $this->paymentCost->getMoney()->isPositive()) {
+        if (!$this->paymentCost->getMoney()->isPositive()) {
             return null;
         }
 
@@ -176,7 +175,7 @@ class DefaultCart implements Cart
 
     public function getDiscountPrice(?bool $includeTax = null): ?string
     {
-        if (! $this->discountTotal->getMoney()->isPositive()) {
+        if (!$this->discountTotal->getMoney()->isPositive()) {
             return null;
         }
 

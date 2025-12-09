@@ -4,9 +4,11 @@ declare(strict_types=1);
 namespace Thinktomorrow\Trader\Domain\Model\Order;
 
 use Money\Money;
+use Thinktomorrow\Trader\Domain\Common\Price\DefaultItemPrice;
+use Thinktomorrow\Trader\Domain\Common\Price\DefaultTotalPrice;
 use Thinktomorrow\Trader\Domain\Common\Price\PriceTotal;
+use Thinktomorrow\Trader\Domain\Common\Price\TotalPrice;
 use Thinktomorrow\Trader\Domain\Model\Order\Discount\DiscountTotal;
-use Thinktomorrow\Trader\Domain\Model\Order\Line\Line;
 use Thinktomorrow\Trader\Domain\Model\Order\Payment\Payment;
 use Thinktomorrow\Trader\Domain\Model\Order\Payment\PaymentCost;
 use Thinktomorrow\Trader\Domain\Model\Order\Shipping\Shipping;
@@ -14,34 +16,53 @@ use Thinktomorrow\Trader\Domain\Model\Order\Shipping\ShippingCost;
 
 trait HasTotals
 {
-    public function getSubTotal(): OrderTotal
+    public function getSubTotal(): TotalPrice
     {
-        $total = OrderTotal::zero();
+        $subtotal = DefaultTotalPrice::zero();
 
-        if (count($this->lines) < 1) {
-            return $total;
+        foreach ($this->lines as $line) {
+            $subtotal = $subtotal->add($line->getTotal());
         }
 
-        return array_reduce($this->lines, function (?PriceTotal $carry, Line $line) {
-            return $carry === null
-                ? $line->getTotal()
-                : $carry->add($line->getTotal());
-        }, $total);
+        return $subtotal;
     }
 
-    public function getTotal(): OrderTotal
+    public function getTotal(): TotalPrice
     {
+        $shippingItemPrice = DefaultItemPrice::fromCalculated(
+            $this->getShippingCost()->getIncludingVat(),
+            $this->getShippingCost()->getExcludingVat(),
+            $this->getShippingCost()->getVatPercentage()
+        );
+
+        $paymentItemPrice = DefaultItemPrice::fromCalculated(
+            $this->getPaymentCost()->getIncludingVat(),
+            $this->getPaymentCost()->getExcludingVat(),
+            $this->getPaymentCost()->getVatPercentage()
+        );
+
+        $discountTotalPrice = DefaultTotalPrice::fromCalculated(
+            $this->getDiscountTotal()->getIncludingVat(),
+            $this->getDiscountTotal()->getExcludingVat()
+        );
+
         return $this->getSubTotal()
-            ->subtract($this->getDiscountTotal())
-            ->add($this->getShippingCost())
-            ->add($this->getPaymentCost());
+            ->subtract($discountTotalPrice)
+            ->add($shippingItemPrice)
+            ->add($paymentItemPrice);
     }
+
+//    public function getTotal(): OrderTotal
+//    {
+//        return $this->getSubTotal()
+//            ->subtract($this->getDiscountTotal())
+//            ->add($this->getShippingCost())
+//            ->add($this->getPaymentCost());
+//    }
 
     public function getTaxTotal(): Money
     {
-        return $this->getTotal()->getIncludingVat()->subtract(
-            $this->getTotal()->getExcludingVat()
-        );
+        return $this->getTotal()->getVatTotal();
     }
 
     public function getDiscountTotal(): DiscountTotal

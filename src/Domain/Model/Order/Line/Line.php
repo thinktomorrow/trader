@@ -6,6 +6,8 @@ namespace Thinktomorrow\Trader\Domain\Model\Order\Line;
 use Money\Money;
 use Thinktomorrow\Trader\Domain\Common\Entity\ChildAggregate;
 use Thinktomorrow\Trader\Domain\Common\Entity\HasData;
+use Thinktomorrow\Trader\Domain\Common\Price\DefaultItemPrice;
+use Thinktomorrow\Trader\Domain\Common\Price\ItemPrice;
 use Thinktomorrow\Trader\Domain\Common\Price\Price;
 use Thinktomorrow\Trader\Domain\Model\Order\Discount\Discount;
 use Thinktomorrow\Trader\Domain\Model\Order\Discount\Discountable;
@@ -80,22 +82,47 @@ final class Line implements ChildAggregate, Discountable
             ->multiply($this->quantity->asInt());
     }
 
-    public function getTotal(): Price
+    public function getTotal(): DefaultItemPrice
     {
-        return $this->getSubTotal()
-            ->subtract($this->getDiscountTotal());
-    }
+        return $this->getCalculatedTotal();
 
-    public function getTaxTotal(): Money
-    {
-        return $this->getTotal()->getIncludingVat()->subtract(
-            $this->getTotal()->getExcludingVat()
-        );
+//        return $this->getSubTotal()
+//            ->subtract($this->getDiscountTotal());
     }
 
     public function getDiscountTotal(): DiscountTotal
     {
         return $this->calculateDiscountTotal($this->getLinePrice());
+    }
+
+    public function getTaxTotal(): Money
+    {
+        return $this->getCalculatedTotal()->getVatTotal();
+    }
+
+    private function getCalculatedTotal(): ItemPrice
+    {
+        $discountTotal = $this->getDiscountTotal();
+        $discountIncl = $discountTotal->getIncludingVat();
+        $discountExcl = $discountTotal->getExcludingVat();
+
+        // Divide discount per unit first
+        $unitDiscountIncl = $discountIncl->divide($this->quantity->asInt());
+        $unitDiscountExcl = $discountExcl->divide($this->quantity->asInt());
+
+        // Then calculate new unit prices
+        $unitIncl = $this->linePrice->getIncludingVat()->subtract($unitDiscountIncl);
+        $unitExcl = $this->linePrice->getExcludingVat()->subtract($unitDiscountExcl);
+
+        // We multiply after calculating unit prices to avoid rounding issues
+        $totalIncl = $unitIncl->multiply($this->quantity->asInt());
+        $totalExcl = $unitExcl->multiply($this->quantity->asInt());
+
+        return DefaultItemPrice::fromCalculated(
+            $totalIncl,
+            $totalExcl,
+            $this->linePrice->getVatPercentage()
+        );
     }
 
     public function getMappedData(): array
@@ -109,9 +136,9 @@ final class Line implements ChildAggregate, Discountable
             'line_price' => $this->linePrice->getMoney()->getAmount(),
             'tax_rate' => $this->linePrice->getVatPercentage()->get(),
             'includes_vat' => $this->linePrice->includesVat(),
-            'total' => $this->getTotal()->getMoney()->getAmount(),
+            'total' => $this->linePrice->includesVat() ? $this->getTotal()->getIncludingVat()->getAmount() : $this->getTotal()->getExcludingVat()->getAmount(),
             'tax_total' => $this->getTaxTotal()->getAmount(),
-            'discount_total' => $this->getTotal()->includesVat()
+            'discount_total' => $this->linePrice->includesVat()
                 ? $this->getDiscountTotal()->getIncludingVat()->getAmount()
                 : $this->getDiscountTotal()->getExcludingVat()->getAmount(),
             'quantity' => $this->quantity->asInt(),
@@ -123,8 +150,8 @@ final class Line implements ChildAggregate, Discountable
     public function getChildEntities(): array
     {
         return [
-            LinePersonalisation::class => array_map(fn ($personalisation) => $personalisation->getMappedData(), $this->personalisations),
-            Discount::class => array_map(fn ($discount) => $discount->getMappedData(), $this->discounts),
+            LinePersonalisation::class => array_map(fn($personalisation) => $personalisation->getMappedData(), $this->personalisations),
+            Discount::class => array_map(fn($discount) => $discount->getMappedData(), $this->discounts),
         ];
     }
 
@@ -138,8 +165,8 @@ final class Line implements ChildAggregate, Discountable
         $line->linePrice = LinePrice::fromScalars($state['line_price'], $state['tax_rate'], $state['includes_vat']);
         $line->quantity = Quantity::fromInt($state['quantity']);
         $line->reducedFromStock = $state['reduced_from_stock'];
-        $line->discounts = array_map(fn ($discountState) => Discount::fromMappedData($discountState, $state), $childEntities[Discount::class]);
-        $line->personalisations = array_map(fn ($personalisationState) => LinePersonalisation::fromMappedData($personalisationState, $state), $childEntities[LinePersonalisation::class]);
+        $line->discounts = array_map(fn($discountState) => Discount::fromMappedData($discountState, $state), $childEntities[Discount::class]);
+        $line->personalisations = array_map(fn($personalisationState) => LinePersonalisation::fromMappedData($personalisationState, $state), $childEntities[LinePersonalisation::class]);
         $line->data = json_decode($state['data'], true);
 
         return $line;
