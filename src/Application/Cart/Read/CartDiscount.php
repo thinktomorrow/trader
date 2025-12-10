@@ -22,4 +22,8 @@ interface CartDiscount
     public function getTitle(): ?string;
 
     public function getDescription(): ?string;
+
+    public function isCouponCodeBased(): bool;
+
+    public function getCouponCode(): ?string;
 }

@@ -25,7 +25,7 @@ abstract class BaseDiscount
     protected function isApplicable(Order $order, Discountable $discountable): bool
     {
         foreach ($this->conditions as $condition) {
-            if (! $condition->check($order, $discountable)) {
+            if (!$condition->check($order, $discountable)) {
                 return false;
             }
         }
@@ -35,7 +35,7 @@ abstract class BaseDiscount
 
     public function apply(Order $order, Discountable $discountable, DiscountId $nextDiscountId): void
     {
-        if (! $this->isApplicable($order, $discountable)) {
+        if (!$this->isApplicable($order, $discountable)) {
             return;
         }
 
@@ -60,7 +60,10 @@ abstract class BaseDiscount
         $discount = new static();
         $discount->promoId = PromoId::fromString($aggregateState['promo_id']);
         $discount->promoDiscountId = PromoDiscountId::fromString($state['discount_id']);
-        $discount->promoData = json_decode($aggregateState['data'], true);
+        $discount->promoData = [
+            'coupon_code' => $aggregateState['coupon_code'],
+            ...json_decode($aggregateState['data'], true)
+        ];
         $discount->conditions = $conditions;
 
         return $discount;

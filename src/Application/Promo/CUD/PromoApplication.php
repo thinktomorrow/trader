@@ -27,7 +27,7 @@ class PromoApplication
     }
 
 
-    public function createPromo(CreateCouponPromo $command): PromoId
+    public function createPromo(CreatePromo $command): PromoId
     {
         $promoId = $this->promoRepository->nextReference();
 

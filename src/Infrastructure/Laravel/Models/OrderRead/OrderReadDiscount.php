@@ -75,6 +75,16 @@ abstract class OrderReadDiscount
         return $this->data('description');
     }
 
+    public function isCouponCodeBased(): bool
+    {
+        return $this->data('coupon_code') !== null;
+    }
+
+    public function getCouponCode(): ?string
+    {
+        return $this->data('coupon_code');
+    }
+
     public function getData(string $key, $default = null): mixed
     {
         return $this->data($key, null, $default);
