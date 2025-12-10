@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Thinktomorrow\Trader\Infrastructure\Shop\CustomerAuth\Controllers;
@@ -7,8 +8,7 @@ use Illuminate\Foundation\Validation\ValidatesRequests;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
 use Illuminate\Support\Facades\Auth;
-use function redirect;
-use function route;
+use Illuminate\Support\Facades\Log;
 use Thinktomorrow\Trader\Domain\Model\Customer\CustomerId;
 use Thinktomorrow\Trader\Domain\Model\Customer\Events\CustomerHasLoggedIn;
 use Thinktomorrow\Trader\Domain\Model\Customer\Events\CustomerHasLoggedOut;
@@ -61,6 +61,9 @@ class CustomerAuthController extends Controller
     public function logout(Request $request)
     {
         $customerId = CustomerId::fromString(Auth::guard('customer')->user()->getCustomerId());
+
+        // Testing log
+        Log::info('Explicite logout for customer '.$customerId->get());
 
         Auth::guard('customer')->logout();
 
