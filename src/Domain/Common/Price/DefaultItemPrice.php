@@ -8,7 +8,6 @@ use Thinktomorrow\Trader\Domain\Common\Cash\Cash;
 use Thinktomorrow\Trader\Domain\Common\Price\Exceptions\PriceCannotBeNegative;
 use Thinktomorrow\Trader\Domain\Common\Vat\VatPercentage;
 
-
 /**
  * Value object representing a calculated price where the canonical state is:
  *   - excluding VAT amount

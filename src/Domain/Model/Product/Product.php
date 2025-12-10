@@ -67,7 +67,7 @@ class Product implements Aggregate
         return [
             'product_id' => $this->productId->get(),
             'state' => $this->state->value,
-            'taxon_ids' => array_map(fn($taxonId) => $taxonId->get(), $this->taxonIds),
+            'taxon_ids' => array_map(fn ($taxonId) => $taxonId->get(), $this->taxonIds),
             'data' => json_encode($this->data),
         ];
     }
@@ -75,13 +75,13 @@ class Product implements Aggregate
     public function getChildEntities(): array
     {
         return [
-            Variant::class => array_map(fn(Variant $variant) => $variant->getMappedData(), $this->variants),
+            Variant::class => array_map(fn (Variant $variant) => $variant->getMappedData(), $this->variants),
             Option::class => array_map(
-                fn(Option $option) => array_merge($option->getMappedData(), ['values' => $option->getChildEntities()[OptionValue::class]]),
+                fn (Option $option) => array_merge($option->getMappedData(), ['values' => $option->getChildEntities()[OptionValue::class]]),
                 array_values($this->options)
             ),
             Personalisation::class => array_map(
-                fn(Personalisation $personalisation) => $personalisation->getMappedData(),
+                fn (Personalisation $personalisation) => $personalisation->getMappedData(),
                 array_values($this->personalisations)
             ),
         ];
@@ -94,7 +94,7 @@ class Product implements Aggregate
         $product->state = ProductState::from($state['state']);
 
         if (array_key_exists(Variant::class, $childEntities)) {
-            $product->variants = array_map(fn($variantState) => Variant::fromMappedData($variantState, $state), $childEntities[Variant::class]);
+            $product->variants = array_map(fn ($variantState) => Variant::fromMappedData($variantState, $state), $childEntities[Variant::class]);
         }
 
         if (array_key_exists(Option::class, $childEntities)) {
@@ -110,7 +110,7 @@ class Product implements Aggregate
         }
 
         $product->data = json_decode($state['data'], true);
-        $product->taxonIds = array_map(fn($taxonId) => TaxonId::fromString($taxonId), $state['taxon_ids']);
+        $product->taxonIds = array_map(fn ($taxonId) => TaxonId::fromString($taxonId), $state['taxon_ids']);
 
         return $product;
     }

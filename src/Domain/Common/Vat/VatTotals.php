@@ -37,7 +37,7 @@ class VatTotals
             }
         }
 
-        if (!$match) {
+        if (! $match) {
             $vatTotals[] = $vatTotal;
         }
 
@@ -77,7 +77,7 @@ class VatTotals
     {
         $total = array_reduce(
             $this->vatTotals,
-            fn($carry, VatTotal $vatTotal) => $carry->add($vatTotal->getTotal()),
+            fn ($carry, VatTotal $vatTotal) => $carry->add($vatTotal->getTotal()),
             Cash::zero()
         );
 

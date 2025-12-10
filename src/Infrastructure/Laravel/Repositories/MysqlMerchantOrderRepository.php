@@ -71,7 +71,7 @@ class MysqlMerchantOrderRepository implements MerchantOrderRepository
 
         // TODO: how to refresh data based on the latest variant price or actual discounts, ...? not on read but better on a dedicated time in the cart...
         // Need to make note of any change in that case.
-        $lines = array_map(fn($line) => $this->container->get(MerchantOrderLine::class)::fromMappedData(
+        $lines = array_map(fn ($line) => $this->container->get(MerchantOrderLine::class)::fromMappedData(
             array_merge($line->getMappedData(), [
                 'total' => $line->getTotal(),
                 'taxTotal' => $line->getTaxTotal(),
@@ -79,11 +79,11 @@ class MysqlMerchantOrderRepository implements MerchantOrderRepository
                 'linePrice' => $line->getLinePrice(),
             ]),
             $orderState,
-            array_map(fn(Discount $discount) => $this->container->get(MerchantOrderDiscount::class)::fromMappedData(array_merge($discount->getMappedData(), [
+            array_map(fn (Discount $discount) => $this->container->get(MerchantOrderDiscount::class)::fromMappedData(array_merge($discount->getMappedData(), [
                 'total' => $discount->getItemDiscount(),
                 'percentage' => $discount->getPercentage($line->getSubTotal()),
             ]), $orderState), $line->getDiscounts()),
-            array_map(fn(LinePersonalisation $linePersonalisation) => $this->container->get(MerchantOrderLinePersonalisation::class)::fromMappedData(array_merge($linePersonalisation->getMappedData(), [
+            array_map(fn (LinePersonalisation $linePersonalisation) => $this->container->get(MerchantOrderLinePersonalisation::class)::fromMappedData(array_merge($linePersonalisation->getMappedData(), [
                 //
             ]), $line->getMappedData()), $line->getPersonalisations())
         ), $order->getLines());
@@ -98,25 +98,25 @@ class MysqlMerchantOrderRepository implements MerchantOrderRepository
             $orderState
         ) : null;
 
-        $shippings = array_map(fn(Shipping $shipping) => $this->container->get(MerchantOrderShipping::class)::fromMappedData(
+        $shippings = array_map(fn (Shipping $shipping) => $this->container->get(MerchantOrderShipping::class)::fromMappedData(
             array_merge($shipping->getMappedData(), [
                 'shipping_state' => $shipping->getShippingState(),
                 'cost' => $shipping->getShippingCost(),
             ]),
             $orderState,
-            array_map(fn(Discount $discount) => $this->container->get(MerchantOrderDiscount::class)::fromMappedData(array_merge($discount->getMappedData(), [
+            array_map(fn (Discount $discount) => $this->container->get(MerchantOrderDiscount::class)::fromMappedData(array_merge($discount->getMappedData(), [
                 'total' => $discount->getItemDiscount(),
                 'percentage' => $discount->getPercentage($shipping->getShippingCost()),
             ]), $orderState), $shipping->getDiscounts())
         ), $order->getShippings());
 
-        $payments = array_map(fn(Payment $payment) => $this->container->get(MerchantOrderPayment::class)::fromMappedData(
+        $payments = array_map(fn (Payment $payment) => $this->container->get(MerchantOrderPayment::class)::fromMappedData(
             array_merge($payment->getMappedData(), [
                 'payment_state' => $payment->getPaymentState(),
                 'cost' => $payment->getPaymentCost(),
             ]),
             $orderState,
-            array_map(fn(Discount $discount) => $this->container->get(MerchantOrderDiscount::class)::fromMappedData(array_merge($discount->getMappedData(), [
+            array_map(fn (Discount $discount) => $this->container->get(MerchantOrderDiscount::class)::fromMappedData(array_merge($discount->getMappedData(), [
                 'total' => $discount->getItemDiscount(),
                 'percentage' => $discount->getPercentage($payment->getPaymentCost()),
             ]), $orderState), $payment->getDiscounts())
@@ -127,7 +127,7 @@ class MysqlMerchantOrderRepository implements MerchantOrderRepository
             $orderState,
         ) : null;
 
-        $orderEvents = array_map(fn(OrderEvent $orderEvent) => $this->container->get(MerchantOrderEvent::class)::fromMappedData(
+        $orderEvents = array_map(fn (OrderEvent $orderEvent) => $this->container->get(MerchantOrderEvent::class)::fromMappedData(
             $orderEvent->getMappedData(),
             $orderState,
         ), array_reverse($order->getOrderEvents()));
@@ -143,7 +143,7 @@ class MysqlMerchantOrderRepository implements MerchantOrderRepository
                 MerchantOrderShopper::class => $shopper,
                 MerchantOrderEvent::class => $orderEvents,
             ],
-            array_map(fn(Discount $discount) => $this->container->get(MerchantOrderDiscount::class)::fromMappedData(array_merge($discount->getMappedData(), [
+            array_map(fn (Discount $discount) => $this->container->get(MerchantOrderDiscount::class)::fromMappedData(array_merge($discount->getMappedData(), [
                 'total' => $discount->getItemDiscount(),
                 'percentage' => $discount->getPercentage($order->getSubTotal()),
             ]), $orderState), $order->getDiscounts()),

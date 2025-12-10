@@ -78,4 +78,3 @@ class VatTotalTest extends TestCase
         $vatTotal->add(Money::USD(10)); // Money library will throw here
     }
 }
-
