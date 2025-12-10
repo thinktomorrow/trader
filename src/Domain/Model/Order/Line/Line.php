@@ -4,16 +4,18 @@ declare(strict_types=1);
 namespace Thinktomorrow\Trader\Domain\Model\Order\Line;
 
 use Money\Money;
+use Thinktomorrow\Trader\Domain\Common\Cash\Cash;
 use Thinktomorrow\Trader\Domain\Common\Entity\ChildAggregate;
 use Thinktomorrow\Trader\Domain\Common\Entity\HasData;
 use Thinktomorrow\Trader\Domain\Common\Price\DefaultItemPrice;
+use Thinktomorrow\Trader\Domain\Common\Price\ItemDiscount;
 use Thinktomorrow\Trader\Domain\Common\Price\ItemPrice;
-use Thinktomorrow\Trader\Domain\Common\Price\Old\Price;
+use Thinktomorrow\Trader\Domain\Common\Price\WithPriceInputMode;
+use Thinktomorrow\Trader\Domain\Common\Vat\VatPercentage;
 use Thinktomorrow\Trader\Domain\Model\Order\Discount\Discount;
 use Thinktomorrow\Trader\Domain\Model\Order\Discount\Discountable;
 use Thinktomorrow\Trader\Domain\Model\Order\Discount\DiscountableId;
 use Thinktomorrow\Trader\Domain\Model\Order\Discount\DiscountableType;
-use Thinktomorrow\Trader\Domain\Model\Order\Discount\DiscountTotal;
 use Thinktomorrow\Trader\Domain\Model\Order\Discount\HasDiscounts;
 use Thinktomorrow\Trader\Domain\Model\Order\Line\Personalisations\HasPersonalisations;
 use Thinktomorrow\Trader\Domain\Model\Order\Line\Personalisations\LinePersonalisation;
@@ -22,6 +24,7 @@ use Thinktomorrow\Trader\Domain\Model\Product\Variant\VariantId;
 
 final class Line implements ChildAggregate, Discountable
 {
+    use WithPriceInputMode;
     use HasData;
     use HasDiscounts;
     use HasPersonalisations;
@@ -30,14 +33,14 @@ final class Line implements ChildAggregate, Discountable
     public readonly OrderId $orderId;
     public readonly LineId $lineId;
     private ?VariantId $variantId;
-    private LinePrice $linePrice;
+    private ItemPrice $linePrice;
     private Quantity $quantity;
 
     private function __construct()
     {
     }
 
-    public static function create(OrderId $orderId, LineId $lineId, VariantId $productId, LinePrice $linePrice, Quantity $quantity, array $data): static
+    public static function create(OrderId $orderId, LineId $lineId, VariantId $productId, ItemPrice $linePrice, Quantity $quantity, array $data): static
     {
         $line = new static();
 
@@ -51,7 +54,7 @@ final class Line implements ChildAggregate, Discountable
         return $line;
     }
 
-    public function updatePrice(LinePrice $linePrice): void
+    public function updatePrice(ItemPrice $linePrice): void
     {
         $this->linePrice = $linePrice;
     }
@@ -71,74 +74,50 @@ final class Line implements ChildAggregate, Discountable
         return $this->variantId;
     }
 
-    public function getLinePrice(): Price
+    public function getLinePrice(): ItemPrice
     {
         return $this->linePrice;
     }
 
-    public function getSubTotal(): Price
+    public function getSubTotal(): ItemPrice
     {
-        return $this->linePrice
-            ->multiply($this->quantity->asInt());
+        return $this->linePrice->multiply($this->quantity->asInt());
     }
 
     public function getTotal(): DefaultItemPrice
     {
-        return $this->getCalculatedTotal();
-
-        //        return $this->getSubTotal()
-        //            ->subtract($this->getDiscountTotal());
+        return $this->getSubTotal()
+            ->applyDiscount($this->getDiscountTotal());
     }
 
-    public function getDiscountTotal(): DiscountTotal
+    public function getDiscountTotal(): ItemDiscount
     {
-        return $this->calculateDiscountTotal($this->getLinePrice());
+        return $this->calculateItemDiscount($this->linePrice);
     }
 
     public function getTaxTotal(): Money
     {
-        return $this->getCalculatedTotal()->getVatTotal();
-    }
-
-    private function getCalculatedTotal(): ItemPrice
-    {
-        $discountTotal = $this->getDiscountTotal();
-        $discountIncl = $discountTotal->getIncludingVat();
-        $discountExcl = $discountTotal->getExcludingVat();
-
-        // Divide discount per unit first
-        $unitDiscountIncl = $discountIncl->divide($this->quantity->asInt());
-        $unitDiscountExcl = $discountExcl->divide($this->quantity->asInt());
-
-        // Then calculate new unit prices
-        $unitIncl = $this->linePrice->getIncludingVat()->subtract($unitDiscountIncl);
-        $unitExcl = $this->linePrice->getExcludingVat()->subtract($unitDiscountExcl);
-
-        // We multiply after calculating unit prices to avoid rounding issues
-        $totalIncl = $unitIncl->multiply($this->quantity->asInt());
-        $totalExcl = $unitExcl->multiply($this->quantity->asInt());
-
-        return DefaultItemPrice::fromCalculated(
-            $totalIncl,
-            $totalExcl,
-            $this->linePrice->getVatPercentage()
-        );
+        return $this->getTotal()->getVatTotal();
     }
 
     public function getMappedData(): array
     {
         $data = $this->addDataIfNotNull(['variant_id' => $this->variantId?->get()]);
 
+        $includesVat = $this->priceEnteredIncludesVat();
+
         return [
             'order_id' => $this->orderId->get(),
             'line_id' => $this->lineId->get(),
             'variant_id' => $this->variantId?->get(),
-            'line_price' => $this->linePrice->getMoney()->getAmount(),
+            'line_price' => $includesVat
+                ? $this->linePrice->getIncludingVat()->getAmount()
+                : $this->linePrice->getExcludingVat()->getAmount(),
             'tax_rate' => $this->linePrice->getVatPercentage()->get(),
-            'includes_vat' => $this->linePrice->includesVat(),
-            'total' => $this->linePrice->includesVat() ? $this->getTotal()->getIncludingVat()->getAmount() : $this->getTotal()->getExcludingVat()->getAmount(),
+            'includes_vat' => $includesVat,
+            'total' => $this->getTotal()->getExcludingVat()->getAmount(),
             'tax_total' => $this->getTaxTotal()->getAmount(),
-            'discount_total' => $this->linePrice->includesVat()
+            'discount_total' => $includesVat
                 ? $this->getDiscountTotal()->getIncludingVat()->getAmount()
                 : $this->getDiscountTotal()->getExcludingVat()->getAmount(),
             'quantity' => $this->quantity->asInt(),
@@ -159,10 +138,12 @@ final class Line implements ChildAggregate, Discountable
     {
         $line = new static();
 
+        $line->setPriceEnteredIncludingVat($state['includes_vat']);
+
         $line->orderId = OrderId::fromString($aggregateState['order_id']);
         $line->lineId = LineId::fromString($state['line_id']);
         $line->variantId = $state['variant_id'] ? VariantId::fromString($state['variant_id']) : null;
-        $line->linePrice = LinePrice::fromScalars($state['line_price'], $state['tax_rate'], $state['includes_vat']);
+        $line->linePrice = DefaultItemPrice::fromMoney(Cash::make($state['line_price']), VatPercentage::fromString($state['tax_rate']), $state['includes_vat']);
         $line->quantity = Quantity::fromInt($state['quantity']);
         $line->reducedFromStock = $state['reduced_from_stock'];
         $line->discounts = array_map(fn($discountState) => Discount::fromMappedData($discountState, $state), $childEntities[Discount::class]);

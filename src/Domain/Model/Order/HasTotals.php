@@ -4,15 +4,9 @@ declare(strict_types=1);
 namespace Thinktomorrow\Trader\Domain\Model\Order;
 
 use Money\Money;
-use Thinktomorrow\Trader\Domain\Common\Price\DefaultItemPrice;
 use Thinktomorrow\Trader\Domain\Common\Price\DefaultTotalPrice;
-use Thinktomorrow\Trader\Domain\Common\Price\Old\PriceTotal;
+use Thinktomorrow\Trader\Domain\Common\Price\ItemDiscount;
 use Thinktomorrow\Trader\Domain\Common\Price\TotalPrice;
-use Thinktomorrow\Trader\Domain\Model\Order\Discount\DiscountTotal;
-use Thinktomorrow\Trader\Domain\Model\Order\Payment\Payment;
-use Thinktomorrow\Trader\Domain\Model\Order\Payment\PaymentCost;
-use Thinktomorrow\Trader\Domain\Model\Order\Shipping\Shipping;
-use Thinktomorrow\Trader\Domain\Model\Order\Shipping\ShippingCost;
 
 trait HasTotals
 {
@@ -29,70 +23,53 @@ trait HasTotals
 
     public function getTotal(): TotalPrice
     {
-        $shippingItemPrice = DefaultItemPrice::fromCalculated(
-            $this->getShippingCost()->getIncludingVat(),
-            $this->getShippingCost()->getExcludingVat(),
-            $this->getShippingCost()->getVatPercentage()
-        );
-
-        $paymentItemPrice = DefaultItemPrice::fromCalculated(
-            $this->getPaymentCost()->getIncludingVat(),
-            $this->getPaymentCost()->getExcludingVat(),
-            $this->getPaymentCost()->getVatPercentage()
-        );
-
         $discountTotalPrice = DefaultTotalPrice::fromCalculated(
             $this->getDiscountTotal()->getIncludingVat(),
             $this->getDiscountTotal()->getExcludingVat()
         );
 
         return $this->getSubTotal()
-            ->subtract($discountTotalPrice)
-            ->add($shippingItemPrice)
-            ->add($paymentItemPrice);
+            ->subtract($this->getDiscountTotal())
+            ->add($this->getShippingCost())
+            ->add($this->getPaymentCost());
     }
-
-    //    public function getTotal(): OrderTotal
-    //    {
-    //        return $this->getSubTotal()
-    //            ->subtract($this->getDiscountTotal())
-    //            ->add($this->getShippingCost())
-    //            ->add($this->getPaymentCost());
-    //    }
 
     public function getTaxTotal(): Money
     {
         return $this->getTotal()->getVatTotal();
     }
 
-    public function getDiscountTotal(): DiscountTotal
+    /**
+     * This is the discount total that is applied on the entire order (not per item).
+     * Note that this is not a sum of all item discounts, but specifically the
+     * order discounts total as calculated based on the subtotal.
+     *
+     * @return ItemDiscount
+     */
+    public function getDiscountTotal(): ItemDiscount
     {
-        return $this->calculateDiscountTotal($this->getSubTotal());
+        return $this->calculateItemDiscount($this->getSubTotal());
     }
 
-    public function getShippingCost(): ShippingCost
+    public function getShippingCost(): TotalPrice
     {
-        if (count($this->shippings) < 1) {
-            return ShippingCost::zero();
+        $shippingCost = DefaultTotalPrice::zero();
+
+        foreach ($this->shippings as $shipping) {
+            $shippingCost = $shippingCost->add($shipping->getShippingCost());
         }
 
-        return array_reduce($this->shippings, function (?PriceTotal $carry, Shipping $shipping) {
-            return $carry === null
-                ? $shipping->getShippingCost()
-                : $carry->add($shipping->getShippingCost());
-        }, null);
+        return $shippingCost;
     }
 
-    public function getPaymentCost(): PaymentCost
+    public function getPaymentCost(): TotalPrice
     {
-        if (count($this->payments) < 1) {
-            return PaymentCost::zero();
+        $paymentCost = DefaultTotalPrice::zero();
+
+        foreach ($this->payments as $payment) {
+            $paymentCost = $paymentCost->add($payment->getShippingCost());
         }
 
-        return array_reduce($this->payments, function (?PriceTotal $carry, Payment $payment) {
-            return $carry === null
-                ? $payment->getPaymentCost()
-                : $carry->add($payment->getPaymentCost());
-        }, null);
+        return $paymentCost;
     }
 }

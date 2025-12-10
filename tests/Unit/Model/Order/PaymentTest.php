@@ -5,7 +5,6 @@ namespace Tests\Unit\Model\Order;
 
 use Money\Money;
 use Tests\Unit\TestCase;
-use Thinktomorrow\Trader\Domain\Model\Order\Discount\Discount;
 use Thinktomorrow\Trader\Domain\Model\Order\Discount\DiscountTotal;
 use Thinktomorrow\Trader\Domain\Model\Order\Events\PaymentAdded;
 use Thinktomorrow\Trader\Domain\Model\Order\Events\PaymentDeleted;

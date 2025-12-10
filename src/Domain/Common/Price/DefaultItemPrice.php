@@ -14,10 +14,14 @@ use Thinktomorrow\Trader\Domain\Common\Vat\VatPercentage;
  *   - excluding VAT amount
  *   - VAT percentage
  *
- * Including VAT and VAT total are always derived from the canonical state,
- * which avoids drift and rounding inconsistencies.
- *
- * This class is immutable.
+ * Domain logic:
+ * - The canonical state is always excluding VAT.
+ * - Including VAT and VAT total are always derived from the canonical state
+ * - In case the price is constructed from an including VAT amount, that original
+ *   amount is stored to avoid rounding drift when retrieving including VAT again.
+ * - Multiplication should be done on the excluding VAT amount to avoid rounding drift.
+ * - Discount should be applied to the entire line total, not per unit.
+ * - ItemPrice should handle VAT correctness.
  */
 class DefaultItemPrice implements ItemPrice
 {

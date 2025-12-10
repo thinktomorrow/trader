@@ -5,19 +5,13 @@ namespace Thinktomorrow\Trader\Domain\Common\Price;
 
 use Money\Money;
 
-interface TotalPrice
+interface TotalPrice extends Price
 {
     public static function fromCalculated(Money $includingVat, Money $excludingVat): static;
 
     public static function zero(): static;
 
-    public function getIncludingVat(): Money;
+    public function add(Price $otherPrice): static;
 
-    public function getExcludingVat(): Money;
-
-    public function getVatTotal(): Money;
-
-    public function add(ItemPrice|TotalPrice $otherPrice): static;
-
-    public function subtract(ItemPrice|TotalPrice $otherPrice): static;
+    public function subtract(Price $otherPrice): static;
 }

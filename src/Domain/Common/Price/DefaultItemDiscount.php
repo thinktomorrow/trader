@@ -58,4 +58,12 @@ class DefaultItemDiscount implements ItemDiscount
     {
         return $this->vatPercentage;
     }
+
+    public function add(ItemDiscount $otherItemDiscount): static
+    {
+        return new static(
+            $this->excludingVat->add($otherItemDiscount->getExcludingVat()),
+            $this->vatPercentage
+        );
+    }
 }

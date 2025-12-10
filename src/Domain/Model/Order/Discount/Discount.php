@@ -7,8 +7,10 @@ use Thinktomorrow\Trader\Domain\Common\Cash\Cash;
 use Thinktomorrow\Trader\Domain\Common\Cash\Percentage;
 use Thinktomorrow\Trader\Domain\Common\Entity\ChildEntity;
 use Thinktomorrow\Trader\Domain\Common\Entity\HasData;
-use Thinktomorrow\Trader\Domain\Common\Price\Old\Price;
-use Thinktomorrow\Trader\Domain\Common\Price\Old\PriceTotal;
+use Thinktomorrow\Trader\Domain\Common\Price\DefaultItemDiscount;
+use Thinktomorrow\Trader\Domain\Common\Price\ItemDiscount;
+use Thinktomorrow\Trader\Domain\Common\Price\Price;
+use Thinktomorrow\Trader\Domain\Common\Vat\VatPercentage;
 use Thinktomorrow\Trader\Domain\Model\Order\OrderId;
 use Thinktomorrow\Trader\Domain\Model\Promo\DiscountId as PromoDiscountId;
 use Thinktomorrow\Trader\Domain\Model\Promo\PromoId;
@@ -23,20 +25,20 @@ final class Discount implements ChildEntity
     public readonly DiscountableId $discountableId;
     public readonly ?PromoId $promoId;
     public readonly ?PromoDiscountId $promoDiscountId;
-    private readonly DiscountTotal $total;
+    private readonly ItemDiscount $itemDiscount;
 
     private function __construct()
     {
     }
 
-    public function getTotal(): DiscountTotal
+    public function getItemDiscount(): ItemDiscount
     {
-        return $this->total;
+        return $this->itemDiscount;
     }
 
-    public function getPercentage(Price|PriceTotal $price): Percentage
+    public function getPercentage(Price $price): Percentage
     {
-        return Cash::from($this->total->getIncludingVat())->asPercentage($price->getIncludingVat());
+        return Cash::from($this->itemDiscount->getIncludingVat())->asPercentage($price->getIncludingVat());
     }
 
     public function getMappedData(): array
@@ -53,14 +55,14 @@ final class Discount implements ChildEntity
             'discount_id' => $this->discountId->get(),
             'promo_id' => $this->promoId?->get(),
             'promo_discount_id' => $this->promoDiscountId?->get(),
-            'total' => $this->total->getIncludingVat()->getAmount(),
-            'tax_rate' => $this->total->getVatPercentage()->get(),
-            'includes_vat' => $this->total->includesVat(),
+            'total' => $this->itemDiscount->getExcludingVat()->getAmount(),
+            'tax_rate' => $this->itemDiscount->getVatPercentage()->get(),
+            'includes_vat' => false,
             'data' => json_encode($data),
         ];
     }
 
-    public static function create(OrderId $orderId, DiscountId $discountId, DiscountableType $discountableType, DiscountableId $discountableId, PromoId $promoId, PromoDiscountId $promoDiscountId, DiscountTotal $discountTotal, array $data): static
+    public static function create(OrderId $orderId, DiscountId $discountId, DiscountableType $discountableType, DiscountableId $discountableId, PromoId $promoId, PromoDiscountId $promoDiscountId, ItemDiscount $itemDiscount, array $data): static
     {
         $discount = new static();
 
@@ -70,7 +72,7 @@ final class Discount implements ChildEntity
         $discount->discountableId = $discountableId;
         $discount->promoId = $promoId;
         $discount->promoDiscountId = $promoDiscountId;
-        $discount->total = $discountTotal;
+        $discount->itemDiscount = $itemDiscount;
         $discount->data = $data;
 
         return $discount;
@@ -86,7 +88,7 @@ final class Discount implements ChildEntity
         $discount->discountableId = DiscountableId::fromString($state['discountable_id']);
         $discount->promoId = $state['promo_id'] ? PromoId::fromString($state['promo_id']) : null;
         $discount->promoDiscountId = $state['promo_discount_id'] ? PromoDiscountId::fromString($state['promo_discount_id']) : null;
-        $discount->total = DiscountTotal::fromScalars($state['total'], $state['tax_rate'], $state['includes_vat']);
+        $discount->itemDiscount = DefaultItemDiscount::fromMoney(Cash::make($state['total']), VatPercentage::fromString($state['tax_rate']), $state['includes_vat']);
         $discount->data = json_decode($state['data'], true);
 
         return $discount;

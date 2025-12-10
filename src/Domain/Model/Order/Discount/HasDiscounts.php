@@ -3,12 +3,14 @@
 namespace Thinktomorrow\Trader\Domain\Model\Order\Discount;
 
 use Thinktomorrow\Trader\Domain\Common\Cash\Cash;
-use Thinktomorrow\Trader\Domain\Common\Price\Old\Price;
-use Thinktomorrow\Trader\Domain\Common\Price\Old\PriceTotal;
-use Thinktomorrow\Trader\Domain\Common\Price\TotalPrice;
+use Thinktomorrow\Trader\Domain\Common\Price\DefaultItemDiscount;
+use Thinktomorrow\Trader\Domain\Common\Price\ItemDiscount;
+use Thinktomorrow\Trader\Domain\Common\Price\ItemPrice;
+use Thinktomorrow\Trader\Domain\Common\Price\Price;
 
 trait HasDiscounts
 {
+    /** @var Discount[] */
     private array $discounts = [];
 
     /**
@@ -18,40 +20,24 @@ trait HasDiscounts
      *
      * @return DiscountTotal
      */
-    protected function calculateDiscountTotal(Price|PriceTotal|TotalPrice $basePrice): DiscountTotal
+    protected function calculateItemDiscount(Price|ItemPrice $price): ItemDiscount
     {
-        $discountTaxRate = DiscountPriceDefaults::getDiscountTaxRate();
-        $discountIncludesVat = DiscountPriceDefaults::getDiscountIncludeTax();
+        $vatPercentage = $price instanceof ItemPrice ? $price->getVatPercentage() : DiscountPriceDefaults::getDiscountTaxRate();
 
-        //        if ($basePrice instanceof Price) {
-        //            $discountTaxRate = $basePrice->getVatPercentage();
-        //        }
-
-        $zeroDiscountTotal = DiscountTotal::fromMoney(
+        $itemDiscount = DefaultItemDiscount::fromExcludingVat(
             Cash::zero(),
-            $discountTaxRate,
-            $discountIncludesVat
+            $vatPercentage,
         );
 
-        if (count($this->discounts) < 1) {
-            return $zeroDiscountTotal;
+        foreach ($this->discounts as $discount) {
+            $itemDiscount = $itemDiscount->add($discount->getItemDiscount());
         }
 
-        $discountTotal = array_reduce($this->discounts, function (?DiscountTotal $carry, Discount $discount) use ($discountTaxRate, $discountIncludesVat) {
-            return $carry === null
-                ? $discount->getTotal()
-                : $carry->add(DiscountTotal::fromMoney(
-                    $discountIncludesVat ? $discount->getTotal()->getIncludingVat() : $discount->getTotal()->getExcludingVat(),
-                    $discountTaxRate,
-                    $discountIncludesVat
-                ));
-        }, $zeroDiscountTotal);
-
-        if ($discountTotal->getIncludingVat()->greaterThanOrEqual($basePrice->getIncludingVat())) {
-            return DiscountTotal::fromMoney($discountIncludesVat ? $basePrice->getIncludingVat() : $basePrice->getExcludingVat(), $discountTaxRate, $discountIncludesVat);
+        if ($itemDiscount->getExcludingVat()->greaterThanOrEqual($price->getExcludingVat())) {
+            return DefaultItemDiscount::fromExcludingVat($price->getExcludingVat(), $vatPercentage);
         }
 
-        return $discountTotal;
+        return $itemDiscount;
     }
 
     public function addDiscount(Discount $discount): void

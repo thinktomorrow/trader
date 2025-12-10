@@ -31,7 +31,7 @@ class OrderDiscountTest extends TestCase
             ['foo' => 'bar']
         );
 
-        $this->assertEquals($discountTotal, $discount->getTotal());
+        $this->assertEquals($discountTotal, $discount->getItemDiscount());
         $this->assertEquals(Percentage::fromString('50.00'), $discount->getPercentage(OrderTotal::make(Money::EUR(100), VatTotals::zero(), false)));
         $this->assertEquals([
             'order_id' => $orderId->get(),

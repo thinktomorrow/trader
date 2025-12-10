@@ -55,7 +55,7 @@ class DefaultTotalPrice implements TotalPrice
             ->subtract($this->getExcludingVat());
     }
 
-    public function add(ItemPrice|TotalPrice $otherPrice): static
+    public function add(Price $otherPrice): static
     {
         return new static(
             $this->includingVat->add($otherPrice->getIncludingVat()),
@@ -63,7 +63,7 @@ class DefaultTotalPrice implements TotalPrice
         );
     }
 
-    public function subtract(ItemPrice|TotalPrice $otherPrice): static
+    public function subtract(Price $otherPrice): static
     {
         return new static(
             $this->includingVat->subtract($otherPrice->getIncludingVat()),
