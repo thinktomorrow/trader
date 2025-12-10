@@ -46,7 +46,7 @@ class Promo implements Aggregate
      */
     public function hasCouponCode(): bool
     {
-        return !!$this->coupon_code;
+        return ! ! $this->coupon_code;
     }
 
     public function getCouponCode(): ?string
@@ -112,7 +112,7 @@ class Promo implements Aggregate
     public function getChildEntities(): array
     {
         return [
-            Discount::class => array_map(fn(Discount $discount) => $discount->getMappedData(), $this->discounts),
+            Discount::class => array_map(fn (Discount $discount) => $discount->getMappedData(), $this->discounts),
         ];
     }
 
