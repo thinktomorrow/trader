@@ -55,12 +55,12 @@ class AdjustDiscounts implements Adjuster
             }
 
             // Check if existing promos are combinable
-            if (!$this->areExistingPromosCombinable($order, $combinablePromoIds)) {
+            if (! $this->areExistingPromosCombinable($order, $combinablePromoIds)) {
                 break;
             }
 
             // Check if this promo is combinable when there are already promos on the order present
-            if ($this->hasPromo($order) && !$promo->isCombinable()) {
+            if ($this->hasPromo($order) && ! $promo->isCombinable()) {
                 continue;
             }
 
@@ -84,7 +84,7 @@ class AdjustDiscounts implements Adjuster
     private function areExistingPromosCombinable(Order $order, array $combinablePromoIds)
     {
         foreach ($this->getExistingPromoIds($order) as $existingPromoId) {
-            if (!in_array($existingPromoId, $combinablePromoIds)) {
+            if (! in_array($existingPromoId, $combinablePromoIds)) {
                 return false;
             }
         }
