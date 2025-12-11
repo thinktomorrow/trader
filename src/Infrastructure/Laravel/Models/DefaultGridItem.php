@@ -50,7 +50,7 @@ class DefaultGridItem implements GridItem
         );
 
         foreach ($taxa as $taxon) {
-            if (! ($taxon instanceof ProductTaxonItem)) {
+            if (!($taxon instanceof ProductTaxonItem)) {
                 throw new \InvalidArgumentException('Taxa must be instances of ProductTaxonItem or VariantTaxonItem');
             }
         }
@@ -147,5 +147,10 @@ class DefaultGridItem implements GridItem
         return array_filter($this->taxa, function (ProductTaxonItem $taxon) {
             return $taxon->getTaxonomyType() === TaxonomyType::tag->value && $taxon->showOnline();
         });
+    }
+
+    public function getData(?string $key = null, $default = null): mixed
+    {
+        return $this->data($key, null, $default);
     }
 }

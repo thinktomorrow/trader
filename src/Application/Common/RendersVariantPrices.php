@@ -11,8 +11,9 @@ trait RendersVariantPrices
     use HasLocale;
     use RendersMoney;
 
-    private VariantSalePrice $salePrice;
-    private VariantUnitPrice $unitPrice;
+    protected VariantSalePrice $salePrice;
+
+    protected VariantUnitPrice $unitPrice;
 
     public function getSalePrice(bool $includeTax = true): string
     {

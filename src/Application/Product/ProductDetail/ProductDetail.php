@@ -95,4 +95,6 @@ interface ProductDetail extends Stockable
      * @return array
      */
     public static function stateSelect(): array;
+
+    public function getData(?string $key = null, $default = null): mixed;
 }
