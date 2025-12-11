@@ -10,6 +10,7 @@ use Thinktomorrow\Trader\Domain\Common\Entity\HasData;
 use Thinktomorrow\Trader\Domain\Common\Price\DefaultItemDiscount;
 use Thinktomorrow\Trader\Domain\Common\Price\ItemDiscount;
 use Thinktomorrow\Trader\Domain\Common\Price\Price;
+use Thinktomorrow\Trader\Domain\Common\Price\WithPriceInputMode;
 use Thinktomorrow\Trader\Domain\Common\Vat\VatPercentage;
 use Thinktomorrow\Trader\Domain\Model\Order\OrderId;
 use Thinktomorrow\Trader\Domain\Model\Promo\DiscountId as PromoDiscountId;
@@ -18,6 +19,7 @@ use Thinktomorrow\Trader\Domain\Model\Promo\PromoId;
 final class Discount implements ChildEntity
 {
     use HasData;
+    use WithPriceInputMode;
 
     public readonly OrderId $orderId;
     public readonly DiscountId $discountId;
@@ -48,6 +50,8 @@ final class Discount implements ChildEntity
             'promo_discount_id' => $this->promoDiscountId?->get(),
         ]);
 
+        $includesVat = $this->priceEnteredIncludesVat();
+
         return [
             'order_id' => $this->orderId->get(),
             'discountable_type' => $this->discountableType->value,
@@ -55,9 +59,9 @@ final class Discount implements ChildEntity
             'discount_id' => $this->discountId->get(),
             'promo_id' => $this->promoId?->get(),
             'promo_discount_id' => $this->promoDiscountId?->get(),
-            'total' => $this->itemDiscount->getExcludingVat()->getAmount(),
+            'total' => $includesVat ? $this->itemDiscount->getIncludingVat()->getAmount() : $this->itemDiscount->getExcludingVat()->getAmount(),
             'tax_rate' => $this->itemDiscount->getVatPercentage()->get(),
-            'includes_vat' => false,
+            'includes_vat' => $includesVat,
             'data' => json_encode($data),
         ];
     }
@@ -65,6 +69,8 @@ final class Discount implements ChildEntity
     public static function create(OrderId $orderId, DiscountId $discountId, DiscountableType $discountableType, DiscountableId $discountableId, PromoId $promoId, PromoDiscountId $promoDiscountId, ItemDiscount $itemDiscount, array $data): static
     {
         $discount = new static();
+
+        $discount->setPriceEnteredIncludingVat($itemDiscount->hasOriginalIncludingVat());
 
         $discount->orderId = $orderId;
         $discount->discountId = $discountId;
@@ -81,6 +87,8 @@ final class Discount implements ChildEntity
     public static function fromMappedData(array $state, array $aggregateState): static
     {
         $discount = new static();
+
+        $discount->setPriceEnteredIncludingVat($state['includes_vat']);
 
         $discount->orderId = OrderId::fromString($aggregateState['order_id']);
         $discount->discountId = DiscountId::fromString($state['discount_id']);

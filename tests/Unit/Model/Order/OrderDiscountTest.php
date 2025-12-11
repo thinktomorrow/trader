@@ -6,14 +6,14 @@ namespace Tests\Unit\Model\Order;
 use Money\Money;
 use Tests\Unit\TestCase;
 use Thinktomorrow\Trader\Domain\Common\Cash\Percentage;
-use Thinktomorrow\Trader\Domain\Common\Vat\VatTotals;
+use Thinktomorrow\Trader\Domain\Common\Price\DefaultItemDiscount;
+use Thinktomorrow\Trader\Domain\Common\Price\DefaultTotalPrice;
 use Thinktomorrow\Trader\Domain\Model\Order\Discount\Discount;
 use Thinktomorrow\Trader\Domain\Model\Order\Discount\DiscountableId;
 use Thinktomorrow\Trader\Domain\Model\Order\Discount\DiscountableType;
 use Thinktomorrow\Trader\Domain\Model\Order\Discount\DiscountId;
-use Thinktomorrow\Trader\Domain\Model\Order\Discount\DiscountTotal;
+use Thinktomorrow\Trader\Domain\Model\Order\Discount\DiscountPriceDefaults;
 use Thinktomorrow\Trader\Domain\Model\Order\OrderId;
-use Thinktomorrow\Trader\Domain\Model\Order\OrderTotal;
 use Thinktomorrow\Trader\Domain\Model\Promo\PromoId;
 
 class OrderDiscountTest extends TestCase
@@ -27,12 +27,12 @@ class OrderDiscountTest extends TestCase
             $discountableId = DiscountableId::fromString('ccc'),
             $promoId = PromoId::fromString('ddd'),
             $promoDiscountId = \Thinktomorrow\Trader\Domain\Model\Promo\DiscountId::fromString('eee'),
-            $discountTotal = DiscountTotal::fromDefault(Money::EUR(50)),
+            $discountTotal = DefaultItemDiscount::fromScalars('50', DiscountPriceDefaults::getDiscountTaxRate()->get(), DiscountPriceDefaults::getDiscountIncludeTax()),
             ['foo' => 'bar']
         );
 
         $this->assertEquals($discountTotal, $discount->getItemDiscount());
-        $this->assertEquals(Percentage::fromString('50.00'), $discount->getPercentage(OrderTotal::make(Money::EUR(100), VatTotals::zero(), false)));
+        $this->assertEquals(Percentage::fromString('50.00'), $discount->getPercentage(DefaultTotalPrice::fromCalculated(Money::EUR(100), Money::EUR(80))));
         $this->assertEquals([
             'order_id' => $orderId->get(),
             'discount_id' => $discountId->get(),

@@ -4,7 +4,7 @@ namespace Thinktomorrow\Trader\Domain\Common\Price;
 
 trait WithPriceInputMode
 {
-    protected bool $priceEnteredIncludingVat;
+    protected bool $priceEnteredIncludingVat = false;
 
     protected function priceEnteredIncludesVat(): bool
     {

@@ -69,6 +69,15 @@ class DefaultItemPrice implements ItemPrice
         return new static($amount, $vatPercentage);
     }
 
+    public static function fromScalars(int|string $amount, string $vatPercentage, bool $includesVat): static
+    {
+        return static::fromMoney(
+            Cash::make($amount),
+            VatPercentage::fromString($vatPercentage),
+            $includesVat
+        );
+    }
+
     public function getIncludingVat(): Money
     {
         return $this->includingVatOriginal ?? Cash::from($this->excludingVat)->addPercentage($this->vatPercentage->toPercentage());
@@ -91,10 +100,16 @@ class DefaultItemPrice implements ItemPrice
 
     public function multiply(int $quantity): static
     {
-        return new static(
+        $self = new static(
             $this->excludingVat->multiply($quantity),
             $this->vatPercentage
         );
+
+        if ($this->includingVatOriginal) {
+            $self->includingVatOriginal = $this->includingVatOriginal->multiply($quantity);
+        }
+
+        return $self;
     }
 
     public function applyDiscount(ItemDiscount $discount): static
@@ -108,11 +123,23 @@ class DefaultItemPrice implements ItemPrice
             );
         }
 
-        return new static($newExcluding, $this->vatPercentage);
+        $self = new static($newExcluding, $this->vatPercentage);
+
+        if ($this->includingVatOriginal) {
+            $newIncluding = $this->includingVatOriginal->subtract($discount->getIncludingVat());
+            $self->includingVatOriginal = $newIncluding;
+        }
+
+        return $self;
     }
 
     public function changeVatPercentage(VatPercentage $vatPercentage): static
     {
         return new static($this->excludingVat, $vatPercentage);
+    }
+
+    public function hasOriginalIncludingVat(): bool
+    {
+        return $this->includingVatOriginal !== null;
     }
 }

@@ -7,6 +7,7 @@ use Thinktomorrow\Trader\Domain\Common\Price\DefaultItemDiscount;
 use Thinktomorrow\Trader\Domain\Common\Price\ItemDiscount;
 use Thinktomorrow\Trader\Domain\Common\Price\ItemPrice;
 use Thinktomorrow\Trader\Domain\Common\Price\Price;
+use Thinktomorrow\Trader\Domain\Common\Vat\VatPercentage;
 
 trait HasDiscounts
 {
@@ -22,7 +23,9 @@ trait HasDiscounts
      */
     protected function calculateItemDiscount(Price|ItemPrice $price): ItemDiscount
     {
-        $vatPercentage = $price instanceof ItemPrice ? $price->getVatPercentage() : DiscountPriceDefaults::getDiscountTaxRate();
+        $vatPercentage = $price instanceof ItemPrice
+            ? $price->getVatPercentage()
+            : $this->resolveVatPercentageFromDiscounts();
 
         $itemDiscount = DefaultItemDiscount::fromExcludingVat(
             Cash::zero(),
@@ -68,6 +71,17 @@ trait HasDiscounts
     }
 
     /**
+     * If there are discounts added, the first one will dictate the vat
+     * percentage to be used for the total discount calculation.
+     */
+    private function resolveVatPercentageFromDiscounts(): ?VatPercentage
+    {
+        return count($this->discounts) > 0
+            ? $this->discounts[0]->getItemDiscount()->getVatPercentage()
+            : DiscountPriceDefaults::getDiscountTaxRate();
+    }
+
+    /**
      * @param Discount $discount
      * @return void
      */
@@ -77,7 +91,7 @@ trait HasDiscounts
         // TODO:: test assert owner_type and owner_id matches
         // TODO: test assert discount isnt already added... (cf. addShipping)
 
-        if (! $discount->discountableId->equals($this->getDiscountableId())) {
+        if (!$discount->discountableId->equals($this->getDiscountableId())) {
             throw new \InvalidArgumentException('Cannot add discount when discountable id doesn\'t match. Discountable id: ' . $this->getDiscountableId()->get() . '. Passed: ' . $discount->discountableId->get());
         }
 
@@ -85,11 +99,11 @@ trait HasDiscounts
             throw new \InvalidArgumentException('Cannot add discount when discountable type doesn\'t match.  Discountable type: ' . $this->getDiscountableType()->value . '. Passed: ' . $discount->discountableType->value);
         }
 
-        if (in_array($discount->discountId, array_map(fn (Discount $discount) => $discount->discountId, $this->discounts))) {
+        if (in_array($discount->discountId, array_map(fn(Discount $discount) => $discount->discountId, $this->discounts))) {
             throw new \InvalidArgumentException('Cannot add same discount (with same discount id: ' . $discount->discountId->get() . ') twice.');
         }
 
-        if (in_array($discount->promoDiscountId, array_map(fn (Discount $discount) => $discount->promoDiscountId, $this->discounts))) {
+        if (in_array($discount->promoDiscountId, array_map(fn(Discount $discount) => $discount->promoDiscountId, $this->discounts))) {
             throw new \InvalidArgumentException('Cannot add same discount (with same promo discount id: ' . $discount->promoDiscountId->get() . ') twice.');
         }
     }

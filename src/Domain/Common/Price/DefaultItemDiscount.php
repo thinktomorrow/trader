@@ -13,6 +13,12 @@ class DefaultItemDiscount implements ItemDiscount
     private Money $excludingVat;
     private VatPercentage $vatPercentage;
 
+    /**
+     * Stores the originally provided VAT-inclusive amount (when given),
+     * so we can return it without re-computing and causing rounding drift.
+     */
+    private ?Money $includingVatOriginal = null;
+
     private function __construct(Money $excludingVat, VatPercentage $vatPercentage)
     {
         if ($excludingVat->isNegative()) {
@@ -32,16 +38,28 @@ class DefaultItemDiscount implements ItemDiscount
     {
         if ($includesVat) {
             $excludingVat = Cash::from($amount)->subtractTaxPercentage($vatPercentage->toPercentage());
-        } else {
-            $excludingVat = $amount;
+
+            $self = new static($excludingVat, $vatPercentage);
+            $self->includingVatOriginal = $amount;
+
+            return $self;
         }
 
-        return new static($excludingVat, $vatPercentage);
+        return new static($amount, $vatPercentage);
+    }
+
+    public static function fromScalars(int|string $amount, string $vatPercentage, bool $includesVat): static
+    {
+        return static::fromMoney(
+            Cash::make($amount),
+            VatPercentage::fromString($vatPercentage),
+            $includesVat
+        );
     }
 
     public function getIncludingVat(): Money
     {
-        return Cash::from($this->excludingVat)->addPercentage($this->vatPercentage->toPercentage());
+        return $this->includingVatOriginal ?? Cash::from($this->excludingVat)->addPercentage($this->vatPercentage->toPercentage());
     }
 
     public function getExcludingVat(): Money
@@ -61,9 +79,20 @@ class DefaultItemDiscount implements ItemDiscount
 
     public function add(ItemDiscount $otherItemDiscount): static
     {
-        return new static(
+        $self = new static(
             $this->excludingVat->add($otherItemDiscount->getExcludingVat()),
             $this->vatPercentage
         );
+
+        if ($this->includingVatOriginal) {
+            $self->includingVatOriginal = $this->includingVatOriginal->add($otherItemDiscount->getIncludingVat());
+        }
+
+        return $self;
+    }
+
+    public function hasOriginalIncludingVat(): bool
+    {
+        return $this->includingVatOriginal !== null;
     }
 }

@@ -67,7 +67,7 @@ trait HasTotals
         $paymentCost = DefaultTotalPrice::zero();
 
         foreach ($this->payments as $payment) {
-            $paymentCost = $paymentCost->add($payment->getShippingCost());
+            $paymentCost = $paymentCost->add($payment->getPaymentCost());
         }
 
         return $paymentCost;

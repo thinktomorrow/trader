@@ -5,12 +5,12 @@ namespace Tests\Unit\Model\Order;
 
 use Tests\Unit\TestCase;
 use Thinktomorrow\Trader\Domain\Common\Address\AddressType;
-use Thinktomorrow\Trader\Domain\Model\Order\Discount\DiscountTotal;
-use Thinktomorrow\Trader\Domain\Model\Order\OrderTotal;
-use Thinktomorrow\Trader\Domain\Model\Order\Payment\PaymentCost;
+use Thinktomorrow\Trader\Domain\Common\Cash\Cash;
+use Thinktomorrow\Trader\Domain\Common\Price\DefaultItemDiscount;
+use Thinktomorrow\Trader\Domain\Common\Price\DefaultItemPrice;
+use Thinktomorrow\Trader\Domain\Common\Price\DefaultTotalPrice;
+use Thinktomorrow\Trader\Domain\Common\Vat\VatPercentage;
 use Thinktomorrow\Trader\Domain\Model\Order\Shipping\DefaultShippingState;
-use Thinktomorrow\Trader\Domain\Model\Order\Shipping\ShippingCost;
-use Thinktomorrow\Trader\Domain\Model\Product\Variant\VariantSalePrice;
 
 class OrderDetailsTest extends TestCase
 {
@@ -19,31 +19,37 @@ class OrderDetailsTest extends TestCase
         $order = $this->createDefaultOrder();
 
         $this->assertEquals(
-            OrderTotal::zero()->add(VariantSalePrice::fromScalars(400, '10', true)),
+            DefaultTotalPrice::zero()->add(
+                DefaultItemPrice::fromMoney(Cash::make(400), VatPercentage::fromString('10'), true)
+            ),
             $order->getSubTotal()
         );
 
         $this->assertEquals(
-            ShippingCost::fromScalars(30, '10', true),
+            DefaultTotalPrice::zero()->add(
+                DefaultItemPrice::fromScalars(30, '10', true)
+            ),
             $order->getShippingCost()
         );
 
         $this->assertEquals(
-            PaymentCost::fromScalars(20, '10', true),
+            DefaultTotalPrice::zero()->add(
+                DefaultItemPrice::fromScalars(20, '10', true)
+            ),
             $order->getPaymentCost()
         );
 
         $this->assertEquals(
-            DiscountTotal::fromScalars(30, '21', true), // Default percentage
+            DefaultItemDiscount::fromScalars(30, '9', true),
             $order->getDiscountTotal()
         );
 
         $this->assertEquals(
-            OrderTotal::zero()
-                ->add(VariantSalePrice::fromScalars(400, '10', true))
-                ->add(ShippingCost::fromScalars(30, '10', true))
-                ->add(PaymentCost::fromScalars(20, '10', true))
-                ->subtract(DiscountTotal::fromScalars(30, '21', true)),
+            DefaultTotalPrice::zero()
+                ->add(DefaultItemPrice::fromScalars(400, '10', true))
+                ->add(DefaultItemPrice::fromScalars(30, '10', true))
+                ->add(DefaultItemPrice::fromScalars(20, '10', true))
+                ->subtract(DefaultItemDiscount::fromScalars(30, '9', true)),
             $order->getTotal()
         );
     }

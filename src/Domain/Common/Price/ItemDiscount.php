@@ -12,7 +12,11 @@ interface ItemDiscount extends Price
 
     public static function fromMoney(Money $amount, VatPercentage $vatPercentage, bool $includesVat): static;
 
+    public static function fromScalars(int|string $amount, string $vatPercentage, bool $includesVat): static;
+
     public function getVatPercentage(): VatPercentage;
 
     public function add(ItemDiscount $otherItemDiscount): static;
+
+    public function hasOriginalIncludingVat(): bool;
 }

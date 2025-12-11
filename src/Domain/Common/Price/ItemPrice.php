@@ -12,6 +12,8 @@ interface ItemPrice extends Price
 
     public static function fromMoney(Money $amount, VatPercentage $vatPercentage, bool $includesVat): static;
 
+    public static function fromScalars(int|string $amount, string $vatPercentage, bool $includesVat): static;
+
     public function getVatPercentage(): VatPercentage;
 
     public function multiply(int $quantity): static;
@@ -19,4 +21,6 @@ interface ItemPrice extends Price
     public function applyDiscount(ItemDiscount $discount): static;
 
     public function changeVatPercentage(VatPercentage $vatPercentage): static;
+
+    public function hasOriginalIncludingVat(): bool;
 }
