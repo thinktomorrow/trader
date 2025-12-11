@@ -54,4 +54,11 @@ interface CartLine
 
     /** @return CartLinePersonalisation[] */
     public function getPersonalisations(): iterable;
+
+    /**
+     * Simple array of the variant taxa related to this line
+     * for display purposes. Format of each item should be
+     * something like ['label' => '...', 'value', ...]`
+     */
+    public function getVariants(): array;
 }

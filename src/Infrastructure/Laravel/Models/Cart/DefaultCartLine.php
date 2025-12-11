@@ -12,4 +12,20 @@ class DefaultCartLine extends OrderReadLine implements CartLine
     {
         return $this->getPurchasableReference()->getId();
     }
+
+    public function getVariants(): array
+    {
+        $taxa = $this->getData('taxa', []);
+
+        $result = [];
+
+        foreach ($taxa as $taxon) {
+            $result[] = [
+                'label' => data_get($taxon, 'taxonomy_data.title.' . app()->getLocale()) ?? null,
+                'value' => data_get($taxon, 'data.title.' . app()->getLocale()) ?? null,
+            ];
+        }
+
+        return $result;
+    }
 }

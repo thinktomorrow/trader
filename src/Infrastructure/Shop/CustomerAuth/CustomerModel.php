@@ -84,4 +84,9 @@ class CustomerModel extends Model implements AuthenticatableContract, CanResetPa
     {
         return trim($this->getFirstName() . ' ' . $this->getLastName());
     }
+
+    public function getData(string $key, $default = null)
+    {
+        return data_get($this->data, $key, $default);
+    }
 }

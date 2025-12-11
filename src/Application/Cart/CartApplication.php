@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Thinktomorrow\Trader\Application\Cart;
@@ -43,18 +44,31 @@ use Thinktomorrow\Trader\TraderConfig;
 final class CartApplication
 {
     private VariantForCartRepository $findVariantDetailsForCart;
+
     private AdjustLine $adjustLine;
+
     private OrderRepository $orderRepository;
+
     private ShippingProfileRepository $shippingProfileRepository;
+
     private EventDispatcher $eventDispatcher;
+
     private CustomerRepository $customerRepository;
+
     private TraderConfig $config;
+
     private RefreshCartAction $refreshCartAction;
+
     private ContainerInterface $container;
+
     private UpdateShippingProfileOnOrder $updateShippingProfileOnOrder;
+
     private UpdatePaymentMethodOnOrder $updatePaymentMethodOnOrder;
+
     private OrderStateMachine $orderStateMachine;
+
     private VatNumberApplication $vatNumberApplication;
+
     private VatExemptionApplication $vatExemptionApplication;
 
     public function __construct(
@@ -72,7 +86,8 @@ final class CartApplication
         EventDispatcher              $eventDispatcher,
         VatNumberApplication         $vatNumberApplication,
         VatExemptionApplication      $vatExemptionApplication
-    ) {
+    )
+    {
         $this->findVariantDetailsForCart = $findVariantDetailsForCart;
         $this->adjustLine = $adjustLine;
         $this->orderRepository = $orderRepository;
@@ -141,6 +156,7 @@ final class CartApplication
             $addLine->getQuantity(),
             array_merge($addLine->getData(), [
                 'title' => $variant->getTitle($addLine->getData()['locale'] ?? null),
+                'taxa' => $variant->getTaxa(),
                 'product_id' => $variant->getProductId()->get(),
                 'unit_price_excluding_vat' => $variant->getUnitPrice()->getExcludingVat()->getAmount(),
                 'unit_price_including_vat' => $variant->getUnitPrice()->getIncludingVat()->getAmount(),
@@ -162,7 +178,7 @@ final class CartApplication
                 }
             }
 
-            if (! $originalPersonalisation) {
+            if (!$originalPersonalisation) {
                 throw new \InvalidArgumentException('No personalisation found for variant [' . $addLine->getVariantId()->get() . '] by personalisation id [' . $personalisation_id . '].');
             }
 
@@ -333,7 +349,7 @@ final class CartApplication
         $order = $this->orderRepository->findForCart($command->getOrderId());
         $shopper = $order->getShopper();
 
-        if (! $billingAddressCountryId = $order->getBillingAddress()?->getAddress()->countryId) {
+        if (!$billingAddressCountryId = $order->getBillingAddress()?->getAddress()->countryId) {
             return;
         }
 
@@ -393,11 +409,11 @@ final class CartApplication
         $shopper->addData($customer->getData());
         $order->updateShopper($shopper);
 
-        if (! $order->getBillingAddress() && $billingAddress = $customer->getBillingAddress()) {
+        if (!$order->getBillingAddress() && $billingAddress = $customer->getBillingAddress()) {
             $this->chooseCustomerBillingAddress($order, $billingAddress);
         }
 
-        if (! $order->getShippingAddress() && $shippingAddress = $customer->getShippingAddress()) {
+        if (!$order->getShippingAddress() && $shippingAddress = $customer->getShippingAddress()) {
             $this->chooseCustomerShippingAddress($order, $shippingAddress);
         }
 

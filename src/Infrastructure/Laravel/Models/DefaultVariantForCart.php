@@ -20,6 +20,7 @@ class DefaultVariantForCart implements VariantForCart
     private VariantState $state;
     private VariantUnitPrice $variantUnitPrice;
     private VariantSalePrice $variantSalePrice;
+    private array $taxa; // Extra info on which variant taxa this variant has applied.
     private array $personalisations;
     private array $data;
     private array $productData;
@@ -38,6 +39,7 @@ class DefaultVariantForCart implements VariantForCart
         $object->variantUnitPrice = VariantUnitPrice::fromScalars($state['unit_price'], $state['tax_rate'], $state['includes_vat']);
         $object->variantSalePrice = VariantSalePrice::fromScalars($state['sale_price'], $state['tax_rate'], $state['includes_vat']);
         $object->personalisations = $personalisations;
+        $object->taxa = $state['taxa'] ?? [];
         $object->data = json_decode($state['data'], true);
         $object->productData = json_decode($state['product_data'], true);
 
@@ -85,9 +87,14 @@ class DefaultVariantForCart implements VariantForCart
         return $this->personalisations;
     }
 
+    public function getTaxa(): array
+    {
+        return $this->taxa;
+    }
+
     public function getData(?string $key = null, $default = null): mixed
     {
-        if (! $key) {
+        if (!$key) {
             return $this->data;
         }
 
@@ -96,7 +103,7 @@ class DefaultVariantForCart implements VariantForCart
 
     public function getProductData(?string $key = null, $default = null): mixed
     {
-        if (! $key) {
+        if (!$key) {
             return $this->productData;
         }
 

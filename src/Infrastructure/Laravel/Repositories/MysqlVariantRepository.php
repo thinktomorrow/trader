@@ -39,7 +39,7 @@ class MysqlVariantRepository implements VariantRepository, VariantForCartReposit
     {
         $state = $variant->getMappedData();
 
-        if (! $this->exists($variant->variantId)) {
+        if (!$this->exists($variant->variantId)) {
             DB::table(static::$variantTable)->insert($state);
         } else {
             DB::table(static::$variantTable)->where('variant_id', $variant->variantId->get())->update($state);
@@ -55,7 +55,7 @@ class MysqlVariantRepository implements VariantRepository, VariantForCartReposit
 
     private function upsertVariantTaxa(Variant $variant): void
     {
-        $taxonIds = array_map(fn ($taxonState) => $taxonState['taxon_id'], $variant->getChildEntities()[VariantTaxon::class]);
+        $taxonIds = array_map(fn($taxonState) => $taxonState['taxon_id'], $variant->getChildEntities()[VariantTaxon::class]);
 
         DB::table(static::$variantTaxaLookupTable)
             ->where('variant_id', $variant->variantId->get())
@@ -93,13 +93,13 @@ class MysqlVariantRepository implements VariantRepository, VariantForCartReposit
             ->groupBy(static::$variantTable . '.variant_id')
             ->orderBy(static::$variantTable . '.order_column')
             ->get()
-            ->map(fn ($item) => (array)$item)
-            ->map(fn ($item) => array_merge($item, [
+            ->map(fn($item) => (array)$item)
+            ->map(fn($item) => array_merge($item, [
                 'includes_vat' => (bool)$item['includes_vat'],
             ]))
             ->map(function ($item) {
                 $pairs = [];
-                if (! empty($item['taxa'])) {
+                if (!empty($item['taxa'])) {
                     foreach (explode('|||', $item['taxa']) as $pair) {
                         [$taxonomyId, $taxonomyType, $taxonId, $taxonState, $taxonData] = explode('::::', $pair);
                         $pairs[] = [
@@ -149,18 +149,49 @@ class MysqlVariantRepository implements VariantRepository, VariantForCartReposit
             ])
             ->first();
 
-        if (! $state) {
+        if (!$state) {
             throw new \RuntimeException('No online/available variant found by id [' . $variantId->get() . ']');
         }
 
         $state = (array)$state;
 
+        $variantTaxa = DB::table(static::$variantTaxaLookupTable)
+            ->join('trader_taxa', static::$variantTaxaLookupTable . '.taxon_id', '=', 'trader_taxa.taxon_id')
+            ->join('trader_taxonomies', 'trader_taxa.taxonomy_id', '=', 'trader_taxonomies.taxonomy_id')
+            ->where(static::$variantTaxaLookupTable . '.variant_id', $variantId->get())
+            ->select([
+                'trader_taxonomies.taxonomy_id',
+                'trader_taxonomies.type as taxonomy_type',
+                'trader_taxa.taxon_id',
+                'trader_taxa.data',
+                'trader_taxonomies.data AS taxonomy_data',
+                static::$variantTaxaLookupTable . '.state',
+                static::$variantTaxaLookupTable . '.data AS taxa_variant_data',
+            ])
+            ->orderBy(static::$variantTaxaLookupTable . '.order_column')
+            ->get()
+            ->map(fn($item) => (array)$item);
+
+        $state['taxa'] = [];
+
+        // Add taxa info to variant state
+        foreach ($variantTaxa as $variantTaxon) {
+            $state['taxa'][] = [
+                'taxonomy_id' => $variantTaxon['taxonomy_id'],
+                'taxonomy_type' => $variantTaxon['taxonomy_type'],
+                'taxon_id' => $variantTaxon['taxon_id'],
+                'data' => json_decode($variantTaxon['data'], true),
+                'taxonomy_data' => json_decode($variantTaxon['taxonomy_data'], true),
+                'taxa_variant_data' => json_decode($variantTaxon['taxa_variant_data'], true),
+            ];
+        }
+
         $personalisationStates = DB::table(static::$productPersonalisationsTable)
             ->where(static::$productPersonalisationsTable . '.product_id', $state['product_id'])
             ->get()
-            ->map(fn ($item) => (array)$item);
+            ->map(fn($item) => (array)$item);
 
-        $personalisations = $personalisationStates->map(fn ($personalisationState) => Personalisation::fromMappedData($personalisationState, $state))->all();
+        $personalisations = $personalisationStates->map(fn($personalisationState) => Personalisation::fromMappedData($personalisationState, $state))->all();
 
         return $this->composeVariantForCart($state, $personalisations);
     }
@@ -170,7 +201,7 @@ class MysqlVariantRepository implements VariantRepository, VariantForCartReposit
         $states = DB::table(static::$variantTable)
             ->join(static::$productTable, static::$variantTable . '.product_id', '=', static::$productTable . '.product_id')
             ->whereIn(static::$productTable . '.state', ProductState::onlineStates())
-            ->whereIn(static::$variantTable . '.variant_id', array_map(fn ($variantId) => $variantId instanceof VariantId ? $variantId->get() : $variantId, $variantIds))
+            ->whereIn(static::$variantTable . '.variant_id', array_map(fn($variantId) => $variantId instanceof VariantId ? $variantId->get() : $variantId, $variantIds))
             ->select([
                 static::$variantTable . '.*',
                 static::$productTable . '.data AS product_data',
@@ -180,11 +211,11 @@ class MysqlVariantRepository implements VariantRepository, VariantForCartReposit
         $allPersonalisationStates = DB::table(static::$productPersonalisationsTable)
             ->where(static::$productPersonalisationsTable . '.product_id', $states->pluck('product_id')->unique()->toArray())
             ->get()
-            ->map(fn ($item) => (array)$item);
+            ->map(fn($item) => (array)$item);
 
         return $states
-            ->map(fn ($state) => (array)$state)
-            ->map(fn ($state) => $this->composeVariantForCart($state, $allPersonalisationStates->filter(fn ($personalisationState) => $personalisationState['product_id'] == $state['product_id'])->map(fn ($personalisationState) => Personalisation::fromMappedData($personalisationState, $state))->all()))->toArray();
+            ->map(fn($state) => (array)$state)
+            ->map(fn($state) => $this->composeVariantForCart($state, $allPersonalisationStates->filter(fn($personalisationState) => $personalisationState['product_id'] == $state['product_id'])->map(fn($personalisationState) => Personalisation::fromMappedData($personalisationState, $state))->all()))->toArray();
     }
 
     private function composeVariantForCart(array $state, array $personalisations): VariantForCart
@@ -204,7 +235,7 @@ class MysqlVariantRepository implements VariantRepository, VariantForCartReposit
             ])
             ->first();
 
-        if (! $state) {
+        if (!$state) {
             throw new CouldNotFindStockItem('No stockitem found by id [' . $stockItemId->get() . ']');
         }
 
@@ -220,7 +251,7 @@ class MysqlVariantRepository implements VariantRepository, VariantForCartReposit
         $state = $stockItem->getMappedData();
 
         // StockItemId corresponds to the variant id. This is a given requirement.
-        if (! $this->exists(VariantId::fromString($stockItem->stockItemId->get()))) {
+        if (!$this->exists(VariantId::fromString($stockItem->stockItemId->get()))) {
             throw new VariantRecordDoesNotExistWhenSavingStockItem('No variant record found by id ' . $stockItem->stockItemId->get());
         }
 
