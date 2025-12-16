@@ -126,7 +126,7 @@ final class VatAllocator
             $itemPrice = $line->getTotal(); // ItemPrice (item-level)
             $vatRate = $line->getTotal()->getVatPercentage()->get();
 
-            if (!isset($results[$vatRate])) {
+            if (! isset($results[$vatRate])) {
                 $results[$vatRate] = Cash::zero();
             }
 
@@ -144,7 +144,7 @@ final class VatAllocator
         foreach ($amounts as $money) {
             $sum = $sum->add($money);
         }
+
         return $sum;
     }
 }
-

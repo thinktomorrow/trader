@@ -108,7 +108,7 @@ class Payment implements ChildAggregate, DiscountableItem
     public function getChildEntities(): array
     {
         return [
-            Discount::class => array_map(fn($discount) => $discount->getMappedData(), $this->discounts),
+            Discount::class => array_map(fn ($discount) => $discount->getMappedData(), $this->discounts),
         ];
     }
 
@@ -116,7 +116,7 @@ class Payment implements ChildAggregate, DiscountableItem
     {
         $payment = new static();
 
-        if (!$state['payment_state'] instanceof PaymentState) {
+        if (! $state['payment_state'] instanceof PaymentState) {
             throw new \InvalidArgumentException('Payment state is expected to be instance of PaymentState. Instead ' . gettype($state['payment_state']) . ' is passed.');
         }
 
@@ -127,7 +127,7 @@ class Payment implements ChildAggregate, DiscountableItem
         $payment->paymentMethodId = $state['payment_method_id'] ? PaymentMethodId::fromString($state['payment_method_id']) : null;
         $payment->paymentState = $state['payment_state'];
         $payment->paymentCost = DefaultServicePrice::fromExcludingVat($costExcludingVat);
-        $payment->discounts = array_map(fn($discountState) => Discount::fromMappedData($discountState, $state), $childEntities[Discount::class]);
+        $payment->discounts = array_map(fn ($discountState) => Discount::fromMappedData($discountState, $state), $childEntities[Discount::class]);
         $payment->data = json_decode($state['data'], true);
 
         return $payment;

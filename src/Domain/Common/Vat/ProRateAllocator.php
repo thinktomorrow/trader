@@ -109,9 +109,10 @@ class ProRateAllocator
     {
         $currency = $totalToAllocate->getCurrency();
         $result = array_map(
-            fn() => new Money('0', $currency),
+            fn () => new Money('0', $currency),
             $itemTotals
         );
+
         return $result;
     }
 
@@ -122,6 +123,7 @@ class ProRateAllocator
         foreach ($amounts as $money) {
             $sum = $sum->add($money);
         }
+
         return $sum;
     }
 

@@ -41,7 +41,7 @@ trait WithOrderTotals
 
         return Money::zero();
 
-//        return $this->getTotal()->getVatTotal();
+        //        return $this->getTotal()->getVatTotal();
     }
 
     /**

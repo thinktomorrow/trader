@@ -19,7 +19,7 @@ final class MinimumLinesQuantityOrderCondition implements OrderCondition
 
     public function check(Order $order, DiscountableItem $discountable): bool
     {
-        if (!$discountable instanceof Order) {
+        if (! $discountable instanceof Order) {
             return false;
         }
 

@@ -7,7 +7,6 @@ use Tests\Unit\TestCase;
 use Thinktomorrow\Trader\Domain\Common\Address\AddressType;
 use Thinktomorrow\Trader\Domain\Common\Cash\Cash;
 use Thinktomorrow\Trader\Domain\Common\Price\DefaultDiscountPrice;
-use Thinktomorrow\Trader\Domain\Common\Price\DefaultItemDiscount;
 use Thinktomorrow\Trader\Domain\Common\Price\DefaultItemPrice;
 use Thinktomorrow\Trader\Domain\Common\Price\DefaultTotalPrice;
 use Thinktomorrow\Trader\Domain\Common\Vat\VatPercentage;

@@ -24,7 +24,7 @@ class PercentageOffOrderDiscount extends BaseDiscount implements OrderDiscount
     public function isApplicable(Order $order, DiscountableItem $discountable): bool
     {
         // This is a global discount: it only applies to the order total
-        if (!$discountable instanceof Order) {
+        if (! $discountable instanceof Order) {
             return false;
         }
 

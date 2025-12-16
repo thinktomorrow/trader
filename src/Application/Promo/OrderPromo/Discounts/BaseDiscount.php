@@ -25,7 +25,7 @@ abstract class BaseDiscount
     protected function isApplicable(Order $order, DiscountableItem $discountable): bool
     {
         foreach ($this->conditions as $condition) {
-            if (!$condition->check($order, $discountable)) {
+            if (! $condition->check($order, $discountable)) {
                 return false;
             }
         }
@@ -35,7 +35,7 @@ abstract class BaseDiscount
 
     public function apply(Order $order, DiscountableItem $discountable, DiscountId $nextDiscountId): void
     {
-        if (!$this->isApplicable($order, $discountable)) {
+        if (! $this->isApplicable($order, $discountable)) {
             return;
         }
 
