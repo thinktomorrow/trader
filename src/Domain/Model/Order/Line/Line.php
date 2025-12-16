@@ -8,21 +8,22 @@ use Thinktomorrow\Trader\Domain\Common\Cash\Cash;
 use Thinktomorrow\Trader\Domain\Common\Entity\ChildAggregate;
 use Thinktomorrow\Trader\Domain\Common\Entity\HasData;
 use Thinktomorrow\Trader\Domain\Common\Price\DefaultItemPrice;
-use Thinktomorrow\Trader\Domain\Common\Price\ItemDiscount;
+use Thinktomorrow\Trader\Domain\Common\Price\DiscountPrice;
 use Thinktomorrow\Trader\Domain\Common\Price\ItemPrice;
 use Thinktomorrow\Trader\Domain\Common\Price\WithPriceInputMode;
 use Thinktomorrow\Trader\Domain\Common\Vat\VatPercentage;
 use Thinktomorrow\Trader\Domain\Model\Order\Discount\Discount;
-use Thinktomorrow\Trader\Domain\Model\Order\Discount\Discountable;
 use Thinktomorrow\Trader\Domain\Model\Order\Discount\DiscountableId;
+use Thinktomorrow\Trader\Domain\Model\Order\Discount\DiscountableItem;
 use Thinktomorrow\Trader\Domain\Model\Order\Discount\DiscountableType;
+use Thinktomorrow\Trader\Domain\Model\Order\Discount\GetValidatedTotalDiscountPrice;
 use Thinktomorrow\Trader\Domain\Model\Order\Discount\HasDiscounts;
 use Thinktomorrow\Trader\Domain\Model\Order\Line\Personalisations\HasPersonalisations;
 use Thinktomorrow\Trader\Domain\Model\Order\Line\Personalisations\LinePersonalisation;
 use Thinktomorrow\Trader\Domain\Model\Order\OrderId;
 use Thinktomorrow\Trader\Domain\Model\Product\Variant\VariantId;
 
-final class Line implements ChildAggregate, Discountable
+final class Line implements ChildAggregate, DiscountableItem
 {
     use WithPriceInputMode;
     use HasData;
@@ -87,12 +88,12 @@ final class Line implements ChildAggregate, Discountable
     public function getTotal(): DefaultItemPrice
     {
         return $this->getSubTotal()
-            ->applyDiscount($this->getDiscountTotal());
+            ->applyDiscount($this->getTotalDiscountPrice());
     }
 
-    public function getDiscountTotal(): ItemDiscount
+    public function getTotalDiscountPrice(): DiscountPrice
     {
-        return $this->calculateItemDiscount($this->linePrice);
+        return GetValidatedTotalDiscountPrice::get($this->linePrice, $this);
     }
 
     public function getTaxTotal(): Money
@@ -117,9 +118,7 @@ final class Line implements ChildAggregate, Discountable
             'includes_vat' => $includesVat,
             'total' => $this->getTotal()->getExcludingVat()->getAmount(),
             'tax_total' => $this->getTaxTotal()->getAmount(),
-            'discount_total' => $includesVat
-                ? $this->getDiscountTotal()->getIncludingVat()->getAmount()
-                : $this->getDiscountTotal()->getExcludingVat()->getAmount(),
+            'discount_total' => $this->getTotalDiscountPrice()->getExcludingVat()->getAmount(),
             'quantity' => $this->quantity->asInt(),
             'reduced_from_stock' => $this->reducedFromStock,
             'data' => json_encode($data),
@@ -129,8 +128,8 @@ final class Line implements ChildAggregate, Discountable
     public function getChildEntities(): array
     {
         return [
-            LinePersonalisation::class => array_map(fn ($personalisation) => $personalisation->getMappedData(), $this->personalisations),
-            Discount::class => array_map(fn ($discount) => $discount->getMappedData(), $this->discounts),
+            LinePersonalisation::class => array_map(fn($personalisation) => $personalisation->getMappedData(), $this->personalisations),
+            Discount::class => array_map(fn($discount) => $discount->getMappedData(), $this->discounts),
         ];
     }
 
@@ -146,8 +145,8 @@ final class Line implements ChildAggregate, Discountable
         $line->linePrice = DefaultItemPrice::fromMoney(Cash::make($state['line_price']), VatPercentage::fromString($state['tax_rate']), $state['includes_vat']);
         $line->quantity = Quantity::fromInt($state['quantity']);
         $line->reducedFromStock = $state['reduced_from_stock'];
-        $line->discounts = array_map(fn ($discountState) => Discount::fromMappedData($discountState, $state), $childEntities[Discount::class]);
-        $line->personalisations = array_map(fn ($personalisationState) => LinePersonalisation::fromMappedData($personalisationState, $state), $childEntities[LinePersonalisation::class]);
+        $line->discounts = array_map(fn($discountState) => Discount::fromMappedData($discountState, $state), $childEntities[Discount::class]);
+        $line->personalisations = array_map(fn($personalisationState) => LinePersonalisation::fromMappedData($personalisationState, $state), $childEntities[LinePersonalisation::class]);
         $line->data = json_decode($state['data'], true);
 
         return $line;

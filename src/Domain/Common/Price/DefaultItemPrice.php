@@ -9,18 +9,7 @@ use Thinktomorrow\Trader\Domain\Common\Price\Exceptions\PriceCannotBeNegative;
 use Thinktomorrow\Trader\Domain\Common\Vat\VatPercentage;
 
 /**
- * Value object representing a calculated price where the canonical state is:
- *   - excluding VAT amount
- *   - VAT percentage
- *
- * Domain logic:
- * - The canonical state is always excluding VAT.
- * - Including VAT and VAT total are always derived from the canonical state
- * - In case the price is constructed from an including VAT amount, that original
- *   amount is stored to avoid rounding drift when retrieving including VAT again.
- * - Multiplication should be done on the excluding VAT amount to avoid rounding drift.
- * - Discount should be applied to the entire line total, not per unit.
- * - ItemPrice should handle VAT correctness.
+ * @inheritdoc
  */
 class DefaultItemPrice implements ItemPrice
 {
@@ -112,7 +101,7 @@ class DefaultItemPrice implements ItemPrice
         return $self;
     }
 
-    public function applyDiscount(ItemDiscount $discount): static
+    public function applyDiscount(DiscountPrice $discount): static
     {
         $newExcluding = $this->excludingVat->subtract($discount->getExcludingVat());
 
@@ -126,7 +115,10 @@ class DefaultItemPrice implements ItemPrice
         $self = new static($newExcluding, $this->vatPercentage);
 
         if ($this->includingVatOriginal) {
-            $newIncluding = $this->includingVatOriginal->subtract($discount->getIncludingVat());
+
+            $discountIncludingVat = Cash::from($discount->getExcludingVat())->addPercentage($this->vatPercentage->toPercentage());
+
+            $newIncluding = $this->includingVatOriginal->subtract($discountIncludingVat);
             $self->includingVatOriginal = $newIncluding;
         }
 

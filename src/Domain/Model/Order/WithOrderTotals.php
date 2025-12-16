@@ -5,10 +5,11 @@ namespace Thinktomorrow\Trader\Domain\Model\Order;
 
 use Money\Money;
 use Thinktomorrow\Trader\Domain\Common\Price\DefaultTotalPrice;
-use Thinktomorrow\Trader\Domain\Common\Price\ItemDiscount;
+use Thinktomorrow\Trader\Domain\Common\Price\DiscountPrice;
 use Thinktomorrow\Trader\Domain\Common\Price\TotalPrice;
+use Thinktomorrow\Trader\Domain\Model\Order\Discount\GetValidatedTotalDiscountPrice;
 
-trait HasTotals
+trait WithOrderTotals
 {
     public function getSubTotal(): TotalPrice
     {
@@ -23,32 +24,34 @@ trait HasTotals
 
     public function getTotal(): TotalPrice
     {
-        $discountTotalPrice = DefaultTotalPrice::fromCalculated(
-            $this->getDiscountTotal()->getIncludingVat(),
-            $this->getDiscountTotal()->getExcludingVat()
-        );
-
         return $this->getSubTotal()
-            ->subtract($this->getDiscountTotal())
+            ->subtract($this->getTotalDiscountPrice())
             ->add($this->getShippingCost())
             ->add($this->getPaymentCost());
     }
 
     public function getTaxTotal(): Money
     {
-        return $this->getTotal()->getVatTotal();
+        // TODO: vat Allocator implementation
+        // exacte VAT percentages
+        //pro-rata verdeling
+        //afrondingsregels
+        //grouping per VAT rate
+        //invoice-level VAT logica indien nodig
+
+        return Money::zero();
+
+//        return $this->getTotal()->getVatTotal();
     }
 
     /**
      * This is the discount total that is applied on the entire order (not per item).
      * Note that this is not a sum of all item discounts, but specifically the
      * order discounts total as calculated based on the subtotal.
-     *
-     * @return ItemDiscount
      */
-    public function getDiscountTotal(): ItemDiscount
+    public function getTotalDiscountPrice(): DiscountPrice
     {
-        return $this->calculateItemDiscount($this->getSubTotal());
+        return GetValidatedTotalDiscountPrice::get($this->getSubTotal(), $this);
     }
 
     public function getShippingCost(): TotalPrice

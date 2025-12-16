@@ -7,7 +7,7 @@ use Money\Money;
 
 interface TotalPrice extends Price
 {
-    public static function fromCalculated(Money $includingVat, Money $excludingVat): static;
+    public static function fromExcludingVat(Money $excludingVat): static;
 
     public static function zero(): static;
 

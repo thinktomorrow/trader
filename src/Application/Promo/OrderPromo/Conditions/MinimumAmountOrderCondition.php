@@ -6,7 +6,7 @@ namespace Thinktomorrow\Trader\Application\Promo\OrderPromo\Conditions;
 use Money\Money;
 use Thinktomorrow\Trader\Application\Promo\OrderPromo\OrderCondition;
 use Thinktomorrow\Trader\Domain\Common\Cash\Cash;
-use Thinktomorrow\Trader\Domain\Model\Order\Discount\Discountable;
+use Thinktomorrow\Trader\Domain\Model\Order\Discount\DiscountableItem;
 use Thinktomorrow\Trader\Domain\Model\Order\Order;
 use Thinktomorrow\Trader\Domain\Model\Promo\Conditions\MinimumAmount;
 
@@ -19,9 +19,9 @@ class MinimumAmountOrderCondition implements OrderCondition
         return MinimumAmount::getMapKey();
     }
 
-    public function check(Order $order, Discountable $discountable): bool
+    public function check(Order $order, DiscountableItem $discountable): bool
     {
-        if (! $discountable instanceof Order) {
+        if (!$discountable instanceof Order) {
             return false;
         }
 

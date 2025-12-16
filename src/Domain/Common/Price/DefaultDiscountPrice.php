@@ -7,7 +7,7 @@ use Money\Money;
 use Thinktomorrow\Trader\Domain\Common\Cash\Cash;
 use Thinktomorrow\Trader\Domain\Common\Price\Exceptions\PriceCannotBeNegative;
 
-class DefaultTotalPrice implements TotalPrice
+class DefaultDiscountPrice implements DiscountPrice
 {
     private Money $excludingVat;
 
@@ -20,11 +20,9 @@ class DefaultTotalPrice implements TotalPrice
         $this->excludingVat = $excludingVat;
     }
 
-    public static function fromExcludingVat(Money $excludingVat): static
+    public static function fromExcludingVat(Money $amount): static
     {
-        return new static(
-            $excludingVat,
-        );
+        return new static($amount);
     }
 
     public static function zero(): static
@@ -37,17 +35,8 @@ class DefaultTotalPrice implements TotalPrice
         return $this->excludingVat;
     }
 
-    public function add(Price $otherPrice): static
+    public function add(DiscountPrice $discountPrice): static
     {
-        return new static(
-            $this->excludingVat->add($otherPrice->getExcludingVat()),
-        );
-    }
-
-    public function subtract(Price $otherPrice): static
-    {
-        return new static(
-            $this->excludingVat->subtract($otherPrice->getExcludingVat()),
-        );
+        return new static($this->excludingVat->add($discountPrice->getExcludingVat()));
     }
 }

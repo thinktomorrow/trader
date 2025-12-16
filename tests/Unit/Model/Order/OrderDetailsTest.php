@@ -6,6 +6,7 @@ namespace Tests\Unit\Model\Order;
 use Tests\Unit\TestCase;
 use Thinktomorrow\Trader\Domain\Common\Address\AddressType;
 use Thinktomorrow\Trader\Domain\Common\Cash\Cash;
+use Thinktomorrow\Trader\Domain\Common\Price\DefaultDiscountPrice;
 use Thinktomorrow\Trader\Domain\Common\Price\DefaultItemDiscount;
 use Thinktomorrow\Trader\Domain\Common\Price\DefaultItemPrice;
 use Thinktomorrow\Trader\Domain\Common\Price\DefaultTotalPrice;
@@ -40,8 +41,10 @@ class OrderDetailsTest extends TestCase
         );
 
         $this->assertEquals(
-            DefaultItemDiscount::fromScalars(30, '9', true),
-            $order->getDiscountTotal()
+            DefaultDiscountPrice::fromExcludingVat(
+                Cash::make('28')
+            ),
+            $order->getTotalDiscountPrice()
         );
 
         $this->assertEquals(
@@ -49,7 +52,7 @@ class OrderDetailsTest extends TestCase
                 ->add(DefaultItemPrice::fromScalars(400, '10', true))
                 ->add(DefaultItemPrice::fromScalars(30, '10', true))
                 ->add(DefaultItemPrice::fromScalars(20, '10', true))
-                ->subtract(DefaultItemDiscount::fromScalars(30, '9', true)),
+                ->subtract(DefaultDiscountPrice::fromExcludingVat(Cash::make('28'))),
             $order->getTotal()
         );
     }
