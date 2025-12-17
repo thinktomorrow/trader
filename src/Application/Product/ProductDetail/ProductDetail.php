@@ -71,6 +71,8 @@ interface ProductDetail extends Stockable
 
     public function getSaleDiscount(): string;
 
+    public function getSaleDiscountPercentage(): int;
+
     public function getTitle(?string $locale = null): string;
 
     public function getIntro(?string $locale = null): string;

@@ -44,6 +44,18 @@ trait RendersVariantPrices
         );
     }
 
+    public function getSaleDiscountPercentage(): int
+    {
+        $unitPrice = $this->getUnitPriceAsMoney()->getAmount();
+        $salePrice = $this->getSalePriceAsMoney()->getAmount();
+
+        if ($unitPrice == 0) {
+            return 0;
+        }
+
+        return (int)round((($unitPrice - $salePrice) / $unitPrice) * 100, 0);
+    }
+
     public function getUnitPriceAsMoney(bool $includeTax = true): Money
     {
         return $includeTax ? $this->unitPrice->getIncludingVat() : $this->unitPrice->getExcludingVat();
