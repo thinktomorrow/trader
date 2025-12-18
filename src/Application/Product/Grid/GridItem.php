@@ -53,6 +53,8 @@ interface GridItem
 
     public function getSaleDiscount(): string;
 
+    public function getSaleDiscountPercentage(): int;
+
     public function getTitle(): string;
 
     public function getUrl(): string;
