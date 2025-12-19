@@ -48,7 +48,6 @@ use Thinktomorrow\Trader\Domain\Model\Country\CountryId;
 use Thinktomorrow\Trader\Domain\Model\Customer\Customer;
 use Thinktomorrow\Trader\Domain\Model\Order\Exceptions\CouldNotFindOrder;
 use Thinktomorrow\Trader\Domain\Model\Order\Invoice\InvoiceRepository;
-use Thinktomorrow\Trader\Domain\Model\Order\Line\Line;
 use Thinktomorrow\Trader\Domain\Model\Order\Line\LineId;
 use Thinktomorrow\Trader\Domain\Model\Order\Line\Quantity;
 use Thinktomorrow\Trader\Domain\Model\Order\Order;
@@ -390,7 +389,7 @@ abstract class CartContext extends TestCase
     {
         $order = $this->getOrder();
 
-        $count = count($order->getChildEntities()[Line::class]);
+        $count = count($order->getLines());
 
         // Add product to order
         $this->cartApplication->addLine(new AddLine(
@@ -402,14 +401,14 @@ abstract class CartContext extends TestCase
         ));
 
         $checkFlag = false;
-        $lines = $this->orderRepository->find($order->orderId)->getChildEntities()[Line::class];
+        $lines = $this->orderRepository->find($order->orderId)->getLines();
         foreach ($lines as $line) {
             if ($line['variant_id'] == $productVariantId) {
                 $checkFlag = true;
             }
         }
 
-        if (! $checkFlag) {
+        if (!$checkFlag) {
             throw new \Exception('Cartitem presence check failed. No line found by ' . $productVariantId);
         }
     }
@@ -428,14 +427,14 @@ abstract class CartContext extends TestCase
         ));
 
         $checkFlag = false;
-        $lines = $this->orderRepository->find($orderId)->getChildEntities()[Line::class];
+        $lines = $this->orderRepository->find($orderId)->getLines();
         foreach ($lines as $line) {
             if ($line['variant_id'] == $productVariantId) {
                 $checkFlag = true;
             }
         }
 
-        if (! $checkFlag) {
+        if (!$checkFlag) {
             throw new \Exception('Cartitem presence check failed. No line found by ' . $productVariantId);
         }
     }
@@ -443,7 +442,7 @@ abstract class CartContext extends TestCase
     protected function whenIChangeTheProductQuantity($productTitle, $quantity)
     {
         $order = $this->getOrder();
-        $lines = $order->getChildEntities()[Line::class];
+        $lines = $order->getLines();
 
         // Find matching line by productId
         $lineId = null;
@@ -463,7 +462,7 @@ abstract class CartContext extends TestCase
     protected function whenIRemoveTheLine($productVariantId)
     {
         $order = $this->getOrder();
-        $lines = $order->getChildEntities()[Line::class];
+        $lines = $order->getLines();
 
         // Find matching line by productId
         $lineId = null;
@@ -508,7 +507,7 @@ abstract class CartContext extends TestCase
     protected function thenIShouldHaveProductInTheCart($times, $quantity, string $orderId = 'xxx')
     {
         $order = $this->orderRepository->find(OrderId::fromString($orderId));
-        $lines = $this->orderRepository->find($order->orderId)->getChildEntities()[Line::class];
+        $lines = $this->orderRepository->find($order->orderId)->getLines();
 
         Assert::assertCount((int)$times, $lines);
         if (count($lines) > 0) {
@@ -591,7 +590,7 @@ abstract class CartContext extends TestCase
             }
         }
 
-        if (! $line) {
+        if (!$line) {
             throw new \Exception('No line found by ' . $productVariantId);
         }
 
