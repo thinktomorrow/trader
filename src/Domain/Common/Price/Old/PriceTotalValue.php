@@ -8,7 +8,6 @@ use Thinktomorrow\Trader\Domain\Common\Cash\Cash;
 use Thinktomorrow\Trader\Domain\Common\Price\DefaultItemPrice;
 use Thinktomorrow\Trader\Domain\Common\Price\Exceptions\PriceCannotBeNegative;
 use Thinktomorrow\Trader\Domain\Common\Vat\VatApplicableTotal;
-use Thinktomorrow\Trader\Domain\Common\Vat\VatTotals;
 
 trait PriceTotalValue
 {
@@ -54,7 +53,7 @@ trait PriceTotalValue
 
     public function getExcludingVat(): Money
     {
-        if (! $this->includesVat) {
+        if (!$this->includesVat) {
             return $this->money;
         }
 

@@ -4,8 +4,8 @@ namespace Tests\Unit\Common\Vat;
 
 use Money\Money;
 use PHPUnit\Framework\TestCase;
+use Thinktomorrow\Trader\Domain\Common\Price\Old\VatTotal;
 use Thinktomorrow\Trader\Domain\Common\Vat\VatPercentage;
-use Thinktomorrow\Trader\Domain\Common\Vat\VatTotal;
 
 class VatTotalTest extends TestCase
 {

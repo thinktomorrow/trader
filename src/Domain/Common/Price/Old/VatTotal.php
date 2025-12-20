@@ -1,10 +1,11 @@
 <?php
 declare(strict_types=1);
 
-namespace Thinktomorrow\Trader\Domain\Common\Vat;
+namespace Thinktomorrow\Trader\Domain\Common\Price\Old;
 
 use Money\Money;
 use Thinktomorrow\Trader\Domain\Common\Cash\Cash;
+use Thinktomorrow\Trader\Domain\Common\Vat\VatPercentage;
 
 class VatTotal
 {

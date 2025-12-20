@@ -4,7 +4,6 @@ declare(strict_types=1);
 namespace Thinktomorrow\Trader\Domain\Common\Price\Old;
 
 use Money\Money;
-use Thinktomorrow\Trader\Domain\Common\Vat\VatTotals;
 
 /**
  * The total of multiple prices combined. This can refer to a subtotal of a cart where

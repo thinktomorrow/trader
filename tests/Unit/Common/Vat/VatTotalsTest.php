@@ -5,9 +5,9 @@ namespace Tests\Unit\Common\Vat;
 use Money\Exception\CurrencyMismatchException;
 use Money\Money;
 use PHPUnit\Framework\TestCase;
+use Thinktomorrow\Trader\Domain\Common\Price\Old\VatTotal;
+use Thinktomorrow\Trader\Domain\Common\Price\Old\VatTotals;
 use Thinktomorrow\Trader\Domain\Common\Vat\VatPercentage;
-use Thinktomorrow\Trader\Domain\Common\Vat\VatTotal;
-use Thinktomorrow\Trader\Domain\Common\Vat\VatTotals;
 
 class VatTotalsTest extends TestCase
 {

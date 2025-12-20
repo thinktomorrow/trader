@@ -2,11 +2,12 @@
 
 declare(strict_types=1);
 
-namespace Thinktomorrow\Trader\Domain\Common\Vat;
+namespace Thinktomorrow\Trader\Domain\Common\Price\Old;
 
 use Assert\Assertion;
 use Money\Money;
 use Thinktomorrow\Trader\Domain\Common\Cash\Cash;
+use Thinktomorrow\Trader\Domain\Common\Vat\VatPercentage;
 
 class VatTotals
 {
@@ -37,7 +38,7 @@ class VatTotals
             }
         }
 
-        if (! $match) {
+        if (!$match) {
             $vatTotals[] = $vatTotal;
         }
 
@@ -77,7 +78,7 @@ class VatTotals
     {
         $total = array_reduce(
             $this->vatTotals,
-            fn ($carry, VatTotal $vatTotal) => $carry->add($vatTotal->getTotal()),
+            fn($carry, VatTotal $vatTotal) => $carry->add($vatTotal->getTotal()),
             Cash::zero()
         );
 

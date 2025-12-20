@@ -3,6 +3,7 @@
 namespace Tests\Unit\Common\Vat;
 
 use Money\Money;
+use PHPUnit\Framework\Attributes\DataProvider;
 use Tests\Unit\TestCase;
 use Thinktomorrow\Trader\Domain\Common\Vat\ProRateAllocator;
 
@@ -99,15 +100,14 @@ final class ProRateAllocatorTest extends TestCase
         );
     }
 
-    /**
-     * @dataProvider remainderCases
-     */
+    #[DataProvider('remainderCases')]
     public function test_remainder_distribution_edge_cases(
         array $items,
         int   $toAllocate,
         array $expected
-    ): void {
-        $moneyItems = array_map(fn ($v) => Money::EUR($v), $items);
+    ): void
+    {
+        $moneyItems = array_map(fn($v) => Money::EUR($v), $items);
         $total = Money::EUR($toAllocate);
 
         $result = $this->allocator->allocate($moneyItems, $total);
@@ -241,7 +241,6 @@ final class ProRateAllocatorTest extends TestCase
             '12' => Money::EUR(1),
         ];
 
-        // Probeer iets "gevaarlijks"
         $toAllocate = Money::EUR(10);
 
         $result = $this->allocator->allocate($items, $toAllocate);
