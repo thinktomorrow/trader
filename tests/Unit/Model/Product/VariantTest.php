@@ -54,10 +54,10 @@ class VariantTest extends TestCase
             $salePrice = VariantSalePrice::fromMoney(Money::EUR(8), VatPercentage::fromString('20'), false),
         );
 
-        $this->assertEquals($unitPrice->getMoney()->getAmount(), $variant->getMappedData()['unit_price']);
-        $this->assertEquals($salePrice->getMoney()->getAmount(), $variant->getMappedData()['sale_price']);
+        $this->assertEquals($unitPrice->getExcludingVat()->getAmount(), $variant->getMappedData()['unit_price']);
+        $this->assertEquals($salePrice->getExcludingVat()->getAmount(), $variant->getMappedData()['sale_price']);
         $this->assertEquals($salePrice->getVatPercentage()->toPercentage()->get(), $variant->getMappedData()['tax_rate']);
-        $this->assertEquals($salePrice->includesVat(), $variant->getMappedData()['includes_vat']);
+        $this->assertEquals($salePrice->hasOriginalIncludingVat(), $variant->getMappedData()['includes_vat']);
         $this->assertEquals($salePrice, $variant->getSalePrice());
     }
 

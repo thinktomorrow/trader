@@ -3,10 +3,8 @@ declare(strict_types=1);
 
 namespace Thinktomorrow\Trader\Domain\Model\Product\Variant;
 
-use Thinktomorrow\Trader\Domain\Common\Price\Old\Price;
-use Thinktomorrow\Trader\Domain\Common\Price\Old\PriceValue;
+use Thinktomorrow\Trader\Domain\Common\Price\DefaultItemPrice;
 
-final class VariantSalePrice implements Price
+final class VariantSalePrice extends DefaultItemPrice
 {
-    use PriceValue;
 }
