@@ -1,21 +1,26 @@
 <?php
 declare(strict_types=1);
 
-namespace Thinktomorrow\Trader\Domain\Common\Price;
+namespace Thinktomorrow\Trader\Domain\Common\Price\Old;
 
 use Money\Money;
-use Thinktomorrow\Trader\Domain\Common\Vat\VatTotals;
 
 /**
  * The total of multiple prices combined. This can refer to a subtotal of a cart where
  * multiple prices with different tax rates are possible. This PriceTotal takes care
  * of these combinations to provide a consistent api for tax behaviour.
  */
-interface PriceTotal extends ConvertsToMoney
+interface PriceTotal
 {
     public static function make(Money $money, VatTotals $vatTotals, bool $includesVat): static;
 
     public static function zero(): static;
+
+    public function getMoney(): Money;
+
+    public function getIncludingVat(): Money;
+
+    public function getExcludingVat(): Money;
 
     public function getVatTotals(): VatTotals;
 

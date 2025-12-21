@@ -8,7 +8,8 @@ use Money\Money;
 use Thinktomorrow\Trader\Application\Common\RendersData;
 use Thinktomorrow\Trader\Application\Common\RendersMoney;
 use Thinktomorrow\Trader\Domain\Common\Cash\Cash;
-use Thinktomorrow\Trader\Domain\Common\Price\Price;
+use Thinktomorrow\Trader\Domain\Common\Price\DefaultItemPrice;
+use Thinktomorrow\Trader\Domain\Common\Price\Old\Price;
 use Thinktomorrow\Trader\Domain\Model\Order\Line\LinePrice;
 use Thinktomorrow\Trader\Domain\Model\Order\Line\PurchasableReference;
 use Thinktomorrow\Trader\Domain\Model\Product\Variant\VariantUnitPrice;
@@ -25,7 +26,7 @@ abstract class OrderReadLine
     protected array $purchasableData;
     protected LinePrice $linePrice;
     protected VariantUnitPrice $unitPrice;
-    protected Price $total;
+    protected DefaultItemPrice $total;
     protected Price $discountTotal;
     protected Money $taxTotal;
 
@@ -155,14 +156,13 @@ abstract class OrderReadLine
 
     public function getSubtotalPrice(): string
     {
-        $subtotal = $this->total->subtractDifferent($this->discountTotal);
+        if ($this->include_tax) {
+            $subtotal = $this->total->getIncludingVat()->subtract($this->discountTotal->getIncludingVat());
+        } else {
+            $subtotal = $this->total->getExcludingVat()->subtract($this->discountTotal->getExcludingVat());
+        }
 
-        // TODO: wat met verschillende taxrates...
-
-        return $this->renderMoney(
-            $this->include_tax ? $subtotal->getIncludingVat() : $subtotal->getExcludingVat(),
-            $this->getLocale()
-        );
+        return $this->renderMoney($subtotal, $this->getLocale());
     }
 
     public function getTaxPrice(): string

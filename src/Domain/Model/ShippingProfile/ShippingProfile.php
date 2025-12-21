@@ -6,8 +6,9 @@ namespace Thinktomorrow\Trader\Domain\Model\ShippingProfile;
 use Thinktomorrow\Trader\Domain\Common\Entity\Aggregate;
 use Thinktomorrow\Trader\Domain\Common\Entity\HasData;
 use Thinktomorrow\Trader\Domain\Common\Event\RecordsEvents;
-use Thinktomorrow\Trader\Domain\Common\Price\Price;
-use Thinktomorrow\Trader\Domain\Common\Price\PriceTotal;
+use Thinktomorrow\Trader\Domain\Common\Price\Old\Price;
+use Thinktomorrow\Trader\Domain\Common\Price\Old\PriceTotal;
+use Thinktomorrow\Trader\Domain\Common\Price\TotalPrice;
 use Thinktomorrow\Trader\Domain\Model\Country\CountryId;
 use Thinktomorrow\Trader\Domain\Model\Country\HasCountryIds;
 use Thinktomorrow\Trader\Domain\Model\ShippingProfile\Events\TariffDeleted;
@@ -72,7 +73,7 @@ final class ShippingProfile implements Aggregate
         return $this->tariffs;
     }
 
-    public function findTariffByPrice(Price|PriceTotal $price, bool $tariff_amounts_include_tax): ?Tariff
+    public function findTariffByPrice(Price|PriceTotal|TotalPrice $price, bool $tariff_amounts_include_tax): ?Tariff
     {
         $normalizedAmount = $tariff_amounts_include_tax ? $price->getIncludingVat() : $price->getExcludingVat();
 

@@ -6,7 +6,7 @@ namespace Thinktomorrow\Trader\Application\Promo\OrderPromo\Discounts;
 use Thinktomorrow\Trader\Application\Promo\OrderPromo\OrderDiscount;
 use Thinktomorrow\Trader\Domain\Common\Cash\Cash;
 use Thinktomorrow\Trader\Domain\Common\Cash\Percentage;
-use Thinktomorrow\Trader\Domain\Model\Order\Discount\Discountable;
+use Thinktomorrow\Trader\Domain\Model\Order\Discount\DiscountableItem;
 use Thinktomorrow\Trader\Domain\Model\Order\Discount\DiscountPriceDefaults;
 use Thinktomorrow\Trader\Domain\Model\Order\Discount\DiscountTotal;
 use Thinktomorrow\Trader\Domain\Model\Order\Order;
@@ -21,7 +21,7 @@ class PercentageOffOrderDiscount extends BaseDiscount implements OrderDiscount
         return PercentageOffDiscount::getMapKey();
     }
 
-    public function isApplicable(Order $order, Discountable $discountable): bool
+    public function isApplicable(Order $order, DiscountableItem $discountable): bool
     {
         // This is a global discount: it only applies to the order total
         if (! $discountable instanceof Order) {
@@ -31,7 +31,7 @@ class PercentageOffOrderDiscount extends BaseDiscount implements OrderDiscount
         return parent::isApplicable($order, $discountable);
     }
 
-    public function getDiscountTotal(Order $order, Discountable $discountable): DiscountTotal
+    public function getDiscountTotal(Order $order, DiscountableItem $discountable): DiscountTotal
     {
         $discountMoney = Cash::from(
             $order->getSubTotal()->getIncludingVat()

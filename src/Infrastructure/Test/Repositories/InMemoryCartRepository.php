@@ -44,7 +44,7 @@ final class InMemoryCartRepository implements CartRepository, InMemoryRepository
             'total' => $order->getTotal(),
             'taxTotal' => $order->getTaxTotal(),
             'subtotal' => $order->getSubTotal(),
-            'discountTotal' => $order->getDiscountTotal(),
+            'discountTotal' => $order->getItemDiscount(),
             'shippingCost' => $order->getShippingCost(),
             'paymentCost' => $order->getPaymentCost(),
         ]);
@@ -53,12 +53,12 @@ final class InMemoryCartRepository implements CartRepository, InMemoryRepository
             array_merge($line->getMappedData(), [
                 'total' => $line->getTotal(),
                 'taxTotal' => $line->getTaxTotal(),
-                'discountTotal' => $line->getDiscountTotal(),
+                'discountTotal' => $line->getItemDiscount(),
                 'linePrice' => $line->getLinePrice(),
             ]),
             $orderState,
             array_map(fn (Discount $discount) => DefaultCartDiscount::fromMappedData(array_merge($discount->getMappedData(), [
-                'total' => $discount->getTotal(),
+                'total' => $discount->getItemDiscount(),
                 'percentage' => $discount->getPercentage($line->getSubTotal()),
             ]), $orderState), $line->getDiscounts()),
             array_map(fn (LinePersonalisation $linePersonalisation) => DefaultCartLinePersonalisation::fromMappedData(array_merge($linePersonalisation->getMappedData(), [
@@ -83,7 +83,7 @@ final class InMemoryCartRepository implements CartRepository, InMemoryRepository
             ]),
             $orderState,
             array_map(fn (Discount $discount) => DefaultCartDiscount::fromMappedData(array_merge($discount->getMappedData(), [
-                'total' => $discount->getTotal(),
+                'total' => $discount->getItemDiscount(),
                 'percentage' => $discount->getPercentage($shipping->getShippingCost()),
             ]), $orderState), $shipping->getDiscounts())// TODO: cart shipping discounts
         ), $order->getShippings());
@@ -95,7 +95,7 @@ final class InMemoryCartRepository implements CartRepository, InMemoryRepository
             ]),
             $orderState,
             array_map(fn (Discount $discount) => DefaultCartDiscount::fromMappedData(array_merge($discount->getMappedData(), [
-                'total' => $discount->getTotal(),
+                'total' => $discount->getItemDiscount(),
                 'percentage' => $discount->getPercentage($payment->getPaymentCost()),
             ]), $orderState), $payment->getDiscounts())// TODO: cart payment discounts
         ), $order->getPayments());
@@ -116,7 +116,7 @@ final class InMemoryCartRepository implements CartRepository, InMemoryRepository
                 CartShopper::class => $shopper,
             ],
             array_map(fn (Discount $discount) => DefaultCartDiscount::fromMappedData(array_merge($discount->getMappedData(), [
-                'total' => $discount->getTotal(),
+                'total' => $discount->getItemDiscount(),
                 'percentage' => $discount->getPercentage($order->getSubTotal()),
             ]), $orderState), $order->getDiscounts()), // TODO: cart discounts
         );

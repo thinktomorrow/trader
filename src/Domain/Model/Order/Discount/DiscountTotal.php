@@ -5,8 +5,8 @@ namespace Thinktomorrow\Trader\Domain\Model\Order\Discount;
 
 use Money\Money;
 use Thinktomorrow\Trader\Domain\Common\Cash\Cash;
-use Thinktomorrow\Trader\Domain\Common\Price\Price;
-use Thinktomorrow\Trader\Domain\Common\Price\PriceValue;
+use Thinktomorrow\Trader\Domain\Common\Price\Old\Price;
+use Thinktomorrow\Trader\Domain\Common\Price\Old\PriceValue;
 
 final class DiscountTotal implements Price
 {

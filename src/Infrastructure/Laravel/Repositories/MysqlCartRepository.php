@@ -45,11 +45,13 @@ final class MysqlCartRepository implements CartRepository
             throw new OrderAlreadyInMerchantHands('Cannot fetch cart. Order is no longer in customer hands and has already the following state: ' . $order->getOrderState()->value);
         }
 
+        $subtotal = $order->getSubTotal();
+
         $orderState = array_merge($order->getMappedData(), [
             'total' => $order->getTotal(),
             'taxTotal' => $order->getTaxTotal(),
             'subtotal' => $order->getSubTotal(),
-            'discountTotal' => $order->getDiscountTotal(),
+            'discountTotal' => $order->getItemDiscount(),
             'shippingCost' => $order->getShippingCost(),
             'paymentCost' => $order->getPaymentCost(),
         ]);
@@ -60,12 +62,12 @@ final class MysqlCartRepository implements CartRepository
             array_merge($line->getMappedData(), [
                 'total' => $line->getTotal(),
                 'taxTotal' => $line->getTaxTotal(),
-                'discountTotal' => $line->getDiscountTotal(),
+                'discountTotal' => $line->getItemDiscount(),
                 'linePrice' => $line->getLinePrice(),
             ]),
             $orderState,
             array_map(fn (Discount $discount) => $this->container->get(CartDiscount::class)::fromMappedData(array_merge($discount->getMappedData(), [
-                'total' => $discount->getTotal(),
+                'total' => $discount->getItemDiscount(),
                 'percentage' => $discount->getPercentage($line->getSubTotal()),
             ]), $orderState), $line->getDiscounts()),
             array_map(fn (LinePersonalisation $linePersonalisation) => $this->container->get(CartLinePersonalisation::class)::fromMappedData(array_merge($linePersonalisation->getMappedData(), [
@@ -90,7 +92,7 @@ final class MysqlCartRepository implements CartRepository
             ]),
             $orderState,
             array_map(fn (Discount $discount) => $this->container->get(CartDiscount::class)::fromMappedData(array_merge($discount->getMappedData(), [
-                'total' => $discount->getTotal(),
+                'total' => $discount->getItemDiscount(),
                 'percentage' => $discount->getPercentage($shipping->getShippingCost()),
             ]), $orderState), $shipping->getDiscounts())
         ), $order->getShippings());
@@ -102,7 +104,7 @@ final class MysqlCartRepository implements CartRepository
             ]),
             $orderState,
             array_map(fn (Discount $discount) => $this->container->get(CartDiscount::class)::fromMappedData(array_merge($discount->getMappedData(), [
-                'total' => $discount->getTotal(),
+                'total' => $discount->getItemDiscount(),
                 'percentage' => $discount->getPercentage($payment->getPaymentCost()),
             ]), $orderState), $payment->getDiscounts())
         ), $order->getPayments());
@@ -123,7 +125,7 @@ final class MysqlCartRepository implements CartRepository
                 CartShopper::class => $shopper,
             ],
             array_map(fn (Discount $discount) => $this->container->get(CartDiscount::class)::fromMappedData(array_merge($discount->getMappedData(), [
-                'total' => $discount->getTotal(),
+                'total' => $discount->getItemDiscount(),
                 'percentage' => $discount->getPercentage($order->getSubTotal()),
             ]), $orderState), $order->getDiscounts()),
         );

@@ -5,16 +5,20 @@ namespace Thinktomorrow\Trader\Domain\Model\Order\Shipping;
 
 use Thinktomorrow\Trader\Domain\Common\Entity\ChildAggregate;
 use Thinktomorrow\Trader\Domain\Common\Entity\HasData;
+use Thinktomorrow\Trader\Domain\Common\Price\DefaultServicePrice;
+use Thinktomorrow\Trader\Domain\Common\Price\DiscountPrice;
+use Thinktomorrow\Trader\Domain\Common\Price\ExtractPriceExcludingVat;
+use Thinktomorrow\Trader\Domain\Common\Price\ServicePrice;
 use Thinktomorrow\Trader\Domain\Model\Order\Discount\Discount;
-use Thinktomorrow\Trader\Domain\Model\Order\Discount\Discountable;
 use Thinktomorrow\Trader\Domain\Model\Order\Discount\DiscountableId;
+use Thinktomorrow\Trader\Domain\Model\Order\Discount\DiscountableItem;
 use Thinktomorrow\Trader\Domain\Model\Order\Discount\DiscountableType;
-use Thinktomorrow\Trader\Domain\Model\Order\Discount\DiscountTotal;
+use Thinktomorrow\Trader\Domain\Model\Order\Discount\GetValidatedTotalDiscountPrice;
 use Thinktomorrow\Trader\Domain\Model\Order\Discount\HasDiscounts;
 use Thinktomorrow\Trader\Domain\Model\Order\OrderId;
 use Thinktomorrow\Trader\Domain\Model\ShippingProfile\ShippingProfileId;
 
-final class Shipping implements ChildAggregate, Discountable
+final class Shipping implements ChildAggregate, DiscountableItem
 {
     use HasData;
     use HasDiscounts;
@@ -23,13 +27,13 @@ final class Shipping implements ChildAggregate, Discountable
     public readonly ShippingId $shippingId;
     private ?ShippingProfileId $shippingProfileId;
     private ShippingState $shippingState;
-    private ShippingCost $shippingCost;
+    private ServicePrice $shippingCost;
 
     private function __construct()
     {
     }
 
-    public static function create(OrderId $orderId, ShippingId $shippingId, ShippingProfileId $shippingProfileId, ShippingState $shippingState, ShippingCost $shippingCost): static
+    public static function create(OrderId $orderId, ShippingId $shippingId, ShippingProfileId $shippingProfileId, ShippingState $shippingState, ServicePrice $shippingCost): static
     {
         $shipping = new static();
 
@@ -52,7 +56,7 @@ final class Shipping implements ChildAggregate, Discountable
         $this->shippingState = $shippingState;
     }
 
-    public function updateCost(ShippingCost $shippingCost): void
+    public function updateCost(ServicePrice $shippingCost): void
     {
         $this->shippingCost = $shippingCost;
     }
@@ -67,14 +71,14 @@ final class Shipping implements ChildAggregate, Discountable
         return $this->shippingState;
     }
 
-    public function getShippingCost(): ShippingCost
+    public function getShippingCost(): ServicePrice
     {
         return $this->shippingCost;
     }
 
-    public function getShippingCostTotal(): ShippingCost
+    public function getShippingCostTotal(): ServicePrice
     {
-        return $this->shippingCost->subtract($this->getDiscountTotal());
+        return $this->shippingCost->applyDiscount($this->getTotalDiscountPrice());
     }
 
     public function getMappedData(): array
@@ -85,11 +89,15 @@ final class Shipping implements ChildAggregate, Discountable
             'order_id' => $this->orderId->get(),
             'shipping_id' => $this->shippingId->get(),
             'shipping_profile_id' => $this->shippingProfileId?->get(),
-            'shipping_state' => $this->shippingState->value,
-            'cost' => $this->shippingCost->getMoney()->getAmount(),
-            'tax_rate' => $this->shippingCost->getVatPercentage()->get(),
-            'includes_vat' => $this->shippingCost->includesVat(),
+            'shipping_state' => $this->shippingState->getValueAsString(),
+            // Always store excluding vat cost, vat is calculated based on the products in the order.
+            'cost' => $this->shippingCost->getExcludingVat()->getAmount(),
             'data' => json_encode($data),
+
+            // Shipping is a service and has no vat by itself
+            // Both these fields are no longer used but are kept for backward compatibility
+            'tax_rate' => 0,
+            'includes_vat' => false,
         ];
     }
 
@@ -108,24 +116,22 @@ final class Shipping implements ChildAggregate, Discountable
             throw new \InvalidArgumentException('Shipping state is expected to be instance of ShippingState. Instead ' . gettype($state['shipping_state']) . ' is passed.');
         }
 
+        $costExcludingVat = ExtractPriceExcludingVat::extract($state, 'cost');
+
         $shipping->orderId = OrderId::fromString($aggregateState['order_id']);
         $shipping->shippingId = ShippingId::fromString($state['shipping_id']);
         $shipping->shippingProfileId = $state['shipping_profile_id'] ? ShippingProfileId::fromString($state['shipping_profile_id']) : null;
         $shipping->shippingState = $state['shipping_state'];
-        $shipping->shippingCost = ShippingCost::fromScalars(
-            $state['cost'],
-            $state['tax_rate'],
-            $state['includes_vat']
-        );
+        $shipping->shippingCost = DefaultServicePrice::fromExcludingVat($costExcludingVat);
         $shipping->discounts = array_map(fn ($discountState) => Discount::fromMappedData($discountState, $state), $childEntities[Discount::class]);
         $shipping->data = json_decode($state['data'], true);
 
         return $shipping;
     }
 
-    public function getDiscountTotal(): DiscountTotal
+    public function getTotalDiscountPrice(): DiscountPrice
     {
-        return $this->calculateDiscountTotal($this->getShippingCost());
+        return GetValidatedTotalDiscountPrice::get($this->shippingCost, $this);
     }
 
     public function getDiscountableId(): DiscountableId

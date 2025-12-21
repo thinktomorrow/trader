@@ -4,7 +4,7 @@ declare(strict_types=1);
 namespace Thinktomorrow\Trader\Application\Promo\OrderPromo\Conditions;
 
 use Thinktomorrow\Trader\Application\Promo\OrderPromo\OrderCondition;
-use Thinktomorrow\Trader\Domain\Model\Order\Discount\Discountable;
+use Thinktomorrow\Trader\Domain\Model\Order\Discount\DiscountableItem;
 use Thinktomorrow\Trader\Domain\Model\Order\Order;
 use Thinktomorrow\Trader\Domain\Model\Promo\Conditions\MinimumLinesQuantity;
 
@@ -17,7 +17,7 @@ final class MinimumLinesQuantityOrderCondition implements OrderCondition
         return MinimumLinesQuantity::getMapKey();
     }
 
-    public function check(Order $order, Discountable $discountable): bool
+    public function check(Order $order, DiscountableItem $discountable): bool
     {
         if (! $discountable instanceof Order) {
             return false;

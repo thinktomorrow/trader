@@ -13,8 +13,8 @@ use Thinktomorrow\Trader\Application\Cart\Read\CartShippingAddress;
 use Thinktomorrow\Trader\Application\Cart\Read\CartShopper;
 use Thinktomorrow\Trader\Application\Common\RendersData;
 use Thinktomorrow\Trader\Application\Common\RendersMoney;
-use Thinktomorrow\Trader\Domain\Common\Price\Price;
-use Thinktomorrow\Trader\Domain\Common\Price\PriceTotal;
+use Thinktomorrow\Trader\Domain\Common\Price\Old\Price;
+use Thinktomorrow\Trader\Domain\Common\Price\TotalPrice;
 
 class DefaultCart implements Cart
 {
@@ -31,9 +31,9 @@ class DefaultCart implements Cart
     protected array $discounts;
     protected array $data;
 
-    protected PriceTotal $total;
+    protected TotalPrice $total;
     protected Money $taxTotal;
-    protected PriceTotal $subtotal;
+    protected TotalPrice $subtotal;
     protected Price $discountTotal;
     protected Price $shippingCost;
     protected Price $paymentCost;
@@ -50,7 +50,6 @@ class DefaultCart implements Cart
         $cart = new static();
 
         $cart->orderId = $state['order_id'];
-
         $cart->total = $state['total'];
         $cart->taxTotal = $state['taxTotal'];
         $cart->subtotal = $state['subtotal'];
@@ -143,6 +142,7 @@ class DefaultCart implements Cart
     public function getSubtotalPriceAsMoney(?bool $includeTax = null): Money
     {
         $includeTax = $includeTax ?? $this->include_tax;
+        dump($includeTax, $this->subtotal, $this->subtotal->getIncludingVat(), $this->subtotal->getExcludingVat());
 
         return $includeTax ? $this->subtotal->getIncludingVat() : $this->subtotal->getExcludingVat();
     }

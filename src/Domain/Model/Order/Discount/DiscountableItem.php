@@ -3,16 +3,15 @@ declare(strict_types=1);
 
 namespace Thinktomorrow\Trader\Domain\Model\Order\Discount;
 
-interface Discountable
+use Thinktomorrow\Trader\Domain\Common\Price\DiscountPrice;
+
+interface DiscountableItem
 {
     public function getDiscountableId(): DiscountableId;
 
     public function getDiscountableType(): DiscountableType;
 
-    /**
-     * The total amount of the calculated discount.
-     */
-    public function getDiscountTotal(): DiscountTotal;
+    public function getTotalDiscountPrice(): DiscountPrice;
 
     /**
      * @return Discount[]

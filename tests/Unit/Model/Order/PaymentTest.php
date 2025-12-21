@@ -167,6 +167,6 @@ class PaymentTest extends TestCase
         // 20 (and not 30 discount) because payment cost is only 20.
         $discountTotal = DiscountTotal::fromMoney(Money::EUR('20'), $payment->getPaymentCost()->getVatPercentage(), $payment->getPaymentCost()->includesVat());
 
-        $this->assertEquals($discountTotal, $payment->getDiscountTotal());
+        $this->assertEquals($discountTotal, $payment->getItemDiscount());
     }
 }

@@ -5,16 +5,20 @@ namespace Thinktomorrow\Trader\Domain\Model\Order\Payment;
 
 use Thinktomorrow\Trader\Domain\Common\Entity\ChildAggregate;
 use Thinktomorrow\Trader\Domain\Common\Entity\HasData;
+use Thinktomorrow\Trader\Domain\Common\Price\DefaultServicePrice;
+use Thinktomorrow\Trader\Domain\Common\Price\DiscountPrice;
+use Thinktomorrow\Trader\Domain\Common\Price\ExtractPriceExcludingVat;
+use Thinktomorrow\Trader\Domain\Common\Price\ServicePrice;
 use Thinktomorrow\Trader\Domain\Model\Order\Discount\Discount;
-use Thinktomorrow\Trader\Domain\Model\Order\Discount\Discountable;
 use Thinktomorrow\Trader\Domain\Model\Order\Discount\DiscountableId;
+use Thinktomorrow\Trader\Domain\Model\Order\Discount\DiscountableItem;
 use Thinktomorrow\Trader\Domain\Model\Order\Discount\DiscountableType;
-use Thinktomorrow\Trader\Domain\Model\Order\Discount\DiscountTotal;
+use Thinktomorrow\Trader\Domain\Model\Order\Discount\GetValidatedTotalDiscountPrice;
 use Thinktomorrow\Trader\Domain\Model\Order\Discount\HasDiscounts;
 use Thinktomorrow\Trader\Domain\Model\Order\OrderId;
 use Thinktomorrow\Trader\Domain\Model\PaymentMethod\PaymentMethodId;
 
-class Payment implements ChildAggregate, Discountable
+class Payment implements ChildAggregate, DiscountableItem
 {
     use HasData;
     use HasDiscounts;
@@ -23,13 +27,13 @@ class Payment implements ChildAggregate, Discountable
     public readonly PaymentId $paymentId;
     private ?PaymentMethodId $paymentMethodId;
     private PaymentState $paymentState;
-    private PaymentCost $paymentCost;
+    private ServicePrice $paymentCost;
 
     private function __construct()
     {
     }
 
-    public static function create(OrderId $orderId, PaymentId $paymentId, PaymentMethodId $paymentMethodId, PaymentState $paymentState, PaymentCost $paymentCost): static
+    public static function create(OrderId $orderId, PaymentId $paymentId, PaymentMethodId $paymentMethodId, PaymentState $paymentState, ServicePrice $paymentCost): static
     {
         $payment = new static();
 
@@ -47,7 +51,7 @@ class Payment implements ChildAggregate, Discountable
         $this->paymentState = $paymentState;
     }
 
-    public function updateCost(PaymentCost $paymentCost): void
+    public function updateCost(ServicePrice $paymentCost): void
     {
         $this->paymentCost = $paymentCost;
     }
@@ -67,14 +71,19 @@ class Payment implements ChildAggregate, Discountable
         return $this->paymentState;
     }
 
-    public function getPaymentCost(): PaymentCost
+    public function getPaymentCost(): ServicePrice
     {
         return $this->paymentCost;
     }
 
-    public function getPaymentCostTotal(): PaymentCost
+    public function getPaymentCostTotal(): ServicePrice
     {
-        return $this->paymentCost->subtract($this->getDiscountTotal());
+        return $this->paymentCost->applyDiscount($this->getTotalDiscountPrice());
+    }
+
+    public function getTotalDiscountPrice(): DiscountPrice
+    {
+        return GetValidatedTotalDiscountPrice::get($this->paymentCost, $this);
     }
 
     public function getMappedData(): array
@@ -85,11 +94,14 @@ class Payment implements ChildAggregate, Discountable
             'order_id' => $this->orderId->get(),
             'payment_id' => $this->paymentId->get(),
             'payment_method_id' => $this->paymentMethodId?->get(),
-            'payment_state' => $this->paymentState->value,
-            'cost' => $this->paymentCost->getMoney()->getAmount(),
-            'tax_rate' => $this->paymentCost->getVatPercentage()->get(),
-            'includes_vat' => $this->paymentCost->includesVat(),
+            'payment_state' => $this->paymentState->getValueAsString(),
+            'cost' => $this->paymentCost->getExcludingVat()->getAmount(),
             'data' => json_encode($data),
+
+            // Payment is a service and has no vat by itself
+            // Both these fields are no longer used but are kept for backward compatibility
+            'tax_rate' => 0,
+            'includes_vat' => false,
         ];
     }
 
@@ -108,24 +120,17 @@ class Payment implements ChildAggregate, Discountable
             throw new \InvalidArgumentException('Payment state is expected to be instance of PaymentState. Instead ' . gettype($state['payment_state']) . ' is passed.');
         }
 
+        $costExcludingVat = ExtractPriceExcludingVat::extract($state, 'cost');
+
         $payment->orderId = OrderId::fromString($aggregateState['order_id']);
         $payment->paymentId = PaymentId::fromString($state['payment_id']);
         $payment->paymentMethodId = $state['payment_method_id'] ? PaymentMethodId::fromString($state['payment_method_id']) : null;
         $payment->paymentState = $state['payment_state'];
-        $payment->paymentCost = PaymentCost::fromScalars(
-            $state['cost'],
-            $state['tax_rate'],
-            $state['includes_vat']
-        );
+        $payment->paymentCost = DefaultServicePrice::fromExcludingVat($costExcludingVat);
         $payment->discounts = array_map(fn ($discountState) => Discount::fromMappedData($discountState, $state), $childEntities[Discount::class]);
         $payment->data = json_decode($state['data'], true);
 
         return $payment;
-    }
-
-    public function getDiscountTotal(): DiscountTotal
-    {
-        return $this->calculateDiscountTotal($this->getPaymentCost());
     }
 
     public function getDiscountableId(): DiscountableId

@@ -84,7 +84,7 @@ class ShippingTest extends TestCase
 
         $discountTotal = DiscountTotal::fromMoney(Money::EUR('30'), $shipping->getShippingCost()->getVatPercentage(), $shipping->getShippingCost()->includesVat());
 
-        $this->assertEquals($discountTotal, $shipping->getDiscountTotal());
+        $this->assertEquals($discountTotal, $shipping->getItemDiscount());
     }
 
     public function test_it_can_find_a_shipping()

@@ -1,10 +1,12 @@
 <?php
 declare(strict_types=1);
 
-namespace Thinktomorrow\Trader\Domain\Common\Price;
+namespace Thinktomorrow\Trader\Domain\Common\Price\Old;
 
 use Money\Money;
 use Thinktomorrow\Trader\Domain\Common\Cash\Cash;
+use Thinktomorrow\Trader\Domain\Common\Price\Exceptions\PriceCannotBeNegative;
+use Thinktomorrow\Trader\Domain\Common\Price\Exceptions\PriceCannotContainMultipleTaxRates;
 use Thinktomorrow\Trader\Domain\Common\Vat\VatPercentage;
 
 trait PriceValue

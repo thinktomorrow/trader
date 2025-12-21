@@ -1,12 +1,13 @@
 <?php
 declare(strict_types=1);
 
-namespace Thinktomorrow\Trader\Domain\Common\Price;
+namespace Thinktomorrow\Trader\Domain\Common\Price\Old;
 
 use Money\Money;
 use Thinktomorrow\Trader\Domain\Common\Cash\Cash;
+use Thinktomorrow\Trader\Domain\Common\Price\DefaultItemPrice;
+use Thinktomorrow\Trader\Domain\Common\Price\Exceptions\PriceCannotBeNegative;
 use Thinktomorrow\Trader\Domain\Common\Vat\VatApplicableTotal;
-use Thinktomorrow\Trader\Domain\Common\Vat\VatTotals;
 
 trait PriceTotalValue
 {
@@ -52,7 +53,7 @@ trait PriceTotalValue
 
     public function getExcludingVat(): Money
     {
-        if (! $this->includesVat) {
+        if (!$this->includesVat) {
             return $this->money;
         }
 
@@ -76,24 +77,32 @@ trait PriceTotalValue
         return $this->includesVat;
     }
 
-    public function add(Price $otherPrice): static
+    public function add(Price|DefaultItemPrice $otherPrice): static
     {
         $otherMoney = $this->includesVat()
             ? $otherPrice->getIncludingVat()
             : $otherPrice->getExcludingVat();
 
-        $vatTotals = $this->vatTotals->addVatApplicableTotal($otherPrice->getVatPercentage(), $this->getVatApplicableTotal($otherPrice));
+        if ($otherPrice instanceof DefaultItemPrice) {
+            $vatTotals = $this->vatTotals->addVatApplicableTotal($otherPrice->getVatPercentage(), VatApplicableTotal::fromMoney($otherPrice->getVatTotal()));
+        } else {
+            $vatTotals = $this->vatTotals->addVatApplicableTotal($otherPrice->getVatPercentage(), $this->getVatApplicableTotal($otherPrice));
+        }
 
         return new static($this->money->add($otherMoney), $vatTotals, $this->includesVat);
     }
 
-    public function subtract(Price $otherPrice): static
+    public function subtract(Price|DefaultItemPrice $otherPrice): static
     {
         $otherMoney = $this->includesVat()
             ? $otherPrice->getIncludingVat()
             : $otherPrice->getExcludingVat();
 
-        $vatTotals = $this->vatTotals->subtractVatApplicableTotal($otherPrice->getVatPercentage(), $this->getVatApplicableTotal($otherPrice));
+        if ($otherPrice instanceof DefaultItemPrice) {
+            $vatTotals = $this->vatTotals->addVatApplicableTotal($otherPrice->getVatPercentage(), VatApplicableTotal::fromMoney($otherPrice->getVatTotal()));
+        } else {
+            $vatTotals = $this->vatTotals->addVatApplicableTotal($otherPrice->getVatPercentage(), $this->getVatApplicableTotal($otherPrice));
+        }
 
         return new static($this->money->subtract($otherMoney), $vatTotals, $this->includesVat);
     }

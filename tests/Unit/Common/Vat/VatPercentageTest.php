@@ -1,11 +1,11 @@
 <?php
 
-namespace Tests\Unit\Common\Taxes;
+namespace Tests\Unit\Common\Vat;
 
 use PHPUnit\Framework\TestCase;
 use Thinktomorrow\Trader\Domain\Common\Vat\VatPercentage;
 
-class TaxRateTest extends TestCase
+class VatPercentageTest extends TestCase
 {
     public function test_it_can_be_set_by_integer()
     {

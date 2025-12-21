@@ -22,7 +22,7 @@ class Cash
         $this->money = $money;
     }
 
-    public static function from($money, $currencyCode = null): self
+    public static function from($money, ?string $currencyCode = null): self
     {
         if (! $money instanceof Money) {
             $money = static::make($money, $currencyCode);
@@ -91,7 +91,7 @@ class Cash
     /**
      * @return Money|int
      */
-    public function percentage(Percentage|string $percentage, int $rounding_mode = Money::ROUND_HALF_UP, bool $returnAsMoney = true, ?int $round = null)
+    public function percentage(Percentage|string $percentage, \RoundingMode $roundMethod = \RoundingMode::HalfAwayFromZero, bool $returnAsMoney = true, int $round = 0)
     {
         if ($percentage instanceof Percentage) {
             $percentage = $percentage->get();
@@ -99,23 +99,17 @@ class Cash
 
         $multiplier = (string)($percentage / 100);
 
-        $money = $this->money->multiply($multiplier, $rounding_mode);
+        $money = $this->money->multiply($multiplier);
 
-        if ($returnAsMoney) {
-            return $money;
-        }
+        $money = new Money((int)round((int)$money->getAmount(), $round, $roundMethod), $money->getCurrency());
 
-        if (! $round) {
-            $round = 0;
-        }
-
-        return (int)round((int)$money->getAmount(), $round, $rounding_mode);
+        return $returnAsMoney ? $money : $money->getAmount();
     }
 
     /**
      * Add a percentage of the amount
      */
-    public function addPercentage(Percentage|string $percentage, int $roundMethod = PHP_ROUND_HALF_UP): Money
+    public function addPercentage(Percentage|string $percentage, \RoundingMode $roundMethod = \RoundingMode::HalfAwayFromZero): Money
     {
         if ($percentage instanceof Percentage) {
             $percentage = $percentage->get();
@@ -131,7 +125,7 @@ class Cash
      * @param int $roundMethod
      * @return Money
      */
-    public function subtractPercentage($percentage, $roundMethod = PHP_ROUND_HALF_UP): Money
+    public function subtractPercentage($percentage, \RoundingMode $roundMethod = \RoundingMode::HalfAwayFromZero): Money
     {
         if ($percentage instanceof Percentage) {
             $percentage = $percentage->get();

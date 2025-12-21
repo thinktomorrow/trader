@@ -202,8 +202,8 @@ class ProductTest extends TestCase
         $product->createVariant(Variant::create(
             ProductId::fromString('false-product-id'),
             VariantId::fromString('yyy'),
-            VariantUnitPrice::zero(),
-            VariantSalePrice::zero(),
+            VariantUnitPrice::fromScalars('100', '20', true),
+            VariantSalePrice::fromScalars('80', '20', true),
             'sku',
         ));
     }
@@ -213,12 +213,12 @@ class ProductTest extends TestCase
         $product = $this->createProductWithVariant();
 
         $variant = $product->getVariants()[0];
-        $variant->updatePrice(VariantUnitPrice::zero(), VariantSalePrice::zero());
+        $variant->updatePrice(VariantUnitPrice::fromScalars('150', '20', true), VariantSalePrice::fromScalars('120', '20', true));
 
         $product->updateVariant($variant);
 
-        $this->assertEquals('0', $product->getChildEntities()[Variant::class][0]['unit_price']);
-        $this->assertEquals('0', $product->getChildEntities()[Variant::class][0]['sale_price']);
+        $this->assertEquals('150', $product->getChildEntities()[Variant::class][0]['unit_price']);
+        $this->assertEquals('120', $product->getChildEntities()[Variant::class][0]['sale_price']);
     }
 
     public function test_it_records_event_when_variant_is_updated()

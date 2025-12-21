@@ -99,14 +99,16 @@ final class Variant implements ChildAggregate
 
     public function getMappedData(): array
     {
+        $includeVat = $this->unitPrice->hasOriginalIncludingVat();
+
         return [
             'product_id' => $this->productId->get(),
             'variant_id' => $this->variantId->get(),
             'state' => $this->state->value,
-            'unit_price' => $this->unitPrice->getMoney()->getAmount(),
-            'sale_price' => $this->salePrice->getMoney()->getAmount(),
+            'unit_price' => $includeVat ? $this->unitPrice->getIncludingVat()->getAmount() : $this->unitPrice->getExcludingVat()->getAmount(),
+            'sale_price' => $includeVat ? $this->salePrice->getIncludingVat()->getAmount() : $this->salePrice->getExcludingVat()->getAmount(),
             'tax_rate' => $this->unitPrice->getVatPercentage()->get(),
-            'includes_vat' => $this->unitPrice->includesVat(),
+            'includes_vat' => $includeVat,
             'sku' => $this->sku,
             'ean' => $this->ean,
             'show_in_grid' => $this->show_in_grid,

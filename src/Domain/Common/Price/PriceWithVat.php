@@ -1,14 +1,13 @@
 <?php
+declare(strict_types=1);
 
 namespace Thinktomorrow\Trader\Domain\Common\Price;
 
 use Money\Money;
 
-interface ConvertsToMoney
+interface PriceWithVat extends Price
 {
-    public function getMoney(): Money;
-
     public function getIncludingVat(): Money;
 
-    public function getExcludingVat(): Money;
+    public function getVatTotal(): Money;
 }
