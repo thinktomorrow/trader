@@ -6,13 +6,12 @@ namespace Tests\Unit\Model\Order;
 use Money\Money;
 use Tests\Unit\TestCase;
 use Thinktomorrow\Trader\Domain\Common\Cash\Percentage;
-use Thinktomorrow\Trader\Domain\Common\Price\DefaultItemDiscount;
+use Thinktomorrow\Trader\Domain\Common\Price\DefaultDiscountPrice;
 use Thinktomorrow\Trader\Domain\Common\Price\DefaultTotalPrice;
 use Thinktomorrow\Trader\Domain\Model\Order\Discount\Discount;
 use Thinktomorrow\Trader\Domain\Model\Order\Discount\DiscountableId;
 use Thinktomorrow\Trader\Domain\Model\Order\Discount\DiscountableType;
 use Thinktomorrow\Trader\Domain\Model\Order\Discount\DiscountId;
-use Thinktomorrow\Trader\Domain\Model\Order\Discount\DiscountPriceDefaults;
 use Thinktomorrow\Trader\Domain\Model\Order\OrderId;
 use Thinktomorrow\Trader\Domain\Model\Promo\PromoId;
 
@@ -27,7 +26,7 @@ class OrderDiscountTest extends TestCase
             $discountableId = DiscountableId::fromString('ccc'),
             $promoId = PromoId::fromString('ddd'),
             $promoDiscountId = \Thinktomorrow\Trader\Domain\Model\Promo\DiscountId::fromString('eee'),
-            $discountTotal = DefaultItemDiscount::fromScalars('50', DiscountPriceDefaults::getDiscountTaxRate()->get(), DiscountPriceDefaults::getDiscountIncludeTax()),
+            $discountTotal = DefaultDiscountPrice::fromExcludingVat(Money::EUR(50)),
             ['foo' => 'bar']
         );
 
