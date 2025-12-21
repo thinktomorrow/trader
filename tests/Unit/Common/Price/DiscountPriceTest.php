@@ -90,4 +90,3 @@ final class DiscountPriceTest extends TestCase
         $this->assertEquals(Money::EUR(1_000_000), $discount->getExcludingVat());
     }
 }
-

@@ -73,4 +73,3 @@ final class ServicePriceTest extends TestCase
         $this->assertEquals(Money::EUR(1_000_000), $price->getExcludingVat());
     }
 }
-

@@ -53,7 +53,7 @@ trait PriceTotalValue
 
     public function getExcludingVat(): Money
     {
-        if (!$this->includesVat) {
+        if (! $this->includesVat) {
             return $this->money;
         }
 
