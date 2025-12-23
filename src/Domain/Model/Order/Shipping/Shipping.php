@@ -3,11 +3,11 @@ declare(strict_types=1);
 
 namespace Thinktomorrow\Trader\Domain\Model\Order\Shipping;
 
+use Money\Money;
 use Thinktomorrow\Trader\Domain\Common\Entity\ChildAggregate;
 use Thinktomorrow\Trader\Domain\Common\Entity\HasData;
 use Thinktomorrow\Trader\Domain\Common\Price\DefaultServicePrice;
 use Thinktomorrow\Trader\Domain\Common\Price\DiscountPrice;
-use Thinktomorrow\Trader\Domain\Common\Price\ExtractPriceExcludingVat;
 use Thinktomorrow\Trader\Domain\Common\Price\ServicePrice;
 use Thinktomorrow\Trader\Domain\Model\Order\Discount\Discount;
 use Thinktomorrow\Trader\Domain\Model\Order\Discount\DiscountableId;
@@ -93,18 +93,13 @@ final class Shipping implements ChildAggregate, DiscountableItem
             // Always store excluding vat cost, vat is calculated based on the products in the order.
             'cost' => $this->shippingCost->getExcludingVat()->getAmount(),
             'data' => json_encode($data),
-
-            // Shipping is a service and has no vat by itself
-            // Both these fields are no longer used but are kept for backward compatibility
-            'tax_rate' => 0,
-            'includes_vat' => false,
         ];
     }
 
     public function getChildEntities(): array
     {
         return [
-            Discount::class => array_map(fn ($discount) => $discount->getMappedData(), $this->discounts),
+            Discount::class => array_map(fn($discount) => $discount->getMappedData(), $this->discounts),
         ];
     }
 
@@ -112,18 +107,16 @@ final class Shipping implements ChildAggregate, DiscountableItem
     {
         $shipping = new static();
 
-        if (! $state['shipping_state'] instanceof ShippingState) {
+        if (!$state['shipping_state'] instanceof ShippingState) {
             throw new \InvalidArgumentException('Shipping state is expected to be instance of ShippingState. Instead ' . gettype($state['shipping_state']) . ' is passed.');
         }
-
-        $costExcludingVat = ExtractPriceExcludingVat::extract($state, 'cost');
 
         $shipping->orderId = OrderId::fromString($aggregateState['order_id']);
         $shipping->shippingId = ShippingId::fromString($state['shipping_id']);
         $shipping->shippingProfileId = $state['shipping_profile_id'] ? ShippingProfileId::fromString($state['shipping_profile_id']) : null;
         $shipping->shippingState = $state['shipping_state'];
-        $shipping->shippingCost = DefaultServicePrice::fromExcludingVat($costExcludingVat);
-        $shipping->discounts = array_map(fn ($discountState) => Discount::fromMappedData($discountState, $state), $childEntities[Discount::class]);
+        $shipping->shippingCost = DefaultServicePrice::fromExcludingVat(Money::EUR($state['cost']));
+        $shipping->discounts = array_map(fn($discountState) => Discount::fromMappedData($discountState, $state), $childEntities[Discount::class]);
         $shipping->data = json_decode($state['data'], true);
 
         return $shipping;

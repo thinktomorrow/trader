@@ -3,11 +3,11 @@ declare(strict_types=1);
 
 namespace Thinktomorrow\Trader\Domain\Model\Order\Payment;
 
+use Money\Money;
 use Thinktomorrow\Trader\Domain\Common\Entity\ChildAggregate;
 use Thinktomorrow\Trader\Domain\Common\Entity\HasData;
 use Thinktomorrow\Trader\Domain\Common\Price\DefaultServicePrice;
 use Thinktomorrow\Trader\Domain\Common\Price\DiscountPrice;
-use Thinktomorrow\Trader\Domain\Common\Price\ExtractPriceExcludingVat;
 use Thinktomorrow\Trader\Domain\Common\Price\ServicePrice;
 use Thinktomorrow\Trader\Domain\Model\Order\Discount\Discount;
 use Thinktomorrow\Trader\Domain\Model\Order\Discount\DiscountableId;
@@ -97,18 +97,13 @@ class Payment implements ChildAggregate, DiscountableItem
             'payment_state' => $this->paymentState->getValueAsString(),
             'cost' => $this->paymentCost->getExcludingVat()->getAmount(),
             'data' => json_encode($data),
-
-            // Payment is a service and has no vat by itself
-            // Both these fields are no longer used but are kept for backward compatibility
-            'tax_rate' => 0,
-            'includes_vat' => false,
         ];
     }
 
     public function getChildEntities(): array
     {
         return [
-            Discount::class => array_map(fn ($discount) => $discount->getMappedData(), $this->discounts),
+            Discount::class => array_map(fn($discount) => $discount->getMappedData(), $this->discounts),
         ];
     }
 
@@ -116,18 +111,16 @@ class Payment implements ChildAggregate, DiscountableItem
     {
         $payment = new static();
 
-        if (! $state['payment_state'] instanceof PaymentState) {
+        if (!$state['payment_state'] instanceof PaymentState) {
             throw new \InvalidArgumentException('Payment state is expected to be instance of PaymentState. Instead ' . gettype($state['payment_state']) . ' is passed.');
         }
-
-        $costExcludingVat = ExtractPriceExcludingVat::extract($state, 'cost');
 
         $payment->orderId = OrderId::fromString($aggregateState['order_id']);
         $payment->paymentId = PaymentId::fromString($state['payment_id']);
         $payment->paymentMethodId = $state['payment_method_id'] ? PaymentMethodId::fromString($state['payment_method_id']) : null;
         $payment->paymentState = $state['payment_state'];
-        $payment->paymentCost = DefaultServicePrice::fromExcludingVat($costExcludingVat);
-        $payment->discounts = array_map(fn ($discountState) => Discount::fromMappedData($discountState, $state), $childEntities[Discount::class]);
+        $payment->paymentCost = DefaultServicePrice::fromExcludingVat(Money::EUR($state['cost']));
+        $payment->discounts = array_map(fn($discountState) => Discount::fromMappedData($discountState, $state), $childEntities[Discount::class]);
         $payment->data = json_decode($state['data'], true);
 
         return $payment;
