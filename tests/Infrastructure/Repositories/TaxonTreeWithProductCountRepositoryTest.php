@@ -29,7 +29,7 @@ final class TaxonTreeWithProductCountRepositoryTest extends TestCase
 
     public function test_it_can_get_total_of_products()
     {
-        $product = $this->createProductWithVariant();
+        $product = $this->catalogContext->createProduct();
 
         foreach ($this->repositories() as $i => $repository) {
 
@@ -59,7 +59,7 @@ final class TaxonTreeWithProductCountRepositoryTest extends TestCase
 
     public function test_it_can_get_count_of_products()
     {
-        $product = $this->createProductWithVariant();
+        $product = $this->catalogContext->createProduct();
 
         foreach ($this->repositories() as $i => $repository) {
 

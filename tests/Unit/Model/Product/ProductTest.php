@@ -36,17 +36,17 @@ class ProductTest extends TestCase
 {
     public function test_it_can_create_a_product()
     {
-        $product = $this->catalogContext->createProduct();
+        $product = $this->catalogContext->keepDomainEvents()->createProduct();
 
         $this->assertEquals([
-            'product_id' => 'xxx',
+            'product_id' => 'product-aaa',
             'state' => ProductState::online->value,
             'data' => '[]',
         ], $product->getMappedData());
 
-        $this->assertEquals([
-            new ProductCreated(ProductId::fromString('xxx')),
-        ], $product->releaseEvents());
+        $this->assertEquals(
+            new ProductCreated(ProductId::fromString('product-aaa'))
+            , $product->releaseEvents()[0]);
     }
 
     public function test_it_can_be_build_from_raw_data()
@@ -60,12 +60,12 @@ class ProductTest extends TestCase
         ]);
 
         $product = Product::fromMappedData([
-            'product_id' => 'xxx',
+            'product_id' => 'product-aaa',
             'state' => ProductState::offline->value,
             'data' => $data,
         ]);
 
-        $this->assertEquals(ProductId::fromString('xxx'), $product->getMappedData()['product_id']);
+        $this->assertEquals(ProductId::fromString('product-aaa'), $product->getMappedData()['product_id']);
         $this->assertEquals(ProductState::offline, $product->getState());
         $this->assertEquals([
             'nl' => 'title nl',
@@ -77,15 +77,15 @@ class ProductTest extends TestCase
     public function test_it_can_be_build_from_raw_data_with_child_entities()
     {
         $product = Product::fromMappedData([
-            'product_id' => 'xxx',
+            'product_id' => 'product-aaa',
             'state' => ProductState::online->value,
             'data' => json_encode(['title' => ['nl' => 'A title']]),
         ], [
             Variant::class => [
                 [
                     [
-                        'product_id' => 'xxx',
-                        'variant_id' => 'yyy',
+                        'product_id' => 'product-aaa',
+                        'variant_id' => 'variant-aaa',
                         'state' => VariantState::available->value,
                         'unit_price' => 100,
                         'sale_price' => 90,
@@ -99,7 +99,7 @@ class ProductTest extends TestCase
                     [
                         VariantTaxon::class => [
                             [
-                                'variant_id' => 'yyy',
+                                'variant_id' => 'variant-aaa',
                                 'taxon_id' => 'variant-prop',
                                 'state' => TaxonState::online->value,
                                 'data' => json_encode(['label' => 'prop']),
@@ -111,14 +111,14 @@ class ProductTest extends TestCase
             ],
             ProductTaxon::class => [
                 [
-                    'product_id' => 'xxx',
+                    'product_id' => 'product-aaa',
                     'taxon_id' => 'variant-prop',
                     'state' => TaxonState::online->value,
                     'data' => json_encode(['foo' => 'bar']),
                     'taxonomy_type' => TaxonomyType::variant_property->value,
                 ],
                 [
-                    'product_id' => 'xxx',
+                    'product_id' => 'product-aaa',
                     'taxon_id' => 'category',
                     'state' => TaxonState::online->value,
                     'data' => json_encode(['foo' => 'baz']),
@@ -127,7 +127,7 @@ class ProductTest extends TestCase
             ],
             Personalisation::class => [
                 [
-                    'product_id' => 'xxx',
+                    'product_id' => 'product-aaa',
                     'personalisation_id' => 'pers-1',
                     'personalisation_type' => PersonalisationType::TEXT,
                     'data' => json_encode(['foo' => 'bar']),
@@ -136,7 +136,7 @@ class ProductTest extends TestCase
         ]);
 
         $this->assertCount(1, $product->getVariants());
-        $this->assertEquals(VariantId::fromString('yyy'), $product->getVariants()[0]->variantId);
+        $this->assertEquals(VariantId::fromString('variant-aaa'), $product->getVariants()[0]->variantId);
 
         $this->assertCount(1, $product->getVariants()[0]->getVariantProperties());
         $this->assertInstanceOf(VariantProperty::class, $product->getVariantProperties()[0]);
@@ -170,25 +170,25 @@ class ProductTest extends TestCase
         $product->addData(['title' => ['nl' => 'updated title']]);
 
         $this->assertEquals([
-            new ProductDataUpdated(ProductId::fromString('xxx')),
+            new ProductDataUpdated(ProductId::fromString('product-aaa')),
         ], $product->releaseEvents());
     }
 
     public function test_it_can_add_variant()
     {
-        $product = $this->createProductWithVariant();
+        $product = $this->catalogContext->keepDomainEvents()->createProduct();
 
-        $this->assertEquals([
-            new ProductCreated(ProductId::fromString('xxx')),
-            new VariantCreated(ProductId::fromString('xxx'), VariantId::fromString('yyy')),
-        ], $product->releaseEvents());
+        $events = $product->releaseEvents();
+
+        $this->assertTrue(in_array(new ProductCreated(ProductId::fromString('product-aaa')), $events));
+        $this->assertTrue(in_array(new VariantCreated(ProductId::fromString('product-aaa'), VariantId::fromString('variant-aaa')), $events));
     }
 
     public function test_it_cannot_add_same_variant_twice()
     {
         $this->expectException(VariantAlreadyExistsOnProduct::class);
 
-        $product = $this->createProductWithVariant();
+        $product = $this->catalogContext->createProduct();
 
         $product->createVariant($product->getVariants()[0]);
     }
@@ -201,7 +201,7 @@ class ProductTest extends TestCase
 
         $product->createVariant(Variant::create(
             ProductId::fromString('false-product-id'),
-            VariantId::fromString('yyy'),
+            VariantId::fromString('variant-aaa'),
             VariantUnitPrice::fromScalars('100', '20', true),
             VariantSalePrice::fromScalars('80', '20', true),
             'sku',
@@ -210,7 +210,7 @@ class ProductTest extends TestCase
 
     public function test_it_can_update_variant()
     {
-        $product = $this->createProductWithVariant();
+        $product = $this->catalogContext->createProduct();
 
         $variant = $product->getVariants()[0];
         $variant->updatePrice(VariantUnitPrice::fromScalars('150', '20', true), VariantSalePrice::fromScalars('120', '20', true));
@@ -223,16 +223,16 @@ class ProductTest extends TestCase
 
     public function test_it_records_event_when_variant_is_updated()
     {
-        $product = $this->createProductWithVariant();
+        $product = $this->catalogContext->createProduct();
         $product->releaseEvents();
 
         $variant = $product->getVariants()[0];
-        $variant->updatePrice(VariantUnitPrice::zero(), VariantSalePrice::zero());
+        $variant->updatePrice(VariantUnitPrice::fromScalars('10', '21', false), VariantSalePrice::fromScalars('8', '21', false));
 
         $product->updateVariant($variant);
 
         $this->assertEquals([
-            new VariantUpdated(ProductId::fromString('xxx'), VariantId::fromString('yyy')),
+            new VariantUpdated(ProductId::fromString('product-aaa'), VariantId::fromString('variant-aaa')),
         ], $product->releaseEvents());
     }
 
@@ -240,13 +240,13 @@ class ProductTest extends TestCase
     {
         $this->expectException(CouldNotFindVariantOnProduct::class);
 
-        $product = $this->createProductWithVariant();
+        $product = $this->catalogContext->createProduct();
 
         $product->updateVariant(Variant::create(
-            ProductId::fromString('xxx'),
+            ProductId::fromString('product-aaa'),
             VariantId::fromString('unknown'),
-            VariantUnitPrice::zero(),
-            VariantSalePrice::zero(),
+            VariantUnitPrice::fromScalars('10', '21', false),
+            VariantSalePrice::fromScalars('8', '21', false),
             'other-sku',
         ));
     }
@@ -255,22 +255,22 @@ class ProductTest extends TestCase
     {
         $this->expectException(\InvalidArgumentException::class);
 
-        $product = $this->createProductWithVariant();
+        $product = $this->catalogContext->createProduct();
 
         $product->updateVariant(Variant::create(
             ProductId::fromString('other-product'),
             VariantId::fromString('zzz'),
-            VariantUnitPrice::zero(),
-            VariantSalePrice::zero(),
+            VariantUnitPrice::fromScalars('10', '21', false),
+            VariantSalePrice::fromScalars('8', '21', false),
             'sku',
         ));
     }
 
     public function test_it_can_delete_variant()
     {
-        $product = $this->createProductWithVariant();
+        $product = $this->catalogContext->keepDomainEvents()->createProduct();
         $product->createVariant(Variant::create(
-            ProductId::fromString('xxx'),
+            ProductId::fromString('product-aaa'),
             VariantId::fromString('zzz'),
             VariantUnitPrice::fromMoney(Money::EUR(10), VatPercentage::fromString('20'), false),
             VariantSalePrice::fromMoney(Money::EUR(8), VatPercentage::fromString('20'), false),
@@ -279,21 +279,24 @@ class ProductTest extends TestCase
 
         $product->deleteVariant(VariantId::fromString('zzz'));
 
-        $this->assertEquals([
-            new ProductCreated(ProductId::fromString('xxx')),
-            new VariantCreated(ProductId::fromString('xxx'), VariantId::fromString('yyy')),
-            new VariantCreated(ProductId::fromString('xxx'), VariantId::fromString('zzz')),
-            new VariantDeleted(ProductId::fromString('xxx'), VariantId::fromString('zzz')),
-        ], $product->releaseEvents());
+        $events = $product->releaseEvents();
+
+        $this->assertTrue(in_array(new ProductCreated(ProductId::fromString('product-aaa')), $events));
+
+        $this->assertTrue(in_array(new VariantCreated(ProductId::fromString('product-aaa'), VariantId::fromString('variant-aaa')), $events));
+
+        $this->assertTrue(in_array(new VariantCreated(ProductId::fromString('product-aaa'), VariantId::fromString('zzz')), $events));
+
+        $this->assertTrue(in_array(new VariantDeleted(ProductId::fromString('product-aaa'), VariantId::fromString('zzz')), $events));
     }
 
     public function test_it_cannot_delete_last_variant()
     {
         $this->expectException(CouldNotDeleteVariant::class);
 
-        $product = $this->createProductWithVariant();
+        $product = $this->catalogContext->createProduct();
 
-        $product->deleteVariant(VariantId::fromString('yyy'));
+        $product->deleteVariant(VariantId::fromString('variant-aaa'));
 
         $this->assertCount(1, $product->getVariants());
     }

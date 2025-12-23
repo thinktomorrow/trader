@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\Unit\Common\Vat;
+namespace Acceptance\VatRate;
 
 use Money\Money;
 use PHPUnit\Framework\Attributes\DataProvider;

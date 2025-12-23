@@ -22,7 +22,7 @@ class StockItemRepositoryTest extends TestCase
     public function test_it_can_find_and_save_a_stock_item(StockItem $stockItem)
     {
         foreach ($this->repositories() as $i => $repository) {
-            $product = $this->createProductWithVariant();
+            $product = $this->catalogContext->createProduct();
             iterator_to_array($this->productRepositories())[$i]->save($product);
 
             $repository->saveStockItem($stockItem);

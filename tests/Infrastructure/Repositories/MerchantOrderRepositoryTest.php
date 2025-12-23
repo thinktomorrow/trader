@@ -35,7 +35,7 @@ class MerchantOrderRepositoryTest extends TestCase
             $merchantOrderRepository = iterator_to_array($this->merchantOrderRepositories())[$i];
 
             // Make sure we have a purchasable variant
-            $product = $this->createProductWithVariant();
+            $product = $this->catalogContext->createProduct();
             $productRepository->save($product);
 
             $merchantOrder = $merchantOrderRepository->findMerchantOrder($order->orderId);

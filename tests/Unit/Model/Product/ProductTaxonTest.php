@@ -4,7 +4,6 @@ declare(strict_types=1);
 namespace Tests\Unit\Model\Product;
 
 use Tests\Unit\TestCase;
-use Thinktomorrow\Trader\Domain\Model\Product\Events\ProductCreated;
 use Thinktomorrow\Trader\Domain\Model\Product\Events\ProductTaxaUpdated;
 use Thinktomorrow\Trader\Domain\Model\Product\ProductId;
 use Thinktomorrow\Trader\Domain\Model\Product\ProductTaxa\ProductTaxon;
@@ -16,14 +15,12 @@ class ProductTaxonTest extends TestCase
     public function test_it_can_update_product_taxa(): void
     {
         $product = $this->catalogContext->createProduct();
+        $productTaxon = ProductTaxon::create($product->productId, TaxonId::fromString('ppp'));
 
-        $product->updateProductTaxa([
-            $productTaxon = ProductTaxon::create($product->productId, TaxonId::fromString('ppp')),
-        ]);
+        $product->updateProductTaxa([$productTaxon]);
 
         $this->assertEquals([
-            new ProductCreated(ProductId::fromString('xxx')),
-            new ProductTaxaUpdated(ProductId::fromString('xxx')),
+            new ProductTaxaUpdated(ProductId::fromString('product-aaa')),
         ], $product->releaseEvents());
 
         $this->assertEquals([$productTaxon->getMappedData()], $product->getChildEntities()[ProductTaxon::class]);

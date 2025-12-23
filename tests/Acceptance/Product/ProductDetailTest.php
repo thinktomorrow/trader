@@ -58,7 +58,7 @@ class ProductDetailTest extends ProductContext
 
     public function test_it_can_get_sku_and_ean()
     {
-        $product = $this->createProductWithVariant();
+        $product = $this->catalogContext->createProduct();
         $this->productRepository->save($product);
 
         $variantId = $product->getVariants()[0]->variantId;
@@ -132,7 +132,7 @@ class ProductDetailTest extends ProductContext
 
     public function test_it_can_get_stockable_info()
     {
-        $product = $this->createProductWithVariant();
+        $product = $this->catalogContext->createProduct();
         $this->productRepository->save($product);
 
         $stockable = $this->productDetailRepository->findProductDetail($product->getVariants()[0]->variantId);
