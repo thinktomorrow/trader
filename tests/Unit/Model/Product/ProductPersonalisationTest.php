@@ -54,33 +54,26 @@ class ProductPersonalisationTest extends TestCase
 
     public function test_it_can_rearrange_personalisations()
     {
-        $product = $this->createProductWithPersonalisations();
+        $product = $this->catalogContext->createProduct();
+        $personalisation = $this->catalogContext->makePersonalisation();
+        $personalisation2 = $this->catalogContext->makePersonalisation('product-aaa', 'personalisation-bbb');
+        $this->catalogContext->addPersonalisationToProduct($product, $personalisation);
+        $this->catalogContext->addPersonalisationToProduct($product, $personalisation2);
 
         // Switch order
-        $product->updatePersonalisations([
-            Personalisation::create($product->productId, PersonalisationId::fromString('ppp'), PersonalisationType::fromString(PersonalisationType::IMAGE), []),
-            Personalisation::create($product->productId, PersonalisationId::fromString('ooo'), PersonalisationType::fromString(PersonalisationType::TEXT), []),
-        ]);
+        $product->updatePersonalisations([$personalisation2, $personalisation]);
 
         $this->assertEquals([
-            [
-                'product_id' => $product->productId->get(),
-                'personalisation_id' => 'ppp',
-                'personalisation_type' => PersonalisationType::IMAGE,
-                'data' => json_encode([]),
-            ],
-            [
-                'product_id' => $product->productId->get(),
-                'personalisation_id' => 'ooo',
-                'personalisation_type' => PersonalisationType::TEXT,
-                'data' => json_encode([]),
-            ],
+            $personalisation2->getMappedData(),
+            $personalisation->getMappedData(),
         ], $product->getChildEntities()[Personalisation::class]);
     }
 
     public function test_it_can_get_all_personalisations()
     {
-        $product = $this->createProductWithPersonalisations();
+        $product = $this->catalogContext->createProduct();
+        $personalisation = $this->catalogContext->makePersonalisation();
+        $this->catalogContext->addPersonalisationToProduct($product, $personalisation);
 
         $this->assertCount(1, $product->getPersonalisations());
     }
