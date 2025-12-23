@@ -5,7 +5,7 @@ namespace Tests\Unit\Common\Vat;
 use Money\Money;
 use PHPUnit\Framework\Attributes\DataProvider;
 use Tests\Unit\TestCase;
-use Thinktomorrow\Trader\Domain\Common\Vat\ProRateAllocator;
+use Thinktomorrow\Trader\Application\VatRate\Allocator\ProRateAllocator;
 
 final class ProRateAllocatorTest extends TestCase
 {

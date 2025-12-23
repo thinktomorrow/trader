@@ -27,7 +27,7 @@ class OrderGridRepositoryTest extends TestCase
         parent::setUp();
 
         $this->prepareWorldForOrder(1);
-        $this->order = $this->createDefaultOrder();
+        $this->order = $this->orderContext->createDefaultOrder();
         (new TestContainer())->get(MysqlOrderRepository::class)->save($this->order);
     }
 

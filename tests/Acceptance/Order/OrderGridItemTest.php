@@ -15,7 +15,7 @@ class OrderGridItemTest extends TestCase
 
     public function test_it_can_create_a_order_grid_item()
     {
-        $gridItem = DefaultOrderGridItem::fromMappedData(array_merge($this->createDefaultOrder()->getMappedData(), [
+        $gridItem = DefaultOrderGridItem::fromMappedData(array_merge($this->orderContext->createDefaultOrder()->getMappedData(), [
         ]), []);
 
         $this->assertEquals('xxx', $gridItem->getOrderId());
@@ -31,7 +31,7 @@ class OrderGridItemTest extends TestCase
 
     public function test_it_can_get_important_timestamps()
     {
-        $gridItem = DefaultOrderGridItem::fromMappedData(array_merge($this->createDefaultOrder()->getMappedData(), [
+        $gridItem = DefaultOrderGridItem::fromMappedData(array_merge($this->orderContext->createDefaultOrder()->getMappedData(), [
             'confirmed_at' => $confirmed_at = '2022-02-02 10:10:10',
             'paid_at' => $paid_at = '2022-02-03 10:10:10',
             'delivered_at' => $delivered_at = '2022-02-04 10:10:10',
@@ -44,7 +44,7 @@ class OrderGridItemTest extends TestCase
 
     public function test_it_can_get_shopper_details()
     {
-        $gridItem = DefaultOrderGridItem::fromMappedData(array_merge($this->createDefaultOrder()->getMappedData(), [
+        $gridItem = DefaultOrderGridItem::fromMappedData(array_merge($this->orderContext->createDefaultOrder()->getMappedData(), [
         ]), [
             'email' => 'ben@thinktomorrow.be',
             'is_business' => true,

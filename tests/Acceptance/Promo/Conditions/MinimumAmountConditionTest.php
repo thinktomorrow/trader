@@ -34,7 +34,7 @@ class MinimumAmountConditionTest extends PromoContext
 
     public function test_it_can_check_condition()
     {
-        $order = $this->createDefaultOrder();
+        $order = $this->orderContext->createDefaultOrder();
 
         $condition = $this->factory->make('minimum_amount', [
             'data' => json_encode(['amount' => '50']),

@@ -24,7 +24,7 @@ class MerchantOrderRepositoryTest extends TestCase
 
     public function test_it_can_find_a_merchantorder()
     {
-        $order = $this->createDefaultOrder();
+        $order = $this->orderContext->createDefaultOrder();
 
         foreach ($this->orderRepositories() as $i => $orderRepository) {
             $this->prepareWorldForOrder($i);
@@ -51,7 +51,7 @@ class MerchantOrderRepositoryTest extends TestCase
 
     public function test_it_can_find_a_merchantorder_by_reference()
     {
-        $order = $this->createDefaultOrder();
+        $order = $this->orderContext->createDefaultOrder();
 
         foreach ($this->orderRepositories() as $i => $orderRepository) {
             $this->prepareWorldForOrder($i);
@@ -66,7 +66,7 @@ class MerchantOrderRepositoryTest extends TestCase
 
     public function test_it_can_find_merchant_order_without_variant_when_variant_is_no_longer_present()
     {
-        $order = $this->createDefaultOrder();
+        $order = $this->orderContext->createDefaultOrder();
 
         foreach ($this->orderRepositories() as $i => $orderRepository) {
             $this->prepareWorldForOrder($i);

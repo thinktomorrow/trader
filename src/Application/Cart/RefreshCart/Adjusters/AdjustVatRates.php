@@ -9,7 +9,7 @@ use Thinktomorrow\Trader\Domain\Model\Order\Line\Line;
 use Thinktomorrow\Trader\Domain\Model\Order\Order;
 use Thinktomorrow\Trader\Domain\Model\Product\Variant\VariantId;
 
-class AdjustTaxRates implements Adjuster
+class AdjustVatRates implements Adjuster
 {
     private VariantForCartRepository $variantForCartRepository;
     private FindVatRateForOrder $findVatRateForOrder;

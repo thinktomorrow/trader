@@ -91,14 +91,14 @@ final class OrderRepositoryTest extends TestCase
 
     public function orders(): \Generator
     {
-        yield $this->createDefaultOrder();
+        yield $this->orderContext->createDefaultOrder();
 
-        $orderWithDiscount = $this->createDefaultOrder();
+        $orderWithDiscount = $this->orderContext->createDefaultOrder();
         $orderWithDiscount->addDiscount($this->createOrderDiscount(['discount_id' => 'order-discount-def', 'promo_discount_id' => 'eee'], $orderWithDiscount->getMappedData()));
 
         yield $orderWithDiscount;
 
-        $orderWithLineDiscount = $this->createDefaultOrder();
+        $orderWithLineDiscount = $this->orderContext->createDefaultOrder();
         $orderWithLineDiscount->getLines()[0]->addDiscount($this->createOrderDiscount([
             'discount_id' => 'order-discount-def',
             'promo_discount_id' => 'eee',
@@ -107,7 +107,7 @@ final class OrderRepositoryTest extends TestCase
         ], $orderWithLineDiscount->getMappedData()));
         yield $orderWithLineDiscount;
         //
-        $orderWithShippingDiscount = $this->createDefaultOrder();
+        $orderWithShippingDiscount = $this->orderContext->createDefaultOrder();
         $orderWithShippingDiscount->getShippings()[0]->addDiscount($this->createOrderDiscount([
             'discount_id' => 'order-discount-def',
             'promo_discount_id' => 'eee',
@@ -122,7 +122,7 @@ final class OrderRepositoryTest extends TestCase
             DefaultOrderState::confirmed
         );
 
-        $orderWithLogEntries = $this->createDefaultOrder();
+        $orderWithLogEntries = $this->orderContext->createDefaultOrder();
         $orderWithLogEntries->addLogEntry(OrderEvent::create(OrderEventId::fromString('def'), 'yyy', new \DateTime('2022-03-01 19:19:00'), ['foo' => 'baz']));
         yield $orderWithLogEntries;
     }

@@ -3,9 +3,12 @@ declare(strict_types=1);
 
 namespace Thinktomorrow\Trader\Domain\Model\Order;
 
+use Money\Money;
 use Thinktomorrow\Trader\Domain\Common\Entity\Aggregate;
 use Thinktomorrow\Trader\Domain\Common\Entity\HasData;
 use Thinktomorrow\Trader\Domain\Common\Event\RecordsEvents;
+use Thinktomorrow\Trader\Domain\Common\Vat\VatAllocatedLine;
+use Thinktomorrow\Trader\Domain\Common\Vat\VatPercentage;
 use Thinktomorrow\Trader\Domain\Model\Order\Address\BillingAddress;
 use Thinktomorrow\Trader\Domain\Model\Order\Address\ShippingAddress;
 use Thinktomorrow\Trader\Domain\Model\Order\Discount\Discount;
@@ -268,41 +271,44 @@ final class Order implements Aggregate, DiscountableItem
 
     public function getMappedData(): array
     {
-        $includesVat = true;
-        $total = $this->getTotal();
-
-        // TODO: get from totals
-
-        // Total including
-        // Total excluding
-        // Total service costs incl/excl
-        // Total discount incl/excl
-        // Total tax
-        // Subtotal incl/excl
-
-        // -> relation to vat pro rate lines
-
         return [
             'order_id' => $this->orderId->get(),
             'order_ref' => $this->orderReference->get(),
             'invoice_ref' => $this->invoiceReference?->get(),
             'order_state' => $this->orderState->getValueAsString(),
 
-            'total' => $total->getIncludingVat()->getAmount(),
-            'tax_total' => $this->getTaxTotal()->getAmount(),
-            'includes_vat' => $includesVat,
-            'subtotal' => $includesVat
-                ? $this->getSubTotal()->getIncludingVat()->getAmount()
-                : $this->getSubTotal()->getExcludingVat()->getAmount(),
-            'discount_total' => $includesVat
-                ? $this->getTotalDiscountPrice()->getIncludingVat()->getAmount()
-                : $this->getTotalDiscountPrice()->getExcludingVat()->getAmount(),
-            'shipping_cost' => $includesVat
-                ? $this->getShippingCost()->getIncludingVat()->getAmount()
-                : $this->getShippingCost()->getExcludingVat()->getAmount(),
-            'payment_cost' => $includesVat
-                ? $this->getPaymentCost()->getIncludingVat()->getAmount()
-                : $this->getPaymentCost()->getExcludingVat()->getAmount(),
+            'total_excl' => $this->totalExcl->getAmount(),
+            'total_incl' => $this->totalIncl->getAmount(),
+            'total_vat' => $this->totalVat->getAmount(),
+            'vat_lines' => json_encode(array_map(fn(VatAllocatedLine $vatLine) => [
+                'taxable_base' => $vatLine->getTaxableBase()->getAmount(),
+                'vat_amount' => $vatLine->getVatAmount()->getAmount(),
+                'vat_percentage' => $vatLine->getVatPercentage()->get(),
+            ], $this->vatLines)),
+            'subtotal_excl' => $this->subtotalExcl->getAmount(),
+            'subtotal_incl' => $this->subtotalIncl->getAmount(),
+            'discount_total_excl' => $this->discountExcl->getAmount(),
+            'discount_total_incl' => $this->discountIncl->getAmount(),
+            'shipping_cost_excl' => $this->shippingExcl->getAmount(),
+            'shipping_cost_incl' => $this->shippingIncl->getAmount(),
+            'payment_cost_excl' => $this->paymentExcl->getAmount(),
+            'payment_cost_incl' => $this->paymentIncl->getAmount(),
+
+//            'total' => $total->getIncludingVat()->getAmount(),
+//            'tax_total' => $this->getTaxTotal()->getAmount(),
+//            'includes_vat' => $includesVat,
+//            'subtotal' => $includesVat
+//                ? $this->getSubTotal()->getIncludingVat()->getAmount()
+//                : $this->getSubTotal()->getExcludingVat()->getAmount(),
+//            'discount_total' => $includesVat
+//                ? $this->getTotalDiscountPrice()->getIncludingVat()->getAmount()
+//                : $this->getTotalDiscountPrice()->getExcludingVat()->getAmount(),
+//            'shipping_cost' => $includesVat
+//                ? $this->getShippingCost()->getIncludingVat()->getAmount()
+//                : $this->getShippingCost()->getExcludingVat()->getAmount(),
+//            'payment_cost' => $includesVat
+//                ? $this->getPaymentCost()->getIncludingVat()->getAmount()
+//                : $this->getPaymentCost()->getExcludingVat()->getAmount(),
 
             'data' => json_encode($this->data),
         ];
@@ -334,8 +340,26 @@ final class Order implements Aggregate, DiscountableItem
         $order->orderReference = OrderReference::fromString($state['order_ref']);
         $order->invoiceReference = $state['invoice_ref'] ? InvoiceReference::fromString($state['invoice_ref']) : null;
         $order->orderState = $state['order_state'];
-        $order->discounts = array_map(fn($discountState) => Discount::fromMappedData($discountState, $state), $childEntities[Discount::class]);
 
+        $order->totalExcl = Money::EUR($state['total_excl']);
+        $order->totalIncl = Money::EUR($state['total_incl']);
+        $order->totalVat = Money::EUR($state['total_vat']);
+        $order->subtotalExcl = Money::EUR($state['subtotal_excl']);
+        $order->subtotalIncl = Money::EUR($state['subtotal_incl']);
+        $order->discountExcl = Money::EUR($state['discount_total_excl']);
+        $order->discountIncl = Money::EUR($state['discount_total_incl']);
+        $order->shippingExcl = Money::EUR($state['shipping_cost_excl']);
+        $order->shippingIncl = Money::EUR($state['shipping_cost_incl']);
+        $order->paymentExcl = Money::EUR($state['payment_cost_excl']);
+        $order->paymentIncl = Money::EUR($state['payment_cost_incl']);
+        $order->vatLines = array_map(fn($vatLineData) => new VatAllocatedLine(
+            Money::EUR($vatLineData['taxable_base']),
+            Money::EUR($vatLineData['vat_amount']),
+            VatPercentage::fromString($vatLineData['vat_percentage']),
+        ), json_decode($state['vat_lines'], true));
+
+
+        $order->discounts = array_map(fn($discountState) => Discount::fromMappedData($discountState, $state), $childEntities[Discount::class]);
         $order->lines = array_map(fn($lineState) => Line::fromMappedData($lineState, $state, [
             Discount::class => $lineState[Discount::class],
             LinePersonalisation::class => $lineState[LinePersonalisation::class],
@@ -345,7 +369,6 @@ final class Order implements Aggregate, DiscountableItem
         $order->shippingAddress = $childEntities[ShippingAddress::class] ? ShippingAddress::fromMappedData($childEntities[ShippingAddress::class], $state) : null;
         $order->billingAddress = $childEntities[BillingAddress::class] ? BillingAddress::fromMappedData($childEntities[BillingAddress::class], $state) : null;
         $order->shopper = $childEntities[Shopper::class] ? Shopper::fromMappedData($childEntities[Shopper::class], $state) : null;
-
         $order->data = json_decode($state['data'], true);
         $order->orderEvents = array_map(fn($orderEventState) => OrderEvent::fromMappedData($orderEventState, $state), $childEntities[OrderEvent::class]);
 

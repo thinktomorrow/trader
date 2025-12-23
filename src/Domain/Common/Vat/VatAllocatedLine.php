@@ -16,13 +16,13 @@ final class VatAllocatedLine
 {
     private Money $taxableBase;
     private Money $vatAmount;
-    private VatPercentage $vatRate;
+    private VatPercentage $vatPercentage;
 
-    public function __construct(Money $taxableBase, Money $vatAmount, VatPercentage $vatRate)
+    public function __construct(Money $taxableBase, Money $vatAmount, VatPercentage $vatPercentage)
     {
         $this->taxableBase = $taxableBase;
         $this->vatAmount = $vatAmount;
-        $this->vatRate = $vatRate;
+        $this->vatPercentage = $vatPercentage;
     }
 
     public function getTaxableBase(): Money
@@ -35,9 +35,9 @@ final class VatAllocatedLine
         return $this->vatAmount;
     }
 
-    public function getVatRate(): VatPercentage
+    public function getVatPercentage(): VatPercentage
     {
-        return $this->vatRate;
+        return $this->vatPercentage;
     }
 
     public function getTotalIncludingVat(): Money

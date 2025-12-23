@@ -26,7 +26,7 @@ final class CartRepositoryTest extends TestCase
 
     public function test_it_can_find_a_cart()
     {
-        $order = $this->createDefaultOrder();
+        $order = $this->orderContext->createDefaultOrder();
 
         foreach ($this->orderRepositories() as $i => $orderRepository) {
             $this->prepareWorldForOrder($i);
@@ -48,7 +48,7 @@ final class CartRepositoryTest extends TestCase
 
     public function test_it_can_check_if_cart_exists()
     {
-        $order = $this->createDefaultOrder();
+        $order = $this->orderContext->createDefaultOrder();
         $order->updateState(DefaultOrderState::cart_pending);
 
         foreach ($this->orderRepositories() as $i => $orderRepository) {
@@ -64,7 +64,7 @@ final class CartRepositoryTest extends TestCase
 
     public function test_it_can_save_line_personalisations()
     {
-        $order = $this->createDefaultOrder();
+        $order = $this->orderContext->createDefaultOrder();
 
         $line = $order->getLines()[0];
         $order->updateLinePersonalisations($line->lineId, [
@@ -92,7 +92,7 @@ final class CartRepositoryTest extends TestCase
 
     public function test_it_checks_if_cart_is_in_customer_hands()
     {
-        $order = $this->createDefaultOrder();
+        $order = $this->orderContext->createDefaultOrder();
         $order->updateState(DefaultOrderState::confirmed);
 
         foreach ($this->orderRepositories() as $i => $orderRepository) {
@@ -110,7 +110,7 @@ final class CartRepositoryTest extends TestCase
     {
         $calls = 0;
 
-        $order = $this->createDefaultOrder();
+        $order = $this->orderContext->createDefaultOrder();
         $order->updateState(DefaultOrderState::confirmed);
 
         foreach ($this->orderRepositories() as $i => $orderRepository) {

@@ -20,7 +20,7 @@ use Thinktomorrow\Trader\Application\Cart\RefreshCart\Adjusters\AdjustDiscounts;
 use Thinktomorrow\Trader\Application\Cart\RefreshCart\Adjusters\AdjustLine;
 use Thinktomorrow\Trader\Application\Cart\RefreshCart\Adjusters\AdjustLines;
 use Thinktomorrow\Trader\Application\Cart\RefreshCart\Adjusters\AdjustShipping;
-use Thinktomorrow\Trader\Application\Cart\RefreshCart\Adjusters\AdjustTaxRates;
+use Thinktomorrow\Trader\Application\Cart\RefreshCart\Adjusters\AdjustVatRates;
 use Thinktomorrow\Trader\Application\Cart\RefreshCart\RefreshCartAction;
 use Thinktomorrow\Trader\Application\Cart\ShippingProfile\UpdateShippingProfileOnOrder;
 use Thinktomorrow\Trader\Application\Cart\UpdateBillingAddress;
@@ -161,7 +161,7 @@ abstract class CartContext extends TestCase
         (new TestContainer())->add(ApplyPromoToOrder::class, new ApplyPromoToOrder($this->orderRepository));
         (new TestContainer())->add(AdjustLine::class, new DefaultAdjustLine());
         (new TestContainer())->add(AdjustLines::class, new AdjustLines(new InMemoryVariantRepository(), TestContainer::make(AdjustLine::class)));
-        (new TestContainer())->add(AdjustTaxRates::class, new AdjustTaxRates($this->variantRepository, new FindVatRateForOrder(new TestTraderConfig(), new VatExemptionApplication(new TestTraderConfig()), $this->vatRateRepository)));
+        (new TestContainer())->add(AdjustVatRates::class, new AdjustVatRates($this->variantRepository, new FindVatRateForOrder(new TestTraderConfig(), new VatExemptionApplication(new TestTraderConfig()), $this->vatRateRepository)));
         (new TestContainer())->add(AdjustDiscounts::class, new AdjustDiscounts($this->promoRepository, (new TestContainer())->get(ApplyPromoToOrder::class)));
         (new TestContainer())->add(OrderStateMachine::class, new OrderStateMachine([
             ...DefaultOrderState::customerStates(), DefaultOrderState::confirmed,

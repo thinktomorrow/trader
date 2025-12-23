@@ -81,7 +81,7 @@ final class VatAllocatedTotalPrice
     public function findByRate(string $rate): ?VatAllocatedLine
     {
         foreach ($this->vatLines as $line) {
-            if ($line->getVatRate()->get() === $rate) {
+            if ($line->getVatPercentage()->get() === $rate) {
                 return $line;
             }
         }
@@ -92,7 +92,7 @@ final class VatAllocatedTotalPrice
     private function validateLines(array $vatLines): void
     {
         foreach ($vatLines as $line) {
-            if (! $line instanceof VatAllocatedLine) {
+            if (!$line instanceof VatAllocatedLine) {
                 throw new \InvalidArgumentException('vatLines must be an array of VatAllocatedLine instances.');
             }
         }

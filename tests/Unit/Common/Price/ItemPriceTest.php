@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace Tests\Unit\Common\Price;
 
 use Money\Money;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Thinktomorrow\Trader\Domain\Common\Price\DefaultDiscountPrice;
 use Thinktomorrow\Trader\Domain\Common\Price\DefaultItemPrice;
@@ -140,9 +141,7 @@ class ItemPriceTest extends TestCase
         $object->applyDiscount($discount);
     }
 
-    /**
-     * @dataProvider quantityProvider
-     */
+    #[DataProvider('quantityProvider')]
     public function test_it_avoids_rounding_errors_for_quantities(int $qty)
     {
         $item = DefaultItemPrice::fromMoney(

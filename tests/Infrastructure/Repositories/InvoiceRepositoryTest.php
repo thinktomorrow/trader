@@ -46,13 +46,13 @@ class InvoiceRepositoryTest extends TestCase
 
     public function orders(): \Generator
     {
-        yield $this->createDefaultOrder();
+        yield $this->orderContext->createDefaultOrder();
 
-        $orderWithDiscount = $this->createDefaultOrder();
+        $orderWithDiscount = $this->orderContext->createDefaultOrder();
         $orderWithDiscount->addDiscount($this->createOrderDiscount(['discount_id' => 'def', 'promo_discount_id' => 'ghi'], $orderWithDiscount->getMappedData()));
         yield $orderWithDiscount;
 
-        $orderWithLineDiscount = $this->createDefaultOrder();
+        $orderWithLineDiscount = $this->orderContext->createDefaultOrder();
         $orderWithLineDiscount->getLines()[0]->addDiscount($this->createOrderDiscount([
             'discount_id' => 'def',
             'promo_discount_id' => 'ghi',
@@ -61,7 +61,7 @@ class InvoiceRepositoryTest extends TestCase
         ], $orderWithLineDiscount->getMappedData()));
         yield $orderWithLineDiscount;
 
-        $orderWithShippingDiscount = $this->createDefaultOrder();
+        $orderWithShippingDiscount = $this->orderContext->createDefaultOrder();
         $orderWithShippingDiscount->getShippings()[0]->addDiscount($this->createOrderDiscount([
             'discount_id' => 'def',
             'promo_discount_id' => 'ghi',

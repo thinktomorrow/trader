@@ -13,8 +13,9 @@ use Thinktomorrow\Trader\Application\Cart\PaymentMethod\UpdatePaymentMethodOnOrd
 use Thinktomorrow\Trader\Application\Cart\RefreshCart\Adjusters\AdjustDiscounts;
 use Thinktomorrow\Trader\Application\Cart\RefreshCart\Adjusters\AdjustLine;
 use Thinktomorrow\Trader\Application\Cart\RefreshCart\Adjusters\AdjustLines;
+use Thinktomorrow\Trader\Application\Cart\RefreshCart\Adjusters\AdjustOrderTotals;
 use Thinktomorrow\Trader\Application\Cart\RefreshCart\Adjusters\AdjustShipping;
-use Thinktomorrow\Trader\Application\Cart\RefreshCart\Adjusters\AdjustTaxRates;
+use Thinktomorrow\Trader\Application\Cart\RefreshCart\Adjusters\AdjustVatRates;
 use Thinktomorrow\Trader\Application\Cart\RefreshCart\RefreshCart;
 use Thinktomorrow\Trader\Application\Cart\RefreshCart\RefreshCartAction;
 use Thinktomorrow\Trader\Application\Cart\ShippingProfile\UpdateShippingProfileOnOrder;
@@ -38,69 +39,26 @@ use Thinktomorrow\Trader\Domain\Model\Order\Shopper;
 use Thinktomorrow\Trader\Domain\Model\Order\State\OrderState;
 use Thinktomorrow\Trader\Domain\Model\Order\State\OrderStateMachine;
 use Thinktomorrow\Trader\Domain\Model\Product\Personalisation\PersonalisationId;
-use Thinktomorrow\Trader\Domain\Model\ShippingProfile\ShippingProfileRepository;
 use Thinktomorrow\Trader\TraderConfig;
 
 final class CartApplication
 {
-    private VariantForCartRepository $findVariantDetailsForCart;
-
-    private AdjustLine $adjustLine;
-
-    private OrderRepository $orderRepository;
-
-    private ShippingProfileRepository $shippingProfileRepository;
-
-    private EventDispatcher $eventDispatcher;
-
-    private CustomerRepository $customerRepository;
-
-    private TraderConfig $config;
-
-    private RefreshCartAction $refreshCartAction;
-
-    private ContainerInterface $container;
-
-    private UpdateShippingProfileOnOrder $updateShippingProfileOnOrder;
-
-    private UpdatePaymentMethodOnOrder $updatePaymentMethodOnOrder;
-
-    private OrderStateMachine $orderStateMachine;
-
-    private VatNumberApplication $vatNumberApplication;
-
-    private VatExemptionApplication $vatExemptionApplication;
-
     public function __construct(
-        TraderConfig                 $config,
-        ContainerInterface           $container,
-        VariantForCartRepository     $findVariantDetailsForCart,
-        AdjustLine                   $adjustLine,
-        OrderRepository              $orderRepository,
-        OrderStateMachine            $orderStateMachine,
-        RefreshCartAction            $refreshCartAction,
-        ShippingProfileRepository    $shippingProfileRepository,
-        UpdateShippingProfileOnOrder $updateShippingProfileOnOrder,
-        UpdatePaymentMethodOnOrder   $updatePaymentMethodOnOrder,
-        CustomerRepository           $customerRepository,
-        EventDispatcher              $eventDispatcher,
-        VatNumberApplication         $vatNumberApplication,
-        VatExemptionApplication      $vatExemptionApplication
-    ) {
-        $this->findVariantDetailsForCart = $findVariantDetailsForCart;
-        $this->adjustLine = $adjustLine;
-        $this->orderRepository = $orderRepository;
-        $this->shippingProfileRepository = $shippingProfileRepository;
-        $this->eventDispatcher = $eventDispatcher;
-        $this->updateShippingProfileOnOrder = $updateShippingProfileOnOrder;
-        $this->updatePaymentMethodOnOrder = $updatePaymentMethodOnOrder;
-        $this->customerRepository = $customerRepository;
-        $this->config = $config;
-        $this->refreshCartAction = $refreshCartAction;
-        $this->container = $container;
-        $this->orderStateMachine = $orderStateMachine;
-        $this->vatNumberApplication = $vatNumberApplication;
-        $this->vatExemptionApplication = $vatExemptionApplication;
+        private TraderConfig                 $config,
+        private ContainerInterface           $container,
+        private VariantForCartRepository     $findVariantDetailsForCart,
+        private AdjustLine                   $adjustLine,
+        private OrderRepository              $orderRepository,
+        private OrderStateMachine            $orderStateMachine,
+        private RefreshCartAction            $refreshCartAction,
+        private UpdateShippingProfileOnOrder $updateShippingProfileOnOrder,
+        private UpdatePaymentMethodOnOrder   $updatePaymentMethodOnOrder,
+        private CustomerRepository           $customerRepository,
+        private EventDispatcher              $eventDispatcher,
+        private VatNumberApplication         $vatNumberApplication,
+        private VatExemptionApplication      $vatExemptionApplication,
+    )
+    {
 
     }
 
@@ -111,8 +69,9 @@ final class CartApplication
         $this->refreshCartAction->handle($order, [
             $this->container->get(AdjustLines::class),
             $this->container->get(AdjustShipping::class),
-            $this->container->get(AdjustTaxRates::class),
+            $this->container->get(AdjustVatRates::class),
             $this->container->get(AdjustDiscounts::class),
+            $this->container->get(AdjustOrderTotals::class),
         ]);
 
         $this->orderRepository->save($order);
@@ -177,7 +136,7 @@ final class CartApplication
                 }
             }
 
-            if (! $originalPersonalisation) {
+            if (!$originalPersonalisation) {
                 throw new \InvalidArgumentException('No personalisation found for variant [' . $addLine->getVariantId()->get() . '] by personalisation id [' . $personalisation_id . '].');
             }
 
@@ -348,7 +307,7 @@ final class CartApplication
         $order = $this->orderRepository->findForCart($command->getOrderId());
         $shopper = $order->getShopper();
 
-        if (! $billingAddressCountryId = $order->getBillingAddress()?->getAddress()->countryId) {
+        if (!$billingAddressCountryId = $order->getBillingAddress()?->getAddress()->countryId) {
             return;
         }
 
@@ -408,11 +367,11 @@ final class CartApplication
         $shopper->addData($customer->getData());
         $order->updateShopper($shopper);
 
-        if (! $order->getBillingAddress() && $billingAddress = $customer->getBillingAddress()) {
+        if (!$order->getBillingAddress() && $billingAddress = $customer->getBillingAddress()) {
             $this->chooseCustomerBillingAddress($order, $billingAddress);
         }
 
-        if (! $order->getShippingAddress() && $shippingAddress = $customer->getShippingAddress()) {
+        if (!$order->getShippingAddress() && $shippingAddress = $customer->getShippingAddress()) {
             $this->chooseCustomerShippingAddress($order, $shippingAddress);
         }
 

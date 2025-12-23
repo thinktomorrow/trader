@@ -1,6 +1,6 @@
 <?php
 
-namespace Thinktomorrow\Trader\Domain\Common\Vat;
+namespace Thinktomorrow\Trader\Application\VatRate\Allocator;
 
 use Money\Money;
 use Thinktomorrow\Trader\Domain\Common\Cash\Cash;
@@ -109,7 +109,7 @@ class ProRateAllocator
     {
         $currency = $totalToAllocate->getCurrency();
         $result = array_map(
-            fn () => new Money('0', $currency),
+            fn() => new Money('0', $currency),
             $itemTotals
         );
 
