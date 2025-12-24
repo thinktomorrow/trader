@@ -13,20 +13,80 @@ use Thinktomorrow\Trader\Domain\Model\Order\Discount\GetValidatedTotalDiscountPr
 
 trait WithOrderTotals
 {
-    private(set) Money $subtotalExcl;
-    private(set) Money $subtotalIncl;
-    private(set) Money $shippingExcl;
-    private(set) Money $shippingIncl;
-    private(set) Money $paymentExcl;
-    private(set) Money $paymentIncl;
-    private(set) Money $discountExcl;
-    private(set) Money $discountIncl;
-    private(set) Money $totalExcl;
-    private(set) Money $totalVat;
-    private(set) Money $totalIncl;
+    private Money $subtotalExcl;
+    private Money $subtotalIncl;
+    private Money $shippingExcl;
+    private Money $shippingIncl;
+    private Money $paymentExcl;
+    private Money $paymentIncl;
+    private Money $discountExcl;
+    private Money $discountIncl;
+    private Money $totalExcl;
+    private Money $totalVat;
+    private Money $totalIncl;
 
     /** @var VatAllocatedLine[] */
-    private(set) array $vatLines = [];
+    private array $vatLines = [];
+
+    public function getSubtotalExcl(): Money
+    {
+        return $this->subtotalExcl;
+    }
+
+    public function getSubtotalIncl(): Money
+    {
+        return $this->subtotalIncl;
+    }
+
+    public function getShippingCostExcl(): Money
+    {
+        return $this->shippingExcl;
+    }
+
+    public function getShippingCostIncl(): Money
+    {
+        return $this->shippingIncl;
+    }
+
+    public function getPaymentCostExcl(): Money
+    {
+        return $this->paymentExcl;
+    }
+
+    public function getPaymentCostIncl(): Money
+    {
+        return $this->paymentIncl;
+    }
+
+    public function getDiscountTotalExcl(): Money
+    {
+        return $this->discountExcl;
+    }
+
+    public function getDiscountTotalIncl(): Money
+    {
+        return $this->discountIncl;
+    }
+
+    public function getTotalExcl(): Money
+    {
+        return $this->totalExcl;
+    }
+
+    public function getTotalVat(): Money
+    {
+        return $this->totalVat;
+    }
+
+    public function getTotalIncl(): Money
+    {
+        return $this->totalIncl;
+    }
+
+    public function getVatLines(): array
+    {
+        return $this->vatLines;
+    }
 
     public function getSubTotal(): TotalPrice
     {
@@ -136,5 +196,28 @@ trait WithOrderTotals
         $this->totalExcl = $allocation->getTotalExcludingVat();
         $this->totalVat = $allocation->getTotalVat();
         $this->totalIncl = $allocation->getTotalIncludingVat();
+    }
+
+    private function initializeEmptyTotals(): void
+    {
+        $zero = Money::EUR(0);
+
+        $this->subtotalExcl = $zero;
+        $this->subtotalIncl = $zero;
+
+        $this->shippingExcl = $zero;
+        $this->shippingIncl = $zero;
+
+        $this->paymentExcl = $zero;
+        $this->paymentIncl = $zero;
+
+        $this->discountExcl = $zero;
+        $this->discountIncl = $zero;
+
+        $this->totalExcl = $zero;
+        $this->totalVat = $zero;
+        $this->totalIncl = $zero;
+
+        $this->vatLines = [];
     }
 }

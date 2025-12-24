@@ -5,8 +5,8 @@ namespace Tests\Unit\Model\Order;
 
 use Money\Money;
 use Tests\Unit\TestCase;
-use Thinktomorrow\Trader\Domain\Model\Order\Discount\Discount;
-use Thinktomorrow\Trader\Domain\Model\Order\Discount\DiscountTotal;
+use Thinktomorrow\Trader\Domain\Common\Price\DefaultDiscountPrice;
+use Thinktomorrow\Trader\Domain\Common\Price\DefaultServicePrice;
 use Thinktomorrow\Trader\Domain\Model\Order\Events\ShippingAdded;
 use Thinktomorrow\Trader\Domain\Model\Order\Events\ShippingDeleted;
 use Thinktomorrow\Trader\Domain\Model\Order\Events\ShippingUpdated;
@@ -15,7 +15,6 @@ use Thinktomorrow\Trader\Domain\Model\Order\Exceptions\ShippingAlreadyOnOrder;
 use Thinktomorrow\Trader\Domain\Model\Order\OrderId;
 use Thinktomorrow\Trader\Domain\Model\Order\Shipping\DefaultShippingState;
 use Thinktomorrow\Trader\Domain\Model\Order\Shipping\Shipping;
-use Thinktomorrow\Trader\Domain\Model\Order\Shipping\ShippingCost;
 use Thinktomorrow\Trader\Domain\Model\Order\Shipping\ShippingId;
 use Thinktomorrow\Trader\Domain\Model\ShippingProfile\ShippingProfileId;
 
@@ -28,7 +27,7 @@ class ShippingTest extends TestCase
             $shippingId = ShippingId::fromString('yyy'),
             $shippingProfileId = ShippingProfileId::fromString('zzz'),
             $state = DefaultShippingState::getDefaultState(),
-            $cost = ShippingCost::fromScalars('150', '10', true),
+            $cost = DefaultServicePrice::fromExcludingVat(Money::EUR(150)),
         );
 
         $this->assertEquals([
@@ -36,55 +35,35 @@ class ShippingTest extends TestCase
             'shipping_id' => $shippingId->get(),
             'shipping_profile_id' => $shippingProfileId->get(),
             'shipping_state' => $state->value,
-            'cost' => $cost->getMoney()->getAmount(),
-            'tax_rate' => $cost->getVatPercentage()->toPercentage()->get(),
-            'includes_vat' => $cost->includesVat(),
+            'cost' => $cost->getExcludingVat()->getAmount(),
             'data' => json_encode(['shipping_profile_id' => $shippingProfileId->get()]),
         ], $shipping->getMappedData());
     }
 
     public function test_it_can_be_build_from_raw_data()
     {
-        $shipping = $this->createOrderShipping();
+        $shipping = $this->orderContext->createShipping();
 
-        $this->assertEquals(ShippingId::fromString('sss'), $shipping->shippingId);
+        $this->assertEquals(ShippingId::fromString('order-aaa:shipping-aaa'), $shipping->shippingId);
         $this->assertEquals([
-            'order_id' => 'xxx',
-            'shipping_id' => 'sss',
-            'shipping_profile_id' => 'ppp',
+            'order_id' => 'order-aaa',
+            'shipping_id' => 'order-aaa:shipping-aaa',
+            'shipping_profile_id' => 'shipping-profile-aaa',
             'shipping_state' => DefaultShippingState::none->value,
-            'cost' => '30',
-            'tax_rate' => '10',
-            'includes_vat' => true,
-            'data' => json_encode(['shipping_profile_id' => 'ppp']),
+            'cost' => '50',
+            'data' => json_encode([
+                'title' => ['nl' => 'shipping-aaa title nl', 'fr' => 'shipping-aaa title fr'],
+                'shipping_profile_id' => 'shipping-profile-aaa'
+            ]),
         ], $shipping->getMappedData());
     }
 
-    public function test_it_can_add_a_discount_to_shipping()
+    public function test_it_can_update_shipping_profile()
     {
-        $order = $this->orderContext->createDefaultOrder();
-        $shipping = $order->getShippings()[0];
-        $shipping->addDiscount($this->createOrderShippingDiscount(['promo_discount_id' => 'qqq', 'discount_id' => 'defgh'], $order->getMappedData()));
+        $shipping = $this->orderContext->createShipping();
 
-        $this->assertCount(1, $shipping->getDiscounts());
-
-        $shippingCost = $shipping->getShippingCost();
-        $this->assertEquals(ShippingCost::fromMoney(Money::EUR(0), $shippingCost->getVatPercentage(), $shippingCost->includesVat()), $shipping->getShippingCostTotal());
-
-        $this->assertEquals([
-            Discount::class => array_map(fn ($discount) => $discount->getMappedData(), $shipping->getDiscounts()),
-        ], $shipping->getChildEntities());
-    }
-
-    public function test_it_sets_discount_tax_the_same_as_discountable_tax()
-    {
-        $order = $this->orderContext->createDefaultOrder();
-        $shipping = $order->getShippings()[0];
-        $shipping->addDiscount($this->createOrderShippingDiscount(['promo_discount_id' => 'qqq', 'discount_id' => 'defgh'], $order->getMappedData()));
-
-        $discountTotal = DiscountTotal::fromMoney(Money::EUR('30'), $shipping->getShippingCost()->getVatPercentage(), $shipping->getShippingCost()->includesVat());
-
-        $this->assertEquals($discountTotal, $shipping->getItemDiscount());
+        $shipping->updateShippingProfile($shippingProfileId = ShippingProfileId::fromString('eee'));
+        $this->assertEquals($shippingProfileId, $shipping->getShippingProfileId());
     }
 
     public function test_it_can_find_a_shipping()
@@ -100,7 +79,7 @@ class ShippingTest extends TestCase
     {
         $this->expectException(CouldNotFindShippingOnOrder::class);
 
-        $order = $this->orderContext->createDefaultOrder();
+        $order = $this->orderContext->createOrder();
         $order->findShipping(ShippingId::fromString('unknown'));
     }
 
@@ -108,17 +87,17 @@ class ShippingTest extends TestCase
     {
         $this->expectException(CouldNotFindShippingOnOrder::class);
 
-        $order = $this->orderContext->createDefaultOrder();
-        $order->updateShipping($this->createOrderShipping(['shipping_id' => 'unknown']));
+        $order = $this->orderContext->createOrder();
+        $order->updateShipping($this->orderContext->createShipping());
     }
 
     public function test_it_can_add_a_shipping()
     {
-        $order = $this->orderContext->createDefaultOrder();
+        $order = $this->orderContext->createOrder();
 
-        $order->addShipping($addedShipping = $this->createOrderShipping(['shipping_id' => 'hhhh']));
+        $order->addShipping($addedShipping = $this->orderContext->createShipping());
 
-        $this->assertCount(2, $order->getShippings());
+        $this->assertCount(1, $order->getShippings());
 
         $this->assertEquals([
             new ShippingAdded($order->orderId, $addedShipping->shippingId),
@@ -130,7 +109,7 @@ class ShippingTest extends TestCase
         $this->expectException(ShippingAlreadyOnOrder::class);
 
         $order = $this->orderContext->createDefaultOrder();
-        $order->addShipping($this->createOrderShipping());
+        $order->addShipping($this->orderContext->createShipping());
     }
 
     public function test_it_can_update_shipping()
@@ -138,7 +117,7 @@ class ShippingTest extends TestCase
         $order = $this->orderContext->createDefaultOrder();
 
         $shipping = $order->getShippings()[0];
-        $shipping->updateCost($cost = ShippingCost::fromScalars('23', '1', false));
+        $shipping->updateCost($cost = DefaultServicePrice::fromExcludingVat(Money::EUR(20)));
 
         $order->updateShipping($shipping);
 
@@ -166,11 +145,16 @@ class ShippingTest extends TestCase
         ], $order->releaseEvents());
     }
 
-    public function test_it_can_update_shipping_profile()
+    public function test_it_can_add_a_discount_to_shipping()
     {
-        $shipping = $this->createOrderShipping();
+        $order = $this->orderContext->createDefaultOrder();
+        $shipping = $order->getShippings()[0];
+        $shipping->addDiscount($this->orderContext->createShippingDiscount());
 
-        $shipping->updateShippingProfile($shippingProfileId = ShippingProfileId::fromString('eee'));
-        $this->assertEquals($shippingProfileId, $shipping->getShippingProfileId());
+        $this->assertCount(1, $shipping->getDiscounts());
+
+        $this->assertEquals(DefaultServicePrice::fromExcludingVat(Money::EUR(50)), $shipping->getShippingCost());
+        $this->assertEquals(DefaultDiscountPrice::fromExcludingVat(Money::EUR(15)), $shipping->getSumOfDiscountPrices());
+        $this->assertEquals(DefaultServicePrice::fromExcludingVat(Money::EUR(35)), $shipping->getShippingCostTotal());
     }
 }

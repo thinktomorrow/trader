@@ -19,7 +19,7 @@ class UpdateShippingDataTest extends CartContext
     public function test_merchant_can_change_shipping_data()
     {
         $order = $this->createOrder(['order_id' => 'xxx'], [], [], [
-            $shipping = $this->createOrderShipping(),
+            $shipping = $this->orderContext->createShipping(),
         ]);
 
         $this->orderRepository->save($order);

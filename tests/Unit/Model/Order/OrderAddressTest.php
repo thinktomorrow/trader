@@ -82,4 +82,36 @@ class OrderAddressTest extends TestCase
             'postal_code' => 'postal-code-other',
         ], $address->diff($otherAddress));
     }
+
+    public function test_it_can_get_shipping_address_details()
+    {
+        $order = $this->orderContext->createDefaultOrder();
+
+        $this->assertEquals([
+            'order_id' => 'order-aaa',
+            'country_id' => 'BE',
+            'line_1' => 'Lierseweg 81',
+            'line_2' => '',
+            'postal_code' => '2200',
+            'city' => 'Herentals',
+            'data' => "[]",
+            'type' => AddressType::shipping->value,
+        ], $order->getShippingAddress()->getMappedData());
+    }
+
+    public function test_it_can_get_billing_address_details()
+    {
+        $order = $this->orderContext->createDefaultOrder();
+
+        $this->assertEquals([
+            'order_id' => 'order-aaa',
+            'country_id' => 'NL',
+            'line_1' => 'Example 12',
+            'line_2' => '',
+            'postal_code' => '1000',
+            'city' => 'Amsterdam',
+            'data' => "[]",
+            'type' => AddressType::billing->value,
+        ], $order->getBillingAddress()->getMappedData());
+    }
 }

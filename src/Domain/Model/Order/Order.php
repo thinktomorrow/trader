@@ -73,6 +73,8 @@ final class Order implements Aggregate, DiscountableItem
         $order->orderReference = $orderReference;
         $order->orderState = $orderState;
 
+        $order->initializeEmptyTotals();
+
         $order->recordEvent(new OrderCreated($order->orderId));
 
         return $order;

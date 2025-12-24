@@ -5,7 +5,8 @@ namespace Tests\Unit\Model\Order;
 
 use Money\Money;
 use Tests\Unit\TestCase;
-use Thinktomorrow\Trader\Domain\Model\Order\Discount\DiscountTotal;
+use Thinktomorrow\Trader\Domain\Common\Price\DefaultDiscountPrice;
+use Thinktomorrow\Trader\Domain\Common\Price\DefaultServicePrice;
 use Thinktomorrow\Trader\Domain\Model\Order\Events\PaymentAdded;
 use Thinktomorrow\Trader\Domain\Model\Order\Events\PaymentDeleted;
 use Thinktomorrow\Trader\Domain\Model\Order\Events\PaymentUpdated;
@@ -14,7 +15,6 @@ use Thinktomorrow\Trader\Domain\Model\Order\Exceptions\PaymentAlreadyOnOrder;
 use Thinktomorrow\Trader\Domain\Model\Order\OrderId;
 use Thinktomorrow\Trader\Domain\Model\Order\Payment\DefaultPaymentState;
 use Thinktomorrow\Trader\Domain\Model\Order\Payment\Payment;
-use Thinktomorrow\Trader\Domain\Model\Order\Payment\PaymentCost;
 use Thinktomorrow\Trader\Domain\Model\Order\Payment\PaymentId;
 use Thinktomorrow\Trader\Domain\Model\PaymentMethod\PaymentMethodId;
 
@@ -27,7 +27,7 @@ class PaymentTest extends TestCase
             $paymentId = PaymentId::fromString('yyy'),
             $paymentMethodId = PaymentMethodId::fromString('zzz'),
             $state = DefaultPaymentState::getDefaultState(),
-            $cost = PaymentCost::fromScalars('150', '10', true),
+            $cost = DefaultServicePrice::fromExcludingVat(Money::EUR(150)),
         );
 
         $this->assertEquals([
@@ -35,27 +35,26 @@ class PaymentTest extends TestCase
             'payment_id' => $paymentId->get(),
             'payment_method_id' => $paymentMethodId->get(),
             'payment_state' => $state->value,
-            'cost' => $cost->getMoney()->getAmount(),
-            'tax_rate' => $cost->getVatPercentage()->toPercentage()->get(),
-            'includes_vat' => $cost->includesVat(),
+            'cost' => $cost->getExcludingVat()->getAmount(),
             'data' => json_encode(['payment_method_id' => $paymentMethodId->get()]),
         ], $payment->getMappedData());
     }
 
     public function test_it_can_be_build_from_raw_data()
     {
-        $payment = $this->createOrderPayment();
+        $payment = $this->orderContext->createPayment();
 
-        $this->assertEquals(PaymentId::fromString('ppppp'), $payment->paymentId);
+        $this->assertEquals(PaymentId::fromString('order-aaa:payment-aaa'), $payment->paymentId);
         $this->assertEquals([
-            'order_id' => 'xxx',
-            'payment_id' => 'ppppp',
-            'payment_method_id' => 'mmm',
+            'order_id' => 'order-aaa',
+            'payment_id' => 'order-aaa:payment-aaa',
+            'payment_method_id' => 'payment-method-aaa',
             'payment_state' => DefaultPaymentState::initialized->value,
             'cost' => '20',
-            'tax_rate' => '10',
-            'includes_vat' => true,
-            'data' => json_encode(['payment_method_id' => 'mmm']),
+            'data' => json_encode([
+                'title' => ['nl' => 'payment-aaa title nl', 'fr' => 'payment-aaa title fr'],
+                'payment_method_id' => 'payment-method-aaa'
+            ]),
         ], $payment->getMappedData());
     }
 
@@ -81,14 +80,14 @@ class PaymentTest extends TestCase
         $this->expectException(CouldNotFindPaymentOnOrder::class);
 
         $order = $this->orderContext->createDefaultOrder();
-        $order->updatePayment($this->createOrderPayment(['payment_id' => 'unknown']));
+        $order->updatePayment($this->orderContext->createPayment('order-aaa', 'unknown'));
     }
 
     public function test_it_can_add_a_payment()
     {
         $order = $this->orderContext->createDefaultOrder();
 
-        $order->addPayment($addedPayment = $this->createOrderPayment(['payment_id' => 'hhhh']));
+        $order->addPayment($addedPayment = $this->orderContext->createPayment('order-aaa', 'unknown'));
 
         $this->assertCount(2, $order->getPayments());
 
@@ -102,7 +101,7 @@ class PaymentTest extends TestCase
         $this->expectException(PaymentAlreadyOnOrder::class);
 
         $order = $this->orderContext->createDefaultOrder();
-        $order->addPayment($this->createOrderPayment());
+        $order->addPayment($this->orderContext->createPayment());
     }
 
     public function test_it_can_update_payment()
@@ -110,7 +109,7 @@ class PaymentTest extends TestCase
         $order = $this->orderContext->createDefaultOrder();
 
         $payment = $order->getPayments()[0];
-        $payment->updateCost($cost = PaymentCost::fromScalars('23', '1', false));
+        $payment->updateCost($cost = DefaultServicePrice::fromExcludingVat(Money::EUR(23)));
 
         $order->updatePayment($payment);
 
@@ -140,7 +139,7 @@ class PaymentTest extends TestCase
 
     public function test_it_can_update_payment_method()
     {
-        $payment = $this->createOrderPayment();
+        $payment = $this->orderContext->createPayment();
 
         $payment->updatePaymentMethod($paymentMethodId = PaymentMethodId::fromString('eee'));
         $this->assertEquals($paymentMethodId, $payment->getPaymentMethodId());
@@ -150,23 +149,12 @@ class PaymentTest extends TestCase
     {
         $order = $this->orderContext->createDefaultOrder();
         $payment = $order->getPayments()[0];
-        $payment->addDiscount($this->createOrderPaymentDiscount(['promo_discount_id' => 'qqq', 'discount_id' => 'defgh'], $order->getMappedData()));
+        $payment->addDiscount($this->orderContext->createPaymentDiscount());
 
         $this->assertCount(1, $payment->getDiscounts());
 
-        $paymentCost = $payment->getPaymentCost();
-        $this->assertEquals(PaymentCost::fromMoney(Money::EUR(0), $paymentCost->getVatPercentage(), $paymentCost->includesVat()), $payment->getPaymentCostTotal());
-    }
-
-    public function test_it_sets_discount_tax_the_same_as_discountable_tax()
-    {
-        $order = $this->orderContext->createDefaultOrder();
-        $payment = $order->getPayments()[0];
-        $payment->addDiscount($this->createOrderPaymentDiscount(['promo_discount_id' => 'qqq', 'discount_id' => 'defgh'], $order->getMappedData()));
-
-        // 20 (and not 30 discount) because payment cost is only 20.
-        $discountTotal = DiscountTotal::fromMoney(Money::EUR('20'), $payment->getPaymentCost()->getVatPercentage(), $payment->getPaymentCost()->includesVat());
-
-        $this->assertEquals($discountTotal, $payment->getItemDiscount());
+        $this->assertEquals(DefaultServicePrice::fromExcludingVat(Money::EUR(20)), $payment->getPaymentCost());
+        $this->assertEquals(DefaultDiscountPrice::fromExcludingVat(Money::EUR(15)), $payment->getSumOfDiscountPrices());
+        $this->assertEquals(DefaultServicePrice::fromExcludingVat(Money::EUR(5)), $payment->getPaymentCostTotal());
     }
 }

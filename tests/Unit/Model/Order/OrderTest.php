@@ -3,8 +3,10 @@ declare(strict_types=1);
 
 namespace Tests\Unit\Model\Order;
 
+use Money\Money;
 use Tests\Unit\TestCase;
 use Thinktomorrow\Trader\Domain\Common\Email;
+use Thinktomorrow\Trader\Domain\Common\Price\DefaultServicePrice;
 use Thinktomorrow\Trader\Domain\Model\Customer\CustomerId;
 use Thinktomorrow\Trader\Domain\Model\Order\Address\BillingAddress;
 use Thinktomorrow\Trader\Domain\Model\Order\Address\ShippingAddress;
@@ -20,7 +22,6 @@ use Thinktomorrow\Trader\Domain\Model\Order\OrderId;
 use Thinktomorrow\Trader\Domain\Model\Order\OrderReference;
 use Thinktomorrow\Trader\Domain\Model\Order\Shipping\DefaultShippingState;
 use Thinktomorrow\Trader\Domain\Model\Order\Shipping\Shipping;
-use Thinktomorrow\Trader\Domain\Model\Order\Shipping\ShippingCost;
 use Thinktomorrow\Trader\Domain\Model\Order\Shipping\ShippingId;
 use Thinktomorrow\Trader\Domain\Model\Order\State\DefaultOrderState;
 use Thinktomorrow\Trader\Domain\Model\ShippingProfile\ShippingProfileId;
@@ -36,18 +37,23 @@ class OrderTest extends TestCase
         );
 
         $this->assertEquals([
-            'order_id' => $orderId->get(),
-            'order_ref' => $orderReference->get(),
-            'order_state' => DefaultOrderState::cart_pending->value,
+            'order_id' => 'xxx',
+            'order_ref' => 'xx-ref',
             'invoice_ref' => null,
-            'total' => '0',
-            'tax_total' => '0',
-            'subtotal' => '0',
-            'discount_total' => '0',
-            'shipping_cost' => '0',
-            'payment_cost' => '0',
-            'includes_vat' => true,
-            'data' => "[]",
+            'order_state' => 'cart_pending',
+            'total_excl' => '0',
+            'total_incl' => '0',
+            'total_vat' => '0',
+            'vat_lines' => '[]',
+            'subtotal_excl' => '0',
+            'subtotal_incl' => '0',
+            'discount_total_excl' => '0',
+            'discount_total_incl' => '0',
+            'shipping_cost_excl' => '0',
+            'shipping_cost_incl' => '0',
+            'payment_cost_excl' => '0',
+            'payment_cost_incl' => '0',
+            'data' => '[]',
         ], $order->getMappedData());
 
         $this->assertEquals([
@@ -66,7 +72,6 @@ class OrderTest extends TestCase
         $this->assertEquals(CustomerId::fromString('zzz'), $order->getShopper()->getCustomerId());
         $this->assertEquals(Email::fromString('ben@thinktomorrow.be'), $order->getShopper()->getEmail());
         $this->assertFalse($order->getShopper()->isBusiness());
-        $this->assertTrue($order->getShopper()->registerAfterCheckout());
 
         $this->assertEquals([
             new OrderUpdated($order->orderId),
@@ -82,7 +87,7 @@ class OrderTest extends TestCase
             $shippingId = ShippingId::fromString('qqqq'),
             ShippingProfileId::fromString('postnl_home'),
             DefaultShippingState::getDefaultState(),
-            ShippingCost::fromScalars('23', '1', false)
+            DefaultServicePrice::fromExcludingVat(Money::EUR('23'))
         ));
 
         $this->assertCount(2, $order->getShippings());
@@ -99,7 +104,7 @@ class OrderTest extends TestCase
 
         /** @var \Thinktomorrow\Trader\Domain\Model\Order\Shipping\Shipping $shipping */
         $shipping = $order->getShippings()[0];
-        $shipping->updateCost($cost = ShippingCost::fromScalars('23', '1', false));
+        $shipping->updateCost($cost = DefaultServicePrice::fromExcludingVat(Money::EUR('23')));
 
         $order->updateShipping($shipping);
 
@@ -190,8 +195,8 @@ class OrderTest extends TestCase
 
         $order->addLogEntry($logEntry = OrderEvent::create(OrderEventId::fromString('abc'), 'xxx', new \DateTime(), []));
 
-        $this->assertCount(2, $order->getOrderEvents());
-        $this->assertEquals($logEntry->getMappedData(), $order->getChildEntities()[OrderEvent::class][1]);
+        $this->assertCount(1, $order->getOrderEvents());
+        $this->assertEquals($logEntry->getMappedData(), $order->getChildEntities()[OrderEvent::class][0]);
     }
 
     public function test_it_can_set_vat_exempt(): void

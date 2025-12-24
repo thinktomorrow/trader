@@ -5,13 +5,14 @@ namespace Tests\Unit\Model\Order;
 
 use Money\Money;
 use Tests\Unit\TestCase;
+use Thinktomorrow\Trader\Domain\Common\Price\DefaultDiscountPrice;
+use Thinktomorrow\Trader\Domain\Common\Price\DefaultItemPrice;
 use Thinktomorrow\Trader\Domain\Common\Vat\VatPercentage;
 use Thinktomorrow\Trader\Domain\Model\Order\Events\LineAdded;
 use Thinktomorrow\Trader\Domain\Model\Order\Events\LineDeleted;
 use Thinktomorrow\Trader\Domain\Model\Order\Events\LineUpdated;
 use Thinktomorrow\Trader\Domain\Model\Order\Line\Line;
 use Thinktomorrow\Trader\Domain\Model\Order\Line\LineId;
-use Thinktomorrow\Trader\Domain\Model\Order\Line\LinePrice;
 use Thinktomorrow\Trader\Domain\Model\Order\Line\Personalisations\LinePersonalisation;
 use Thinktomorrow\Trader\Domain\Model\Order\Line\Personalisations\LinePersonalisationId;
 use Thinktomorrow\Trader\Domain\Model\Order\Line\PurchasableReference;
@@ -53,7 +54,7 @@ class OrderLineTest extends TestCase
 
         $foundLine = $order->findLine($line->lineId);
 
-        $this->assertEquals(LinePrice::fromMoney(Money::EUR(200), VatPercentage::fromString('21'), true), $foundLine->getLinePrice());
+        $this->assertEquals(DefaultItemPrice::fromExcludingVat(Money::EUR(200), VatPercentage::fromString('21')), $foundLine->getLinePrice());
 
         $this->assertEquals(
             new LineUpdated(
@@ -113,7 +114,7 @@ class OrderLineTest extends TestCase
         $order = $this->orderContext->createDefaultOrder();
         $line = $order->findLine(LineId::fromString('order-aaa:line-aaa'));
 
-        $order->updateLinePrice($line->lineId, $price = LinePrice::fromMoney(Money::EUR(30), VatPercentage::fromString('10'), false));
+        $order->updateLinePrice($line->lineId, $price = DefaultItemPrice::fromMoney(Money::EUR(30), VatPercentage::fromString('10'), false));
         $this->assertEquals($price, $line->getLinePrice());
     }
 
@@ -162,20 +163,16 @@ class OrderLineTest extends TestCase
         $this->assertEquals('bar', $line->getData('foo'));
     }
 
-    public function test_it_can_have_a_discount()
+    public function test_it_can_add_a_discount_to_payment()
     {
         $order = $this->orderContext->createDefaultOrder();
         $line = $order->findLine(LineId::fromString('order-aaa:line-aaa'));
-        $lineTotal = $line->getTotal();
-
         $discount = $this->orderContext->createLineDiscount();
-
-        $this->assertEquals(LinePrice::fromMoney(Money::EUR(100), $lineTotal->getVatPercentage(), $lineTotal->includesVat()), $line->getTotal());
-
         $line->addDiscount($discount);
 
-        $this->assertCount(1, $line->getDiscounts());
 
-        $this->assertEquals(LinePrice::fromMoney(Money::EUR(85), $lineTotal->getVatPercentage(), $lineTotal->includesVat()), $line->getTotal());
+        $this->assertEquals(DefaultItemPrice::fromExcludingVat(Money::EUR(83), VatPercentage::fromString('21')), $line->getLinePrice());
+        $this->assertEquals(DefaultDiscountPrice::fromExcludingVat(Money::EUR(15)), $line->getSumOfDiscountPrices());
+        $this->assertEquals(DefaultItemPrice::fromExcludingVat(Money::EUR(68), VatPercentage::fromString('21')), $line->getTotal());
     }
 }
