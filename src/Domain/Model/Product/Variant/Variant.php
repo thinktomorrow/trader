@@ -99,7 +99,7 @@ final class Variant implements ChildAggregate
 
     public function getMappedData(): array
     {
-        $includeVat = $this->unitPrice->hasOriginalIncludingVat();
+        $includeVat = $this->unitPrice->includingIsAuthoritative();
 
         return [
             'product_id' => $this->productId->get(),
@@ -120,7 +120,7 @@ final class Variant implements ChildAggregate
     {
         return [
             VariantTaxon::class => array_map(
-                fn (VariantTaxon $option) => array_merge($option->getMappedData()),
+                fn(VariantTaxon $option) => array_merge($option->getMappedData()),
                 array_values($this->variantTaxa),
             ),
         ];

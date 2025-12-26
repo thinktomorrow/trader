@@ -2,8 +2,6 @@
 
 namespace Tests\Acceptance\VatRate;
 
-use Thinktomorrow\Trader\Application\VatRate\FindVatRateForOrder;
-use Thinktomorrow\Trader\Application\VatRate\VatExemptionApplication;
 use Thinktomorrow\Trader\Domain\Common\Email;
 use Thinktomorrow\Trader\Domain\Common\Locale;
 use Thinktomorrow\Trader\Domain\Common\Vat\VatPercentage;
@@ -18,34 +16,16 @@ use Thinktomorrow\Trader\Domain\Model\Order\ShopperId;
 use Thinktomorrow\Trader\Domain\Model\Order\State\DefaultOrderState;
 use Thinktomorrow\Trader\Domain\Model\VatRate\BaseRate;
 use Thinktomorrow\Trader\Domain\Model\VatRate\VatRate;
-use Thinktomorrow\Trader\Infrastructure\Test\TestTraderConfig;
 
 class FindVatRateForOrderTest extends VatRateContext
 {
-    private FindVatRateForOrder $findVatRateForOrder;
-
-    protected function setUp(): void
-    {
-        parent::setUp();
-
-        $this->findVatRateForOrder = new FindVatRateForOrder(new TestTraderConfig(), new VatExemptionApplication(new TestTraderConfig()), $this->vatRateRepository);
-    }
-
-    public function tearDown(): void
-    {
-        $this->orderRepository->clear();
-        $this->findVatRateForOrder = new FindVatRateForOrder(new TestTraderConfig(), new VatExemptionApplication(new TestTraderConfig()), $this->vatRateRepository);
-
-        parent::tearDown();
-    }
-
     public function test_it_does_not_affect_shipping_cost_vat_when_no_country_rate_applies()
     {
         $this->createVatRate('NL', '10');
 
         $order = $this->getOrder('BE');
 
-        $result = $this->findVatRateForOrder->findForShippingCost($order);
+        $result = $this->orderContext->orderApps()->findVatRateForOrder()->findForShippingCost($order);
 
         $this->assertEquals('21', $result);
     }
@@ -56,7 +36,7 @@ class FindVatRateForOrderTest extends VatRateContext
 
         $order = $this->getOrder('NL');
 
-        $result = $this->findVatRateForOrder->findForShippingCost($order);
+        $result = $this->orderContext->orderApps()->findVatRateForOrder()->findForShippingCost($order);
 
         $this->assertEquals($vatRate->getRate(), $result);
     }
@@ -67,7 +47,7 @@ class FindVatRateForOrderTest extends VatRateContext
 
         $order = $this->getOrder();
 
-        $result = $this->findVatRateForOrder->findForPaymentCost($order);
+        $result = $this->orderContext->orderApps()->findVatRateForOrder()->findForPaymentCost($order);
 
         $this->assertEquals('21', $result);
     }
@@ -78,7 +58,7 @@ class FindVatRateForOrderTest extends VatRateContext
 
         $order = $this->getOrder('NL');
 
-        $result = $this->findVatRateForOrder->findForPaymentCost($order);
+        $result = $this->orderContext->orderApps()->findVatRateForOrder()->findForPaymentCost($order);
 
         $this->assertEquals($vatRate->getRate(), $result);
     }
@@ -90,7 +70,7 @@ class FindVatRateForOrderTest extends VatRateContext
         $order = $this->getOrder('BE');
         $variantVatPercentage = VatPercentage::fromString('21');
 
-        $result = $this->findVatRateForOrder->findForLine($order, $variantVatPercentage);
+        $result = $this->orderContext->orderApps()->findVatRateForOrder()->findForLine($order, $variantVatPercentage);
 
         $this->assertEquals($variantVatPercentage, $result);
     }
@@ -102,7 +82,7 @@ class FindVatRateForOrderTest extends VatRateContext
         $order = $this->getOrder('BE');
         $variantVatPercentage = VatPercentage::fromString('20');
 
-        $result = $this->findVatRateForOrder->findForLine($order, $variantVatPercentage);
+        $result = $this->orderContext->orderApps()->findVatRateForOrder()->findForLine($order, $variantVatPercentage);
 
         $this->assertEquals($variantVatPercentage, $result);
     }
@@ -114,7 +94,7 @@ class FindVatRateForOrderTest extends VatRateContext
         $order = $this->getOrder('FR');
         $variantVatPercentage = VatPercentage::fromString('20');
 
-        $result = $this->findVatRateForOrder->findForLine($order, $variantVatPercentage);
+        $result = $this->orderContext->orderApps()->findVatRateForOrder()->findForLine($order, $variantVatPercentage);
 
         $this->assertEquals($variantVatPercentage, $result);
     }
@@ -129,7 +109,7 @@ class FindVatRateForOrderTest extends VatRateContext
         $order = $this->getOrder('NL');
         $variantVatPercentage = VatPercentage::fromString('21');
 
-        $result = $this->findVatRateForOrder->findForLine($order, $variantVatPercentage);
+        $result = $this->orderContext->orderApps()->findVatRateForOrder()->findForLine($order, $variantVatPercentage);
 
         $this->assertEquals($vatRate->getRate(), $result);
     }
@@ -144,7 +124,7 @@ class FindVatRateForOrderTest extends VatRateContext
         $order = $this->getOrder('NL');
         $variantVatPercentage = VatPercentage::fromString('21');
 
-        $result = $this->findVatRateForOrder->findForLine($order, $variantVatPercentage);
+        $result = $this->orderContext->orderApps()->findVatRateForOrder()->findForLine($order, $variantVatPercentage);
 
         $this->assertEquals($vatRate2->getRate(), $result);
     }
@@ -164,9 +144,9 @@ class FindVatRateForOrderTest extends VatRateContext
         ]);
         $order->updateShopper($shopper);
 
-        $result = $this->findVatRateForOrder->findForLine($order, $variantVatPercentage);
-        $resultShippingCost = $this->findVatRateForOrder->findForShippingCost($order);
-        $resultPaymentCost = $this->findVatRateForOrder->findForPaymentCost($order);
+        $result = $this->orderContext->orderApps()->findVatRateForOrder()->findForLine($order, $variantVatPercentage);
+        $resultShippingCost = $this->orderContext->orderApps()->findVatRateForOrder()->findForShippingCost($order);
+        $resultPaymentCost = $this->orderContext->orderApps()->findVatRateForOrder()->findForPaymentCost($order);
 
         $this->assertEquals(VatPercentage::zero(), $result);
         $this->assertEquals(VatPercentage::zero(), $resultShippingCost);

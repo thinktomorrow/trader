@@ -130,7 +130,7 @@ class DefaultItemPrice implements ItemPrice
         return new static($this->excludingVat, $vatPercentage);
     }
 
-    public function hasOriginalIncludingVat(): bool
+    public function includingIsAuthoritative(): bool
     {
         return $this->includingVatOriginal !== null;
     }

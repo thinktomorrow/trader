@@ -71,7 +71,7 @@ final class VatAllocator
 
         // 4) Build all allocated totals
         return new VatAllocatedTotalPrices(
-            items: $this->buildAllocatedTotal($itemTotals),
+            items: $this->buildAllocatedTotal($itemTotals, $this->authoritativeItemsIncl($order)),
             shipping: $this->buildAllocatedTotal($shippingAlloc),
             payment: $this->buildAllocatedTotal($paymentAlloc),
             discounts: $this->buildAllocatedTotal($discountAlloc),
@@ -79,12 +79,22 @@ final class VatAllocator
         );
     }
 
-    private function buildAllocatedTotal(array $basesPerRate): VatAllocatedTotalPrice
+    /**
+     * Build the VatAllocatedTotalPrice from bases per VAT rate.
+     *
+     * In e-commerce, VAT rounding is resolved at the final aggregation level.
+     * The customer-facing including-VAT total can be set as authoritative.
+     * Any rounding difference is then absorbed by the VAT amount.
+     *
+     * @param array $basesPerRate
+     * @param Money|null $authoritativeIncl
+     * @return VatAllocatedTotalPrice
+     */
+    private function buildAllocatedTotal(array $basesPerRate, ?Money $authoritativeIncl = null): VatAllocatedTotalPrice
     {
         $vatLines = [];
         $totalExcl = Cash::zero();
         $totalVat = Cash::zero();
-        $totalIncl = Cash::zero();
 
         foreach ($basesPerRate as $rate => $base) {
             $vatPercentage = VatPercentage::fromString($rate);
@@ -97,7 +107,13 @@ final class VatAllocator
 
             $totalExcl = $totalExcl->add($base);
             $totalVat = $totalVat->add($vat);
-            $totalIncl = $totalIncl->add($base)->add($vat);
+        }
+
+        if ($authoritativeIncl) {
+            $totalIncl = $authoritativeIncl;
+            $totalVat = $totalIncl->subtract($totalExcl);
+        } else {
+            $totalIncl = $totalExcl->add($totalVat);
         }
 
         return new VatAllocatedTotalPrice(
@@ -126,6 +142,25 @@ final class VatAllocator
 
         return $results;
     }
+
+    private function authoritativeItemsIncl(Order $order): ?Money
+    {
+        $sum = Cash::zero();
+        $hasAuthoritative = false;
+
+        foreach ($order->getLines() as $line) {
+            $item = $line->getTotal();
+
+            $sum = $sum->add($item->getIncludingVat());
+
+            if ($item->includingIsAuthoritative()) {
+                $hasAuthoritative = true;
+            }
+        }
+
+        return $hasAuthoritative ? $sum : null;
+    }
+
 
     private function sum(array $amounts): Money
     {

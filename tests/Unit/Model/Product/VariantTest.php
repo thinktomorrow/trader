@@ -56,7 +56,7 @@ class VariantTest extends TestCase
         $this->assertEquals($unitPrice->getExcludingVat()->getAmount(), $variant->getMappedData()['unit_price']);
         $this->assertEquals($salePrice->getExcludingVat()->getAmount(), $variant->getMappedData()['sale_price']);
         $this->assertEquals($salePrice->getVatPercentage()->toPercentage()->get(), $variant->getMappedData()['tax_rate']);
-        $this->assertEquals($salePrice->hasOriginalIncludingVat(), $variant->getMappedData()['includes_vat']);
+        $this->assertEquals($salePrice->includingIsAuthoritative(), $variant->getMappedData()['includes_vat']);
         $this->assertEquals($salePrice, $variant->getSalePrice());
     }
 

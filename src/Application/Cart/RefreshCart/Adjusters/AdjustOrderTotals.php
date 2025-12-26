@@ -21,10 +21,13 @@ class AdjustOrderTotals implements Adjuster
             $this->getPaymentTotalExcludingVat($order),
             $this->getDiscountTotalExcludingVat($order),
         );
+        dd($vatAllocatedTotalPrices->items());
+
+        // TODO: keep excl/incl/vat per line
 
         $order->applySubtotalTotals(
             $vatAllocatedTotalPrices->items(),
-        );O
+        );
 
         $order->applyServiceTotals(
             $vatAllocatedTotalPrices->shipping(),

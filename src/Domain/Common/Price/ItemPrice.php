@@ -36,5 +36,5 @@ interface ItemPrice extends PriceWithVat
 
     public function changeVatPercentage(VatPercentage $vatPercentage): static;
 
-    public function hasOriginalIncludingVat(): bool;
+    public function includingIsAuthoritative(): bool;
 }

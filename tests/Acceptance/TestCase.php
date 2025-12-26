@@ -7,29 +7,25 @@ use Illuminate\Support\Arr;
 use Thinktomorrow\Trader\Application\Common\DataRenderer;
 use Thinktomorrow\Trader\Application\Common\DefaultLocale;
 use Thinktomorrow\Trader\Domain\Common\Locale;
-use Thinktomorrow\Trader\Domain\Common\Vat\VatPercentage;
-use Thinktomorrow\Trader\Domain\Model\Order\Discount\DiscountPriceDefaults;
-use Thinktomorrow\Trader\Infrastructure\Test\Repositories\InMemoryOrderRepository;
-use Thinktomorrow\Trader\Infrastructure\Test\Repositories\InMemoryPaymentMethodRepository;
-use Thinktomorrow\Trader\Testing\Support\Catalog;
-use Thinktomorrow\Trader\Testing\Support\Shop;
+use Thinktomorrow\Trader\Testing\Catalog\CatalogContext;
+use Thinktomorrow\Trader\Testing\Order\OrderContext;
 
 class TestCase extends \PHPUnit\Framework\TestCase
 {
-    protected InMemoryOrderRepository $orderRepository;
-    protected InMemoryPaymentMethodRepository $paymentMethodRepository;
+    protected CatalogContext $catalogContext;
+    protected OrderContext $orderContext;
+
+//    protected InMemoryOrderRepository $orderRepository;
+//    protected InMemoryPaymentMethodRepository $paymentMethodRepository;
 
     protected function setUp(): void
     {
-        $this->addInstancesToContainer();
-
-        DiscountPriceDefaults::setDiscountTaxRate(VatPercentage::fromString('21'));
-        DiscountPriceDefaults::setDiscountIncludeTax(true);
+//        $this->addInstancesToContainer();
 
         DefaultLocale::set(Locale::fromString('nl'));
 
         DataRenderer::setDataResolver(function (array $data, string $key, ?string $language = null, ?string $default = null) {
-            if (! $language) {
+            if (!$language) {
                 $language = 'nl';
             }
 
@@ -42,20 +38,23 @@ class TestCase extends \PHPUnit\Framework\TestCase
             return $value === null ? $default : $value;
         });
 
-        Catalog::setUp();
-        Shop::setUp();
+        CatalogContext::setUp();
+        OrderContext::setUp();
+
+        $this->catalogContext = CatalogContext::inMemory();
+        $this->orderContext = OrderContext::inMemory();
     }
 
     protected function tearDown(): void
     {
-        Catalog::tearDown();
-        Shop::tearDown();
+        CatalogContext::tearDown();
+        OrderContext::tearDown();
     }
 
     private function addInstancesToContainer()
     {
-        $this->orderRepository = new InMemoryOrderRepository();
-        $this->paymentMethodRepository = new InMemoryPaymentMethodRepository();
+//        $this->orderRepository = new InMemoryOrderRepository();
+//        $this->paymentMethodRepository = new InMemoryPaymentMethodRepository();
 
         //        (new TestContainer())->add(VerifyPaymentMethodForCart::class, new DefaultVerifyPaymentMethodForCart());
         //        (new TestContainer())->add(UpdatePaymentMethodOnOrder::class, new UpdatePaymentMethodOnOrder(new TestContainer(), new TestTraderConfig(), $this->orderRepository, (new TestContainer())->get(VerifyPaymentMethodForCart::class), $this->paymentMethodRepository));
