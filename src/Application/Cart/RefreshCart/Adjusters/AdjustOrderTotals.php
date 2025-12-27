@@ -21,9 +21,6 @@ class AdjustOrderTotals implements Adjuster
             $this->getPaymentTotalExcludingVat($order),
             $this->getDiscountTotalExcludingVat($order),
         );
-        dd($vatAllocatedTotalPrices->items());
-
-        // TODO: keep excl/incl/vat per line
 
         $order->applySubtotalTotals(
             $vatAllocatedTotalPrices->items(),
@@ -70,7 +67,7 @@ class AdjustOrderTotals implements Adjuster
         $total = Money::EUR(0);
 
         foreach ($order->getDiscounts() as $discount) {
-            $total = $total->add($discount->getDiscountAmount()->getExcludingVat());
+            $total = $total->add($discount->getDiscountPrice()->getExcludingVat());
         }
 
         return $total;

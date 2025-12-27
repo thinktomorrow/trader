@@ -31,6 +31,17 @@ return new class extends Migration {
             $table->unsignedBigInteger('payment_cost_excl')->nullable()->after('shipping_cost_incl');
             $table->unsignedBigInteger('payment_cost_incl')->nullable()->after('payment_cost_excl');
         });
+
+        Schema::table('trader_order_lines', function (Blueprint $table) {
+            $table->bigInteger('unit_price_excl')->unsigned()->nullable();
+            $table->bigInteger('unit_price_incl')->unsigned()->nullable();
+
+            $table->bigInteger('total_excl')->unsigned()->nullable();
+            $table->bigInteger('total_vat')->unsigned()->nullable();
+            $table->bigInteger('total_incl')->unsigned()->nullable();
+
+            $table->bigInteger('discount_excl')->unsigned()->default(0);
+        });
     }
 
     public function down(): void
