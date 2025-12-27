@@ -5,7 +5,7 @@ namespace Thinktomorrow\Trader\Infrastructure\Laravel\Models\OrderRead;
 
 use Thinktomorrow\Trader\Application\Common\RendersData;
 use Thinktomorrow\Trader\Application\Common\RendersMoney;
-use Thinktomorrow\Trader\Domain\Common\Price\Old\Price;
+use Thinktomorrow\Trader\Domain\Common\Price\ServicePrice;
 use Thinktomorrow\Trader\Domain\Model\Order\Shipping\ShippingState;
 
 abstract class OrderReadShipping
@@ -13,7 +13,7 @@ abstract class OrderReadShipping
     use RendersData;
     use RendersMoney;
 
-    protected Price $cost;
+    protected ServicePrice $cost;
     protected string $shipping_id;
     protected ?string $shipping_profile_id;
     protected ShippingState $state;
@@ -31,7 +31,7 @@ abstract class OrderReadShipping
     {
         $shipping = new static();
 
-        if (! $state['shipping_state'] instanceof ShippingState) {
+        if (!$state['shipping_state'] instanceof ShippingState) {
             throw new \InvalidArgumentException('Shipping state is expected to be instance of ShippingState. Instead ' . gettype($state['shipping_state']) . ' is passed.');
         }
 

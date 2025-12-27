@@ -7,7 +7,8 @@ use Money\Money;
 use Tests\Unit\TestCase;
 use Thinktomorrow\Trader\Domain\Common\Cash\Percentage;
 use Thinktomorrow\Trader\Domain\Common\Price\DefaultDiscountPrice;
-use Thinktomorrow\Trader\Domain\Common\Price\DefaultTotalPrice;
+use Thinktomorrow\Trader\Domain\Common\Price\DefaultItemPrice;
+use Thinktomorrow\Trader\Domain\Common\Vat\VatPercentage;
 use Thinktomorrow\Trader\Domain\Model\Order\Discount\Discount;
 use Thinktomorrow\Trader\Domain\Model\Order\Discount\DiscountableId;
 use Thinktomorrow\Trader\Domain\Model\Order\Discount\DiscountableType;
@@ -30,8 +31,8 @@ class OrderDiscountTest extends TestCase
             ['foo' => 'bar']
         );
 
-        $this->assertEquals($discountTotal, $discount->getItemDiscount());
-        $this->assertEquals(Percentage::fromString('50.00'), $discount->getPercentage(DefaultTotalPrice::fromCalculated(Money::EUR(100), Money::EUR(80))));
+        $this->assertEquals($discountTotal, $discount->getDiscountPrice());
+        $this->assertEquals(Percentage::fromString('50.00'), $discount->getPercentage(DefaultItemPrice::fromExcludingVat(Money::EUR(100), VatPercentage::fromString("21"))));
         $this->assertEquals([
             'order_id' => $orderId->get(),
             'discount_id' => $discountId->get(),
@@ -39,9 +40,7 @@ class OrderDiscountTest extends TestCase
             'discountable_id' => $discountableId->get(),
             'promo_id' => $promoId->get(),
             'promo_discount_id' => $promoDiscountId->get(),
-            'total' => $discountTotal->getIncludingVat()->getAmount(),
-            'includes_vat' => true,
-            'tax_rate' => '21',
+            'total' => $discountTotal->getExcludingVat()->getAmount(),
             'data' => json_encode(['foo' => 'bar', 'promo_id' => $promoId->get(), 'promo_discount_id' => $promoDiscountId->get()]),
         ], $discount->getMappedData());
     }

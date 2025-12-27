@@ -5,7 +5,7 @@ namespace Thinktomorrow\Trader\Infrastructure\Laravel\Models\OrderRead;
 
 use Thinktomorrow\Trader\Application\Common\RendersData;
 use Thinktomorrow\Trader\Application\Common\RendersMoney;
-use Thinktomorrow\Trader\Domain\Common\Price\Old\Price;
+use Thinktomorrow\Trader\Domain\Common\Price\ServicePrice;
 use Thinktomorrow\Trader\Domain\Model\Order\Payment\PaymentState;
 
 abstract class OrderReadPayment
@@ -13,7 +13,7 @@ abstract class OrderReadPayment
     use RendersData;
     use RendersMoney;
 
-    protected Price $cost;
+    protected ServicePrice $cost;
     protected string $payment_id;
     protected ?string $payment_method_id;
     protected PaymentState $state;
@@ -31,7 +31,7 @@ abstract class OrderReadPayment
     {
         $payment = new static();
 
-        if (! $state['payment_state'] instanceof PaymentState) {
+        if (!$state['payment_state'] instanceof PaymentState) {
             throw new \InvalidArgumentException('Payment state is expected to be instance of PaymentState. Instead ' . gettype($state['payment_state']) . ' is passed.');
         }
 

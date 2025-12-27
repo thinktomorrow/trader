@@ -28,10 +28,10 @@ class OrderPromoTest extends CartContext
         $cart = $this->cartRepository->findCart($this->getOrder()->orderId);
         $this->assertCount(1, $cart->getDiscounts());
 
-        $this->assertTrue($order->getItemDiscount()->includesVat());
+        $this->assertTrue($order->getDiscountTotal()->includesVat());
 
         $this->assertEquals(Money::EUR(2500), $order->getSubTotal()->getIncludingVat());
-        $this->assertEquals(Money::EUR(40), $order->getItemDiscount()->getIncludingVat());
+        $this->assertEquals(Money::EUR(40), $order->getDiscountTotal()->getIncludingVat());
         $this->assertEquals(Money::EUR(2460), $order->getTotal()->getIncludingVat());
 
         $this->assertEquals('€ 25', $cart->getSubtotalPrice());
@@ -57,11 +57,11 @@ class OrderPromoTest extends CartContext
         $cart = $this->cartRepository->findCart($this->getOrder()->orderId);
         $this->assertCount(1, $cart->getDiscounts());
 
-        $this->assertFalse($order->getItemDiscount()->includesVat());
+        $this->assertFalse($order->getDiscountTotal()->includesVat());
 
         $this->assertEquals(Money::EUR(2500), $order->getSubTotal()->getIncludingVat());
-        $this->assertEquals(Money::EUR(40), $order->getItemDiscount()->getExcludingVat());
-        $this->assertEquals(Money::EUR(48), $order->getItemDiscount()->getIncludingVat());
+        $this->assertEquals(Money::EUR(40), $order->getDiscountTotal()->getExcludingVat());
+        $this->assertEquals(Money::EUR(48), $order->getDiscountTotal()->getIncludingVat());
         $this->assertEquals(Money::EUR(2452), $order->getTotal()->getIncludingVat());
 
         $this->assertEquals('€ 25', $cart->getSubtotalPrice());
@@ -81,7 +81,7 @@ class OrderPromoTest extends CartContext
         $this->assertCount(0, $order->getDiscounts());
 
         $this->assertEquals(Money::EUR(2500), $order->getSubTotal()->getIncludingVat());
-        $this->assertEquals(Money::EUR(0), $order->getItemDiscount()->getIncludingVat());
+        $this->assertEquals(Money::EUR(0), $order->getDiscountTotal()->getIncludingVat());
         $this->assertEquals(Money::EUR(2500), $order->getTotal()->getIncludingVat());
     }
 
@@ -97,7 +97,7 @@ class OrderPromoTest extends CartContext
         $this->assertCount(0, $order->getDiscounts());
 
         $this->assertEquals(Money::EUR(2000), $order->getSubTotal()->getIncludingVat());
-        $this->assertEquals(Money::EUR(0), $order->getItemDiscount()->getIncludingVat());
+        $this->assertEquals(Money::EUR(0), $order->getDiscountTotal()->getIncludingVat());
         $this->assertEquals(Money::EUR(2000), $order->getTotal()->getIncludingVat());
     }
 
@@ -114,7 +114,7 @@ class OrderPromoTest extends CartContext
         $this->assertCount(1, $order->getDiscounts());
 
         $this->assertEquals(Money::EUR(2500), $order->getSubTotal()->getIncludingVat());
-        $this->assertEquals(Money::EUR(40), $order->getItemDiscount()->getIncludingVat());
+        $this->assertEquals(Money::EUR(40), $order->getDiscountTotal()->getIncludingVat());
         $this->assertEquals(Money::EUR(2460), $order->getTotal()->getIncludingVat());
     }
 
@@ -132,7 +132,7 @@ class OrderPromoTest extends CartContext
         $this->assertCount(2, $order->getDiscounts());
 
         $this->assertEquals(Money::EUR(2500), $order->getSubTotal()->getIncludingVat());
-        $this->assertEquals(Money::EUR(80), $order->getItemDiscount()->getIncludingVat());
+        $this->assertEquals(Money::EUR(80), $order->getDiscountTotal()->getIncludingVat());
         $this->assertEquals(Money::EUR(2420), $order->getTotal()->getIncludingVat());
     }
 
@@ -150,7 +150,7 @@ class OrderPromoTest extends CartContext
         $this->assertCount(1, $order->getDiscounts());
 
         $this->assertEquals(Money::EUR(2500), $order->getSubTotal()->getIncludingVat());
-        $this->assertEquals(Money::EUR(200), $order->getItemDiscount()->getIncludingVat());
+        $this->assertEquals(Money::EUR(200), $order->getDiscountTotal()->getIncludingVat());
         $this->assertEquals(Money::EUR(2300), $order->getTotal()->getIncludingVat());
     }
 
@@ -171,7 +171,7 @@ class OrderPromoTest extends CartContext
         $this->assertCount(2, $order->getDiscounts());
 
         $this->assertEquals(Money::EUR(2500), $order->getSubTotal()->getIncludingVat());
-        $this->assertEquals(Money::EUR(80), $order->getItemDiscount()->getIncludingVat());
+        $this->assertEquals(Money::EUR(80), $order->getDiscountTotal()->getIncludingVat());
         $this->assertEquals(Money::EUR(2420), $order->getTotal()->getIncludingVat());
     }
 
@@ -187,7 +187,7 @@ class OrderPromoTest extends CartContext
         $order = $this->orderRepository->find($this->getOrder()->orderId);
         $this->assertCount(1, $order->getDiscounts());
 
-        $this->assertEquals($order->getSubTotal()->getIncludingVat(), $order->getItemDiscount()->getIncludingVat());
+        $this->assertEquals($order->getSubTotal()->getIncludingVat(), $order->getDiscountTotal()->getIncludingVat());
         $this->assertEquals(Cash::zero(), $order->getTotal()->getIncludingVat());
         $this->assertEquals(Cash::zero(), $order->getTotal()->getExcludingVat());
     }

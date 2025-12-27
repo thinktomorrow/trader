@@ -7,9 +7,9 @@ use Assert\Assertion;
 use Money\Money;
 use Thinktomorrow\Trader\Application\Common\RendersData;
 use Thinktomorrow\Trader\Application\Common\RendersMoney;
-use Thinktomorrow\Trader\Domain\Common\Cash\Cash;
 use Thinktomorrow\Trader\Domain\Common\Price\DefaultItemPrice;
-use Thinktomorrow\Trader\Domain\Common\Price\Old\Price;
+use Thinktomorrow\Trader\Domain\Common\Price\DiscountPrice;
+use Thinktomorrow\Trader\Domain\Common\Price\ItemPrice;
 use Thinktomorrow\Trader\Domain\Model\Order\Line\LinePrice;
 use Thinktomorrow\Trader\Domain\Model\Order\Line\PurchasableReference;
 use Thinktomorrow\Trader\Domain\Model\Product\Variant\VariantUnitPrice;
@@ -24,10 +24,10 @@ abstract class OrderReadLine
     protected ?string $variant_id;
     protected ?string $product_id;
     protected array $purchasableData;
-    protected LinePrice $linePrice;
+    protected ItemPrice $linePrice;
     protected VariantUnitPrice $unitPrice;
     protected DefaultItemPrice $total;
-    protected Price $discountTotal;
+    protected DiscountPrice $discountTotal;
     protected Money $taxTotal;
 
     protected int $quantity;
@@ -55,7 +55,8 @@ abstract class OrderReadLine
         }
 
         $line->line_id = $state['line_id'];
-        $line->linePrice = $state['linePrice'];
+        $line->unitPrice = $state['unitPrice'];
+        $line->linePrice = $state['unitPrice'];
         $line->total = $state['total'];
         $line->discountTotal = $state['discountTotal'];
         $line->taxTotal = $state['taxTotal'];
@@ -74,13 +75,14 @@ abstract class OrderReadLine
         $line->variant_id = $line->purchasableReference->isVariant() ? $line->purchasableReference->getId() : $line->data('variant_id');
         $line->product_id = $line->data('product_id');
 
-        $line->unitPrice = VariantUnitPrice::fromMoney(
-            Cash::make($line->linePrice->includesVat() ? $line->data('unit_price_including_vat') : $line->data('unit_price_excluding_vat')),
-            $line->linePrice->getVatPercentage(),
-            $line->linePrice->includesVat()
-        );
 
-        $line->include_tax = $line->linePrice->includesVat();
+//        $line->unitPrice = VariantUnitPrice::fromMoney(
+//            Cash::make($line->linePrice->includesVat() ? $line->data('unit_price_including_vat') : $line->data('unit_price_excluding_vat')),
+//            $line->linePrice->getVatPercentage(),
+//            $line->linePrice->includesVat()
+//        );
+
+//        $line->include_tax = $line->linePrice->includesVat();
 
         return $line;
     }
@@ -218,7 +220,7 @@ abstract class OrderReadLine
 
     public function getData(?string $key = null, $default = null): mixed
     {
-        if (! $key) {
+        if (!$key) {
             return $this->data;
         }
 
