@@ -48,7 +48,7 @@ class OrderDiscountTest extends TestCase
     public function test_it_can_add_a_discount()
     {
         $order = $this->orderContext->createDefaultOrder();
-        $discount = $this->orderContext->createDiscount('order-aaa', 'discount-bbb', ['promo_discount_id' => 'promo-discount-bbb']);
+        $discount = $this->orderContext->createOrderDiscount('order-aaa', 'discount-bbb', ['promo_discount_id' => 'promo-discount-bbb']);
 
         $order->addDiscount($discount);
 
@@ -58,7 +58,7 @@ class OrderDiscountTest extends TestCase
     public function test_it_can_add_a_discount_to_payment()
     {
         $order = $this->orderContext->createDefaultOrder();
-        $discount = $this->orderContext->createDiscount('order-aaa', 'discount-bbb', [
+        $discount = $this->orderContext->createOrderDiscount('order-aaa', 'discount-bbb', [
             'discountable_type' => DiscountableType::payment->value,
             'discountable_id' => 'order-aaa:payment-aaa',
         ]);
@@ -73,7 +73,7 @@ class OrderDiscountTest extends TestCase
         $this->expectException(\InvalidArgumentException::class);
 
         $order = $this->orderContext->createDefaultOrder();
-        $discount = $this->orderContext->createDiscount();
+        $discount = $this->orderContext->createOrderDiscount();
 
         $order->addDiscount($discount);
 
@@ -85,7 +85,7 @@ class OrderDiscountTest extends TestCase
         $this->expectException(\InvalidArgumentException::class);
 
         $order = $this->orderContext->createDefaultOrder();
-        $discount = $this->orderContext->createDiscount('order-aaa', 'discount-bbb');
+        $discount = $this->orderContext->createOrderDiscount('order-aaa', 'discount-bbb');
 
         $order->addDiscount($discount);
 
@@ -97,7 +97,7 @@ class OrderDiscountTest extends TestCase
         $this->expectException(\InvalidArgumentException::class);
 
         $order = $this->orderContext->createDefaultOrder();
-        $discount = $this->orderContext->createDiscount('order-aaa', 'discount-bbb', [
+        $discount = $this->orderContext->createOrderDiscount('order-aaa', 'discount-bbb', [
             'discountable_type' => DiscountableType::line->value,
         ]);
 
@@ -111,7 +111,7 @@ class OrderDiscountTest extends TestCase
         $this->expectException(\InvalidArgumentException::class);
 
         $order = $this->orderContext->createDefaultOrder();
-        $discount = $this->orderContext->createDiscount('order-aaa', 'discount-bbb', [
+        $discount = $this->orderContext->createOrderDiscount('order-aaa', 'discount-bbb', [
             'discountable_type' => DiscountableType::line->value,
             'discountable_id' => 'some-other-id',
         ]);

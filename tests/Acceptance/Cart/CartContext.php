@@ -380,7 +380,7 @@ abstract class CartContext extends TestCase
 
     public function givenThereIsAPromo(array $mappedData = [], array $discounts = [])
     {
-        $promo = $this->createPromo($mappedData, $discounts ?: [$this->createDiscount([], [$this->createCondition()])]);
+        $promo = $this->createPromo($mappedData, $discounts ?: [$this->orderContext->createOrderDiscount([], [$this->createCondition()])]);
 
         $this->promoRepository->save($promo);
     }

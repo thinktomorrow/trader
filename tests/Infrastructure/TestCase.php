@@ -83,7 +83,7 @@ abstract class TestCase extends \Orchestra\Testbench\TestCase
         app(ProductRepository::class)->save($product);
 
         $promo = $this->createPromo([], [
-            $this->createDiscount(),
+            $this->orderContext->createOrderDiscount(),
         ]);
         app(PromoRepository::class)->save($promo);
 

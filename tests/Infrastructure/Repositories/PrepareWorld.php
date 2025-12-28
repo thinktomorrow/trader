@@ -36,12 +36,12 @@ trait PrepareWorld
 
         $promoRepository = iterator_to_array($this->promoRepositories())[$i];
         $promo = $this->createPromo([], [
-            $this->createDiscount(['discount_id' => 'ddd'], []),
+            $this->orderContext->createOrderDiscount(['discount_id' => 'ddd'], []),
         ]);
         $promoRepository->save($promo);
 
         $promo = $this->createPromo(['promo_id' => 'def'], [
-            $this->createDiscount(['discount_id' => 'eee'], []),
+            $this->orderContext->createOrderDiscount(['discount_id' => 'eee'], []),
         ]);
         $promoRepository->save($promo);
 
@@ -50,7 +50,7 @@ trait PrepareWorld
         $shippingProfileRepository->save($shippingProfile);
 
         $paymentMethodRepository = iterator_to_array($this->paymentMethodRepositories())[$i];
-        $paymentMethod = $this->createPaymentMethod();
+        $paymentMethod = $this->orderContext->createPaymentMethod();
         $paymentMethodRepository->save($paymentMethod);
     }
 
@@ -69,12 +69,12 @@ trait PrepareWorld
 
         $promoRepository = iterator_to_array($this->promoRepositories())[$i];
         $promo = $this->createPromo([], [
-            $this->createDiscount(['discount_id' => 'ddd'], []),
+            $this->orderContext->createOrderDiscount(['discount_id' => 'ddd'], []),
         ]);
         $promoRepository->delete($promo->promoId);
 
         $promo = $this->createPromo(['promo_id' => 'def'], [
-            $this->createDiscount(['discount_id' => 'eee'], []),
+            $this->orderContext->createOrderDiscount(['discount_id' => 'eee'], []),
         ]);
         $promoRepository->delete($promo->promoId);
 
@@ -83,7 +83,7 @@ trait PrepareWorld
         $shippingProfileRepository->delete($shippingProfile->shippingProfileId);
 
         $paymentMethodRepository = iterator_to_array($this->paymentMethodRepositories())[$i];
-        $paymentMethod = $this->createPaymentMethod();
+        $paymentMethod = $this->orderContext->createPaymentMethod();
         $paymentMethodRepository->delete($paymentMethod->paymentMethodId);
     }
 

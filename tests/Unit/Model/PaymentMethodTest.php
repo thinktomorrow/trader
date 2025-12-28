@@ -32,7 +32,7 @@ class PaymentMethodTest extends TestCase
 
     public function test_it_can_update_rate()
     {
-        $paymentMethod = $this->createPaymentMethod();
+        $paymentMethod = $this->orderContext->createPaymentMethod();
 
         $paymentMethod->updateRate(Money::EUR(30));
 
@@ -41,7 +41,7 @@ class PaymentMethodTest extends TestCase
 
     public function test_it_can_update_provider()
     {
-        $paymentMethod = $this->createPaymentMethod();
+        $paymentMethod = $this->orderContext->createPaymentMethod();
 
         $paymentMethod->updateProvider($updatedProvider = PaymentMethodProviderId::fromString('updated-provider'));
 
@@ -50,7 +50,7 @@ class PaymentMethodTest extends TestCase
 
     public function test_adding_data_merges_with_existing_data()
     {
-        $paymentMethod = $this->createPaymentMethod();
+        $paymentMethod = $this->orderContext->createPaymentMethod();
 
         $paymentMethod->addData(['bar' => 'baz']);
         $paymentMethod->addData(['foo' => 'bar', 'bar' => 'boo']);
@@ -60,7 +60,7 @@ class PaymentMethodTest extends TestCase
 
     public function test_it_can_delete_data()
     {
-        $paymentMethod = $this->createPaymentMethod();
+        $paymentMethod = $this->orderContext->createPaymentMethod();
 
         $paymentMethod->addData(['foo' => 'bar', 'bar' => 'boo']);
         $paymentMethod->deleteData('bar');
@@ -70,7 +70,7 @@ class PaymentMethodTest extends TestCase
 
     public function test_it_can_update_countries()
     {
-        $paymentMethod = $this->createPaymentMethod();
+        $paymentMethod = $this->orderContext->createPaymentMethod();
 
         $countries = [
             CountryId::fromString('FR'),
@@ -90,7 +90,7 @@ class PaymentMethodTest extends TestCase
 
     public function test_it_can_add_country()
     {
-        $paymentMethod = $this->createPaymentMethod();
+        $paymentMethod = $this->orderContext->createPaymentMethod();
 
         $paymentMethod->addCountry(CountryId::fromString('FR'));
 
@@ -102,7 +102,7 @@ class PaymentMethodTest extends TestCase
 
     public function test_it_can_delete_country()
     {
-        $paymentMethod = $this->createPaymentMethod();
+        $paymentMethod = $this->orderContext->createPaymentMethod();
         $paymentMethod->addCountry(CountryId::fromString('BE'));
         $paymentMethod->addCountry(CountryId::fromString('NL'));
         $paymentMethod->deleteCountry(CountryId::fromString('BE'));

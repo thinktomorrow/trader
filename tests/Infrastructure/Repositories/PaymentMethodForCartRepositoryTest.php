@@ -30,7 +30,7 @@ class PaymentMethodForCartRepositoryTest extends TestCase
 
     public function test_it_can_find_payment_methods_for_cart()
     {
-        $paymentMethod = $this->createPaymentMethod();
+        $paymentMethod = $this->orderContext->createPaymentMethod();
 
         foreach ($this->repositories() as $i => $repository) {
             $this->countryRepositories()[$i]->save($this->country);
@@ -43,7 +43,7 @@ class PaymentMethodForCartRepositoryTest extends TestCase
 
     public function test_it_can_find_methods_for_cart_with_matching_countries()
     {
-        $paymentMethod = $this->createPaymentMethod();
+        $paymentMethod = $this->orderContext->createPaymentMethod();
         $paymentMethod->addCountry(CountryId::fromString('BE'));
 
         foreach ($this->repositories() as $i => $repository) {

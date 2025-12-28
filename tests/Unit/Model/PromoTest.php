@@ -7,7 +7,6 @@ use Tests\Unit\TestCase;
 use Thinktomorrow\Trader\Domain\Model\Promo\Condition;
 use Thinktomorrow\Trader\Domain\Model\Promo\Conditions\MinimumLinesQuantity;
 use Thinktomorrow\Trader\Domain\Model\Promo\Discount;
-use Thinktomorrow\Trader\Domain\Model\Promo\Discounts\PercentageOffDiscount;
 use Thinktomorrow\Trader\Domain\Model\Promo\Events\PromoCreated;
 use Thinktomorrow\Trader\Domain\Model\Promo\Promo;
 use Thinktomorrow\Trader\Domain\Model\Promo\PromoId;
@@ -36,19 +35,18 @@ final class PromoTest extends TestCase
 
     public function test_it_can_build_discount_from_mapped_data()
     {
-        $discount = $this->createDiscount([], [
+        $discount = $this->orderContext->createPromoDiscount('promo-aaa', 'promo-discount-aaa', 'percentage_off', [], [
             MinimumLinesQuantity::fromMappedData([
                 'data' => json_encode(['minimum_quantity' => '5']),
             ], []),
         ]);
 
         $this->assertEquals([
-            'promo_id' => 'abc',
-            'discount_id' => 'ddd',
-            'key' => 'fixed_amount',
-            'data' => json_encode(['amount' => '40']),
+            'promo_id' => 'promo-aaa',
+            'discount_id' => 'promo-discount-aaa',
+            'key' => 'percentage_off',
+            'data' => json_encode(['percentage' => '15']),
         ], $discount->getMappedData());
-
 
         $this->assertCount(1, $discount->getChildEntities()[Condition::class]);
 
@@ -64,42 +62,28 @@ final class PromoTest extends TestCase
 
     public function test_it_can_build_promo_from_mapped_data()
     {
-        $promo = $this->createPromo([
-            'coupon_code' => 'foobar',
-            'start_at' => '2022-05-05 10:10:10',
-            'end_at' => '2022-05-09 10:10:10',
-            'data' => json_encode(['foo' => 'bar']),
-        ], [
-            PercentageOffDiscount::fromMappedData([
-                'discount_id' => 'ddd',
-                'data' => json_encode(['percentage' => '40']),
-            ], ['promo_id' => 'xxx'], [
-                Condition::class => [
-                    MinimumLinesQuantity::fromMappedData([
-                        'data' => json_encode(['minimum_quantity' => '5']),
-                    ], []),
-                ],
-            ]),
+        $promo = $this->orderContext->createPromo('promo-aaa', [], [
+            $this->orderContext->createPromoDiscount(),
         ]);
 
         $this->assertEquals([
-            'promo_id' => 'abc',
+            'promo_id' => 'promo-aaa',
             'state' => PromoState::online->value,
-            'data' => json_encode(['foo' => 'bar']),
-            'coupon_code' => 'foobar',
+            'data' => json_encode([]),
             'is_combinable' => false,
-            'start_at' => '2022-05-05 10:10:10',
-            'end_at' => '2022-05-09 10:10:10',
+            'coupon_code' => 'PROMO123',
+            'start_at' => null,
+            'end_at' => null,
         ], $promo->getMappedData());
 
         $this->assertCount(1, $promo->getChildEntities()[Discount::class]);
         $this->assertEquals([
             Discount::class => [
                 [
-                    'promo_id' => 'xxx',
-                    'discount_id' => 'ddd',
+                    'promo_id' => 'promo-aaa',
+                    'discount_id' => 'promo-discount-aaa',
                     'key' => 'percentage_off',
-                    'data' => json_encode(['percentage' => '40']),
+                    'data' => json_encode(['percentage' => '15']),
                 ],
             ],
         ], $promo->getChildEntities());
@@ -107,20 +91,20 @@ final class PromoTest extends TestCase
 
     public function test_it_can_update_discounts()
     {
-        $promo = Promo::create(PromoId::fromString('xxx'), 'foobar', \DateTime::createFromFormat('Y-m-d H:i:s', '2022-02-02 10:10:10'), \DateTime::createFromFormat('Y-m-d H:i:s', '2023-02-02 10:10:10'), false);
+        $promo = Promo::create(PromoId::fromString('promo-aaa'), 'foobar', \DateTime::createFromFormat('Y-m-d H:i:s', '2022-02-02 10:10:10'), \DateTime::createFromFormat('Y-m-d H:i:s', '2023-02-02 10:10:10'), false);
 
         $promo->updateDiscounts([
-            $this->createDiscount(),
+            $this->orderContext->createPromoDiscount(),
         ]);
 
         $this->assertCount(1, $promo->getChildEntities()[Discount::class]);
         $this->assertEquals([
             Discount::class => [
                 [
-                    'promo_id' => 'abc',
-                    'discount_id' => 'ddd',
-                    'key' => 'fixed_amount',
-                    'data' => json_encode(['amount' => '40']),
+                    'promo_id' => 'promo-aaa',
+                    'discount_id' => 'promo-discount-aaa',
+                    'key' => 'percentage_off',
+                    'data' => json_encode(['percentage' => '15']),
                 ],
             ],
         ], $promo->getChildEntities());
@@ -140,8 +124,8 @@ final class PromoTest extends TestCase
         $promo = Promo::create(PromoId::fromString('xxx'), 'foobar', \DateTime::createFromFormat('Y-m-d H:i:s', '2022-02-02 10:10:10'), \DateTime::createFromFormat('Y-m-d H:i:s', '2023-02-02 10:10:10'), false);
 
         $promo->updateDiscounts([
-            $this->createDiscount(),
-            $this->createDiscount(),
+            $this->orderContext->createPromoDiscount(),
+            $this->orderContext->createPromoDiscount(),
         ]);
 
         $this->assertCount(2, $promo->getChildEntities()[Discount::class]);
@@ -153,7 +137,7 @@ final class PromoTest extends TestCase
 
     public function test_discount_can_add_condition()
     {
-        $discount = $this->createDiscount();
+        $discount = $this->orderContext->createPromoDiscount();
 
         $discount->updateConditions([
             MinimumLinesQuantity::fromMappedData([
@@ -174,7 +158,7 @@ final class PromoTest extends TestCase
 
     public function test_discount_can_update_condition()
     {
-        $discount = $this->createDiscount();
+        $discount = $this->orderContext->createPromoDiscount();
 
         $discount->updateConditions([
             MinimumLinesQuantity::fromMappedData([
@@ -201,7 +185,7 @@ final class PromoTest extends TestCase
 
     public function test_discount_can_delete_condition()
     {
-        $discount = $this->createDiscount();
+        $discount = $this->orderContext->createPromoDiscount();
 
         $discount->updateConditions([
             MinimumLinesQuantity::fromMappedData([
