@@ -25,7 +25,7 @@ final class InMemoryProductDetailRepository implements ProductDetailRepository, 
             'stock_data' => json_encode([]),
         ]);
 
-        if (! $allowOffline && ! in_array($product->getState(), ProductState::onlineStates())) {
+        if (!$allowOffline && !in_array($product->getState(), ProductState::onlineStates())) {
             throw new CouldNotFindVariant('No online variant found by id [' . $variantId->get() . ']');
         }
 
@@ -61,7 +61,7 @@ final class InMemoryProductDetailRepository implements ProductDetailRepository, 
             if ($variant->variantId->get() === $variantId->get()) {
 
                 foreach ($variant->getVariantTaxa() as $variantTaxon) {
-                    $taxon = $taxonRepo->find($productTaxon->taxonId);
+                    $taxon = $taxonRepo->find($variantTaxon->taxonId);
                     $taxonomy = $taxonomyRepo->find($taxon->taxonomyId);
 
                     $keys = $taxon->getTaxonKeys();

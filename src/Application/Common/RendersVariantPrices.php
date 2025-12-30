@@ -33,7 +33,7 @@ trait RendersVariantPrices
 
     public function onSale(): bool
     {
-        return $this->salePrice->getMoney()->lessThan($this->unitPrice->getMoney());
+        return $this->salePrice->getExcludingVat()->lessThan($this->unitPrice->getExcludingVat());
     }
 
     public function getSaleDiscount(): string

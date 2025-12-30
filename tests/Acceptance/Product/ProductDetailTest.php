@@ -65,7 +65,7 @@ class ProductDetailTest extends ProductContext
         $productDetail = $this->productDetailRepository->findProductDetail($variantId);
 
         // Fallback values for sku / ean
-        $this->assertEquals('fake-sku', $productDetail->getSku());
+        $this->assertEquals('sku-variant-aaa', $productDetail->getSku());
         $this->assertNull($productDetail->getEan());
 
         // Set specific sku / ean values
