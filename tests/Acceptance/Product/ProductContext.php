@@ -78,7 +78,6 @@ abstract class ProductContext extends TestCase
 
         $this->productOptionsComposer = new VariantLinksComposer(
             $this->productRepository,
-            $this->productDetailRepository,
             new TestContainer(),
         );
 

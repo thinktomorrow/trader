@@ -5,9 +5,7 @@ namespace Tests\Acceptance\Product;
 
 use Tests\TestHelpers;
 use Thinktomorrow\Trader\Application\Product\VariantLinks\VariantLinks;
-use Thinktomorrow\Trader\Application\Product\VariantLinks\VariantLinksComposer;
 use Thinktomorrow\Trader\Domain\Common\Locale;
-use Thinktomorrow\Trader\Infrastructure\Test\TestContainer;
 
 class VariantLinksTest extends ProductContext
 {
@@ -15,34 +13,54 @@ class VariantLinksTest extends ProductContext
 
     public function test_it_can_compose_variant_links()
     {
-        $product = $this->createProductWithProductVariantProperties();
-        $this->productRepository->save($product);
+        $product = $this->catalogContext->createProduct();
+        $variant1 = $this->catalogContext->createVariant($product->productId->get(), 'variant-bbb');
+        $variant2 = $this->catalogContext->createVariant($product->productId->get(), 'variant-ccc');
 
-        $links = (new VariantLinksComposer($this->productRepository, new TestContainer()))->get(
-            $product->productId,
-            $product->getVariants()[0]->variantId,
-            Locale::fromString('nl', 'BE')
+        $productDetail = $this->catalogContext->catalogRepos()->productDetailRepository()->findProductDetail($product->getVariants()[0]->variantId);
+
+        $links = $this->catalogContext->catalogRepos()->variantLinksComposer()->get(
+            $productDetail,
+            Locale::fromString('nl')
         );
 
         $this->assertCount(3, $links);
         $this->assertInstanceOf(VariantLinks::class, $links);
     }
 
-    public function test_it_can_compose_variant_links_per_locale()
+    public function test_it_can_compose_variant_links_url_and_label()
     {
-        $this->markTestIncomplete();
-        
-        $product = $this->createProductWithProductVariantProperties();
-        $this->productRepository->save($product);
+        $product = $this->catalogContext->createProduct();
+        $variant1 = $this->catalogContext->createVariant($product->productId->get(), 'variant-bbb');
+        $variant2 = $this->catalogContext->createVariant($product->productId->get(), 'variant-ccc');
 
-        $links = (new VariantLinksComposer($this->productRepository, new TestContainer()))->get(
-            $product->productId,
-            $product->getVariants()[0]->variantId,
-            Locale::fromString('nl', 'BE')
+        $productDetail = $this->catalogContext->catalogRepos()->productDetailRepository()->findProductDetail($product->getVariants()[0]->variantId);
+
+        $links = $this->catalogContext->catalogRepos()->variantLinksComposer()->get(
+            $productDetail,
+            Locale::fromString('nl')
         );
 
-        $this->assertEquals('/yyy', $links[0]->getUrl());
-        $this->assertEquals('/yyy', $links[1]->getUrl());
-        $this->assertEquals('/yyy', $links[2]->getUrl());
+        $this->assertEquals('/variant-aaa', $links[0]->getUrl());
+        $this->assertEquals('/variant-bbb', $links[1]->getUrl());
+        $this->assertEquals('/variant-ccc', $links[2]->getUrl());
+
+        $this->assertEquals('variant-aaa option title nl', $links[0]->getLabel());
+        $this->assertEquals('variant-bbb option title nl', $links[1]->getLabel());
+        $this->assertEquals('variant-ccc option title nl', $links[2]->getLabel());
+    }
+
+    public function test_it_can_compose_variant_links_label_per_locale()
+    {
+        $product = $this->catalogContext->createProduct();
+
+        $productDetail = $this->catalogContext->catalogRepos()->productDetailRepository()->findProductDetail($product->getVariants()[0]->variantId);
+
+        $links = $this->catalogContext->catalogRepos()->variantLinksComposer()->get(
+            $productDetail,
+            Locale::fromString('fr')
+        );
+
+        $this->assertEquals('variant-aaa option title fr', $links[0]->getLabel());
     }
 }
