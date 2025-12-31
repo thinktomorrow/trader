@@ -113,18 +113,18 @@ trait TestHelpers
             'order_state' => DefaultOrderState::cart_revived,
             'data' => "[]",
         ], $orderValues), [
-            Line::class => array_map(fn (Line $line) => [
+            Line::class => array_map(fn(Line $line) => [
                 ...$line->getMappedData(),
-                Discount::class => array_map(fn (Discount $discount) => $discount->getMappedData(), $line->getDiscounts()),
-                LinePersonalisation::class => array_map(fn (LinePersonalisation $linePersonalisation) => $linePersonalisation->getMappedData(), $line->getPersonalisations()),
+                Discount::class => array_map(fn(Discount $discount) => $discount->getMappedData(), $line->getDiscounts()),
+                LinePersonalisation::class => array_map(fn(LinePersonalisation $linePersonalisation) => $linePersonalisation->getMappedData(), $line->getPersonalisations()),
             ], $lines),
-            Shipping::class => array_map(fn (Shipping $shipping) => [...array_merge($shipping->getMappedData(), ['shipping_state' => $shipping->getShippingState()]), Discount::class => array_map(fn (Discount $discount) => $discount->getMappedData(), $shipping->getDiscounts())], $shippings),
-            Payment::class => array_map(fn (Payment $payment) => [...array_merge($payment->getMappedData(), ['payment_state' => $payment->getPaymentState()]), Discount::class => array_map(fn (Discount $discount) => $discount->getMappedData(), $payment->getDiscounts())], $payments),
+            Shipping::class => array_map(fn(Shipping $shipping) => [...array_merge($shipping->getMappedData(), ['shipping_state' => $shipping->getShippingState()]), Discount::class => array_map(fn(Discount $discount) => $discount->getMappedData(), $shipping->getDiscounts())], $shippings),
+            Payment::class => array_map(fn(Payment $payment) => [...array_merge($payment->getMappedData(), ['payment_state' => $payment->getPaymentState()]), Discount::class => array_map(fn(Discount $discount) => $discount->getMappedData(), $payment->getDiscounts())], $payments),
             ShippingAddress::class => $shippingAddress?->getMappedData(),
             BillingAddress::class => $billingAddress?->getMappedData(),
             Shopper::class => $shopper?->getMappedData(),
-            Discount::class => array_map(fn (Discount $discount) => $discount->getMappedData(), $discounts),
-            OrderEvent::class => array_map(fn (OrderEvent $logEntry) => $logEntry->getMappedData(), $logEntries),
+            Discount::class => array_map(fn(Discount $discount) => $discount->getMappedData(), $discounts),
+            OrderEvent::class => array_map(fn(OrderEvent $logEntry) => $logEntry->getMappedData(), $logEntries),
         ]);
     }
 
@@ -148,17 +148,17 @@ trait TestHelpers
         return Line::fromMappedData(array_merge([
             'line_id' => 'abc',
             'variant_id' => 'yyy',
-            'line_price' => 200,
+            'unit_price_excl' => 200,
             'tax_rate' => '10',
-            'includes_vat' => true,
+            'includes_vat' => false,
             'reduced_from_stock' => false,
             'quantity' => 2,
             'data' => json_encode(['product_id' => 'xxx', 'unit_price_including_vat' => '1000', 'unit_price_excluding_vat' => '900', 'foo' => 'bar', 'variant_id' => 'yyy']),
         ], $values), array_merge([
             'order_id' => 'xxx',
         ], $aggregateState), [
-            Discount::class => array_map(fn (Discount $discount) => $discount->getMappedData(), $discounts),
-            LinePersonalisation::class => array_map(fn (LinePersonalisation $linePersonalisation) => $linePersonalisation->getMappedData(), $personalisations),
+            Discount::class => array_map(fn(Discount $discount) => $discount->getMappedData(), $discounts),
+            LinePersonalisation::class => array_map(fn(LinePersonalisation $linePersonalisation) => $linePersonalisation->getMappedData(), $personalisations),
         ]);
     }
 
@@ -176,7 +176,7 @@ trait TestHelpers
         ], $values), array_merge([
             'order_id' => 'xxx',
         ], $aggregateState), [
-            Discount::class => array_map(fn (Discount $discount) => $discount->getMappedData(), $discounts),
+            Discount::class => array_map(fn(Discount $discount) => $discount->getMappedData(), $discounts),
         ]);
     }
 
@@ -193,7 +193,7 @@ trait TestHelpers
         ], $values), array_merge([
             'order_id' => 'xxx',
         ], $aggregateState), [
-            Discount::class => array_map(fn (Discount $discount) => $discount->getMappedData(), $discounts),
+            Discount::class => array_map(fn(Discount $discount) => $discount->getMappedData(), $discounts),
         ]);
     }
 
@@ -662,7 +662,7 @@ trait TestHelpers
         $this->assertEquals(array_keys($expected), array_keys($actual), 'Keys do not match: ' . $message);
 
         foreach ($expected as $expectedKey => $expectedValue) {
-            if (is_array($expectedValue) && ! is_array($actual[$expectedKey])) {
+            if (is_array($expectedValue) && !is_array($actual[$expectedKey])) {
                 $this->assertEquals($expectedValue, $actual[$expectedKey], $message);
             }
 

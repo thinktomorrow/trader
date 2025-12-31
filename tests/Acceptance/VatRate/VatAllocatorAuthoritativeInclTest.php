@@ -27,9 +27,9 @@ final class VatAllocatorAuthoritativeInclTest extends TestCase
 
         $line = $this->orderContext->createLine(
             'order-aaa', 'line-aaa', [
-                'line_price' => $unitIncl,
+                'unit_price_incl' => $unitIncl,
                 'tax_rate' => $vatRate,
-                'includes_vat' => true, // TODO: this should be removed, and use excl/incl prices explicit
+                'includes_vat' => true,
                 'quantity' => $quantity,
             ]
         );

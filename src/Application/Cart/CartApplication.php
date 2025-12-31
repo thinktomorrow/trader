@@ -25,11 +25,11 @@ use Thinktomorrow\Trader\Application\VatNumber\VatNumberApplication;
 use Thinktomorrow\Trader\Application\VatNumber\VatNumberValidation;
 use Thinktomorrow\Trader\Application\VatRate\VatExemptionApplication;
 use Thinktomorrow\Trader\Domain\Common\Event\EventDispatcher;
+use Thinktomorrow\Trader\Domain\Common\Price\DefaultItemPrice;
 use Thinktomorrow\Trader\Domain\Model\Customer\CustomerRepository;
 use Thinktomorrow\Trader\Domain\Model\Order\Address\BillingAddress;
 use Thinktomorrow\Trader\Domain\Model\Order\Address\ShippingAddress;
 use Thinktomorrow\Trader\Domain\Model\Order\Line\Line;
-use Thinktomorrow\Trader\Domain\Model\Order\Line\LinePrice;
 use Thinktomorrow\Trader\Domain\Model\Order\Line\Personalisations\LinePersonalisation;
 use Thinktomorrow\Trader\Domain\Model\Order\Line\PurchasableReference;
 use Thinktomorrow\Trader\Domain\Model\Order\Order;
@@ -102,15 +102,17 @@ final class CartApplication
 
         $variant = $this->findVariantDetailsForCart->findVariantForCart($addLine->getVariantId());
 
+        $itemPrice = DefaultItemPrice::fromMoney(
+            $this->config->includeVatInPrices() ? $variant->getSalePrice()->getIncludingVat() : $variant->getSalePrice()->getExcludingVat(),
+            $variant->getSalePrice()->getVatPercentage(),
+            $this->config->includeVatInPrices()
+        );
+
         $line = Line::create(
             $orderId,
             $lineId,
             new PurchasableReference('variant', $addLine->getVariantId()->get()),
-            LinePrice::fromMoney(
-                $this->config->includeVatInPrices() ? $variant->getSalePrice()->getIncludingVat() : $variant->getSalePrice()->getExcludingVat(),
-                $variant->getSalePrice()->getVatPercentage(),
-                $this->config->includeVatInPrices()
-            ),
+            $itemPrice,
             $addLine->getQuantity(),
             array_merge($addLine->getData(), [
                 'title' => $variant->getTitle($addLine->getData()['locale'] ?? null),

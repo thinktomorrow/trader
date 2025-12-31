@@ -4,7 +4,6 @@ declare(strict_types=1);
 namespace Tests\Acceptance\Cart;
 
 use Illuminate\Support\Str;
-use Money\Money;
 use PHPUnit\Framework\Assert;
 use Tests\Acceptance\TestCase;
 use Tests\TestHelpers;
@@ -16,12 +15,6 @@ use Thinktomorrow\Trader\Application\Cart\Line\AddLine;
 use Thinktomorrow\Trader\Application\Cart\Line\ChangeLineQuantity;
 use Thinktomorrow\Trader\Application\Cart\Line\RemoveLine;
 use Thinktomorrow\Trader\Application\Cart\PaymentMethod\UpdatePaymentMethodOnOrder;
-use Thinktomorrow\Trader\Application\Cart\RefreshCart\Adjusters\AdjustDiscounts;
-use Thinktomorrow\Trader\Application\Cart\RefreshCart\Adjusters\AdjustLine;
-use Thinktomorrow\Trader\Application\Cart\RefreshCart\Adjusters\AdjustLines;
-use Thinktomorrow\Trader\Application\Cart\RefreshCart\Adjusters\AdjustShipping;
-use Thinktomorrow\Trader\Application\Cart\RefreshCart\Adjusters\AdjustVatRates;
-use Thinktomorrow\Trader\Application\Cart\RefreshCart\RefreshCartAction;
 use Thinktomorrow\Trader\Application\Cart\ShippingProfile\UpdateShippingProfileOnOrder;
 use Thinktomorrow\Trader\Application\Cart\UpdateBillingAddress;
 use Thinktomorrow\Trader\Application\Cart\UpdateShippingAddress;
@@ -31,11 +24,6 @@ use Thinktomorrow\Trader\Application\Order\Merchant\MerchantOrderApplication;
 use Thinktomorrow\Trader\Application\Product\ProductApplication;
 use Thinktomorrow\Trader\Application\Product\UpdateProduct\UpdateProductPersonalisations;
 use Thinktomorrow\Trader\Application\Promo\Coupon\CouponPromoApplication;
-use Thinktomorrow\Trader\Application\Promo\OrderPromo\ApplyPromoToOrder;
-use Thinktomorrow\Trader\Application\Promo\OrderPromo\Discounts\FixedAmountOrderDiscount;
-use Thinktomorrow\Trader\Application\Promo\OrderPromo\Discounts\PercentageOffOrderDiscount;
-use Thinktomorrow\Trader\Application\Promo\OrderPromo\OrderConditionFactory;
-use Thinktomorrow\Trader\Application\Promo\OrderPromo\OrderDiscountFactory;
 use Thinktomorrow\Trader\Application\VatNumber\VatNumberApplication;
 use Thinktomorrow\Trader\Application\VatNumber\VatNumberValidator;
 use Thinktomorrow\Trader\Application\VatRate\FindVatRateForOrder;
@@ -47,32 +35,17 @@ use Thinktomorrow\Trader\Domain\Common\Vat\VatPercentage;
 use Thinktomorrow\Trader\Domain\Model\Country\CountryId;
 use Thinktomorrow\Trader\Domain\Model\Customer\Customer;
 use Thinktomorrow\Trader\Domain\Model\Order\Exceptions\CouldNotFindOrder;
-use Thinktomorrow\Trader\Domain\Model\Order\Invoice\InvoiceRepository;
 use Thinktomorrow\Trader\Domain\Model\Order\Line\LineId;
 use Thinktomorrow\Trader\Domain\Model\Order\Line\Quantity;
 use Thinktomorrow\Trader\Domain\Model\Order\Order;
 use Thinktomorrow\Trader\Domain\Model\Order\OrderId;
 use Thinktomorrow\Trader\Domain\Model\Order\OrderReference;
-use Thinktomorrow\Trader\Domain\Model\Order\Payment\DefaultPaymentState;
-use Thinktomorrow\Trader\Domain\Model\Order\Payment\PaymentState;
-use Thinktomorrow\Trader\Domain\Model\Order\Shipping\DefaultShippingState;
-use Thinktomorrow\Trader\Domain\Model\Order\Shipping\ShippingState;
 use Thinktomorrow\Trader\Domain\Model\Order\State\DefaultOrderState;
-use Thinktomorrow\Trader\Domain\Model\Order\State\OrderState;
-use Thinktomorrow\Trader\Domain\Model\Order\State\OrderStateMachine;
 use Thinktomorrow\Trader\Domain\Model\PaymentMethod\PaymentMethod;
 use Thinktomorrow\Trader\Domain\Model\PaymentMethod\PaymentMethodId;
 use Thinktomorrow\Trader\Domain\Model\PaymentMethod\PaymentMethodProviderId;
-use Thinktomorrow\Trader\Domain\Model\Product\Product;
 use Thinktomorrow\Trader\Domain\Model\Product\ProductId;
-use Thinktomorrow\Trader\Domain\Model\Product\Variant\Variant;
 use Thinktomorrow\Trader\Domain\Model\Product\Variant\VariantId;
-use Thinktomorrow\Trader\Domain\Model\Product\Variant\VariantSalePrice;
-use Thinktomorrow\Trader\Domain\Model\Product\Variant\VariantUnitPrice;
-use Thinktomorrow\Trader\Domain\Model\Promo\ConditionFactory;
-use Thinktomorrow\Trader\Domain\Model\Promo\Conditions\MinimumLinesQuantity;
-use Thinktomorrow\Trader\Domain\Model\Promo\DiscountFactory;
-use Thinktomorrow\Trader\Domain\Model\Promo\Discounts\FixedAmountDiscount;
 use Thinktomorrow\Trader\Domain\Model\ShippingProfile\ShippingProfile;
 use Thinktomorrow\Trader\Domain\Model\ShippingProfile\ShippingProfileId;
 use Thinktomorrow\Trader\Domain\Model\ShippingProfile\ShippingProviderId;
@@ -80,9 +53,6 @@ use Thinktomorrow\Trader\Domain\Model\ShippingProfile\Tariff;
 use Thinktomorrow\Trader\Domain\Model\VatRate\BaseRate;
 use Thinktomorrow\Trader\Domain\Model\VatRate\VatRate;
 use Thinktomorrow\Trader\Domain\Model\VatRate\VatRateId;
-use Thinktomorrow\Trader\Infrastructure\Laravel\Models\Cart\DefaultAdjustLine;
-use Thinktomorrow\Trader\Infrastructure\Laravel\Models\PaymentMethod\DefaultVerifyPaymentMethodForCart;
-use Thinktomorrow\Trader\Infrastructure\Test\DummyVatNumberValidator;
 use Thinktomorrow\Trader\Infrastructure\Test\EventDispatcherSpy;
 use Thinktomorrow\Trader\Infrastructure\Test\Repositories\InMemoryCartRepository;
 use Thinktomorrow\Trader\Infrastructure\Test\Repositories\InMemoryCustomerRepository;
@@ -94,7 +64,6 @@ use Thinktomorrow\Trader\Infrastructure\Test\Repositories\InMemoryPromoRepositor
 use Thinktomorrow\Trader\Infrastructure\Test\Repositories\InMemoryShippingProfileRepository;
 use Thinktomorrow\Trader\Infrastructure\Test\Repositories\InMemoryVariantRepository;
 use Thinktomorrow\Trader\Infrastructure\Test\Repositories\InMemoryVatRateRepository;
-use Thinktomorrow\Trader\Infrastructure\Test\TestContainer;
 use Thinktomorrow\Trader\Infrastructure\Test\TestTraderConfig;
 
 abstract class CartContext extends TestCase
@@ -129,172 +98,148 @@ abstract class CartContext extends TestCase
     {
         parent::setUp();
 
-        // states
-        (new TestContainer())->add(OrderState::class, DefaultOrderState::class);
-        (new TestContainer())->add(ShippingState::class, DefaultShippingState::class);
-        (new TestContainer())->add(PaymentState::class, DefaultPaymentState::class);
-
-        $this->productRepository = new InMemoryProductRepository();
-        $this->variantRepository = new InMemoryVariantRepository();
-        $this->cartRepository = new InMemoryCartRepository();
-        $this->merchantOrderRepository = new InMemoryMerchantOrderRepository();
-        $this->vatRateRepository = new InMemoryVatRateRepository(new TestTraderConfig());
-        $this->vatExemptionApplication = new VatExemptionApplication(new TestTraderConfig());
-        $this->findVatRateForOrder = new FindVatRateForOrder(new TestTraderConfig(), $this->vatExemptionApplication, $this->vatRateRepository);
-        $this->promoRepository = new InMemoryPromoRepository(
-            new DiscountFactory([
-                FixedAmountDiscount::class,
-                PercentageOffOrderDiscount::class,
-            ], new ConditionFactory([
-                MinimumLinesQuantity::class,
-            ])),
-            new OrderDiscountFactory([
-                FixedAmountOrderDiscount::class,
-                PercentageOffOrderDiscount::class,
-            ], new OrderConditionFactory([
-                \Thinktomorrow\Trader\Application\Promo\OrderPromo\Conditions\MinimumLinesQuantityOrderCondition::class,
-            ]))
-        );
+//        // states
+//        (new TestContainer())->add(OrderState::class, DefaultOrderState::class);
+//        (new TestContainer())->add(ShippingState::class, DefaultShippingState::class);
+//        (new TestContainer())->add(PaymentState::class, DefaultPaymentState::class);
+//
+//        $this->catalogContextcatalogRepos()->->productRepository() = new InMemoryProductRepository();
+//        $this->>catalogContext->catalogRepos()->variantRepository() = new InMemoryVariantRepository();
+//        $this->cartRepository = new InMemoryCartRepository();
+//        $this->merchantOrderRepository = new InMemoryMerchantOrderRepository();
+//        $this->vatRateRepository = new InMemoryVatRateRepository(new TestTraderConfig());
+//        $this->vatExemptionApplication = new VatExemptionApplication(new TestTraderConfig());
+//        $this->findVatRateForOrder = new FindVatRateForOrder(new TestTraderConfig(), $this->vatExemptionApplication, $this->vatRateRepository);
+//        $this->promoRepository = new InMemoryPromoRepository(
+//            new DiscountFactory([
+//                FixedAmountDiscount::class,
+//                PercentageOffOrderDiscount::class,
+//            ], new ConditionFactory([
+//                MinimumLinesQuantity::class,
+//            ])),
+//            new OrderDiscountFactory([
+//                FixedAmountOrderDiscount::class,
+//                PercentageOffOrderDiscount::class,
+//            ], new OrderConditionFactory([
+//                \Thinktomorrow\Trader\Application\Promo\OrderPromo\Conditions\MinimumLinesQuantityOrderCondition::class,
+//            ]))
+//        );
 
         // Adjusters are loaded via container so set them up here
-        (new TestContainer())->add(InvoiceRepository::class, $this->orderRepository);
-        (new TestContainer())->add(ApplyPromoToOrder::class, new ApplyPromoToOrder($this->orderRepository));
-        (new TestContainer())->add(AdjustLine::class, new DefaultAdjustLine());
-        (new TestContainer())->add(AdjustLines::class, new AdjustLines(new InMemoryVariantRepository(), TestContainer::make(AdjustLine::class)));
-        (new TestContainer())->add(AdjustVatRates::class, new AdjustVatRates($this->variantRepository, new FindVatRateForOrder(new TestTraderConfig(), new VatExemptionApplication(new TestTraderConfig()), $this->vatRateRepository)));
-        (new TestContainer())->add(AdjustDiscounts::class, new AdjustDiscounts($this->promoRepository, (new TestContainer())->get(ApplyPromoToOrder::class)));
-        (new TestContainer())->add(OrderStateMachine::class, new OrderStateMachine([
-            ...DefaultOrderState::customerStates(), DefaultOrderState::confirmed,
-        ], [
-            'complete' => DefaultOrderState::getTransitions()['complete'],
-            'confirm' => DefaultOrderState::getTransitions()['confirm'],
-        ]));
-
-        $this->vatNumberValidator = new DummyVatNumberValidator();
-        $this->vatNumberApplication = new VatNumberApplication($this->vatNumberValidator);
-
-        $this->cartApplication = new CartApplication(
-            new TestTraderConfig(),
-            new TestContainer(),
-            $this->variantRepository,
-            TestContainer::make(AdjustLine::class),
-            $this->orderRepository,
-            (new TestContainer())->get(OrderStateMachine::class),
-            new RefreshCartAction(),
-            $this->shippingProfileRepository = new InMemoryShippingProfileRepository(),
-            $this->updateShippingProfileOnOrder = new UpdateShippingProfileOnOrder(new TestContainer(), new TestTraderConfig(), $this->orderRepository, $this->shippingProfileRepository, $this->findVatRateForOrder),
-            $this->updatePaymentMethodOnOrder = new UpdatePaymentMethodOnOrder(new TestContainer(), new TestTraderConfig(), $this->orderRepository, new DefaultVerifyPaymentMethodForCart(), $this->paymentMethodRepository, $this->findVatRateForOrder),
-            $this->customerRepository = new InMemoryCustomerRepository(),
-            $this->eventDispatcher = new EventDispatcherSpy(),
-            $this->vatNumberApplication,
-            $this->vatExemptionApplication,
-        );
-
-        $this->productApplication = new ProductApplication(
-            new TestTraderConfig(),
-            $this->eventDispatcher,
-            $this->productRepository,
-            $this->variantRepository,
-        );
-
-        $this->promoApplication = new CouponPromoApplication(
-            new TestTraderConfig(),
-            new TestContainer(),
-            $this->orderRepository,
-            $this->promoRepository,
-            (new TestContainer())->get(ApplyPromoToOrder::class),
-            $this->eventDispatcher,
-        );
-
-        $this->customerApplication = new CustomerApplication(
-            $this->customerRepository,
-            $this->eventDispatcher,
-        );
-
-        // Container bindings
-        (new TestContainer())->add(AdjustShipping::class, new AdjustShipping(
-            $this->updateShippingProfileOnOrder,
-        ));
-
-        $this->merchantOrderApplication = new MerchantOrderApplication(
-            $this->orderRepository,
-            $this->eventDispatcher,
-            $this->vatNumberApplication,
-        );
-
-        // Make sure we start with a clean slate
-        $this->clearRepositories();
+//        (new TestContainer())->add(InvoiceRepository::class, $this->>orderContext->orderRepos()->orderRepository());
+//        (new TestContainer())->add(ApplyPromoToOrder::class, new ApplyPromoToOrder($this->>orderContext->orderRepos()->orderRepository()));
+//        (new TestContainer())->add(AdjustLine::class, new DefaultAdjustLine());
+//        (new TestContainer())->add(AdjustLines::class, new AdjustLines(new InMemoryVariantRepository(), TestContainer::make(AdjustLine::class)));
+//        (new TestContainer())->add(AdjustVatRates::class, new AdjustVatRates($this->>catalogContext->catalogRepos()->variantRepository(), new FindVatRateForOrder(new TestTraderConfig(), new VatExemptionApplication(new TestTraderConfig()), $this->vatRateRepository)));
+//        (new TestContainer())->add(AdjustDiscounts::class, new AdjustDiscounts($this->promoRepository, (new TestContainer())->get(ApplyPromoToOrder::class)));
+//        (new TestContainer())->add(OrderStateMachine::class, new OrderStateMachine([
+//            ...DefaultOrderState::customerStates(), DefaultOrderState::confirmed,
+//        ], [
+//            'complete' => DefaultOrderState::getTransitions()['complete'],
+//            'confirm' => DefaultOrderState::getTransitions()['confirm'],
+//        ]));
+//
+//        $this->vatNumberValidator = new DummyVatNumberValidator();
+//        $this->vatNumberApplication = new VatNumberApplication($this->vatNumberValidator);
+//
+//        $this->orderContext->orderApps()->cartApplication() = new CartApplication(
+//            new TestTraderConfig(),
+//            new TestContainer(),
+//            $this->>catalogContext->catalogRepos()->variantRepository(),
+//            TestContainer::make(AdjustLine::class),
+//            $this->>orderContext->orderRepos()->orderRepository(),
+//            (new TestContainer())->get(OrderStateMachine::class),
+//            new RefreshCartAction(),
+//            $this->shippingProfileRepository = new InMemoryShippingProfileRepository(),
+//            $this->updateShippingProfileOnOrder = new UpdateShippingProfileOnOrder(new TestContainer(), new TestTraderConfig(), $this->>orderContext->orderRepos()->orderRepository(), $this->shippingProfileRepository, $this->findVatRateForOrder),
+//            $this->updatePaymentMethodOnOrder = new UpdatePaymentMethodOnOrder(new TestContainer(), new TestTraderConfig(), $this->>orderContext->orderRepos()->orderRepository(), new DefaultVerifyPaymentMethodForCart(), $this->paymentMethodRepository, $this->findVatRateForOrder),
+//            $this->customerRepository = new InMemoryCustomerRepository(),
+//            $this->eventDispatcher = new EventDispatcherSpy(),
+//            $this->vatNumberApplication,
+//            $this->vatExemptionApplication,
+//        );
+//
+//        $this->productApplication = new ProductApplication(
+//            new TestTraderConfig(),
+//            $this->eventDispatcher,
+//            $this->catalogContextcatalogRepos()->->productRepository(),
+//            $this->>catalogContext->catalogRepos()->variantRepository(),
+//        );
+//
+//        $this->promoApplication = new CouponPromoApplication(
+//            new TestTraderConfig(),
+//            new TestContainer(),
+//            $this->>orderContext->orderRepos()->orderRepository(),
+//            $this->promoRepository,
+//            (new TestContainer())->get(ApplyPromoToOrder::class),
+//            $this->eventDispatcher,
+//        );
+//
+//        $this->customerApplication = new CustomerApplication(
+//            $this->customerRepository,
+//            $this->eventDispatcher,
+//        );
+//
+//        // Container bindings
+//        (new TestContainer())->add(AdjustShipping::class, new AdjustShipping(
+//            $this->updateShippingProfileOnOrder,
+//        ));
+//
+//        $this->merchantOrderApplication = new MerchantOrderApplication(
+//            $this->>orderContext->orderRepos()->orderRepository(),
+//            $this->eventDispatcher,
+//            $this->vatNumberApplication,
+//        );
+//
+//        // Make sure we start with a clean slate
+//        $this->clearRepositories();
     }
 
     public function tearDown(): void
     {
-        $this->clearRepositories();
         $this->resetMemoizedVatPercentages();
-    }
 
-    private function clearRepositories()
-    {
-        $this->productRepository->clear();
-        $this->variantRepository->clear();
-        $this->orderRepository->clear();
-        $this->shippingProfileRepository->clear();
-        $this->paymentMethodRepository->clear();
-        $this->promoRepository->clear();
-        $this->vatRateRepository->clear();
+        parent::tearDown();
     }
 
     protected function resetMemoizedVatPercentages(): void
     {
-        $this->findVatRateForOrder = new FindVatRateForOrder(new TestTraderConfig(), $this->vatExemptionApplication, $this->vatRateRepository);
+        // TODO: move to trader testing package
+        $this->findVatRateForOrder = new FindVatRateForOrder(new TestTraderConfig(), $this->orderContext->orderApps()->vatExemptionApplication(), $this->orderContext->orderRepos()->vatRateRepository());
     }
 
     protected function givenThereIsAProductWhichCostsEur($productTitle, $price)
     {
-        // Create a product
-        $product = Product::create(ProductId::fromString($productTitle));
+        $productId = ProductId::fromString($productTitle)->get();
 
-        $variant = Variant::create(
-            ProductId::fromString($productTitle),
-            VariantId::fromString($productTitle . '-123'),
-            VariantUnitPrice::fromMoney(
-                Cash::make(1000),
-                VatPercentage::fromString('20'),
-                true
-            ),
-            VariantSalePrice::fromMoney(Money::EUR($price * 100), VatPercentage::fromString('20'), true),
-            'sku',
-        );
-
-        $variant->addData(['title' => ['nl' => $productTitle . ' variant']]);
-        $product->createVariant($variant);
-
-        $this->productRepository->save($product);
-
-        Assert::assertNotNull($this->productRepository->find(ProductId::fromString($productTitle)));
-        Assert::assertNotNull($this->variantRepository->findVariantForCart(VariantId::fromString($productTitle . '-123')));
+        $this->catalogContext->createProduct($productId, null);
+        $this->catalogContext->createVariant($productId, $productId . '-variant-aaa', [
+            'unit_price' => $price * 100,
+            'sale_price' => $price * 100,
+        ]);
     }
 
     protected function givenThereIsAProductPersonalisation($productTitle, array $personalisations)
     {
-        $product = $this->productRepository->find(ProductId::fromString($productTitle));
+        $product = $this->catalogContext->catalogRepos()->productRepository()->find(ProductId::fromString($productTitle));
 
         $this->productApplication->updateProductPersonalisations(new UpdateProductPersonalisations($product->productId->get(), $personalisations));
 
-        Assert::assertCount(count($personalisations), $this->productRepository->find(ProductId::fromString($productTitle))->getPersonalisations());
+        Assert::assertCount(count($personalisations), $this->catalogContext->catalogRepos()->productRepository()->find(ProductId::fromString($productTitle))->getPersonalisations());
     }
 
     public function givenOrderHasAShippingCountry(string $country)
     {
         $order = $this->getOrder();
 
-        $this->cartApplication->updateShippingAddress(new UpdateShippingAddress($order->orderId->get(), $country));
+        $this->orderContext->orderApps()->cartApplication()->updateShippingAddress(new UpdateShippingAddress($order->orderId->get(), $country));
     }
 
     public function givenOrderHasABillingCountry(string $country)
     {
         $order = $this->getOrder();
 
-        $this->cartApplication->updateBillingAddress(new UpdateBillingAddress($order->orderId->get(), $country));
+        $this->orderContext->orderApps()->cartApplication()->updateBillingAddress(new UpdateBillingAddress($order->orderId->get(), $country));
     }
 
     public function givenShippingCostsForAPurchaseOfEur($shippingCost, $from, $to, array $countries = ['BE'], string $shippingProfileId = 'bpost_home', bool $requiredAddress = true)
@@ -392,7 +337,7 @@ abstract class CartContext extends TestCase
         $count = count($order->getLines());
 
         // Add product to order
-        $this->cartApplication->addLine(new AddLine(
+        $this->orderContext->orderApps()->cartApplication()->addLine(new AddLine(
             $order->orderId->get(),
             VariantId::fromString($productVariantId)->get(),
             Quantity::fromInt((int)$quantity)->asInt(),
@@ -401,9 +346,9 @@ abstract class CartContext extends TestCase
         ));
 
         $checkFlag = false;
-        $lines = $this->orderRepository->find($order->orderId)->getLines();
+        $lines = $this->orderContext->orderRepos()->orderRepository()->find($order->orderId)->getLines();
         foreach ($lines as $line) {
-            if ($line['variant_id'] == $productVariantId) {
+            if ($line->getPurchasableReference()->getId() == $productVariantId) {
                 $checkFlag = true;
             }
         }
@@ -415,10 +360,10 @@ abstract class CartContext extends TestCase
 
     protected function whenIAddTheFirstVariantToTheCart($productVariantId, $quantity = 1, array $data = [], array $personalisations = [])
     {
-        $orderId = $this->cartApplication->createNewOrder();
+        $orderId = $this->orderContext->orderApps()->cartApplication()->createNewOrder();
 
         // Add product to a new order
-        $this->cartApplication->addLine(new AddLine(
+        $this->orderContext->orderApps()->cartApplication()->addLine(new AddLine(
             $orderId->get(),
             VariantId::fromString($productVariantId)->get(),
             Quantity::fromInt((int)$quantity)->asInt(),
@@ -427,9 +372,9 @@ abstract class CartContext extends TestCase
         ));
 
         $checkFlag = false;
-        $lines = $this->orderRepository->find($orderId)->getLines();
+        $lines = $this->orderContext->orderRepos()->orderRepository()->find($orderId)->getLines();
         foreach ($lines as $line) {
-            if ($line['variant_id'] == $productVariantId) {
+            if ($line->getPurchasableReference()->getId() == $productVariantId) {
                 $checkFlag = true;
             }
         }
@@ -452,7 +397,7 @@ abstract class CartContext extends TestCase
             }
         }
 
-        $this->cartApplication->changeLineQuantity(new ChangeLineQuantity(
+        $this->orderContext->orderApps()->cartApplication()->changeLineQuantity(new ChangeLineQuantity(
             $order->orderId->get(),
             $lineId->get(),
             Quantity::fromInt((int)$quantity)->asInt(),
@@ -472,7 +417,7 @@ abstract class CartContext extends TestCase
             }
         }
 
-        $this->cartApplication->removeLine(new RemoveLine(
+        $this->orderContext->orderApps()->cartApplication()->removeLine(new RemoveLine(
             $order->orderId->get(),
             $lineId->get(),
         ));
@@ -482,7 +427,7 @@ abstract class CartContext extends TestCase
     {
         $order = $this->getOrder();
 
-        $this->cartApplication->updateShopper(new UpdateShopper(
+        $this->orderContext->orderApps()->cartApplication()->updateShopper(new UpdateShopper(
             $order->orderId->get(),
             $email,
             $is_business,
@@ -498,7 +443,7 @@ abstract class CartContext extends TestCase
     {
         $customer = $this->customerRepository->findByEmail(Email::fromString($email));
 
-        $this->cartApplication->chooseCustomer(new ChooseCustomer(
+        $this->orderContext->orderApps()->cartApplication()->chooseCustomer(new ChooseCustomer(
             $this->getOrder()->orderId->get(),
             $customer->customerId->get(),
         ));
@@ -506,12 +451,12 @@ abstract class CartContext extends TestCase
 
     protected function thenIShouldHaveProductInTheCart($times, $quantity, string $orderId = 'xxx')
     {
-        $order = $this->orderRepository->find(OrderId::fromString($orderId));
-        $lines = $this->orderRepository->find($order->orderId)->getLines();
+        $order = $this->orderContext->orderRepos()->orderRepository()->find(OrderId::fromString($orderId));
+        $lines = $this->orderContext->orderRepos()->orderRepository()->find($order->orderId)->getLines();
 
         Assert::assertCount((int)$times, $lines);
         if (count($lines) > 0) {
-            Assert::assertEquals((int)$quantity, $lines[0]['quantity']);
+            Assert::assertEquals((int)$quantity, $lines[0]->getQuantity()->asInt());
         }
     }
 
@@ -522,7 +467,7 @@ abstract class CartContext extends TestCase
 
     protected function whenIAddShippingAddress(?string $country = null, ?string $line1 = null, ?string $line2 = null, ?string $postalCode = null, ?string $city = null)
     {
-        $this->cartApplication->updateShippingAddress(new UpdateShippingAddress(
+        $this->orderContext->orderApps()->cartApplication()->updateShippingAddress(new UpdateShippingAddress(
             $this->getOrder()->orderId->get(),
             $country,
             $line1,
@@ -536,7 +481,7 @@ abstract class CartContext extends TestCase
 
     protected function whenIAddBillingAddress(?string $country = null, ?string $line1 = null, ?string $line2 = null, ?string $postalCode = null, ?string $city = null)
     {
-        $this->cartApplication->updateBillingAddress(new UpdateBillingAddress(
+        $this->orderContext->orderApps()->cartApplication()->updateBillingAddress(new UpdateBillingAddress(
             $this->getOrder()->orderId->get(),
             $country,
             $line1,
@@ -550,7 +495,7 @@ abstract class CartContext extends TestCase
 
     protected function whenIChooseShipping(string $shippingProfileId)
     {
-        $this->cartApplication->chooseShippingProfile(new ChooseShippingProfile(
+        $this->orderContext->orderApps()->cartApplication()->chooseShippingProfile(new ChooseShippingProfile(
             $this->getOrder()->orderId->get(),
             $shippingProfileId
         ));
@@ -562,7 +507,7 @@ abstract class CartContext extends TestCase
 
     protected function whenIChoosePayment(string $paymentMethodId)
     {
-        $this->cartApplication->choosePaymentMethod(new ChoosePaymentMethod(
+        $this->orderContext->orderApps()->cartApplication()->choosePaymentMethod(new ChoosePaymentMethod(
             $this->getOrder()->orderId->get(),
             $paymentMethodId
         ));
@@ -579,7 +524,7 @@ abstract class CartContext extends TestCase
 
     protected function thenTheCartItemShouldContainData($productVariantId, $dataKey, $dataValue)
     {
-        $order = $this->orderRepository->find(OrderId::fromString('xxx'));
+        $order = $this->orderContext->orderRepos()->orderRepository()->find(OrderId::fromString('xxx'));
         $lines = $order->getLines();
 
         // Find matching line by variantId
@@ -602,9 +547,9 @@ abstract class CartContext extends TestCase
     {
         // Create an order if not already
         try {
-            return $this->orderRepository->find(OrderId::fromString('xxx'));
+            return $this->orderContext->orderRepos()->orderRepository()->find(OrderId::fromString('xxx'));
         } catch (CouldNotFindOrder $e) {
-            $this->orderRepository->save($order = Order::create(
+            $this->orderContext->orderRepos()->orderRepository()->save($order = Order::create(
                 OrderId::fromString('xxx'),
                 OrderReference::fromString('xx-ref'),
                 DefaultOrderState::cart_pending,

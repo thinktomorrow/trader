@@ -86,8 +86,4 @@ class UpdateProductPersonalisationsTest extends ProductContext
 
         $this->assertEquals([], $product->getChildEntities()[Personalisation::class]);
     }
-
-    public function test_it_can_reorder_personalisations()
-    {
-    }
 }
