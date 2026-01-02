@@ -29,6 +29,6 @@ class DeletePaymentMethodTest extends PaymentMethodContext
         ], $this->eventDispatcher->releaseDispatchedEvents());
 
         $this->expectException(CouldNotFindPaymentMethod::class);
-        $this->paymentMethodRepository->find($paymentMethodId);
+        $this->orderContext->orderRepos()->paymentMethodRepository()->find($paymentMethodId);
     }
 }

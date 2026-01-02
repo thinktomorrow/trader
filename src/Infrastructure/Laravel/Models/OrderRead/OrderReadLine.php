@@ -7,28 +7,20 @@ use Assert\Assertion;
 use Money\Money;
 use Thinktomorrow\Trader\Application\Common\RendersData;
 use Thinktomorrow\Trader\Application\Common\RendersMoney;
-use Thinktomorrow\Trader\Domain\Common\Price\DefaultItemPrice;
-use Thinktomorrow\Trader\Domain\Common\Price\DiscountPrice;
-use Thinktomorrow\Trader\Domain\Common\Price\ItemPrice;
-use Thinktomorrow\Trader\Domain\Model\Order\Line\LinePrice;
+use Thinktomorrow\Trader\Domain\Common\Vat\VatPercentage;
 use Thinktomorrow\Trader\Domain\Model\Order\Line\PurchasableReference;
-use Thinktomorrow\Trader\Domain\Model\Product\Variant\VariantUnitPrice;
 
 abstract class OrderReadLine
 {
     use RendersData;
     use RendersMoney;
+    use WithLineTotals;
 
     protected string $line_id;
     protected PurchasableReference $purchasableReference;
     protected ?string $variant_id;
     protected ?string $product_id;
     protected array $purchasableData;
-    protected ItemPrice $linePrice;
-    protected VariantUnitPrice $unitPrice;
-    protected DefaultItemPrice $total;
-    protected DiscountPrice $discountTotal;
-    protected Money $taxTotal;
 
     protected int $quantity;
     protected iterable $discounts;
@@ -36,6 +28,7 @@ abstract class OrderReadLine
 
     // General flag for all line prices to render with or without tax.
     protected bool $include_tax;
+    protected VatPercentage $vatRate;
     protected iterable $images;
     protected iterable $personalisations;
 
@@ -55,11 +48,15 @@ abstract class OrderReadLine
         }
 
         $line->line_id = $state['line_id'];
-        $line->unitPrice = $state['unitPrice'];
-        $line->linePrice = $state['unitPrice'];
-        $line->total = $state['total'];
-        $line->discountTotal = $state['discountTotal'];
-        $line->taxTotal = $state['taxTotal'];
+
+        $line->unitPriceExcl = Money::EUR($state['unit_price_excl']);
+        $line->unitPriceIncl = Money::EUR($state['unit_price_incl']);
+        $line->totalPriceExcl = Money::EUR($state['total_excl']);
+        $line->totalPriceIncl = Money::EUR($state['total_incl']);
+        $line->totalVat = Money::EUR($state['total_vat']);
+        $line->vatRate = VatPercentage::fromString($state['tax_rate']);
+        $line->discountPriceExcl = Money::EUR($state['discount_excl']);
+        $line->discountPriceIncl = Money::EUR($state['discount_incl']);
 
         $line->quantity = $state['quantity'];
         $line->discounts = $discounts;
@@ -75,14 +72,8 @@ abstract class OrderReadLine
         $line->variant_id = $line->purchasableReference->isVariant() ? $line->purchasableReference->getId() : $line->data('variant_id');
         $line->product_id = $line->data('product_id');
 
-
-//        $line->unitPrice = VariantUnitPrice::fromMoney(
-//            Cash::make($line->linePrice->includesVat() ? $line->data('unit_price_including_vat') : $line->data('unit_price_excluding_vat')),
-//            $line->linePrice->getVatPercentage(),
-//            $line->linePrice->includesVat()
-//        );
-
-//        $line->include_tax = $line->linePrice->includesVat();
+        // Show prices including tax by default or not
+        $line->include_tax = $state['includes_vat'] ?? false;
 
         return $line;
     }
@@ -112,76 +103,124 @@ abstract class OrderReadLine
         $this->include_tax = $include_tax;
     }
 
-    public function getUnitPrice(): string
+    public function getVatRate(): VatPercentage
+    {
+        return $this->vatRate;
+    }
+
+    public function getFormattedUnitPrice(): string
     {
         return $this->renderMoney(
-            $this->getUnitPriceAsMoney(),
+            $this->include_tax ? $this->getUnitPriceIncl() : $this->getUnitPriceExcl(),
             $this->getLocale()
         );
     }
 
-    public function getUnitPriceAsMoney(): Money
-    {
-        return $this->include_tax ? $this->unitPrice->getIncludingVat() : $this->unitPrice->getExcludingVat();
-    }
-
-    public function getUnitPriceAsPrice(): VariantUnitPrice
-    {
-        return $this->unitPrice;
-    }
-
-    public function getLinePrice(): string
+    public function getFormattedDiscountPrice(): string
     {
         return $this->renderMoney(
-            $this->getLinePriceAsMoney(),
+            $this->include_tax ? $this->getDiscountPriceIncl() : $this->getDiscountPriceExcl(),
             $this->getLocale()
         );
     }
 
-    public function getLinePriceAsMoney(): Money
-    {
-        return $this->include_tax ? $this->linePrice->getIncludingVat() : $this->linePrice->getExcludingVat();
-    }
-
-    public function getLinePriceAsPrice(): LinePrice
-    {
-        return $this->linePrice;
-    }
-
-    public function getTotalPrice(): string
+    public function getFormattedTotalPrice(): string
     {
         return $this->renderMoney(
-            $this->include_tax ? $this->total->getIncludingVat() : $this->total->getExcludingVat(),
+            $this->include_tax ? $this->getTotalPriceIncl() : $this->getTotalPriceExcl(),
             $this->getLocale()
         );
     }
 
-    public function getSubtotalPrice(): string
+    public function getFormattedSubtotalPrice(): string
     {
-        if ($this->include_tax) {
-            $subtotal = $this->total->getIncludingVat()->subtract($this->discountTotal->getIncludingVat());
-        } else {
-            $subtotal = $this->total->getExcludingVat()->subtract($this->discountTotal->getExcludingVat());
-        }
+        $subtotal = $this->include_tax
+            ? $this->getTotalPriceIncl()->subtract($this->getDiscountPriceIncl())
+            : $this->getTotalPriceExcl()->subtract($this->getDiscountPriceExcl());
 
         return $this->renderMoney($subtotal, $this->getLocale());
     }
 
-    public function getTaxPrice(): string
+    public function getFormattedTaxPrice(): string
     {
         return $this->renderMoney(
-            $this->taxTotal,
+            $this->getTotalVat(),
             $this->getLocale()
         );
     }
 
-    public function getDiscountPrice(): string
+    public function getFormattedVatRate(): string
     {
-        return $this->renderMoney(
-            $this->include_tax ? $this->discountTotal->getIncludingVat() : $this->discountTotal->getExcludingVat(),
-            $this->getLocale()
-        );
+        return $this->vatRate->get();
     }
+//
+//    public function getUnitPrice(): string
+//    {
+//        return $this->renderMoney(
+//            $this->getUnitPriceAsMoney(),
+//            $this->getLocale()
+//        );
+//    }
+
+//    public function getUnitPriceAsMoney(): Money
+//    {
+//        return $this->include_tax ? $this->unitPrice->getIncludingVat() : $this->unitPrice->getExcludingVat();
+//    }
+//
+//    public function getUnitPriceAsPrice(): ItemPrice
+//    {
+//        return $this->unitPrice;
+//    }
+
+//    public function getTotalPrice(): string
+//    {
+//        return $this->renderMoney(
+//            $this->include_tax ? $this->total->getIncludingVat() : $this->total->getExcludingVat(),
+//            $this->getLocale()
+//        );
+//    }
+//
+//    public function getSubtotalPrice(): string
+//    {
+//        if ($this->include_tax) {
+//            $subtotal = $this->total->getIncludingVat()->subtract($this->discountTotal->getIncludingVat());
+//        } else {
+//            $subtotal = $this->total->getExcludingVat()->subtract($this->discountTotal->getExcludingVat());
+//        }
+//
+//        return $this->renderMoney($subtotal, $this->getLocale());
+//    }
+//
+//    public function getTaxPrice(): string
+//    {
+//        return $this->renderMoney(
+//            $this->taxTotal,
+//            $this->getLocale()
+//        );
+//    }
+//
+//    public function getDiscountPrice(): string
+//    {
+//        return $this->renderMoney(
+//            $this->include_tax ? $this->discountTotal->getIncludingVat() : $this->discountTotal->getExcludingVat(),
+//            $this->getLocale()
+//        );
+//    }
+
+//    public function getLinePrice(): string
+//    {
+//        throw new \Exception('getLinePrice is deprecated, use getUnitPrice instead.');
+//    }
+//
+//    public function getLinePriceAsMoney(): Money
+//    {
+//        throw new \Exception('getLinePriceAsMoney is deprecated, use getUnitPriceAsMoney instead.');
+//    }
+//
+//    public function getLinePriceAsPrice(): LinePrice
+//    {
+//        throw new \Exception('getLinePriceAsPrice is deprecated, use getUnitPriceAsPrice instead.');
+//    }
 
     public function getQuantity(): int
     {

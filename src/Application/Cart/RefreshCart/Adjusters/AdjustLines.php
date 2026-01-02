@@ -47,7 +47,7 @@ class AdjustLines implements Adjuster
             }
 
             // Price can be changed in the meanwhile
-            if (!$line->getLinePrice()->getExcludingVat()->equals($variant->getSalePrice()->getExcludingVat())) {
+            if (!$line->getUnitPrice()->getExcludingVat()->equals($variant->getSalePrice()->getExcludingVat())) {
                 $line->updatePrice(LinePrice::fromPrice($variant->getSalePrice()));
             }
 

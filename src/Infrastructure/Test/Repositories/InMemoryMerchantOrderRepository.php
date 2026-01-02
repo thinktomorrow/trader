@@ -54,7 +54,7 @@ class InMemoryMerchantOrderRepository implements MerchantOrderRepository, InMemo
                 'total' => $line->getTotal(),
                 'taxTotal' => $line->getTaxTotal(),
                 'discountTotal' => $line->getDiscountTotal(),
-                'unitPrice' => $line->getLinePrice(),
+                'unitPrice' => $line->getUnitPrice(),
             ]),
             $orderState,
             array_map(fn(Discount $discount) => DefaultMerchantOrderDiscount::fromMappedData(array_merge($discount->getMappedData(), [

@@ -7,26 +7,21 @@ use Money\Money;
 use Thinktomorrow\Trader\Domain\Common\Price\DefaultTotalPrice;
 use Thinktomorrow\Trader\Domain\Common\Price\DiscountPrice;
 use Thinktomorrow\Trader\Domain\Common\Price\TotalPrice;
-use Thinktomorrow\Trader\Domain\Common\Vat\VatAllocatedLine;
-use Thinktomorrow\Trader\Domain\Common\Vat\VatAllocatedTotalPrice;
 use Thinktomorrow\Trader\Domain\Model\Order\Discount\GetValidatedTotalDiscountPrice;
 
 trait WithOrderTotals
 {
-    private Money $subtotalExcl;
-    private Money $subtotalIncl;
-    private Money $shippingExcl;
-    private Money $shippingIncl;
-    private Money $paymentExcl;
-    private Money $paymentIncl;
-    private Money $discountExcl;
-    private Money $discountIncl;
-    private Money $totalExcl;
-    private Money $totalVat;
-    private Money $totalIncl;
-
-    /** @var VatAllocatedLine[] */
-    private array $vatLines = [];
+    protected Money $subtotalExcl;
+    protected Money $subtotalIncl;
+    protected Money $shippingExcl;
+    protected Money $shippingIncl;
+    protected Money $paymentExcl;
+    protected Money $paymentIncl;
+    protected Money $discountExcl;
+    protected Money $discountIncl;
+    protected Money $totalExcl;
+    protected Money $totalVat;
+    protected Money $totalIncl;
 
     public function getSubtotalExcl(): Money
     {
@@ -81,11 +76,6 @@ trait WithOrderTotals
     public function getTotalIncl(): Money
     {
         return $this->totalIncl;
-    }
-
-    public function getVatLines(): array
-    {
-        return $this->vatLines;
     }
 
     public function getSubTotal(): TotalPrice
@@ -165,59 +155,5 @@ trait WithOrderTotals
         }
 
         return $paymentCost;
-    }
-
-    public function applySubtotalTotals(VatAllocatedTotalPrice $subtotal): void
-    {
-        $this->subtotalExcl = $subtotal->getTotalExcludingVat();
-        $this->subtotalIncl = $subtotal->getTotalIncludingVat();
-    }
-
-    public function applyServiceTotals(VatAllocatedTotalPrice $shippingCost, VatAllocatedTotalPrice $paymentCost): void
-    {
-        $this->shippingExcl = $shippingCost->getTotalExcludingVat();
-        $this->shippingIncl = $shippingCost->getTotalIncludingVat();
-        $this->paymentExcl = $paymentCost->getTotalExcludingVat();
-        $this->paymentIncl = $paymentCost->getTotalIncludingVat();
-    }
-
-    public function applyDiscountTotals(VatAllocatedTotalPrice $discount): void
-    {
-        $this->discountExcl = $discount->getTotalExcludingVat();
-        $this->discountIncl = $discount->getTotalIncludingVat();
-    }
-
-    public function applyTotals(VatAllocatedTotalPrice $allocation): void
-    {
-        // For totals we keep the vat lines breakdown
-        $this->vatLines = $allocation->getVatLines();
-
-        // Totals
-        $this->totalExcl = $allocation->getTotalExcludingVat();
-        $this->totalVat = $allocation->getTotalVat();
-        $this->totalIncl = $allocation->getTotalIncludingVat();
-    }
-
-    private function initializeEmptyTotals(): void
-    {
-        $zero = Money::EUR(0);
-
-        $this->subtotalExcl = $zero;
-        $this->subtotalIncl = $zero;
-
-        $this->shippingExcl = $zero;
-        $this->shippingIncl = $zero;
-
-        $this->paymentExcl = $zero;
-        $this->paymentIncl = $zero;
-
-        $this->discountExcl = $zero;
-        $this->discountIncl = $zero;
-
-        $this->totalExcl = $zero;
-        $this->totalVat = $zero;
-        $this->totalIncl = $zero;
-
-        $this->vatLines = [];
     }
 }

@@ -20,12 +20,12 @@ class PaymentMethodContext extends TestCase
 
         $this->paymentMethodApplication = new PaymentMethodApplication(
             $this->eventDispatcher = new EventDispatcherSpy(),
-            $this->paymentMethodRepository = new InMemoryPaymentMethodRepository(),
+            $this->orderContext->orderRepos()->paymentMethodRepository() = new InMemoryPaymentMethodRepository(),
         );
     }
 
     public function tearDown(): void
     {
-        $this->paymentMethodRepository->clear();
+        $this->orderContext->orderRepos()->paymentMethodRepository()->clear();
     }
 }

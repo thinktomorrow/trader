@@ -17,7 +17,7 @@ class DeletePromoTest extends PromoContext
         $promo = $this->createPromo([], [
             $this->orderContext->createOrderDiscount([], [$this->createCondition()]),
         ]);
-        $this->promoRepository->save($promo);
+        $this->orderContext->orderRepos()->promoRepository()->save($promo);
 
         $this->promoApplication->deletePromo(new DeletePromo($promo->promoId->get()));
 
@@ -26,6 +26,6 @@ class DeletePromoTest extends PromoContext
         ], $this->eventDispatcher->releaseDispatchedEvents());
 
         $this->expectException(CouldNotFindPromo::class);
-        $this->promoRepository->find($promo->promoId);
+        $this->orderContext->orderRepos()->promoRepository()->find($promo->promoId);
     }
 }

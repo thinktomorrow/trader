@@ -33,21 +33,21 @@ final class Line implements ChildAggregate, DiscountableItem
     public readonly OrderId $orderId;
     public readonly LineId $lineId;
     private PurchasableReference $purchasableReference;
-    private ItemPrice $linePrice;
+    private ItemPrice $unitPrice;
     private Quantity $quantity;
 
     private function __construct()
     {
     }
 
-    public static function create(OrderId $orderId, LineId $lineId, PurchasableReference $purchasableReference, ItemPrice $linePrice, Quantity $quantity, array $data): static
+    public static function create(OrderId $orderId, LineId $lineId, PurchasableReference $purchasableReference, ItemPrice $unitPrice, Quantity $quantity, array $data): static
     {
         $line = new static();
 
         $line->orderId = $orderId;
         $line->lineId = $lineId;
         $line->purchasableReference = $purchasableReference;
-        $line->linePrice = $linePrice; // unit price
+        $line->unitPrice = $unitPrice;
         $line->quantity = $quantity;
         $line->data = $data;
 
@@ -56,34 +56,47 @@ final class Line implements ChildAggregate, DiscountableItem
 
     public function updatePrice(ItemPrice $unitPrice): void
     {
-        $this->linePrice = $unitPrice;
+        $this->unitPrice = $unitPrice;
     }
 
-    public function getLinePrice(): ItemPrice
+    public function getUnitPrice(): ItemPrice
     {
-        return $this->linePrice;
-    }
-
-    public function getSubTotal(): ItemPrice
-    {
-        return $this->linePrice->multiply($this->quantity->asInt());
+        return $this->unitPrice;
     }
 
     public function getTotal(): ItemPrice
     {
-        return $this->getSubTotal()
-            ->applyDiscount($this->getTotalDiscountPrice());
+        return $this->unitPrice
+            ->multiply($this->quantity->asInt())
+            ->applyDiscount($this->getDiscountPrice());
+    }
+
+    public function getDiscountPrice(): DiscountPrice
+    {
+        return GetValidatedTotalDiscountPrice::get($this->unitPrice, $this);
     }
 
     public function getTotalDiscountPrice(): DiscountPrice
     {
-        return GetValidatedTotalDiscountPrice::get($this->linePrice, $this);
+        throw new \Exception('Use getDiscountPrice() instead of getTotalDiscountPrice() on Line.');
     }
 
-    public function getTaxTotal(): Money
+    public function getDiscountPriceExcl(): Money
     {
-        return $this->getTotal()->getVatTotal();
+        return $this->getDiscountPrice()->getExcludingVat();
     }
+
+    public function getDiscountPriceIncl(): Money
+    {
+        return Cash::from($this->getDiscountPrice()->getExcludingVat())->addPercentage(
+            $this->unitPrice->getVatPercentage()->toPercentage()
+        );
+    }
+
+//    public function getTaxTotal(): Money
+//    {
+//        return $this->getTotal()->getVatTotal();
+//    }
 
     public function getQuantity(): Quantity
     {
@@ -115,18 +128,16 @@ final class Line implements ChildAggregate, DiscountableItem
             'line_id' => $this->lineId->get(),
             'purchasable_reference' => $purchasableReference,
 
-            'unit_price_incl' => $this->linePrice->getIncludingVat()->getAmount(),
-            'unit_price_excl' => $this->linePrice->getExcludingVat()->getAmount(),
+            'unit_price_incl' => $this->unitPrice->getIncludingVat()->getAmount(),
+            'unit_price_excl' => $this->unitPrice->getExcludingVat()->getAmount(),
             'total_excl' => $this->getTotal()->getExcludingVat()->getAmount(),
             'total_incl' => $this->getTotal()->getIncludingVat()->getAmount(),
             'total_vat' => $this->getTotal()->getVatTotal()->getAmount(),
-            'discount_excl' => $this->getTotalDiscountPrice()->getExcludingVat()->getAmount(),
+            'discount_excl' => $this->getDiscountPriceExcl()->getAmount(),
+            'discount_incl' => $this->getDiscountPriceIncl()->getAmount(),
 
-            'tax_rate' => $this->linePrice->getVatPercentage()->get(),
+            'tax_rate' => $this->unitPrice->getVatPercentage()->get(),
             'includes_vat' => $includesVat,
-//            'total' => $this->getTotal()->getExcludingVat()->getAmount(),
-//            'tax_total' => $this->getTaxTotal()->getAmount(),
-//            'discount_total' => $this->getTotalDiscountPrice()->getExcludingVat()->getAmount(),
             'quantity' => $this->quantity->asInt(),
             'reduced_from_stock' => $this->reducedFromStock,
             'data' => json_encode($data),
@@ -157,7 +168,7 @@ final class Line implements ChildAggregate, DiscountableItem
         $line->orderId = OrderId::fromString($aggregateState['order_id']);
         $line->lineId = LineId::fromString($state['line_id']);
 
-        $line->linePrice = $line->authoritativeIncl()
+        $line->unitPrice = $line->authoritativeIncl()
             ? DefaultItemPrice::fromMoney(Cash::make($state['unit_price_incl']), VatPercentage::fromString($state['tax_rate']), true)
             : DefaultItemPrice::fromMoney(Cash::make($state['unit_price_excl']), VatPercentage::fromString($state['tax_rate']), false);
 

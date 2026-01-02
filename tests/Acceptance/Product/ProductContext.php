@@ -8,11 +8,9 @@ use Tests\Acceptance\TestCase;
 use Thinktomorrow\Trader\Application\Product\CreateProduct;
 use Thinktomorrow\Trader\Application\Product\CreateVariant;
 use Thinktomorrow\Trader\Application\Product\ProductApplication;
-use Thinktomorrow\Trader\Application\Product\VariantLinks\VariantLink;
 use Thinktomorrow\Trader\Application\Product\VariantLinks\VariantLinksComposer;
 use Thinktomorrow\Trader\Application\Product\VariantProperties\MissingVariants;
 use Thinktomorrow\Trader\Application\Taxon\TaxonApplication;
-use Thinktomorrow\Trader\Application\Taxon\Tree\TaxonNode;
 use Thinktomorrow\Trader\Application\Taxonomy\TaxonomyApplication;
 use Thinktomorrow\Trader\Domain\Model\Product\Events\ProductCreated;
 use Thinktomorrow\Trader\Domain\Model\Product\Events\ProductDataUpdated;
@@ -20,17 +18,12 @@ use Thinktomorrow\Trader\Domain\Model\Product\Events\ProductTaxaUpdated;
 use Thinktomorrow\Trader\Domain\Model\Product\Events\VariantCreated;
 use Thinktomorrow\Trader\Domain\Model\Product\ProductId;
 use Thinktomorrow\Trader\Domain\Model\Product\Variant\VariantId;
-use Thinktomorrow\Trader\Infrastructure\Laravel\Models\DefaultTaxonNode;
-use Thinktomorrow\Trader\Infrastructure\Laravel\Models\DefaultVariantLink;
 use Thinktomorrow\Trader\Infrastructure\Test\EventDispatcherSpy;
 use Thinktomorrow\Trader\Infrastructure\Test\Repositories\InMemoryProductDetailRepository;
 use Thinktomorrow\Trader\Infrastructure\Test\Repositories\InMemoryProductRepository;
 use Thinktomorrow\Trader\Infrastructure\Test\Repositories\InMemoryTaxonomyRepository;
 use Thinktomorrow\Trader\Infrastructure\Test\Repositories\InMemoryTaxonRepository;
-use Thinktomorrow\Trader\Infrastructure\Test\Repositories\InMemoryTaxonTreeRepository;
 use Thinktomorrow\Trader\Infrastructure\Test\Repositories\InMemoryVariantRepository;
-use Thinktomorrow\Trader\Infrastructure\Test\TestContainer;
-use Thinktomorrow\Trader\Infrastructure\Test\TestTraderConfig;
 
 abstract class ProductContext extends TestCase
 {
@@ -50,53 +43,55 @@ abstract class ProductContext extends TestCase
     {
         parent::setUp();
 
-        $this->taxonomyApplication = new TaxonomyApplication(
-            new TestTraderConfig(),
-            $this->eventDispatcher = new EventDispatcherSpy(),
-            $this->taxonomyRepository = new InMemoryTaxonomyRepository(),
-        );
-
-        $this->taxonApplication = new TaxonApplication(
-            new TestTraderConfig(),
-            $this->eventDispatcher,
-            $this->taxonRepository = new InMemoryTaxonRepository(),
-        );
-
-        $this->productApplication = new ProductApplication(
-            new TestTraderConfig(),
-            $this->eventDispatcher,
-            $this->productRepository = new InMemoryProductRepository(),
-            $this->variantRepository = new InMemoryVariantRepository(),
-            new InMemoryTaxonTreeRepository(new TestContainer(), new TestTraderConfig()),
-            new InMemoryTaxonomyRepository(),
-        );
-
-        (new TestContainer())->add(TaxonNode::class, DefaultTaxonNode::class);
-        (new TestContainer())->add(VariantLink::class, DefaultVariantLink::class);
-
-        $this->productDetailRepository = new InMemoryProductDetailRepository();
-
-        $this->productOptionsComposer = new VariantLinksComposer(
-            $this->productRepository,
-            new TestContainer(),
-        );
-
-
-        $this->missingOptionCombinations = new MissingVariants(
-            $this->taxonomyRepository,
-            $this->taxonRepository,
-        );
+//        $this->taxonomyApplication = new TaxonomyApplication(
+//            new TestTraderConfig(),
+//            $this->eventDispatcher = new EventDispatcherSpy(),
+//            $this->taxonomyRepository = new InMemoryTaxonomyRepository(),
+//        );
+//
+//        $this->taxonApplication = new TaxonApplication(
+//            new TestTraderConfig(),
+//            $this->eventDispatcher,
+//            $this->taxonRepository = new InMemoryTaxonRepository(),
+//        );
+//
+//        $this->catalogContext->catalogApps()->productApplication() = new ProductApplication(
+//            new TestTraderConfig(),
+//            $this->eventDispatcher,
+//            $this->catalogContext->catalogRepos()->productRepository() = new InMemoryProductRepository(),
+//            $this->variantRepository = new InMemoryVariantRepository(),
+//            new InMemoryTaxonTreeRepository(new TestContainer(), new TestTraderConfig()),
+//            new InMemoryTaxonomyRepository(),
+//        );
+//
+//        (new TestContainer())->add(TaxonNode::class, DefaultTaxonNode::class);
+//        (new TestContainer())->add(VariantLink::class, DefaultVariantLink::class);
+//
+//        $this->productDetailRepository = new InMemoryProductDetailRepository();
+//
+//        $this->productOptionsComposer = new VariantLinksComposer(
+//            $this->catalogContext->catalogRepos()->productRepository(),
+//            new TestContainer(),
+//        );
+//
+//
+//        $this->missingOptionCombinations = new MissingVariants(
+//            $this->taxonomyRepository,
+//            $this->taxonRepository,
+//        );
     }
 
     public function tearDown(): void
     {
-        $this->productRepository->clear();
-        $this->variantRepository->clear();
+        parent::tearDown();
+
+//        $this->catalogContext->catalogRepos()->productRepository()->clear();
+//        $this->variantRepository->clear();
     }
 
     protected function createAProduct(string $unitPrice, array $taxonIds, string $sku = 'sku', array $data = [], array $variantData = []): ProductId
     {
-        $productId = $this->productApplication->createProduct(new CreateProduct(
+        $productId = $this->catalogContext->catalogApps()->productApplication()->createProduct(new CreateProduct(
             $taxonIds,
             $unitPrice,
             '12',
@@ -105,7 +100,7 @@ abstract class ProductContext extends TestCase
             $variantData
         ));
 
-        Assert::assertNotNull($product = $this->productRepository->find($productId));
+        Assert::assertNotNull($product = $this->catalogContext->catalogRepos()->productRepository()->find($productId));
 
         $this->assertEquals([
             new ProductCreated($productId),
@@ -122,7 +117,7 @@ abstract class ProductContext extends TestCase
     {
         InMemoryVariantRepository::setNextReference($variantId);
 
-        $variantId = $this->productApplication->createVariant(new CreateVariant(
+        $variantId = $this->catalogContext->catalogApps()->productApplication()->createVariant(new CreateVariant(
             $productId,
             $unitPrice,
             $taxRate,

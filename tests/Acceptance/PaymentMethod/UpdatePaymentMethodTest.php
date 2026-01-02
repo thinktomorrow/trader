@@ -28,7 +28,7 @@ class UpdatePaymentMethodTest extends PaymentMethodContext
             ['foo' => 'baz']
         ));
 
-        $updatedPaymentMethod = $this->paymentMethodRepository->find($paymentMethodId);
+        $updatedPaymentMethod = $this->orderContext->orderRepos()->paymentMethodRepository()->find($paymentMethodId);
 
         $this->assertEquals(PaymentMethodProviderId::fromString('stripe'), $updatedPaymentMethod->getProvider());
         $this->assertEquals(Money::EUR(20), $updatedPaymentMethod->getRate());

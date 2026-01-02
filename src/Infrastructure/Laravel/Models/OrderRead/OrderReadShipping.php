@@ -20,9 +20,6 @@ abstract class OrderReadShipping
     protected iterable $discounts;
     protected array $data;
 
-    // General flag for all line prices to render with or without tax.
-    protected bool $include_tax = true;
-
     final public function __construct()
     {
     }
@@ -58,14 +55,9 @@ abstract class OrderReadShipping
     public function getCostPrice(): string
     {
         return $this->renderMoney(
-            $this->include_tax ? $this->cost->getIncludingVat() : $this->cost->getExcludingVat(),
+            $this->cost->getExcludingVat(),
             $this->getLocale()
         );
-    }
-
-    public function includeTax(bool $includeTax = true): void
-    {
-        $this->include_tax = $includeTax;
     }
 
     public function getDiscounts(): iterable

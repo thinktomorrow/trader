@@ -7,27 +7,16 @@ use Illuminate\Support\Str;
 use PHPUnit\Framework\Assert;
 use Tests\Acceptance\TestCase;
 use Tests\TestHelpers;
-use Thinktomorrow\Trader\Application\Cart\CartApplication;
 use Thinktomorrow\Trader\Application\Cart\ChooseCustomer;
 use Thinktomorrow\Trader\Application\Cart\ChoosePaymentMethod;
 use Thinktomorrow\Trader\Application\Cart\ChooseShippingProfile;
 use Thinktomorrow\Trader\Application\Cart\Line\AddLine;
 use Thinktomorrow\Trader\Application\Cart\Line\ChangeLineQuantity;
 use Thinktomorrow\Trader\Application\Cart\Line\RemoveLine;
-use Thinktomorrow\Trader\Application\Cart\PaymentMethod\UpdatePaymentMethodOnOrder;
-use Thinktomorrow\Trader\Application\Cart\ShippingProfile\UpdateShippingProfileOnOrder;
 use Thinktomorrow\Trader\Application\Cart\UpdateBillingAddress;
 use Thinktomorrow\Trader\Application\Cart\UpdateShippingAddress;
 use Thinktomorrow\Trader\Application\Cart\UpdateShopper;
-use Thinktomorrow\Trader\Application\Customer\CustomerApplication;
-use Thinktomorrow\Trader\Application\Order\Merchant\MerchantOrderApplication;
-use Thinktomorrow\Trader\Application\Product\ProductApplication;
 use Thinktomorrow\Trader\Application\Product\UpdateProduct\UpdateProductPersonalisations;
-use Thinktomorrow\Trader\Application\Promo\Coupon\CouponPromoApplication;
-use Thinktomorrow\Trader\Application\VatNumber\VatNumberApplication;
-use Thinktomorrow\Trader\Application\VatNumber\VatNumberValidator;
-use Thinktomorrow\Trader\Application\VatRate\FindVatRateForOrder;
-use Thinktomorrow\Trader\Application\VatRate\VatExemptionApplication;
 use Thinktomorrow\Trader\Domain\Common\Cash\Cash;
 use Thinktomorrow\Trader\Domain\Common\Email;
 use Thinktomorrow\Trader\Domain\Common\Locale;
@@ -53,45 +42,33 @@ use Thinktomorrow\Trader\Domain\Model\ShippingProfile\Tariff;
 use Thinktomorrow\Trader\Domain\Model\VatRate\BaseRate;
 use Thinktomorrow\Trader\Domain\Model\VatRate\VatRate;
 use Thinktomorrow\Trader\Domain\Model\VatRate\VatRateId;
-use Thinktomorrow\Trader\Infrastructure\Test\EventDispatcherSpy;
-use Thinktomorrow\Trader\Infrastructure\Test\Repositories\InMemoryCartRepository;
-use Thinktomorrow\Trader\Infrastructure\Test\Repositories\InMemoryCustomerRepository;
-use Thinktomorrow\Trader\Infrastructure\Test\Repositories\InMemoryMerchantOrderRepository;
-use Thinktomorrow\Trader\Infrastructure\Test\Repositories\InMemoryOrderRepository;
-use Thinktomorrow\Trader\Infrastructure\Test\Repositories\InMemoryPaymentMethodRepository;
-use Thinktomorrow\Trader\Infrastructure\Test\Repositories\InMemoryProductRepository;
-use Thinktomorrow\Trader\Infrastructure\Test\Repositories\InMemoryPromoRepository;
-use Thinktomorrow\Trader\Infrastructure\Test\Repositories\InMemoryShippingProfileRepository;
-use Thinktomorrow\Trader\Infrastructure\Test\Repositories\InMemoryVariantRepository;
-use Thinktomorrow\Trader\Infrastructure\Test\Repositories\InMemoryVatRateRepository;
-use Thinktomorrow\Trader\Infrastructure\Test\TestTraderConfig;
 
 abstract class CartContext extends TestCase
 {
     use TestHelpers;
 
-    protected CartApplication $cartApplication;
-    protected CouponPromoApplication $promoApplication;
-    protected InMemoryProductRepository $productRepository;
-    protected InMemoryOrderRepository $orderRepository;
-    protected InMemoryShippingProfileRepository $shippingProfileRepository;
-    protected InMemoryVatRateRepository $vatRateRepository;
-    protected InMemoryVariantRepository $variantRepository;
-    protected InMemoryCartRepository $cartRepository;
-    protected InMemoryPaymentMethodRepository $paymentMethodRepository;
-    protected InMemoryCustomerRepository $customerRepository;
-    protected InMemoryPromoRepository $promoRepository;
-    protected UpdateShippingProfileOnOrder $updateShippingProfileOnOrder;
-    protected UpdatePaymentMethodOnOrder $updatePaymentMethodOnOrder;
-    protected EventDispatcherSpy $eventDispatcher;
-    protected CustomerApplication $customerApplication;
-    protected ProductApplication $productApplication;
-    protected InMemoryMerchantOrderRepository $merchantOrderRepository;
-    protected FindVatRateForOrder $findVatRateForOrder;
-    protected VatNumberApplication $vatNumberApplication;
-    protected VatNumberValidator $vatNumberValidator;
-    protected MerchantOrderApplication $merchantOrderApplication;
-    protected VatExemptionApplication $vatExemptionApplication;
+//    protected CartApplication $cartApplication;
+//    protected CouponPromoApplication $promoApplication;
+//    protected InMemoryProductRepository $productRepository;
+//    protected InMemoryOrderRepository $orderRepository;
+//    protected InMemoryShippingProfileRepository $shippingProfileRepository;
+//    protected InMemoryVatRateRepository $vatRateRepository;
+//    protected InMemoryVariantRepository $variantRepository;
+//    protected InMemoryCartRepository $cartRepository;
+//    protected InMemoryPaymentMethodRepository $paymentMethodRepository;
+//    protected InMemoryCustomerRepository $customerRepository;
+//    protected InMemoryPromoRepository $promoRepository;
+//    protected UpdateShippingProfileOnOrder $updateShippingProfileOnOrder;
+//    protected UpdatePaymentMethodOnOrder $updatePaymentMethodOnOrder;
+//    protected EventDispatcherSpy $eventDispatcher;
+//    protected CustomerApplication $customerApplication;
+//    protected ProductApplication $productApplication;
+//    protected InMemoryMerchantOrderRepository $merchantOrderRepository;
+//    protected FindVatRateForOrder $findVatRateForOrder;
+//    protected VatNumberApplication $vatNumberApplication;
+//    protected VatNumberValidator $vatNumberValidator;
+//    protected MerchantOrderApplication $merchantOrderApplication;
+//    protected VatExemptionApplication $vatExemptionApplication;
 
 
     protected function setUp(): void
@@ -107,10 +84,10 @@ abstract class CartContext extends TestCase
 //        $this->>catalogContext->catalogRepos()->variantRepository() = new InMemoryVariantRepository();
 //        $this->cartRepository = new InMemoryCartRepository();
 //        $this->merchantOrderRepository = new InMemoryMerchantOrderRepository();
-//        $this->vatRateRepository = new InMemoryVatRateRepository(new TestTraderConfig());
+//        $this->orderContext->orderRepos()->vatRateRepository() = new InMemoryVatRateRepository(new TestTraderConfig());
 //        $this->vatExemptionApplication = new VatExemptionApplication(new TestTraderConfig());
-//        $this->findVatRateForOrder = new FindVatRateForOrder(new TestTraderConfig(), $this->vatExemptionApplication, $this->vatRateRepository);
-//        $this->promoRepository = new InMemoryPromoRepository(
+//        $this->findVatRateForOrder = new FindVatRateForOrder(new TestTraderConfig(), $this->vatExemptionApplication, $this->orderContext->orderRepos()->vatRateRepository());
+//        $this->orderContext->orderRepos()->promoRepository() = new InMemoryPromoRepository(
 //            new DiscountFactory([
 //                FixedAmountDiscount::class,
 //                PercentageOffOrderDiscount::class,
@@ -130,8 +107,8 @@ abstract class CartContext extends TestCase
 //        (new TestContainer())->add(ApplyPromoToOrder::class, new ApplyPromoToOrder($this->>orderContext->orderRepos()->orderRepository()));
 //        (new TestContainer())->add(AdjustLine::class, new DefaultAdjustLine());
 //        (new TestContainer())->add(AdjustLines::class, new AdjustLines(new InMemoryVariantRepository(), TestContainer::make(AdjustLine::class)));
-//        (new TestContainer())->add(AdjustVatRates::class, new AdjustVatRates($this->>catalogContext->catalogRepos()->variantRepository(), new FindVatRateForOrder(new TestTraderConfig(), new VatExemptionApplication(new TestTraderConfig()), $this->vatRateRepository)));
-//        (new TestContainer())->add(AdjustDiscounts::class, new AdjustDiscounts($this->promoRepository, (new TestContainer())->get(ApplyPromoToOrder::class)));
+//        (new TestContainer())->add(AdjustVatRates::class, new AdjustVatRates($this->>catalogContext->catalogRepos()->variantRepository(), new FindVatRateForOrder(new TestTraderConfig(), new VatExemptionApplication(new TestTraderConfig()), $this->orderContext->orderRepos()->vatRateRepository())));
+//        (new TestContainer())->add(AdjustDiscounts::class, new AdjustDiscounts($this->orderContext->orderRepos()->promoRepository(), (new TestContainer())->get(ApplyPromoToOrder::class)));
 //        (new TestContainer())->add(OrderStateMachine::class, new OrderStateMachine([
 //            ...DefaultOrderState::customerStates(), DefaultOrderState::confirmed,
 //        ], [
@@ -150,16 +127,16 @@ abstract class CartContext extends TestCase
 //            $this->>orderContext->orderRepos()->orderRepository(),
 //            (new TestContainer())->get(OrderStateMachine::class),
 //            new RefreshCartAction(),
-//            $this->shippingProfileRepository = new InMemoryShippingProfileRepository(),
-//            $this->updateShippingProfileOnOrder = new UpdateShippingProfileOnOrder(new TestContainer(), new TestTraderConfig(), $this->>orderContext->orderRepos()->orderRepository(), $this->shippingProfileRepository, $this->findVatRateForOrder),
-//            $this->updatePaymentMethodOnOrder = new UpdatePaymentMethodOnOrder(new TestContainer(), new TestTraderConfig(), $this->>orderContext->orderRepos()->orderRepository(), new DefaultVerifyPaymentMethodForCart(), $this->paymentMethodRepository, $this->findVatRateForOrder),
-//            $this->customerRepository = new InMemoryCustomerRepository(),
+//            $this->orderContext->orderRepos()->shippingProfileRepository() = new InMemoryShippingProfileRepository(),
+//            $this->updateShippingProfileOnOrder = new UpdateShippingProfileOnOrder(new TestContainer(), new TestTraderConfig(), $this->>orderContext->orderRepos()->orderRepository(), $this->orderContext->orderRepos()->shippingProfileRepository(), $this->findVatRateForOrder),
+//            $this->updatePaymentMethodOnOrder = new UpdatePaymentMethodOnOrder(new TestContainer(), new TestTraderConfig(), $this->>orderContext->orderRepos()->orderRepository(), new DefaultVerifyPaymentMethodForCart(), $this->orderContext->orderRepos()->paymentMethodRepository(), $this->findVatRateForOrder),
+//            $this->orderContext->orderRepos()->customerRepository() = new InMemoryCustomerRepository(),
 //            $this->eventDispatcher = new EventDispatcherSpy(),
 //            $this->vatNumberApplication,
 //            $this->vatExemptionApplication,
 //        );
 //
-//        $this->productApplication = new ProductApplication(
+//        $this->catalogContext->catalogApps()->productApplication() = new ProductApplication(
 //            new TestTraderConfig(),
 //            $this->eventDispatcher,
 //            $this->catalogContextcatalogRepos()->->productRepository(),
@@ -170,13 +147,13 @@ abstract class CartContext extends TestCase
 //            new TestTraderConfig(),
 //            new TestContainer(),
 //            $this->>orderContext->orderRepos()->orderRepository(),
-//            $this->promoRepository,
+//            $this->orderContext->orderRepos()->promoRepository(),
 //            (new TestContainer())->get(ApplyPromoToOrder::class),
 //            $this->eventDispatcher,
 //        );
 //
 //        $this->customerApplication = new CustomerApplication(
-//            $this->customerRepository,
+//            $this->orderContext->orderRepos()->customerRepository(),
 //            $this->eventDispatcher,
 //        );
 //
@@ -197,15 +174,7 @@ abstract class CartContext extends TestCase
 
     public function tearDown(): void
     {
-        $this->resetMemoizedVatPercentages();
-
         parent::tearDown();
-    }
-
-    protected function resetMemoizedVatPercentages(): void
-    {
-        // TODO: move to trader testing package
-        $this->findVatRateForOrder = new FindVatRateForOrder(new TestTraderConfig(), $this->orderContext->orderApps()->vatExemptionApplication(), $this->orderContext->orderRepos()->vatRateRepository());
     }
 
     protected function givenThereIsAProductWhichCostsEur($productTitle, $price)
@@ -223,7 +192,7 @@ abstract class CartContext extends TestCase
     {
         $product = $this->catalogContext->catalogRepos()->productRepository()->find(ProductId::fromString($productTitle));
 
-        $this->productApplication->updateProductPersonalisations(new UpdateProductPersonalisations($product->productId->get(), $personalisations));
+        $this->catalogContext->catalogApps()->productApplication()->updateProductPersonalisations(new UpdateProductPersonalisations($product->productId->get(), $personalisations));
 
         Assert::assertCount(count($personalisations), $this->catalogContext->catalogRepos()->productRepository()->find(ProductId::fromString($productTitle))->getPersonalisations());
     }
@@ -257,7 +226,7 @@ abstract class CartContext extends TestCase
 
         $shippingProfile->addTariff(
             Tariff::create(
-                $this->shippingProfileRepository->nextTariffReference(),
+                $this->orderContext->orderRepos()->shippingProfileRepository()->nextTariffReference(),
                 $shippingProfile->shippingProfileId,
                 Cash::make($shippingCost * 100),
                 Cash::make($from * 100),
@@ -265,7 +234,7 @@ abstract class CartContext extends TestCase
             )
         );
 
-        $this->shippingProfileRepository->save($shippingProfile);
+        $this->orderContext->orderRepos()->shippingProfileRepository()->save($shippingProfile);
     }
 
     public function givenPaymentMethod($paymentRate, string $paymentMethodId = 'visa')
@@ -277,7 +246,7 @@ abstract class CartContext extends TestCase
         );
         $paymentMethod->addData(['title' => ['nl' => Str::headline($paymentMethodId)]]);
 
-        $this->paymentMethodRepository->save($paymentMethod);
+        $this->orderContext->orderRepos()->paymentMethodRepository()->save($paymentMethod);
     }
 
     public function givenThereIsAVatRate(string $countryId = 'NL', string $vatRateValue = '21', string $vatRateId = 'taxrates-nl'): VatRate
@@ -290,35 +259,35 @@ abstract class CartContext extends TestCase
         );
         $vatRate->addData(['title' => ['nl' => Str::headline($vatRateId)]]);
 
-        $this->vatRateRepository->save($vatRate);
+        $this->orderContext->orderRepos()->vatRateRepository()->save($vatRate);
 
         return $vatRate;
     }
 
     public function givenVatRateHasBaseRateOf(VatRateId $vatRateId, VatRateId $originVatRateId, ?string $baseRateId = null)
     {
-        $vatRate = $this->vatRateRepository->find($vatRateId);
-        $baseVatRate = $this->vatRateRepository->find($originVatRateId);
+        $vatRate = $this->orderContext->orderRepos()->vatRateRepository()->find($vatRateId);
+        $baseVatRate = $this->orderContext->orderRepos()->vatRateRepository()->find($originVatRateId);
         $vatRate->addBaseRate(BaseRate::create(
-            $baseRateId ?: $this->vatRateRepository->nextBaseRateReference(),
+            $baseRateId ?: $this->orderContext->orderRepos()->vatRateRepository()->nextBaseRateReference(),
             $originVatRateId,
             $vatRateId,
             $baseVatRate->getRate()
         ));
 
-        $this->vatRateRepository->save($vatRate);
+        $this->orderContext->orderRepos()->vatRateRepository()->save($vatRate);
     }
 
     public function givenACustomerExists(string $email, bool $is_business = false, string $locale = 'nl_BE'): Customer
     {
         $customer = Customer::create(
-            $this->customerRepository->nextReference(),
+            $this->orderContext->orderRepos()->customerRepository()->nextReference(),
             Email::fromString($email),
             $is_business,
             Locale::fromString($locale)
         );
 
-        $this->customerRepository->save($customer);
+        $this->orderContext->orderRepos()->customerRepository()->save($customer);
 
         return $customer;
     }
@@ -327,7 +296,7 @@ abstract class CartContext extends TestCase
     {
         $promo = $this->createPromo($mappedData, $discounts ?: [$this->orderContext->createOrderDiscount([], [$this->createCondition()])]);
 
-        $this->promoRepository->save($promo);
+        $this->orderContext->orderRepos()->promoRepository()->save($promo);
     }
 
     protected function whenIAddTheVariantToTheCart($productVariantId, $quantity = 1, array $data = [], array $personalisations = [])
@@ -441,7 +410,7 @@ abstract class CartContext extends TestCase
 
     protected function whenIChooseCustomer(string $email)
     {
-        $customer = $this->customerRepository->findByEmail(Email::fromString($email));
+        $customer = $this->orderContext->orderRepos()->customerRepository()->findByEmail(Email::fromString($email));
 
         $this->orderContext->orderApps()->cartApplication()->chooseCustomer(new ChooseCustomer(
             $this->getOrder()->orderId->get(),

@@ -21,7 +21,7 @@ class CreateVatRateTest extends VatRateContext
             ['foo' => 'bar']
         ));
 
-        $vatRate = $this->vatRateRepository->find($vatRateId);
+        $vatRate = $this->orderContext->orderRepos()->vatRateRepository()->find($vatRateId);
 
         $this->assertInstanceOf(VatRateId::class, $vatRateId);
         $this->assertEquals($vatRateId, $vatRate->vatRateId);
@@ -37,7 +37,7 @@ class CreateVatRateTest extends VatRateContext
             'baseRateId' => $baseRateId
         ] = $this->createBaseRateStub();
 
-        $baseRate = $this->vatRateRepository->find($targetVatRateId)->findBaseRate($baseRateId);
+        $baseRate = $this->orderContext->orderRepos()->vatRateRepository()->find($targetVatRateId)->findBaseRate($baseRateId);
 
         $this->assertInstanceOf(BaseRateId::class, $baseRateId);
 
@@ -56,7 +56,7 @@ class CreateVatRateTest extends VatRateContext
             ['foo' => 'bar']
         ));
 
-        $this->vatRateRepository->setNextReference('zzz-123');
+        $this->orderContext->orderRepos()->vatRateRepository()->setNextReference('zzz-123');
         $targetVatRateId = $this->vatRateApplication->createVatRate(new CreateVatRate(
             'NL',
             '20',
@@ -65,7 +65,7 @@ class CreateVatRateTest extends VatRateContext
 
         $this->vatRateApplication->createBaseRate(new CreateBaseRate($originVatRateId->get(), $targetVatRateId->get()));
 
-        $this->assertCount(0, $this->vatRateRepository->find($originVatRateId)->getBaseRates());
-        $this->assertCount(1, $this->vatRateRepository->find($targetVatRateId)->getBaseRates());
+        $this->assertCount(0, $this->orderContext->orderRepos()->vatRateRepository()->find($originVatRateId)->getBaseRates());
+        $this->assertCount(1, $this->orderContext->orderRepos()->vatRateRepository()->find($targetVatRateId)->getBaseRates());
     }
 }

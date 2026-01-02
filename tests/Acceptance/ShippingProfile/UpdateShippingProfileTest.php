@@ -30,7 +30,7 @@ class UpdateShippingProfileTest extends ShippingProfileContext
             ['foo' => 'baz']
         ));
 
-        $shippingProfile = $this->shippingProfileRepository->find($shippingProfileId);
+        $shippingProfile = $this->orderContext->orderRepos()->shippingProfileRepository()->find($shippingProfileId);
 
         $this->assertEquals([
             CountryId::fromString('BE'),
@@ -53,7 +53,7 @@ class UpdateShippingProfileTest extends ShippingProfileContext
 
         $this->shippingProfileApplication->updateTariff(new UpdateTariff($tariffId->get(), $shippingProfileId->get(), '60', '20', null));
 
-        $tariff = $this->shippingProfileRepository->find($shippingProfileId)->findTariff($tariffId);
+        $tariff = $this->orderContext->orderRepos()->shippingProfileRepository()->find($shippingProfileId)->findTariff($tariffId);
 
         $this->assertEquals(Money::EUR('60'), $tariff->getRate());
         $this->assertEquals('20', $tariff->getMappedData()['from']);

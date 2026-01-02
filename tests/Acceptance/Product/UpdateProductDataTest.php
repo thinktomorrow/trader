@@ -17,9 +17,9 @@ class UpdateProductDataTest extends ProductContext
         $productId = $this->createAProduct('50', []);
         $dataPayload = ['foo' => 'bar'];
 
-        $this->productApplication->updateProductData(new UpdateProductData($productId->get(), $dataPayload));
+        $this->catalogContext->catalogApps()->productApplication()->updateProductData(new UpdateProductData($productId->get(), $dataPayload));
 
-        $product = $this->productRepository->find($productId);
+        $product = $this->catalogContext->catalogRepos()->productRepository()->find($productId);
 
         $this->assertEquals(json_encode($dataPayload), $product->getMappedData()['data']);
 
@@ -33,9 +33,9 @@ class UpdateProductDataTest extends ProductContext
     {
         $productId = $this->createAProduct('50', [], 'sku', ['foo' => 'bar']);
 
-        $this->productApplication->updateProductData(new UpdateProductData($productId->get(), ['foo' => ['nl' => 'baz']]));
+        $this->catalogContext->catalogApps()->productApplication()->updateProductData(new UpdateProductData($productId->get(), ['foo' => ['nl' => 'baz']]));
 
-        $product = $this->productRepository->find($productId);
+        $product = $this->catalogContext->catalogRepos()->productRepository()->find($productId);
 
         $this->assertEquals(json_encode(['foo' => ['nl' => 'baz']]), $product->getMappedData()['data']);
     }
@@ -44,9 +44,9 @@ class UpdateProductDataTest extends ProductContext
     {
         $productId = $this->createAProduct('50', [], 'sku', ['foo' => 'bar']);
 
-        $this->productApplication->updateProductData(new UpdateProductData($productId->get(), ['label' => ['nl' => 'baz']]));
+        $this->catalogContext->catalogApps()->productApplication()->updateProductData(new UpdateProductData($productId->get(), ['label' => ['nl' => 'baz']]));
 
-        $product = $this->productRepository->find($productId);
+        $product = $this->catalogContext->catalogRepos()->productRepository()->find($productId);
 
         $this->assertEquals(json_encode(['foo' => 'bar', 'label' => ['nl' => 'baz']]), $product->getMappedData()['data']);
     }

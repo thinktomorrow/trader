@@ -37,31 +37,29 @@ class UpdateShippingProfileOnOrder
     {
         $shippingProfile = $this->shippingProfileRepository->find($shippingProfileId);
 
-        if (! in_array($shippingProfile->getState(), ShippingProfileState::onlineStates())) {
+        if (!in_array($shippingProfile->getState(), ShippingProfileState::onlineStates())) {
             $this->removeAllShippingsFromOrder($order);
 
             return;
         }
 
         // When shipping country is not given, but profile is country restricted, we bail out.
-        if (! ($shippingCountryId = $order->getShippingAddress()?->getAddress()->countryId) && $shippingProfile->hasAnyCountries()) {
+        if (!($shippingCountryId = $order->getShippingAddress()?->getAddress()->countryId) && $shippingProfile->hasAnyCountries()) {
             $this->removeAllShippingsFromOrder($order);
 
             return;
         } // If shipping country does not match the allowed countries, we bail out.
-        elseif ($shippingCountryId && ! $shippingProfile->hasCountry($shippingCountryId)) {
+        elseif ($shippingCountryId && !$shippingProfile->hasCountry($shippingCountryId)) {
             $this->removeAllShippingsFromOrder($order);
 
             return;
         }
 
         // Apply matching tariff - if no tariff is found, no rate will be applied
-        $tariff = $shippingProfile->findTariffByPrice($order->getSubtotal(), $this->config->doesTariffInputIncludesVat());
+        $tariff = $shippingProfile->findTariffByPrice($order->getSubtotalExcl());
 
-        $shippingCost = ShippingCost::fromMoney(
+        $shippingCost = ShippingCost::fromExcludingVat(
             $tariff ? $tariff->getRate() : Cash::zero(),
-            $this->findVatRateForOrder->findForShippingCost($order),
-            $this->config->doesTariffInputIncludesVat()
         );
 
         if (count($order->getShippings()) > 0) {

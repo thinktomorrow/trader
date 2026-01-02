@@ -17,9 +17,9 @@ class UpdateProductTaxaTest extends ProductContext
         $this->createAndSaveTaxonomiesAndTaxa(['ooo'], ['xxx', 'yyy']);
         $productId = $this->createAProduct('50', [], 'sku', ['title' => ['nl' => 'foobar nl']]);
 
-        $this->productApplication->updateProductTaxa(new UpdateProductTaxa($productId->get(), ['xxx', 'yyy'], ['ooo']));
+        $this->catalogContext->catalogApps()->productApplication()->updateProductTaxa(new UpdateProductTaxa($productId->get(), ['xxx', 'yyy'], ['ooo']));
 
-        $product = $this->productRepository->find($productId);
+        $product = $this->catalogContext->catalogRepos()->productRepository()->find($productId);
 
         $this->assertContainsOnlyInstancesOf(ProductTaxon::class, $product->getProductTaxa());
         $this->assertCount(2, $product->getChildEntities()[ProductTaxon::class]);
@@ -48,9 +48,9 @@ class UpdateProductTaxaTest extends ProductContext
     {
         $productId = $this->createAProduct('50', [], 'sku', ['title' => ['nl' => 'foobar nl']]);
 
-        $this->productApplication->updateProductTaxa(new UpdateProductTaxa($productId->get(), ['xxx', 'yyy']));
+        $this->catalogContext->catalogApps()->productApplication()->updateProductTaxa(new UpdateProductTaxa($productId->get(), ['xxx', 'yyy']));
 
-        $product = $this->productRepository->find($productId);
+        $product = $this->catalogContext->catalogRepos()->productRepository()->find($productId);
 
         $this->assertContainsOnlyInstancesOf(ProductTaxon::class, $product->getProductTaxa());
         $this->assertCount(2, $product->getChildEntities()[ProductTaxon::class]);
@@ -79,9 +79,9 @@ class UpdateProductTaxaTest extends ProductContext
     {
         $productId = $this->createAProduct('50', ['1', '2'], 'sku', ['title' => ['nl' => 'foobar nl']]);
 
-        $this->productApplication->updateProductTaxa(new UpdateProductTaxa($productId->get(), [], []));
+        $this->catalogContext->catalogApps()->productApplication()->updateProductTaxa(new UpdateProductTaxa($productId->get(), [], []));
 
-        $product = $this->productRepository->find($productId);
+        $product = $this->catalogContext->catalogRepos()->productRepository()->find($productId);
 
         $this->assertCount(0, $product->getChildEntities()[ProductTaxon::class]);
 
@@ -95,14 +95,14 @@ class UpdateProductTaxaTest extends ProductContext
     {
         $product = $this->createProductWithVariantAndTaxon();
 
-        $this->productRepository->save($product);
+        $this->catalogContext->catalogRepos()->productRepository()->save($product);
 
         $this->assertCount(1, $product->getProductTaxa());
         $this->assertCount(1, $product->getVariants()[0]->getVariantTaxa());
 
-        $this->productApplication->updateProductTaxa(new UpdateProductTaxa($product->productId->get(), [], []));
+        $this->catalogContext->catalogApps()->productApplication()->updateProductTaxa(new UpdateProductTaxa($product->productId->get(), [], []));
 
-        $product = $this->productRepository->find($product->productId);
+        $product = $this->catalogContext->catalogRepos()->productRepository()->find($product->productId);
 
         $this->assertCount(0, $product->getProductTaxa());
         $this->assertCount(0, $product->getVariants()[0]->getVariantTaxa());
@@ -113,15 +113,15 @@ class UpdateProductTaxaTest extends ProductContext
         $this->createAndSaveTaxonomiesAndTaxa(['ooo'], ['xxx', 'yyy']);
         $product = $this->createProductWithVariantAndTaxon();
 
-        $this->productRepository->save($product);
+        $this->catalogContext->catalogRepos()->productRepository()->save($product);
 
         $this->assertCount(1, $product->getProductTaxa());
         $this->assertCount(1, $product->getVariants()[0]->getVariantTaxa());
 
         // Add a different taxon, existing variant taxa remain intact.
-        $this->productApplication->updateProductTaxa(new UpdateProductTaxa($product->productId->get(), ['xxx', 'yyy'], []));
+        $this->catalogContext->catalogApps()->productApplication()->updateProductTaxa(new UpdateProductTaxa($product->productId->get(), ['xxx', 'yyy'], []));
 
-        $product = $this->productRepository->find($product->productId);
+        $product = $this->catalogContext->catalogRepos()->productRepository()->find($product->productId);
 
         $this->assertCount(2, $product->getProductTaxa());
         $this->assertEquals('xxx', $product->getProductTaxa()[0]->taxonId->get());

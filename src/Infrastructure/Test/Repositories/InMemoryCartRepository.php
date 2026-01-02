@@ -14,6 +14,7 @@ use Thinktomorrow\Trader\Application\Cart\Read\CartShopper;
 use Thinktomorrow\Trader\Domain\Model\Order\Discount\Discount;
 use Thinktomorrow\Trader\Domain\Model\Order\Exceptions\CouldNotFindOrder;
 use Thinktomorrow\Trader\Domain\Model\Order\Exceptions\OrderAlreadyInMerchantHands;
+use Thinktomorrow\Trader\Domain\Model\Order\Line\Line;
 use Thinktomorrow\Trader\Domain\Model\Order\Line\Personalisations\LinePersonalisation;
 use Thinktomorrow\Trader\Domain\Model\Order\OrderId;
 use Thinktomorrow\Trader\Infrastructure\Laravel\Models\Cart\DefaultCart;
@@ -41,20 +42,29 @@ final class InMemoryCartRepository implements CartRepository, InMemoryRepository
         }
 
         $orderState = array_merge(InMemoryOrderRepository::$orders[$orderId->get()]->getMappedData(), [
-            'total' => $order->getTotal(),
-            'taxTotal' => $order->getTaxTotal(),
-            'subtotal' => $order->getSubTotal(),
-            'discountTotal' => $order->getDiscountTotal(),
-            'shippingCost' => $order->getShippingCost(),
-            'paymentCost' => $order->getPaymentCost(),
+            'total_excl' => $order->getTotalExcl()->getAmount(),
+            'total_incl' => $order->getTotalIncl()->getAmount(),
+            'total_vat' => $order->getTotalVat()->getAmount(),
+            'vat_lines' => $order->getVatLines(),
+            'subtotal_excl' => $order->getSubtotalExcl()->getAmount(),
+            'subtotal_incl' => $order->getSubtotalIncl()->getAmount(),
+            'discount_total_excl' => $order->getDiscountTotalExcl()->getAmount(),
+            'discount_total_incl' => $order->getDiscountTotalIncl()->getAmount(),
+            'shipping_cost_excl' => $order->getShippingCostExcl()->getAmount(),
+            'shipping_cost_incl' => $order->getShippingCostIncl()->getAmount(),
+            'payment_cost_excl' => $order->getPaymentCostExcl()->getAmount(),
+            'payment_cost_incl' => $order->getPaymentCostIncl()->getAmount(),
         ]);
 
-        $lines = array_map(fn($line) => DefaultCartLine::fromMappedData(
+        $lines = array_map(fn(Line $line) => DefaultCartLine::fromMappedData(
             array_merge($line->getMappedData(), [
-                'total' => $line->getTotal(),
-                'taxTotal' => $line->getTaxTotal(),
-                'discountTotal' => $line->getDiscountTotal(),
-                'unitPrice' => $line->getLinePrice(),
+                'unit_price_incl' => $line->getUnitPrice()->getIncludingVat()->getAmount(),
+                'unit_price_excl' => $line->getUnitPrice()->getExcludingVat()->getAmount(),
+                'total_excl' => $line->getTotal()->getExcludingVat()->getAmount(),
+                'total_incl' => $line->getTotal()->getIncludingVat()->getAmount(),
+                'total_vat' => $line->getTotal()->getVatTotal()->getAmount(),
+                'discount_excl' => $line->getDiscountPriceExcl()->getAmount(),
+                'discount_incl' => $line->getDiscountPriceIncl()->getAmount(),
             ]),
             $orderState,
             array_map(fn(Discount $discount) => DefaultCartDiscount::fromMappedData(array_merge($discount->getMappedData(), [

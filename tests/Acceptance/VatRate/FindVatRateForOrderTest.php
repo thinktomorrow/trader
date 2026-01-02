@@ -174,7 +174,7 @@ class FindVatRateForOrderTest extends VatRateContext
 
         // Create an order if not already
         try {
-            return $this->orderRepository->find(OrderId::fromString('xxx'));
+            return $this->orderContext->orderRepos()->orderRepository()->find(OrderId::fromString('xxx'));
         } catch (CouldNotFindOrder $e) {
 
             $order = Order::create(
@@ -192,7 +192,7 @@ class FindVatRateForOrderTest extends VatRateContext
                 'data' => json_encode([]),
             ], ['order_id' => 'xxx']));
 
-            $this->orderRepository->save($order);
+            $this->orderContext->orderRepos()->orderRepository()->save($order);
 
             return $order;
         }
@@ -201,13 +201,13 @@ class FindVatRateForOrderTest extends VatRateContext
     private function createVatRate(string $countryId, string $vatPercentage, bool $isStandard = true): VatRate
     {
         $vatRate = VatRate::create(
-            $this->vatRateRepository->nextReference(),
+            $this->orderContext->orderRepos()->vatRateRepository()->nextReference(),
             CountryId::fromString($countryId),
             VatPercentage::fromString($vatPercentage),
             $isStandard
         );
 
-        $this->vatRateRepository->save($vatRate);
+        $this->orderContext->orderRepos()->vatRateRepository()->save($vatRate);
 
         return $vatRate;
     }
@@ -215,7 +215,7 @@ class FindVatRateForOrderTest extends VatRateContext
     private function addBaseRate(VatRate $originVatRate, VatRate $targetVatRate): void
     {
         $baseRate = BaseRate::create(
-            $this->vatRateRepository->nextBaseRateReference(),
+            $this->orderContext->orderRepos()->vatRateRepository()->nextBaseRateReference(),
             $originVatRate->vatRateId,
             $targetVatRate->vatRateId,
             $originVatRate->getRate()
@@ -223,6 +223,6 @@ class FindVatRateForOrderTest extends VatRateContext
 
         $targetVatRate->addBaseRate($baseRate);
 
-        $this->vatRateRepository->save($targetVatRate);
+        $this->orderContext->orderRepos()->vatRateRepository()->save($targetVatRate);
     }
 }

@@ -76,7 +76,7 @@ class MysqlMerchantOrderRepository implements MerchantOrderRepository
                 'total' => $line->getTotal(),
                 'taxTotal' => $line->getTaxTotal(),
                 'discountTotal' => $line->getDiscountTotal(),
-                'unitPrice' => $line->getLinePrice(),
+                'unitPrice' => $line->getUnitPrice(),
             ]),
             $orderState,
             array_map(fn(Discount $discount) => $this->container->get(MerchantOrderDiscount::class)::fromMappedData(array_merge($discount->getMappedData(), [

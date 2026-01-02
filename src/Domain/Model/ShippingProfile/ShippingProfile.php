@@ -3,12 +3,10 @@ declare(strict_types=1);
 
 namespace Thinktomorrow\Trader\Domain\Model\ShippingProfile;
 
+use Money\Money;
 use Thinktomorrow\Trader\Domain\Common\Entity\Aggregate;
 use Thinktomorrow\Trader\Domain\Common\Entity\HasData;
 use Thinktomorrow\Trader\Domain\Common\Event\RecordsEvents;
-use Thinktomorrow\Trader\Domain\Common\Price\Old\Price;
-use Thinktomorrow\Trader\Domain\Common\Price\Old\PriceTotal;
-use Thinktomorrow\Trader\Domain\Common\Price\TotalPrice;
 use Thinktomorrow\Trader\Domain\Model\Country\CountryId;
 use Thinktomorrow\Trader\Domain\Model\Country\HasCountryIds;
 use Thinktomorrow\Trader\Domain\Model\ShippingProfile\Events\TariffDeleted;
@@ -73,12 +71,10 @@ final class ShippingProfile implements Aggregate
         return $this->tariffs;
     }
 
-    public function findTariffByPrice(Price|PriceTotal|TotalPrice $price, bool $tariff_amounts_include_tax): ?Tariff
+    public function findTariffByPrice(Money $tariffBaseExcl): ?Tariff
     {
-        $normalizedAmount = $tariff_amounts_include_tax ? $price->getIncludingVat() : $price->getExcludingVat();
-
         foreach ($this->tariffs as $tariff) {
-            if ($tariff->withinRange($normalizedAmount)) {
+            if ($tariff->withinRange($tariffBaseExcl)) {
                 return $tariff;
             }
         }
@@ -126,8 +122,8 @@ final class ShippingProfile implements Aggregate
     public function getChildEntities(): array
     {
         return [
-            Tariff::class => array_map(fn (Tariff $tariff) => $tariff->getMappedData(), $this->tariffs),
-            CountryId::class => array_map(fn (CountryId $countryId) => $countryId->get(), $this->countryIds),
+            Tariff::class => array_map(fn(Tariff $tariff) => $tariff->getMappedData(), $this->tariffs),
+            CountryId::class => array_map(fn(CountryId $countryId) => $countryId->get(), $this->countryIds),
         ];
     }
 
@@ -140,8 +136,8 @@ final class ShippingProfile implements Aggregate
         $shippingProfile->requiresAddress = $state['requires_address'];
         $shippingProfile->data = json_decode($state['data'], true);
 
-        $shippingProfile->tariffs = array_map(fn ($tariffState) => Tariff::fromMappedData($tariffState, $state), $childEntities[Tariff::class]);
-        $shippingProfile->countryIds = array_map(fn ($countryState) => CountryId::fromString($countryState['country_id']), $childEntities[CountryId::class]);
+        $shippingProfile->tariffs = array_map(fn($tariffState) => Tariff::fromMappedData($tariffState, $state), $childEntities[Tariff::class]);
+        $shippingProfile->countryIds = array_map(fn($countryState) => CountryId::fromString($countryState['country_id']), $childEntities[CountryId::class]);
 
         return $shippingProfile;
     }

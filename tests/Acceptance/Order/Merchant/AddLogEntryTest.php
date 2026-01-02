@@ -13,13 +13,13 @@ class AddLogEntryTest extends CartContext
     {
         parent::setUp();
 
-        $this->orderRepository = new InMemoryOrderRepository();
+        $this->orderContext->orderRepos()->orderRepository() = new InMemoryOrderRepository();
     }
 
     public function test_merchant_can_change_shipping_data()
     {
         $order = $this->createOrder(['order_id' => 'xxx']);
-        $this->orderRepository->save($order);
+        $this->orderContext->orderRepos()->orderRepository()->save($order);
 
         $this->merchantOrderApplication->addLogEntry(new AddLogEntry(
             $order->orderId->get(),
@@ -27,7 +27,7 @@ class AddLogEntryTest extends CartContext
             ['foo' => 'bar']
         ));
 
-        $order = $this->orderRepository->find($order->orderId);
+        $order = $this->orderContext->orderRepos()->orderRepository()->find($order->orderId);
 
         $this->assertCount(1, $order->getOrderEvents());
         $this->assertEquals('transition.confirmed', $order->getOrderEvents()[0]->getEvent());

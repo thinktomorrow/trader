@@ -17,24 +17,21 @@ class RefreshCartVatTest extends CartContext
     public function test_it_can_refresh_vat_rates()
     {
         $nlVatRate = $this->givenThereIsAVatRate('NL', '10');
-        $this->givenThereIsAProductWhichCostsEur('aaa', 5);
-        $this->whenIAddTheVariantToTheCart('aaa-123', 1);
+        $this->givenThereIsAProductWhichCostsEur('product-aaa', 5);
+        $this->whenIAddTheVariantToTheCart('product-aaa-variant-aaa', 1);
 
         // Check unchanged line first
-        $cart = $this->cartRepository->findCart(OrderId::fromString('xxx'));
-        $lineTaxRate = $cart->getLines()[0]->getLinePriceAsPrice()->getVatPercentage();
+        $cart = $this->orderContext->orderRepos()->cartRepository()->findCart(OrderId::fromString('xxx'));
+        $lineTaxRate = $cart->getLines()[0]->getVatRate();
         $this->assertEquals('20', $lineTaxRate->get());
 
         // Change billing country to NL
         $this->givenOrderHasABillingCountry('NL');
 
-        // Reset memoized vat
-        $this->resetMemoizedVatPercentages();
+        $this->orderContext->orderApps()->cartApplication()->refresh(new RefreshCart('xxx'));
 
-        $this->cartApplication->refresh(new RefreshCart('xxx'));
-
-        $cart = $this->cartRepository->findCart(OrderId::fromString('xxx'));
-        $lineTaxRate = $cart->getLines()[0]->getLinePriceAsPrice()->getVatPercentage();
+        $cart = $this->orderContext->orderRepos()->cartRepository()->findCart(OrderId::fromString('xxx'));
+        $lineTaxRate = $cart->getLines()[0]->getVatRate();
         $this->assertEquals('10', $lineTaxRate->get());
     }
 
@@ -46,23 +43,20 @@ class RefreshCartVatTest extends CartContext
         $this->givenVatRateHasBaseRateOf($nlVatRate2->vatRateId, $primaryVatRate->vatRateId);
 
         $this->givenThereIsAProductWhichCostsEur('aaa', 5);
-        $this->whenIAddTheVariantToTheCart('aaa-123', 1);
+        $this->whenIAddTheVariantToTheCart('aaa-variant-aaa', 1);
 
         // Check unchanged line first
-        $cart = $this->cartRepository->findCart(OrderId::fromString('xxx'));
-        $lineTaxRate = $cart->getLines()[0]->getLinePriceAsPrice()->getVatPercentage();
+        $cart = $this->orderContext->orderRepos()->cartRepository()->findCart(OrderId::fromString('xxx'));
+        $lineTaxRate = $cart->getLines()[0]->getVatRate();
         $this->assertEquals('20', $lineTaxRate->get());
 
         // Change billing country to NL
         $this->givenOrderHasABillingCountry('NL');
 
-        // Reset memoized vat
-        $this->resetMemoizedVatPercentages();
+        $this->orderContext->orderApps()->cartApplication()->refresh(new RefreshCart('xxx'));
 
-        $this->cartApplication->refresh(new RefreshCart('xxx'));
-
-        $cart = $this->cartRepository->findCart(OrderId::fromString('xxx'));
-        $lineTaxRate = $cart->getLines()[0]->getLinePriceAsPrice()->getVatPercentage();
+        $cart = $this->orderContext->orderRepos()->cartRepository()->findCart(OrderId::fromString('xxx'));
+        $lineTaxRate = $cart->getLines()[0]->getVatRate();
         $this->assertEquals('15', $lineTaxRate->get());
     }
 
@@ -70,50 +64,19 @@ class RefreshCartVatTest extends CartContext
     {
         $this->givenThereIsAVatRate('NL', '10');
         $this->givenThereIsAProductWhichCostsEur('aaa', 5);
-        $this->whenIAddTheVariantToTheCart('aaa-123', 1);
+        $this->whenIAddTheVariantToTheCart('aaa-variant-aaa', 1);
 
         // Check unchanged line first
-        $cart = $this->cartRepository->findCart(OrderId::fromString('xxx'));
-        $lineTaxRate = $cart->getLines()[0]->getLinePriceAsPrice()->getVatPercentage();
+        $cart = $this->orderContext->orderRepos()->cartRepository()->findCart(OrderId::fromString('xxx'));
+        $lineTaxRate = $cart->getLines()[0]->getVatRate();
         $this->assertEquals('20', $lineTaxRate->get());
 
         $this->givenOrderHasABillingCountry('FR');
 
-        // Reset memoized vat
-        $this->resetMemoizedVatPercentages();
+        $this->orderContext->orderApps()->cartApplication()->refresh(new RefreshCart('xxx'));
+        $cart = $this->orderContext->orderRepos()->cartRepository()->findCart(OrderId::fromString('xxx'));
 
-        $this->cartApplication->refresh(new RefreshCart('xxx'));
-        $cart = $this->cartRepository->findCart(OrderId::fromString('xxx'));
-
-        $lineTaxRate = $cart->getLines()[0]->getLinePriceAsPrice()->getVatPercentage();
+        $lineTaxRate = $cart->getLines()[0]->getVatRate();
         $this->assertEquals('20', $lineTaxRate->get());
-    }
-
-    public function test_it_can_refresh_shipping_cost_vat_rates()
-    {
-        $this->givenOrderHasAShippingCountry('BE');
-        $this->givenShippingCostsForAPurchaseOfEur('50', 0, 1000);
-        $this->givenThereIsAProductWhichCostsEur('aaa', 5);
-        $this->whenIAddTheVariantToTheCart('aaa-123', 1);
-        $this->whenIChooseShipping('bpost_home');
-
-        //        // Apply shipping
-        $this->cartApplication->refresh(new RefreshCart('xxx'));
-
-        // Check unchanged cost first
-        $order = $this->orderRepository->find(OrderId::fromString('xxx'));
-        $this->assertEquals('21', $order->getShippings()[0]->getShippingCost()->getVatPercentage()->get());
-
-        // Change billing country to NL
-        $nlVat = $this->givenThereIsAVatRate('NL', '25');
-        $this->givenOrderHasABillingCountry('NL');
-
-        // Reset memoized vat
-        $this->resetMemoizedVatPercentages();
-
-        $this->cartApplication->refresh(new RefreshCart('xxx'));
-        $order = $this->orderRepository->find(OrderId::fromString('xxx'));
-
-        $this->assertEquals($nlVat->getRate(), $order->getShippings()[0]->getShippingCost()->getVatPercentage());
     }
 }

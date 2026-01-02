@@ -183,7 +183,7 @@ class ProductTaxaTest extends ProductContext
         $this->createAndSaveTaxonomiesAndTaxa();
 
         $product = $this->createProductWithProductVariantProperties();
-        $this->productRepository->save($product);
+        $this->catalogContext->catalogRepos()->productRepository()->save($product);
 
         $variantId = $product->getVariants()[0]->variantId;
         $productDetail = $this->productDetailRepository->findProductDetail($variantId);

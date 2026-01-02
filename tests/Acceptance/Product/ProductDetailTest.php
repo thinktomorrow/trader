@@ -37,7 +37,7 @@ class ProductDetailTest extends ProductContext
             ],
         ]);
 
-        $this->productRepository->save($product);
+        $this->catalogContext->catalogRepos()->productRepository()->save($product);
 
         $variantId = $product->getVariants()[0]->variantId;
 
@@ -59,7 +59,7 @@ class ProductDetailTest extends ProductContext
     public function test_it_can_get_sku_and_ean()
     {
         $product = $this->catalogContext->createProduct();
-        $this->productRepository->save($product);
+        $this->catalogContext->catalogRepos()->productRepository()->save($product);
 
         $variantId = $product->getVariants()[0]->variantId;
         $productDetail = $this->productDetailRepository->findProductDetail($variantId);
@@ -71,7 +71,7 @@ class ProductDetailTest extends ProductContext
         // Set specific sku / ean values
         $product->getVariants()[0]->updateSku('sku-foobar');
         $product->getVariants()[0]->updateEan('ean-foobar');
-        $this->productRepository->save($product);
+        $this->catalogContext->catalogRepos()->productRepository()->save($product);
 
         $productDetail = $this->productDetailRepository->findProductDetail($variantId);
         $this->assertEquals('sku-foobar', $productDetail->getSku());
@@ -88,7 +88,7 @@ class ProductDetailTest extends ProductContext
             ],
         ]);
 
-        $this->productRepository->save($product);
+        $this->catalogContext->catalogRepos()->productRepository()->save($product);
 
         $productDetail = $this->productDetailRepository->findProductDetail($product->getVariants()[0]->variantId);
         $this->assertEquals('product title nl', $productDetail->getTitle());
@@ -111,9 +111,9 @@ class ProductDetailTest extends ProductContext
             ],
         ]);
 
-        $this->productRepository->save($product);
+        $this->catalogContext->catalogRepos()->productRepository()->save($product);
 
-        $this->productRepository->save($product);
+        $this->catalogContext->catalogRepos()->productRepository()->save($product);
 
         $productDetail = $this->productDetailRepository->findProductDetail($product->getVariants()[0]->variantId);
         $this->assertEquals('product title nl variant option_title nl', $productDetail->getTitle());
@@ -122,7 +122,7 @@ class ProductDetailTest extends ProductContext
     public function test_it_can_add_images()
     {
         $product = $this->createProductWithProductVariantProperties();
-        $this->productRepository->save($product);
+        $this->catalogContext->catalogRepos()->productRepository()->save($product);
 
         $productDetail = $this->productDetailRepository->findProductDetail($product->getVariants()[0]->variantId);
         $productDetail->setImages(['foo' => 'bar']);
@@ -133,7 +133,7 @@ class ProductDetailTest extends ProductContext
     public function test_it_can_get_stockable_info()
     {
         $product = $this->catalogContext->createProduct();
-        $this->productRepository->save($product);
+        $this->catalogContext->catalogRepos()->productRepository()->save($product);
 
         $stockable = $this->productDetailRepository->findProductDetail($product->getVariants()[0]->variantId);
 

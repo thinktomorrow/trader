@@ -10,7 +10,7 @@ class CreateVariantTest extends ProductContext
         $productId = $this->createAProduct('50', ['1', '2'], 'sku', ['title' => ['nl' => 'foobar nl']]);
         $variantId = $this->createAVariant($productId->get(), "1234", "12", ['title' => ['nl' => 'foobar nl']], 'xxx-124');
 
-        $product = $this->productRepository->find($productId);
+        $product = $this->catalogContext->catalogRepos()->productRepository()->find($productId);
 
         $variants = $product->getVariants();
         $this->assertCount(2, $variants);

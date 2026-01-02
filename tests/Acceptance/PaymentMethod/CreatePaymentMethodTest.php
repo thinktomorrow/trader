@@ -20,7 +20,7 @@ class CreatePaymentMethodTest extends PaymentMethodContext
             ['foo' => 'bar']
         ));
 
-        $paymentMethod = $this->paymentMethodRepository->find($paymentMethodId);
+        $paymentMethod = $this->orderContext->orderRepos()->paymentMethodRepository()->find($paymentMethodId);
 
         $this->assertInstanceOf(PaymentMethodId::class, $paymentMethodId);
         $this->assertEquals($paymentMethodId, $paymentMethod->paymentMethodId);

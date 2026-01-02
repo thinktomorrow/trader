@@ -16,11 +16,11 @@ class UpdateVariantTaxaTest extends ProductContext
     public function test_it_can_add_taxa()
     {
         $productId = $this->createAProduct('50', ['1', '2'], 'sku', ['title' => ['nl' => 'foobar nl']]);
-        $variantId = $this->productRepository->find($productId)->getVariants()[0]->variantId;
+        $variantId = $this->catalogContext->catalogRepos()->productRepository()->find($productId)->getVariants()[0]->variantId;
 
-        $this->productApplication->updateVariantTaxa(new UpdateVariantTaxa($productId->get(), $variantId->get(), ['1', '3']));
+        $this->catalogContext->catalogApps()->productApplication()->updateVariantTaxa(new UpdateVariantTaxa($productId->get(), $variantId->get(), ['1', '3']));
 
-        $variant = $this->productRepository->find($productId)->getVariants()[0];
+        $variant = $this->catalogContext->catalogRepos()->productRepository()->find($productId)->getVariants()[0];
 
         $this->assertContainsOnlyInstancesOf(VariantTaxon::class, $variant->getVariantTaxa());
         $this->assertCount(2, $variant->getChildEntities()[VariantTaxon::class]);
@@ -48,15 +48,15 @@ class UpdateVariantTaxaTest extends ProductContext
     public function test_it_can_remove_taxa()
     {
         $productId = $this->createAProduct('50', ['1', '2'], 'sku', ['title' => ['nl' => 'foobar nl']]);
-        $variantId = $this->productRepository->find($productId)->getVariants()[0]->variantId;
+        $variantId = $this->catalogContext->catalogRepos()->productRepository()->find($productId)->getVariants()[0]->variantId;
 
-        $this->productApplication->updateVariantTaxa(new UpdateVariantTaxa(
+        $this->catalogContext->catalogApps()->productApplication()->updateVariantTaxa(new UpdateVariantTaxa(
             $productId->get(),
             $variantId->get(),
             []
         ));
 
-        $variant = $this->productRepository->find($productId)->getVariants()[0];
+        $variant = $this->catalogContext->catalogRepos()->productRepository()->find($productId)->getVariants()[0];
 
         $this->assertCount(0, $variant->getChildEntities()[VariantTaxon::class]);
 

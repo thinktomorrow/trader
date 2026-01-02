@@ -14,7 +14,7 @@ class UpdateShopperTest extends CartContext
     {
         parent::setUp();
 
-        $this->orderRepository = new InMemoryOrderRepository();
+        $this->orderContext->orderRepos()->orderRepository() = new InMemoryOrderRepository();
     }
 
     public function test_merchant_can_change_shopper()
@@ -34,7 +34,7 @@ class UpdateShopperTest extends CartContext
             ])
         );
 
-        $this->orderRepository->save($order);
+        $this->orderContext->orderRepos()->orderRepository()->save($order);
 
         $this->merchantOrderApplication->updateShopper(new UpdateShopper(
             $order->orderId->get(),
@@ -44,7 +44,7 @@ class UpdateShopperTest extends CartContext
             ['foo' => 'baz', 'foz' => 'boss']
         ), []);
 
-        $order = $this->orderRepository->find($order->orderId);
+        $order = $this->orderContext->orderRepos()->orderRepository()->find($order->orderId);
 
         $this->assertEquals('ben-changed@thinktomorrow.be', $order->getShopper()->getEmail()->get());
         $this->assertEquals('nl', $order->getShopper()->getLocale()->get());

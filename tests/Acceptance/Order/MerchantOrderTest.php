@@ -23,7 +23,7 @@ class MerchantOrderTest extends CartContext
     public function test_as_a_merchant_i_need_to_be_able_to_see_the_totals()
     {
         $this->givenThereIsAProductWhichCostsEur('aaa', 5);
-        $this->whenIAddTheVariantToTheCart('aaa-123', 2);
+        $this->whenIAddTheVariantToTheCart('aaa-variant-aaa', 2);
 
         $merchantOrder = $this->merchantOrderRepository->findMerchantOrder(OrderId::fromString('xxx'));
 
@@ -59,10 +59,10 @@ class MerchantOrderTest extends CartContext
 
     public function test_as_a_merchant_i_need_to_be_able_to_see_each_line_of_my_cart()
     {
-        $this->orderRepository->setNextLineReference('foobar');
+        $this->orderContext->orderRepos()->orderRepository()->setNextLineReference('foobar');
 
         $this->givenThereIsAProductWhichCostsEur('lightsaber', 5);
-        $this->whenIAddTheVariantToTheCart('lightsaber-123', 2);
+        $this->whenIAddTheVariantToTheCart('lightsaber-variant-aaa', 2);
 
         $merchantOrder = $this->merchantOrderRepository->findMerchantOrder(OrderId::fromString('xxx'));
 
@@ -86,7 +86,7 @@ class MerchantOrderTest extends CartContext
     public function test_as_a_merchant_i_need_to_be_able_to_see_prices_with_or_without_tax()
     {
         $this->givenThereIsAProductWhichCostsEur('lightsaber', 5);
-        $this->whenIAddTheVariantToTheCart('lightsaber-123', 2);
+        $this->whenIAddTheVariantToTheCart('lightsaber-variant-aaa', 2);
 
         $merchantOrder = $this->merchantOrderRepository->findMerchantOrder(OrderId::fromString('xxx'));
 
@@ -116,7 +116,7 @@ class MerchantOrderTest extends CartContext
     public function test_as_a_merchant_i_need_to_be_able_to_see_shipping_address()
     {
         $this->givenThereIsAProductWhichCostsEur('lightsaber', 5);
-        $this->whenIAddTheVariantToTheCart('lightsaber-123', 2);
+        $this->whenIAddTheVariantToTheCart('lightsaber-variant-aaa', 2);
         $this->whenIAddShippingAddress('BE', 'molenstraat 146', null, '3000', 'Antwerp');
 
         $merchantOrder = $this->merchantOrderRepository->findMerchantOrder(OrderId::fromString('xxx'));
@@ -133,7 +133,7 @@ class MerchantOrderTest extends CartContext
     public function test_as_a_merchant_i_need_to_be_able_to_see_billing_address()
     {
         $this->givenThereIsAProductWhichCostsEur('lightsaber', 5);
-        $this->whenIAddTheVariantToTheCart('lightsaber-123', 2);
+        $this->whenIAddTheVariantToTheCart('lightsaber-variant-aaa', 2);
         $this->whenIAddBillingAddress('BE', 'molenstraat 146', null, '3000', 'Antwerp');
 
         $merchantOrder = $this->merchantOrderRepository->findMerchantOrder(OrderId::fromString('xxx'));
@@ -152,7 +152,7 @@ class MerchantOrderTest extends CartContext
         $this->givenOrderHasAShippingCountry('BE');
         $this->givenShippingCostsForAPurchaseOfEur(30, 0, 1000);
         $this->givenThereIsAProductWhichCostsEur('lightsaber', 5);
-        $this->whenIAddTheVariantToTheCart('lightsaber-123', 2);
+        $this->whenIAddTheVariantToTheCart('lightsaber-variant-aaa', 2);
         $this->whenIChooseShipping('bpost_home');
 
         $merchantOrder = $this->merchantOrderRepository->findMerchantOrder(OrderId::fromString('xxx'));
@@ -169,7 +169,7 @@ class MerchantOrderTest extends CartContext
     {
         $this->givenPaymentMethod(30, 'bancontact');
         $this->givenThereIsAProductWhichCostsEur('lightsaber', 5);
-        $this->whenIAddTheVariantToTheCart('lightsaber-123', 2);
+        $this->whenIAddTheVariantToTheCart('lightsaber-variant-aaa', 2);
         $this->whenIChoosePayment('bancontact');
 
         $merchantOrder = $this->merchantOrderRepository->findMerchantOrder(OrderId::fromString('xxx'));
@@ -228,7 +228,7 @@ class MerchantOrderTest extends CartContext
                 'data' => ['label' => ['nl' => 'label nl', 'en' => 'label en']],
             ],
         ]);
-        $this->whenIAddTheVariantToTheCart('lightsaber-123', 1, ['foo' => 'bar'], ['xxx' => 'foobar']);
+        $this->whenIAddTheVariantToTheCart('lightsaber-variant-aaa', 1, ['foo' => 'bar'], ['xxx' => 'foobar']);
         $this->thenIShouldHaveProductInTheCart(1, 1);
 
         $merchantOrder = $this->merchantOrderRepository->findMerchantOrder(OrderId::fromString('xxx'));
@@ -249,7 +249,7 @@ class MerchantOrderTest extends CartContext
     {
         $this->givenThereIsAProductWhichCostsEur('lightsaber', 5);
         $this->whenIAddBillingAddress('NL', 'molenstraat 146', null, '3000', 'Antwerp');
-        $this->whenIAddTheVariantToTheCart('lightsaber-123', 2);
+        $this->whenIAddTheVariantToTheCart('lightsaber-variant-aaa', 2);
 
         // Update shopper triggers vat number and vat exemption verification
         $this->whenIEnterShopperDetails('foo@example.com', true);
@@ -262,7 +262,7 @@ class MerchantOrderTest extends CartContext
     public function test_as_a_merchant_i_need_to_be_able_to_see_if_order_is_not_vat_exempt()
     {
         $this->givenThereIsAProductWhichCostsEur('lightsaber', 5);
-        $this->whenIAddTheVariantToTheCart('lightsaber-123', 2);
+        $this->whenIAddTheVariantToTheCart('lightsaber-variant-aaa', 2);
         $this->whenIAddBillingAddress('BE', 'molenstraat 146', null, '3000', 'Antwerp');
 
         // Update shopper triggers vat number and vat exemption verification

@@ -8,6 +8,7 @@ use Thinktomorrow\Trader\Domain\Common\Entity\Aggregate;
 use Thinktomorrow\Trader\Domain\Common\Entity\HasData;
 use Thinktomorrow\Trader\Domain\Common\Event\RecordsEvents;
 use Thinktomorrow\Trader\Domain\Common\Vat\VatAllocatedLine;
+use Thinktomorrow\Trader\Domain\Common\Vat\VatAllocatedTotalPrice;
 use Thinktomorrow\Trader\Domain\Common\Vat\VatPercentage;
 use Thinktomorrow\Trader\Domain\Model\Order\Address\BillingAddress;
 use Thinktomorrow\Trader\Domain\Model\Order\Address\ShippingAddress;
@@ -45,6 +46,7 @@ final class Order implements Aggregate, DiscountableItem
 {
     use RecordsEvents;
     use WithOrderTotals;
+    use WithVatLines;
     use HasLines;
     use HasShippings;
     use HasPayments;
@@ -244,6 +246,60 @@ final class Order implements Aggregate, DiscountableItem
         // How to bump version - how to know we are in current (already bumped) version
         // + add to version notes???
         $this->recordEvent(new OrderUpdated($this->orderId));
+    }
+
+    public function applySubtotalTotals(VatAllocatedTotalPrice $subtotal): void
+    {
+        $this->subtotalExcl = $subtotal->getTotalExcludingVat();
+        $this->subtotalIncl = $subtotal->getTotalIncludingVat();
+    }
+
+    public function applyServiceTotals(VatAllocatedTotalPrice $shippingCost, VatAllocatedTotalPrice $paymentCost): void
+    {
+        $this->shippingExcl = $shippingCost->getTotalExcludingVat();
+        $this->shippingIncl = $shippingCost->getTotalIncludingVat();
+        $this->paymentExcl = $paymentCost->getTotalExcludingVat();
+        $this->paymentIncl = $paymentCost->getTotalIncludingVat();
+    }
+
+    public function applyDiscountTotals(VatAllocatedTotalPrice $discount): void
+    {
+        $this->discountExcl = $discount->getTotalExcludingVat();
+        $this->discountIncl = $discount->getTotalIncludingVat();
+    }
+
+    public function applyTotals(VatAllocatedTotalPrice $allocation): void
+    {
+        // For totals we keep the vat lines breakdown
+        $this->vatLines = $allocation->getVatLines();
+
+        // Totals
+        $this->totalExcl = $allocation->getTotalExcludingVat();
+        $this->totalVat = $allocation->getTotalVat();
+        $this->totalIncl = $allocation->getTotalIncludingVat();
+    }
+
+    private function initializeEmptyTotals(): void
+    {
+        $zero = Money::EUR(0);
+
+        $this->subtotalExcl = $zero;
+        $this->subtotalIncl = $zero;
+
+        $this->shippingExcl = $zero;
+        $this->shippingIncl = $zero;
+
+        $this->paymentExcl = $zero;
+        $this->paymentIncl = $zero;
+
+        $this->discountExcl = $zero;
+        $this->discountIncl = $zero;
+
+        $this->totalExcl = $zero;
+        $this->totalVat = $zero;
+        $this->totalIncl = $zero;
+
+        $this->vatLines = [];
     }
 
     public function getEnteredCouponCode(): ?string

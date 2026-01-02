@@ -19,7 +19,7 @@ class ProductDataTest extends ProductContext
         $product->getVariants()[0]->addData([
             'title' => ['nl' => 'title nl', 'en' => 'title en'],
         ]);
-        $this->productRepository->save($product);
+        $this->catalogContext->catalogRepos()->productRepository()->save($product);
 
         $productDetail = $this->productDetailRepository->findProductDetail($product->getVariants()[0]->variantId);
 

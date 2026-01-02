@@ -16,16 +16,16 @@ class OrderPromoTest extends CartContext
     {
         $this->givenThereIsAPromo(['coupon_code' => 'foobar']);
         $this->givenThereIsAProductWhichCostsEur('lightsaber', 5);
-        $this->whenIAddTheVariantToTheCart('lightsaber-123', 5);
+        $this->whenIAddTheVariantToTheCart('lightsaber-variant-aaa', 5);
 
         $this->promoApplication->enterCoupon(new EnterCoupon($this->getOrder()->orderId->get(), 'foobar'));
 
-        $order = $this->orderRepository->find($this->getOrder()->orderId);
+        $order = $this->orderContext->orderRepos()->orderRepository()->find($this->getOrder()->orderId);
         $this->assertCount(1, $order->getDiscounts());
 
         $this->assertEquals('foobar', $order->getEnteredCouponCode());
 
-        $cart = $this->cartRepository->findCart($this->getOrder()->orderId);
+        $cart = $this->orderContext->orderRepos()->cartRepository()->findCart($this->getOrder()->orderId);
         $this->assertCount(1, $cart->getDiscounts());
 
         $this->assertTrue($order->getDiscountTotal()->includesVat());
@@ -45,16 +45,16 @@ class OrderPromoTest extends CartContext
 
         $this->givenThereIsAPromo(['coupon_code' => 'foobar']);
         $this->givenThereIsAProductWhichCostsEur('lightsaber', 5);
-        $this->whenIAddTheVariantToTheCart('lightsaber-123', 5);
+        $this->whenIAddTheVariantToTheCart('lightsaber-variant-aaa', 5);
 
         $this->promoApplication->enterCoupon(new EnterCoupon($this->getOrder()->orderId->get(), 'foobar'));
 
-        $order = $this->orderRepository->find($this->getOrder()->orderId);
+        $order = $this->orderContext->orderRepos()->orderRepository()->find($this->getOrder()->orderId);
         $this->assertCount(1, $order->getDiscounts());
 
         $this->assertEquals('foobar', $order->getEnteredCouponCode());
 
-        $cart = $this->cartRepository->findCart($this->getOrder()->orderId);
+        $cart = $this->orderContext->orderRepos()->cartRepository()->findCart($this->getOrder()->orderId);
         $this->assertCount(1, $cart->getDiscounts());
 
         $this->assertFalse($order->getDiscountTotal()->includesVat());
@@ -73,11 +73,11 @@ class OrderPromoTest extends CartContext
     {
         $this->givenThereIsAPromo(['coupon_code' => 'foobar']);
         $this->givenThereIsAProductWhichCostsEur('lightsaber', 5);
-        $this->whenIAddTheVariantToTheCart('lightsaber-123', 5);
+        $this->whenIAddTheVariantToTheCart('lightsaber-variant-aaa', 5);
 
         $this->promoApplication->enterCoupon(new EnterCoupon($this->getOrder()->orderId->get(), 'fooxxx'));
 
-        $order = $this->orderRepository->find($this->getOrder()->orderId);
+        $order = $this->orderContext->orderRepos()->orderRepository()->find($this->getOrder()->orderId);
         $this->assertCount(0, $order->getDiscounts());
 
         $this->assertEquals(Money::EUR(2500), $order->getSubTotal()->getIncludingVat());
@@ -89,11 +89,11 @@ class OrderPromoTest extends CartContext
     {
         $this->givenThereIsAPromo(['coupon_code' => 'foobar']);
         $this->givenThereIsAProductWhichCostsEur('lightsaber', 5);
-        $this->whenIAddTheVariantToTheCart('lightsaber-123', 4);
+        $this->whenIAddTheVariantToTheCart('lightsaber-variant-aaa', 4);
 
         $this->promoApplication->enterCoupon(new EnterCoupon($this->getOrder()->orderId->get(), 'foobar'));
 
-        $order = $this->orderRepository->find($this->getOrder()->orderId);
+        $order = $this->orderContext->orderRepos()->orderRepository()->find($this->getOrder()->orderId);
         $this->assertCount(0, $order->getDiscounts());
 
         $this->assertEquals(Money::EUR(2000), $order->getSubTotal()->getIncludingVat());
@@ -105,12 +105,12 @@ class OrderPromoTest extends CartContext
     {
         $this->givenThereIsAPromo([]);
         $this->givenThereIsAProductWhichCostsEur('lightsaber', 5);
-        $this->whenIAddTheVariantToTheCart('lightsaber-123', 5);
+        $this->whenIAddTheVariantToTheCart('lightsaber-variant-aaa', 5);
 
         // Refresh cart...
         $this->cartApplication->refresh(new RefreshCart($this->getOrder()->orderId->get()));
 
-        $order = $this->orderRepository->find($this->getOrder()->orderId);
+        $order = $this->orderContext->orderRepos()->orderRepository()->find($this->getOrder()->orderId);
         $this->assertCount(1, $order->getDiscounts());
 
         $this->assertEquals(Money::EUR(2500), $order->getSubTotal()->getIncludingVat());
@@ -123,12 +123,12 @@ class OrderPromoTest extends CartContext
         $this->givenThereIsAPromo(['promo_id' => 'aaa', 'is_combinable' => true], [$this->orderContext->createOrderDiscount(['discount_id' => 'abc'])]);
         $this->givenThereIsAPromo(['promo_id' => 'bbb', 'is_combinable' => true], [$this->orderContext->createOrderDiscount(['discount_id' => 'abcd'])]);
         $this->givenThereIsAProductWhichCostsEur('lightsaber', 5);
-        $this->whenIAddTheVariantToTheCart('lightsaber-123', 5);
+        $this->whenIAddTheVariantToTheCart('lightsaber-variant-aaa', 5);
 
         // Refresh cart...
         $this->cartApplication->refresh(new RefreshCart($this->getOrder()->orderId->get()));
 
-        $order = $this->orderRepository->find($this->getOrder()->orderId);
+        $order = $this->orderContext->orderRepos()->orderRepository()->find($this->getOrder()->orderId);
         $this->assertCount(2, $order->getDiscounts());
 
         $this->assertEquals(Money::EUR(2500), $order->getSubTotal()->getIncludingVat());
@@ -141,12 +141,12 @@ class OrderPromoTest extends CartContext
         $this->givenThereIsAPromo(['promo_id' => 'aaa'], [$this->orderContext->createOrderDiscount(['data' => json_encode(['amount' => '100'])])]);
         $this->givenThereIsAPromo(['promo_id' => 'bbb'], [$this->orderContext->createOrderDiscount(['data' => json_encode(['amount' => '200'])])]);
         $this->givenThereIsAProductWhichCostsEur('lightsaber', 5);
-        $this->whenIAddTheVariantToTheCart('lightsaber-123', 5);
+        $this->whenIAddTheVariantToTheCart('lightsaber-variant-aaa', 5);
 
         // Refresh cart...
         $this->cartApplication->refresh(new RefreshCart($this->getOrder()->orderId->get()));
 
-        $order = $this->orderRepository->find($this->getOrder()->orderId);
+        $order = $this->orderContext->orderRepos()->orderRepository()->find($this->getOrder()->orderId);
         $this->assertCount(1, $order->getDiscounts());
 
         $this->assertEquals(Money::EUR(2500), $order->getSubTotal()->getIncludingVat());
@@ -159,15 +159,15 @@ class OrderPromoTest extends CartContext
         $this->givenThereIsAPromo(['promo_id' => 'aaa', 'coupon_code' => 'foobar', 'is_combinable' => true], [$this->orderContext->createOrderDiscount(['discount_id' => 'abc'])]);
         $this->givenThereIsAPromo(['promo_id' => 'bbb', 'is_combinable' => true], [$this->orderContext->createOrderDiscount(['discount_id' => 'abcd'])]);
         $this->givenThereIsAProductWhichCostsEur('lightsaber', 5);
-        $this->whenIAddTheVariantToTheCart('lightsaber-123', 5);
+        $this->whenIAddTheVariantToTheCart('lightsaber-variant-aaa', 5);
 
         $this->promoApplication->enterCoupon(new EnterCoupon($this->getOrder()->orderId->get(), 'foobar'));
 
         // Refresh cart
-        $order = $this->orderRepository->find($this->getOrder()->orderId);
+        $order = $this->orderContext->orderRepos()->orderRepository()->find($this->getOrder()->orderId);
         $this->cartApplication->refresh(new RefreshCart($order->orderId->get()));
 
-        $order = $this->orderRepository->find($order->orderId);
+        $order = $this->orderContext->orderRepos()->orderRepository()->find($order->orderId);
         $this->assertCount(2, $order->getDiscounts());
 
         $this->assertEquals(Money::EUR(2500), $order->getSubTotal()->getIncludingVat());
@@ -179,12 +179,12 @@ class OrderPromoTest extends CartContext
     {
         $this->givenThereIsAPromo(['promo_id' => 'aaa', 'is_combinable' => true], [$this->orderContext->createOrderDiscount(['data' => json_encode(['amount' => '100000'])])]);
         $this->givenThereIsAProductWhichCostsEur('lightsaber', 5);
-        $this->whenIAddTheVariantToTheCart('lightsaber-123', 5);
+        $this->whenIAddTheVariantToTheCart('lightsaber-variant-aaa', 5);
 
         // Refresh cart...
         $this->cartApplication->refresh(new RefreshCart($this->getOrder()->orderId->get()));
 
-        $order = $this->orderRepository->find($this->getOrder()->orderId);
+        $order = $this->orderContext->orderRepos()->orderRepository()->find($this->getOrder()->orderId);
         $this->assertCount(1, $order->getDiscounts());
 
         $this->assertEquals($order->getSubTotal()->getIncludingVat(), $order->getDiscountTotal()->getIncludingVat());

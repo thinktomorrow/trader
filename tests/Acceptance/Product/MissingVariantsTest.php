@@ -40,7 +40,7 @@ class MissingVariantsTest extends ProductContext
             VariantProperty::create($product->productId, TaxonId::fromString('zzz')),
             VariantProperty::create($product->productId, TaxonId::fromString('aaa')),
         ]);
-        $this->productRepository->save($product);
+        $this->catalogContext->catalogRepos()->productRepository()->save($product);
 
         $missingCombos = $this->missingOptionCombinations->get($product);
 
@@ -67,7 +67,7 @@ class MissingVariantsTest extends ProductContext
             \Thinktomorrow\Trader\Domain\Model\Product\VariantTaxa\VariantProperty::create($variant->variantId, TaxonId::fromString('aaa')),
         ]);
 
-        $this->productRepository->save($product);
+        $this->catalogContext->catalogRepos()->productRepository()->save($product);
 
         $missingCombos = $this->missingOptionCombinations->get($product);
 
@@ -105,7 +105,7 @@ class MissingVariantsTest extends ProductContext
             \Thinktomorrow\Trader\Domain\Model\Product\VariantTaxa\VariantProperty::create($variant->variantId, TaxonId::fromString('aaa')),
         ]);
 
-        $this->productRepository->save($product);
+        $this->catalogContext->catalogRepos()->productRepository()->save($product);
 
         $missingComboLabels = $this->missingOptionCombinations->getAsLabels($product, 'title.nl', 'title.nl');
 

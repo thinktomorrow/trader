@@ -18,7 +18,7 @@ class DeleteVariantTest extends ProductContext
         $productId = $this->createAProduct('50', ['1', '2'], 'sku', ['title' => ['nl' => 'foobar nl']]);
         $variantId = $this->createAVariant($productId->get(), '12', '3', [], 'yyy-123');
 
-        $this->productApplication->deleteVariant(new DeleteVariant($productId->get(), $variantId->get()));
+        $this->catalogContext->catalogApps()->productApplication()->deleteVariant(new DeleteVariant($productId->get(), $variantId->get()));
 
         $this->assertEquals([
             new VariantDeleted($productId, $variantId),
@@ -31,12 +31,12 @@ class DeleteVariantTest extends ProductContext
         $this->expectException(CouldNotDeleteVariant::class);
 
         $productId = $this->createAProduct('50', ['1', '2'], 'sku', ['title' => ['nl' => 'foobar nl']]);
-        $variantId = $this->productRepository->find($productId)->getVariants()[0]->variantId;
+        $variantId = $this->catalogContext->catalogRepos()->productRepository()->find($productId)->getVariants()[0]->variantId;
 
-        $this->productApplication->deleteVariant(new DeleteVariant($productId->get(), $variantId->get()));
+        $this->catalogContext->catalogApps()->productApplication()->deleteVariant(new DeleteVariant($productId->get(), $variantId->get()));
 
         $this->assertEquals([], $this->eventDispatcher->releaseDispatchedEvents());
 
-        $this->assertCount(1, $this->productRepository->find($productId)->getVariants());
+        $this->assertCount(1, $this->catalogContext->catalogRepos()->productRepository()->find($productId)->getVariants());
     }
 }

@@ -3,9 +3,8 @@
 namespace Thinktomorrow\Trader\Application\Cart\Read;
 
 use Money\Money;
-use Thinktomorrow\Trader\Domain\Model\Order\Line\LinePrice;
+use Thinktomorrow\Trader\Domain\Common\Vat\VatPercentage;
 use Thinktomorrow\Trader\Domain\Model\Order\Line\PurchasableReference;
-use Thinktomorrow\Trader\Domain\Model\Product\Variant\VariantUnitPrice;
 
 interface CartLine
 {
@@ -15,25 +14,33 @@ interface CartLine
 
     public function getPurchasableReference(): PurchasableReference;
 
-    public function getUnitPrice(): string;
+    public function getUnitPriceExcl(): Money;
 
-    public function getLinePrice(): string;
+    public function getUnitPriceIncl(): Money;
 
-    public function getUnitPriceAsMoney(): Money;
+    public function getDiscountPriceExcl(): Money;
 
-    public function getLinePriceAsMoney(): Money;
+    public function getDiscountPriceIncl(): Money;
 
-    public function getUnitPriceAsPrice(): VariantUnitPrice;
+    public function getTotalPriceExcl(): Money;
 
-    public function getLinePriceAsPrice(): LinePrice;
+    public function getTotalVat(): Money;
 
-    public function getTotalPrice(): string;
+    public function getVatRate(): VatPercentage;
 
-    public function getSubtotalPrice(): string;
+    public function getTotalPriceIncl(): Money;
 
-    public function getTaxPrice(): string;
+    public function getFormattedUnitPrice(): string;
 
-    public function getDiscountPrice(): string;
+    public function getFormattedDiscountPrice(): string;
+
+    public function getFormattedTotalPrice(): string;
+
+    public function getFormattedSubtotalPrice(): string;
+
+    public function getFormattedTaxPrice(): string;
+
+    public function getFormattedVatRate(): string;
 
     public function includeTax(bool $includeTax = true): void;
 

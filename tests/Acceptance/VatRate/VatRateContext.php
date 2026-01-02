@@ -23,13 +23,13 @@ class VatRateContext extends TestCase
 
         $this->vatRateApplication = new VatRateApplication(
             $this->eventDispatcher = new EventDispatcherSpy(),
-            $this->vatRateRepository = new InMemoryVatRateRepository(new TestTraderConfig()),
+            $this->orderContext->orderRepos()->vatRateRepository() = new InMemoryVatRateRepository(new TestTraderConfig()),
         );
     }
 
     public function tearDown(): void
     {
-        $this->vatRateRepository->clear();
+        $this->orderContext->orderRepos()->vatRateRepository()->clear();
     }
 
     protected function createBaseRateStub(): array
@@ -40,7 +40,7 @@ class VatRateContext extends TestCase
             ['foo' => 'bar']
         ));
 
-        $this->vatRateRepository->setNextReference('zzz-123');
+        $this->orderContext->orderRepos()->vatRateRepository()->setNextReference('zzz-123');
         $targetVatRateId = $this->vatRateApplication->createVatRate(new CreateVatRate(
             'NL',
             '20',

@@ -22,11 +22,11 @@ class RefreshCartTest extends CartContext
     public function test_it_can_refresh_order()
     {
         $this->givenThereIsAProductWhichCostsEur('aaa', 5);
-        $this->whenIAddTheVariantToTheCart('aaa-123', 2);
+        $this->whenIAddTheVariantToTheCart('aaa-variant-aaa', 2);
 
-        $this->cartApplication->refresh(new RefreshCart('xxx'));
+        $this->orderContext->orderApps()->cartApplication()->refresh(new RefreshCart('xxx'));
 
-        $cart = $this->cartRepository->findCart(OrderId::fromString('xxx'));
+        $cart = $this->orderContext->orderRepos()->cartRepository()->findCart(OrderId::fromString('xxx'));
 
         $this->assertEquals('€ 10', $cart->getTotalPrice());
     }
@@ -34,64 +34,55 @@ class RefreshCartTest extends CartContext
     public function test_it_cannot_refresh_cart_when_order_is_no_longer_is_shopper_hands()
     {
         $this->givenThereIsAProductWhichCostsEur('aaa', 5);
-        $this->whenIAddTheVariantToTheCart('aaa-123', 2);
+        $this->whenIAddTheVariantToTheCart('aaa-variant-aaa', 2);
 
         // Force a merchant state
         $order = $this->getOrder();
         $order->updateState(DefaultOrderState::confirmed);
-        $this->orderRepository->save($order);
+        $this->orderContext->orderRepos()->orderRepository()->save($order);
 
         $this->updateVariant();
 
         $this->expectException(OrderAlreadyInMerchantHands::class);
 
-        // Reset memoized vat
-        $this->resetMemoizedVatPercentages();
+        $this->orderContext->orderApps()->cartApplication()->refresh(new RefreshCart('xxx'));
 
-        $this->cartApplication->refresh(new RefreshCart('xxx'));
-
-        $cart = $this->cartRepository->findCart(OrderId::fromString('xxx'));
+        $cart = $this->orderContext->orderRepos()->cartRepository()->findCart(OrderId::fromString('xxx'));
         $this->assertEquals('€ 10', $cart->getTotalPrice());
     }
 
     public function test_it_can_refresh_variant_prices()
     {
         $this->givenThereIsAProductWhichCostsEur('aaa', 5);
-        $this->whenIAddTheVariantToTheCart('aaa-123', 2);
+        $this->whenIAddTheVariantToTheCart('aaa-variant-aaa', 2);
 
         // Check unchanged line first
-        $cart = $this->cartRepository->findCart(OrderId::fromString('xxx'));
+        $cart = $this->orderContext->orderRepos()->cartRepository()->findCart(OrderId::fromString('xxx'));
         $this->assertEquals('€ 10', $cart->getTotalPrice());
 
         $this->updateVariant();
 
-        // Reset memoized vat
-        $this->resetMemoizedVatPercentages();
+        $this->orderContext->orderApps()->cartApplication()->refresh(new RefreshCart('xxx'));
 
-        $this->cartApplication->refresh(new RefreshCart('xxx'));
-
-        $cart = $this->cartRepository->findCart(OrderId::fromString('xxx'));
+        $cart = $this->orderContext->orderRepos()->cartRepository()->findCart(OrderId::fromString('xxx'));
         $this->assertEquals('€ 20', $cart->getTotalPrice());
     }
 
     public function test_it_can_refresh_variant_availability()
     {
         $this->givenThereIsAProductWhichCostsEur('aaa', 5);
-        $this->whenIAddTheVariantToTheCart('aaa-123', 2);
+        $this->whenIAddTheVariantToTheCart('aaa-variant-aaa', 2);
 
         // Check unchanged line first
-        $cart = $this->cartRepository->findCart(OrderId::fromString('xxx'));
+        $cart = $this->orderContext->orderRepos()->cartRepository()->findCart(OrderId::fromString('xxx'));
         $this->assertEquals('€ 10', $cart->getTotalPrice());
         $this->assertEquals(1, $cart->getSize());
 
         $this->updateVariant(VariantState::unavailable);
 
-        // Reset memoized vat
-        $this->resetMemoizedVatPercentages();
+        $this->orderContext->orderApps()->cartApplication()->refresh(new RefreshCart('xxx'));
 
-        $this->cartApplication->refresh(new RefreshCart('xxx'));
-
-        $cart = $this->cartRepository->findCart(OrderId::fromString('xxx'));
+        $cart = $this->orderContext->orderRepos()->cartRepository()->findCart(OrderId::fromString('xxx'));
         $this->assertEquals('€ 0', $cart->getTotalPrice());
         $this->assertEquals(0, $cart->getSize());
     }
@@ -115,7 +106,7 @@ class RefreshCartTest extends CartContext
 
     private function updateVariant(?VariantState $state = null): void
     {
-        $product = $this->productRepository->find(ProductId::fromString('aaa'));
+        $product = $this->catalogContext->catalogRepos()->productRepository()->find(ProductId::fromString('aaa'));
         $variant = $product->getVariants()[0];
         $variant->updatePrice(VariantUnitPrice::fromPrice($variant->getSalePrice()), $variant->getSalePrice()->multiply(2));
 

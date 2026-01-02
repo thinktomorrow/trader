@@ -13,13 +13,13 @@ use Thinktomorrow\Trader\Application\Cart\Read\CartShippingAddress;
 use Thinktomorrow\Trader\Application\Cart\Read\CartShopper;
 use Thinktomorrow\Trader\Application\Common\RendersData;
 use Thinktomorrow\Trader\Application\Common\RendersMoney;
-use Thinktomorrow\Trader\Domain\Common\Price\Old\Price;
-use Thinktomorrow\Trader\Domain\Common\Price\TotalPrice;
+use Thinktomorrow\Trader\Domain\Model\Order\WithOrderTotals;
 
 class DefaultCart implements Cart
 {
     use RendersData;
     use RendersMoney;
+    use WithOrderTotals;
 
     protected string $orderId;
     protected iterable $lines;
@@ -31,12 +31,12 @@ class DefaultCart implements Cart
     protected array $discounts;
     protected array $data;
 
-    protected TotalPrice $total;
-    protected Money $taxTotal;
-    protected TotalPrice $subtotal;
-    protected Price $discountTotal;
-    protected Price $shippingCost;
-    protected Price $paymentCost;
+//    protected TotalPrice $total;
+//    protected Money $taxTotal;
+//    protected TotalPrice $subtotal;
+//    protected Price $discountTotal;
+//    protected Price $shippingCost;
+//    protected Price $paymentCost;
 
     // General flag for all line prices to render with or without tax.
     protected bool $include_tax = true;
@@ -50,12 +50,18 @@ class DefaultCart implements Cart
         $cart = new static();
 
         $cart->orderId = $state['order_id'];
-        $cart->total = $state['total'];
-        $cart->taxTotal = $state['taxTotal'];
-        $cart->subtotal = $state['subtotal'];
-        $cart->discountTotal = $state['discountTotal'];
-        $cart->shippingCost = $state['shippingCost'];
-        $cart->paymentCost = $state['paymentCost'];
+
+        $cart->totalExcl = Money::EUR($state['total_excl']);
+        $cart->totalIncl = Money::EUR($state['total_incl']);
+        $cart->totalVat = Money::EUR($state['total_vat']);
+        $cart->subtotalExcl = Money::EUR($state['subtotal_excl']);
+        $cart->subtotalIncl = Money::EUR($state['subtotal_incl']);
+        $cart->discountExcl = Money::EUR($state['discount_total_excl']);
+        $cart->discountIncl = Money::EUR($state['discount_total_incl']);
+        $cart->shippingExcl = Money::EUR($state['shipping_cost_excl']);
+        $cart->shippingIncl = Money::EUR($state['shipping_cost_incl']);
+        $cart->paymentExcl = Money::EUR($state['payment_cost_excl']);
+        $cart->paymentIncl = Money::EUR($state['payment_cost_incl']);
 
         $cart->lines = $childObjects[CartLine::class];
         $cart->shippingAddress = $childObjects[CartShippingAddress::class];
@@ -103,7 +109,7 @@ class DefaultCart implements Cart
 
     public function getQuantity(): int
     {
-        return array_reduce((array)$this->getLines(), fn ($carry, $line) => $carry + $line->getQuantity(), 0);
+        return array_reduce((array)$this->getLines(), fn($carry, $line) => $carry + $line->getQuantity(), 0);
     }
 
     public function includeTax(bool $includeTax = true): void
@@ -128,7 +134,7 @@ class DefaultCart implements Cart
     {
         $includeTax = $includeTax ?? $this->include_tax;
 
-        return $includeTax ? $this->total->getIncludingVat() : $this->total->getExcludingVat();
+        return $includeTax ? $this->totalIncl : $this->totalExcl;
     }
 
     public function getSubtotalPrice(?bool $includeTax = null): string
@@ -142,14 +148,13 @@ class DefaultCart implements Cart
     public function getSubtotalPriceAsMoney(?bool $includeTax = null): Money
     {
         $includeTax = $includeTax ?? $this->include_tax;
-        dump($includeTax, $this->subtotal, $this->subtotal->getIncludingVat(), $this->subtotal->getExcludingVat());
 
-        return $includeTax ? $this->subtotal->getIncludingVat() : $this->subtotal->getExcludingVat();
+        return $includeTax ? $this->subtotalIncl : $this->subtotalExcl;
     }
 
     public function getShippingCost(?bool $includeTax = null): ?string
     {
-        if (! $this->shippingCost->getMoney()->isPositive()) {
+        if (!$this->getShippingCostExcl()->isPositive()) {
             return null;
         }
 
@@ -163,12 +168,12 @@ class DefaultCart implements Cart
     {
         $includeTax = $includeTax ?? $this->include_tax;
 
-        return $includeTax ? $this->shippingCost->getIncludingVat() : $this->shippingCost->getExcludingVat();
+        return $includeTax ? $this->getShippingCostIncl() : $this->getShippingCostExcl();
     }
 
     public function getPaymentCost(?bool $includeTax = null): ?string
     {
-        if (! $this->paymentCost->getMoney()->isPositive()) {
+        if (!$this->getPaymentCostExcl()->isPositive()) {
             return null;
         }
 
@@ -182,12 +187,12 @@ class DefaultCart implements Cart
     {
         $includeTax = $includeTax ?? $this->include_tax;
 
-        return $includeTax ? $this->paymentCost->getIncludingVat() : $this->paymentCost->getExcludingVat();
+        return $includeTax ? $this->getPaymentCostIncl() : $this->getPaymentCostExcl();
     }
 
     public function getDiscountPrice(?bool $includeTax = null): ?string
     {
-        if (! $this->discountTotal->getMoney()->isPositive()) {
+        if (!$this->getDiscountTotalExcl()->isPositive()) {
             return null;
         }
 
@@ -201,7 +206,7 @@ class DefaultCart implements Cart
     {
         $includeTax = $includeTax ?? $this->include_tax;
 
-        return $includeTax ? $this->discountTotal->getIncludingVat() : $this->discountTotal->getExcludingVat();
+        return $includeTax ? $this->discountIncl : $this->discountExcl;
     }
 
     public function getTaxPrice(): string
@@ -214,7 +219,7 @@ class DefaultCart implements Cart
 
     public function getTaxPriceAsMoney(): Money
     {
-        return $this->taxTotal;
+        return $this->totalVat;
     }
 
     public function getShopper(): ?CartShopper
@@ -274,7 +279,7 @@ class DefaultCart implements Cart
 
     public function getData(?string $key = null, $default = null): mixed
     {
-        if (! $key) {
+        if (!$key) {
             return $this->data;
         }
 

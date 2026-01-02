@@ -69,7 +69,7 @@ trait HasLines
     private function updateLine(Line $line): void
     {
         if (null !== $lineIndexToBeUpdated = $this->findLineIndex($line->lineId)) {
-            $this->lines[$lineIndexToBeUpdated]->updatePrice($line->getLinePrice());
+            $this->lines[$lineIndexToBeUpdated]->updatePrice($line->getUnitPrice());
             $this->lines[$lineIndexToBeUpdated]->updateQuantity($line->getQuantity());
             $this->lines[$lineIndexToBeUpdated]->addData($line->getData());
 
@@ -81,7 +81,7 @@ trait HasLines
     {
         if (null !== $lineIndexToBeUpdated = $this->findLineIndex($lineId)) {
 
-            $formerPrice = $this->lines[$lineIndexToBeUpdated]->getLinePrice();
+            $formerPrice = $this->lines[$lineIndexToBeUpdated]->getUnitPrice();
 
             $this->lines[$lineIndexToBeUpdated]->updatePrice($linePrice);
             $this->recordEvent(new LinePriceUpdated($this->orderId, $lineId, $formerPrice, $linePrice));

@@ -17,7 +17,7 @@ class ChooseShippingProfileTest extends CartContext
         $this->whenIChooseShipping('bpost_home');
 
         // Assert all is present
-        $cart = $this->cartRepository->findCart($this->getOrder()->orderId);
+        $cart = $this->orderContext->orderRepos()->cartRepository()->findCart($this->getOrder()->orderId);
         $this->assertNotNull($cart->getShipping());
     }
 
@@ -25,11 +25,11 @@ class ChooseShippingProfileTest extends CartContext
     {
         $profile = ShippingProfile::create(ShippingProfileId::fromString('foobar'), ShippingProviderId::fromString('postnl'), true);
         $profile->updateState(ShippingProfileState::offline);
-        $this->shippingProfileRepository->save($profile);
+        $this->orderContext->orderRepos()->shippingProfileRepository()->save($profile);
 
         $this->whenIChooseShipping('foobar');
 
-        $cart = $this->cartRepository->findCart($this->getOrder()->orderId);
+        $cart = $this->orderContext->orderRepos()->cartRepository()->findCart($this->getOrder()->orderId);
         $this->assertNull($cart->getShipping());
     }
 
@@ -37,11 +37,11 @@ class ChooseShippingProfileTest extends CartContext
     {
         $profile = ShippingProfile::create(ShippingProfileId::fromString('foobar'), ShippingProviderId::fromString('postnl'), true);
         $profile->addCountry(CountryId::fromString('LU'));
-        $this->shippingProfileRepository->save($profile);
+        $this->orderContext->orderRepos()->shippingProfileRepository()->save($profile);
 
         $this->whenIChooseShipping('foobar');
 
-        $cart = $this->cartRepository->findCart($this->getOrder()->orderId);
+        $cart = $this->orderContext->orderRepos()->cartRepository()->findCart($this->getOrder()->orderId);
         $this->assertNull($cart->getShipping());
     }
 
@@ -49,11 +49,11 @@ class ChooseShippingProfileTest extends CartContext
     {
         $profile = ShippingProfile::create(ShippingProfileId::fromString('foobar'), ShippingProviderId::fromString('postnl'), false);
         $profile->addCountry(CountryId::fromString('LU'));
-        $this->shippingProfileRepository->save($profile);
+        $this->orderContext->orderRepos()->shippingProfileRepository()->save($profile);
 
         $this->whenIChooseShipping('foobar');
 
-        $cart = $this->cartRepository->findCart($this->getOrder()->orderId);
+        $cart = $this->orderContext->orderRepos()->cartRepository()->findCart($this->getOrder()->orderId);
         $this->assertNull($cart->getShipping());
     }
 
@@ -61,12 +61,12 @@ class ChooseShippingProfileTest extends CartContext
     {
         $profile = ShippingProfile::create(ShippingProfileId::fromString('foobar'), ShippingProviderId::fromString('postnl'), true);
         $profile->addCountry(CountryId::fromString('LU'));
-        $this->shippingProfileRepository->save($profile);
+        $this->orderContext->orderRepos()->shippingProfileRepository()->save($profile);
 
         $this->givenOrderHasAShippingCountry('LU');
         $this->whenIChooseShipping('foobar');
 
-        $cart = $this->cartRepository->findCart($this->getOrder()->orderId);
+        $cart = $this->orderContext->orderRepos()->cartRepository()->findCart($this->getOrder()->orderId);
         $this->assertNotNull($cart->getShipping());
     }
 
@@ -74,12 +74,12 @@ class ChooseShippingProfileTest extends CartContext
     {
         $profile = ShippingProfile::create(ShippingProfileId::fromString('foobar'), ShippingProviderId::fromString('postnl'), true);
         $profile->addCountry(CountryId::fromString('LU'));
-        $this->shippingProfileRepository->save($profile);
+        $this->orderContext->orderRepos()->shippingProfileRepository()->save($profile);
 
         $this->givenOrderHasAShippingCountry('BE');
         $this->whenIChooseShipping('foobar');
 
-        $cart = $this->cartRepository->findCart($this->getOrder()->orderId);
+        $cart = $this->orderContext->orderRepos()->cartRepository()->findCart($this->getOrder()->orderId);
         $this->assertNull($cart->getShipping());
     }
 

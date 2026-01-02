@@ -11,7 +11,7 @@ class CreateProductTest extends ProductContext
     {
         $productId = $this->createAProduct('50', ['1', '2'], 'sku', ['title' => ['nl' => 'foobar nl']]);
 
-        $product = $this->productRepository->find($productId);
+        $product = $this->catalogContext->catalogRepos()->productRepository()->find($productId);
 
         // Title
         $this->assertEquals(json_encode(['title' => ['nl' => 'foobar nl']]), $product->getMappedData()['data']);

@@ -54,7 +54,7 @@ class OrderLineTest extends TestCase
 
         $foundLine = $order->findLine($line->lineId);
 
-        $this->assertEquals(DefaultItemPrice::fromExcludingVat(Money::EUR(83), VatPercentage::fromString('21')), $foundLine->getLinePrice());
+        $this->assertEquals(DefaultItemPrice::fromExcludingVat(Money::EUR(83), VatPercentage::fromString('21')), $foundLine->getUnitPrice());
 
         $this->assertEquals(
             new LineUpdated(
@@ -115,7 +115,7 @@ class OrderLineTest extends TestCase
         $line = $order->findLine(LineId::fromString('order-aaa:line-aaa'));
 
         $order->updateLinePrice($line->lineId, $price = DefaultItemPrice::fromMoney(Money::EUR(30), VatPercentage::fromString('10'), false));
-        $this->assertEquals($price, $line->getLinePrice());
+        $this->assertEquals($price, $line->getUnitPrice());
     }
 
     public function test_it_can_update_line_personalisations()
@@ -170,7 +170,7 @@ class OrderLineTest extends TestCase
         $discount = $this->orderContext->createLineDiscount();
         $line->addDiscount($discount);
 
-        $this->assertEquals(DefaultItemPrice::fromExcludingVat(Money::EUR(83), VatPercentage::fromString('21')), $line->getLinePrice());
+        $this->assertEquals(DefaultItemPrice::fromExcludingVat(Money::EUR(83), VatPercentage::fromString('21')), $line->getUnitPrice());
         $this->assertEquals(DefaultDiscountPrice::fromExcludingVat(Money::EUR(15)), $line->getSumOfDiscountPrices());
         $this->assertEquals(DefaultItemPrice::fromExcludingVat(Money::EUR(68), VatPercentage::fromString('21')), $line->getTotal());
     }

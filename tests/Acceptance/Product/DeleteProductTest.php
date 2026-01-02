@@ -16,13 +16,13 @@ class DeleteProductTest extends ProductContext
     {
         $productId = $this->createAProduct('50', ['1', '2'], 'sku', ['title' => ['nl' => 'foobar nl']]);
 
-        $this->productApplication->deleteProduct(new DeleteProduct($productId->get()));
+        $this->catalogContext->catalogApps()->productApplication()->deleteProduct(new DeleteProduct($productId->get()));
 
         $this->assertEquals([
             new ProductDeleted($productId),
         ], $this->eventDispatcher->releaseDispatchedEvents());
 
         $this->expectException(CouldNotFindProduct::class);
-        $this->productRepository->find($productId);
+        $this->catalogContext->catalogRepos()->productRepository()->find($productId);
     }
 }

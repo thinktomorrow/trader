@@ -29,21 +29,21 @@ final class VariantPropertyRepositoryTest extends TestCase
 
         $this->taxonRepository = new MysqlTaxonRepository();
         $this->taxonomyRepository = new MysqlTaxonomyRepository(new TestContainer());
-        $this->productRepository = new MysqlProductRepository(new MysqlVariantRepository(new TestContainer()));
+        $this->catalogContext->catalogRepos()->productRepository() = new MysqlProductRepository(new MysqlVariantRepository(new TestContainer()));
     }
 
     public function test_it_can_check_if_variant_property_combination_exists()
     {
         $this->createAndSaveTaxonomiesAndTaxa();
         $product = $this->createProductWithProductVariantProperties();
-        $this->productRepository->save($product);
+        $this->catalogContext->catalogRepos()->productRepository()->save($product);
 
         $variant = $product->getVariants()[0];
 
         foreach ($this->repositories() as $repository) {
 
             // Check if combo already exists
-            $taxonIds = array_map(fn ($variantTaxonState) => $variantTaxonState['taxon_id'], $variant->getChildEntities()[VariantTaxon::class]);
+            $taxonIds = array_map(fn($variantTaxonState) => $variantTaxonState['taxon_id'], $variant->getChildEntities()[VariantTaxon::class]);
 
             $this->assertTrue($repository->doesUniqueVariantPropertyCombinationExist($product->productId->get(), $taxonIds));
 
@@ -59,21 +59,21 @@ final class VariantPropertyRepositoryTest extends TestCase
     {
         $this->createAndSaveTaxonomiesAndTaxa();
         $product = $this->createProductWithProductVariantProperties();
-        $this->productRepository->save($product);
+        $this->catalogContext->catalogRepos()->productRepository()->save($product);
 
         $repository = new MysqlVariantPropertyRepository();
 
         $variants = $product->getVariants();
         $variantA = $variants[0];
 
-        $taxonIdsA = array_map(fn ($variantTaxonState) => $variantTaxonState['taxon_id'], $variantA->getChildEntities()[VariantTaxon::class]);
+        $taxonIdsA = array_map(fn($variantTaxonState) => $variantTaxonState['taxon_id'], $variantA->getChildEntities()[VariantTaxon::class]);
 
         // Case 1: exists but exclude self => false
         //        $this->assertFalse($repository->doesUniqueVariantPropertyCombinationExist($product->productId->get(), $taxonIdsA, $variantA->variantId->get()));
 
         // Maak een tweede variant met exact dezelfde set
         $product->createVariant($this->createVariantWithVariantProperty('zzz'));
-        $this->productRepository->save($product);
+        $this->catalogContext->catalogRepos()->productRepository()->save($product);
 
         // Case 2: duplicate already exists
         $this->assertTrue($repository->doesUniqueVariantPropertyCombinationExist($product->productId->get(), $taxonIdsA));
@@ -97,7 +97,7 @@ final class VariantPropertyRepositoryTest extends TestCase
             VariantProperty::create($variantB->variantId, TaxonId::fromString('yyy')),
         ]);
         $product->createVariant($variantB);
-        $this->productRepository->save($product);
+        $this->catalogContext->catalogRepos()->productRepository()->save($product);
 
         $this->assertTrue($repository->doesUniqueVariantPropertyCombinationExist($product->productId->get(), ['yyy']));
         $this->assertFalse($repository->doesUniqueVariantPropertyCombinationExist($product->productId->get(), ['yyy'], $variantB->variantId->get()));

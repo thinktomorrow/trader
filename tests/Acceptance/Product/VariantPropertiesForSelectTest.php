@@ -14,9 +14,9 @@ class VariantPropertiesForSelectTest extends ProductContext
     {
         $this->createAndSaveTaxonomiesAndTaxa();
         $product = $this->createProductWithProductVariantProperties();
-        $this->productRepository->save($product);
+        $this->catalogContext->catalogRepos()->productRepository()->save($product);
 
-        $values = (new VariantPropertiesForSelect($this->productRepository, $this->taxonRepository, $this->taxonomyRepository))->get(
+        $values = (new VariantPropertiesForSelect($this->catalogContext->catalogRepos()->productRepository(), $this->taxonRepository, $this->taxonomyRepository))->get(
             $product->productId->get(),
         );
 
