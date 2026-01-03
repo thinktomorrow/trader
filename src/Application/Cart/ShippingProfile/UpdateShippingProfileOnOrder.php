@@ -4,7 +4,6 @@ declare(strict_types=1);
 namespace Thinktomorrow\Trader\Application\Cart\ShippingProfile;
 
 use Psr\Container\ContainerInterface;
-use Thinktomorrow\Trader\Application\VatRate\FindVatRateForOrder;
 use Thinktomorrow\Trader\Domain\Common\Cash\Cash;
 use Thinktomorrow\Trader\Domain\Model\Order\Order;
 use Thinktomorrow\Trader\Domain\Model\Order\OrderRepository;
@@ -14,23 +13,14 @@ use Thinktomorrow\Trader\Domain\Model\Order\Shipping\ShippingState;
 use Thinktomorrow\Trader\Domain\Model\ShippingProfile\ShippingProfileId;
 use Thinktomorrow\Trader\Domain\Model\ShippingProfile\ShippingProfileRepository;
 use Thinktomorrow\Trader\Domain\Model\ShippingProfile\ShippingProfileState;
-use Thinktomorrow\Trader\TraderConfig;
 
 class UpdateShippingProfileOnOrder
 {
-    private ContainerInterface $container;
-    private TraderConfig $config;
-    private OrderRepository $orderRepository;
-    private ShippingProfileRepository $shippingProfileRepository;
-    private FindVatRateForOrder $findVatRateForOrder;
-
-    public function __construct(ContainerInterface $container, TraderConfig $config, OrderRepository $orderRepository, ShippingProfileRepository $shippingProfileRepository, FindVatRateForOrder $findVatRateForOrder)
+    public function __construct(
+        private ContainerInterface        $container,
+        private OrderRepository           $orderRepository,
+        private ShippingProfileRepository $shippingProfileRepository)
     {
-        $this->container = $container;
-        $this->config = $config;
-        $this->orderRepository = $orderRepository;
-        $this->shippingProfileRepository = $shippingProfileRepository;
-        $this->findVatRateForOrder = $findVatRateForOrder;
     }
 
     public function handle(Order $order, ShippingProfileId $shippingProfileId): void

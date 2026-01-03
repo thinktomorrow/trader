@@ -7,7 +7,6 @@ use Thinktomorrow\Trader\Application\Cart\RefreshCart\Adjuster;
 use Thinktomorrow\Trader\Application\Cart\VariantForCart\VariantForCart;
 use Thinktomorrow\Trader\Application\Cart\VariantForCart\VariantForCartRepository;
 use Thinktomorrow\Trader\Domain\Model\Order\Line\Line;
-use Thinktomorrow\Trader\Domain\Model\Order\Line\LinePrice;
 use Thinktomorrow\Trader\Domain\Model\Order\Order;
 use Thinktomorrow\Trader\Domain\Model\Product\Variant\VariantId;
 use Thinktomorrow\Trader\Domain\Model\Product\Variant\VariantState;
@@ -48,7 +47,7 @@ class AdjustLines implements Adjuster
 
             // Price can be changed in the meanwhile
             if (!$line->getUnitPrice()->getExcludingVat()->equals($variant->getSalePrice()->getExcludingVat())) {
-                $line->updatePrice(LinePrice::fromPrice($variant->getSalePrice()));
+                $line->updatePrice($variant->getSalePrice());
             }
 
             // AdjustTax

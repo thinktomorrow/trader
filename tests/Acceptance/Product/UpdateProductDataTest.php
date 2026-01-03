@@ -14,7 +14,9 @@ class UpdateProductDataTest extends ProductContext
 
     public function test_it_can_add_data()
     {
-        $productId = $this->createAProduct('50', []);
+        $product = $this->catalogContext->createProduct();
+        $productId = $product->productId;
+
         $dataPayload = ['foo' => 'bar'];
 
         $this->catalogContext->catalogApps()->productApplication()->updateProductData(new UpdateProductData($productId->get(), $dataPayload));
@@ -26,12 +28,13 @@ class UpdateProductDataTest extends ProductContext
         $this->assertEquals([
             new ProductDataUpdated($productId),
             new ProductTaxaUpdated($productId), // because of the InMemoryRepo implementation.
-        ], $this->eventDispatcher->releaseDispatchedEvents());
+        ], $this->catalogContext->catalogApps()->getEventDispatcher()->releaseDispatchedEvents());
     }
 
     public function test_it_overwrites_data_by_payload()
     {
-        $productId = $this->createAProduct('50', [], 'sku', ['foo' => 'bar']);
+        $product = $this->catalogContext->createProduct();
+        $productId = $product->productId;
 
         $this->catalogContext->catalogApps()->productApplication()->updateProductData(new UpdateProductData($productId->get(), ['foo' => ['nl' => 'baz']]));
 
@@ -42,7 +45,8 @@ class UpdateProductDataTest extends ProductContext
 
     public function test_it_does_not_remove_data_not_in_payload()
     {
-        $productId = $this->createAProduct('50', [], 'sku', ['foo' => 'bar']);
+        $product = $this->catalogContext->createProduct('product-aaa', null, [], ['foo' => 'bar']);
+        $productId = $product->productId;
 
         $this->catalogContext->catalogApps()->productApplication()->updateProductData(new UpdateProductData($productId->get(), ['label' => ['nl' => 'baz']]));
 

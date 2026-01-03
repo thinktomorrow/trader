@@ -5,6 +5,7 @@ namespace Tests\Acceptance\Product;
 
 use Tests\TestHelpers;
 use Thinktomorrow\Trader\Application\Product\VariantProperties\VariantPropertiesForSelect;
+use Thinktomorrow\Trader\Domain\Model\Taxonomy\TaxonomyType;
 
 class VariantPropertiesForSelectTest extends ProductContext
 {
@@ -12,21 +13,32 @@ class VariantPropertiesForSelectTest extends ProductContext
 
     public function test_it_can_compose_a_simple_option_array_for_select_field_rendering()
     {
-        $this->createAndSaveTaxonomiesAndTaxa();
-        $product = $this->createProductWithProductVariantProperties();
-        $this->catalogContext->catalogRepos()->productRepository()->save($product);
+        $this->catalogContext->createTaxonomy('taxonomy-aaa', TaxonomyType::variant_property->value);
+        $taxon = $this->catalogContext->createTaxon();
+        $taxon2 = $this->catalogContext->createTaxon('taxon-bbb');
 
-        $values = (new VariantPropertiesForSelect($this->catalogContext->catalogRepos()->productRepository(), $this->taxonRepository, $this->taxonomyRepository))->get(
+        $product = $this->catalogContext->createProduct();
+        $variantId = $product->getVariants()[0]->variantId;
+
+        $this->catalogContext->linkProductToTaxon($product->productId->get(), $taxon->taxonId->get());
+        $this->catalogContext->linkProductToTaxon($product->productId->get(), $taxon2->taxonId->get());
+//        $this->catalogContext->linkVariantToTaxon($product->productId->get(), $variantId->get(), $taxon->taxonId->get());
+//        $this->catalogContext->linkVariantToTaxon($product->productId->get(), $variantId->get(), $taxon2->taxonId->get());
+
+        $values = (new VariantPropertiesForSelect(
+            $this->catalogContext->catalogRepos()->productRepository(),
+            $this->catalogContext->catalogRepos()->taxonRepository(),
+            $this->catalogContext->catalogRepos()->taxonomyRepository(),
+        ))->get(
             $product->productId->get(),
         );
 
         $this->assertEquals([
-            'qqq' => [
-                'label' => 'Taxonomy qqq nl',
+            'taxonomy-aaa' => [
+                'label' => 'taxonomy-aaa title nl',
                 'options' => [
-                    ['value' => 'xxx', 'label' => 'Taxon xxx nl'],
-                    ['value' => 'yyy', 'label' => 'Taxon yyy nl'],
-                    ['value' => 'zzz', 'label' => 'Taxon zzz nl'],
+                    ['value' => 'taxon-aaa', 'label' => 'taxon-aaa title nl'],
+                    ['value' => 'taxon-bbb', 'label' => 'taxon-bbb title nl'],
                 ],
             ],
         ], $values);

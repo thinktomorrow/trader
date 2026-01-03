@@ -4,115 +4,97 @@ declare(strict_types=1);
 namespace Tests\Acceptance\Product;
 
 use Tests\TestHelpers;
-use Thinktomorrow\Trader\Domain\Model\Product\ProductTaxa\VariantProperty;
-use Thinktomorrow\Trader\Domain\Model\Taxon\TaxonId;
+use Thinktomorrow\Trader\Application\Product\VariantProperties\MissingVariants;
+use Thinktomorrow\Trader\Domain\Model\Taxonomy\TaxonomyType;
 
 class MissingVariantsTest extends ProductContext
 {
     use TestHelpers;
 
+    private MissingVariants $missingOptionCombinations;
+
     protected function setUp(): void
     {
         parent::setUp();
 
-        foreach ([$this->createTaxonomiesAndTaxa(), $this->createTaxonomiesAndTaxa(['ppp'], ['aaa'])] as [$taxonomies, $taxa]) {
-            foreach ($taxonomies as $taxonomy) {
-                $this->taxonomyRepository->save($taxonomy);
-            }
-
-            foreach ($taxa as $taxon) {
-                $this->taxonRepository->save($taxon);
-            }
-        }
-    }
-
-    public function tearDown(): void
-    {
-        parent::tearDown();
+        $this->missingOptionCombinations = new MissingVariants(
+            $this->catalogContext->catalogRepos()->taxonomyRepository(),
+            $this->catalogContext->catalogRepos()->taxonRepository(),
+        );
     }
 
     public function test_it_can_check_missing_variants()
     {
-        $product = $this->createProductWithProductVariantProperties();
-        $product->updateProductTaxa([
-            VariantProperty::create($product->productId, TaxonId::fromString('xxx')),
-            VariantProperty::create($product->productId, TaxonId::fromString('yyy')),
-            VariantProperty::create($product->productId, TaxonId::fromString('zzz')),
-            VariantProperty::create($product->productId, TaxonId::fromString('aaa')),
-        ]);
-        $this->catalogContext->catalogRepos()->productRepository()->save($product);
+        $this->catalogContext->createTaxonomy('taxonomy-aaa', TaxonomyType::variant_property->value);
+        $taxonomy2 = $this->catalogContext->createTaxonomy('taxonomy-bbb', TaxonomyType::variant_property->value);
+        $taxon = $this->catalogContext->createTaxon();
+        $taxon2 = $this->catalogContext->createTaxon('taxon-bbb');
+        $taxon3 = $this->catalogContext->createTaxon('taxon-ccc', $taxonomy2->taxonomyId->get());
 
-        $missingCombos = $this->missingOptionCombinations->get($product);
+        $product = $this->catalogContext->createProduct();
+        $variantId = $product->getVariants()[0]->variantId;
 
-        $this->assertCount(3, $missingCombos);
-        $this->assertEquals(['xxx', 'aaa'], $missingCombos[0]);
-        $this->assertEquals(['yyy', 'aaa'], $missingCombos[1]);
-        $this->assertEquals(['zzz', 'aaa'], $missingCombos[2]);
-    }
+        $this->catalogContext->linkProductToTaxon($product->productId->get(), $taxon->taxonId->get());
+        $this->catalogContext->linkProductToTaxon($product->productId->get(), $taxon2->taxonId->get());
+        $this->catalogContext->linkProductToTaxon($product->productId->get(), $taxon3->taxonId->get());
 
-    public function test_it_leaves_out_existing_variants()
-    {
-        $product = $this->createProductWithProductVariantProperties();
-        $product->updateProductTaxa([
-            VariantProperty::create($product->productId, TaxonId::fromString('xxx')),
-            VariantProperty::create($product->productId, TaxonId::fromString('yyy')),
-            VariantProperty::create($product->productId, TaxonId::fromString('zzz')),
-            VariantProperty::create($product->productId, TaxonId::fromString('aaa')),
-        ]);
-
-        $variant = $product->getVariants()[0];
-
-        $variant->updateVariantProperties([
-            \Thinktomorrow\Trader\Domain\Model\Product\VariantTaxa\VariantProperty::create($variant->variantId, TaxonId::fromString('xxx')),
-            \Thinktomorrow\Trader\Domain\Model\Product\VariantTaxa\VariantProperty::create($variant->variantId, TaxonId::fromString('aaa')),
-        ]);
-
-        $this->catalogContext->catalogRepos()->productRepository()->save($product);
 
         $missingCombos = $this->missingOptionCombinations->get($product);
 
         $this->assertCount(2, $missingCombos);
-        $this->assertEquals(['yyy', 'aaa'], $missingCombos[0]);
-        $this->assertEquals(['zzz', 'aaa'], $missingCombos[1]);
+        $this->assertEquals(['taxon-aaa', 'taxon-ccc'], $missingCombos[0]);
+        $this->assertEquals(['taxon-bbb', 'taxon-ccc'], $missingCombos[1]);
+    }
+
+    public function test_it_leaves_out_existing_variants()
+    {
+        $this->catalogContext->createTaxonomy('taxonomy-aaa', TaxonomyType::variant_property->value);
+        $taxonomy2 = $this->catalogContext->createTaxonomy('taxonomy-bbb', TaxonomyType::variant_property->value);
+        $taxon = $this->catalogContext->createTaxon();
+        $taxon2 = $this->catalogContext->createTaxon('taxon-bbb');
+        $taxon3 = $this->catalogContext->createTaxon('taxon-ccc', $taxonomy2->taxonomyId->get());
+
+        $product = $this->catalogContext->createProduct();
+        $variantId = $product->getVariants()[0]->variantId;
+
+        $this->catalogContext->linkProductToTaxon($product->productId->get(), $taxon->taxonId->get());
+        $this->catalogContext->linkProductToTaxon($product->productId->get(), $taxon2->taxonId->get());
+        $this->catalogContext->linkProductToTaxon($product->productId->get(), $taxon3->taxonId->get());
+        $this->catalogContext->linkVariantToTaxon($product->productId->get(), $variantId->get(), $taxon->taxonId->get());
+        $this->catalogContext->linkVariantToTaxon($product->productId->get(), $variantId->get(), $taxon3->taxonId->get());
+
+        $missingCombos = $this->missingOptionCombinations->get($product);
+
+        $this->assertCount(1, $missingCombos);
+        $this->assertEquals(['taxon-bbb', 'taxon-ccc'], $missingCombos[0]);
     }
 
     public function test_it_can_render_missing_combos_with_labels()
     {
-        $product = $this->createProductWithProductVariantProperties();
+        $this->catalogContext->createTaxonomy('taxonomy-aaa', TaxonomyType::variant_property->value);
+        $taxonomy2 = $this->catalogContext->createTaxonomy('taxonomy-bbb', TaxonomyType::variant_property->value);
+        $taxon = $this->catalogContext->createTaxon();
+        $taxon2 = $this->catalogContext->createTaxon('taxon-bbb');
+        $taxon3 = $this->catalogContext->createTaxon('taxon-ccc', $taxonomy2->taxonomyId->get());
 
-        $prop1 = VariantProperty::create($product->productId, TaxonId::fromString('xxx'));
-        $prop2 = VariantProperty::create($product->productId, TaxonId::fromString('yyy'));
-        $prop3 = VariantProperty::create($product->productId, TaxonId::fromString('zzz'));
-        $prop4 = VariantProperty::create($product->productId, TaxonId::fromString('aaa'));
+        $product = $this->catalogContext->createProduct();
+        $variantId = $product->getVariants()[0]->variantId;
 
-        $prop1->addData(['title' => ['nl' => 'xxx value nl']]);
-        $prop2->addData(['title' => ['nl' => 'yyy value nl']]);
-        $prop3->addData(['title' => ['nl' => 'zzz value nl']]);
-        $prop4->addData(['title' => ['nl' => 'aaa value nl']]);
-
-        $product->updateProductTaxa([
-            $prop1,
-            $prop2,
-            $prop3,
-            $prop4,
-        ]);
-
-
-        $variant = $product->getVariants()[0];
-
-        $variant->updateVariantProperties([
-            \Thinktomorrow\Trader\Domain\Model\Product\VariantTaxa\VariantProperty::create($variant->variantId, TaxonId::fromString('xxx')),
-            \Thinktomorrow\Trader\Domain\Model\Product\VariantTaxa\VariantProperty::create($variant->variantId, TaxonId::fromString('aaa')),
-        ]);
-
-        $this->catalogContext->catalogRepos()->productRepository()->save($product);
+        $this->catalogContext->linkProductToTaxon($product->productId->get(), $taxon->taxonId->get());
+        $this->catalogContext->linkProductToTaxon($product->productId->get(), $taxon2->taxonId->get());
+        $this->catalogContext->linkProductToTaxon($product->productId->get(), $taxon3->taxonId->get());
 
         $missingComboLabels = $this->missingOptionCombinations->getAsLabels($product, 'title.nl', 'title.nl');
 
         $this->assertCount(2, $missingComboLabels);
         $this->assertEquals([
-            'Taxonomy qqq nl: Taxon yyy nl',
-            'Taxonomy ppp nl: Taxon aaa nl',
+            'taxonomy-aaa title nl: taxon-aaa title nl',
+            'taxonomy-bbb title nl: taxon-ccc title nl',
         ], $missingComboLabels[0]);
+
+        $this->assertEquals([
+            'taxonomy-aaa title nl: taxon-bbb title nl',
+            'taxonomy-bbb title nl: taxon-ccc title nl',
+        ], $missingComboLabels[1]);
     }
 }

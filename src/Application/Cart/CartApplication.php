@@ -158,7 +158,6 @@ final class CartApplication
 
         $this->eventDispatcher->dispatchAll($order->releaseEvents());
 
-        $this->refresh(new RefreshCart($order->orderId->get()));
 
         return $orderId;
     }
@@ -176,7 +175,6 @@ final class CartApplication
 
         $this->orderRepository->save($order);
 
-        $this->refresh(new RefreshCart($order->orderId->get()));
 
         $this->eventDispatcher->dispatchAll($order->releaseEvents());
     }
@@ -213,7 +211,6 @@ final class CartApplication
 
         $this->orderRepository->save($order);
 
-        $this->refresh(new RefreshCart($order->orderId->get()));
 
         $this->eventDispatcher->dispatchAll($order->releaseEvents());
     }
@@ -231,7 +228,6 @@ final class CartApplication
 
         $this->orderRepository->save($order);
 
-        $this->refresh(new RefreshCart($order->orderId->get()));
 
         $this->eventDispatcher->dispatchAll($order->releaseEvents());
     }
@@ -249,7 +245,6 @@ final class CartApplication
 
         $this->orderRepository->save($order);
 
-        $this->refresh(new RefreshCart($order->orderId->get()));
 
         $this->eventDispatcher->dispatchAll($order->releaseEvents());
     }
@@ -262,7 +257,6 @@ final class CartApplication
 
         $this->orderRepository->save($order);
 
-        $this->refresh(new RefreshCart($order->orderId->get()));
 
         $this->eventDispatcher->dispatchAll($order->releaseEvents());
     }
@@ -275,7 +269,6 @@ final class CartApplication
 
         $this->orderRepository->save($order);
 
-        $this->refresh(new RefreshCart($order->orderId->get()));
 
         $this->eventDispatcher->dispatchAll($order->releaseEvents());
     }
@@ -317,7 +310,6 @@ final class CartApplication
             $updateShopper->getOrderId()->get()
         ));
 
-        $this->refresh(new RefreshCart($order->orderId->get()));
     }
 
     public function verifyVatNumber(VerifyCartVatNumber $command): void
@@ -398,7 +390,6 @@ final class CartApplication
 
         $this->orderRepository->save($order);
 
-        $this->refresh(new RefreshCart($order->orderId->get()));
 
         $this->eventDispatcher->dispatchAll($order->releaseEvents());
     }
@@ -411,7 +402,6 @@ final class CartApplication
             []
         ));
 
-        $this->refresh(new RefreshCart($order->orderId->get()));
     }
 
     private function chooseCustomerShippingAddress(Order $order, \Thinktomorrow\Trader\Domain\Model\Customer\Address\ShippingAddress $shippingAddress): void
@@ -422,7 +412,6 @@ final class CartApplication
             []
         ));
 
-        $this->refresh(new RefreshCart($order->orderId->get()));
     }
 
     public function completeCart(CompleteCart $command): void
@@ -474,8 +463,6 @@ final class CartApplication
         }
 
         $this->orderRepository->save($order);
-
-        $this->refresh(new RefreshCart($order->orderId->get()));
 
         $this->eventDispatcher->dispatchAll($order->releaseEvents());
     }

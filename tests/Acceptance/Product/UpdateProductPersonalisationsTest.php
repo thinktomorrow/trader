@@ -14,7 +14,8 @@ class UpdateProductPersonalisationsTest extends ProductContext
 
     public function test_it_can_add_personalisations()
     {
-        $productId = $this->createAProduct('50', ['1', '2'], 'sku', ['title' => ['nl' => 'foobar nl']]);
+        $product = $this->catalogContext->createProduct();
+        $productId = $product->productId;
 
         $dataPayload = [
             'label' => ['nl' => 'label nl'],
@@ -41,7 +42,8 @@ class UpdateProductPersonalisationsTest extends ProductContext
 
     public function test_it_can_update_existing_personalisations()
     {
-        $productId = $this->createAProduct('50', ['1', '2'], 'sku', ['title' => ['nl' => 'foobar nl']]);
+        $product = $this->catalogContext->createProduct();
+        $productId = $product->productId;
 
         $dataPayload = [
             'label' => ['nl' => 'label nl'],
@@ -77,8 +79,9 @@ class UpdateProductPersonalisationsTest extends ProductContext
 
     public function test_it_can_remove_existing_personalisations()
     {
-        $product = $this->createProductWithPersonalisations();
-        $this->catalogContext->catalogRepos()->productRepository()->save($product);
+        $product = $this->catalogContext->createProduct();
+        $personalisation = $this->catalogContext->makePersonalisation();
+        $this->catalogContext->addPersonalisationToProduct($product, $personalisation);
 
         $this->catalogContext->catalogApps()->productApplication()->updateProductPersonalisations(new UpdateProductPersonalisations($product->productId->get(), []));
 

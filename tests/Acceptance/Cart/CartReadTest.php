@@ -16,6 +16,8 @@ class CartReadTest extends CartContext
         $this->givenThereIsAProductWhichCostsEur('aaa', 5);
         $this->whenIAddTheVariantToTheCart('aaa-variant-aaa', 2);
 
+        $this->refreshCart();
+
         $cart = $this->orderContext->orderRepos()->cartRepository()->findCart(OrderId::fromString('xxx'));
 
         $this->assertEquals('€ 12', $cart->getTotalPrice());
@@ -48,6 +50,8 @@ class CartReadTest extends CartContext
         $this->givenThereIsAProductWhichCostsEur('lightsaber', 5);
         $this->whenIAddTheVariantToTheCart('lightsaber-variant-aaa', 2);
 
+        $this->refreshCart();
+
         $cart = $this->orderContext->orderRepos()->cartRepository()->findCart(OrderId::fromString('xxx'));
 
         // Line
@@ -70,6 +74,8 @@ class CartReadTest extends CartContext
     {
         $this->givenThereIsAProductWhichCostsEur('lightsaber', 5);
         $this->whenIAddTheVariantToTheCart('lightsaber-variant-aaa', 2);
+
+        $this->refreshCart();
 
         $cart = $this->orderContext->orderRepos()->cartRepository()->findCart(OrderId::fromString('xxx'));
 
@@ -99,6 +105,8 @@ class CartReadTest extends CartContext
         $this->whenIAddTheVariantToTheCart('lightsaber-variant-aaa', 2);
         $this->whenIAddShippingAddress('BE', 'molenstraat 146', null, '3000', 'Antwerp');
 
+        $this->refreshCart();
+
         $cart = $this->orderContext->orderRepos()->cartRepository()->findCart(OrderId::fromString('xxx'));
 
         $this->assertEquals('BE', $cart->getShippingAddress()->getCountryId());
@@ -115,6 +123,8 @@ class CartReadTest extends CartContext
         $this->givenThereIsAProductWhichCostsEur('lightsaber', 5);
         $this->whenIAddTheVariantToTheCart('lightsaber-variant-aaa', 2);
         $this->whenIAddBillingAddress('BE', 'molenstraat 146', null, '3000', 'Antwerp');
+
+        $this->refreshCart();
 
         $cart = $this->orderContext->orderRepos()->cartRepository()->findCart(OrderId::fromString('xxx'));
 
@@ -134,10 +144,14 @@ class CartReadTest extends CartContext
         $this->whenIAddShippingAddress('BE', 'molenstraat 146', null, '3000', 'Antwerp');
         $this->whenIAddBillingAddress('BE', 'molenstraat 146', null, '3000', 'Antwerp');
 
+        $this->refreshCart();
+
         $cart = $this->orderContext->orderRepos()->cartRepository()->findCart(OrderId::fromString('xxx'));
         $this->assertTrue($cart->getShippingAddress()->equalsAddress($cart->getBillingAddress()));
 
         $this->whenIAddBillingAddress('BE', 'molenstraat 22', null, '3000', 'Antwerp');
+
+        $this->refreshCart();
 
         $cart = $this->orderContext->orderRepos()->cartRepository()->findCart(OrderId::fromString('xxx'));
         $this->assertFalse($cart->getShippingAddress()->equalsAddress($cart->getBillingAddress()));
@@ -150,6 +164,8 @@ class CartReadTest extends CartContext
         $this->givenThereIsAProductWhichCostsEur('lightsaber', 5);
         $this->whenIAddTheVariantToTheCart('lightsaber-variant-aaa', 2);
         $this->whenIChooseShipping('bpost_home');
+
+        $this->refreshCart();
 
         $cart = $this->orderContext->orderRepos()->cartRepository()->findCart(OrderId::fromString('xxx'));
 
@@ -168,6 +184,7 @@ class CartReadTest extends CartContext
         $this->whenIAddTheVariantToTheCart('lightsaber-variant-aaa', 2);
         $this->whenIChoosePayment('bancontact');
 
+        $this->refreshCart();
         $cart = $this->orderContext->orderRepos()->cartRepository()->findCart(OrderId::fromString('xxx'));
 
         $this->assertInstanceOf(CartPayment::class, $cart->getPayment());
@@ -189,6 +206,7 @@ class CartReadTest extends CartContext
         $this->whenIAddTheVariantToTheCart('lightsaber-variant-aaa', 1, ['foo' => 'bar'], ['xxx' => 'foobar']);
         $this->thenIShouldHaveProductInTheCart(1, 1);
 
+        $this->refreshCart();
         $cart = $this->orderContext->orderRepos()->cartRepository()->findCart(OrderId::fromString('xxx'));
 
         $line = $cart->getLines()[0];
@@ -213,6 +231,7 @@ class CartReadTest extends CartContext
         ]);
         $this->whenIAddTheVariantToTheCart('lightsaber-variant-aaa', 1, ['foo' => 'bar'], ['xxx' => 'foobar']);
 
+        $this->refreshCart();
         $cart = $this->orderContext->orderRepos()->cartRepository()->findCart(OrderId::fromString('xxx'));
 
         $personalisation = $cart->getLines()[0]->getPersonalisations()[0];

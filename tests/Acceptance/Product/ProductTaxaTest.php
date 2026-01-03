@@ -27,7 +27,7 @@ class ProductTaxaTest extends ProductContext
         $this->catalogContext->linkVariantToTaxon($product->productId->get(), $variantId->get(), $taxon2->taxonId->get());
         $this->catalogContext->linkVariantToTaxon($product->productId->get(), $variantId->get(), $taxon3->taxonId->get());
 
-        $productDetail = $this->productDetailRepository->findProductDetail($variantId);
+        $productDetail = $this->catalogContext->catalogRepos()->productDetailRepository()->findProductDetail($variantId);
 
         $taxa = $productDetail->getTaxa();
 
@@ -50,7 +50,7 @@ class ProductTaxaTest extends ProductContext
 
         $this->catalogContext->linkVariantToTaxon($product->productId->get(), $variantId->get(), $taxon->taxonId->get());
 
-        $productDetail = $this->productDetailRepository->findProductDetail($variantId);
+        $productDetail = $this->catalogContext->catalogRepos()->productDetailRepository()->findProductDetail($variantId);
 
         /** @var ProductTaxonItem $taxon */
         $foundTaxon = $productDetail->getProductProperties()[0];
@@ -75,7 +75,7 @@ class ProductTaxaTest extends ProductContext
 
         $this->catalogContext->linkVariantToTaxon($product->productId->get(), $variantId->get(), $taxon->taxonId->get());
 
-        $productDetail = $this->productDetailRepository->findProductDetail($variantId);
+        $productDetail = $this->catalogContext->catalogRepos()->productDetailRepository()->findProductDetail($variantId);
 
         /** @var ProductTaxonItem $taxon */
         $taxon = $productDetail->getProductProperties()[0];
@@ -100,7 +100,7 @@ class ProductTaxaTest extends ProductContext
             ['title' => ['nl' => 'Custom Label nl', 'fr' => 'Custom Label fr']]
         );
 
-        $productDetail = $this->productDetailRepository->findProductDetail($variantId);
+        $productDetail = $this->catalogContext->catalogRepos()->productDetailRepository()->findProductDetail($variantId);
 
         /** @var ProductTaxonItem $taxon */
         $taxon = $productDetail->getProductProperties()[0];
@@ -124,7 +124,7 @@ class ProductTaxaTest extends ProductContext
 
         $this->catalogContext->linkProductToTaxon($product->productId->get(), $taxon->taxonId->get());
 
-        $productDetail = $this->productDetailRepository->findProductDetail($variantId);
+        $productDetail = $this->catalogContext->catalogRepos()->productDetailRepository()->findProductDetail($variantId);
 
         /** @var ProductTaxonItem $taxon */
         $taxon = $productDetail->getTaxa()[0];
@@ -156,7 +156,7 @@ class ProductTaxaTest extends ProductContext
                 $this->catalogContext->linkProductToTaxon($product->productId->get(), $taxonOffline->taxonId->get());
             }
 
-            $productDetail = $this->productDetailRepository->findProductDetail($variantId);
+            $productDetail = $this->catalogContext->catalogRepos()->productDetailRepository()->findProductDetail($variantId);
 
             $taxa = $productDetail->getTaxa();
 
@@ -180,26 +180,30 @@ class ProductTaxaTest extends ProductContext
 
     public function test_it_can_get_keys_and_url_per_taxa_item(): void
     {
-        $this->createAndSaveTaxonomiesAndTaxa();
+        $this->catalogContext->createTaxonomy();
+        $taxon = $this->catalogContext->createTaxon();
+        $taxon2 = $this->catalogContext->createTaxon('taxon-bbb');
 
-        $product = $this->createProductWithProductVariantProperties();
-        $this->catalogContext->catalogRepos()->productRepository()->save($product);
-
+        $product = $this->catalogContext->createProduct();
         $variantId = $product->getVariants()[0]->variantId;
-        $productDetail = $this->productDetailRepository->findProductDetail($variantId);
+
+        $this->catalogContext->linkProductToTaxon($product->productId->get(), $taxon->taxonId->get());
+        $this->catalogContext->linkProductToTaxon($product->productId->get(), $taxon2->taxonId->get());
+
+        $productDetail = $this->catalogContext->catalogRepos()->productDetailRepository()->findProductDetail($variantId);
 
         $taxa = $productDetail->getTaxa();
 
         /** @var ProductTaxonItem $taxon */
         $taxon = $taxa[0];
 
-        $this->assertEquals('key-xxx-nl', $taxon->getKey());
-        $this->assertEquals('key-xxx-nl', $taxon->getKey('nl'));
-        $this->assertEquals('key-xxx-fr', $taxon->getKey('fr'));
-        $this->assertEquals('key-xxx-nl', $taxon->getKey('de')); // fallback
+        $this->assertEquals('taxon-aaa-key-nl', $taxon->getKey());
+        $this->assertEquals('taxon-aaa-key-nl', $taxon->getKey('nl'));
+        $this->assertEquals('taxon-aaa-key-fr', $taxon->getKey('fr'));
+        $this->assertEquals('taxon-aaa-key-nl', $taxon->getKey('de')); // fallback
 
-        $this->assertEquals('key-xxx-nl', $taxon->getUrl());
-        $this->assertEquals('key-xxx-nl', $taxon->getUrl('nl'));
-        $this->assertEquals('key-xxx-fr', $taxon->getUrl('fr'));
+        $this->assertEquals('taxon-aaa-key-nl', $taxon->getUrl());
+        $this->assertEquals('taxon-aaa-key-nl', $taxon->getUrl('nl'));
+        $this->assertEquals('taxon-aaa-key-fr', $taxon->getUrl('fr'));
     }
 }

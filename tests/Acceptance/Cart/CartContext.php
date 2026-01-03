@@ -13,6 +13,7 @@ use Thinktomorrow\Trader\Application\Cart\ChooseShippingProfile;
 use Thinktomorrow\Trader\Application\Cart\Line\AddLine;
 use Thinktomorrow\Trader\Application\Cart\Line\ChangeLineQuantity;
 use Thinktomorrow\Trader\Application\Cart\Line\RemoveLine;
+use Thinktomorrow\Trader\Application\Cart\RefreshCart\RefreshCart;
 use Thinktomorrow\Trader\Application\Cart\UpdateBillingAddress;
 use Thinktomorrow\Trader\Application\Cart\UpdateShippingAddress;
 use Thinktomorrow\Trader\Application\Cart\UpdateShopper;
@@ -24,7 +25,6 @@ use Thinktomorrow\Trader\Domain\Common\Vat\VatPercentage;
 use Thinktomorrow\Trader\Domain\Model\Country\CountryId;
 use Thinktomorrow\Trader\Domain\Model\Customer\Customer;
 use Thinktomorrow\Trader\Domain\Model\Order\Exceptions\CouldNotFindOrder;
-use Thinktomorrow\Trader\Domain\Model\Order\Line\LineId;
 use Thinktomorrow\Trader\Domain\Model\Order\Line\Quantity;
 use Thinktomorrow\Trader\Domain\Model\Order\Order;
 use Thinktomorrow\Trader\Domain\Model\Order\OrderId;
@@ -361,8 +361,8 @@ abstract class CartContext extends TestCase
         // Find matching line by productId
         $lineId = null;
         foreach ($lines as $line) {
-            if ($line['variant_id'] == $productTitle) {
-                $lineId = LineId::fromString($line['line_id']);
+            if ($line->getPurchasableReference()->getId() == $productTitle) {
+                $lineId = $line->lineId;
             }
         }
 
@@ -381,8 +381,8 @@ abstract class CartContext extends TestCase
         // Find matching line by productId
         $lineId = null;
         foreach ($lines as $line) {
-            if ($line['variant_id'] == $productVariantId) {
-                $lineId = LineId::fromString($line['line_id']);
+            if ($line->getPurchasableReference()->getId() == $productVariantId) {
+                $lineId = $line->lineId;
             }
         }
 
@@ -431,7 +431,7 @@ abstract class CartContext extends TestCase
 
     protected function thenIShouldHaveAShippingCost($cost)
     {
-        $this->assertEquals(Cash::make($cost * 100), $this->getOrder()->getShippingCost()->getIncludingVat());
+        $this->assertEquals(Cash::make($cost * 100), $this->getOrder()->getShippingCostExcl());
     }
 
     protected function whenIAddShippingAddress(?string $country = null, ?string $line1 = null, ?string $line2 = null, ?string $postalCode = null, ?string $city = null)
@@ -488,7 +488,7 @@ abstract class CartContext extends TestCase
 
     protected function thenTheOverallCartPriceShouldBeEur($total)
     {
-        Assert::assertEquals($total * 100, $this->getOrder()->getTotal()->getIncludingVat()->getAmount());
+        Assert::assertEquals($total * 100, $this->getOrder()->getTotalExcl()->getAmount());
     }
 
     protected function thenTheCartItemShouldContainData($productVariantId, $dataKey, $dataValue)
@@ -510,6 +510,15 @@ abstract class CartContext extends TestCase
 
         $this->assertArrayHasKey($dataKey, $line->getData());
         $this->assertEquals($dataValue, $line->getData($dataKey));
+    }
+
+    protected function refreshCart(): static
+    {
+        $this->orderContext->orderApps()->cartApplication()->refresh(new RefreshCart(
+            $this->getOrder()->orderId->get()
+        ));
+
+        return $this;
     }
 
     protected function getOrder(): Order

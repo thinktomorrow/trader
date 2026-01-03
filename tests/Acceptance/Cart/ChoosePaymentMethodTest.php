@@ -95,6 +95,6 @@ class ChoosePaymentMethodTest extends CartContext
     {
         $this->expectException(CouldNotFindPaymentMethod::class);
 
-        $this->whenIChoosePayment('visa');
+        $this->whenIChoosePayment('xxx');
     }
 }

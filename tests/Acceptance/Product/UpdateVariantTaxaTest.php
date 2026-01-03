@@ -15,8 +15,9 @@ class UpdateVariantTaxaTest extends ProductContext
 
     public function test_it_can_add_taxa()
     {
-        $productId = $this->createAProduct('50', ['1', '2'], 'sku', ['title' => ['nl' => 'foobar nl']]);
-        $variantId = $this->catalogContext->catalogRepos()->productRepository()->find($productId)->getVariants()[0]->variantId;
+        $product = $this->catalogContext->createProduct();
+        $productId = $product->productId;
+        $variantId = $product->getVariants()[0]->variantId;
 
         $this->catalogContext->catalogApps()->productApplication()->updateVariantTaxa(new UpdateVariantTaxa($productId->get(), $variantId->get(), ['1', '3']));
 
@@ -42,14 +43,15 @@ class UpdateVariantTaxaTest extends ProductContext
         $this->assertEquals([
             new VariantUpdated($productId, $variantId),
             new ProductTaxaUpdated($productId), // Duplicate because of the InMemoryRepo implementation.
-        ], $this->eventDispatcher->releaseDispatchedEvents());
+        ], $this->catalogContext->catalogApps()->getEventDispatcher()->releaseDispatchedEvents());
     }
 
     public function test_it_can_remove_taxa()
     {
-        $productId = $this->createAProduct('50', ['1', '2'], 'sku', ['title' => ['nl' => 'foobar nl']]);
-        $variantId = $this->catalogContext->catalogRepos()->productRepository()->find($productId)->getVariants()[0]->variantId;
-
+        $product = $this->catalogContext->createProduct();
+        $productId = $product->productId;
+        $variantId = $product->getVariants()[0]->variantId;
+        
         $this->catalogContext->catalogApps()->productApplication()->updateVariantTaxa(new UpdateVariantTaxa(
             $productId->get(),
             $variantId->get(),
@@ -63,6 +65,6 @@ class UpdateVariantTaxaTest extends ProductContext
         $this->assertEquals([
             new VariantUpdated($productId, $variantId),
             new ProductTaxaUpdated($productId), // Duplicate because of the InMemoryRepo implementation.
-        ], $this->eventDispatcher->releaseDispatchedEvents());
+        ], $this->catalogContext->catalogApps()->getEventDispatcher()->releaseDispatchedEvents());
     }
 }

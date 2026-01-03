@@ -3,7 +3,6 @@ declare(strict_types=1);
 
 namespace Tests\Acceptance\Cart;
 
-use Thinktomorrow\Trader\Application\Cart\RefreshCart\RefreshCart;
 use Thinktomorrow\Trader\Domain\Model\Order\Exceptions\OrderAlreadyInMerchantHands;
 use Thinktomorrow\Trader\Domain\Model\Order\OrderId;
 use Thinktomorrow\Trader\Domain\Model\Order\State\DefaultOrderState;
@@ -24,11 +23,11 @@ class RefreshCartTest extends CartContext
         $this->givenThereIsAProductWhichCostsEur('aaa', 5);
         $this->whenIAddTheVariantToTheCart('aaa-variant-aaa', 2);
 
-        $this->orderContext->orderApps()->cartApplication()->refresh(new RefreshCart('xxx'));
+        $this->refreshCart();
 
         $cart = $this->orderContext->orderRepos()->cartRepository()->findCart(OrderId::fromString('xxx'));
 
-        $this->assertEquals('€ 10', $cart->getTotalPrice());
+        $this->assertEquals('€ 12', $cart->getTotalPrice());
     }
 
     public function test_it_cannot_refresh_cart_when_order_is_no_longer_is_shopper_hands()
@@ -45,7 +44,7 @@ class RefreshCartTest extends CartContext
 
         $this->expectException(OrderAlreadyInMerchantHands::class);
 
-        $this->orderContext->orderApps()->cartApplication()->refresh(new RefreshCart('xxx'));
+        $this->refreshCart();
 
         $cart = $this->orderContext->orderRepos()->cartRepository()->findCart(OrderId::fromString('xxx'));
         $this->assertEquals('€ 10', $cart->getTotalPrice());
@@ -57,15 +56,16 @@ class RefreshCartTest extends CartContext
         $this->whenIAddTheVariantToTheCart('aaa-variant-aaa', 2);
 
         // Check unchanged line first
+        $this->refreshCart();
         $cart = $this->orderContext->orderRepos()->cartRepository()->findCart(OrderId::fromString('xxx'));
-        $this->assertEquals('€ 10', $cart->getTotalPrice());
+        $this->assertEquals('€ 12', $cart->getTotalPrice());
 
         $this->updateVariant();
 
-        $this->orderContext->orderApps()->cartApplication()->refresh(new RefreshCart('xxx'));
+        $this->refreshCart();
 
         $cart = $this->orderContext->orderRepos()->cartRepository()->findCart(OrderId::fromString('xxx'));
-        $this->assertEquals('€ 20', $cart->getTotalPrice());
+        $this->assertEquals('€ 24', $cart->getTotalPrice());
     }
 
     public function test_it_can_refresh_variant_availability()
@@ -74,13 +74,14 @@ class RefreshCartTest extends CartContext
         $this->whenIAddTheVariantToTheCart('aaa-variant-aaa', 2);
 
         // Check unchanged line first
+        $this->refreshCart();
         $cart = $this->orderContext->orderRepos()->cartRepository()->findCart(OrderId::fromString('xxx'));
-        $this->assertEquals('€ 10', $cart->getTotalPrice());
+        $this->assertEquals('€ 12', $cart->getTotalPrice());
         $this->assertEquals(1, $cart->getSize());
 
         $this->updateVariant(VariantState::unavailable);
 
-        $this->orderContext->orderApps()->cartApplication()->refresh(new RefreshCart('xxx'));
+        $this->refreshCart();
 
         $cart = $this->orderContext->orderRepos()->cartRepository()->findCart(OrderId::fromString('xxx'));
         $this->assertEquals('€ 0', $cart->getTotalPrice());
@@ -108,7 +109,11 @@ class RefreshCartTest extends CartContext
     {
         $product = $this->catalogContext->catalogRepos()->productRepository()->find(ProductId::fromString('aaa'));
         $variant = $product->getVariants()[0];
-        $variant->updatePrice(VariantUnitPrice::fromPrice($variant->getSalePrice()), $variant->getSalePrice()->multiply(2));
+        $variant->updatePrice(VariantUnitPrice::fromMoney(
+            $variant->getSalePrice()->getExcludingVat(),
+            $variant->getSalePrice()->getVatPercentage(),
+            false
+        ), $variant->getSalePrice()->multiply(2));
 
         if ($state) {
             $variant->updateState($state);

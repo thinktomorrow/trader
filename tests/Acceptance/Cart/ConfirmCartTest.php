@@ -17,11 +17,11 @@ class ConfirmCartTest extends CartContext
         $this->givenThereIsAProductWhichCostsEur('aaa', 5);
         $this->whenIAddTheVariantToTheCart('aaa-variant-aaa', 2);
 
-        $this->orderContext->orderApps()->customerApplication()->completeCart(new CompleteCart('xxx'));
+        $this->orderContext->orderApps()->cartApplication()->completeCart(new CompleteCart('xxx'));
 
         $this->assertEquals(
             new OrderStateUpdated(OrderId::fromString('xxx'), DefaultOrderState::cart_pending, DefaultOrderState::cart_completed),
-            last($this->eventDispatcher->releaseDispatchedEvents())
+            last($this->orderContext->orderApps()->getEventDispatcher()->releaseDispatchedEvents())
         );
 
         $order = $this->orderContext->orderRepos()->orderRepository()->find(OrderId::fromString('xxx'));
@@ -33,11 +33,11 @@ class ConfirmCartTest extends CartContext
         $this->givenThereIsAProductWhichCostsEur('aaa', 5);
         $this->whenIAddTheVariantToTheCart('aaa-variant-aaa', 2);
 
-        $this->orderContext->orderApps()->customerApplication()->confirmCart(new ConfirmCart('xxx'));
+        $this->orderContext->orderApps()->cartApplication()->confirmCart(new ConfirmCart('xxx'));
 
         $this->assertEquals(
             new OrderStateUpdated(OrderId::fromString('xxx'), DefaultOrderState::cart_pending, DefaultOrderState::confirmed),
-            last($this->eventDispatcher->releaseDispatchedEvents())
+            last($this->orderContext->orderApps()->getEventDispatcher()->releaseDispatchedEvents())
         );
 
         $order = $this->orderContext->orderRepos()->orderRepository()->find(OrderId::fromString('xxx'));
@@ -49,12 +49,12 @@ class ConfirmCartTest extends CartContext
         $this->givenThereIsAProductWhichCostsEur('aaa', 5);
         $this->whenIAddTheVariantToTheCart('aaa-variant-aaa', 2);
 
-        $this->orderContext->orderApps()->customerApplication()->completeCart(new CompleteCart('xxx'));
-        $this->orderContext->orderApps()->customerApplication()->confirmCart(new ConfirmCart('xxx'));
+        $this->orderContext->orderApps()->cartApplication()->completeCart(new CompleteCart('xxx'));
+        $this->orderContext->orderApps()->cartApplication()->confirmCart(new ConfirmCart('xxx'));
 
         $this->assertEquals(
             new OrderStateUpdated(OrderId::fromString('xxx'), DefaultOrderState::cart_completed, DefaultOrderState::confirmed),
-            last($this->eventDispatcher->releaseDispatchedEvents())
+            last($this->orderContext->orderApps()->getEventDispatcher()->releaseDispatchedEvents())
         );
 
         $order = $this->orderContext->orderRepos()->orderRepository()->find(OrderId::fromString('xxx'));
@@ -66,10 +66,10 @@ class ConfirmCartTest extends CartContext
         $this->givenThereIsAProductWhichCostsEur('aaa', 5);
         $this->whenIAddTheVariantToTheCart('aaa-variant-aaa', 2);
 
-        $this->orderContext->orderApps()->customerApplication()->confirmCart(new ConfirmCart('xxx'));
+        $this->orderContext->orderApps()->cartApplication()->confirmCart(new ConfirmCart('xxx'));
 
         $this->expectException(OrderAlreadyInMerchantHands::class);
-        $this->orderContext->orderApps()->customerApplication()->confirmCart(new ConfirmCart('xxx'));
+        $this->orderContext->orderApps()->cartApplication()->confirmCart(new ConfirmCart('xxx'));
     }
 
     public function test_a_confirmed_cart_is_no_longer_retrievable_via_cart_repo()
@@ -77,7 +77,7 @@ class ConfirmCartTest extends CartContext
         $this->givenThereIsAProductWhichCostsEur('aaa', 5);
         $this->whenIAddTheVariantToTheCart('aaa-variant-aaa', 2);
 
-        $this->orderContext->orderApps()->customerApplication()->confirmCart(new ConfirmCart('xxx'));
+        $this->orderContext->orderApps()->cartApplication()->confirmCart(new ConfirmCart('xxx'));
 
         // Cart is no longer retrievable since it is in merchant hands
         $this->expectException(OrderAlreadyInMerchantHands::class);
