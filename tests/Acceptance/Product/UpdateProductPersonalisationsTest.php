@@ -22,13 +22,13 @@ class UpdateProductPersonalisationsTest extends ProductContext
             'custom' => 'foobar',
         ];
 
-        $this->catalogContext->catalogApps()->productApplication()->updateProductPersonalisations(new UpdateProductPersonalisations($productId->get(), [[
+        $this->catalogContext->apps()->productApplication()->updateProductPersonalisations(new UpdateProductPersonalisations($productId->get(), [[
             'personalisation_id' => null,
             'personalisation_type' => PersonalisationType::TEXT,
             'data' => $dataPayload,
         ]]));
 
-        $product = $this->catalogContext->catalogRepos()->productRepository()->find($productId);
+        $product = $this->catalogContext->repos()->productRepository()->find($productId);
 
         $this->assertArrayEqualsWithWildcard([
             [
@@ -50,18 +50,18 @@ class UpdateProductPersonalisationsTest extends ProductContext
             'custom' => 'foobar',
         ];
 
-        $this->catalogContext->catalogApps()->productApplication()->updateProductPersonalisations(new UpdateProductPersonalisations($productId->get(), [[
+        $this->catalogContext->apps()->productApplication()->updateProductPersonalisations(new UpdateProductPersonalisations($productId->get(), [[
             'personalisation_id' => null,
             'personalisation_type' => PersonalisationType::TEXT,
             'data' => $dataPayload,
         ]]));
 
-        $product = $this->catalogContext->catalogRepos()->productRepository()->find($productId);
+        $product = $this->catalogContext->repos()->productRepository()->find($productId);
 
         $personalisation_id = $product->getChildEntities()[Personalisation::class][0]['personalisation_id'];
 
         // Update
-        $this->catalogContext->catalogApps()->productApplication()->updateProductPersonalisations(new UpdateProductPersonalisations($productId->get(), [[
+        $this->catalogContext->apps()->productApplication()->updateProductPersonalisations(new UpdateProductPersonalisations($productId->get(), [[
             'personalisation_id' => $personalisation_id,
             'personalisation_type' => PersonalisationType::IMAGE,
             'data' => $dataPayload,
@@ -83,9 +83,9 @@ class UpdateProductPersonalisationsTest extends ProductContext
         $personalisation = $this->catalogContext->makePersonalisation();
         $this->catalogContext->addPersonalisationToProduct($product, $personalisation);
 
-        $this->catalogContext->catalogApps()->productApplication()->updateProductPersonalisations(new UpdateProductPersonalisations($product->productId->get(), []));
+        $this->catalogContext->apps()->productApplication()->updateProductPersonalisations(new UpdateProductPersonalisations($product->productId->get(), []));
 
-        $product = $this->catalogContext->catalogRepos()->productRepository()->find($product->productId);
+        $product = $this->catalogContext->repos()->productRepository()->find($product->productId);
 
         $this->assertEquals([], $product->getChildEntities()[Personalisation::class]);
     }

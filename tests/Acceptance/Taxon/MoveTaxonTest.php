@@ -3,42 +3,43 @@ declare(strict_types=1);
 
 namespace Tests\Acceptance\Taxon;
 
+use Tests\Acceptance\TestCase;
 use Tests\Infrastructure\Vine\TaxonHelpers;
 use Thinktomorrow\Trader\Application\Taxon\CreateTaxon;
 use Thinktomorrow\Trader\Application\Taxon\MoveTaxon;
 use Thinktomorrow\Trader\Domain\Model\Taxon\Exceptions\CouldNotMoveTaxon;
 
-class MoveTaxonTest extends TaxonContext
+class MoveTaxonTest extends TestCase
 {
     use TaxonHelpers;
 
     public function test_it_can_move_a_taxon_to_root()
     {
-        $taxonRootId = $this->taxonApplication->createTaxon(new CreateTaxon('bbb', 'taxon-key-root', 'nl', []));
-        $this->taxonRepository->setNextReference('abc');
-        $taxonId = $this->taxonApplication->createTaxon(new CreateTaxon('bbb', 'taxon-key', 'nl', [], $taxonRootId->get()));
+        $taxonRootId = $this->catalogContext->apps()->taxonApplication()->createTaxon(new CreateTaxon('bbb', 'taxon-key-root', 'nl', []));
+        $this->catalogContext->repos()->taxonRepository()->setNextReference('abc');
+        $taxonId = $this->catalogContext->apps()->taxonApplication()->createTaxon(new CreateTaxon('bbb', 'taxon-key', 'nl', [], $taxonRootId->get()));
 
-        $taxon = $this->taxonRepository->find($taxonId);
+        $taxon = $this->catalogContext->repos()->taxonRepository()->find($taxonId);
         $this->assertEquals($taxonRootId->get(), $taxon->getMappedData()['parent_id']);
 
-        $this->taxonApplication->moveTaxon(new MoveTaxon($taxonId->get()));
+        $this->catalogContext->apps()->taxonApplication()->moveTaxon(new MoveTaxon($taxonId->get()));
 
-        $taxon = $this->taxonRepository->find($taxonId);
+        $taxon = $this->catalogContext->repos()->taxonRepository()->find($taxonId);
         $this->assertNull($taxon->getMappedData()['parent_id']);
     }
 
     public function test_it_can_move_a_taxon_to_another_taxon()
     {
-        $taxonRootId = $this->taxonApplication->createTaxon(new CreateTaxon('bbb', 'taxon-key-root', 'nl', []));
-        $this->taxonRepository->setNextReference('abc');
-        $taxonId = $this->taxonApplication->createTaxon(new CreateTaxon('bbb', 'taxon-key', 'nl', []));
+        $taxonRootId = $this->catalogContext->apps()->taxonApplication()->createTaxon(new CreateTaxon('bbb', 'taxon-key-root', 'nl', []));
+        $this->catalogContext->repos()->taxonRepository()->setNextReference('abc');
+        $taxonId = $this->catalogContext->apps()->taxonApplication()->createTaxon(new CreateTaxon('bbb', 'taxon-key', 'nl', []));
 
-        $taxon = $this->taxonRepository->find($taxonId);
+        $taxon = $this->catalogContext->repos()->taxonRepository()->find($taxonId);
         $this->assertNull($taxon->getMappedData()['parent_id']);
 
-        $this->taxonApplication->moveTaxon(new MoveTaxon($taxonId->get(), $taxonRootId->get()));
+        $this->catalogContext->apps()->taxonApplication()->moveTaxon(new MoveTaxon($taxonId->get(), $taxonRootId->get()));
 
-        $taxon = $this->taxonRepository->find($taxonId);
+        $taxon = $this->catalogContext->repos()->taxonRepository()->find($taxonId);
         $this->assertEquals($taxonRootId->get(), $taxon->getMappedData()['parent_id']);
     }
 
@@ -47,14 +48,14 @@ class MoveTaxonTest extends TaxonContext
         $this->expectException(CouldNotMoveTaxon::class);
         $this->expectExceptionMessage('Could not move taxon because target taxon "abc" does not belong to the same taxonomy "bbb"');
 
-        $taxonRootId = $this->taxonApplication->createTaxon(new CreateTaxon('bbb', 'taxon-key-root', 'nl', []));
-        $this->taxonRepository->setNextReference('abc');
-        $targetTaxonId = $this->taxonApplication->createTaxon(new CreateTaxon('ccc', 'taxon-key', 'nl', []));
-        $this->taxonRepository->setNextReference('def');
-        $taxonId = $this->taxonApplication->createTaxon(new CreateTaxon('bbb', 'taxon-key', 'nl', [], $taxonRootId->get()));
+        $taxonRootId = $this->catalogContext->apps()->taxonApplication()->createTaxon(new CreateTaxon('bbb', 'taxon-key-root', 'nl', []));
+        $this->catalogContext->repos()->taxonRepository()->setNextReference('abc');
+        $targetTaxonId = $this->catalogContext->apps()->taxonApplication()->createTaxon(new CreateTaxon('ccc', 'taxon-key', 'nl', []));
+        $this->catalogContext->repos()->taxonRepository()->setNextReference('def');
+        $taxonId = $this->catalogContext->apps()->taxonApplication()->createTaxon(new CreateTaxon('bbb', 'taxon-key', 'nl', [], $taxonRootId->get()));
 
         // Attempt to move a taxon under a different taxonomy
-        $this->taxonApplication->moveTaxon(new MoveTaxon($taxonId->get(), 'abc'));
+        $this->catalogContext->apps()->taxonApplication()->moveTaxon(new MoveTaxon($taxonId->get(), 'abc'));
 
     }
 }

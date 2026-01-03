@@ -4,23 +4,24 @@ declare(strict_types=1);
 namespace Tests\Acceptance\PaymentMethod;
 
 use Money\Money;
+use Tests\Acceptance\TestCase;
 use Thinktomorrow\Trader\Application\PaymentMethod\CreatePaymentMethod;
 use Thinktomorrow\Trader\Domain\Model\Country\CountryId;
 use Thinktomorrow\Trader\Domain\Model\PaymentMethod\PaymentMethodId;
 use Thinktomorrow\Trader\Domain\Model\PaymentMethod\PaymentMethodProviderId;
 
-class CreatePaymentMethodTest extends PaymentMethodContext
+class CreatePaymentMethodTest extends TestCase
 {
     public function test_it_can_create_a_payment_method()
     {
-        $paymentMethodId = $this->paymentMethodApplication->createPaymentMethod(new CreatePaymentMethod(
+        $paymentMethodId = $this->orderContext->apps()->paymentMethodApplication()->createPaymentMethod(new CreatePaymentMethod(
             'mollie',
             '10',
             ['BE', 'NL'],
             ['foo' => 'bar']
         ));
 
-        $paymentMethod = $this->orderContext->orderRepos()->paymentMethodRepository()->find($paymentMethodId);
+        $paymentMethod = $this->orderContext->repos()->paymentMethodRepository()->find($paymentMethodId);
 
         $this->assertInstanceOf(PaymentMethodId::class, $paymentMethodId);
         $this->assertEquals($paymentMethodId, $paymentMethod->paymentMethodId);

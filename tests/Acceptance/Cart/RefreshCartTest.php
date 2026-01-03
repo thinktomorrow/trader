@@ -25,7 +25,7 @@ class RefreshCartTest extends CartContext
 
         $this->refreshCart();
 
-        $cart = $this->orderContext->orderRepos()->cartRepository()->findCart(OrderId::fromString('xxx'));
+        $cart = $this->orderContext->repos()->cartRepository()->findCart(OrderId::fromString('xxx'));
 
         $this->assertEquals('€ 12', $cart->getTotalPrice());
     }
@@ -38,7 +38,7 @@ class RefreshCartTest extends CartContext
         // Force a merchant state
         $order = $this->getOrder();
         $order->updateState(DefaultOrderState::confirmed);
-        $this->orderContext->orderRepos()->orderRepository()->save($order);
+        $this->orderContext->repos()->orderRepository()->save($order);
 
         $this->updateVariant();
 
@@ -46,7 +46,7 @@ class RefreshCartTest extends CartContext
 
         $this->refreshCart();
 
-        $cart = $this->orderContext->orderRepos()->cartRepository()->findCart(OrderId::fromString('xxx'));
+        $cart = $this->orderContext->repos()->cartRepository()->findCart(OrderId::fromString('xxx'));
         $this->assertEquals('€ 10', $cart->getTotalPrice());
     }
 
@@ -57,14 +57,14 @@ class RefreshCartTest extends CartContext
 
         // Check unchanged line first
         $this->refreshCart();
-        $cart = $this->orderContext->orderRepos()->cartRepository()->findCart(OrderId::fromString('xxx'));
+        $cart = $this->orderContext->repos()->cartRepository()->findCart(OrderId::fromString('xxx'));
         $this->assertEquals('€ 12', $cart->getTotalPrice());
 
         $this->updateVariant();
 
         $this->refreshCart();
 
-        $cart = $this->orderContext->orderRepos()->cartRepository()->findCart(OrderId::fromString('xxx'));
+        $cart = $this->orderContext->repos()->cartRepository()->findCart(OrderId::fromString('xxx'));
         $this->assertEquals('€ 24', $cart->getTotalPrice());
     }
 
@@ -75,7 +75,7 @@ class RefreshCartTest extends CartContext
 
         // Check unchanged line first
         $this->refreshCart();
-        $cart = $this->orderContext->orderRepos()->cartRepository()->findCart(OrderId::fromString('xxx'));
+        $cart = $this->orderContext->repos()->cartRepository()->findCart(OrderId::fromString('xxx'));
         $this->assertEquals('€ 12', $cart->getTotalPrice());
         $this->assertEquals(1, $cart->getSize());
 
@@ -83,7 +83,7 @@ class RefreshCartTest extends CartContext
 
         $this->refreshCart();
 
-        $cart = $this->orderContext->orderRepos()->cartRepository()->findCart(OrderId::fromString('xxx'));
+        $cart = $this->orderContext->repos()->cartRepository()->findCart(OrderId::fromString('xxx'));
         $this->assertEquals('€ 0', $cart->getTotalPrice());
         $this->assertEquals(0, $cart->getSize());
     }
@@ -107,7 +107,7 @@ class RefreshCartTest extends CartContext
 
     private function updateVariant(?VariantState $state = null): void
     {
-        $product = $this->catalogContext->catalogRepos()->productRepository()->find(ProductId::fromString('aaa'));
+        $product = $this->catalogContext->repos()->productRepository()->find(ProductId::fromString('aaa'));
         $variant = $product->getVariants()[0];
         $variant->updatePrice(VariantUnitPrice::fromMoney(
             $variant->getSalePrice()->getExcludingVat(),

@@ -12,17 +12,14 @@ use Thinktomorrow\Trader\Domain\Model\Taxon\TaxonId;
 use Thinktomorrow\Trader\Domain\Model\Taxon\TaxonKey;
 use Thinktomorrow\Trader\Domain\Model\Taxon\TaxonRepository;
 use Thinktomorrow\Trader\Domain\Model\Taxonomy\TaxonomyId;
-use Thinktomorrow\Trader\TraderConfig;
 
 final class TaxonApplication
 {
-    private TraderConfig $traderConfig;
     private EventDispatcher $eventDispatcher;
     private TaxonRepository $taxonRepository;
 
-    public function __construct(TraderConfig $traderConfig, EventDispatcher $eventDispatcher, TaxonRepository $taxonRepository)
+    public function __construct(EventDispatcher $eventDispatcher, TaxonRepository $taxonRepository)
     {
-        $this->traderConfig = $traderConfig;
         $this->eventDispatcher = $eventDispatcher;
         $this->taxonRepository = $taxonRepository;
     }
@@ -30,6 +27,7 @@ final class TaxonApplication
     public function createTaxon(CreateTaxon $createTaxon): TaxonId
     {
         $taxonId = $this->taxonRepository->nextReference();
+
         $taxonKeyId = $this->taxonRepository->uniqueKeyReference($createTaxon->getTaxonKeyId(), $taxonId);
 
         if ($this->checkTaxonBelongsToDifferentTaxonomy($createTaxon->getTaxonomyId(), $createTaxon->getParentTaxonId())) {
@@ -112,12 +110,12 @@ final class TaxonApplication
 
     private function checkTaxonBelongsToDifferentTaxonomy(TaxonomyId $taxonomyId, ?TaxonId $targetTaxonId = null): bool
     {
-        if (! $targetTaxonId) {
+        if (!$targetTaxonId) {
             return false;
         }
 
         $targetTaxon = $this->taxonRepository->find($targetTaxonId);
 
-        return ! $targetTaxon->taxonomyId->equals($taxonomyId);
+        return !$targetTaxon->taxonomyId->equals($taxonomyId);
     }
 }

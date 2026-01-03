@@ -14,7 +14,7 @@ final class InMemoryTaxonRepository implements TaxonRepository, InMemoryReposito
     /** @var Taxon[] */
     public static array $taxons = [];
 
-    private string $nextReference = 'ccc-123';
+    private static string $nextReference = 'taxon-1';
 
     public function save(Taxon $taxon): void
     {
@@ -23,7 +23,7 @@ final class InMemoryTaxonRepository implements TaxonRepository, InMemoryReposito
 
     public function find(TaxonId $taxonId): Taxon
     {
-        if (! isset(static::$taxons[$taxonId->get()])) {
+        if (!isset(static::$taxons[$taxonId->get()])) {
             throw new CouldNotFindTaxon('No taxon found by id ' . $taxonId);
         }
 
@@ -69,7 +69,7 @@ final class InMemoryTaxonRepository implements TaxonRepository, InMemoryReposito
 
     public function delete(TaxonId $taxonId): void
     {
-        if (! isset(static::$taxons[$taxonId->get()])) {
+        if (!isset(static::$taxons[$taxonId->get()])) {
             throw new CouldNotFindTaxon('No taxon found by id ' . $taxonId);
         }
 
@@ -78,12 +78,12 @@ final class InMemoryTaxonRepository implements TaxonRepository, InMemoryReposito
 
     public function nextReference(): TaxonId
     {
-        return TaxonId::fromString($this->nextReference);
+        return TaxonId::fromString(static::$nextReference);
     }
 
     public function setNextReference(string $nextReference): void
     {
-        $this->nextReference = $nextReference;
+        static::$nextReference = $nextReference;
     }
 
     public function uniqueKeyReference(TaxonKeyId $taxonKeyId, TaxonId $allowedTaxonId): TaxonKeyId
@@ -101,7 +101,7 @@ final class InMemoryTaxonRepository implements TaxonRepository, InMemoryReposito
     private function existsByKey(TaxonKeyId $taxonKeyId, TaxonId $allowedTaxonId): bool
     {
         foreach (static::$taxons as $taxon) {
-            if (! $taxon->taxonId->equals($allowedTaxonId) && $taxon->hasTaxonKeyId($taxonKeyId)) {
+            if (!$taxon->taxonId->equals($allowedTaxonId) && $taxon->hasTaxonKeyId($taxonKeyId)) {
                 return true;
             }
         }
@@ -112,5 +112,6 @@ final class InMemoryTaxonRepository implements TaxonRepository, InMemoryReposito
     public static function clear()
     {
         static::$taxons = [];
+        static::$nextReference = 'taxon-1';
     }
 }

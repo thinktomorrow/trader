@@ -17,9 +17,9 @@ class VariantLinksTest extends ProductContext
         $variant1 = $this->catalogContext->createVariant($product->productId->get(), 'variant-bbb');
         $variant2 = $this->catalogContext->createVariant($product->productId->get(), 'variant-ccc');
 
-        $productDetail = $this->catalogContext->catalogRepos()->productDetailRepository()->findProductDetail($product->getVariants()[0]->variantId);
+        $productDetail = $this->catalogContext->repos()->productDetailRepository()->findProductDetail($product->getVariants()[0]->variantId);
 
-        $links = $this->catalogContext->catalogRepos()->variantLinksComposer()->get(
+        $links = $this->catalogContext->repos()->variantLinksComposer()->get(
             $productDetail,
             Locale::fromString('nl')
         );
@@ -34,9 +34,9 @@ class VariantLinksTest extends ProductContext
         $variant1 = $this->catalogContext->createVariant($product->productId->get(), 'variant-bbb');
         $variant2 = $this->catalogContext->createVariant($product->productId->get(), 'variant-ccc');
 
-        $productDetail = $this->catalogContext->catalogRepos()->productDetailRepository()->findProductDetail($product->getVariants()[0]->variantId);
+        $productDetail = $this->catalogContext->repos()->productDetailRepository()->findProductDetail($product->getVariants()[0]->variantId);
 
-        $links = $this->catalogContext->catalogRepos()->variantLinksComposer()->get(
+        $links = $this->catalogContext->repos()->variantLinksComposer()->get(
             $productDetail,
             Locale::fromString('nl')
         );
@@ -54,9 +54,9 @@ class VariantLinksTest extends ProductContext
     {
         $product = $this->catalogContext->createProduct();
 
-        $productDetail = $this->catalogContext->catalogRepos()->productDetailRepository()->findProductDetail($product->getVariants()[0]->variantId);
+        $productDetail = $this->catalogContext->repos()->productDetailRepository()->findProductDetail($product->getVariants()[0]->variantId);
 
-        $links = $this->catalogContext->catalogRepos()->variantLinksComposer()->get(
+        $links = $this->catalogContext->repos()->variantLinksComposer()->get(
             $productDetail,
             Locale::fromString('fr')
         );

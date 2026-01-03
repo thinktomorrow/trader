@@ -20,12 +20,12 @@ class ShippingProfileContext extends TestCase
 
         $this->shippingProfileApplication = new ShippingProfileApplication(
             $this->eventDispatcher = new EventDispatcherSpy(),
-            $this->orderContext->orderRepos()->shippingProfileRepository() = new InMemoryShippingProfileRepository(),
+            $this->orderContext->repos()->shippingProfileRepository() = new InMemoryShippingProfileRepository(),
         );
     }
 
     public function tearDown(): void
     {
-        $this->orderContext->orderRepos()->shippingProfileRepository()->clear();
+        $this->orderContext->repos()->shippingProfileRepository()->clear();
     }
 }

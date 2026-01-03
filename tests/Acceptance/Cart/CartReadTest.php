@@ -18,7 +18,7 @@ class CartReadTest extends CartContext
 
         $this->refreshCart();
 
-        $cart = $this->orderContext->orderRepos()->cartRepository()->findCart(OrderId::fromString('xxx'));
+        $cart = $this->orderContext->repos()->cartRepository()->findCart(OrderId::fromString('xxx'));
 
         $this->assertEquals('€ 12', $cart->getTotalPrice());
         $this->assertEquals('€ 12', $cart->getSubtotalPrice());
@@ -45,14 +45,14 @@ class CartReadTest extends CartContext
 
     public function test_in_order_to_confirm_my_product_choice_as_a_visitor__i_need_to_be_able_to_see_each_line_of_my_cart()
     {
-        $this->orderContext->orderRepos()->orderRepository()->setNextLineReference('foobar');
+        $this->orderContext->repos()->orderRepository()->setNextLineReference('foobar');
 
         $this->givenThereIsAProductWhichCostsEur('lightsaber', 5);
         $this->whenIAddTheVariantToTheCart('lightsaber-variant-aaa', 2);
 
         $this->refreshCart();
 
-        $cart = $this->orderContext->orderRepos()->cartRepository()->findCart(OrderId::fromString('xxx'));
+        $cart = $this->orderContext->repos()->cartRepository()->findCart(OrderId::fromString('xxx'));
 
         // Line
         $this->assertCount(1, $cart->getLines());
@@ -77,7 +77,7 @@ class CartReadTest extends CartContext
 
         $this->refreshCart();
 
-        $cart = $this->orderContext->orderRepos()->cartRepository()->findCart(OrderId::fromString('xxx'));
+        $cart = $this->orderContext->repos()->cartRepository()->findCart(OrderId::fromString('xxx'));
 
         $this->assertEquals(Money::EUR(1200), $cart->getTotalPriceAsMoney());
         $this->assertEquals(Money::EUR(1200), $cart->getSubtotalPriceAsMoney());
@@ -107,7 +107,7 @@ class CartReadTest extends CartContext
 
         $this->refreshCart();
 
-        $cart = $this->orderContext->orderRepos()->cartRepository()->findCart(OrderId::fromString('xxx'));
+        $cart = $this->orderContext->repos()->cartRepository()->findCart(OrderId::fromString('xxx'));
 
         $this->assertEquals('BE', $cart->getShippingAddress()->getCountryId());
         $this->assertEquals('molenstraat 146', $cart->getShippingAddress()->getLine1());
@@ -126,7 +126,7 @@ class CartReadTest extends CartContext
 
         $this->refreshCart();
 
-        $cart = $this->orderContext->orderRepos()->cartRepository()->findCart(OrderId::fromString('xxx'));
+        $cart = $this->orderContext->repos()->cartRepository()->findCart(OrderId::fromString('xxx'));
 
         $this->assertEquals('BE', $cart->getBillingAddress()->getCountryId());
         $this->assertEquals('molenstraat 146', $cart->getBillingAddress()->getLine1());
@@ -146,14 +146,14 @@ class CartReadTest extends CartContext
 
         $this->refreshCart();
 
-        $cart = $this->orderContext->orderRepos()->cartRepository()->findCart(OrderId::fromString('xxx'));
+        $cart = $this->orderContext->repos()->cartRepository()->findCart(OrderId::fromString('xxx'));
         $this->assertTrue($cart->getShippingAddress()->equalsAddress($cart->getBillingAddress()));
 
         $this->whenIAddBillingAddress('BE', 'molenstraat 22', null, '3000', 'Antwerp');
 
         $this->refreshCart();
 
-        $cart = $this->orderContext->orderRepos()->cartRepository()->findCart(OrderId::fromString('xxx'));
+        $cart = $this->orderContext->repos()->cartRepository()->findCart(OrderId::fromString('xxx'));
         $this->assertFalse($cart->getShippingAddress()->equalsAddress($cart->getBillingAddress()));
     }
 
@@ -167,7 +167,7 @@ class CartReadTest extends CartContext
 
         $this->refreshCart();
 
-        $cart = $this->orderContext->orderRepos()->cartRepository()->findCart(OrderId::fromString('xxx'));
+        $cart = $this->orderContext->repos()->cartRepository()->findCart(OrderId::fromString('xxx'));
 
         $this->assertInstanceOf(CartShipping::class, $cart->getShipping());
         $this->assertEquals('shipping-123', $cart->getShipping()->getShippingId());
@@ -185,7 +185,7 @@ class CartReadTest extends CartContext
         $this->whenIChoosePayment('bancontact');
 
         $this->refreshCart();
-        $cart = $this->orderContext->orderRepos()->cartRepository()->findCart(OrderId::fromString('xxx'));
+        $cart = $this->orderContext->repos()->cartRepository()->findCart(OrderId::fromString('xxx'));
 
         $this->assertInstanceOf(CartPayment::class, $cart->getPayment());
         $this->assertEquals('payment-123', $cart->getPayment()->getPaymentId());
@@ -207,7 +207,7 @@ class CartReadTest extends CartContext
         $this->thenIShouldHaveProductInTheCart(1, 1);
 
         $this->refreshCart();
-        $cart = $this->orderContext->orderRepos()->cartRepository()->findCart(OrderId::fromString('xxx'));
+        $cart = $this->orderContext->repos()->cartRepository()->findCart(OrderId::fromString('xxx'));
 
         $line = $cart->getLines()[0];
 
@@ -232,7 +232,7 @@ class CartReadTest extends CartContext
         $this->whenIAddTheVariantToTheCart('lightsaber-variant-aaa', 1, ['foo' => 'bar'], ['xxx' => 'foobar']);
 
         $this->refreshCart();
-        $cart = $this->orderContext->orderRepos()->cartRepository()->findCart(OrderId::fromString('xxx'));
+        $cart = $this->orderContext->repos()->cartRepository()->findCart(OrderId::fromString('xxx'));
 
         $personalisation = $cart->getLines()[0]->getPersonalisations()[0];
         $this->assertEquals('label nl', $personalisation->getLabel());

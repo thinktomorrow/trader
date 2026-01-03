@@ -18,7 +18,7 @@ class UpdateAddressTest extends CartContext
     {
         parent::setUp();
 
-        $this->orderContext->orderRepos()->orderRepository() = new InMemoryOrderRepository();
+        $this->orderContext->repos()->orderRepository() = new InMemoryOrderRepository();
     }
 
     public function test_merchant_can_change_shipping_address()
@@ -38,7 +38,7 @@ class UpdateAddressTest extends CartContext
             ]),
         );
 
-        $this->orderContext->orderRepos()->orderRepository()->save($order);
+        $this->orderContext->repos()->orderRepository()->save($order);
 
         $this->merchantOrderApplication->updateShippingAddress(new UpdateShippingAddress(
             $order->orderId->get(),
@@ -49,13 +49,13 @@ class UpdateAddressTest extends CartContext
             'city',
         ), []);
 
-        $order = $this->orderContext->orderRepos()->orderRepository()->find($order->orderId);
+        $order = $this->orderContext->repos()->orderRepository()->find($order->orderId);
 
         $this->assertEquals(new Address(CountryId::fromString('NL'), 'line-1 updated', 'line-2', 'postal-code', 'city',), $order->getShippingAddress()->getAddress());
 
         $this->assertEquals(new ShippingAddressUpdatedByMerchant($order->orderId, [
             'country_id' => ['old' => 'BE', 'new' => 'NL'], 'line1' => ['old' => 'line-1', 'new' => 'line-1 updated'],
-        ], []), $this->eventDispatcher->releaseDispatchedEvents()[2]);
+        ], []), $this->orderContext->apps()->getEventDispatcher()->releaseDispatchedEvents()[2]);
     }
 
     public function test_merchant_can_change_billing_address()
@@ -76,7 +76,7 @@ class UpdateAddressTest extends CartContext
             ])
         );
 
-        $this->orderContext->orderRepos()->orderRepository()->save($order);
+        $this->orderContext->repos()->orderRepository()->save($order);
 
         $this->merchantOrderApplication->updateBillingAddress(new UpdateBillingAddress(
             $order->orderId->get(),
@@ -87,13 +87,13 @@ class UpdateAddressTest extends CartContext
             'city',
         ), []);
 
-        $order = $this->orderContext->orderRepos()->orderRepository()->find($order->orderId);
+        $order = $this->orderContext->repos()->orderRepository()->find($order->orderId);
 
         $this->assertEquals(new Address(CountryId::fromString('NL'), 'line-1 updated', 'line-2', 'postal-code', 'city',), $order->getBillingAddress()->getAddress());
 
         $this->assertEquals(new BillingAddressUpdatedByMerchant($order->orderId, [
             'country_id' => ['old' => 'BE', 'new' => 'NL'], 'line1' => ['old' => 'line-1', 'new' => 'line-1 updated'],
-        ], []), $this->eventDispatcher->releaseDispatchedEvents()[2]);
+        ], []), $this->orderContext->apps()->getEventDispatcher()->releaseDispatchedEvents()[2]);
     }
 
     public function test_if_shipping_address_is_not_changed_no_event_is_triggered()
@@ -113,13 +113,13 @@ class UpdateAddressTest extends CartContext
             ]),
         );
 
-        $this->orderContext->orderRepos()->orderRepository()->save($order);
+        $this->orderContext->repos()->orderRepository()->save($order);
 
         $this->merchantOrderApplication->updateShippingAddress(new UpdateShippingAddress(
             $order->orderId->get(),
             ...array_values($values)
         ), []);
 
-        $this->assertCount(0, $this->eventDispatcher->releaseDispatchedEvents());
+        $this->assertCount(0, $this->orderContext->apps()->getEventDispatcher()->releaseDispatchedEvents());
     }
 }

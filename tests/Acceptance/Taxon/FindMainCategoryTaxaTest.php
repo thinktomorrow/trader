@@ -4,47 +4,42 @@ declare(strict_types=1);
 
 namespace Tests\Acceptance\Taxon;
 
-use Tests\Infrastructure\Vine\TaxonHelpers;
+use Tests\Acceptance\TestCase;
 use Thinktomorrow\Trader\Application\Taxon\Queries\FindMainCategoryTaxon;
-use Thinktomorrow\Trader\Infrastructure\Test\Repositories\InMemoryTaxonomyRepository;
-use Thinktomorrow\Trader\Infrastructure\Test\Repositories\InMemoryTaxonRepository;
 use Thinktomorrow\Trader\Infrastructure\Test\Repositories\InMemoryTaxonTreeRepository;
 use Thinktomorrow\Trader\Infrastructure\Test\TestContainer;
 use Thinktomorrow\Trader\Infrastructure\Test\TestTraderConfig;
 
-class FindMainCategoryTaxaTest extends TaxonContext
+class FindMainCategoryTaxaTest extends TestCase
 {
-    use TaxonHelpers;
-
     protected function setUp(): void
     {
         parent::setUp();
 
-        $this->createDefaultTaxonomies();
-        $this->createDefaultTaxons();
-    }
-
-    /** Ensure only in memory is used for taxonomy/taxon creation */
-    protected function entityRepositories(): \Generator
-    {
-        yield new InMemoryTaxonRepository;
-    }
-
-    protected function entityTaxonomyRepositories(): \Generator
-    {
-        yield new InMemoryTaxonomyRepository();
+        $this->catalogContext->createTaxonomy();
+        $this->catalogContext->createTaxon();
+        $this->catalogContext->createTaxon('taxon-bbb', 'taxonomy-aaa', 'taxon-aaa');
     }
 
     public function test_it_can_find_the_main_category_taxa()
     {
         $finder = new FindMainCategoryTaxon(
-            new TestTraderConfig(['category_taxonomy_id' => 'bbb']),
+            new TestTraderConfig(['category_taxonomy_id' => 'taxonomy-aaa']),
             new InMemoryTaxonTreeRepository(new TestContainer, new TestTraderConfig)
         );
 
-        $this->assertEquals(['fifth'], array_map(fn ($taxonnode) => $taxonnode->getId(), $finder->findFirstByTaxonIds(['sixth'])));
-        $this->assertEquals(['first'], array_map(fn ($taxonnode) => $taxonnode->getId(), $finder->findFirstByTaxonIds(['third'])));
-        $this->assertEquals(['first'], array_map(fn ($taxonnode) => $taxonnode->getId(), $finder->findFirstByTaxonIds(['first', 'second', 'third'])));
+        $this->assertEquals('taxon-aaa', $finder->findFirstByTaxonIds(['taxon-aaa'])->getId());
+        $this->assertEquals('taxon-bbb', $finder->findFirstByTaxonIds(['taxon-bbb'])->getId());
+    }
+
+    public function test_it_can_get_return_same_taxon_if_taxon_is_category_root()
+    {
+        $finder = new FindMainCategoryTaxon(
+            new TestTraderConfig(['category_taxonomy_id' => 'taxonomy-aaa']),
+            new InMemoryTaxonTreeRepository(new TestContainer, new TestTraderConfig)
+        );
+
+        $this->assertEquals('taxon-aaa', $finder->findFirstByTaxonIds(['taxon-aaa'])->getId());
     }
 
     public function test_it_uses_the_first_taxon_subtree_as_default_category()
@@ -54,26 +49,16 @@ class FindMainCategoryTaxaTest extends TaxonContext
             new InMemoryTaxonTreeRepository(new TestContainer, new TestTraderConfig)
         );
 
-        $this->assertEquals([], $finder->findFirstByTaxonIds(['second', 'sixth']));
+        $this->assertEquals(null, $finder->findFirstByTaxonIds(['taxon-aaa', 'taxon-bbb']));
     }
 
     public function test_it_can_get_multiple_root_taxa()
     {
         $finder = new FindMainCategoryTaxon(
-            new TestTraderConfig(['category_taxonomy_id' => 'bbb']),
+            new TestTraderConfig(['category_taxonomy_id' => 'taxonomy-aaa']),
             new InMemoryTaxonTreeRepository(new TestContainer, new TestTraderConfig)
         );
 
-        $this->assertEquals(['first', 'fifth'], array_map(fn ($taxonnode) => $taxonnode->getId(), $finder->findFirstByTaxonIds(['second', 'sixth'])));
-    }
-
-    public function test_it_can_get_return_same_taxon_if_taxon_is_category_root()
-    {
-        $finder = new FindMainCategoryTaxon(
-            new TestTraderConfig(['category_taxonomy_id' => 'bbb']),
-            new InMemoryTaxonTreeRepository(new TestContainer, new TestTraderConfig)
-        );
-
-        $this->assertEquals(['first'], array_map(fn ($taxonnode) => $taxonnode->getId(), $finder->findFirstByTaxonIds(['first'])));
+        $this->assertEquals('taxon-aaa', $finder->findFirstByTaxonIds(['taxon-aaa', 'taxon-bbb'])->getId());
     }
 }

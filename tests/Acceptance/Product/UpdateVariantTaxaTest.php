@@ -19,9 +19,9 @@ class UpdateVariantTaxaTest extends ProductContext
         $productId = $product->productId;
         $variantId = $product->getVariants()[0]->variantId;
 
-        $this->catalogContext->catalogApps()->productApplication()->updateVariantTaxa(new UpdateVariantTaxa($productId->get(), $variantId->get(), ['1', '3']));
+        $this->catalogContext->apps()->productApplication()->updateVariantTaxa(new UpdateVariantTaxa($productId->get(), $variantId->get(), ['1', '3']));
 
-        $variant = $this->catalogContext->catalogRepos()->productRepository()->find($productId)->getVariants()[0];
+        $variant = $this->catalogContext->repos()->productRepository()->find($productId)->getVariants()[0];
 
         $this->assertContainsOnlyInstancesOf(VariantTaxon::class, $variant->getVariantTaxa());
         $this->assertCount(2, $variant->getChildEntities()[VariantTaxon::class]);
@@ -43,7 +43,7 @@ class UpdateVariantTaxaTest extends ProductContext
         $this->assertEquals([
             new VariantUpdated($productId, $variantId),
             new ProductTaxaUpdated($productId), // Duplicate because of the InMemoryRepo implementation.
-        ], $this->catalogContext->catalogApps()->getEventDispatcher()->releaseDispatchedEvents());
+        ], $this->catalogContext->apps()->getEventDispatcher()->releaseDispatchedEvents());
     }
 
     public function test_it_can_remove_taxa()
@@ -51,20 +51,20 @@ class UpdateVariantTaxaTest extends ProductContext
         $product = $this->catalogContext->createProduct();
         $productId = $product->productId;
         $variantId = $product->getVariants()[0]->variantId;
-        
-        $this->catalogContext->catalogApps()->productApplication()->updateVariantTaxa(new UpdateVariantTaxa(
+
+        $this->catalogContext->apps()->productApplication()->updateVariantTaxa(new UpdateVariantTaxa(
             $productId->get(),
             $variantId->get(),
             []
         ));
 
-        $variant = $this->catalogContext->catalogRepos()->productRepository()->find($productId)->getVariants()[0];
+        $variant = $this->catalogContext->repos()->productRepository()->find($productId)->getVariants()[0];
 
         $this->assertCount(0, $variant->getChildEntities()[VariantTaxon::class]);
 
         $this->assertEquals([
             new VariantUpdated($productId, $variantId),
             new ProductTaxaUpdated($productId), // Duplicate because of the InMemoryRepo implementation.
-        ], $this->catalogContext->catalogApps()->getEventDispatcher()->releaseDispatchedEvents());
+        ], $this->catalogContext->apps()->getEventDispatcher()->releaseDispatchedEvents());
     }
 }

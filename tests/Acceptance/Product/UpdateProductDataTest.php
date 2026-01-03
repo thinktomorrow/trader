@@ -19,16 +19,16 @@ class UpdateProductDataTest extends ProductContext
 
         $dataPayload = ['foo' => 'bar'];
 
-        $this->catalogContext->catalogApps()->productApplication()->updateProductData(new UpdateProductData($productId->get(), $dataPayload));
+        $this->catalogContext->apps()->productApplication()->updateProductData(new UpdateProductData($productId->get(), $dataPayload));
 
-        $product = $this->catalogContext->catalogRepos()->productRepository()->find($productId);
+        $product = $this->catalogContext->repos()->productRepository()->find($productId);
 
         $this->assertEquals(json_encode($dataPayload), $product->getMappedData()['data']);
 
         $this->assertEquals([
             new ProductDataUpdated($productId),
             new ProductTaxaUpdated($productId), // because of the InMemoryRepo implementation.
-        ], $this->catalogContext->catalogApps()->getEventDispatcher()->releaseDispatchedEvents());
+        ], $this->catalogContext->apps()->getEventDispatcher()->releaseDispatchedEvents());
     }
 
     public function test_it_overwrites_data_by_payload()
@@ -36,9 +36,9 @@ class UpdateProductDataTest extends ProductContext
         $product = $this->catalogContext->createProduct();
         $productId = $product->productId;
 
-        $this->catalogContext->catalogApps()->productApplication()->updateProductData(new UpdateProductData($productId->get(), ['foo' => ['nl' => 'baz']]));
+        $this->catalogContext->apps()->productApplication()->updateProductData(new UpdateProductData($productId->get(), ['foo' => ['nl' => 'baz']]));
 
-        $product = $this->catalogContext->catalogRepos()->productRepository()->find($productId);
+        $product = $this->catalogContext->repos()->productRepository()->find($productId);
 
         $this->assertEquals(json_encode(['foo' => ['nl' => 'baz']]), $product->getMappedData()['data']);
     }
@@ -48,9 +48,9 @@ class UpdateProductDataTest extends ProductContext
         $product = $this->catalogContext->createProduct('product-aaa', null, [], ['foo' => 'bar']);
         $productId = $product->productId;
 
-        $this->catalogContext->catalogApps()->productApplication()->updateProductData(new UpdateProductData($productId->get(), ['label' => ['nl' => 'baz']]));
+        $this->catalogContext->apps()->productApplication()->updateProductData(new UpdateProductData($productId->get(), ['label' => ['nl' => 'baz']]));
 
-        $product = $this->catalogContext->catalogRepos()->productRepository()->find($productId);
+        $product = $this->catalogContext->repos()->productRepository()->find($productId);
 
         $this->assertEquals(json_encode(['foo' => 'bar', 'label' => ['nl' => 'baz']]), $product->getMappedData()['data']);
     }

@@ -19,7 +19,7 @@ class CreateProductTest extends ProductContext
         $product = $this->catalogContext->createProduct('product-aaa', null);
         $this->catalogContext->createVariant($product->productId->get());
 
-        $product = $this->catalogContext->catalogRepos()->productRepository()->find($product->productId);
+        $product = $this->catalogContext->repos()->productRepository()->find($product->productId);
 
         $variants = $product->getVariants();
         $this->assertCount(1, $variants);

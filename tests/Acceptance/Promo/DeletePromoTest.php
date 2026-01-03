@@ -17,15 +17,15 @@ class DeletePromoTest extends PromoContext
         $promo = $this->createPromo([], [
             $this->orderContext->createOrderDiscount([], [$this->createCondition()]),
         ]);
-        $this->orderContext->orderRepos()->promoRepository()->save($promo);
+        $this->orderContext->repos()->promoRepository()->save($promo);
 
         $this->promoApplication->deletePromo(new DeletePromo($promo->promoId->get()));
 
         $this->assertEquals([
             new PromoDeleted($promo->promoId),
-        ], $this->eventDispatcher->releaseDispatchedEvents());
+        ], $this->orderContext->apps()->getEventDispatcher()->releaseDispatchedEvents());
 
         $this->expectException(CouldNotFindPromo::class);
-        $this->orderContext->orderRepos()->promoRepository()->find($promo->promoId);
+        $this->orderContext->repos()->promoRepository()->find($promo->promoId);
     }
 }

@@ -19,7 +19,7 @@ class ProductDataTest extends ProductContext
             'title' => ['nl' => 'title nl', 'en' => 'title en'],
         ]);
 
-        $productDetail = $this->catalogContext->catalogRepos()->productDetailRepository()->findProductDetail($product->getVariants()[0]->variantId);
+        $productDetail = $this->catalogContext->repos()->productDetailRepository()->findProductDetail($product->getVariants()[0]->variantId);
 
         // Default test locale is nl
         $this->assertEquals('title nl', $productDetail->getTitle());

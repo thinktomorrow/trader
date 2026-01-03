@@ -21,16 +21,16 @@ class RefreshCartVatTest extends CartContext
         $this->whenIAddTheVariantToTheCart('product-aaa-variant-aaa', 1);
 
         // Check unchanged line first
-        $cart = $this->orderContext->orderRepos()->cartRepository()->findCart(OrderId::fromString('xxx'));
+        $cart = $this->orderContext->repos()->cartRepository()->findCart(OrderId::fromString('xxx'));
         $lineTaxRate = $cart->getLines()[0]->getVatRate();
         $this->assertEquals('20', $lineTaxRate->get());
 
         // Change billing country to NL
         $this->givenOrderHasABillingCountry('NL');
 
-        $this->orderContext->orderApps()->cartApplication()->refresh(new RefreshCart('xxx'));
+        $this->orderContext->apps()->cartApplication()->refresh(new RefreshCart('xxx'));
 
-        $cart = $this->orderContext->orderRepos()->cartRepository()->findCart(OrderId::fromString('xxx'));
+        $cart = $this->orderContext->repos()->cartRepository()->findCart(OrderId::fromString('xxx'));
         $lineTaxRate = $cart->getLines()[0]->getVatRate();
         $this->assertEquals('10', $lineTaxRate->get());
     }
@@ -46,16 +46,16 @@ class RefreshCartVatTest extends CartContext
         $this->whenIAddTheVariantToTheCart('aaa-variant-aaa', 1);
 
         // Check unchanged line first
-        $cart = $this->orderContext->orderRepos()->cartRepository()->findCart(OrderId::fromString('xxx'));
+        $cart = $this->orderContext->repos()->cartRepository()->findCart(OrderId::fromString('xxx'));
         $lineTaxRate = $cart->getLines()[0]->getVatRate();
         $this->assertEquals('20', $lineTaxRate->get());
 
         // Change billing country to NL
         $this->givenOrderHasABillingCountry('NL');
 
-        $this->orderContext->orderApps()->cartApplication()->refresh(new RefreshCart('xxx'));
+        $this->orderContext->apps()->cartApplication()->refresh(new RefreshCart('xxx'));
 
-        $cart = $this->orderContext->orderRepos()->cartRepository()->findCart(OrderId::fromString('xxx'));
+        $cart = $this->orderContext->repos()->cartRepository()->findCart(OrderId::fromString('xxx'));
         $lineTaxRate = $cart->getLines()[0]->getVatRate();
         $this->assertEquals('15', $lineTaxRate->get());
     }
@@ -67,14 +67,14 @@ class RefreshCartVatTest extends CartContext
         $this->whenIAddTheVariantToTheCart('aaa-variant-aaa', 1);
 
         // Check unchanged line first
-        $cart = $this->orderContext->orderRepos()->cartRepository()->findCart(OrderId::fromString('xxx'));
+        $cart = $this->orderContext->repos()->cartRepository()->findCart(OrderId::fromString('xxx'));
         $lineTaxRate = $cart->getLines()[0]->getVatRate();
         $this->assertEquals('20', $lineTaxRate->get());
 
         $this->givenOrderHasABillingCountry('FR');
 
-        $this->orderContext->orderApps()->cartApplication()->refresh(new RefreshCart('xxx'));
-        $cart = $this->orderContext->orderRepos()->cartRepository()->findCart(OrderId::fromString('xxx'));
+        $this->orderContext->apps()->cartApplication()->refresh(new RefreshCart('xxx'));
+        $cart = $this->orderContext->repos()->cartRepository()->findCart(OrderId::fromString('xxx'));
 
         $lineTaxRate = $cart->getLines()[0]->getVatRate();
         $this->assertEquals('20', $lineTaxRate->get());

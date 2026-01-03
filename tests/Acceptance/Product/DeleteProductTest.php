@@ -20,14 +20,14 @@ class DeleteProductTest extends ProductContext
     {
         $product = $this->catalogContext->createProduct();
 
-        $this->catalogContext->catalogApps()->productApplication()->deleteProduct(new DeleteProduct($product->productId->get()));
+        $this->catalogContext->apps()->productApplication()->deleteProduct(new DeleteProduct($product->productId->get()));
 
         $this->assertEquals([
             new ProductDeleted($product->productId),
-        ], $this->catalogContext->catalogApps()->getEventDispatcher()->releaseDispatchedEvents());
+        ], $this->catalogContext->apps()->getEventDispatcher()->releaseDispatchedEvents());
 
         $this->expectException(CouldNotFindProduct::class);
-        $this->catalogContext->catalogRepos()->productRepository()->find($product->productId);
+        $this->catalogContext->repos()->productRepository()->find($product->productId);
     }
 
     public function test_it_can_delete_a_variant()
@@ -39,12 +39,12 @@ class DeleteProductTest extends ProductContext
 
         $variantId = $product->getVariants()[0]->variantId;
 
-        $this->catalogContext->catalogApps()->productApplication()->deleteVariant(new DeleteVariant($product->productId->get(), $variantId->get()));
+        $this->catalogContext->apps()->productApplication()->deleteVariant(new DeleteVariant($product->productId->get(), $variantId->get()));
 
         $this->assertEquals([
             new VariantDeleted($product->productId, $variantId),
             new ProductTaxaUpdated($product->productId), // because of the InMemoryRepo implementation.
-        ], $this->catalogContext->catalogApps()->getEventDispatcher()->releaseDispatchedEvents());
+        ], $this->catalogContext->apps()->getEventDispatcher()->releaseDispatchedEvents());
     }
 
     public function test_it_cannot_delete_last_remaining_variant()
@@ -54,8 +54,8 @@ class DeleteProductTest extends ProductContext
         $product = $this->catalogContext->createProduct();
         $variantId = $product->getVariants()[0]->variantId;
 
-        $this->catalogContext->catalogApps()->productApplication()->deleteVariant(new DeleteVariant($product->productId->get(), $variantId->get()));
+        $this->catalogContext->apps()->productApplication()->deleteVariant(new DeleteVariant($product->productId->get(), $variantId->get()));
 
-        $this->assertCount(1, $this->catalogContext->catalogRepos()->productRepository()->find($product->productId)->getVariants());
+        $this->assertCount(1, $this->catalogContext->repos()->productRepository()->find($product->productId)->getVariants());
     }
 }

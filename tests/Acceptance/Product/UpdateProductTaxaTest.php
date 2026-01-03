@@ -22,9 +22,9 @@ class UpdateProductTaxaTest extends ProductContext
         $product = $this->catalogContext->createProduct();
         $productId = $product->productId;
 
-        $this->catalogContext->catalogApps()->productApplication()->updateProductTaxa(new UpdateProductTaxa($productId->get(), ['taxon-aaa', 'taxon-bbb'], ['taxonomy-aaa']));
+        $this->catalogContext->apps()->productApplication()->updateProductTaxa(new UpdateProductTaxa($productId->get(), ['taxon-aaa', 'taxon-bbb'], ['taxonomy-aaa']));
 
-        $product = $this->catalogContext->catalogRepos()->productRepository()->find($productId);
+        $product = $this->catalogContext->repos()->productRepository()->find($productId);
 
         $this->assertContainsOnlyInstancesOf(ProductTaxon::class, $product->getProductTaxa());
         $this->assertCount(2, $product->getChildEntities()[ProductTaxon::class]);
@@ -46,7 +46,7 @@ class UpdateProductTaxaTest extends ProductContext
         $this->assertEquals([
             new ProductTaxaUpdated($productId), // Duplicate because of the InMemoryRepo implementation.
             new ProductTaxaUpdated($productId),
-        ], $this->catalogContext->catalogApps()->getEventDispatcher()->releaseDispatchedEvents());
+        ], $this->catalogContext->apps()->getEventDispatcher()->releaseDispatchedEvents());
     }
 
     public function test_it_can_add_taxa_without_taxonomy_scope()
@@ -55,9 +55,9 @@ class UpdateProductTaxaTest extends ProductContext
         $product = $this->catalogContext->createProduct();
         $productId = $product->productId;
 
-        $this->catalogContext->catalogApps()->productApplication()->updateProductTaxa(new UpdateProductTaxa($productId->get(), ['taxon-aaa']));
+        $this->catalogContext->apps()->productApplication()->updateProductTaxa(new UpdateProductTaxa($productId->get(), ['taxon-aaa']));
 
-        $product = $this->catalogContext->catalogRepos()->productRepository()->find($productId);
+        $product = $this->catalogContext->repos()->productRepository()->find($productId);
 
         $this->assertContainsOnlyInstancesOf(ProductTaxon::class, $product->getProductTaxa());
         $this->assertCount(1, $product->getChildEntities()[ProductTaxon::class]);
@@ -73,7 +73,7 @@ class UpdateProductTaxaTest extends ProductContext
         $this->assertEquals([
             new ProductTaxaUpdated($productId), // Duplicate because of the InMemoryRepo implementation.
             new ProductTaxaUpdated($productId),
-        ], $this->catalogContext->catalogApps()->getEventDispatcher()->releaseDispatchedEvents());
+        ], $this->catalogContext->apps()->getEventDispatcher()->releaseDispatchedEvents());
     }
 
     public function test_it_can_remove_taxa()
@@ -81,16 +81,16 @@ class UpdateProductTaxaTest extends ProductContext
         $product = $this->catalogContext->createProduct();
         $productId = $product->productId;
 
-        $this->catalogContext->catalogApps()->productApplication()->updateProductTaxa(new UpdateProductTaxa($productId->get(), [], []));
+        $this->catalogContext->apps()->productApplication()->updateProductTaxa(new UpdateProductTaxa($productId->get(), [], []));
 
-        $product = $this->catalogContext->catalogRepos()->productRepository()->find($productId);
+        $product = $this->catalogContext->repos()->productRepository()->find($productId);
 
         $this->assertCount(0, $product->getChildEntities()[ProductTaxon::class]);
 
         $this->assertEquals([
             new ProductTaxaUpdated($productId), // Duplicate because of the InMemoryRepo implementation.
             new ProductTaxaUpdated($productId),
-        ], $this->catalogContext->catalogApps()->getEventDispatcher()->releaseDispatchedEvents());
+        ], $this->catalogContext->apps()->getEventDispatcher()->releaseDispatchedEvents());
     }
 
     public function test_when_removing_taxa_all_corresponding_variant_properties_on_variants_are_removed_as_well()
@@ -104,14 +104,14 @@ class UpdateProductTaxaTest extends ProductContext
         $this->catalogContext->linkProductToTaxon($productId->get(), $taxon->taxonId->get());
         $this->catalogContext->linkVariantToTaxon($productId->get(), $variantId->get(), $taxon->taxonId->get());
 
-        $this->catalogContext->catalogRepos()->productRepository()->save($product);
+        $this->catalogContext->repos()->productRepository()->save($product);
 
         $this->assertCount(1, $product->getProductTaxa());
         $this->assertCount(1, $product->getVariants()[0]->getVariantTaxa());
 
-        $this->catalogContext->catalogApps()->productApplication()->updateProductTaxa(new UpdateProductTaxa($product->productId->get(), [], []));
+        $this->catalogContext->apps()->productApplication()->updateProductTaxa(new UpdateProductTaxa($product->productId->get(), [], []));
 
-        $product = $this->catalogContext->catalogRepos()->productRepository()->find($product->productId);
+        $product = $this->catalogContext->repos()->productRepository()->find($product->productId);
 
         $this->assertCount(0, $product->getProductTaxa());
         $this->assertCount(0, $product->getVariants()[0]->getVariantTaxa());
@@ -129,7 +129,7 @@ class UpdateProductTaxaTest extends ProductContext
         $this->catalogContext->linkProductToTaxon($productId->get(), $taxon->taxonId->get());
         $this->catalogContext->linkVariantToTaxon($productId->get(), $variantId->get(), $taxon->taxonId->get());
 
-        $this->catalogContext->catalogRepos()->productRepository()->save($product);
+        $this->catalogContext->repos()->productRepository()->save($product);
 
         $this->assertCount(1, $product->getProductTaxa());
         $this->assertCount(1, $product->getVariants()[0]->getVariantTaxa());
@@ -137,7 +137,7 @@ class UpdateProductTaxaTest extends ProductContext
         // Add a different taxon, existing variant taxa remain intact.
         $this->catalogContext->linkProductToTaxon($productId->get(), $taxon2->taxonId->get());
 
-        $product = $this->catalogContext->catalogRepos()->productRepository()->find($product->productId);
+        $product = $this->catalogContext->repos()->productRepository()->find($product->productId);
 
         $this->assertCount(2, $product->getProductTaxa());
         $this->assertEquals('taxon-aaa', $product->getProductTaxa()[0]->taxonId->get());

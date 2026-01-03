@@ -50,14 +50,14 @@ abstract class StateContext extends TestCase
     {
         parent::setUp();
 
-        $this->orderContext->orderRepos()->orderRepository() = new InMemoryOrderRepository();
+        $this->orderContext->repos()->orderRepository() = new InMemoryOrderRepository();
         $this->orderStateMachine = new OrderStateMachine(DefaultOrderState::cases(), DefaultOrderState::getTransitions());
         $this->paymentStateMachine = new PaymentStateMachine(DefaultPaymentState::cases(), DefaultPaymentState::getTransitions());
         $this->shippingStateMachine = new ShippingStateMachine(DefaultShippingState::cases(), DefaultShippingState::getTransitions());
         $this->vatExemptionApplication = new VatExemptionApplication(new TestTraderConfig());
 
         $this->orderStateApplication = new OrderStateApplication(
-            $this->orderContext->orderRepos()->orderRepository(),
+            $this->orderContext->repos()->orderRepository(),
             $this->orderStateMachine,
             $this->paymentStateMachine,
             $this->shippingStateMachine,
@@ -72,12 +72,12 @@ abstract class StateContext extends TestCase
             new TestContainer(),
             new InMemoryVariantRepository(),
             new DefaultAdjustLine(),
-            $this->orderContext->orderRepos()->orderRepository(),
+            $this->orderContext->repos()->orderRepository(),
             $this->orderStateMachine,
             new RefreshCartAction(),
             new InMemoryShippingProfileRepository(),
-            new UpdateShippingProfileOnOrder(new TestContainer(), new TestTraderConfig(), $this->orderContext->orderRepos()->orderRepository(), new InMemoryShippingProfileRepository(), new FindVatRateForOrder(new TestTraderConfig(), $this->vatExemptionApplication, new InMemoryVatRateRepository(new TestTraderConfig()))),
-            new UpdatePaymentMethodOnOrder(new TestContainer(), new TestTraderConfig(), $this->orderContext->orderRepos()->orderRepository(), new DefaultVerifyPaymentMethodForCart(), new InMemoryPaymentMethodRepository(), new FindVatRateForOrder(new TestTraderConfig(), $this->vatExemptionApplication, new InMemoryVatRateRepository(new TestTraderConfig()))),
+            new UpdateShippingProfileOnOrder(new TestContainer(), new TestTraderConfig(), $this->orderContext->repos()->orderRepository(), new InMemoryShippingProfileRepository(), new FindVatRateForOrder(new TestTraderConfig(), $this->vatExemptionApplication, new InMemoryVatRateRepository(new TestTraderConfig()))),
+            new UpdatePaymentMethodOnOrder(new TestContainer(), new TestTraderConfig(), $this->orderContext->repos()->orderRepository(), new DefaultVerifyPaymentMethodForCart(), new InMemoryPaymentMethodRepository(), new FindVatRateForOrder(new TestTraderConfig(), $this->vatExemptionApplication, new InMemoryVatRateRepository(new TestTraderConfig()))),
             new InMemoryCustomerRepository(),
             $this->eventDispatcher,
             $this->vatNumberApplication,
@@ -88,7 +88,7 @@ abstract class StateContext extends TestCase
     protected function assertOrderStateTransition(string $transitionMethod, DefaultOrderState $currentState, DefaultOrderState $newState, $useCartApplication = false)
     {
         $order = $this->createOrder(['order_id' => 'xxx', 'order_state' => $currentState]);
-        $this->orderContext->orderRepos()->orderRepository()->save($order);
+        $this->orderContext->repos()->orderRepository()->save($order);
 
 
         if ($useCartApplication) {
@@ -99,7 +99,7 @@ abstract class StateContext extends TestCase
             $this->orderStateApplication->$transitionMethod(new $transitionClass($order->orderId->get()));
         }
 
-        $order = $this->orderContext->orderRepos()->orderRepository()->find($order->orderId);
+        $order = $this->orderContext->repos()->orderRepository()->find($order->orderId);
         $this->assertEquals($newState, $order->getOrderState());
     }
 
@@ -117,12 +117,12 @@ abstract class StateContext extends TestCase
         $order = $this->createOrder(['order_id' => 'xxx', 'order_state' => $orderState], [], [], [], [
             $payment = $this->createOrderPayment(['payment_state' => $currentState]),
         ]);
-        $this->orderContext->orderRepos()->orderRepository()->save($order);
+        $this->orderContext->repos()->orderRepository()->save($order);
 
         $transitionClass = 'Thinktomorrow\\Trader\\Application\\Order\\State\\Payment\\' . ucfirst($transitionMethod);
         $this->orderStateApplication->$transitionMethod(new $transitionClass($order->orderId->get(), $payment->paymentId->get()));
 
-        $order = $this->orderContext->orderRepos()->orderRepository()->find($order->orderId);
+        $order = $this->orderContext->repos()->orderRepository()->find($order->orderId);
         $this->assertEquals($newState, $order->getPayments()[0]->getPaymentState());
 
         if ($newOrderState) {
@@ -139,12 +139,12 @@ abstract class StateContext extends TestCase
         $order = $this->createOrder(['order_id' => 'xxx', 'order_state' => $orderState], [], [], [
             $shipping = $this->orderContext->createShipping(['shipping_state' => $currentState]),
         ]);
-        $this->orderContext->orderRepos()->orderRepository()->save($order);
+        $this->orderContext->repos()->orderRepository()->save($order);
 
         $transitionClass = 'Thinktomorrow\\Trader\\Application\\Order\\State\\Shipping\\' . ucfirst($transitionMethod);
         $this->orderStateApplication->$transitionMethod(new $transitionClass($order->orderId->get(), $shipping->shippingId->get()));
 
-        $order = $this->orderContext->orderRepos()->orderRepository()->find($order->orderId);
+        $order = $this->orderContext->repos()->orderRepository()->find($order->orderId);
         $this->assertEquals($newState, $order->getShippings()[0]->getShippingState());
 
         if ($newOrderState) {

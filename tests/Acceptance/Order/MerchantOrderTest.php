@@ -59,7 +59,7 @@ class MerchantOrderTest extends CartContext
 
     public function test_as_a_merchant_i_need_to_be_able_to_see_each_line_of_my_cart()
     {
-        $this->orderContext->orderRepos()->orderRepository()->setNextLineReference('foobar');
+        $this->orderContext->repos()->orderRepository()->setNextLineReference('foobar');
 
         $this->givenThereIsAProductWhichCostsEur('lightsaber', 5);
         $this->whenIAddTheVariantToTheCart('lightsaber-variant-aaa', 2);

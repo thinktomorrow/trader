@@ -18,8 +18,8 @@ class MissingVariantsTest extends ProductContext
         parent::setUp();
 
         $this->missingOptionCombinations = new MissingVariants(
-            $this->catalogContext->catalogRepos()->taxonomyRepository(),
-            $this->catalogContext->catalogRepos()->taxonRepository(),
+            $this->catalogContext->repos()->taxonomyRepository(),
+            $this->catalogContext->repos()->taxonRepository(),
         );
     }
 

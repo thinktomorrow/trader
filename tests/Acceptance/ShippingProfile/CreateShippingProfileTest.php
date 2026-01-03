@@ -23,7 +23,7 @@ class CreateShippingProfileTest extends ShippingProfileContext
             ['foo' => 'bar']
         ));
 
-        $shippingProfile = $this->orderContext->orderRepos()->shippingProfileRepository()->find($shippingProfileId);
+        $shippingProfile = $this->orderContext->repos()->shippingProfileRepository()->find($shippingProfileId);
 
         $this->assertInstanceOf(ShippingProfileId::class, $shippingProfileId);
         $this->assertEquals($shippingProfileId, $shippingProfile->shippingProfileId);
@@ -48,7 +48,7 @@ class CreateShippingProfileTest extends ShippingProfileContext
         $tariffId = $this->shippingProfileApplication->createTariff(new CreateTariff($shippingProfileId->get(), '50', '10', '30'));
 
         $this->assertInstanceOf(TariffId::class, $tariffId);
-        $this->assertInstanceOf(Tariff::class, $tariff = $this->orderContext->orderRepos()->shippingProfileRepository()->find($shippingProfileId)->findTariff($tariffId));
+        $this->assertInstanceOf(Tariff::class, $tariff = $this->orderContext->repos()->shippingProfileRepository()->find($shippingProfileId)->findTariff($tariffId));
         $this->assertEquals(Money::EUR('50'), $tariff->getRate());
         $this->assertEquals('10', $tariff->getMappedData()['from']);
         $this->assertEquals('30', $tariff->getMappedData()['to']);

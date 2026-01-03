@@ -53,10 +53,10 @@ class TestCase extends \PHPUnit\Framework\TestCase
 
     private function addInstancesToContainer()
     {
-//        $this->orderContext->orderRepos()->orderRepository() = new InMemoryOrderRepository();
-//        $this->orderContext->orderRepos()->paymentMethodRepository() = new InMemoryPaymentMethodRepository();
+//        $this->orderContext->repos()->orderRepository() = new InMemoryOrderRepository();
+//        $this->orderContext->repos()->paymentMethodRepository() = new InMemoryPaymentMethodRepository();
 
         //        (new TestContainer())->add(VerifyPaymentMethodForCart::class, new DefaultVerifyPaymentMethodForCart());
-        //        (new TestContainer())->add(UpdatePaymentMethodOnOrder::class, new UpdatePaymentMethodOnOrder(new TestContainer(), new TestTraderConfig(), $this->orderContext->orderRepos()->orderRepository(), (new TestContainer())->get(VerifyPaymentMethodForCart::class), $this->orderContext->orderRepos()->paymentMethodRepository()));
+        //        (new TestContainer())->add(UpdatePaymentMethodOnOrder::class, new UpdatePaymentMethodOnOrder(new TestContainer(), new TestTraderConfig(), $this->orderContext->repos()->orderRepository(), (new TestContainer())->get(VerifyPaymentMethodForCart::class), $this->orderContext->repos()->paymentMethodRepository()));
     }
 }

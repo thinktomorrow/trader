@@ -81,13 +81,13 @@ abstract class CartContext extends TestCase
 //        (new TestContainer())->add(PaymentState::class, DefaultPaymentState::class);
 //
 //        $this->catalogContextcatalogRepos()->->productRepository() = new InMemoryProductRepository();
-//        $this->>catalogContext->catalogRepos()->variantRepository() = new InMemoryVariantRepository();
+//        $this->>catalogContext->repos()->variantRepository() = new InMemoryVariantRepository();
 //        $this->cartRepository = new InMemoryCartRepository();
 //        $this->merchantOrderRepository = new InMemoryMerchantOrderRepository();
-//        $this->orderContext->orderRepos()->vatRateRepository() = new InMemoryVatRateRepository(new TestTraderConfig());
+//        $this->orderContext->repos()->vatRateRepository() = new InMemoryVatRateRepository(new TestTraderConfig());
 //        $this->vatExemptionApplication = new VatExemptionApplication(new TestTraderConfig());
-//        $this->findVatRateForOrder = new FindVatRateForOrder(new TestTraderConfig(), $this->vatExemptionApplication, $this->orderContext->orderRepos()->vatRateRepository());
-//        $this->orderContext->orderRepos()->promoRepository() = new InMemoryPromoRepository(
+//        $this->findVatRateForOrder = new FindVatRateForOrder(new TestTraderConfig(), $this->vatExemptionApplication, $this->orderContext->repos()->vatRateRepository());
+//        $this->orderContext->repos()->promoRepository() = new InMemoryPromoRepository(
 //            new DiscountFactory([
 //                FixedAmountDiscount::class,
 //                PercentageOffOrderDiscount::class,
@@ -103,12 +103,12 @@ abstract class CartContext extends TestCase
 //        );
 
         // Adjusters are loaded via container so set them up here
-//        (new TestContainer())->add(InvoiceRepository::class, $this->>orderContext->orderRepos()->orderRepository());
-//        (new TestContainer())->add(ApplyPromoToOrder::class, new ApplyPromoToOrder($this->>orderContext->orderRepos()->orderRepository()));
+//        (new TestContainer())->add(InvoiceRepository::class, $this->>orderContext->repos()->orderRepository());
+//        (new TestContainer())->add(ApplyPromoToOrder::class, new ApplyPromoToOrder($this->>orderContext->repos()->orderRepository()));
 //        (new TestContainer())->add(AdjustLine::class, new DefaultAdjustLine());
 //        (new TestContainer())->add(AdjustLines::class, new AdjustLines(new InMemoryVariantRepository(), TestContainer::make(AdjustLine::class)));
-//        (new TestContainer())->add(AdjustVatRates::class, new AdjustVatRates($this->>catalogContext->catalogRepos()->variantRepository(), new FindVatRateForOrder(new TestTraderConfig(), new VatExemptionApplication(new TestTraderConfig()), $this->orderContext->orderRepos()->vatRateRepository())));
-//        (new TestContainer())->add(AdjustDiscounts::class, new AdjustDiscounts($this->orderContext->orderRepos()->promoRepository(), (new TestContainer())->get(ApplyPromoToOrder::class)));
+//        (new TestContainer())->add(AdjustVatRates::class, new AdjustVatRates($this->>catalogContext->repos()->variantRepository(), new FindVatRateForOrder(new TestTraderConfig(), new VatExemptionApplication(new TestTraderConfig()), $this->orderContext->repos()->vatRateRepository())));
+//        (new TestContainer())->add(AdjustDiscounts::class, new AdjustDiscounts($this->orderContext->repos()->promoRepository(), (new TestContainer())->get(ApplyPromoToOrder::class)));
 //        (new TestContainer())->add(OrderStateMachine::class, new OrderStateMachine([
 //            ...DefaultOrderState::customerStates(), DefaultOrderState::confirmed,
 //        ], [
@@ -119,41 +119,41 @@ abstract class CartContext extends TestCase
 //        $this->vatNumberValidator = new DummyVatNumberValidator();
 //        $this->vatNumberApplication = new VatNumberApplication($this->vatNumberValidator);
 //
-//        $this->orderContext->orderApps()->cartApplication() = new CartApplication(
+//        $this->orderContext->apps()->cartApplication() = new CartApplication(
 //            new TestTraderConfig(),
 //            new TestContainer(),
-//            $this->>catalogContext->catalogRepos()->variantRepository(),
+//            $this->>catalogContext->repos()->variantRepository(),
 //            TestContainer::make(AdjustLine::class),
-//            $this->>orderContext->orderRepos()->orderRepository(),
+//            $this->>orderContext->repos()->orderRepository(),
 //            (new TestContainer())->get(OrderStateMachine::class),
 //            new RefreshCartAction(),
-//            $this->orderContext->orderRepos()->shippingProfileRepository() = new InMemoryShippingProfileRepository(),
-//            $this->updateShippingProfileOnOrder = new UpdateShippingProfileOnOrder(new TestContainer(), new TestTraderConfig(), $this->>orderContext->orderRepos()->orderRepository(), $this->orderContext->orderRepos()->shippingProfileRepository(), $this->findVatRateForOrder),
-//            $this->updatePaymentMethodOnOrder = new UpdatePaymentMethodOnOrder(new TestContainer(), new TestTraderConfig(), $this->>orderContext->orderRepos()->orderRepository(), new DefaultVerifyPaymentMethodForCart(), $this->orderContext->orderRepos()->paymentMethodRepository(), $this->findVatRateForOrder),
-//            $this->orderContext->orderRepos()->customerRepository() = new InMemoryCustomerRepository(),
+//            $this->orderContext->repos()->shippingProfileRepository() = new InMemoryShippingProfileRepository(),
+//            $this->updateShippingProfileOnOrder = new UpdateShippingProfileOnOrder(new TestContainer(), new TestTraderConfig(), $this->>orderContext->repos()->orderRepository(), $this->orderContext->repos()->shippingProfileRepository(), $this->findVatRateForOrder),
+//            $this->updatePaymentMethodOnOrder = new UpdatePaymentMethodOnOrder(new TestContainer(), new TestTraderConfig(), $this->>orderContext->repos()->orderRepository(), new DefaultVerifyPaymentMethodForCart(), $this->orderContext->repos()->paymentMethodRepository(), $this->findVatRateForOrder),
+//            $this->orderContext->repos()->customerRepository() = new InMemoryCustomerRepository(),
 //            $this->eventDispatcher = new EventDispatcherSpy(),
 //            $this->vatNumberApplication,
 //            $this->vatExemptionApplication,
 //        );
 //
-//        $this->catalogContext->catalogApps()->productApplication() = new ProductApplication(
+//        $this->catalogContext->apps()->productApplication() = new ProductApplication(
 //            new TestTraderConfig(),
 //            $this->eventDispatcher,
 //            $this->catalogContextcatalogRepos()->->productRepository(),
-//            $this->>catalogContext->catalogRepos()->variantRepository(),
+//            $this->>catalogContext->repos()->variantRepository(),
 //        );
 //
 //        $this->promoApplication = new CouponPromoApplication(
 //            new TestTraderConfig(),
 //            new TestContainer(),
-//            $this->>orderContext->orderRepos()->orderRepository(),
-//            $this->orderContext->orderRepos()->promoRepository(),
+//            $this->>orderContext->repos()->orderRepository(),
+//            $this->orderContext->repos()->promoRepository(),
 //            (new TestContainer())->get(ApplyPromoToOrder::class),
 //            $this->eventDispatcher,
 //        );
 //
 //        $this->customerApplication = new CustomerApplication(
-//            $this->orderContext->orderRepos()->customerRepository(),
+//            $this->orderContext->repos()->customerRepository(),
 //            $this->eventDispatcher,
 //        );
 //
@@ -163,7 +163,7 @@ abstract class CartContext extends TestCase
 //        ));
 //
 //        $this->merchantOrderApplication = new MerchantOrderApplication(
-//            $this->>orderContext->orderRepos()->orderRepository(),
+//            $this->>orderContext->repos()->orderRepository(),
 //            $this->eventDispatcher,
 //            $this->vatNumberApplication,
 //        );
@@ -190,25 +190,25 @@ abstract class CartContext extends TestCase
 
     protected function givenThereIsAProductPersonalisation($productTitle, array $personalisations)
     {
-        $product = $this->catalogContext->catalogRepos()->productRepository()->find(ProductId::fromString($productTitle));
+        $product = $this->catalogContext->repos()->productRepository()->find(ProductId::fromString($productTitle));
 
-        $this->catalogContext->catalogApps()->productApplication()->updateProductPersonalisations(new UpdateProductPersonalisations($product->productId->get(), $personalisations));
+        $this->catalogContext->apps()->productApplication()->updateProductPersonalisations(new UpdateProductPersonalisations($product->productId->get(), $personalisations));
 
-        Assert::assertCount(count($personalisations), $this->catalogContext->catalogRepos()->productRepository()->find(ProductId::fromString($productTitle))->getPersonalisations());
+        Assert::assertCount(count($personalisations), $this->catalogContext->repos()->productRepository()->find(ProductId::fromString($productTitle))->getPersonalisations());
     }
 
     public function givenOrderHasAShippingCountry(string $country)
     {
         $order = $this->getOrder();
 
-        $this->orderContext->orderApps()->cartApplication()->updateShippingAddress(new UpdateShippingAddress($order->orderId->get(), $country));
+        $this->orderContext->apps()->cartApplication()->updateShippingAddress(new UpdateShippingAddress($order->orderId->get(), $country));
     }
 
     public function givenOrderHasABillingCountry(string $country)
     {
         $order = $this->getOrder();
 
-        $this->orderContext->orderApps()->cartApplication()->updateBillingAddress(new UpdateBillingAddress($order->orderId->get(), $country));
+        $this->orderContext->apps()->cartApplication()->updateBillingAddress(new UpdateBillingAddress($order->orderId->get(), $country));
     }
 
     public function givenShippingCostsForAPurchaseOfEur($shippingCost, $from, $to, array $countries = ['BE'], string $shippingProfileId = 'bpost_home', bool $requiredAddress = true)
@@ -226,7 +226,7 @@ abstract class CartContext extends TestCase
 
         $shippingProfile->addTariff(
             Tariff::create(
-                $this->orderContext->orderRepos()->shippingProfileRepository()->nextTariffReference(),
+                $this->orderContext->repos()->shippingProfileRepository()->nextTariffReference(),
                 $shippingProfile->shippingProfileId,
                 Cash::make($shippingCost * 100),
                 Cash::make($from * 100),
@@ -234,7 +234,7 @@ abstract class CartContext extends TestCase
             )
         );
 
-        $this->orderContext->orderRepos()->shippingProfileRepository()->save($shippingProfile);
+        $this->orderContext->repos()->shippingProfileRepository()->save($shippingProfile);
     }
 
     public function givenPaymentMethod($paymentRate, string $paymentMethodId = 'visa')
@@ -246,7 +246,7 @@ abstract class CartContext extends TestCase
         );
         $paymentMethod->addData(['title' => ['nl' => Str::headline($paymentMethodId)]]);
 
-        $this->orderContext->orderRepos()->paymentMethodRepository()->save($paymentMethod);
+        $this->orderContext->repos()->paymentMethodRepository()->save($paymentMethod);
     }
 
     public function givenThereIsAVatRate(string $countryId = 'NL', string $vatRateValue = '21', string $vatRateId = 'taxrates-nl'): VatRate
@@ -259,35 +259,35 @@ abstract class CartContext extends TestCase
         );
         $vatRate->addData(['title' => ['nl' => Str::headline($vatRateId)]]);
 
-        $this->orderContext->orderRepos()->vatRateRepository()->save($vatRate);
+        $this->orderContext->repos()->vatRateRepository()->save($vatRate);
 
         return $vatRate;
     }
 
     public function givenVatRateHasBaseRateOf(VatRateId $vatRateId, VatRateId $originVatRateId, ?string $baseRateId = null)
     {
-        $vatRate = $this->orderContext->orderRepos()->vatRateRepository()->find($vatRateId);
-        $baseVatRate = $this->orderContext->orderRepos()->vatRateRepository()->find($originVatRateId);
+        $vatRate = $this->orderContext->repos()->vatRateRepository()->find($vatRateId);
+        $baseVatRate = $this->orderContext->repos()->vatRateRepository()->find($originVatRateId);
         $vatRate->addBaseRate(BaseRate::create(
-            $baseRateId ?: $this->orderContext->orderRepos()->vatRateRepository()->nextBaseRateReference(),
+            $baseRateId ?: $this->orderContext->repos()->vatRateRepository()->nextBaseRateReference(),
             $originVatRateId,
             $vatRateId,
             $baseVatRate->getRate()
         ));
 
-        $this->orderContext->orderRepos()->vatRateRepository()->save($vatRate);
+        $this->orderContext->repos()->vatRateRepository()->save($vatRate);
     }
 
     public function givenACustomerExists(string $email, bool $is_business = false, string $locale = 'nl_BE'): Customer
     {
         $customer = Customer::create(
-            $this->orderContext->orderRepos()->customerRepository()->nextReference(),
+            $this->orderContext->repos()->customerRepository()->nextReference(),
             Email::fromString($email),
             $is_business,
             Locale::fromString($locale)
         );
 
-        $this->orderContext->orderRepos()->customerRepository()->save($customer);
+        $this->orderContext->repos()->customerRepository()->save($customer);
 
         return $customer;
     }
@@ -296,7 +296,7 @@ abstract class CartContext extends TestCase
     {
         $promo = $this->createPromo($mappedData, $discounts ?: [$this->orderContext->createOrderDiscount([], [$this->createCondition()])]);
 
-        $this->orderContext->orderRepos()->promoRepository()->save($promo);
+        $this->orderContext->repos()->promoRepository()->save($promo);
     }
 
     protected function whenIAddTheVariantToTheCart($productVariantId, $quantity = 1, array $data = [], array $personalisations = [])
@@ -306,7 +306,7 @@ abstract class CartContext extends TestCase
         $count = count($order->getLines());
 
         // Add product to order
-        $this->orderContext->orderApps()->cartApplication()->addLine(new AddLine(
+        $this->orderContext->apps()->cartApplication()->addLine(new AddLine(
             $order->orderId->get(),
             VariantId::fromString($productVariantId)->get(),
             Quantity::fromInt((int)$quantity)->asInt(),
@@ -315,7 +315,7 @@ abstract class CartContext extends TestCase
         ));
 
         $checkFlag = false;
-        $lines = $this->orderContext->orderRepos()->orderRepository()->find($order->orderId)->getLines();
+        $lines = $this->orderContext->repos()->orderRepository()->find($order->orderId)->getLines();
         foreach ($lines as $line) {
             if ($line->getPurchasableReference()->getId() == $productVariantId) {
                 $checkFlag = true;
@@ -329,10 +329,10 @@ abstract class CartContext extends TestCase
 
     protected function whenIAddTheFirstVariantToTheCart($productVariantId, $quantity = 1, array $data = [], array $personalisations = [])
     {
-        $orderId = $this->orderContext->orderApps()->cartApplication()->createNewOrder();
+        $orderId = $this->orderContext->apps()->cartApplication()->createNewOrder();
 
         // Add product to a new order
-        $this->orderContext->orderApps()->cartApplication()->addLine(new AddLine(
+        $this->orderContext->apps()->cartApplication()->addLine(new AddLine(
             $orderId->get(),
             VariantId::fromString($productVariantId)->get(),
             Quantity::fromInt((int)$quantity)->asInt(),
@@ -341,7 +341,7 @@ abstract class CartContext extends TestCase
         ));
 
         $checkFlag = false;
-        $lines = $this->orderContext->orderRepos()->orderRepository()->find($orderId)->getLines();
+        $lines = $this->orderContext->repos()->orderRepository()->find($orderId)->getLines();
         foreach ($lines as $line) {
             if ($line->getPurchasableReference()->getId() == $productVariantId) {
                 $checkFlag = true;
@@ -366,7 +366,7 @@ abstract class CartContext extends TestCase
             }
         }
 
-        $this->orderContext->orderApps()->cartApplication()->changeLineQuantity(new ChangeLineQuantity(
+        $this->orderContext->apps()->cartApplication()->changeLineQuantity(new ChangeLineQuantity(
             $order->orderId->get(),
             $lineId->get(),
             Quantity::fromInt((int)$quantity)->asInt(),
@@ -386,7 +386,7 @@ abstract class CartContext extends TestCase
             }
         }
 
-        $this->orderContext->orderApps()->cartApplication()->removeLine(new RemoveLine(
+        $this->orderContext->apps()->cartApplication()->removeLine(new RemoveLine(
             $order->orderId->get(),
             $lineId->get(),
         ));
@@ -396,7 +396,7 @@ abstract class CartContext extends TestCase
     {
         $order = $this->getOrder();
 
-        $this->orderContext->orderApps()->cartApplication()->updateShopper(new UpdateShopper(
+        $this->orderContext->apps()->cartApplication()->updateShopper(new UpdateShopper(
             $order->orderId->get(),
             $email,
             $is_business,
@@ -410,9 +410,9 @@ abstract class CartContext extends TestCase
 
     protected function whenIChooseCustomer(string $email)
     {
-        $customer = $this->orderContext->orderRepos()->customerRepository()->findByEmail(Email::fromString($email));
+        $customer = $this->orderContext->repos()->customerRepository()->findByEmail(Email::fromString($email));
 
-        $this->orderContext->orderApps()->cartApplication()->chooseCustomer(new ChooseCustomer(
+        $this->orderContext->apps()->cartApplication()->chooseCustomer(new ChooseCustomer(
             $this->getOrder()->orderId->get(),
             $customer->customerId->get(),
         ));
@@ -420,8 +420,8 @@ abstract class CartContext extends TestCase
 
     protected function thenIShouldHaveProductInTheCart($times, $quantity, string $orderId = 'xxx')
     {
-        $order = $this->orderContext->orderRepos()->orderRepository()->find(OrderId::fromString($orderId));
-        $lines = $this->orderContext->orderRepos()->orderRepository()->find($order->orderId)->getLines();
+        $order = $this->orderContext->repos()->orderRepository()->find(OrderId::fromString($orderId));
+        $lines = $this->orderContext->repos()->orderRepository()->find($order->orderId)->getLines();
 
         Assert::assertCount((int)$times, $lines);
         if (count($lines) > 0) {
@@ -436,7 +436,7 @@ abstract class CartContext extends TestCase
 
     protected function whenIAddShippingAddress(?string $country = null, ?string $line1 = null, ?string $line2 = null, ?string $postalCode = null, ?string $city = null)
     {
-        $this->orderContext->orderApps()->cartApplication()->updateShippingAddress(new UpdateShippingAddress(
+        $this->orderContext->apps()->cartApplication()->updateShippingAddress(new UpdateShippingAddress(
             $this->getOrder()->orderId->get(),
             $country,
             $line1,
@@ -450,7 +450,7 @@ abstract class CartContext extends TestCase
 
     protected function whenIAddBillingAddress(?string $country = null, ?string $line1 = null, ?string $line2 = null, ?string $postalCode = null, ?string $city = null)
     {
-        $this->orderContext->orderApps()->cartApplication()->updateBillingAddress(new UpdateBillingAddress(
+        $this->orderContext->apps()->cartApplication()->updateBillingAddress(new UpdateBillingAddress(
             $this->getOrder()->orderId->get(),
             $country,
             $line1,
@@ -464,7 +464,7 @@ abstract class CartContext extends TestCase
 
     protected function whenIChooseShipping(string $shippingProfileId)
     {
-        $this->orderContext->orderApps()->cartApplication()->chooseShippingProfile(new ChooseShippingProfile(
+        $this->orderContext->apps()->cartApplication()->chooseShippingProfile(new ChooseShippingProfile(
             $this->getOrder()->orderId->get(),
             $shippingProfileId
         ));
@@ -476,7 +476,7 @@ abstract class CartContext extends TestCase
 
     protected function whenIChoosePayment(string $paymentMethodId)
     {
-        $this->orderContext->orderApps()->cartApplication()->choosePaymentMethod(new ChoosePaymentMethod(
+        $this->orderContext->apps()->cartApplication()->choosePaymentMethod(new ChoosePaymentMethod(
             $this->getOrder()->orderId->get(),
             $paymentMethodId
         ));
@@ -493,7 +493,7 @@ abstract class CartContext extends TestCase
 
     protected function thenTheCartItemShouldContainData($productVariantId, $dataKey, $dataValue)
     {
-        $order = $this->orderContext->orderRepos()->orderRepository()->find(OrderId::fromString('xxx'));
+        $order = $this->orderContext->repos()->orderRepository()->find(OrderId::fromString('xxx'));
         $lines = $order->getLines();
 
         // Find matching line by variantId
@@ -514,7 +514,7 @@ abstract class CartContext extends TestCase
 
     protected function refreshCart(): static
     {
-        $this->orderContext->orderApps()->cartApplication()->refresh(new RefreshCart(
+        $this->orderContext->apps()->cartApplication()->refresh(new RefreshCart(
             $this->getOrder()->orderId->get()
         ));
 
@@ -525,9 +525,9 @@ abstract class CartContext extends TestCase
     {
         // Create an order if not already
         try {
-            return $this->orderContext->orderRepos()->orderRepository()->find(OrderId::fromString('xxx'));
+            return $this->orderContext->repos()->orderRepository()->find(OrderId::fromString('xxx'));
         } catch (CouldNotFindOrder $e) {
-            $this->orderContext->orderRepos()->orderRepository()->save($order = Order::create(
+            $this->orderContext->repos()->orderRepository()->save($order = Order::create(
                 OrderId::fromString('xxx'),
                 OrderReference::fromString('xx-ref'),
                 DefaultOrderState::cart_pending,

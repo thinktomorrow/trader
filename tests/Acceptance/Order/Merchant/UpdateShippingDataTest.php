@@ -13,7 +13,7 @@ class UpdateShippingDataTest extends CartContext
     {
         parent::setUp();
 
-        $this->orderContext->orderRepos()->orderRepository() = new InMemoryOrderRepository();
+        $this->orderContext->repos()->orderRepository() = new InMemoryOrderRepository();
     }
 
     public function test_merchant_can_change_shipping_data()
@@ -22,7 +22,7 @@ class UpdateShippingDataTest extends CartContext
             $shipping = $this->orderContext->createShipping(),
         ]);
 
-        $this->orderContext->orderRepos()->orderRepository()->save($order);
+        $this->orderContext->repos()->orderRepository()->save($order);
 
         $this->merchantOrderApplication->updateShippingData(new UpdateShippingData(
             $order->orderId->get(),
@@ -30,7 +30,7 @@ class UpdateShippingDataTest extends CartContext
             ['foo' => 'bar']
         ));
 
-        $order = $this->orderContext->orderRepos()->orderRepository()->find($order->orderId);
+        $order = $this->orderContext->repos()->orderRepository()->find($order->orderId);
 
         $this->assertEquals([
             'foo' => 'bar', 'shipping_profile_id' => $shipping->getShippingProfileId()->get(),

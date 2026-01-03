@@ -30,7 +30,7 @@ class DeleteVatRateTest extends VatRateContext
         ], $this->eventDispatcher->releaseDispatchedEvents());
 
         $this->expectException(CouldNotFindVatRate::class);
-        $this->orderContext->orderRepos()->vatRateRepository()->find($vatRateId);
+        $this->orderContext->repos()->vatRateRepository()->find($vatRateId);
     }
 
     public function test_it_can_delete_a_base_rate()
@@ -47,7 +47,7 @@ class DeleteVatRateTest extends VatRateContext
             new BaseRateDeleted($baseRateId, $targetVatRateId),
         ], $this->eventDispatcher->releaseDispatchedEvents());
 
-        $vatRate = $this->orderContext->orderRepos()->vatRateRepository()->find($targetVatRateId);
+        $vatRate = $this->orderContext->repos()->vatRateRepository()->find($targetVatRateId);
         $this->assertCount(0, $vatRate->getBaseRates());
     }
 }

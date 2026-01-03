@@ -48,12 +48,12 @@ class OrderGridItemTest extends TestCase
         ]), [
             'email' => 'ben@thinktomorrow.be',
             'is_business' => true,
-            'customer_id' => 'ccc-123',
+            'customer_id' => 'taxon-1',
         ]);
 
         $this->assertEquals('ben@thinktomorrow.be', $gridItem->getShopperTitle());
         $this->assertTrue($gridItem->isBusiness());
         $this->assertTrue($gridItem->hasCustomer());
-        $this->assertEquals('/admin/customers/ccc-123', $gridItem->getCustomerUrl());
+        $this->assertEquals('/admin/customers/taxon-1', $gridItem->getCustomerUrl());
     }
 }

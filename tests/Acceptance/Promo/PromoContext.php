@@ -45,7 +45,7 @@ class PromoContext extends TestCase
         $this->promoApplication = new PromoApplication(
             new TestTraderConfig(),
             $this->eventDispatcher = new EventDispatcherSpy(),
-            $this->orderContext->orderRepos()->promoRepository() = new InMemoryPromoRepository(
+            $this->orderContext->repos()->promoRepository() = new InMemoryPromoRepository(
                 (new TestContainer())->get(DiscountFactory::class),
                 (new TestContainer())->get(OrderDiscountFactory::class),
             ),
@@ -55,6 +55,6 @@ class PromoContext extends TestCase
 
     public function tearDown(): void
     {
-        $this->orderContext->orderRepos()->promoRepository()->clear();
+        $this->orderContext->repos()->promoRepository()->clear();
     }
 }

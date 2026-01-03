@@ -38,14 +38,14 @@ class UpdatePromoTest extends PromoContext
         ));
 
         $this->assertInstanceOf(PromoId::class, $promoId);
-        $this->assertEquals('foobar-2', $this->orderContext->orderRepos()->promoRepository()->find($promoId)->getCouponCode());
-        $this->assertEquals('2023-02-02 01:10:10', $this->orderContext->orderRepos()->promoRepository()->find($promoId)->getMappedData()['start_at']);
-        $this->assertEquals('2024-02-02 01:10:10', $this->orderContext->orderRepos()->promoRepository()->find($promoId)->getMappedData()['end_at']);
-        $this->assertTrue($this->orderContext->orderRepos()->promoRepository()->find($promoId)->getMappedData()['is_combinable']);
-        $this->assertEquals(['poo' => 'bar', 'foo' => 'bar'], $this->orderContext->orderRepos()->promoRepository()->find($promoId)->getData());
+        $this->assertEquals('foobar-2', $this->orderContext->repos()->promoRepository()->find($promoId)->getCouponCode());
+        $this->assertEquals('2023-02-02 01:10:10', $this->orderContext->repos()->promoRepository()->find($promoId)->getMappedData()['start_at']);
+        $this->assertEquals('2024-02-02 01:10:10', $this->orderContext->repos()->promoRepository()->find($promoId)->getMappedData()['end_at']);
+        $this->assertTrue($this->orderContext->repos()->promoRepository()->find($promoId)->getMappedData()['is_combinable']);
+        $this->assertEquals(['poo' => 'bar', 'foo' => 'bar'], $this->orderContext->repos()->promoRepository()->find($promoId)->getData());
 
-        $this->assertCount(1, $this->orderContext->orderRepos()->promoRepository()->find($promoId)->getDiscounts());
-        $this->assertInstanceOf(FixedAmountDiscount::class, $this->orderContext->orderRepos()->promoRepository()->find($promoId)->getDiscounts()[0]);
+        $this->assertCount(1, $this->orderContext->repos()->promoRepository()->find($promoId)->getDiscounts());
+        $this->assertInstanceOf(FixedAmountDiscount::class, $this->orderContext->repos()->promoRepository()->find($promoId)->getDiscounts()[0]);
     }
 
     public function test_it_can_update_a_promo_with_discount_and_conditions()
@@ -82,7 +82,7 @@ class UpdatePromoTest extends PromoContext
             ]
         ));
 
-        $discounts = $this->orderContext->orderRepos()->promoRepository()->find($promoId)->getDiscounts();
+        $discounts = $this->orderContext->repos()->promoRepository()->find($promoId)->getDiscounts();
 
         $this->assertCount(1, $discounts);
         $this->assertInstanceOf(FixedAmountDiscount::class, $discounts[0]);

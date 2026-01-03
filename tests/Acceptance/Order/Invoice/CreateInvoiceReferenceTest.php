@@ -22,7 +22,7 @@ class CreateInvoiceReferenceTest extends CartContext
     {
         $order = $this->orderContext->createDefaultOrder();
         $order->setInvoiceReference(InvoiceReference::fromString(date('y') . date('m') . '0003'));
-        $this->orderContext->orderRepos()->orderRepository()->save($order);
+        $this->orderContext->repos()->orderRepository()->save($order);
 
         $handler = (new \Thinktomorrow\Trader\Application\Order\Invoice\CreateInvoiceReferenceByYearAndMonth((new TestContainer())->get(InvoiceRepository::class)));
         $reference = $handler->create();
@@ -34,7 +34,7 @@ class CreateInvoiceReferenceTest extends CartContext
     {
         $order = $this->orderContext->createDefaultOrder();
         $order->setInvoiceReference(InvoiceReference::fromString('22080003'));
-        $this->orderContext->orderRepos()->orderRepository()->save($order);
+        $this->orderContext->repos()->orderRepository()->save($order);
 
         $handler = (new \Thinktomorrow\Trader\Application\Order\Invoice\CreateInvoiceReferenceByYearAndMonth((new TestContainer())->get(InvoiceRepository::class)));
         $reference = $handler->create();

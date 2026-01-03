@@ -52,7 +52,7 @@ class Taxon implements Aggregate
     public function changeParent(TaxonId $parentTaxonId): void
     {
         if ($this->taxonId->equals($parentTaxonId)) {
-            throw new InvalidParentTaxonId('Parent taxon id should be different than child taxon id.');
+            throw new InvalidParentTaxonId('Cannot set taxon as parent of itself. [' . $parentTaxonId->get() . ']');
         }
 
         $this->parentTaxonId = $parentTaxonId;

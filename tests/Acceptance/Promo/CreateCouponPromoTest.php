@@ -21,11 +21,11 @@ class CreateCouponPromoTest extends PromoContext
         ));
 
         $this->assertInstanceOf(PromoId::class, $promoId);
-        $this->assertEquals($promoId, $this->orderContext->orderRepos()->promoRepository()->find($promoId)->promoId);
-        $this->assertEquals('foobar', $this->orderContext->orderRepos()->promoRepository()->find($promoId)->getCouponCode());
-        $this->assertEquals('2022-02-02 01:10:10', $this->orderContext->orderRepos()->promoRepository()->find($promoId)->getMappedData()['start_at']);
-        $this->assertEquals('2023-02-02 01:10:10', $this->orderContext->orderRepos()->promoRepository()->find($promoId)->getMappedData()['end_at']);
-        $this->assertFalse($this->orderContext->orderRepos()->promoRepository()->find($promoId)->getMappedData()['is_combinable']);
-        $this->assertEquals(['foo' => 'bar'], $this->orderContext->orderRepos()->promoRepository()->find($promoId)->getData());
+        $this->assertEquals($promoId, $this->orderContext->repos()->promoRepository()->find($promoId)->promoId);
+        $this->assertEquals('foobar', $this->orderContext->repos()->promoRepository()->find($promoId)->getCouponCode());
+        $this->assertEquals('2022-02-02 01:10:10', $this->orderContext->repos()->promoRepository()->find($promoId)->getMappedData()['start_at']);
+        $this->assertEquals('2023-02-02 01:10:10', $this->orderContext->repos()->promoRepository()->find($promoId)->getMappedData()['end_at']);
+        $this->assertFalse($this->orderContext->repos()->promoRepository()->find($promoId)->getMappedData()['is_combinable']);
+        $this->assertEquals(['foo' => 'bar'], $this->orderContext->repos()->promoRepository()->find($promoId)->getData());
     }
 }

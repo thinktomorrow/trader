@@ -18,7 +18,7 @@ class ChoosePaymentMethodTest extends CartContext
         $this->whenIChoosePayment('visa');
 
         // Assert all is present
-        $cart = $this->orderContext->orderRepos()->cartRepository()->findCart($this->getOrder()->orderId);
+        $cart = $this->orderContext->repos()->cartRepository()->findCart($this->getOrder()->orderId);
         $this->assertNotNull($cart->getPayment());
     }
 
@@ -31,11 +31,11 @@ class ChoosePaymentMethodTest extends CartContext
         );
 
         $paymentMethod->updateState(PaymentMethodState::offline);
-        $this->orderContext->orderRepos()->paymentMethodRepository()->save($paymentMethod);
+        $this->orderContext->repos()->paymentMethodRepository()->save($paymentMethod);
 
         $this->whenIChoosePayment('foobar');
 
-        $cart = $this->orderContext->orderRepos()->cartRepository()->findCart($this->getOrder()->orderId);
+        $cart = $this->orderContext->repos()->cartRepository()->findCart($this->getOrder()->orderId);
         $this->assertNull($cart->getPayment());
     }
 
@@ -48,11 +48,11 @@ class ChoosePaymentMethodTest extends CartContext
         );
 
         $paymentMethod->addCountry(CountryId::fromString('LU'));
-        $this->orderContext->orderRepos()->paymentMethodRepository()->save($paymentMethod);
+        $this->orderContext->repos()->paymentMethodRepository()->save($paymentMethod);
 
         $this->whenIChoosePayment('foobar');
 
-        $cart = $this->orderContext->orderRepos()->cartRepository()->findCart($this->getOrder()->orderId);
+        $cart = $this->orderContext->repos()->cartRepository()->findCart($this->getOrder()->orderId);
         $this->assertNotNull($cart->getPayment());
     }
 
@@ -65,12 +65,12 @@ class ChoosePaymentMethodTest extends CartContext
         );
 
         $paymentMethod->addCountry(CountryId::fromString('LU'));
-        $this->orderContext->orderRepos()->paymentMethodRepository()->save($paymentMethod);
+        $this->orderContext->repos()->paymentMethodRepository()->save($paymentMethod);
 
         $this->whenIAddBillingAddress('LU', 'example 13', 'bus 2', '1200', 'Brussel');
         $this->whenIChoosePayment('foobar');
 
-        $cart = $this->orderContext->orderRepos()->cartRepository()->findCart($this->getOrder()->orderId);
+        $cart = $this->orderContext->repos()->cartRepository()->findCart($this->getOrder()->orderId);
         $this->assertNotNull($cart->getPayment());
     }
 
@@ -82,12 +82,12 @@ class ChoosePaymentMethodTest extends CartContext
             Cash::make(10 * 100)
         );
         $paymentMethod->addCountry(CountryId::fromString('LU'));
-        $this->orderContext->orderRepos()->paymentMethodRepository()->save($paymentMethod);
+        $this->orderContext->repos()->paymentMethodRepository()->save($paymentMethod);
 
         $this->whenIAddBillingAddress('BE', 'example 13', 'bus 2', '1200', 'Brussel');
         $this->whenIChoosePayment('foobar');
 
-        $cart = $this->orderContext->orderRepos()->cartRepository()->findCart($this->getOrder()->orderId);
+        $cart = $this->orderContext->repos()->cartRepository()->findCart($this->getOrder()->orderId);
         $this->assertNull($cart->getPayment());
     }
 

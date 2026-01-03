@@ -15,7 +15,7 @@ class VerifyVatNumberTest extends CartContext
     {
         parent::setUp();
 
-        $this->orderContext->orderRepos()->orderRepository() = new InMemoryOrderRepository();
+        $this->orderContext->repos()->orderRepository() = new InMemoryOrderRepository();
     }
 
     public function test_merchant_can_verify_vat_number()
@@ -45,7 +45,7 @@ class VerifyVatNumberTest extends CartContext
             ])
         );
 
-        $this->orderContext->orderRepos()->orderRepository()->save($order);
+        $this->orderContext->repos()->orderRepository()->save($order);
 
         $this->vatNumberValidator->setExpectedResult(new VatNumberValidation('BE', '0123456789', VatNumberValidationState::invalid, []));
 
@@ -54,7 +54,7 @@ class VerifyVatNumberTest extends CartContext
             '0123456789',
         ));
 
-        $order = $this->orderContext->orderRepos()->orderRepository()->find($order->orderId);
+        $order = $this->orderContext->repos()->orderRepository()->find($order->orderId);
 
         $shopper = $order->getShopper();
 

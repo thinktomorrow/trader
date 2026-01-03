@@ -3,20 +3,21 @@ declare(strict_types=1);
 
 namespace Tests\Acceptance\Taxon;
 
+use Tests\Acceptance\TestCase;
 use Tests\Infrastructure\Vine\TaxonHelpers;
 use Thinktomorrow\Trader\Application\Taxon\CreateTaxon;
 use Thinktomorrow\Trader\Domain\Common\Locale;
 use Thinktomorrow\Trader\Domain\Model\Taxon\Exceptions\CouldNotCreateTaxon;
 
-class CreateTaxonTest extends TaxonContext
+class CreateTaxonTest extends TestCase
 {
     use TaxonHelpers;
 
     public function test_it_can_create_a_taxon()
     {
-        $taxonId = $this->taxonApplication->createTaxon(new CreateTaxon('bbb', 'taxon-key', 'nl', ['foo' => 'bar']));
+        $taxonId = $this->catalogContext->apps()->taxonApplication()->createTaxon(new CreateTaxon('bbb', 'taxon-key', 'nl', ['foo' => 'bar']));
 
-        $taxon = $this->taxonRepository->find($taxonId);
+        $taxon = $this->catalogContext->repos()->taxonRepository()->find($taxonId);
 
         $this->assertEquals('bbb', $taxon->taxonomyId->get());
         $this->assertEquals(['foo' => 'bar'], $taxon->getData());
@@ -27,11 +28,11 @@ class CreateTaxonTest extends TaxonContext
 
     public function test_it_can_create_a_nested_taxon()
     {
-        $taxonRootId = $this->taxonApplication->createTaxon(new CreateTaxon('bbb', 'taxon-key-root', 'nl', ['foo' => 'bar']));
-        $this->taxonRepository->setNextReference('abc');
-        $taxonId = $this->taxonApplication->createTaxon(new CreateTaxon('bbb', 'taxon-key', 'nl', ['foo' => 'bar'], $taxonRootId->get()));
+        $taxonRootId = $this->catalogContext->apps()->taxonApplication()->createTaxon(new CreateTaxon('bbb', 'taxon-key-root', 'nl', ['foo' => 'bar']));
+        $this->catalogContext->repos()->taxonRepository()->setNextReference('taxon-2');
+        $taxonId = $this->catalogContext->apps()->taxonApplication()->createTaxon(new CreateTaxon('bbb', 'taxon-key', 'nl', ['foo' => 'bar'], $taxonRootId->get()));
 
-        $taxon = $this->taxonRepository->find($taxonId);
+        $taxon = $this->catalogContext->repos()->taxonRepository()->find($taxonId);
 
         $this->assertEquals('bbb', $taxon->taxonomyId->get());
         $this->assertEquals(['foo' => 'bar'], $taxon->getData());
@@ -42,23 +43,23 @@ class CreateTaxonTest extends TaxonContext
     public function test_it_cannot_create_a_nested_taxon_belonging_to_other_taxonomy(): void
     {
         $this->expectException(CouldNotCreateTaxon::class);
-        $this->expectExceptionMessage('Could not create taxon because parent taxon "ccc-123" does not belong to the same taxonomy "ccc"');
+        $this->expectExceptionMessage('Could not create taxon because parent taxon "taxon-1" does not belong to the same taxonomy "ccc"');
 
-        $taxonRootId = $this->taxonApplication->createTaxon(new CreateTaxon('bbb', 'taxon-key-root', 'nl', ['foo' => 'bar']));
-        $this->taxonRepository->setNextReference('abc');
+        $taxonRootId = $this->catalogContext->apps()->taxonApplication()->createTaxon(new CreateTaxon('bbb', 'taxon-key-root', 'nl', ['foo' => 'bar']));
+        $this->catalogContext->repos()->taxonRepository()->setNextReference('taxon-2');
 
         // Attempt to create a taxon under a different taxonomy
-        $this->taxonApplication->createTaxon(new CreateTaxon('ccc', 'taxon-key', 'nl', ['foo' => 'bar'], $taxonRootId->get()));
+        $this->catalogContext->apps()->taxonApplication()->createTaxon(new CreateTaxon('ccc', 'taxon-key', 'nl', ['foo' => 'bar'], $taxonRootId->get()));
     }
 
     public function test_it_creates_a_unique_key_reference()
     {
-        $this->taxonApplication->createTaxon(new CreateTaxon('bbb', 'taxon-key', 'nl', ['foo' => 'bar']));
+        $this->catalogContext->apps()->taxonApplication()->createTaxon(new CreateTaxon('bbb', 'taxon-key', 'nl', ['foo' => 'bar']));
 
-        $this->taxonRepository->setNextReference('abc');
-        $taxonId = $this->taxonApplication->createTaxon(new CreateTaxon('bbb', 'taxon-key', 'nl', ['foo' => 'bar']));
+        $this->catalogContext->repos()->taxonRepository()->setNextReference('taxon-2');
+        $taxonId = $this->catalogContext->apps()->taxonApplication()->createTaxon(new CreateTaxon('bbb', 'taxon-key', 'nl', ['foo' => 'bar']));
 
-        $taxon = $this->taxonRepository->find($taxonId);
+        $taxon = $this->catalogContext->repos()->taxonRepository()->find($taxonId);
 
         $this->assertNotEquals('taxon-key', $taxon->getTaxonKeys()[0]->getKey()->get());
     }

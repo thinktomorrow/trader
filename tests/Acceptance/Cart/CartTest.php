@@ -99,7 +99,7 @@ class CartTest extends CartContext
     {
         $address = ['NL', 'example 12', 'bus 2', '1000', 'Amsterdam'];
 
-        $this->orderContext->orderApps()->cartApplication()->updateBillingAddress(new UpdateBillingAddress(
+        $this->orderContext->apps()->cartApplication()->updateBillingAddress(new UpdateBillingAddress(
             $this->getOrder()->orderId->get(),
             ...$address
         ));
@@ -116,12 +116,12 @@ class CartTest extends CartContext
 
         (new TestContainer())->get(VatNumberValidator::class)->setExpectedResult(new VatNumberValidation('BE', '0123456789', VatNumberValidationState::invalid, []));
 
-        $this->orderContext->orderApps()->cartApplication()->verifyVatNumber(new VerifyCartVatNumber(
+        $this->orderContext->apps()->cartApplication()->verifyVatNumber(new VerifyCartVatNumber(
             $this->getOrder()->orderId->get(),
             '0123456789',
         ));
 
-        $cart = $this->orderContext->orderRepos()->cartRepository()->findCart($this->getOrder()->orderId);
+        $cart = $this->orderContext->repos()->cartRepository()->findCart($this->getOrder()->orderId);
         $shopper = $cart->getShopper();
 
         $this->assertEquals('0123456789', $shopper->getVatNumber());
@@ -139,11 +139,11 @@ class CartTest extends CartContext
 
         //        $this->vatNumberValidator->setExpectedResult(new VatNumberValidation('NL', '0123456789', VatNumberValidationState::valid, []));
 
-        $this->orderContext->orderApps()->cartApplication()->verifyCartVatExemption(new VerifyCartVatExemption(
+        $this->orderContext->apps()->cartApplication()->verifyCartVatExemption(new VerifyCartVatExemption(
             $this->getOrder()->orderId->get(),
         ));
 
-        $cart = $this->orderContext->orderRepos()->cartRepository()->findCart($this->getOrder()->orderId);
+        $cart = $this->orderContext->repos()->cartRepository()->findCart($this->getOrder()->orderId);
 
         $this->assertTrue($cart->isVatExempt());
     }
@@ -153,11 +153,11 @@ class CartTest extends CartContext
         $this->givenThereIsAProductWhichCostsEur('lightsaber', 5);
         $this->whenIAddTheVariantToTheCart('lightsaber-variant-aaa', 2);
 
-        $this->orderContext->orderApps()->cartApplication()->verifyCartVatExemption(new VerifyCartVatExemption(
+        $this->orderContext->apps()->cartApplication()->verifyCartVatExemption(new VerifyCartVatExemption(
             $this->getOrder()->orderId->get(),
         ));
 
-        $cart = $this->orderContext->orderRepos()->cartRepository()->findCart($this->getOrder()->orderId);
+        $cart = $this->orderContext->repos()->cartRepository()->findCart($this->getOrder()->orderId);
 
         $this->assertFalse($cart->isVatExempt());
     }
@@ -180,7 +180,7 @@ class CartTest extends CartContext
         $this->whenIEnterShopperDetails('ben@tt.be');
 
         // Assert all is present
-        $cart = $this->orderContext->orderRepos()->cartRepository()->findCart($this->getOrder()->orderId);
+        $cart = $this->orderContext->repos()->cartRepository()->findCart($this->getOrder()->orderId);
 
         $this->assertCount(1, $cart->getLines());
         $this->assertNotNull($cart->getBillingAddress());
@@ -190,9 +190,9 @@ class CartTest extends CartContext
         $this->assertNotNull($cart->getPayment());
 
         // Now clear it - Everything but the products should be removed
-        $this->orderContext->orderApps()->cartApplication()->clearCheckoutData(new ClearCheckoutData($this->getOrder()->orderId->get()));
+        $this->orderContext->apps()->cartApplication()->clearCheckoutData(new ClearCheckoutData($this->getOrder()->orderId->get()));
 
-        $cart = $this->orderContext->orderRepos()->cartRepository()->findCart($this->getOrder()->orderId);
+        $cart = $this->orderContext->repos()->cartRepository()->findCart($this->getOrder()->orderId);
         $this->assertCount(1, $cart->getLines());
         $this->assertNull($cart->getBillingAddress());
         $this->assertNull($cart->getShippingAddress());

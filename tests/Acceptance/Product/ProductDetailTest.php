@@ -22,7 +22,7 @@ class ProductDetailTest extends ProductContext
         $this->catalogContext->linkProductToTaxon($product->productId->get(), $taxon->taxonId->get());
         $this->catalogContext->linkProductToTaxon($product->productId->get(), $taxon2->taxonId->get());
 
-        $productDetail = $this->catalogContext->catalogRepos()->productDetailRepository()->findProductDetail($variantId);
+        $productDetail = $this->catalogContext->repos()->productDetailRepository()->findProductDetail($variantId);
 
         $this->assertEquals($variantId->get(), $productDetail->getVariantId());
         $this->assertEquals($product->getVariants()[0]->productId->get(), $productDetail->getProductId());
@@ -40,10 +40,10 @@ class ProductDetailTest extends ProductContext
     public function test_it_can_get_sku_and_ean()
     {
         $product = $this->catalogContext->createProduct();
-        $this->catalogContext->catalogRepos()->productRepository()->save($product);
+        $this->catalogContext->repos()->productRepository()->save($product);
 
         $variantId = $product->getVariants()[0]->variantId;
-        $productDetail = $this->catalogContext->catalogRepos()->productDetailRepository()->findProductDetail($variantId);
+        $productDetail = $this->catalogContext->repos()->productDetailRepository()->findProductDetail($variantId);
 
         // Fallback values for sku / ean
         $this->assertEquals('sku-variant-aaa', $productDetail->getSku());
@@ -52,9 +52,9 @@ class ProductDetailTest extends ProductContext
         // Set specific sku / ean values
         $product->getVariants()[0]->updateSku('sku-foobar');
         $product->getVariants()[0]->updateEan('ean-foobar');
-        $this->catalogContext->catalogRepos()->productRepository()->save($product);
+        $this->catalogContext->repos()->productRepository()->save($product);
 
-        $productDetail = $this->catalogContext->catalogRepos()->productDetailRepository()->findProductDetail($variantId);
+        $productDetail = $this->catalogContext->repos()->productDetailRepository()->findProductDetail($variantId);
         $this->assertEquals('sku-foobar', $productDetail->getSku());
         $this->assertEquals('ean-foobar', $productDetail->getEan());
     }
@@ -68,7 +68,7 @@ class ProductDetailTest extends ProductContext
         ]);
         $variant = $this->catalogContext->createVariant('product-aaa', 'variant-aaa', [], ['title' => null, 'option_title' => null]);
 
-        $productDetail = $this->catalogContext->catalogRepos()->productDetailRepository()->findProductDetail($product->getVariants()[0]->variantId);
+        $productDetail = $this->catalogContext->repos()->productDetailRepository()->findProductDetail($product->getVariants()[0]->variantId);
         $this->assertEquals('product title nl', $productDetail->getTitle());
     }
 
@@ -81,7 +81,7 @@ class ProductDetailTest extends ProductContext
         ]);
         $variant = $this->catalogContext->createVariant('product-aaa', 'variant-aaa', [], ['title' => null]);
 
-        $productDetail = $this->catalogContext->catalogRepos()->productDetailRepository()->findProductDetail($product->getVariants()[0]->variantId);
+        $productDetail = $this->catalogContext->repos()->productDetailRepository()->findProductDetail($product->getVariants()[0]->variantId);
         $this->assertEquals('product title nl variant-aaa option title nl', $productDetail->getTitle());
     }
 
@@ -89,7 +89,7 @@ class ProductDetailTest extends ProductContext
     {
         $product = $this->catalogContext->createProduct();
 
-        $productDetail = $this->catalogContext->catalogRepos()->productDetailRepository()->findProductDetail($product->getVariants()[0]->variantId);
+        $productDetail = $this->catalogContext->repos()->productDetailRepository()->findProductDetail($product->getVariants()[0]->variantId);
         $productDetail->setImages(['foo' => 'bar']);
 
         $this->assertEquals(['foo' => 'bar'], $productDetail->getImages());
@@ -99,7 +99,7 @@ class ProductDetailTest extends ProductContext
     {
         $product = $this->catalogContext->createProduct();
 
-        $stockable = $this->catalogContext->catalogRepos()->productDetailRepository()->findProductDetail($product->getVariants()[0]->variantId);
+        $stockable = $this->catalogContext->repos()->productDetailRepository()->findProductDetail($product->getVariants()[0]->variantId);
 
         $this->assertEquals(5, $stockable->getStockLevel());
         $this->assertEquals(false, $stockable->ignoresOutOfStock());

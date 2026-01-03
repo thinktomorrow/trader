@@ -29,10 +29,10 @@ class DeleteShippingProfileTest extends ShippingProfileContext
 
         $this->assertEquals([
             new ShippingProfileDeleted($shippingProfileId),
-        ], $this->eventDispatcher->releaseDispatchedEvents());
+        ], $this->orderContext->apps()->getEventDispatcher()->releaseDispatchedEvents());
 
         $this->expectException(CouldNotFindShippingProfile::class);
-        $this->orderContext->orderRepos()->shippingProfileRepository()->find($shippingProfileId);
+        $this->orderContext->repos()->shippingProfileRepository()->find($shippingProfileId);
     }
 
     public function test_it_can_delete_a_tariff()
@@ -50,9 +50,9 @@ class DeleteShippingProfileTest extends ShippingProfileContext
 
         $this->assertEquals([
             new TariffDeleted($shippingProfileId, $tariffId),
-        ], $this->eventDispatcher->releaseDispatchedEvents());
+        ], $this->orderContext->apps()->getEventDispatcher()->releaseDispatchedEvents());
 
-        $shippingProfile = $this->orderContext->orderRepos()->shippingProfileRepository()->find($shippingProfileId);
+        $shippingProfile = $this->orderContext->repos()->shippingProfileRepository()->find($shippingProfileId);
         $this->assertCount(0, $shippingProfile->getTariffs());
     }
 }
