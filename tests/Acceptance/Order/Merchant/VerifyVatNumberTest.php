@@ -6,55 +6,35 @@ namespace Tests\Acceptance\Order\Merchant;
 use Tests\Acceptance\Cart\CartContext;
 use Thinktomorrow\Trader\Application\Order\Merchant\VerifyVatNumber;
 use Thinktomorrow\Trader\Application\VatNumber\VatNumberValidation;
+use Thinktomorrow\Trader\Application\VatNumber\VatNumberValidator;
 use Thinktomorrow\Trader\Domain\Model\VatNumber\VatNumberValidationState;
-use Thinktomorrow\Trader\Infrastructure\Test\Repositories\InMemoryOrderRepository;
+use Thinktomorrow\Trader\Infrastructure\Test\TestContainer;
 
 class VerifyVatNumberTest extends CartContext
 {
-    protected function setUp(): void
-    {
-        parent::setUp();
-
-        $this->orderContext->repos()->orderRepository() = new InMemoryOrderRepository();
-    }
-
     public function test_merchant_can_verify_vat_number()
     {
-        $order = $this->createOrder(
-            ['order_id' => 'xxx'],
-            [],
-            [],
-            [],
-            [],
-            null,
-            $this->createOrderBillingAddress([
-                'country_id' => 'BE',
-                'line_1' => 'line-1',
-                'line_2' => 'line-2',
-                'postal_code' => 'postal-code',
-                'city' => 'city',
+        $order = $this->orderContext->createOrder();
+        $billingAddress = $this->orderContext->createBillingAddress();
+        $shopper = $this->orderContext->createShopper($order->orderId->get(), 'shopper-aaa', [
+            'is_business' => true,
+            'data' => json_encode([
+                'company' => 'Think Tomorrow',
+                'vat_number' => '0123456789',
             ]),
-            $this->createOrderShopper([
-                'email' => 'ben@thinktomorrow.be',
-                'is_business' => true,
-                'locale' => 'en_GB',
-                'data' => json_encode([
-                    'foo' => 'bar',
-                    'vat_number' => '0123456789',
-                ]),
-            ])
-        );
+        ]);
 
-        $this->orderContext->repos()->orderRepository()->save($order);
+        $this->orderContext->addBillingAddressToOrder($order, $billingAddress);
+        $this->orderContext->addShopperToOrder($order, $shopper);
 
-        $this->vatNumberValidator->setExpectedResult(new VatNumberValidation('BE', '0123456789', VatNumberValidationState::invalid, []));
+        (new TestContainer())->get(VatNumberValidator::class)->setExpectedResult(new VatNumberValidation('BE', '0123456789', VatNumberValidationState::invalid, []));
 
-        $this->merchantOrderApplication->verifyVatNumber(new VerifyVatNumber(
+        $this->orderContext->apps()->merchantOrderApplication()->verifyVatNumber(new VerifyVatNumber(
             $order->orderId->get(),
             '0123456789',
         ));
 
-        $order = $this->orderContext->repos()->orderRepository()->find($order->orderId);
+        $order = $this->orderContext->findOrder($order->orderId);
 
         $shopper = $order->getShopper();
 

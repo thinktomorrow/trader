@@ -56,8 +56,8 @@ class DefaultCart implements Cart
         $cart->totalVat = Money::EUR($state['total_vat']);
         $cart->subtotalExcl = Money::EUR($state['subtotal_excl']);
         $cart->subtotalIncl = Money::EUR($state['subtotal_incl']);
-        $cart->discountExcl = Money::EUR($state['discount_total_excl']);
-        $cart->discountIncl = Money::EUR($state['discount_total_incl']);
+        $cart->discountExcl = Money::EUR($state['discount_excl']);
+        $cart->discountIncl = Money::EUR($state['discount_incl']);
         $cart->shippingExcl = Money::EUR($state['shipping_cost_excl']);
         $cart->shippingIncl = Money::EUR($state['shipping_cost_incl']);
         $cart->paymentExcl = Money::EUR($state['payment_cost_excl']);

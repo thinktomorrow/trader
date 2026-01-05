@@ -6,6 +6,7 @@ namespace Thinktomorrow\Trader\Infrastructure\Laravel\Models\OrderRead;
 use Thinktomorrow\Trader\Application\Common\RendersData;
 use Thinktomorrow\Trader\Application\Common\RendersMoney;
 use Thinktomorrow\Trader\Domain\Common\Cash\Percentage;
+use Thinktomorrow\Trader\Domain\Common\Price\DiscountPrice;
 use Thinktomorrow\Trader\Domain\Model\Order\Discount\DiscountTotal;
 
 abstract class OrderReadDiscount
@@ -13,7 +14,7 @@ abstract class OrderReadDiscount
     use RendersData;
     use RendersMoney;
 
-    protected DiscountTotal $total;
+    protected DiscountPrice $total;
     protected Percentage $percentage;
     protected string $discount_id;
     protected array $data;

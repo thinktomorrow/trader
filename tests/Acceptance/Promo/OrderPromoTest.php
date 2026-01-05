@@ -20,7 +20,7 @@ class OrderPromoTest extends CartContext
 
         $this->promoApplication->enterCoupon(new EnterCoupon($this->getOrder()->orderId->get(), 'foobar'));
 
-        $order = $this->orderContext->repos()->orderRepository()->find($this->getOrder()->orderId);
+        $order = $this->orderContext->findOrder($this->getOrder()->orderId);
         $this->assertCount(1, $order->getDiscounts());
 
         $this->assertEquals('foobar', $order->getEnteredCouponCode());
@@ -49,7 +49,7 @@ class OrderPromoTest extends CartContext
 
         $this->promoApplication->enterCoupon(new EnterCoupon($this->getOrder()->orderId->get(), 'foobar'));
 
-        $order = $this->orderContext->repos()->orderRepository()->find($this->getOrder()->orderId);
+        $order = $this->orderContext->findOrder($this->getOrder()->orderId);
         $this->assertCount(1, $order->getDiscounts());
 
         $this->assertEquals('foobar', $order->getEnteredCouponCode());
@@ -77,7 +77,7 @@ class OrderPromoTest extends CartContext
 
         $this->promoApplication->enterCoupon(new EnterCoupon($this->getOrder()->orderId->get(), 'fooxxx'));
 
-        $order = $this->orderContext->repos()->orderRepository()->find($this->getOrder()->orderId);
+        $order = $this->orderContext->findOrder($this->getOrder()->orderId);
         $this->assertCount(0, $order->getDiscounts());
 
         $this->assertEquals(Money::EUR(2500), $order->getSubTotal()->getIncludingVat());
@@ -93,7 +93,7 @@ class OrderPromoTest extends CartContext
 
         $this->promoApplication->enterCoupon(new EnterCoupon($this->getOrder()->orderId->get(), 'foobar'));
 
-        $order = $this->orderContext->repos()->orderRepository()->find($this->getOrder()->orderId);
+        $order = $this->orderContext->findOrder($this->getOrder()->orderId);
         $this->assertCount(0, $order->getDiscounts());
 
         $this->assertEquals(Money::EUR(2000), $order->getSubTotal()->getIncludingVat());
@@ -110,7 +110,7 @@ class OrderPromoTest extends CartContext
         // Refresh cart...
         $this->cartApplication->refresh(new RefreshCart($this->getOrder()->orderId->get()));
 
-        $order = $this->orderContext->repos()->orderRepository()->find($this->getOrder()->orderId);
+        $order = $this->orderContext->findOrder($this->getOrder()->orderId);
         $this->assertCount(1, $order->getDiscounts());
 
         $this->assertEquals(Money::EUR(2500), $order->getSubTotal()->getIncludingVat());
@@ -128,7 +128,7 @@ class OrderPromoTest extends CartContext
         // Refresh cart...
         $this->cartApplication->refresh(new RefreshCart($this->getOrder()->orderId->get()));
 
-        $order = $this->orderContext->repos()->orderRepository()->find($this->getOrder()->orderId);
+        $order = $this->orderContext->findOrder($this->getOrder()->orderId);
         $this->assertCount(2, $order->getDiscounts());
 
         $this->assertEquals(Money::EUR(2500), $order->getSubTotal()->getIncludingVat());
@@ -146,7 +146,7 @@ class OrderPromoTest extends CartContext
         // Refresh cart...
         $this->cartApplication->refresh(new RefreshCart($this->getOrder()->orderId->get()));
 
-        $order = $this->orderContext->repos()->orderRepository()->find($this->getOrder()->orderId);
+        $order = $this->orderContext->findOrder($this->getOrder()->orderId);
         $this->assertCount(1, $order->getDiscounts());
 
         $this->assertEquals(Money::EUR(2500), $order->getSubTotal()->getIncludingVat());
@@ -164,10 +164,10 @@ class OrderPromoTest extends CartContext
         $this->promoApplication->enterCoupon(new EnterCoupon($this->getOrder()->orderId->get(), 'foobar'));
 
         // Refresh cart
-        $order = $this->orderContext->repos()->orderRepository()->find($this->getOrder()->orderId);
+        $order = $this->orderContext->findOrder($this->getOrder()->orderId);
         $this->cartApplication->refresh(new RefreshCart($order->orderId->get()));
 
-        $order = $this->orderContext->repos()->orderRepository()->find($order->orderId);
+        $order = $this->orderContext->findOrder($order->orderId);
         $this->assertCount(2, $order->getDiscounts());
 
         $this->assertEquals(Money::EUR(2500), $order->getSubTotal()->getIncludingVat());
@@ -184,7 +184,7 @@ class OrderPromoTest extends CartContext
         // Refresh cart...
         $this->cartApplication->refresh(new RefreshCart($this->getOrder()->orderId->get()));
 
-        $order = $this->orderContext->repos()->orderRepository()->find($this->getOrder()->orderId);
+        $order = $this->orderContext->findOrder($this->getOrder()->orderId);
         $this->assertCount(1, $order->getDiscounts());
 
         $this->assertEquals($order->getSubTotal()->getIncludingVat(), $order->getDiscountTotal()->getIncludingVat());

@@ -5,15 +5,15 @@ namespace Thinktomorrow\Trader\Infrastructure\Laravel\Models\OrderRead;
 
 use Thinktomorrow\Trader\Application\Common\RendersData;
 use Thinktomorrow\Trader\Application\Common\RendersMoney;
-use Thinktomorrow\Trader\Domain\Common\Price\ServicePrice;
 use Thinktomorrow\Trader\Domain\Model\Order\Shipping\ShippingState;
 
 abstract class OrderReadShipping
 {
     use RendersData;
     use RendersMoney;
+    use WithServiceTotals;
+    use WithFormattedServiceTotals;
 
-    protected ServicePrice $cost;
     protected string $shipping_id;
     protected ?string $shipping_profile_id;
     protected ShippingState $state;
@@ -35,9 +35,10 @@ abstract class OrderReadShipping
         $shipping->shipping_id = $state['shipping_id'];
         $shipping->shipping_profile_id = $state['shipping_profile_id'] ?: null;
         $shipping->state = $state['shipping_state'];
-        $shipping->cost = $state['cost'];
         $shipping->data = json_decode($state['data'], true);
         $shipping->discounts = $discounts;
+
+        $shipping->initializeServiceTotalsFromState($state);
 
         return $shipping;
     }
@@ -50,14 +51,6 @@ abstract class OrderReadShipping
     public function getShippingProfileId(): ?string
     {
         return $this->shipping_profile_id;
-    }
-
-    public function getCostPrice(): string
-    {
-        return $this->renderMoney(
-            $this->cost->getExcludingVat(),
-            $this->getLocale()
-        );
     }
 
     public function getDiscounts(): iterable

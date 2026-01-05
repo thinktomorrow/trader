@@ -7,12 +7,15 @@ use Money\Money;
 use Thinktomorrow\Trader\Application\Common\HasLocale;
 use Thinktomorrow\Trader\Application\Common\RendersMoney;
 use Thinktomorrow\Trader\Application\Order\Grid\OrderGridItem;
-use Thinktomorrow\Trader\Domain\Common\Cash\Cash;
+use Thinktomorrow\Trader\Domain\Model\Order\WithOrderTotals;
+use Thinktomorrow\Trader\Infrastructure\Laravel\Models\OrderRead\WithFormattedOrderTotals;
 
 class DefaultOrderGridItem implements OrderGridItem
 {
     use RendersMoney;
     use HasLocale;
+    use WithOrderTotals;
+    use WithFormattedOrderTotals;
 
     protected string $order_id;
     protected string $order_reference;
@@ -22,7 +25,6 @@ class DefaultOrderGridItem implements OrderGridItem
     protected ?\DateTime $confirmed_at;
     protected ?\DateTime $paid_at;
     protected ?\DateTime $delivered_at;
-    protected Money $totalAsMoney;
     protected ?string $customer_id;
     protected array $shopperData;
 
@@ -44,7 +46,17 @@ class DefaultOrderGridItem implements OrderGridItem
         $gridItem->paid_at = isset($state['paid_at']) ? new \DateTime($state['paid_at']) : null;
         $gridItem->delivered_at = isset($state['delivered_at']) ? new \DateTime($state['delivered_at']) : null;
 
-        $gridItem->totalAsMoney = Cash::make($state['total']);
+        $gridItem->totalExcl = Money::EUR($state['total_excl']);
+        $gridItem->totalIncl = Money::EUR($state['total_incl']);
+        $gridItem->totalVat = Money::EUR($state['total_vat']);
+        $gridItem->subtotalExcl = Money::EUR($state['subtotal_excl']);
+        $gridItem->subtotalIncl = Money::EUR($state['subtotal_incl']);
+        $gridItem->discountExcl = Money::EUR($state['discount_excl']);
+        $gridItem->discountIncl = Money::EUR($state['discount_incl']);
+        $gridItem->shippingExcl = Money::EUR($state['shipping_cost_excl']);
+        $gridItem->shippingIncl = Money::EUR($state['shipping_cost_incl']);
+        $gridItem->paymentExcl = Money::EUR($state['payment_cost_excl']);
+        $gridItem->paymentIncl = Money::EUR($state['payment_cost_incl']);
 
         $gridItem->shopperData = [
             'email' => $shopperState['email'] ?? null,
@@ -96,14 +108,6 @@ class DefaultOrderGridItem implements OrderGridItem
         return $this->delivered_at;
     }
 
-    public function getTotalPrice(): string
-    {
-        return $this->renderMoney(
-            $this->totalAsMoney,
-            $this->getLocale()
-        );
-    }
-
     public function getTitle(): string
     {
         return $this->order_reference;
@@ -126,17 +130,17 @@ class DefaultOrderGridItem implements OrderGridItem
 
     public function isBusiness(): bool
     {
-        return ! ! $this->shopperData['is_business'];
+        return !!$this->shopperData['is_business'];
     }
 
     public function hasCustomer(): bool
     {
-        return ! is_null($this->customer_id);
+        return !is_null($this->customer_id);
     }
 
     public function getCustomerUrl(): ?string
     {
-        if (! $this->customer_id) {
+        if (!$this->customer_id) {
             return null;
         }
 

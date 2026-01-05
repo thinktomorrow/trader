@@ -41,19 +41,20 @@ final class InMemoryCartRepository implements CartRepository, InMemoryRepository
             throw new OrderAlreadyInMerchantHands('Cannot fetch cart. Order is no longer in customer hands and has already the following state: ' . $order->getOrderState()->value);
         }
 
-        $orderState = array_merge(InMemoryOrderRepository::$orders[$orderId->get()]->getMappedData(), [
-            'total_excl' => $order->getTotalExcl()->getAmount(),
-            'total_incl' => $order->getTotalIncl()->getAmount(),
-            'total_vat' => $order->getTotalVat()->getAmount(),
-            'vat_lines' => $order->getVatLines(),
-            'subtotal_excl' => $order->getSubtotalExcl()->getAmount(),
-            'subtotal_incl' => $order->getSubtotalIncl()->getAmount(),
-            'discount_total_excl' => $order->getDiscountTotalExcl()->getAmount(),
-            'discount_total_incl' => $order->getDiscountTotalIncl()->getAmount(),
-            'shipping_cost_excl' => $order->getShippingCostExcl()->getAmount(),
-            'shipping_cost_incl' => $order->getShippingCostIncl()->getAmount(),
-            'payment_cost_excl' => $order->getPaymentCostExcl()->getAmount(),
-            'payment_cost_incl' => $order->getPaymentCostIncl()->getAmount(),
+        $orderState = array_merge($order->getMappedData(), [
+//
+//            'total_excl' => $order->getTotalExcl()->getAmount(),
+//            'total_incl' => $order->getTotalIncl()->getAmount(),
+//            'total_vat' => $order->getTotalVat()->getAmount(),
+//            'vat_lines' => $order->getVatLines(),
+//            'subtotal_excl' => $order->getSubtotalExcl()->getAmount(),
+//            'subtotal_incl' => $order->getSubtotalIncl()->getAmount(),
+//            'discount_excl' => $order->getDiscountTotalExcl()->getAmount(),
+//            'discount_incl' => $order->getDiscountTotalIncl()->getAmount(),
+//            'shipping_cost_excl' => $order->getShippingCostExcl()->getAmount(),
+//            'shipping_cost_incl' => $order->getShippingCostIncl()->getAmount(),
+//            'payment_cost_excl' => $order->getPaymentCostExcl()->getAmount(),
+//            'payment_cost_incl' => $order->getPaymentCostIncl()->getAmount(),
         ]);
 
         $lines = array_map(fn(Line $line) => DefaultCartLine::fromMappedData(

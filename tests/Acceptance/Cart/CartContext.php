@@ -315,7 +315,7 @@ abstract class CartContext extends TestCase
         ));
 
         $checkFlag = false;
-        $lines = $this->orderContext->repos()->orderRepository()->find($order->orderId)->getLines();
+        $lines = $this->orderContext->findOrder($order->orderId)->getLines();
         foreach ($lines as $line) {
             if ($line->getPurchasableReference()->getId() == $productVariantId) {
                 $checkFlag = true;
@@ -341,7 +341,7 @@ abstract class CartContext extends TestCase
         ));
 
         $checkFlag = false;
-        $lines = $this->orderContext->repos()->orderRepository()->find($orderId)->getLines();
+        $lines = $this->orderContext->findOrder($orderId)->getLines();
         foreach ($lines as $line) {
             if ($line->getPurchasableReference()->getId() == $productVariantId) {
                 $checkFlag = true;
@@ -420,8 +420,8 @@ abstract class CartContext extends TestCase
 
     protected function thenIShouldHaveProductInTheCart($times, $quantity, string $orderId = 'xxx')
     {
-        $order = $this->orderContext->repos()->orderRepository()->find(OrderId::fromString($orderId));
-        $lines = $this->orderContext->repos()->orderRepository()->find($order->orderId)->getLines();
+        $order = $this->orderContext->findOrder(OrderId::fromString($orderId));
+        $lines = $this->orderContext->findOrder($order->orderId)->getLines();
 
         Assert::assertCount((int)$times, $lines);
         if (count($lines) > 0) {
@@ -493,7 +493,7 @@ abstract class CartContext extends TestCase
 
     protected function thenTheCartItemShouldContainData($productVariantId, $dataKey, $dataValue)
     {
-        $order = $this->orderContext->repos()->orderRepository()->find(OrderId::fromString('xxx'));
+        $order = $this->orderContext->findOrder(OrderId::fromString('xxx'));
         $lines = $order->getLines();
 
         // Find matching line by variantId
@@ -525,7 +525,7 @@ abstract class CartContext extends TestCase
     {
         // Create an order if not already
         try {
-            return $this->orderContext->repos()->orderRepository()->find(OrderId::fromString('xxx'));
+            return $this->orderContext->findOrder(OrderId::fromString('xxx'));
         } catch (CouldNotFindOrder $e) {
             $this->orderContext->repos()->orderRepository()->save($order = Order::create(
                 OrderId::fromString('xxx'),

@@ -66,9 +66,13 @@ final class Line implements ChildAggregate, DiscountableItem
 
     public function getTotal(): ItemPrice
     {
-        return $this->unitPrice
-            ->multiply($this->quantity->asInt())
+        return $this->getSubTotal()
             ->applyDiscount($this->getDiscountPrice());
+    }
+
+    public function getSubTotal(): ItemPrice
+    {
+        return $this->unitPrice->multiply($this->quantity->asInt());
     }
 
     public function getDiscountPrice(): DiscountPrice

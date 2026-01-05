@@ -38,7 +38,7 @@ interface CartLine
 
     public function getFormattedSubtotalPrice(): string;
 
-    public function getFormattedTaxPrice(): string;
+    public function getFormattedTotalVat(): string;
 
     public function getFormattedVatRate(): string;
 

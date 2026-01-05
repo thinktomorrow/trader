@@ -14,6 +14,7 @@ use Thinktomorrow\Trader\Application\Order\MerchantOrder\MerchantOrderShippingAd
 use Thinktomorrow\Trader\Application\Order\MerchantOrder\MerchantOrderShopper;
 use Thinktomorrow\Trader\Domain\Model\Order\Discount\Discount;
 use Thinktomorrow\Trader\Domain\Model\Order\Exceptions\CouldNotFindOrder;
+use Thinktomorrow\Trader\Domain\Model\Order\Line\Line;
 use Thinktomorrow\Trader\Domain\Model\Order\Line\Personalisations\LinePersonalisation;
 use Thinktomorrow\Trader\Domain\Model\Order\OrderEvent\OrderEvent;
 use Thinktomorrow\Trader\Domain\Model\Order\OrderId;
@@ -39,27 +40,16 @@ class InMemoryMerchantOrderRepository implements MerchantOrderRepository, InMemo
 
         $order = InMemoryOrderRepository::$orders[$orderId->get()];
 
-        $orderState = array_merge(InMemoryOrderRepository::$orders[$orderId->get()]->getMappedData(), [
+        $orderState = array_merge($order->getMappedData(), [
             'order_state' => $order->getOrderState(),
-            'total' => $order->getTotal(),
-            'taxTotal' => $order->getTaxTotal(),
-            'subtotal' => $order->getSubTotal(),
-            'discountTotal' => $order->getDiscountTotal(),
-            'shippingCost' => $order->getShippingCost(),
-            'paymentCost' => $order->getPaymentCost(),
         ]);
 
-        $lines = array_map(fn($line) => DefaultMerchantOrderLine::fromMappedData(
-            array_merge($line->getMappedData(), [
-                'total' => $line->getTotal(),
-                'taxTotal' => $line->getTaxTotal(),
-                'discountTotal' => $line->getDiscountTotal(),
-                'unitPrice' => $line->getUnitPrice(),
-            ]),
+        $lines = array_map(fn(Line $line) => DefaultMerchantOrderLine::fromMappedData(
+            array_merge($line->getMappedData(), []),
             $orderState,
             array_map(fn(Discount $discount) => DefaultMerchantOrderDiscount::fromMappedData(array_merge($discount->getMappedData(), [
                 'total' => $discount->getDiscountPrice(),
-                'percentage' => $discount->getPercentage($line->getSubTotal()),
+                'percentage' => $discount->getPercentage($line->getSubTotal()->getExcludingVat()),
             ]), $orderState), $line->getDiscounts()),
             array_map(fn(LinePersonalisation $linePersonalisation) => DefaultMerchantOrderLinePersonalisation::fromMappedData(array_merge($linePersonalisation->getMappedData(), [
                 //
@@ -84,7 +74,7 @@ class InMemoryMerchantOrderRepository implements MerchantOrderRepository, InMemo
             $orderState,
             array_map(fn(Discount $discount) => DefaultMerchantOrderDiscount::fromMappedData(array_merge($discount->getMappedData(), [
                 'total' => $discount->getDiscountPrice(),
-                'percentage' => $discount->getPercentage($shipping->getShippingCost()),
+                'percentage' => $discount->getPercentage($shipping->getShippingCost()->getExcludingVat()),
             ]), $orderState), $shipping->getDiscounts())// TODO: cart shipping discounts
         ), $order->getShippings());
 
@@ -96,7 +86,7 @@ class InMemoryMerchantOrderRepository implements MerchantOrderRepository, InMemo
             $orderState,
             array_map(fn(Discount $discount) => DefaultMerchantOrderDiscount::fromMappedData(array_merge($discount->getMappedData(), [
                 'total' => $discount->getDiscountPrice(),
-                'percentage' => $discount->getPercentage($payment->getPaymentCost()),
+                'percentage' => $discount->getPercentage($payment->getPaymentCost()->getExcludingVat()),
             ]), $orderState), $payment->getDiscounts())// TODO: cart payment discounts
         ), $order->getPayments());
 
@@ -123,7 +113,7 @@ class InMemoryMerchantOrderRepository implements MerchantOrderRepository, InMemo
             ],
             array_map(fn(Discount $discount) => DefaultMerchantOrderDiscount::fromMappedData(array_merge($discount->getMappedData(), [
                 'total' => $discount->getDiscountPrice(),
-                'percentage' => $discount->getPercentage($order->getSubTotal()),
+                'percentage' => $discount->getPercentage($order->getSubtotalExcl()),
             ]), $orderState), $order->getDiscounts()), // TODO: cart discounts
         );
     }

@@ -95,7 +95,9 @@ class Payment implements ChildAggregate, DiscountableItem
             'payment_id' => $this->paymentId->get(),
             'payment_method_id' => $this->paymentMethodId?->get(),
             'payment_state' => $this->paymentState->getValueAsString(),
-            'cost' => $this->paymentCost->getExcludingVat()->getAmount(),
+            'cost_excl' => $this->paymentCost->getExcludingVat()->getAmount(),
+            'discount_excl' => $this->getTotalDiscountPrice()->getExcludingVat()->getAmount(),
+            'total_excl' => $this->getPaymentCostTotal()->getExcludingVat()->getAmount(),
             'data' => json_encode($data),
         ];
     }
@@ -119,7 +121,7 @@ class Payment implements ChildAggregate, DiscountableItem
         $payment->paymentId = PaymentId::fromString($state['payment_id']);
         $payment->paymentMethodId = $state['payment_method_id'] ? PaymentMethodId::fromString($state['payment_method_id']) : null;
         $payment->paymentState = $state['payment_state'];
-        $payment->paymentCost = DefaultServicePrice::fromExcludingVat(Money::EUR($state['cost']));
+        $payment->paymentCost = DefaultServicePrice::fromExcludingVat(Money::EUR($state['cost_excl']));
         $payment->discounts = array_map(fn($discountState) => Discount::fromMappedData($discountState, $state), $childEntities[Discount::class]);
         $payment->data = json_decode($state['data'], true);
 

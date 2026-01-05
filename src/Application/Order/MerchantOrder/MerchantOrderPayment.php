@@ -2,6 +2,8 @@
 
 namespace Thinktomorrow\Trader\Application\Order\MerchantOrder;
 
+use Money\Money;
+
 interface MerchantOrderPayment
 {
     public static function fromMappedData(array $state, array $orderState, iterable $discounts): static;
@@ -12,9 +14,17 @@ interface MerchantOrderPayment
 
     public function getPaymentState(): string;
 
-    public function getCostPrice(): string;
+    public function getCostPriceExcl(): Money;
 
-    public function includeTax(bool $includeTax = true): void;
+    public function getDiscountPriceExcl(): Money;
+
+    public function getTotalPriceExcl(): Money;
+
+    public function getFormattedCostPriceExcl(): string;
+
+    public function getFormattedDiscountPriceExcl(): string;
+
+    public function getFormattedTotalPriceExcl(): string;
 
     /** @return MerchantOrderDiscount[] */
     public function getDiscounts(): iterable;

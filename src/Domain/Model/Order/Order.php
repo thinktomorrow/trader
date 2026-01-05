@@ -3,13 +3,11 @@ declare(strict_types=1);
 
 namespace Thinktomorrow\Trader\Domain\Model\Order;
 
-use Money\Money;
 use Thinktomorrow\Trader\Domain\Common\Entity\Aggregate;
 use Thinktomorrow\Trader\Domain\Common\Entity\HasData;
 use Thinktomorrow\Trader\Domain\Common\Event\RecordsEvents;
-use Thinktomorrow\Trader\Domain\Common\Vat\VatAllocatedLine;
+use Thinktomorrow\Trader\Domain\Common\Price\DiscountPrice;
 use Thinktomorrow\Trader\Domain\Common\Vat\VatAllocatedTotalPrice;
-use Thinktomorrow\Trader\Domain\Common\Vat\VatPercentage;
 use Thinktomorrow\Trader\Domain\Model\Order\Address\BillingAddress;
 use Thinktomorrow\Trader\Domain\Model\Order\Address\ShippingAddress;
 use Thinktomorrow\Trader\Domain\Model\Order\Discount\Discount;
@@ -75,7 +73,7 @@ final class Order implements Aggregate, DiscountableItem
         $order->orderReference = $orderReference;
         $order->orderState = $orderState;
 
-        $order->initializeEmptyTotals();
+        $order->initializeEmptyOrderTotals();
 
         $order->recordEvent(new OrderCreated($order->orderId));
 
@@ -279,29 +277,6 @@ final class Order implements Aggregate, DiscountableItem
         $this->totalIncl = $allocation->getTotalIncludingVat();
     }
 
-    private function initializeEmptyTotals(): void
-    {
-        $zero = Money::EUR(0);
-
-        $this->subtotalExcl = $zero;
-        $this->subtotalIncl = $zero;
-
-        $this->shippingExcl = $zero;
-        $this->shippingIncl = $zero;
-
-        $this->paymentExcl = $zero;
-        $this->paymentIncl = $zero;
-
-        $this->discountExcl = $zero;
-        $this->discountIncl = $zero;
-
-        $this->totalExcl = $zero;
-        $this->totalVat = $zero;
-        $this->totalIncl = $zero;
-
-        $this->vatLines = [];
-    }
-
     public function getEnteredCouponCode(): ?string
     {
         return $this->getData('coupon_code');
@@ -335,38 +310,8 @@ final class Order implements Aggregate, DiscountableItem
             'invoice_ref' => $this->invoiceReference?->get(),
             'order_state' => $this->orderState->getValueAsString(),
 
-            'total_excl' => $this->totalExcl->getAmount(),
-            'total_incl' => $this->totalIncl->getAmount(),
-            'total_vat' => $this->totalVat->getAmount(),
-            'vat_lines' => json_encode(array_map(fn(VatAllocatedLine $vatLine) => [
-                'taxable_base' => $vatLine->getTaxableBase()->getAmount(),
-                'vat_amount' => $vatLine->getVatAmount()->getAmount(),
-                'vat_percentage' => $vatLine->getVatPercentage()->get(),
-            ], $this->vatLines)),
-            'subtotal_excl' => $this->subtotalExcl->getAmount(),
-            'subtotal_incl' => $this->subtotalIncl->getAmount(),
-            'discount_total_excl' => $this->discountExcl->getAmount(),
-            'discount_total_incl' => $this->discountIncl->getAmount(),
-            'shipping_cost_excl' => $this->shippingExcl->getAmount(),
-            'shipping_cost_incl' => $this->shippingIncl->getAmount(),
-            'payment_cost_excl' => $this->paymentExcl->getAmount(),
-            'payment_cost_incl' => $this->paymentIncl->getAmount(),
-
-//            'total' => $total->getIncludingVat()->getAmount(),
-//            'tax_total' => $this->getTaxTotal()->getAmount(),
-//            'includes_vat' => $includesVat,
-//            'subtotal' => $includesVat
-//                ? $this->getSubTotal()->getIncludingVat()->getAmount()
-//                : $this->getSubTotal()->getExcludingVat()->getAmount(),
-//            'discount_total' => $includesVat
-//                ? $this->getTotalDiscountPrice()->getIncludingVat()->getAmount()
-//                : $this->getTotalDiscountPrice()->getExcludingVat()->getAmount(),
-//            'shipping_cost' => $includesVat
-//                ? $this->getShippingCost()->getIncludingVat()->getAmount()
-//                : $this->getShippingCost()->getExcludingVat()->getAmount(),
-//            'payment_cost' => $includesVat
-//                ? $this->getPaymentCost()->getIncludingVat()->getAmount()
-//                : $this->getPaymentCost()->getExcludingVat()->getAmount(),
+            ...$this->getOrderTotalsState(),
+            ...$this->getVatLinesState(),
 
             'data' => json_encode($this->data),
         ];
@@ -399,23 +344,8 @@ final class Order implements Aggregate, DiscountableItem
         $order->invoiceReference = $state['invoice_ref'] ? InvoiceReference::fromString($state['invoice_ref']) : null;
         $order->orderState = $state['order_state'];
 
-        $order->totalExcl = Money::EUR($state['total_excl']);
-        $order->totalIncl = Money::EUR($state['total_incl']);
-        $order->totalVat = Money::EUR($state['total_vat']);
-        $order->subtotalExcl = Money::EUR($state['subtotal_excl']);
-        $order->subtotalIncl = Money::EUR($state['subtotal_incl']);
-        $order->discountExcl = Money::EUR($state['discount_total_excl']);
-        $order->discountIncl = Money::EUR($state['discount_total_incl']);
-        $order->shippingExcl = Money::EUR($state['shipping_cost_excl']);
-        $order->shippingIncl = Money::EUR($state['shipping_cost_incl']);
-        $order->paymentExcl = Money::EUR($state['payment_cost_excl']);
-        $order->paymentIncl = Money::EUR($state['payment_cost_incl']);
-        $order->vatLines = array_map(fn($vatLineData) => new VatAllocatedLine(
-            Money::EUR($vatLineData['taxable_base']),
-            Money::EUR($vatLineData['vat_amount']),
-            VatPercentage::fromString($vatLineData['vat_percentage']),
-        ), json_decode($state['vat_lines'], true));
-
+        $order->initializeOrderTotalsFromState($state);
+        $order->initializeVatLinesFromState($state);
 
         $order->discounts = array_map(fn($discountState) => Discount::fromMappedData($discountState, $state), $childEntities[Discount::class]);
         $order->lines = array_map(fn($lineState) => Line::fromMappedData($lineState, $state, [
@@ -441,5 +371,18 @@ final class Order implements Aggregate, DiscountableItem
     public function getDiscountableType(): DiscountableType
     {
         return DiscountableType::order;
+    }
+
+    /**
+     * This is the discount total that is applied on the entire order (not per item).
+     * Note that this is not a sum of all item discounts, but specifically the
+     * order discounts total as calculated based on the subtotal.
+     */
+    public function getTotalDiscountPrice(): DiscountPrice
+    {
+        throw new \Exception('getTotalDiscountPrice is deprecated, use getDiscountTotalExcl or getDiscountTotalIncl instead.');
+
+        // TODO: for order this is calculated in application layer...
+        // TODO: change interface ...
     }
 }

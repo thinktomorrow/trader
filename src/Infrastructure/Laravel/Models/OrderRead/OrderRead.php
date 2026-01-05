@@ -13,14 +13,17 @@ use Thinktomorrow\Trader\Application\Order\MerchantOrder\MerchantOrderPayment;
 use Thinktomorrow\Trader\Application\Order\MerchantOrder\MerchantOrderShipping;
 use Thinktomorrow\Trader\Application\Order\MerchantOrder\MerchantOrderShippingAddress;
 use Thinktomorrow\Trader\Application\Order\MerchantOrder\MerchantOrderShopper;
-use Thinktomorrow\Trader\Domain\Common\Price\Old\Price;
-use Thinktomorrow\Trader\Domain\Common\Price\Old\PriceTotal;
 use Thinktomorrow\Trader\Domain\Model\Order\State\OrderState;
+use Thinktomorrow\Trader\Domain\Model\Order\WithOrderTotals;
+use Thinktomorrow\Trader\Domain\Model\Order\WithVatLines;
 
 abstract class OrderRead
 {
     use RendersData;
     use RendersMoney;
+    use WithOrderTotals;
+    use WithVatLines;
+    use WithFormattedOrderTotals;
 
     protected string $orderId;
     protected string $orderReference;
@@ -42,13 +45,6 @@ abstract class OrderRead
     protected array $orderEvents;
     protected array $data;
 
-    protected PriceTotal $total;
-    protected Money $taxTotal;
-    protected PriceTotal $subtotal;
-    protected Price $discountTotal;
-    protected Price $shippingCost;
-    protected Price $paymentCost;
-
     // General flag for all line prices to render with or without tax.
     protected bool $include_tax = true;
 
@@ -60,7 +56,7 @@ abstract class OrderRead
     {
         $order = new static();
 
-        if (! $state['order_state'] instanceof OrderState) {
+        if (!$state['order_state'] instanceof OrderState) {
             throw new \InvalidArgumentException('Order state is expected to be instance of OrderState. Instead ' . gettype($state['order_state']) . ' is passed.');
         }
 
@@ -69,12 +65,8 @@ abstract class OrderRead
         $order->orderReference = $state['order_ref'];
         $order->invoiceReference = $state['invoice_ref'];
 
-        $order->total = $state['total'];
-        $order->taxTotal = $state['taxTotal'];
-        $order->subtotal = $state['subtotal'];
-        $order->discountTotal = $state['discountTotal'];
-        $order->shippingCost = $state['shippingCost'];
-        $order->paymentCost = $state['paymentCost'];
+        $order->initializeOrderTotalsFromState($state);
+        $order->initializeVatLinesFromState($state);
 
         $order->lines = $childObjects[MerchantOrderLine::class];
         $order->shippingAddress = $childObjects[MerchantOrderShippingAddress::class];
@@ -122,7 +114,7 @@ abstract class OrderRead
 
     public function getQuantity(): int
     {
-        return array_reduce((array)$this->getLines(), fn ($carry, $line) => $carry + $line->getQuantity(), 0);
+        return array_reduce((array)$this->getLines(), fn($carry, $line) => $carry + $line->getQuantity(), 0);
     }
 
     public function includeTax(bool $includeTax = true): void
@@ -167,7 +159,7 @@ abstract class OrderRead
 
     public function getShippingCost(?bool $includeTax = null): ?string
     {
-        if (! $this->shippingCost->getMoney()->isPositive()) {
+        if (!$this->shippingCost->getMoney()->isPositive()) {
             return null;
         }
 
@@ -186,7 +178,7 @@ abstract class OrderRead
 
     public function getPaymentCost(?bool $includeTax = null): ?string
     {
-        if (! $this->paymentCost->getMoney()->isPositive()) {
+        if (!$this->paymentCost->getMoney()->isPositive()) {
             return null;
         }
 
@@ -205,7 +197,7 @@ abstract class OrderRead
 
     public function getDiscountPrice(?bool $includeTax = null): ?string
     {
-        if (! $this->discountTotal->getMoney()->isPositive()) {
+        if (!$this->discountTotal->getMoney()->isPositive()) {
             return null;
         }
 

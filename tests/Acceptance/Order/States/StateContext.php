@@ -30,7 +30,7 @@ abstract class StateContext extends TestCase
             $this->orderContext->apps()->orderStateApplication()->$transitionMethod(new $transitionClass($order->orderId->get()));
         }
 
-        $order = $this->orderContext->repos()->orderRepository()->find($order->orderId);
+        $order = $this->orderContext->findOrder($order->orderId);
         $this->assertEquals($newState, $order->getOrderState());
     }
 
@@ -56,7 +56,7 @@ abstract class StateContext extends TestCase
         $transitionClass = 'Thinktomorrow\\Trader\\Application\\Order\\State\\Payment\\' . ucfirst($transitionMethod);
         $this->orderContext->apps()->orderStateApplication()->$transitionMethod(new $transitionClass($order->orderId->get(), $payment->paymentId->get()));
 
-        $order = $this->orderContext->repos()->orderRepository()->find($order->orderId);
+        $order = $this->orderContext->findOrder($order->orderId);
         $this->assertEquals($newState, $order->getPayments()[0]->getPaymentState());
 
         if ($newOrderState) {
@@ -80,7 +80,7 @@ abstract class StateContext extends TestCase
         $transitionClass = 'Thinktomorrow\\Trader\\Application\\Order\\State\\Shipping\\' . ucfirst($transitionMethod);
         $this->orderContext->apps()->orderStateApplication()->$transitionMethod(new $transitionClass($order->orderId->get(), $shipping->shippingId->get()));
 
-        $order = $this->orderContext->repos()->orderRepository()->find($order->orderId);
+        $order = $this->orderContext->findOrder($order->orderId);
         $this->assertEquals($newState, $order->getShippings()[0]->getShippingState());
 
         if ($newOrderState) {

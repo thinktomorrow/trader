@@ -24,7 +24,7 @@ class ConfirmCartTest extends CartContext
             last($this->orderContext->apps()->getEventDispatcher()->releaseDispatchedEvents())
         );
 
-        $order = $this->orderContext->repos()->orderRepository()->find(OrderId::fromString('xxx'));
+        $order = $this->orderContext->findOrder(OrderId::fromString('xxx'));
         $this->assertSame(DefaultOrderState::cart_completed, $order->getOrderState());
     }
 
@@ -40,7 +40,7 @@ class ConfirmCartTest extends CartContext
             last($this->orderContext->apps()->getEventDispatcher()->releaseDispatchedEvents())
         );
 
-        $order = $this->orderContext->repos()->orderRepository()->find(OrderId::fromString('xxx'));
+        $order = $this->orderContext->findOrder(OrderId::fromString('xxx'));
         $this->assertSame(DefaultOrderState::confirmed, $order->getOrderState());
     }
 
@@ -57,7 +57,7 @@ class ConfirmCartTest extends CartContext
             last($this->orderContext->apps()->getEventDispatcher()->releaseDispatchedEvents())
         );
 
-        $order = $this->orderContext->repos()->orderRepository()->find(OrderId::fromString('xxx'));
+        $order = $this->orderContext->findOrder(OrderId::fromString('xxx'));
         $this->assertSame(DefaultOrderState::confirmed, $order->getOrderState());
     }
 

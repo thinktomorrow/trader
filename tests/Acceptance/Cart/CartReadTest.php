@@ -61,7 +61,7 @@ class CartReadTest extends CartContext
         $this->assertEquals('€ 5', $line->getFormattedUnitPrice());
         $this->assertEquals('€ 10', $line->getFormattedTotalPrice());
         $this->assertEquals('€ 10', $line->getFormattedSubtotalPrice());
-        $this->assertEquals('€ 2', $line->getFormattedTaxPrice());
+        $this->assertEquals('€ 2', $line->getFormattedTotalVat());
         $this->assertEquals('20', $line->getFormattedVatRate());
         $this->assertEquals(2, $line->getQuantity());
         $this->assertCount(0, $line->getImages());
@@ -90,13 +90,13 @@ class CartReadTest extends CartContext
         $this->assertEquals('€ 5', $line->getFormattedUnitPrice()); // 4,1666666
         $this->assertEquals('€ 10', $line->getFormattedTotalPrice()); // 8,333333
         $this->assertEquals('€ 10', $line->getFormattedSubtotalPrice());
-        $this->assertEquals('€ 2', $line->getFormattedTaxPrice()); // tax is 20%
+        $this->assertEquals('€ 2', $line->getFormattedTotalVat()); // tax is 20%
 
         $line->includeTax();
         $this->assertEquals('€ 6', $line->getFormattedUnitPrice());
         $this->assertEquals('€ 12', $line->getFormattedTotalPrice());
         $this->assertEquals('€ 12', $line->getFormattedSubtotalPrice());
-        $this->assertEquals('€ 2', $line->getFormattedTaxPrice()); // tax is 20%
+        $this->assertEquals('€ 2', $line->getFormattedTotalVat()); // tax is 20%
     }
 
     public function test_it_can_see_shipping_address()

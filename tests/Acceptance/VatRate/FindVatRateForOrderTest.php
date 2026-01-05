@@ -174,7 +174,7 @@ class FindVatRateForOrderTest extends VatRateContext
 
         // Create an order if not already
         try {
-            return $this->orderContext->repos()->orderRepository()->find(OrderId::fromString('xxx'));
+            return $this->orderContext->findOrder(OrderId::fromString('xxx'));
         } catch (CouldNotFindOrder $e) {
 
             $order = Order::create(

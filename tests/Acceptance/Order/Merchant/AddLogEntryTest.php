@@ -5,29 +5,20 @@ namespace Tests\Acceptance\Order\Merchant;
 
 use Tests\Acceptance\Cart\CartContext;
 use Thinktomorrow\Trader\Application\Order\Merchant\AddLogEntry;
-use Thinktomorrow\Trader\Infrastructure\Test\Repositories\InMemoryOrderRepository;
 
 class AddLogEntryTest extends CartContext
 {
-    protected function setUp(): void
-    {
-        parent::setUp();
-
-        $this->orderContext->repos()->orderRepository() = new InMemoryOrderRepository();
-    }
-
     public function test_merchant_can_change_shipping_data()
     {
-        $order = $this->createOrder(['order_id' => 'xxx']);
-        $this->orderContext->repos()->orderRepository()->save($order);
+        $order = $this->orderContext->createOrder();
 
-        $this->merchantOrderApplication->addLogEntry(new AddLogEntry(
+        $this->orderContext->apps()->merchantOrderApplication()->addLogEntry(new AddLogEntry(
             $order->orderId->get(),
             'transition.confirmed', // transition.confirmed, transition.paid, notification.delay
             ['foo' => 'bar']
         ));
 
-        $order = $this->orderContext->repos()->orderRepository()->find($order->orderId);
+        $order = $this->orderContext->findOrder($order->orderId);
 
         $this->assertCount(1, $order->getOrderEvents());
         $this->assertEquals('transition.confirmed', $order->getOrderEvents()[0]->getEvent());

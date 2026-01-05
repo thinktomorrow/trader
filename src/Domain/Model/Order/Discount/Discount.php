@@ -10,7 +10,6 @@ use Thinktomorrow\Trader\Domain\Common\Entity\ChildEntity;
 use Thinktomorrow\Trader\Domain\Common\Entity\HasData;
 use Thinktomorrow\Trader\Domain\Common\Price\DefaultDiscountPrice;
 use Thinktomorrow\Trader\Domain\Common\Price\DiscountPrice;
-use Thinktomorrow\Trader\Domain\Common\Price\Price;
 use Thinktomorrow\Trader\Domain\Model\Order\OrderId;
 use Thinktomorrow\Trader\Domain\Model\Promo\DiscountId as PromoDiscountId;
 use Thinktomorrow\Trader\Domain\Model\Promo\PromoId;
@@ -32,16 +31,16 @@ final class Discount implements ChildEntity
     }
 
     /**
-     * The discount amount excluding VAT.
+     * The discount amount (excluding VAT).
      */
     public function getDiscountPrice(): DiscountPrice
     {
         return $this->discountPrice;
     }
 
-    public function getPercentage(Price $price): Percentage
+    public function getPercentage(Money $basePrice): Percentage
     {
-        return Cash::from($this->discountPrice->getExcludingVat())->asPercentage($price->getExcludingVat());
+        return Cash::from($this->discountPrice->getExcludingVat())->asPercentage($basePrice);
     }
 
     public function getMappedData(): array

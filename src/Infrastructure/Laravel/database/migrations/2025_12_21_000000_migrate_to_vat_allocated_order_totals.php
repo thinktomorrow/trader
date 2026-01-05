@@ -20,11 +20,11 @@ return new class extends Migration {
             $table->unsignedBigInteger('subtotal_incl')->nullable()->after('subtotal_excl');
 
             // Discounts
-            $table->unsignedBigInteger('discount_total_excl')->nullable()->after('subtotal_incl');
-            $table->unsignedBigInteger('discount_total_incl')->nullable()->after('discount_total_excl');
+            $table->unsignedBigInteger('discount_excl')->nullable()->after('subtotal_incl');
+            $table->unsignedBigInteger('discount_incl')->nullable()->after('discount_excl');
 
             // Shipping
-            $table->unsignedBigInteger('shipping_cost_excl')->nullable()->after('discount_total_incl');
+            $table->unsignedBigInteger('shipping_cost_excl')->nullable()->after('discount_incl');
             $table->unsignedBigInteger('shipping_cost_incl')->nullable()->after('shipping_cost_excl');
 
             // Payment
@@ -42,6 +42,18 @@ return new class extends Migration {
 
             $table->bigInteger('discount_excl')->unsigned()->default(0);
         });
+
+        Schema::table('trader_order_shipping', function (Blueprint $table) {
+            $table->bigInteger('cost_excl')->unsigned()->nullable();
+            $table->bigInteger('total_excl')->unsigned()->nullable();
+            $table->bigInteger('discount_excl')->unsigned()->default(0);
+        });
+
+        Schema::table('trader_order_payment', function (Blueprint $table) {
+            $table->bigInteger('cost_excl')->unsigned()->nullable();
+            $table->bigInteger('total_excl')->unsigned()->nullable();
+            $table->bigInteger('discount_excl')->unsigned()->default(0);
+        });
     }
 
     public function down(): void
@@ -50,8 +62,8 @@ return new class extends Migration {
             $table->dropColumn([
                 'subtotal_excl',
                 'subtotal_incl',
-                'discount_total_excl',
-                'discount_total_incl',
+                'discount_excl',
+                'discount_incl',
                 'shipping_cost_excl',
                 'shipping_cost_incl',
                 'payment_cost_excl',

@@ -91,7 +91,9 @@ final class Shipping implements ChildAggregate, DiscountableItem
             'shipping_profile_id' => $this->shippingProfileId?->get(),
             'shipping_state' => $this->shippingState->getValueAsString(),
             // Always store excluding vat cost, vat is calculated based on the products in the order.
-            'cost' => $this->shippingCost->getExcludingVat()->getAmount(),
+            'cost_excl' => $this->shippingCost->getExcludingVat()->getAmount(),
+            'discount_excl' => $this->getTotalDiscountPrice()->getExcludingVat()->getAmount(),
+            'total_excl' => $this->getShippingCostTotal()->getExcludingVat()->getAmount(),
             'data' => json_encode($data),
         ];
     }
@@ -115,7 +117,7 @@ final class Shipping implements ChildAggregate, DiscountableItem
         $shipping->shippingId = ShippingId::fromString($state['shipping_id']);
         $shipping->shippingProfileId = $state['shipping_profile_id'] ? ShippingProfileId::fromString($state['shipping_profile_id']) : null;
         $shipping->shippingState = $state['shipping_state'];
-        $shipping->shippingCost = DefaultServicePrice::fromExcludingVat(Money::EUR($state['cost']));
+        $shipping->shippingCost = DefaultServicePrice::fromExcludingVat(Money::EUR($state['cost_excl']));
         $shipping->discounts = array_map(fn($discountState) => Discount::fromMappedData($discountState, $state), $childEntities[Discount::class]);
         $shipping->data = json_decode($state['data'], true);
 
