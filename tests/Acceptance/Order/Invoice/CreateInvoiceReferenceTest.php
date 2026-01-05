@@ -5,14 +5,14 @@ namespace Tests\Acceptance\Order\Invoice;
 
 use Tests\Acceptance\Cart\CartContext;
 use Thinktomorrow\Trader\Domain\Model\Order\Invoice\InvoiceReference;
-use Thinktomorrow\Trader\Domain\Model\Order\Invoice\InvoiceRepository;
-use Thinktomorrow\Trader\Infrastructure\Test\TestContainer;
 
 class CreateInvoiceReferenceTest extends CartContext
 {
     public function test_it_can_create_default_invoice_reference()
     {
-        $handler = (new \Thinktomorrow\Trader\Application\Order\Invoice\CreateInvoiceReferenceByYearAndMonth((new TestContainer())->get(InvoiceRepository::class)));
+        $handler = (new \Thinktomorrow\Trader\Application\Order\Invoice\CreateInvoiceReferenceByYearAndMonth(
+            $this->orderContext->repos()->invoiceRepository()
+        ));
         $reference = $handler->create();
 
         $this->assertEquals(InvoiceReference::fromString(date('y') . date('m') . '0001'), $reference);
@@ -24,7 +24,9 @@ class CreateInvoiceReferenceTest extends CartContext
         $order->setInvoiceReference(InvoiceReference::fromString(date('y') . date('m') . '0003'));
         $this->orderContext->repos()->orderRepository()->save($order);
 
-        $handler = (new \Thinktomorrow\Trader\Application\Order\Invoice\CreateInvoiceReferenceByYearAndMonth((new TestContainer())->get(InvoiceRepository::class)));
+        $handler = (new \Thinktomorrow\Trader\Application\Order\Invoice\CreateInvoiceReferenceByYearAndMonth(
+            $this->orderContext->repos()->invoiceRepository()
+        ));
         $reference = $handler->create();
 
         $this->assertEquals(InvoiceReference::fromString(date('y') . date('m') . '0004'), $reference);
@@ -36,7 +38,9 @@ class CreateInvoiceReferenceTest extends CartContext
         $order->setInvoiceReference(InvoiceReference::fromString('22080003'));
         $this->orderContext->repos()->orderRepository()->save($order);
 
-        $handler = (new \Thinktomorrow\Trader\Application\Order\Invoice\CreateInvoiceReferenceByYearAndMonth((new TestContainer())->get(InvoiceRepository::class)));
+        $handler = (new \Thinktomorrow\Trader\Application\Order\Invoice\CreateInvoiceReferenceByYearAndMonth(
+            $this->orderContext->repos()->invoiceRepository()
+        ));
         $reference = $handler->create();
 
         $this->assertEquals(InvoiceReference::fromString(date('y') . date('m') . '0001'), $reference);

@@ -84,9 +84,9 @@ abstract class CartContext extends TestCase
 //        $this->>catalogContext->repos()->variantRepository() = new InMemoryVariantRepository();
 //        $this->cartRepository = new InMemoryCartRepository();
 //        $this->merchantOrderRepository = new InMemoryMerchantOrderRepository();
-//        $this->orderContext->repos()->vatRateRepository() = new InMemoryVatRateRepository(new TestTraderConfig());
+//        $this->catalogContext->repos()->vatRateRepository() = new InMemoryVatRateRepository(new TestTraderConfig());
 //        $this->vatExemptionApplication = new VatExemptionApplication(new TestTraderConfig());
-//        $this->findVatRateForOrder = new FindVatRateForOrder(new TestTraderConfig(), $this->vatExemptionApplication, $this->orderContext->repos()->vatRateRepository());
+//        $this->findVatRateForOrder = new FindVatRateForOrder(new TestTraderConfig(), $this->vatExemptionApplication, $this->catalogContext->repos()->vatRateRepository());
 //        $this->orderContext->repos()->promoRepository() = new InMemoryPromoRepository(
 //            new DiscountFactory([
 //                FixedAmountDiscount::class,
@@ -107,7 +107,7 @@ abstract class CartContext extends TestCase
 //        (new TestContainer())->add(ApplyPromoToOrder::class, new ApplyPromoToOrder($this->>orderContext->repos()->orderRepository()));
 //        (new TestContainer())->add(AdjustLine::class, new DefaultAdjustLine());
 //        (new TestContainer())->add(AdjustLines::class, new AdjustLines(new InMemoryVariantRepository(), TestContainer::make(AdjustLine::class)));
-//        (new TestContainer())->add(AdjustVatRates::class, new AdjustVatRates($this->>catalogContext->repos()->variantRepository(), new FindVatRateForOrder(new TestTraderConfig(), new VatExemptionApplication(new TestTraderConfig()), $this->orderContext->repos()->vatRateRepository())));
+//        (new TestContainer())->add(AdjustVatRates::class, new AdjustVatRates($this->>catalogContext->repos()->variantRepository(), new FindVatRateForOrder(new TestTraderConfig(), new VatExemptionApplication(new TestTraderConfig()), $this->catalogContext->repos()->vatRateRepository())));
 //        (new TestContainer())->add(AdjustDiscounts::class, new AdjustDiscounts($this->orderContext->repos()->promoRepository(), (new TestContainer())->get(ApplyPromoToOrder::class)));
 //        (new TestContainer())->add(OrderStateMachine::class, new OrderStateMachine([
 //            ...DefaultOrderState::customerStates(), DefaultOrderState::confirmed,
@@ -259,23 +259,23 @@ abstract class CartContext extends TestCase
         );
         $vatRate->addData(['title' => ['nl' => Str::headline($vatRateId)]]);
 
-        $this->orderContext->repos()->vatRateRepository()->save($vatRate);
+        $this->catalogContext->repos()->vatRateRepository()->save($vatRate);
 
         return $vatRate;
     }
 
     public function givenVatRateHasBaseRateOf(VatRateId $vatRateId, VatRateId $originVatRateId, ?string $baseRateId = null)
     {
-        $vatRate = $this->orderContext->repos()->vatRateRepository()->find($vatRateId);
-        $baseVatRate = $this->orderContext->repos()->vatRateRepository()->find($originVatRateId);
+        $vatRate = $this->catalogContext->repos()->vatRateRepository()->find($vatRateId);
+        $baseVatRate = $this->catalogContext->repos()->vatRateRepository()->find($originVatRateId);
         $vatRate->addBaseRate(BaseRate::create(
-            $baseRateId ?: $this->orderContext->repos()->vatRateRepository()->nextBaseRateReference(),
+            $baseRateId ?: $this->catalogContext->repos()->vatRateRepository()->nextBaseRateReference(),
             $originVatRateId,
             $vatRateId,
             $baseVatRate->getRate()
         ));
 
-        $this->orderContext->repos()->vatRateRepository()->save($vatRate);
+        $this->catalogContext->repos()->vatRateRepository()->save($vatRate);
     }
 
     public function givenACustomerExists(string $email, bool $is_business = false, string $locale = 'nl_BE'): Customer

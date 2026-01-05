@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 
-namespace Tests\Acceptance\Order;
+namespace Tests\Acceptance\Order\States;
 
 use Thinktomorrow\Trader\Domain\Common\State\StateException;
 use Thinktomorrow\Trader\Domain\Model\Order\Payment\DefaultPaymentState;

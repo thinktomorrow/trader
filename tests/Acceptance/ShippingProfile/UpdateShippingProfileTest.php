@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace Tests\Acceptance\ShippingProfile;
 
 use Money\Money;
+use Tests\Acceptance\TestCase;
 use Thinktomorrow\Trader\Application\ShippingProfile\CreateShippingProfile;
 use Thinktomorrow\Trader\Application\ShippingProfile\CreateTariff;
 use Thinktomorrow\Trader\Application\ShippingProfile\UpdateShippingProfile;
@@ -11,18 +12,18 @@ use Thinktomorrow\Trader\Application\ShippingProfile\UpdateTariff;
 use Thinktomorrow\Trader\Domain\Model\Country\CountryId;
 use Thinktomorrow\Trader\Domain\Model\ShippingProfile\ShippingProviderId;
 
-class UpdateShippingProfileTest extends ShippingProfileContext
+class UpdateShippingProfileTest extends TestCase
 {
     public function test_it_can_update_a_profile()
     {
-        $shippingProfileId = $this->shippingProfileApplication->createShippingProfile(new CreateShippingProfile(
+        $shippingProfileId = $this->orderContext->apps()->shippingProfileApplication()->createShippingProfile(new CreateShippingProfile(
             'postnl',
             true,
             ['BE', 'NL'],
             ['foo' => 'bar']
         ));
 
-        $this->shippingProfileApplication->updateShippingProfile(new UpdateShippingProfile(
+        $this->orderContext->apps()->shippingProfileApplication()->updateShippingProfile(new UpdateShippingProfile(
             $shippingProfileId->get(),
             'bpack',
             false,
@@ -42,16 +43,16 @@ class UpdateShippingProfileTest extends ShippingProfileContext
 
     public function test_it_can_update_a_tariff()
     {
-        $shippingProfileId = $this->shippingProfileApplication->createShippingProfile(new CreateShippingProfile(
+        $shippingProfileId = $this->orderContext->apps()->shippingProfileApplication()->createShippingProfile(new CreateShippingProfile(
             'postnl',
             true,
             ['BE', 'NL'],
             ['foo' => 'bar']
         ));
 
-        $tariffId = $this->shippingProfileApplication->createTariff(new CreateTariff($shippingProfileId->get(), '50', '10', '30'));
+        $tariffId = $this->orderContext->apps()->shippingProfileApplication()->createTariff(new CreateTariff($shippingProfileId->get(), '50', '10', '30'));
 
-        $this->shippingProfileApplication->updateTariff(new UpdateTariff($tariffId->get(), $shippingProfileId->get(), '60', '20', null));
+        $this->orderContext->apps()->shippingProfileApplication()->updateTariff(new UpdateTariff($tariffId->get(), $shippingProfileId->get(), '60', '20', null));
 
         $tariff = $this->orderContext->repos()->shippingProfileRepository()->find($shippingProfileId)->findTariff($tariffId);
 

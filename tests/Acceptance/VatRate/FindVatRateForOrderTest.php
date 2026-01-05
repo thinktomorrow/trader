@@ -201,13 +201,13 @@ class FindVatRateForOrderTest extends VatRateContext
     private function createVatRate(string $countryId, string $vatPercentage, bool $isStandard = true): VatRate
     {
         $vatRate = VatRate::create(
-            $this->orderContext->repos()->vatRateRepository()->nextReference(),
+            $this->catalogContext->repos()->vatRateRepository()->nextReference(),
             CountryId::fromString($countryId),
             VatPercentage::fromString($vatPercentage),
             $isStandard
         );
 
-        $this->orderContext->repos()->vatRateRepository()->save($vatRate);
+        $this->catalogContext->repos()->vatRateRepository()->save($vatRate);
 
         return $vatRate;
     }
@@ -215,7 +215,7 @@ class FindVatRateForOrderTest extends VatRateContext
     private function addBaseRate(VatRate $originVatRate, VatRate $targetVatRate): void
     {
         $baseRate = BaseRate::create(
-            $this->orderContext->repos()->vatRateRepository()->nextBaseRateReference(),
+            $this->catalogContext->repos()->vatRateRepository()->nextBaseRateReference(),
             $originVatRate->vatRateId,
             $targetVatRate->vatRateId,
             $originVatRate->getRate()
@@ -223,6 +223,6 @@ class FindVatRateForOrderTest extends VatRateContext
 
         $targetVatRate->addBaseRate($baseRate);
 
-        $this->orderContext->repos()->vatRateRepository()->save($targetVatRate);
+        $this->catalogContext->repos()->vatRateRepository()->save($targetVatRate);
     }
 }

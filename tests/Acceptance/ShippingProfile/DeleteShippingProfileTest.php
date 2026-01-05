@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace Tests\Acceptance\ShippingProfile;
 
+use Tests\Acceptance\TestCase;
 use Tests\TestHelpers;
 use Thinktomorrow\Trader\Application\ShippingProfile\CreateShippingProfile;
 use Thinktomorrow\Trader\Application\ShippingProfile\CreateTariff;
@@ -12,20 +13,20 @@ use Thinktomorrow\Trader\Domain\Model\ShippingProfile\Events\ShippingProfileDele
 use Thinktomorrow\Trader\Domain\Model\ShippingProfile\Events\TariffDeleted;
 use Thinktomorrow\Trader\Domain\Model\ShippingProfile\Exceptions\CouldNotFindShippingProfile;
 
-class DeleteShippingProfileTest extends ShippingProfileContext
+class DeleteShippingProfileTest extends TestCase
 {
     use TestHelpers;
 
     public function test_it_can_delete_a_profile()
     {
-        $shippingProfileId = $this->shippingProfileApplication->createShippingProfile(new CreateShippingProfile(
+        $shippingProfileId = $this->orderContext->apps()->shippingProfileApplication()->createShippingProfile(new CreateShippingProfile(
             'postnl',
             true,
             ['BE', 'NL'],
             ['foo' => 'bar']
         ));
 
-        $this->shippingProfileApplication->deleteShippingProfile(new DeleteShippingProfile($shippingProfileId->get()));
+        $this->orderContext->apps()->shippingProfileApplication()->deleteShippingProfile(new DeleteShippingProfile($shippingProfileId->get()));
 
         $this->assertEquals([
             new ShippingProfileDeleted($shippingProfileId),
@@ -37,16 +38,16 @@ class DeleteShippingProfileTest extends ShippingProfileContext
 
     public function test_it_can_delete_a_tariff()
     {
-        $shippingProfileId = $this->shippingProfileApplication->createShippingProfile(new CreateShippingProfile(
+        $shippingProfileId = $this->orderContext->apps()->shippingProfileApplication()->createShippingProfile(new CreateShippingProfile(
             'postnl',
             true,
             ['BE', 'NL'],
             ['foo' => 'bar']
         ));
 
-        $tariffId = $this->shippingProfileApplication->createTariff(new CreateTariff($shippingProfileId->get(), '50', '10', '30'));
+        $tariffId = $this->orderContext->apps()->shippingProfileApplication()->createTariff(new CreateTariff($shippingProfileId->get(), '50', '10', '30'));
 
-        $this->shippingProfileApplication->deleteTariff(new DeleteTariff($shippingProfileId->get(), $tariffId->get()));
+        $this->orderContext->apps()->shippingProfileApplication()->deleteTariff(new DeleteTariff($shippingProfileId->get(), $tariffId->get()));
 
         $this->assertEquals([
             new TariffDeleted($shippingProfileId, $tariffId),

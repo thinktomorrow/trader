@@ -24,7 +24,7 @@ class UpdateVatRateTest extends VatRateContext
             ['foo' => 'baz']
         ));
 
-        $vatRate = $this->orderContext->repos()->vatRateRepository()->find($vatRateId);
+        $vatRate = $this->catalogContext->repos()->vatRateRepository()->find($vatRateId);
 
         $this->assertEquals(VatPercentage::fromString('20'), $vatRate->getRate());
         $this->assertEquals(['foo' => 'baz'], $vatRate->getData());

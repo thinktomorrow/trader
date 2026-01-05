@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace Tests\Acceptance\ShippingProfile;
 
 use Money\Money;
+use Tests\Acceptance\TestCase;
 use Thinktomorrow\Trader\Application\ShippingProfile\CreateShippingProfile;
 use Thinktomorrow\Trader\Application\ShippingProfile\CreateTariff;
 use Thinktomorrow\Trader\Domain\Model\Country\CountryId;
@@ -12,11 +13,11 @@ use Thinktomorrow\Trader\Domain\Model\ShippingProfile\ShippingProviderId;
 use Thinktomorrow\Trader\Domain\Model\ShippingProfile\Tariff;
 use Thinktomorrow\Trader\Domain\Model\ShippingProfile\TariffId;
 
-class CreateShippingProfileTest extends ShippingProfileContext
+class CreateShippingProfileTest extends TestCase
 {
     public function test_it_can_create_a_shipping_profile()
     {
-        $shippingProfileId = $this->shippingProfileApplication->createShippingProfile(new CreateShippingProfile(
+        $shippingProfileId = $this->orderContext->apps()->shippingProfileApplication()->createShippingProfile(new CreateShippingProfile(
             'postnl',
             false,
             ['BE', 'NL'],
@@ -38,14 +39,14 @@ class CreateShippingProfileTest extends ShippingProfileContext
 
     public function test_it_can_create_a_tariff()
     {
-        $shippingProfileId = $this->shippingProfileApplication->createShippingProfile(new CreateShippingProfile(
+        $shippingProfileId = $this->orderContext->apps()->shippingProfileApplication()->createShippingProfile(new CreateShippingProfile(
             'postnl',
             true,
             ['BE', 'NL'],
             ['foo' => 'bar']
         ));
 
-        $tariffId = $this->shippingProfileApplication->createTariff(new CreateTariff($shippingProfileId->get(), '50', '10', '30'));
+        $tariffId = $this->orderContext->apps()->shippingProfileApplication()->createTariff(new CreateTariff($shippingProfileId->get(), '50', '10', '30'));
 
         $this->assertInstanceOf(TariffId::class, $tariffId);
         $this->assertInstanceOf(Tariff::class, $tariff = $this->orderContext->repos()->shippingProfileRepository()->find($shippingProfileId)->findTariff($tariffId));
