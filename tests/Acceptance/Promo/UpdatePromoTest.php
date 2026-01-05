@@ -3,19 +3,20 @@ declare(strict_types=1);
 
 namespace Tests\Acceptance\Promo;
 
+use Tests\Acceptance\TestCase;
 use Thinktomorrow\Trader\Application\Promo\CUD\CreateCouponPromo;
 use Thinktomorrow\Trader\Application\Promo\CUD\UpdatePromo;
 use Thinktomorrow\Trader\Domain\Model\Promo\Conditions\MinimumLinesQuantity;
 use Thinktomorrow\Trader\Domain\Model\Promo\Discounts\FixedAmountDiscount;
 use Thinktomorrow\Trader\Domain\Model\Promo\PromoId;
 
-class UpdatePromoTest extends PromoContext
+class UpdatePromoTest extends TestCase
 {
     public function test_it_can_update_a_promo_with_discounts()
     {
         $promoId = $this->createPromo();
 
-        $this->promoApplication->updatePromo(new UpdatePromo(
+        $this->orderContext->apps()->promoApplication()->updatePromo(new UpdatePromo(
             $promoId->get(),
             'foobar-2',
             '2023-02-02 01:10:10',
@@ -52,7 +53,7 @@ class UpdatePromoTest extends PromoContext
     {
         $promoId = $this->createPromo();
 
-        $this->promoApplication->updatePromo(new UpdatePromo(
+        $this->orderContext->apps()->promoApplication()->updatePromo(new UpdatePromo(
             $promoId->get(),
             'foobar-2',
             '2023-02-02 01:10:10',
@@ -93,7 +94,7 @@ class UpdatePromoTest extends PromoContext
 
     private function createPromo(): PromoId
     {
-        return $this->promoApplication->createPromo(new CreateCouponPromo(
+        return $this->orderContext->apps()->promoApplication()->createPromo(new CreateCouponPromo(
             'foobar',
             '2022-02-02 01:10:10',
             '2023-02-02 01:10:10',

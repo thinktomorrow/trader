@@ -3,14 +3,15 @@ declare(strict_types=1);
 
 namespace Tests\Acceptance\Promo;
 
+use Tests\Acceptance\TestCase;
 use Thinktomorrow\Trader\Application\Promo\CUD\CreateCouponPromo;
 use Thinktomorrow\Trader\Domain\Model\Promo\PromoId;
 
-class CreateCouponPromoTest extends PromoContext
+class CreateCouponPromoTest extends TestCase
 {
     public function test_it_can_create_a_coupon_promo()
     {
-        $promoId = $this->promoApplication->createPromo(new CreateCouponPromo(
+        $promoId = $this->orderContext->apps()->promoApplication()->createPromo(new CreateCouponPromo(
             'foobar',
             '2022-02-02 01:10:10',
             '2023-02-02 01:10:10',

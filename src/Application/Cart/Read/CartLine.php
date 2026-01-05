@@ -3,7 +3,6 @@
 namespace Thinktomorrow\Trader\Application\Cart\Read;
 
 use Money\Money;
-use Thinktomorrow\Trader\Domain\Common\Vat\VatPercentage;
 use Thinktomorrow\Trader\Domain\Model\Order\Line\PurchasableReference;
 
 interface CartLine
@@ -26,23 +25,27 @@ interface CartLine
 
     public function getTotalVat(): Money;
 
-    public function getVatRate(): VatPercentage;
-
     public function getTotalPriceIncl(): Money;
 
-    public function getFormattedUnitPrice(): string;
+    public function getFormattedUnitPriceExcl(): string;
 
-    public function getFormattedDiscountPrice(): string;
+    public function getFormattedUnitPriceIncl(): string;
 
-    public function getFormattedTotalPrice(): string;
+    public function getFormattedDiscountPriceExcl(): string;
 
-    public function getFormattedSubtotalPrice(): string;
+    public function getFormattedDiscountPriceIncl(): string;
+
+    public function getFormattedTotalPriceExcl(): string;
+
+    public function getFormattedTotalPriceIncl(): string;
+
+    public function getFormattedSubtotalPriceExcl(): string;
+
+    public function getFormattedSubtotalPriceIncl(): string;
 
     public function getFormattedTotalVat(): string;
 
     public function getFormattedVatRate(): string;
-
-    public function includeTax(bool $includeTax = true): void;
 
     public function getQuantity(): int;
 

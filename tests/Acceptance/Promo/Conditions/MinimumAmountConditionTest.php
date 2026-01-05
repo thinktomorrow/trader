@@ -3,12 +3,12 @@ declare(strict_types=1);
 
 namespace Tests\Acceptance\Promo\Conditions;
 
-use Tests\Acceptance\Promo\PromoContext;
+use Tests\Acceptance\TestCase;
 use Tests\TestHelpers;
 use Thinktomorrow\Trader\Application\Promo\OrderPromo\Conditions\MinimumAmountOrderCondition;
 use Thinktomorrow\Trader\Application\Promo\OrderPromo\OrderConditionFactory;
 
-class MinimumAmountConditionTest extends PromoContext
+class MinimumAmountConditionTest extends TestCase
 {
     use TestHelpers;
 
@@ -37,13 +37,13 @@ class MinimumAmountConditionTest extends PromoContext
         $order = $this->orderContext->createDefaultOrder();
 
         $condition = $this->factory->make('minimum_amount', [
-            'data' => json_encode(['amount' => '50']),
+            'data' => json_encode(['amount' => '82500']),
         ], []);
 
         $this->assertTrue($condition->check($order, $order));
 
         $condition = $this->factory->make('minimum_amount', [
-            'data' => json_encode(['amount' => '500']),
+            'data' => json_encode(['amount' => '82501']),
         ], []);
 
         $this->assertFalse($condition->check($order, $order));

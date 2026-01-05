@@ -5,10 +5,10 @@ namespace Thinktomorrow\Trader\Application\Promo\OrderPromo\Discounts;
 
 use Assert\Assertion;
 use Thinktomorrow\Trader\Application\Promo\OrderPromo\OrderCondition;
+use Thinktomorrow\Trader\Domain\Common\Price\DiscountPrice;
 use Thinktomorrow\Trader\Domain\Model\Order\Discount\Discount;
 use Thinktomorrow\Trader\Domain\Model\Order\Discount\DiscountableItem;
 use Thinktomorrow\Trader\Domain\Model\Order\Discount\DiscountId;
-use Thinktomorrow\Trader\Domain\Model\Order\Discount\DiscountTotal;
 use Thinktomorrow\Trader\Domain\Model\Order\Order;
 use Thinktomorrow\Trader\Domain\Model\Promo\DiscountId as PromoDiscountId;
 use Thinktomorrow\Trader\Domain\Model\Promo\PromoId;
@@ -25,7 +25,7 @@ abstract class BaseDiscount
     protected function isApplicable(Order $order, DiscountableItem $discountable): bool
     {
         foreach ($this->conditions as $condition) {
-            if (! $condition->check($order, $discountable)) {
+            if (!$condition->check($order, $discountable)) {
                 return false;
             }
         }
@@ -35,7 +35,7 @@ abstract class BaseDiscount
 
     public function apply(Order $order, DiscountableItem $discountable, DiscountId $nextDiscountId): void
     {
-        if (! $this->isApplicable($order, $discountable)) {
+        if (!$this->isApplicable($order, $discountable)) {
             return;
         }
 
@@ -46,7 +46,7 @@ abstract class BaseDiscount
             $discountable->getDiscountableId(),
             $this->promoId,
             $this->promoDiscountId,
-            $this->getDiscountTotal($order, $discountable),
+            $this->getDiscountPrice($order, $discountable),
             $this->promoData,
         );
 
@@ -69,10 +69,10 @@ abstract class BaseDiscount
         return $discount;
     }
 
-    public function getCombinedDiscountTotal(Order $order): DiscountTotal
+    public function getCombinedDiscountPrice(Order $order): DiscountPrice
     {
-        return $this->getDiscountTotal($order, $order);
+        return $this->getDiscountPrice($order, $order);
     }
 
-    abstract public function getDiscountTotal(Order $order, DiscountableItem $discountable): DiscountTotal;
+    abstract public function getDiscountPrice(Order $order, DiscountableItem $discountable): DiscountPrice;
 }

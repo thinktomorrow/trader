@@ -30,6 +30,7 @@ class AdjustDiscounts implements Adjuster
 
         // If coupon is given on cart, we'll refresh that promo first
         if ($order->getEnteredCouponCode() && $couponPromo = $this->orderPromoRepository->findOrderPromoByCouponCode($order->getEnteredCouponCode())) {
+
             $this->applyPromoToOrder->apply($order, $couponPromo->getDiscounts());
 
             if ($couponPromo->isCombinable()) {
@@ -43,8 +44,8 @@ class AdjustDiscounts implements Adjuster
 
         // Sort them by highest impact
         usort($promos, function (OrderPromo $a, OrderPromo $b) use ($order) {
-            $aValue = $a->getCombinedDiscountTotal($order)->getExcludingVat()->getAmount();
-            $bValue = $b->getCombinedDiscountTotal($order)->getExcludingVat()->getAmount();
+            $aValue = $a->getCombinedDiscountPrice($order)->getExcludingVat()->getAmount();
+            $bValue = $b->getCombinedDiscountPrice($order)->getExcludingVat()->getAmount();
 
             return $bValue <=> $aValue; // DESC
         });
@@ -55,12 +56,12 @@ class AdjustDiscounts implements Adjuster
             }
 
             // Check if existing promos are combinable
-            if (! $this->areExistingPromosCombinable($order, $combinablePromoIds)) {
+            if (!$this->areExistingPromosCombinable($order, $combinablePromoIds)) {
                 break;
             }
 
             // Check if this promo is combinable when there are already promos on the order present
-            if ($this->hasPromo($order) && ! $promo->isCombinable()) {
+            if ($this->hasPromo($order) && !$promo->isCombinable()) {
                 continue;
             }
 
@@ -84,7 +85,7 @@ class AdjustDiscounts implements Adjuster
     private function areExistingPromosCombinable(Order $order, array $combinablePromoIds)
     {
         foreach ($this->getExistingPromoIds($order) as $existingPromoId) {
-            if (! in_array($existingPromoId, $combinablePromoIds)) {
+            if (!in_array($existingPromoId, $combinablePromoIds)) {
                 return false;
             }
         }

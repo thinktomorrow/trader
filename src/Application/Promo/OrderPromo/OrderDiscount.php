@@ -4,9 +4,9 @@ declare(strict_types=1);
 namespace Thinktomorrow\Trader\Application\Promo\OrderPromo;
 
 use Thinktomorrow\Trader\Domain\Common\Map\Mappable;
+use Thinktomorrow\Trader\Domain\Common\Price\DiscountPrice;
 use Thinktomorrow\Trader\Domain\Model\Order\Discount\DiscountableItem;
 use Thinktomorrow\Trader\Domain\Model\Order\Discount\DiscountId;
-use Thinktomorrow\Trader\Domain\Model\Order\Discount\DiscountTotal;
 use Thinktomorrow\Trader\Domain\Model\Order\Order;
 
 interface OrderDiscount extends Mappable
@@ -17,7 +17,7 @@ interface OrderDiscount extends Mappable
 
     public function apply(Order $order, DiscountableItem $discountable, DiscountId $nextDiscountId): void;
 
-    public function getDiscountTotal(Order $order, DiscountableItem $discountable): DiscountTotal;
+    public function getDiscountPrice(Order $order, DiscountableItem $discountable): DiscountPrice;
 
     /**
      * The total discount on the order. This is not used in the price calculation, but rather
@@ -25,7 +25,7 @@ interface OrderDiscount extends Mappable
      * discount impact. This way the visitor receives the best available discount.
      *
      * @param Order $order
-     * @return DiscountTotal
+     * @return DiscountPrice
      */
-    public function getCombinedDiscountTotal(Order $order): DiscountTotal;
+    public function getCombinedDiscountPrice(Order $order): DiscountPrice;
 }

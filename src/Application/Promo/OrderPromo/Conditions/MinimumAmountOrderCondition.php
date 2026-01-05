@@ -21,11 +21,11 @@ class MinimumAmountOrderCondition implements OrderCondition
 
     public function check(Order $order, DiscountableItem $discountable): bool
     {
-        if (! $discountable instanceof Order) {
+        if (!$discountable instanceof Order) {
             return false;
         }
 
-        return $discountable->getSubTotal()->getMoney()->greaterThanOrEqual($this->amount);
+        return $discountable->getSubtotalExcl()->greaterThanOrEqual($this->amount);
     }
 
     public static function fromMappedData(array $state, array $aggregateState): static

@@ -5,7 +5,8 @@ namespace Thinktomorrow\Trader\Application\Promo\OrderPromo;
 
 use Assert\Assertion;
 use Thinktomorrow\Trader\Domain\Common\Entity\HasData;
-use Thinktomorrow\Trader\Domain\Model\Order\Discount\DiscountTotal;
+use Thinktomorrow\Trader\Domain\Common\Price\DefaultDiscountPrice;
+use Thinktomorrow\Trader\Domain\Common\Price\DiscountPrice;
 use Thinktomorrow\Trader\Domain\Model\Order\Order;
 use Thinktomorrow\Trader\Domain\Model\Promo\PromoId;
 
@@ -68,9 +69,9 @@ class OrderPromo
         return $this->isCombinable;
     }
 
-    public function getCombinedDiscountTotal(Order $order): DiscountTotal
+    public function getCombinedDiscountPrice(Order $order): DiscountPrice
     {
-        return array_reduce($this->discounts, fn ($carry, OrderDiscount $discount) => $discount->getCombinedDiscountTotal($order), DiscountTotal::zero());
+        return array_reduce($this->discounts, fn($carry, OrderDiscount $discount) => $discount->getCombinedDiscountPrice($order), DefaultDiscountPrice::zero());
     }
 
     public static function fromMappedData(array $state, array $childEntities = []): static

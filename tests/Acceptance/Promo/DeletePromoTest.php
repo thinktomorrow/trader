@@ -3,23 +3,21 @@ declare(strict_types=1);
 
 namespace Tests\Acceptance\Promo;
 
+use Tests\Acceptance\TestCase;
 use Tests\TestHelpers;
 use Thinktomorrow\Trader\Application\Promo\CUD\DeletePromo;
 use Thinktomorrow\Trader\Domain\Model\Promo\Events\PromoDeleted;
 use Thinktomorrow\Trader\Domain\Model\Promo\Exceptions\CouldNotFindPromo;
 
-class DeletePromoTest extends PromoContext
+class DeletePromoTest extends TestCase
 {
     use TestHelpers;
 
     public function test_it_can_delete_a_promo()
     {
-        $promo = $this->createPromo([], [
-            $this->orderContext->createOrderDiscount([], [$this->createCondition()]),
-        ]);
-        $this->orderContext->repos()->promoRepository()->save($promo);
+        $promo = $this->orderContext->createPromo();
 
-        $this->promoApplication->deletePromo(new DeletePromo($promo->promoId->get()));
+        $this->orderContext->apps()->promoApplication()->deletePromo(new DeletePromo($promo->promoId->get()));
 
         $this->assertEquals([
             new PromoDeleted($promo->promoId),

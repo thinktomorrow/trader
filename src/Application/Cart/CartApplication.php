@@ -70,6 +70,7 @@ final class CartApplication
             $this->container->get(AdjustLines::class),
             $this->container->get(AdjustShipping::class),
             $this->container->get(AdjustVatRates::class),
+            $this->container->get(AdjustOrderTotals::class), // First adjust totals to reset before discounts can be applied because they rely on subtotals
             $this->container->get(AdjustDiscounts::class),
             $this->container->get(AdjustOrderTotals::class),
         ]);

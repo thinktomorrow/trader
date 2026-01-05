@@ -292,12 +292,12 @@ abstract class CartContext extends TestCase
         return $customer;
     }
 
-    public function givenThereIsAPromo(array $mappedData = [], array $discounts = [])
-    {
-        $promo = $this->createPromo($mappedData, $discounts ?: [$this->orderContext->createOrderDiscount([], [$this->createCondition()])]);
-
-        $this->orderContext->repos()->promoRepository()->save($promo);
-    }
+//    public function givenThereIsAPromo(array $mappedData = [], array $discounts = [])
+//    {
+//        $promo = $this->createPromo($mappedData, $discounts ?: [$this->orderContext->createOrderDiscount([], [$this->createCondition()])]);
+//
+//        $this->orderContext->repos()->promoRepository()->save($promo);
+//    }
 
     protected function whenIAddTheVariantToTheCart($productVariantId, $quantity = 1, array $data = [], array $personalisations = [])
     {

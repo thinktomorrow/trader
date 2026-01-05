@@ -4,203 +4,228 @@ declare(strict_types=1);
 namespace Tests\Acceptance\Promo;
 
 use Money\Money;
-use Tests\Acceptance\Cart\CartContext;
-use Thinktomorrow\Trader\Application\Cart\RefreshCart\RefreshCart;
+use Tests\Acceptance\TestCase;
 use Thinktomorrow\Trader\Application\Promo\Coupon\EnterCoupon;
-use Thinktomorrow\Trader\Domain\Common\Cash\Cash;
-use Thinktomorrow\Trader\Domain\Model\Order\Discount\DiscountPriceDefaults;
+use Thinktomorrow\Trader\Domain\Model\Promo\Conditions\MinimumAmount;
 
-class OrderPromoTest extends CartContext
+class OrderPromoTest extends TestCase
 {
     public function test_it_can_apply_promo_by_coupon_code()
     {
-        $this->givenThereIsAPromo(['coupon_code' => 'foobar']);
-        $this->givenThereIsAProductWhichCostsEur('lightsaber', 5);
-        $this->whenIAddTheVariantToTheCart('lightsaber-variant-aaa', 5);
+        $this->orderContext->createPromo('promo-aaa', [
+            'coupon_code' => 'foobar',
+        ], [
+            $this->orderContext->createPromoDiscount(),
+        ]);
 
-        $this->promoApplication->enterCoupon(new EnterCoupon($this->getOrder()->orderId->get(), 'foobar'));
+        // Required for refresh order to work properly (line will be deleted is no related variant is found)
+        $this->catalogContext->createProduct();
+        $order = $this->orderContext->createEmptyOrder();
+        $line = $this->orderContext->createLine();
+        $this->orderContext->addLineToOrder($order, $line);
+        $order = $this->orderContext->refreshOrder($order->orderId->get());
 
-        $order = $this->orderContext->findOrder($this->getOrder()->orderId);
+        $this->orderContext->apps()->couponPromoApplication()->enterCoupon(new EnterCoupon($order->orderId->get(), 'foobar'));
+
+        $this->orderContext->refreshOrder($order->orderId->get());
+
+        $order = $this->orderContext->findOrder($order->orderId);
+        $this->assertEquals('foobar', $order->getEnteredCouponCode());
         $this->assertCount(1, $order->getDiscounts());
 
-        $this->assertEquals('foobar', $order->getEnteredCouponCode());
-
-        $cart = $this->orderContext->repos()->cartRepository()->findCart($this->getOrder()->orderId);
+        $cart = $this->orderContext->findCart($order->orderId);
         $this->assertCount(1, $cart->getDiscounts());
 
-        $this->assertTrue($order->getDiscountTotal()->includesVat());
-
-        $this->assertEquals(Money::EUR(2500), $order->getSubTotal()->getIncludingVat());
-        $this->assertEquals(Money::EUR(40), $order->getDiscountTotal()->getIncludingVat());
-        $this->assertEquals(Money::EUR(2460), $order->getTotal()->getIncludingVat());
-
-        $this->assertEquals('€ 25', $cart->getSubtotalPrice());
-        $this->assertEquals('€ 0,40', $cart->getDiscountPrice());
-        $this->assertEquals('€ 24,60', $cart->getTotalPrice());
-    }
-
-    public function test_it_can_apply_promo_when_discount_amount_is_excluded_vat()
-    {
-        DiscountPriceDefaults::setDiscountIncludeTax(false);
-
-        $this->givenThereIsAPromo(['coupon_code' => 'foobar']);
-        $this->givenThereIsAProductWhichCostsEur('lightsaber', 5);
-        $this->whenIAddTheVariantToTheCart('lightsaber-variant-aaa', 5);
-
-        $this->promoApplication->enterCoupon(new EnterCoupon($this->getOrder()->orderId->get(), 'foobar'));
-
-        $order = $this->orderContext->findOrder($this->getOrder()->orderId);
-        $this->assertCount(1, $order->getDiscounts());
-
-        $this->assertEquals('foobar', $order->getEnteredCouponCode());
-
-        $cart = $this->orderContext->repos()->cartRepository()->findCart($this->getOrder()->orderId);
-        $this->assertCount(1, $cart->getDiscounts());
-
-        $this->assertFalse($order->getDiscountTotal()->includesVat());
-
-        $this->assertEquals(Money::EUR(2500), $order->getSubTotal()->getIncludingVat());
-        $this->assertEquals(Money::EUR(40), $order->getDiscountTotal()->getExcludingVat());
-        $this->assertEquals(Money::EUR(48), $order->getDiscountTotal()->getIncludingVat());
-        $this->assertEquals(Money::EUR(2452), $order->getTotal()->getIncludingVat());
-
-        $this->assertEquals('€ 25', $cart->getSubtotalPrice());
-        $this->assertEquals('€ 0,48', $cart->getDiscountPrice());
-        $this->assertEquals('€ 24,52', $cart->getTotalPrice());
+        $this->assertEquals(Money::EUR(80), $order->getSubTotalExcl());
+        $this->assertEquals(Money::EUR(12), $order->getDiscountTotalExcl());
+        $this->assertEquals(Money::EUR(68), $order->getTotalExcl());
     }
 
     public function test_it_cannot_apply_promo_by_coupon_code_if_code_is_wrong()
     {
-        $this->givenThereIsAPromo(['coupon_code' => 'foobar']);
-        $this->givenThereIsAProductWhichCostsEur('lightsaber', 5);
-        $this->whenIAddTheVariantToTheCart('lightsaber-variant-aaa', 5);
+        $this->orderContext->createPromo('promo-aaa', [
+            'coupon_code' => 'foobar',
+        ], [
+            $this->orderContext->createPromoDiscount(),
+        ]);
 
-        $this->promoApplication->enterCoupon(new EnterCoupon($this->getOrder()->orderId->get(), 'fooxxx'));
+        // Required for refresh order to work properly (line will be deleted is no related variant is found)
+        $this->catalogContext->createProduct();
+        $order = $this->orderContext->createEmptyOrder();
+        $line = $this->orderContext->createLine();
+        $this->orderContext->addLineToOrder($order, $line);
+        $order = $this->orderContext->refreshOrder($order->orderId->get());
 
-        $order = $this->orderContext->findOrder($this->getOrder()->orderId);
+        $this->orderContext->apps()->couponPromoApplication()->enterCoupon(new EnterCoupon($order->orderId->get(), 'wrong'));
+
+        $this->orderContext->refreshOrder($order->orderId->get());
+
+        $order = $this->orderContext->findOrder($order->orderId);
+
+        $this->assertNull($order->getEnteredCouponCode());
         $this->assertCount(0, $order->getDiscounts());
-
-        $this->assertEquals(Money::EUR(2500), $order->getSubTotal()->getIncludingVat());
-        $this->assertEquals(Money::EUR(0), $order->getDiscountTotal()->getIncludingVat());
-        $this->assertEquals(Money::EUR(2500), $order->getTotal()->getIncludingVat());
+        $this->assertEquals(Money::EUR(0), $order->getDiscountTotalExcl());
     }
 
     public function test_it_cannot_apply_promo_by_coupon_code_if_conditions_fail()
     {
-        $this->givenThereIsAPromo(['coupon_code' => 'foobar']);
-        $this->givenThereIsAProductWhichCostsEur('lightsaber', 5);
-        $this->whenIAddTheVariantToTheCart('lightsaber-variant-aaa', 4);
+        $promo = $this->orderContext->createPromo('promo-aaa', [
+            'coupon_code' => 'foobar',
+        ], [
+            $this->orderContext->createPromoDiscount('promo-aaa', 'promo-discount-aaa', 'percentage_off', [], [
+                MinimumAmount::fromMappedData(['data' => json_encode(['amount' => '9000'])], []),
+            ]),
+        ]);
+        // Required for refresh order to work properly (line will be deleted is no related variant is found)
+        $this->catalogContext->createProduct();
+        $order = $this->orderContext->createEmptyOrder();
+        $line = $this->orderContext->createLine();
+        $this->orderContext->addLineToOrder($order, $line);
+        $order = $this->orderContext->refreshOrder($order->orderId->get());
 
-        $this->promoApplication->enterCoupon(new EnterCoupon($this->getOrder()->orderId->get(), 'foobar'));
+        $this->orderContext->apps()->couponPromoApplication()->enterCoupon(new EnterCoupon($order->orderId->get(), 'foobar'));
 
-        $order = $this->orderContext->findOrder($this->getOrder()->orderId);
+        $this->orderContext->refreshOrder($order->orderId->get());
+
+        $order = $this->orderContext->findOrder($order->orderId);
         $this->assertCount(0, $order->getDiscounts());
 
-        $this->assertEquals(Money::EUR(2000), $order->getSubTotal()->getIncludingVat());
-        $this->assertEquals(Money::EUR(0), $order->getDiscountTotal()->getIncludingVat());
-        $this->assertEquals(Money::EUR(2000), $order->getTotal()->getIncludingVat());
+        $this->assertEquals(Money::EUR(0), $order->getDiscountTotalExcl());
     }
 
     public function test_it_can_apply_automatic_applicable_promos()
     {
-        $this->givenThereIsAPromo([]);
-        $this->givenThereIsAProductWhichCostsEur('lightsaber', 5);
-        $this->whenIAddTheVariantToTheCart('lightsaber-variant-aaa', 5);
+        $this->orderContext->createPromo('promo-aaa', [
+            'coupon_code' => null,
+        ], [
+            $this->orderContext->createPromoDiscount(),
+        ]);
 
-        // Refresh cart...
-        $this->cartApplication->refresh(new RefreshCart($this->getOrder()->orderId->get()));
+        // Required for refresh order to work properly (line will be deleted is no related variant is found)
+        $this->catalogContext->createProduct();
+        $order = $this->orderContext->createEmptyOrder();
+        $line = $this->orderContext->createLine();
+        $this->orderContext->addLineToOrder($order, $line);
 
-        $order = $this->orderContext->findOrder($this->getOrder()->orderId);
+        $order = $this->orderContext->refreshOrder($order->orderId->get());
+        $order = $this->orderContext->findOrder($order->orderId);
+
         $this->assertCount(1, $order->getDiscounts());
-
-        $this->assertEquals(Money::EUR(2500), $order->getSubTotal()->getIncludingVat());
-        $this->assertEquals(Money::EUR(40), $order->getDiscountTotal()->getIncludingVat());
-        $this->assertEquals(Money::EUR(2460), $order->getTotal()->getIncludingVat());
+        $this->assertEquals(Money::EUR(12), $order->getDiscountTotalExcl());
     }
 
     public function test_it_can_apply_multiple_combinable_automatic_applicable_promos()
     {
-        $this->givenThereIsAPromo(['promo_id' => 'aaa', 'is_combinable' => true], [$this->orderContext->createOrderDiscount(['discount_id' => 'abc'])]);
-        $this->givenThereIsAPromo(['promo_id' => 'bbb', 'is_combinable' => true], [$this->orderContext->createOrderDiscount(['discount_id' => 'abcd'])]);
-        $this->givenThereIsAProductWhichCostsEur('lightsaber', 5);
-        $this->whenIAddTheVariantToTheCart('lightsaber-variant-aaa', 5);
+        $this->orderContext->createPromo('promo-aaa', [
+            'coupon_code' => null,
+            'is_combinable' => true,
+        ], [
+            $this->orderContext->createPromoDiscount(),
+        ]);
 
-        // Refresh cart...
-        $this->cartApplication->refresh(new RefreshCart($this->getOrder()->orderId->get()));
+        $this->orderContext->createPromo('promo-bbb', [
+            'coupon_code' => null,
+            'is_combinable' => true,
+        ], [
+            $this->orderContext->createPromoDiscount('promo-bbb', 'promo-discount-bbb'),
+        ]);
 
-        $order = $this->orderContext->findOrder($this->getOrder()->orderId);
+        // Required for refresh order to work properly (line will be deleted is no related variant is found)
+        $this->catalogContext->createProduct();
+        $order = $this->orderContext->createEmptyOrder();
+        $line = $this->orderContext->createLine();
+        $this->orderContext->addLineToOrder($order, $line);
+
+        $order = $this->orderContext->refreshOrder($order->orderId->get());
+        $order = $this->orderContext->findOrder($order->orderId);
+
         $this->assertCount(2, $order->getDiscounts());
-
-        $this->assertEquals(Money::EUR(2500), $order->getSubTotal()->getIncludingVat());
-        $this->assertEquals(Money::EUR(80), $order->getDiscountTotal()->getIncludingVat());
-        $this->assertEquals(Money::EUR(2420), $order->getTotal()->getIncludingVat());
+        $this->assertEquals(Money::EUR(24), $order->getDiscountTotalExcl());
     }
 
     public function test_it_applies_promo_with_highest_discount()
     {
-        $this->givenThereIsAPromo(['promo_id' => 'aaa'], [$this->orderContext->createOrderDiscount(['data' => json_encode(['amount' => '100'])])]);
-        $this->givenThereIsAPromo(['promo_id' => 'bbb'], [$this->orderContext->createOrderDiscount(['data' => json_encode(['amount' => '200'])])]);
-        $this->givenThereIsAProductWhichCostsEur('lightsaber', 5);
-        $this->whenIAddTheVariantToTheCart('lightsaber-variant-aaa', 5);
+        $this->orderContext->createPromo('promo-aaa', [
+            'coupon_code' => null,
+            'is_combinable' => false,
+        ], [
+            $this->orderContext->createPromoDiscount('promo-aaa', 'promo-discount-aaa', 'percentage_off', ['data' => json_encode(['percentage' => '10'])]),
+        ]);
 
-        // Refresh cart...
-        $this->cartApplication->refresh(new RefreshCart($this->getOrder()->orderId->get()));
+        $this->orderContext->createPromo('promo-bbb', [
+            'coupon_code' => null,
+            'is_combinable' => false,
+        ], [
+            $this->orderContext->createPromoDiscount('promo-bbb', 'promo-discount-bbb', 'percentage_off', ['data' => json_encode(['percentage' => '15'])]),
+        ]);
 
-        $order = $this->orderContext->findOrder($this->getOrder()->orderId);
+        // Required for refresh order to work properly (line will be deleted is no related variant is found)
+        $this->catalogContext->createProduct();
+        $order = $this->orderContext->createEmptyOrder();
+        $line = $this->orderContext->createLine();
+        $this->orderContext->addLineToOrder($order, $line);
+
+        $order = $this->orderContext->refreshOrder($order->orderId->get());
+        $order = $this->orderContext->findOrder($order->orderId);
+
         $this->assertCount(1, $order->getDiscounts());
-
-        $this->assertEquals(Money::EUR(2500), $order->getSubTotal()->getIncludingVat());
-        $this->assertEquals(Money::EUR(200), $order->getDiscountTotal()->getIncludingVat());
-        $this->assertEquals(Money::EUR(2300), $order->getTotal()->getIncludingVat());
+        $this->assertEquals(Money::EUR(12), $order->getDiscountTotalExcl());
     }
 
     public function test_it_can_apply_combinable_automatic_applicable_promos_with_coupon_promo()
     {
-        $this->givenThereIsAPromo(['promo_id' => 'aaa', 'coupon_code' => 'foobar', 'is_combinable' => true], [$this->orderContext->createOrderDiscount(['discount_id' => 'abc'])]);
-        $this->givenThereIsAPromo(['promo_id' => 'bbb', 'is_combinable' => true], [$this->orderContext->createOrderDiscount(['discount_id' => 'abcd'])]);
-        $this->givenThereIsAProductWhichCostsEur('lightsaber', 5);
-        $this->whenIAddTheVariantToTheCart('lightsaber-variant-aaa', 5);
+        $this->orderContext->createPromo('promo-aaa', [
+            'coupon_code' => 'foobar',
+            'is_combinable' => true,
+        ], [
+            $this->orderContext->createPromoDiscount(),
+        ]);
 
-        $this->promoApplication->enterCoupon(new EnterCoupon($this->getOrder()->orderId->get(), 'foobar'));
+        $this->orderContext->createPromo('promo-bbb', [
+            'coupon_code' => null,
+            'is_combinable' => true,
+        ], [
+            $this->orderContext->createPromoDiscount('promo-bbb', 'promo-discount-bbb'),
+        ]);
 
-        // Refresh cart
-        $order = $this->orderContext->findOrder($this->getOrder()->orderId);
-        $this->cartApplication->refresh(new RefreshCart($order->orderId->get()));
+        // Required for refresh order to work properly (line will be deleted is no related variant is found)
+        $this->catalogContext->createProduct();
+        $order = $this->orderContext->createEmptyOrder();
+        $line = $this->orderContext->createLine();
+        $this->orderContext->addLineToOrder($order, $line);
 
+        $order = $this->orderContext->refreshOrder($order->orderId->get());
         $order = $this->orderContext->findOrder($order->orderId);
-        $this->assertCount(2, $order->getDiscounts());
 
-        $this->assertEquals(Money::EUR(2500), $order->getSubTotal()->getIncludingVat());
-        $this->assertEquals(Money::EUR(80), $order->getDiscountTotal()->getIncludingVat());
-        $this->assertEquals(Money::EUR(2420), $order->getTotal()->getIncludingVat());
+        $this->orderContext->apps()->couponPromoApplication()->enterCoupon(new EnterCoupon($order->orderId->get(), 'foobar'));
+
+        $this->orderContext->refreshOrder($order->orderId->get());
+        $order = $this->orderContext->findOrder($order->orderId);
+
+        $this->assertCount(2, $order->getDiscounts());
+        $this->assertEquals(Money::EUR(24), $order->getDiscountTotalExcl());
     }
 
     public function test_it_cannot_go_below_zero()
     {
-        $this->givenThereIsAPromo(['promo_id' => 'aaa', 'is_combinable' => true], [$this->orderContext->createOrderDiscount(['data' => json_encode(['amount' => '100000'])])]);
-        $this->givenThereIsAProductWhichCostsEur('lightsaber', 5);
-        $this->whenIAddTheVariantToTheCart('lightsaber-variant-aaa', 5);
+        $this->orderContext->createPromo('promo-aaa', [
+            'coupon_code' => null,
+        ], [
+            $this->orderContext->createPromoDiscount('promo-aaa', 'promo-discount-aaa', 'percentage_off', ['data' => json_encode(['percentage' => '110'])]),
+        ]);
 
-        // Refresh cart...
-        $this->cartApplication->refresh(new RefreshCart($this->getOrder()->orderId->get()));
+        // Required for refresh order to work properly (line will be deleted is no related variant is found)
+        $this->catalogContext->createProduct();
+        $order = $this->orderContext->createEmptyOrder();
+        $line = $this->orderContext->createLine();
+        $this->orderContext->addLineToOrder($order, $line);
 
-        $order = $this->orderContext->findOrder($this->getOrder()->orderId);
+        $order = $this->orderContext->refreshOrder($order->orderId->get());
+        $order = $this->orderContext->findOrder($order->orderId);
+
         $this->assertCount(1, $order->getDiscounts());
-
-        $this->assertEquals($order->getSubTotal()->getIncludingVat(), $order->getDiscountTotal()->getIncludingVat());
-        $this->assertEquals(Cash::zero(), $order->getTotal()->getIncludingVat());
-        $this->assertEquals(Cash::zero(), $order->getTotal()->getExcludingVat());
-    }
-
-    public function test_it_can_apply_discount_on_entire_order()
-    {
-    }
-
-    public function test_it_can_apply_discount_on_line()
-    {
-    }
-
-    public function test_it_can_apply_discount_on_shipping()
-    {
+        $this->assertEquals(Money::EUR(80), $order->getSubTotalExcl());
+        $this->assertEquals(Money::EUR(80), $order->getDiscountTotalExcl());
+        $this->assertEquals(Money::EUR(0), $order->getTotalExcl());
     }
 }

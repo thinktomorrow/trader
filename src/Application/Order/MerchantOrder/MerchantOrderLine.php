@@ -21,26 +21,6 @@ interface MerchantOrderLine
 
     public function getProductId(): ?string;
 
-//    public function getUnitPriceAsMoney(): Money;
-//
-//    public function getLinePriceAsMoney(): Money;
-//
-//    public function getUnitPriceAsPrice(): VariantUnitPrice;
-//
-//    public function getLinePriceAsPrice(): LinePrice;
-
-//    public function getLinePrice(): string;
-//
-//    public function getTotalPrice(): string;
-//
-//    public function getSubtotalPrice(): string;
-//
-//    public function getTaxPrice(): string;
-//
-//    public function getDiscountPrice(): string;
-
-//    public function getUnitPrice(): ItemPrice;
-
     public function getUnitPriceExcl(): Money;
 
     public function getUnitPriceIncl(): Money;
@@ -71,19 +51,9 @@ interface MerchantOrderLine
 
     public function getFormattedSubtotalPriceIncl(): string;
 
-//    public function getFormattedUnitPrice(): string;
-//
-//    public function getFormattedDiscountPrice(): string;
-//
-//    public function getFormattedTotalPrice(): string;
-//
-//    public function getFormattedSubtotalPrice(): string;
-
     public function getFormattedTotalVat(): string;
 
     public function getFormattedVatRate(): string;
-
-//    public function includeTax(bool $includeTax = true): void;
 
     public function getQuantity(): int;
 
