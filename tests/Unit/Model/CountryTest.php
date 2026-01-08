@@ -27,7 +27,10 @@ class CountryTest extends TestCase
 
     public function test_it_can_be_build_from_raw_data()
     {
-        $country = $this->createCountry(['data' => json_encode(['foo' => 'bar'])]);
+        $country = Country::fromMappedData([
+            'country_id' => 'BE',
+            'data' => json_encode(['foo' => 'bar'])
+        ]);
 
         $this->assertEquals(CountryId::fromString('BE'), $country->countryId);
         $this->assertEquals('bar', $country->getData('foo'));
@@ -35,17 +38,23 @@ class CountryTest extends TestCase
 
     public function test_adding_data_merges_with_existing_data()
     {
-        $country = $this->createCountry();
+        $country = Country::create(
+            $countryId = CountryId::fromString('yyy'),
+            ['foo' => 'bar']
+        );
 
         $country->addData(['bar' => 'baz']);
         $country->addData(['foo' => 'bar', 'bar' => 'boo']);
 
-        $this->assertEquals(json_encode(['bar' => 'boo', 'foo' => 'bar']), $country->getMappedData()['data']);
+        $this->assertEquals(json_encode(['foo' => 'bar', 'bar' => 'boo']), $country->getMappedData()['data']);
     }
 
     public function test_it_can_delete_data()
     {
-        $country = $this->createCountry();
+        $country = Country::create(
+            $countryId = CountryId::fromString('yyy'),
+            ['foo' => 'bar']
+        );
 
         $country->addData(['foo' => 'bar', 'bar' => 'boo']);
         $country->deleteData('bar');

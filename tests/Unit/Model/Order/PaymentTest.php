@@ -35,7 +35,9 @@ class PaymentTest extends TestCase
             'payment_id' => $paymentId->get(),
             'payment_method_id' => $paymentMethodId->get(),
             'payment_state' => $state->value,
-            'cost' => $cost->getExcludingVat()->getAmount(),
+            'cost_excl' => $cost->getExcludingVat()->getAmount(),
+            'discount_excl' => 0,
+            'total_excl' => $cost->getExcludingVat()->getAmount(),
             'data' => json_encode(['payment_method_id' => $paymentMethodId->get()]),
         ], $payment->getMappedData());
     }
@@ -50,7 +52,9 @@ class PaymentTest extends TestCase
             'payment_id' => 'order-aaa:payment-aaa',
             'payment_method_id' => 'payment-method-aaa',
             'payment_state' => DefaultPaymentState::initialized->value,
-            'cost' => '20',
+            'cost_excl' => '50',
+            'discount_excl' => '0',
+            'total_excl' => '50',
             'data' => json_encode([
                 'title' => ['nl' => 'payment-aaa title nl', 'fr' => 'payment-aaa title fr'],
                 'payment_method_id' => 'payment-method-aaa'
@@ -153,8 +157,8 @@ class PaymentTest extends TestCase
 
         $this->assertCount(1, $payment->getDiscounts());
 
-        $this->assertEquals(DefaultServicePrice::fromExcludingVat(Money::EUR(20)), $payment->getPaymentCost());
+        $this->assertEquals(DefaultServicePrice::fromExcludingVat(Money::EUR(50)), $payment->getPaymentCost());
         $this->assertEquals(DefaultDiscountPrice::fromExcludingVat(Money::EUR(15)), $payment->getSumOfDiscountPrices());
-        $this->assertEquals(DefaultServicePrice::fromExcludingVat(Money::EUR(5)), $payment->getPaymentCostTotal());
+        $this->assertEquals(DefaultServicePrice::fromExcludingVat(Money::EUR(35)), $payment->getPaymentCostTotal());
     }
 }

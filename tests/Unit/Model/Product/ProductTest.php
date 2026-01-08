@@ -3,9 +3,7 @@ declare(strict_types=1);
 
 namespace Tests\Unit\Model\Product;
 
-use Money\Money;
 use Tests\Unit\TestCase;
-use Thinktomorrow\Trader\Domain\Common\Vat\VatPercentage;
 use Thinktomorrow\Trader\Domain\Model\Product\Events\ProductCreated;
 use Thinktomorrow\Trader\Domain\Model\Product\Events\ProductDataUpdated;
 use Thinktomorrow\Trader\Domain\Model\Product\Events\VariantCreated;
@@ -36,11 +34,11 @@ class ProductTest extends TestCase
 {
     public function test_it_can_create_a_product()
     {
-        $product = $this->catalogContext->keepDomainEvents()->createProduct();
+        $product = Product::create(ProductId::fromString('product-aaa'));
 
         $this->assertEquals([
             'product_id' => 'product-aaa',
-            'state' => ProductState::online->value,
+            'state' => ProductState::offline->value,
             'data' => '[]',
         ], $product->getMappedData());
 
@@ -155,7 +153,7 @@ class ProductTest extends TestCase
 
     public function test_it_can_update_state()
     {
-        $product = $this->catalogContext->createProduct();
+        $product = Product::create(ProductId::fromString('product-aaa'));
 
         $product->updateState(ProductState::archived);
 
@@ -164,7 +162,7 @@ class ProductTest extends TestCase
 
     public function test_it_records_event_when_data_is_updated()
     {
-        $product = $this->catalogContext->createProduct();
+        $product = Product::create(ProductId::fromString('product-aaa'));
         $product->releaseEvents();
 
         $product->addData(['title' => ['nl' => 'updated title']]);
@@ -176,7 +174,14 @@ class ProductTest extends TestCase
 
     public function test_it_can_add_variant()
     {
-        $product = $this->catalogContext->keepDomainEvents()->createProduct();
+        $product = Product::create(ProductId::fromString('product-aaa'));
+        $product->createVariant(Variant::create(
+            ProductId::fromString('product-aaa'),
+            VariantId::fromString('variant-aaa'),
+            VariantUnitPrice::fromScalars('100', '20', true),
+            VariantSalePrice::fromScalars('80', '20', true),
+            'sku',
+        ));
 
         $events = $product->releaseEvents();
 
@@ -188,7 +193,14 @@ class ProductTest extends TestCase
     {
         $this->expectException(VariantAlreadyExistsOnProduct::class);
 
-        $product = $this->catalogContext->createProduct();
+        $product = Product::create(ProductId::fromString('product-aaa'));
+        $product->createVariant(Variant::create(
+            ProductId::fromString('product-aaa'),
+            VariantId::fromString('variant-aaa'),
+            VariantUnitPrice::fromScalars('100', '20', true),
+            VariantSalePrice::fromScalars('80', '20', true),
+            'sku',
+        ));
 
         $product->createVariant($product->getVariants()[0]);
     }
@@ -197,7 +209,7 @@ class ProductTest extends TestCase
     {
         $this->expectException(\InvalidArgumentException::class);
 
-        $product = $this->catalogContext->createProduct();
+        $product = Product::create(ProductId::fromString('product-aaa'));
 
         $product->createVariant(Variant::create(
             ProductId::fromString('false-product-id'),
@@ -210,7 +222,15 @@ class ProductTest extends TestCase
 
     public function test_it_can_update_variant()
     {
-        $product = $this->catalogContext->createProduct();
+        $product = Product::create(ProductId::fromString('product-aaa'));
+
+        $product->createVariant(Variant::create(
+            ProductId::fromString('product-aaa'),
+            VariantId::fromString('variant-aaa'),
+            VariantUnitPrice::fromScalars('100', '20', true),
+            VariantSalePrice::fromScalars('80', '20', true),
+            'sku',
+        ));
 
         $variant = $product->getVariants()[0];
         $variant->updatePrice(VariantUnitPrice::fromScalars('150', '20', true), VariantSalePrice::fromScalars('120', '20', true));
@@ -223,7 +243,16 @@ class ProductTest extends TestCase
 
     public function test_it_records_event_when_variant_is_updated()
     {
-        $product = $this->catalogContext->createProduct();
+        $product = Product::create(ProductId::fromString('product-aaa'));
+
+        $product->createVariant(Variant::create(
+            ProductId::fromString('product-aaa'),
+            VariantId::fromString('variant-aaa'),
+            VariantUnitPrice::fromScalars('100', '20', true),
+            VariantSalePrice::fromScalars('80', '20', true),
+            'sku',
+        ));
+
         $product->releaseEvents();
 
         $variant = $product->getVariants()[0];
@@ -240,7 +269,7 @@ class ProductTest extends TestCase
     {
         $this->expectException(CouldNotFindVariantOnProduct::class);
 
-        $product = $this->catalogContext->createProduct();
+        $product = Product::create(ProductId::fromString('product-aaa'));
 
         $product->updateVariant(Variant::create(
             ProductId::fromString('product-aaa'),
@@ -255,7 +284,7 @@ class ProductTest extends TestCase
     {
         $this->expectException(\InvalidArgumentException::class);
 
-        $product = $this->catalogContext->createProduct();
+        $product = Product::create(ProductId::fromString('product-aaa'));
 
         $product->updateVariant(Variant::create(
             ProductId::fromString('other-product'),
@@ -268,33 +297,46 @@ class ProductTest extends TestCase
 
     public function test_it_can_delete_variant()
     {
-        $product = $this->catalogContext->keepDomainEvents()->createProduct();
+        $product = Product::create(ProductId::fromString('product-aaa'));
         $product->createVariant(Variant::create(
             ProductId::fromString('product-aaa'),
-            VariantId::fromString('zzz'),
-            VariantUnitPrice::fromMoney(Money::EUR(10), VatPercentage::fromString('20'), false),
-            VariantSalePrice::fromMoney(Money::EUR(8), VatPercentage::fromString('20'), false),
+            VariantId::fromString('variant-aaa'),
+            VariantUnitPrice::fromScalars('100', '20', true),
+            VariantSalePrice::fromScalars('80', '20', true),
             'sku',
         ));
 
-        $product->deleteVariant(VariantId::fromString('zzz'));
+        $product->createVariant(Variant::create(
+            ProductId::fromString('product-aaa'),
+            VariantId::fromString('variant-zzz'),
+            VariantUnitPrice::fromScalars('100', '20', true),
+            VariantSalePrice::fromScalars('80', '20', true),
+            'sku',
+        ));
+
+        $product->deleteVariant(VariantId::fromString('variant-zzz'));
 
         $events = $product->releaseEvents();
 
         $this->assertTrue(in_array(new ProductCreated(ProductId::fromString('product-aaa')), $events));
-
         $this->assertTrue(in_array(new VariantCreated(ProductId::fromString('product-aaa'), VariantId::fromString('variant-aaa')), $events));
-
-        $this->assertTrue(in_array(new VariantCreated(ProductId::fromString('product-aaa'), VariantId::fromString('zzz')), $events));
-
-        $this->assertTrue(in_array(new VariantDeleted(ProductId::fromString('product-aaa'), VariantId::fromString('zzz')), $events));
+        $this->assertTrue(in_array(new VariantCreated(ProductId::fromString('product-aaa'), VariantId::fromString('variant-zzz')), $events));
+        $this->assertTrue(in_array(new VariantDeleted(ProductId::fromString('product-aaa'), VariantId::fromString('variant-zzz')), $events));
     }
 
     public function test_it_cannot_delete_last_variant()
     {
         $this->expectException(CouldNotDeleteVariant::class);
 
-        $product = $this->catalogContext->createProduct();
+        $product = Product::create(ProductId::fromString('product-aaa'));
+
+        $product->createVariant(Variant::create(
+            ProductId::fromString('product-aaa'),
+            VariantId::fromString('variant-aaa'),
+            VariantUnitPrice::fromScalars('100', '20', true),
+            VariantSalePrice::fromScalars('80', '20', true),
+            'sku',
+        ));
 
         $product->deleteVariant(VariantId::fromString('variant-aaa'));
 

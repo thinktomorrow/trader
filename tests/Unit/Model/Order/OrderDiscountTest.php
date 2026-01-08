@@ -7,8 +7,6 @@ use Money\Money;
 use Tests\Unit\TestCase;
 use Thinktomorrow\Trader\Domain\Common\Cash\Percentage;
 use Thinktomorrow\Trader\Domain\Common\Price\DefaultDiscountPrice;
-use Thinktomorrow\Trader\Domain\Common\Price\DefaultItemPrice;
-use Thinktomorrow\Trader\Domain\Common\Vat\VatPercentage;
 use Thinktomorrow\Trader\Domain\Model\Order\Discount\Discount;
 use Thinktomorrow\Trader\Domain\Model\Order\Discount\DiscountableId;
 use Thinktomorrow\Trader\Domain\Model\Order\Discount\DiscountableType;
@@ -32,7 +30,7 @@ class OrderDiscountTest extends TestCase
         );
 
         $this->assertEquals($discountTotal, $discount->getDiscountPrice());
-        $this->assertEquals(Percentage::fromString('50.00'), $discount->getPercentage(DefaultItemPrice::fromExcludingVat(Money::EUR(100), VatPercentage::fromString("21"))));
+        $this->assertEquals(Percentage::fromString('50.00'), $discount->getPercentage(Money::EUR(100)));
         $this->assertEquals([
             'order_id' => $orderId->get(),
             'discount_id' => $discountId->get(),
