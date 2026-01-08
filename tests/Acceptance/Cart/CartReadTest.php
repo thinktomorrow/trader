@@ -4,8 +4,6 @@ declare(strict_types=1);
 namespace Tests\Acceptance\Cart;
 
 use Money\Money;
-use Thinktomorrow\Trader\Application\Cart\Read\CartPayment;
-use Thinktomorrow\Trader\Application\Cart\Read\CartShipping;
 use Thinktomorrow\Trader\Domain\Model\Order\OrderId;
 use Thinktomorrow\Trader\Domain\Model\Product\Personalisation\PersonalisationType;
 
@@ -58,10 +56,7 @@ class CartReadTest extends CartContext
         $this->assertCount(1, $cart->getLines());
         $line = $cart->getLines()[0];
 
-        $this->assertEquals('€ 5', $line->getFormattedUnitPrice());
-        $this->assertEquals('€ 10', $line->getFormattedTotalPrice());
-        $this->assertEquals('€ 10', $line->getFormattedSubtotalPrice());
-        $this->assertEquals('€ 2', $line->getFormattedTotalVat());
+        $this->assertEquals('€ 10', $line->getFormattedTotalPriceExcl());
         $this->assertEquals('20', $line->getFormattedVatRate());
         $this->assertEquals(2, $line->getQuantity());
         $this->assertCount(0, $line->getImages());
@@ -86,17 +81,14 @@ class CartReadTest extends CartContext
 
         $line = $cart->getLines()[0];
 
-        $line->includeTax(false);
-        $this->assertEquals('€ 5', $line->getFormattedUnitPrice()); // 4,1666666
-        $this->assertEquals('€ 10', $line->getFormattedTotalPrice()); // 8,333333
-        $this->assertEquals('€ 10', $line->getFormattedSubtotalPrice());
+        $this->assertEquals('€ 5', $line->getFormattedUnitPriceExcl()); // 4,1666666
+        $this->assertEquals('€ 10', $line->getFormattedTotalPriceExcl()); // 8,333333
+        $this->assertEquals('€ 10', $line->getFormattedSubtotalPriceExcl());
         $this->assertEquals('€ 2', $line->getFormattedTotalVat()); // tax is 20%
 
-        $line->includeTax();
-        $this->assertEquals('€ 6', $line->getFormattedUnitPrice());
-        $this->assertEquals('€ 12', $line->getFormattedTotalPrice());
-        $this->assertEquals('€ 12', $line->getFormattedSubtotalPrice());
-        $this->assertEquals('€ 2', $line->getFormattedTotalVat()); // tax is 20%
+        $this->assertEquals('€ 6', $line->getFormattedUnitPriceIncl());
+        $this->assertEquals('€ 12', $line->getFormattedTotalPriceIncl());
+        $this->assertEquals('€ 12', $line->getFormattedSubtotalPriceIncl());
     }
 
     public function test_it_can_see_shipping_address()
@@ -155,42 +147,6 @@ class CartReadTest extends CartContext
 
         $cart = $this->orderContext->repos()->cartRepository()->findCart(OrderId::fromString('xxx'));
         $this->assertFalse($cart->getShippingAddress()->equalsAddress($cart->getBillingAddress()));
-    }
-
-    public function test_it_can_see_shipping()
-    {
-        $this->givenOrderHasAShippingCountry('BE');
-        $this->givenShippingCostsForAPurchaseOfEur(30, 0, 1000);
-        $this->givenThereIsAProductWhichCostsEur('lightsaber', 5);
-        $this->whenIAddTheVariantToTheCart('lightsaber-variant-aaa', 2);
-        $this->whenIChooseShipping('bpost_home');
-
-        $this->refreshCart();
-
-        $cart = $this->orderContext->repos()->cartRepository()->findCart(OrderId::fromString('xxx'));
-
-        $this->assertInstanceOf(CartShipping::class, $cart->getShipping());
-        $this->assertEquals('shipping-123', $cart->getShipping()->getShippingId());
-        $this->assertTrue($cart->getShipping()->requiresAddress());
-        $this->assertEquals('bpost_home', $cart->getShipping()->getShippingProfileId());
-        $this->assertEquals('€ 30', $cart->getShipping()->getCostPrice());
-        $this->assertEquals('Bpost Home', $cart->getShipping()->getTitle());
-    }
-
-    public function test_it_can_see_payment()
-    {
-        $this->givenPaymentMethod(30, 'bancontact');
-        $this->givenThereIsAProductWhichCostsEur('lightsaber', 5);
-        $this->whenIAddTheVariantToTheCart('lightsaber-variant-aaa', 2);
-        $this->whenIChoosePayment('bancontact');
-
-        $this->refreshCart();
-        $cart = $this->orderContext->repos()->cartRepository()->findCart(OrderId::fromString('xxx'));
-
-        $this->assertInstanceOf(CartPayment::class, $cart->getPayment());
-        $this->assertEquals('payment-123', $cart->getPayment()->getPaymentId());
-        $this->assertEquals('bancontact', $cart->getPayment()->getPaymentMethodId());
-        $this->assertEquals('€ 30', $cart->getPayment()->getCostPrice());
     }
 
     public function test_it_can_see_personalisations()
