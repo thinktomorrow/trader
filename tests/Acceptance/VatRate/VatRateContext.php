@@ -6,42 +6,19 @@ namespace Tests\Acceptance\VatRate;
 use Tests\Acceptance\TestCase;
 use Thinktomorrow\Trader\Application\VatRate\CreateBaseRate;
 use Thinktomorrow\Trader\Application\VatRate\CreateVatRate;
-use Thinktomorrow\Trader\Application\VatRate\VatRateApplication;
-use Thinktomorrow\Trader\Infrastructure\Test\EventDispatcherSpy;
-use Thinktomorrow\Trader\Infrastructure\Test\Repositories\InMemoryVatRateRepository;
-use Thinktomorrow\Trader\Infrastructure\Test\TestTraderConfig;
 
 class VatRateContext extends TestCase
 {
-    protected VatRateApplication $vatRateApplication;
-    protected InMemoryVatRateRepository $vatRateRepository;
-    protected EventDispatcherSpy $eventDispatcher;
-
-    protected function setUp(): void
-    {
-        parent::setUp();
-
-        $this->vatRateApplication = new VatRateApplication(
-            $this->eventDispatcher = new EventDispatcherSpy(),
-            $this->catalogContext->repos()->vatRateRepository() = new InMemoryVatRateRepository(new TestTraderConfig()),
-        );
-    }
-
-    public function tearDown(): void
-    {
-        $this->catalogContext->repos()->vatRateRepository()->clear();
-    }
-
     protected function createBaseRateStub(): array
     {
-        $originVatRateId = $this->vatRateApplication->createVatRate(new CreateVatRate(
+        $originVatRateId = $this->catalogContext->apps()->vatRateApplication()->createVatRate(new CreateVatRate(
             'BE',
             '21',
             ['foo' => 'bar']
         ));
 
         $this->catalogContext->repos()->vatRateRepository()->setNextReference('zzz-123');
-        $targetVatRateId = $this->vatRateApplication->createVatRate(new CreateVatRate(
+        $targetVatRateId = $this->catalogContext->apps()->vatRateApplication()->createVatRate(new CreateVatRate(
             'NL',
             '20',
             ['foo' => 'baz']
@@ -50,7 +27,7 @@ class VatRateContext extends TestCase
         return [
             'originVatRateId' => $originVatRateId,
             'targetVatRateId' => $targetVatRateId,
-            'baseRateId' => $this->vatRateApplication->createBaseRate(new CreateBaseRate($originVatRateId->get(), $targetVatRateId->get())),
+            'baseRateId' => $this->catalogContext->apps()->vatRateApplication()->createBaseRate(new CreateBaseRate($originVatRateId->get(), $targetVatRateId->get())),
         ];
     }
 }

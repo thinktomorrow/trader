@@ -17,17 +17,17 @@ class DeleteVatRateTest extends VatRateContext
 
     public function test_it_can_delete_a_vat_rate()
     {
-        $vatRateId = $this->vatRateApplication->createVatRate(new CreateVatRate(
+        $vatRateId = $this->catalogContext->apps()->vatRateApplication()->createVatRate(new CreateVatRate(
             'BE',
             '21',
             ['foo' => 'bar']
         ));
 
-        $this->vatRateApplication->deleteVatRate(new DeleteVatRate($vatRateId->get()));
+        $this->catalogContext->apps()->vatRateApplication()->deleteVatRate(new DeleteVatRate($vatRateId->get()));
 
         $this->assertEquals([
             new VatRateDeleted($vatRateId),
-        ], $this->eventDispatcher->releaseDispatchedEvents());
+        ], $this->catalogContext->apps()->getEventDispatcher()->releaseDispatchedEvents());
 
         $this->expectException(CouldNotFindVatRate::class);
         $this->catalogContext->repos()->vatRateRepository()->find($vatRateId);
@@ -41,11 +41,11 @@ class DeleteVatRateTest extends VatRateContext
             'baseRateId' => $baseRateId
         ] = $this->createBaseRateStub();
 
-        $this->vatRateApplication->deleteBaseRate(new DeleteBaseRate($baseRateId->get(), $targetVatRateId->get()));
+        $this->catalogContext->apps()->vatRateApplication()->deleteBaseRate(new DeleteBaseRate($baseRateId->get(), $targetVatRateId->get()));
 
         $this->assertEquals([
             new BaseRateDeleted($baseRateId, $targetVatRateId),
-        ], $this->eventDispatcher->releaseDispatchedEvents());
+        ], $this->catalogContext->apps()->getEventDispatcher()->releaseDispatchedEvents());
 
         $vatRate = $this->catalogContext->repos()->vatRateRepository()->find($targetVatRateId);
         $this->assertCount(0, $vatRate->getBaseRates());

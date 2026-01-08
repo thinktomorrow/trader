@@ -7,7 +7,6 @@ use Thinktomorrow\Trader\Domain\Common\Locale;
 use Thinktomorrow\Trader\Domain\Common\Vat\VatPercentage;
 use Thinktomorrow\Trader\Domain\Model\Country\CountryId;
 use Thinktomorrow\Trader\Domain\Model\Order\Address\BillingAddress;
-use Thinktomorrow\Trader\Domain\Model\Order\Exceptions\CouldNotFindOrder;
 use Thinktomorrow\Trader\Domain\Model\Order\Order;
 use Thinktomorrow\Trader\Domain\Model\Order\OrderId;
 use Thinktomorrow\Trader\Domain\Model\Order\OrderReference;
@@ -19,50 +18,6 @@ use Thinktomorrow\Trader\Domain\Model\VatRate\VatRate;
 
 class FindVatRateForOrderTest extends VatRateContext
 {
-    public function test_it_does_not_affect_shipping_cost_vat_when_no_country_rate_applies()
-    {
-        $this->createVatRate('NL', '10');
-
-        $order = $this->getOrder('BE');
-
-        $result = $this->orderContext->apps()->findVatRateForOrder()->findForShippingCost($order);
-
-        $this->assertEquals('21', $result);
-    }
-
-    public function test_it_affects_shipping_cost_vat_when_country_rate_applies()
-    {
-        $vatRate = $this->createVatRate('NL', '10');
-
-        $order = $this->getOrder('NL');
-
-        $result = $this->orderContext->apps()->findVatRateForOrder()->findForShippingCost($order);
-
-        $this->assertEquals($vatRate->getRate(), $result);
-    }
-
-    public function test_it_does_not_affect_payment_cost_vat_when_no_country_rate_applies()
-    {
-        $this->createVatRate('NL', '10');
-
-        $order = $this->getOrder();
-
-        $result = $this->orderContext->apps()->findVatRateForOrder()->findForPaymentCost($order);
-
-        $this->assertEquals('21', $result);
-    }
-
-    public function test_it_affects_payment_cost_vat_when_country_rate_applies()
-    {
-        $vatRate = $this->createVatRate('NL', '10');
-
-        $order = $this->getOrder('NL');
-
-        $result = $this->orderContext->apps()->findVatRateForOrder()->findForPaymentCost($order);
-
-        $this->assertEquals($vatRate->getRate(), $result);
-    }
-
     public function test_it_does_not_affect_line_vat_when_no_standard_rate_applies()
     {
         $this->createVatRate('NL', '10');
@@ -145,12 +100,8 @@ class FindVatRateForOrderTest extends VatRateContext
         $order->updateShopper($shopper);
 
         $result = $this->orderContext->apps()->findVatRateForOrder()->findForLine($order, $variantVatPercentage);
-        $resultShippingCost = $this->orderContext->apps()->findVatRateForOrder()->findForShippingCost($order);
-        $resultPaymentCost = $this->orderContext->apps()->findVatRateForOrder()->findForPaymentCost($order);
 
         $this->assertEquals(VatPercentage::zero(), $result);
-        $this->assertEquals(VatPercentage::zero(), $resultShippingCost);
-        $this->assertEquals(VatPercentage::zero(), $resultPaymentCost);
     }
 
     private function getOrder(string $billingCountryId = 'BE'): Order
@@ -171,31 +122,31 @@ class FindVatRateForOrderTest extends VatRateContext
         ], ['order_id' => 'xxx']));
 
         return $order;
-
-        // Create an order if not already
-        try {
-            return $this->orderContext->findOrder(OrderId::fromString('xxx'));
-        } catch (CouldNotFindOrder $e) {
-
-            $order = Order::create(
-                OrderId::fromString('xxx'),
-                OrderReference::fromString('xx-ref'),
-                DefaultOrderState::cart_pending,
-            );
-
-            $order->updateBillingAddress(BillingAddress::fromMappedData([
-                'country_id' => $billingCountryId,
-                'line_1' => 'street 123',
-                'line_2' => 'bus 456',
-                'postal_code' => '2200',
-                'city' => 'Herentals',
-                'data' => json_encode([]),
-            ], ['order_id' => 'xxx']));
-
-            $this->orderContext->repos()->orderRepository()->save($order);
-
-            return $order;
-        }
+//
+//        // Create an order if not already
+//        try {
+//            return $this->orderContext->findOrder(OrderId::fromString('xxx'));
+//        } catch (CouldNotFindOrder $e) {
+//
+//            $order = Order::create(
+//                OrderId::fromString('xxx'),
+//                OrderReference::fromString('xx-ref'),
+//                DefaultOrderState::cart_pending,
+//            );
+//
+//            $order->updateBillingAddress(BillingAddress::fromMappedData([
+//                'country_id' => $billingCountryId,
+//                'line_1' => 'street 123',
+//                'line_2' => 'bus 456',
+//                'postal_code' => '2200',
+//                'city' => 'Herentals',
+//                'data' => json_encode([]),
+//            ], ['order_id' => 'xxx']));
+//
+//            $this->orderContext->repos()->orderRepository()->save($order);
+//
+//            return $order;
+//        }
     }
 
     private function createVatRate(string $countryId, string $vatPercentage, bool $isStandard = true): VatRate

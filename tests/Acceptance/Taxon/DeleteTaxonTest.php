@@ -25,7 +25,7 @@ class DeleteTaxonTest extends TestCase
 
         $this->assertEquals([
             new TaxonDeleted($taxonId),
-        ], $this->eventDispatcher->releaseDispatchedEvents());
+        ], $this->orderContext->apps()->getEventDispatcher()->releaseDispatchedEvents());
     }
 
     public function test_deleting_taxon_moves_child_taxa_to_level_above()

@@ -15,7 +15,7 @@ class CreateVatRateTest extends VatRateContext
 {
     public function test_it_can_create_a_vat_rate()
     {
-        $vatRateId = $this->vatRateApplication->createVatRate(new CreateVatRate(
+        $vatRateId = $this->catalogContext->apps()->vatRateApplication()->createVatRate(new CreateVatRate(
             'BE',
             '21',
             ['foo' => 'bar']
@@ -50,20 +50,20 @@ class CreateVatRateTest extends VatRateContext
 
     public function test_base_rate_belongs_to_target_rate()
     {
-        $originVatRateId = $this->vatRateApplication->createVatRate(new CreateVatRate(
+        $originVatRateId = $this->catalogContext->apps()->vatRateApplication()->createVatRate(new CreateVatRate(
             'BE',
             '21',
             ['foo' => 'bar']
         ));
 
         $this->catalogContext->repos()->vatRateRepository()->setNextReference('zzz-123');
-        $targetVatRateId = $this->vatRateApplication->createVatRate(new CreateVatRate(
+        $targetVatRateId = $this->catalogContext->apps()->vatRateApplication()->createVatRate(new CreateVatRate(
             'NL',
             '20',
             ['foo' => 'baz']
         ));
 
-        $this->vatRateApplication->createBaseRate(new CreateBaseRate($originVatRateId->get(), $targetVatRateId->get()));
+        $this->catalogContext->apps()->vatRateApplication()->createBaseRate(new CreateBaseRate($originVatRateId->get(), $targetVatRateId->get()));
 
         $this->assertCount(0, $this->catalogContext->repos()->vatRateRepository()->find($originVatRateId)->getBaseRates());
         $this->assertCount(1, $this->catalogContext->repos()->vatRateRepository()->find($targetVatRateId)->getBaseRates());

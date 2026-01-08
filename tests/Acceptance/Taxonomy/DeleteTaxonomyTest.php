@@ -21,6 +21,6 @@ class DeleteTaxonomyTest extends TaxonomyContext
 
         $this->assertEquals([
             new TaxonomyDeleted($taxonomyId),
-        ], $this->eventDispatcher->releaseDispatchedEvents());
+        ], $this->orderContext->apps()->getEventDispatcher()->releaseDispatchedEvents());
     }
 }

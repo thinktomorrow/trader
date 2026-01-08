@@ -12,13 +12,13 @@ class UpdateVatRateTest extends VatRateContext
 {
     public function test_it_can_update_a_vat_rate()
     {
-        $vatRateId = $this->vatRateApplication->createVatRate(new CreateVatRate(
+        $vatRateId = $this->catalogContext->apps()->vatRateApplication()->createVatRate(new CreateVatRate(
             'BE',
             '21',
             ['foo' => 'bar']
         ));
 
-        $this->vatRateApplication->updateVatRate(new UpdateVatRate(
+        $this->catalogContext->apps()->vatRateApplication()->updateVatRate(new UpdateVatRate(
             $vatRateId->get(),
             '20',
             ['foo' => 'baz']
