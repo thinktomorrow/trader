@@ -9,7 +9,7 @@ use Thinktomorrow\Trader\Domain\Model\Product\Personalisation\PersonalisationTyp
 
 class CartReadTest extends CartContext
 {
-    public function test_in_order_to_know_how_much_to_pay_as_a_visitor__i_need_to_be_able_to_see_the_cart_totals()
+    public function test_in_order_to_know_how_much_to_pay_as_a_visitor_i_need_to_be_able_to_see_the_cart_totals()
     {
         $this->givenThereIsAProductWhichCostsEur('aaa', 5);
         $this->whenIAddTheVariantToTheCart('aaa-variant-aaa', 2);
@@ -18,18 +18,29 @@ class CartReadTest extends CartContext
 
         $cart = $this->orderContext->repos()->cartRepository()->findCart(OrderId::fromString('xxx'));
 
-        $this->assertEquals('€ 12', $cart->getTotalPrice());
-        $this->assertEquals('€ 12', $cart->getSubtotalPrice());
-        $this->assertEquals('€ 2', $cart->getTaxPrice()); // tax is 20%
-        $this->assertNull($cart->getPaymentCost());
-        $this->assertNull($cart->getShippingCost());
-        $this->assertNull($cart->getDiscountPrice());
-        $this->assertEquals(Money::EUR(1200), $cart->getTotalPriceAsMoney());
-        $this->assertEquals(Money::EUR(1200), $cart->getSubtotalPriceAsMoney());
-        $this->assertEquals(Money::EUR(0), $cart->getShippingCostAsMoney());
-        $this->assertEquals(Money::EUR(0), $cart->getPaymentCostAsMoney());
-        $this->assertEquals(Money::EUR(0), $cart->getDiscountPriceAsMoney());
-        $this->assertEquals(Money::EUR(200), $cart->getTaxPriceAsMoney());
+        $this->assertEquals(Money::EUR(1000), $cart->getTotalExcl());
+        $this->assertEquals(Money::EUR(1200), $cart->getTotalIncl());
+        $this->assertEquals(Money::EUR(1000), $cart->getSubtotalExcl());
+        $this->assertEquals(Money::EUR(1200), $cart->getSubtotalIncl());
+        $this->assertEquals(Money::EUR(0), $cart->getShippingCostExcl());
+        $this->assertEquals(Money::EUR(0), $cart->getShippingCostIncl());
+        $this->assertEquals(Money::EUR(0), $cart->getPaymentCostExcl());
+        $this->assertEquals(Money::EUR(0), $cart->getPaymentCostIncl());
+        $this->assertEquals(Money::EUR(0), $cart->getDiscountTotalExcl());
+        $this->assertEquals(Money::EUR(0), $cart->getDiscountTotalIncl());
+        $this->assertEquals(Money::EUR(200), $cart->getTotalVat());
+
+        $this->assertEquals('€ 10', $cart->getFormattedTotalExcl());
+        $this->assertEquals('€ 12', $cart->getFormattedTotalIncl());
+        $this->assertEquals('€ 10', $cart->getFormattedSubtotalExcl());
+        $this->assertEquals('€ 12', $cart->getFormattedSubtotalIncl());
+        $this->assertEquals('€ 2', $cart->getFormattedTotalVat()); // tax is 20%
+        $this->assertEquals('€ 0', $cart->getFormattedPaymentCostExcl());
+        $this->assertEquals('€ 0', $cart->getFormattedPaymentCostIncl());
+        $this->assertEquals('€ 0', $cart->getFormattedShippingCostExcl());
+        $this->assertEquals('€ 0', $cart->getFormattedShippingCostIncl());
+        $this->assertEquals('€ 0', $cart->getFormattedDiscountTotalExcl());
+        $this->assertEquals('€ 0', $cart->getFormattedDiscountTotalIncl());
 
         $this->assertEquals(1, $cart->getSize());
         $this->assertEquals(2, $cart->getQuantity());
@@ -63,32 +74,6 @@ class CartReadTest extends CartContext
         $this->assertEquals('lightsaber-variant-aaa title nl', $line->getTitle());
         $this->assertNull($line->getDescription());
         $this->assertCount(0, $line->getDiscounts());
-    }
-
-    public function test_it_can_show_line_prices_without_tax_for_business_accounts()
-    {
-        $this->givenThereIsAProductWhichCostsEur('lightsaber', 5);
-        $this->whenIAddTheVariantToTheCart('lightsaber-variant-aaa', 2);
-
-        $this->refreshCart();
-
-        $cart = $this->orderContext->repos()->cartRepository()->findCart(OrderId::fromString('xxx'));
-
-        $this->assertEquals(Money::EUR(1200), $cart->getTotalPriceAsMoney());
-        $this->assertEquals(Money::EUR(1200), $cart->getSubtotalPriceAsMoney());
-        $this->assertEquals(Money::EUR(1000), $cart->getTotalPriceAsMoney(false));
-        $this->assertEquals(Money::EUR(1000), $cart->getSubtotalPriceAsMoney(false));
-
-        $line = $cart->getLines()[0];
-
-        $this->assertEquals('€ 5', $line->getFormattedUnitPriceExcl()); // 4,1666666
-        $this->assertEquals('€ 10', $line->getFormattedTotalPriceExcl()); // 8,333333
-        $this->assertEquals('€ 10', $line->getFormattedSubtotalPriceExcl());
-        $this->assertEquals('€ 2', $line->getFormattedTotalVat()); // tax is 20%
-
-        $this->assertEquals('€ 6', $line->getFormattedUnitPriceIncl());
-        $this->assertEquals('€ 12', $line->getFormattedTotalPriceIncl());
-        $this->assertEquals('€ 12', $line->getFormattedSubtotalPriceIncl());
     }
 
     public function test_it_can_see_shipping_address()

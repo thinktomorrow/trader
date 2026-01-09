@@ -7,8 +7,10 @@ use DateTime;
 use Money\Money;
 use Tests\Acceptance\TestCase;
 use Tests\TestHelpers;
+use Thinktomorrow\Trader\Application\Cart\RefreshCart\Adjusters\AdjustOrderVatSnapshot;
 use Thinktomorrow\Trader\Domain\Model\Order\State\DefaultOrderState;
 use Thinktomorrow\Trader\Infrastructure\Laravel\Models\DefaultOrderGridItem;
+use Thinktomorrow\Trader\Infrastructure\Test\TestContainer;
 
 class OrderGridItemTest extends TestCase
 {
@@ -16,8 +18,14 @@ class OrderGridItemTest extends TestCase
 
     public function test_it_can_create_a_order_grid_item()
     {
-        $order = DefaultOrderGridItem::fromMappedData(array_merge($this->orderContext->createDefaultOrder()->getMappedData(), [
-        ]), []);
+        $order = $this->orderContext->createDefaultOrder();
+
+        // Refresh Vat snapshot
+        (new TestContainer())->get(AdjustOrderVatSnapshot::class)->adjust($order);
+        $this->orderContext->saveOrder($order);
+        $order = $this->orderContext->findOrder($order->orderId);
+
+        $order = DefaultOrderGridItem::fromMappedData($order->getMappedData(), []);
 
         $this->assertEquals('order-aaa', $order->getOrderId());
         $this->assertEquals('order-aaa-ref', $order->getOrderReference());
@@ -28,35 +36,41 @@ class OrderGridItemTest extends TestCase
         $this->assertEquals('', $order->getDescription());
         $this->assertEquals('/admin/orders/order-aaa', $order->getUrl());
 
-        $this->assertEquals(Money::EUR('82500'), $order->getSubtotalExcl());
-        $this->assertEquals(Money::EUR('100000'), $order->getSubtotalIncl());
-        $this->assertEquals(Money::EUR('4132'), $order->getShippingCostExcl());
-        $this->assertEquals(Money::EUR('5000'), $order->getShippingCostIncl());
-        $this->assertEquals(Money::EUR('1653'), $order->getPaymentCostExcl());
-        $this->assertEquals(Money::EUR('2000'), $order->getPaymentCostIncl());
-        $this->assertEquals(Money::EUR('5785'), $order->getDiscountTotalExcl());
-        $this->assertEquals(Money::EUR('7000'), $order->getDiscountTotalIncl());
-        $this->assertEquals(Money::EUR('82500'), $order->getTotalExcl());
-        $this->assertEquals(Money::EUR('17500'), $order->getTotalVat());
-        $this->assertEquals(Money::EUR('100000'), $order->getTotalIncl());
+        $this->assertEquals(Money::EUR('166'), $order->getSubtotalExcl());
+        $this->assertEquals(Money::EUR('200'), $order->getSubtotalIncl());
+        $this->assertEquals(Money::EUR('50'), $order->getShippingCostExcl());
+        $this->assertEquals(Money::EUR('61'), $order->getShippingCostIncl());
+        $this->assertEquals(Money::EUR('50'), $order->getPaymentCostExcl());
+        $this->assertEquals(Money::EUR('61'), $order->getPaymentCostIncl());
+        $this->assertEquals(Money::EUR('15'), $order->getDiscountTotalExcl());
+        $this->assertEquals(Money::EUR('18'), $order->getDiscountTotalIncl());
+        $this->assertEquals(Money::EUR('251'), $order->getTotalExcl());
+        $this->assertEquals(Money::EUR('53'), $order->getTotalVat());
+        $this->assertEquals(Money::EUR('304'), $order->getTotalIncl());
     }
 
     public function test_it_can_return_formatted_prices()
     {
-        $order = DefaultOrderGridItem::fromMappedData(array_merge($this->orderContext->createDefaultOrder()->getMappedData(), [
-        ]), []);
+        $order = $this->orderContext->createDefaultOrder();
 
-        $this->assertEquals('€ 825', $order->getFormattedSubtotalExcl());
-        $this->assertEquals('€ 1.000', $order->getFormattedSubtotalIncl());
-        $this->assertEquals('€ 41,32', $order->getFormattedShippingCostExcl());
-        $this->assertEquals('€ 50', $order->getFormattedShippingCostIncl());
-        $this->assertEquals('€ 16,53', $order->getFormattedPaymentCostExcl());
-        $this->assertEquals('€ 20', $order->getFormattedPaymentCostIncl());
-        $this->assertEquals('€ 57,85', $order->getFormattedDiscountTotalExcl());
-        $this->assertEquals('€ 70', $order->getFormattedDiscountTotalIncl());
-        $this->assertEquals('€ 825', $order->getFormattedTotalExcl());
-        $this->assertEquals('€ 175', $order->getFormattedTotalVat());
-        $this->assertEquals('€ 1.000', $order->getFormattedTotalIncl());
+        // Refresh Vat snapshot
+        (new TestContainer())->get(AdjustOrderVatSnapshot::class)->adjust($order);
+        $this->orderContext->saveOrder($order);
+        $order = $this->orderContext->findOrder($order->orderId);
+
+        $order = DefaultOrderGridItem::fromMappedData($order->getMappedData(), []);
+
+        $this->assertEquals('€ 1,66', $order->getFormattedSubtotalExcl());
+        $this->assertEquals('€ 2', $order->getFormattedSubtotalIncl());
+        $this->assertEquals('€ 0,50', $order->getFormattedShippingCostExcl());
+        $this->assertEquals('€ 0,61', $order->getFormattedShippingCostIncl());
+        $this->assertEquals('€ 0,50', $order->getFormattedPaymentCostExcl());
+        $this->assertEquals('€ 0,61', $order->getFormattedPaymentCostIncl());
+        $this->assertEquals('€ 0,15', $order->getFormattedDiscountTotalExcl());
+        $this->assertEquals('€ 0,18', $order->getFormattedDiscountTotalIncl());
+        $this->assertEquals('€ 2,51', $order->getFormattedTotalExcl());
+        $this->assertEquals('€ 0,53', $order->getFormattedTotalVat());
+        $this->assertEquals('€ 3,04', $order->getFormattedTotalIncl());
     }
 
     public function test_it_can_get_important_timestamps()

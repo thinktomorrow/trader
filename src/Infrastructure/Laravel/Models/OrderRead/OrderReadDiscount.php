@@ -44,6 +44,14 @@ abstract class OrderReadDiscount
         return $this->total;
     }
 
+    public function getFormattedDiscountPriceExcl(): string
+    {
+        return $this->renderMoney(
+            $this->getDiscountPrice()->getExcludingVat(),
+            $this->getLocale()
+        );
+    }
+
     public function getPercentage(): string
     {
         return $this->percentage->get();

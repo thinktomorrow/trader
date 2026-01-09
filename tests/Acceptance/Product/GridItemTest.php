@@ -3,7 +3,11 @@ declare(strict_types=1);
 
 namespace Tests\Acceptance\Product;
 
+use Money\Money;
 use Tests\TestHelpers;
+use Thinktomorrow\Trader\Domain\Common\Vat\VatPercentage;
+use Thinktomorrow\Trader\Domain\Model\Product\Variant\VariantSalePrice;
+use Thinktomorrow\Trader\Domain\Model\Product\Variant\VariantUnitPrice;
 use Thinktomorrow\Trader\Infrastructure\Laravel\Models\DefaultGridItem;
 
 class GridItemTest extends ProductContext
@@ -32,12 +36,19 @@ class GridItemTest extends ProductContext
         $this->assertEquals('Test Product', $gridItem->getTitle());
         $this->assertCount(0, $gridItem->getTaxa());
         $this->assertTrue($gridItem->isAvailable());
-        $this->assertEquals('€ 10', $gridItem->getUnitPrice());
-        $this->assertEquals('€ 8,26', $gridItem->getUnitPrice(false));
-        $this->assertEquals('€ 8', $gridItem->getSalePrice());
-        $this->assertEquals('€ 6,61', $gridItem->getSalePrice(false));
+
+        $this->assertEquals(VariantUnitPrice::fromMoney(Money::EUR('1000'), VatPercentage::fromString('21'), true), $gridItem->getUnitPrice());
+        $this->assertEquals(VariantSalePrice::fromMoney(Money::EUR('800'), VatPercentage::fromString('21'), true), $gridItem->getSalePrice());
+        $this->assertEquals(VariantUnitPrice::fromMoney(Money::EUR('200'), VatPercentage::fromString('21'), true), $gridItem->getSaleDiscountPrice());
+        $this->assertEquals('€ 8,26', $gridItem->getFormattedUnitPriceExcl());
+        $this->assertEquals('€ 10', $gridItem->getFormattedUnitPriceIncl());
+        $this->assertEquals('€ 6,61', $gridItem->getFormattedSalePriceExcl());
+        $this->assertEquals('€ 8', $gridItem->getFormattedSalePriceIncl());
+        $this->assertEquals('€ 1,65', $gridItem->getFormattedSaleDiscountPriceExcl());
+        $this->assertEquals('€ 2', $gridItem->getFormattedSaleDiscountPriceIncl());
         $this->assertEquals('21', $gridItem->getFormattedVatRate());
+
         $this->assertTrue($gridItem->onSale());
-        $this->assertEquals('€ 2', $gridItem->getFormattedSaleDiscount());
+        $this->assertEquals(20, $gridItem->getSaleDiscountPercentage());
     }
 }

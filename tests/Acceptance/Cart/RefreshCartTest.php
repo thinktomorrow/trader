@@ -27,7 +27,7 @@ class RefreshCartTest extends CartContext
 
         $cart = $this->orderContext->repos()->cartRepository()->findCart(OrderId::fromString('xxx'));
 
-        $this->assertEquals('€ 12', $cart->getTotalPrice());
+        $this->assertEquals('€ 12', $cart->getFormattedTotalIncl());
     }
 
     public function test_it_cannot_refresh_cart_when_order_is_no_longer_is_shopper_hands()
@@ -47,7 +47,7 @@ class RefreshCartTest extends CartContext
         $this->refreshCart();
 
         $cart = $this->orderContext->repos()->cartRepository()->findCart(OrderId::fromString('xxx'));
-        $this->assertEquals('€ 10', $cart->getTotalPrice());
+        $this->assertEquals('€ 10', $cart->getFormattedTotalIncl());
     }
 
     public function test_it_can_refresh_variant_prices()
@@ -58,14 +58,14 @@ class RefreshCartTest extends CartContext
         // Check unchanged line first
         $this->refreshCart();
         $cart = $this->orderContext->repos()->cartRepository()->findCart(OrderId::fromString('xxx'));
-        $this->assertEquals('€ 12', $cart->getTotalPrice());
+        $this->assertEquals('€ 12', $cart->getFormattedTotalIncl());
 
         $this->updateVariant();
 
         $this->refreshCart();
 
         $cart = $this->orderContext->repos()->cartRepository()->findCart(OrderId::fromString('xxx'));
-        $this->assertEquals('€ 24', $cart->getTotalPrice());
+        $this->assertEquals('€ 24', $cart->getFormattedTotalIncl());
     }
 
     public function test_it_can_refresh_variant_availability()
@@ -76,7 +76,7 @@ class RefreshCartTest extends CartContext
         // Check unchanged line first
         $this->refreshCart();
         $cart = $this->orderContext->repos()->cartRepository()->findCart(OrderId::fromString('xxx'));
-        $this->assertEquals('€ 12', $cart->getTotalPrice());
+        $this->assertEquals('€ 12', $cart->getFormattedTotalIncl());
         $this->assertEquals(1, $cart->getSize());
 
         $this->updateVariant(VariantState::unavailable);
@@ -84,7 +84,7 @@ class RefreshCartTest extends CartContext
         $this->refreshCart();
 
         $cart = $this->orderContext->repos()->cartRepository()->findCart(OrderId::fromString('xxx'));
-        $this->assertEquals('€ 0', $cart->getTotalPrice());
+        $this->assertEquals('€ 0', $cart->getFormattedTotalIncl());
         $this->assertEquals(0, $cart->getSize());
     }
 

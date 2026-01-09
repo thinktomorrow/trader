@@ -11,6 +11,7 @@ use Thinktomorrow\Trader\Application\Cart\Read\CartRepository;
 use Thinktomorrow\Trader\Application\Cart\Read\CartShipping;
 use Thinktomorrow\Trader\Application\Cart\Read\CartShippingAddress;
 use Thinktomorrow\Trader\Application\Cart\Read\CartShopper;
+use Thinktomorrow\Trader\Application\Cart\RefreshCart\Adjusters\AdjustOrderVatSnapshot;
 use Thinktomorrow\Trader\Domain\Model\Order\Discount\Discount;
 use Thinktomorrow\Trader\Domain\Model\Order\Exceptions\CouldNotFindOrder;
 use Thinktomorrow\Trader\Domain\Model\Order\Exceptions\OrderAlreadyInMerchantHands;
@@ -26,6 +27,7 @@ use Thinktomorrow\Trader\Infrastructure\Laravel\Models\Cart\DefaultCartPayment;
 use Thinktomorrow\Trader\Infrastructure\Laravel\Models\Cart\DefaultCartShipping;
 use Thinktomorrow\Trader\Infrastructure\Laravel\Models\Cart\DefaultCartShippingAddress;
 use Thinktomorrow\Trader\Infrastructure\Laravel\Models\Cart\DefaultCartShopper;
+use Thinktomorrow\Trader\Infrastructure\Test\TestContainer;
 
 final class InMemoryCartRepository implements CartRepository, InMemoryRepository
 {
@@ -41,21 +43,10 @@ final class InMemoryCartRepository implements CartRepository, InMemoryRepository
             throw new OrderAlreadyInMerchantHands('Cannot fetch cart. Order is no longer in customer hands and has already the following state: ' . $order->getOrderState()->value);
         }
 
-        $orderState = array_merge($order->getMappedData(), [
-//
-//            'total_excl' => $order->getTotalExcl()->getAmount(),
-//            'total_incl' => $order->getTotalIncl()->getAmount(),
-//            'total_vat' => $order->getTotalVat()->getAmount(),
-//            'vat_lines' => $order->getVatLines(),
-//            'subtotal_excl' => $order->getSubtotalExcl()->getAmount(),
-//            'subtotal_incl' => $order->getSubtotalIncl()->getAmount(),
-//            'discount_excl' => $order->getDiscountTotalExcl()->getAmount(),
-//            'discount_incl' => $order->getDiscountTotalIncl()->getAmount(),
-//            'shipping_cost_excl' => $order->getShippingCostExcl()->getAmount(),
-//            'shipping_cost_incl' => $order->getShippingCostIncl()->getAmount(),
-//            'payment_cost_excl' => $order->getPaymentCostExcl()->getAmount(),
-//            'payment_cost_incl' => $order->getPaymentCostIncl()->getAmount(),
-        ]);
+        // Since we rely on the vat order snapshot for prices, we need to provide a vat snapshot state to the cart read models.
+        (new TestContainer())->get(AdjustOrderVatSnapshot::class)->adjust($order);
+
+        $orderState = $order->getMappedData();
 
         $lines = array_map(fn(Line $line) => DefaultCartLine::fromMappedData(
             array_merge($line->getMappedData(), [

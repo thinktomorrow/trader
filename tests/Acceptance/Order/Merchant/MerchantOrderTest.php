@@ -5,6 +5,7 @@ namespace Tests\Acceptance\Order\Merchant;
 
 use Money\Money;
 use Tests\Acceptance\Cart\CartContext;
+use Thinktomorrow\Trader\Application\Cart\RefreshCart\Adjusters\AdjustOrderVatSnapshot;
 use Thinktomorrow\Trader\Application\Order\MerchantOrder\MerchantOrder;
 use Thinktomorrow\Trader\Application\Order\MerchantOrder\MerchantOrderPayment;
 use Thinktomorrow\Trader\Application\Order\MerchantOrder\MerchantOrderShipping;
@@ -14,59 +15,56 @@ use Thinktomorrow\Trader\Domain\Model\Order\Payment\DefaultPaymentState;
 use Thinktomorrow\Trader\Domain\Model\Order\Shipping\DefaultShippingState;
 use Thinktomorrow\Trader\Domain\Model\Order\State\DefaultOrderState;
 use Thinktomorrow\Trader\Domain\Model\Product\Personalisation\PersonalisationType;
+use Thinktomorrow\Trader\Infrastructure\Test\TestContainer;
 
 class MerchantOrderTest extends CartContext
 {
     public function test_as_a_merchant_i_need_to_be_able_to_see_the_totals()
     {
         $order = $this->orderContext->createDefaultOrder();
+
+        (new TestContainer())->get(AdjustOrderVatSnapshot::class)->adjust($order);
+        $this->orderContext->saveOrder($order);
+
         $order = $this->orderContext->findMerchantOrder($order->orderId->get());
 
         $this->assertEquals(DefaultOrderState::cart_pending->value, $order->getState());
         $this->assertEquals(2, $order->getSize());
         $this->assertEquals(2, $order->getQuantity());
 
-        $this->assertEquals(Money::EUR('82500'), $order->getSubtotalExcl());
-        $this->assertEquals(Money::EUR('100000'), $order->getSubtotalIncl());
-        $this->assertEquals(Money::EUR('4132'), $order->getShippingCostExcl());
-        $this->assertEquals(Money::EUR('5000'), $order->getShippingCostIncl());
-        $this->assertEquals(Money::EUR('1653'), $order->getPaymentCostExcl());
-        $this->assertEquals(Money::EUR('2000'), $order->getPaymentCostIncl());
-        $this->assertEquals(Money::EUR('5785'), $order->getDiscountTotalExcl());
-        $this->assertEquals(Money::EUR('7000'), $order->getDiscountTotalIncl());
-        $this->assertEquals(Money::EUR('82500'), $order->getTotalExcl());
-        $this->assertEquals(Money::EUR('17500'), $order->getTotalVat());
-        $this->assertEquals(Money::EUR('100000'), $order->getTotalIncl());
-
-        $this->assertEquals('€ 825', $order->getFormattedSubtotalExcl());
-        $this->assertEquals('€ 1.000', $order->getFormattedSubtotalIncl());
-        $this->assertEquals('€ 41,32', $order->getFormattedShippingCostExcl());
-        $this->assertEquals('€ 50', $order->getFormattedShippingCostIncl());
-        $this->assertEquals('€ 16,53', $order->getFormattedPaymentCostExcl());
-        $this->assertEquals('€ 20', $order->getFormattedPaymentCostIncl());
-        $this->assertEquals('€ 57,85', $order->getFormattedDiscountTotalExcl());
-        $this->assertEquals('€ 70', $order->getFormattedDiscountTotalIncl());
-        $this->assertEquals('€ 825', $order->getFormattedTotalExcl());
-        $this->assertEquals('€ 175', $order->getFormattedTotalVat());
-        $this->assertEquals('€ 1.000', $order->getFormattedTotalIncl());
+        $this->assertEquals(Money::EUR('166'), $order->getSubtotalExcl());
+        $this->assertEquals(Money::EUR('200'), $order->getSubtotalIncl());
+        $this->assertEquals(Money::EUR('50'), $order->getShippingCostExcl());
+        $this->assertEquals(Money::EUR('61'), $order->getShippingCostIncl());
+        $this->assertEquals(Money::EUR('50'), $order->getPaymentCostExcl());
+        $this->assertEquals(Money::EUR('61'), $order->getPaymentCostIncl());
+        $this->assertEquals(Money::EUR('15'), $order->getDiscountTotalExcl());
+        $this->assertEquals(Money::EUR('18'), $order->getDiscountTotalIncl());
+        $this->assertEquals(Money::EUR('251'), $order->getTotalExcl());
+        $this->assertEquals(Money::EUR('53'), $order->getTotalVat());
+        $this->assertEquals(Money::EUR('304'), $order->getTotalIncl());
     }
 
     public function test_it_can_get_formatted_totals()
     {
         $order = $this->orderContext->createDefaultOrder();
+
+        (new TestContainer())->get(AdjustOrderVatSnapshot::class)->adjust($order);
+        $this->orderContext->saveOrder($order);
+
         $order = $this->orderContext->findMerchantOrder($order->orderId->get());
 
-        $this->assertEquals('€ 825', $order->getFormattedSubtotalExcl());
-        $this->assertEquals('€ 1.000', $order->getFormattedSubtotalIncl());
-        $this->assertEquals('€ 41,32', $order->getFormattedShippingCostExcl());
-        $this->assertEquals('€ 50', $order->getFormattedShippingCostIncl());
-        $this->assertEquals('€ 16,53', $order->getFormattedPaymentCostExcl());
-        $this->assertEquals('€ 20', $order->getFormattedPaymentCostIncl());
-        $this->assertEquals('€ 57,85', $order->getFormattedDiscountTotalExcl());
-        $this->assertEquals('€ 70', $order->getFormattedDiscountTotalIncl());
-        $this->assertEquals('€ 825', $order->getFormattedTotalExcl());
-        $this->assertEquals('€ 175', $order->getFormattedTotalVat());
-        $this->assertEquals('€ 1.000', $order->getFormattedTotalIncl());
+        $this->assertEquals('€ 1,66', $order->getFormattedSubtotalExcl());
+        $this->assertEquals('€ 2', $order->getFormattedSubtotalIncl());
+        $this->assertEquals('€ 0,50', $order->getFormattedShippingCostExcl());
+        $this->assertEquals('€ 0,61', $order->getFormattedShippingCostIncl());
+        $this->assertEquals('€ 0,50', $order->getFormattedPaymentCostExcl());
+        $this->assertEquals('€ 0,61', $order->getFormattedPaymentCostIncl());
+        $this->assertEquals('€ 0,15', $order->getFormattedDiscountTotalExcl());
+        $this->assertEquals('€ 0,18', $order->getFormattedDiscountTotalIncl());
+        $this->assertEquals('€ 2,51', $order->getFormattedTotalExcl());
+        $this->assertEquals('€ 0,53', $order->getFormattedTotalVat());
+        $this->assertEquals('€ 3,04', $order->getFormattedTotalIncl());
     }
 
     public function test_as_a_merchant_i_need_to_be_able_to_see_each_line_of_the_order()
@@ -187,6 +185,11 @@ class MerchantOrderTest extends CartContext
         $this->givenACustomerExists('ben@thinktomorrow.be');
         $this->whenIChooseCustomer('ben@thinktomorrow.be');
 
+        // Vat Snapshot needs to be adjusted to pick up customer info
+        $order = $this->orderContext->findOrder(OrderId::fromString('xxx'));
+        (new TestContainer())->get(AdjustOrderVatSnapshot::class)->adjust($order);
+        $this->orderContext->saveOrder($order);
+
         $order = $this->orderContext->findMerchantOrder(OrderId::fromString('xxx'));
 
         $this->assertInstanceOf(MerchantOrderShopper::class, $order->getShopper());
@@ -200,6 +203,11 @@ class MerchantOrderTest extends CartContext
     {
         $this->givenACustomerExists('ben@thinktomorrow.be', true);
         $this->whenIChooseCustomer('ben@thinktomorrow.be');
+
+        // Vat Snapshot needs to be adjusted to pick up customer info
+        $order = $this->orderContext->findOrder(OrderId::fromString('xxx'));
+        (new TestContainer())->get(AdjustOrderVatSnapshot::class)->adjust($order);
+        $this->orderContext->saveOrder($order);
 
         $order = $this->orderContext->findMerchantOrder(OrderId::fromString('xxx'));
 

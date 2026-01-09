@@ -37,13 +37,13 @@ class MinimumAmountConditionTest extends TestCase
         $order = $this->orderContext->createDefaultOrder();
 
         $condition = $this->factory->make('minimum_amount', [
-            'data' => json_encode(['amount' => '82500']),
+            'data' => json_encode(['amount' => '100']),
         ], []);
 
         $this->assertTrue($condition->check($order, $order));
 
         $condition = $this->factory->make('minimum_amount', [
-            'data' => json_encode(['amount' => '82501']),
+            'data' => json_encode(['amount' => '1000']),
         ], []);
 
         $this->assertFalse($condition->check($order, $order));

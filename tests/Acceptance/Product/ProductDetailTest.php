@@ -3,8 +3,12 @@ declare(strict_types=1);
 
 namespace Tests\Acceptance\Product;
 
+use Money\Money;
 use Tests\TestHelpers;
 use Thinktomorrow\Trader\Application\Product\Taxa\ProductTaxonItem;
+use Thinktomorrow\Trader\Domain\Common\Vat\VatPercentage;
+use Thinktomorrow\Trader\Domain\Model\Product\Variant\VariantSalePrice;
+use Thinktomorrow\Trader\Domain\Model\Product\Variant\VariantUnitPrice;
 
 class ProductDetailTest extends ProductContext
 {
@@ -27,10 +31,21 @@ class ProductDetailTest extends ProductContext
         $this->assertEquals($variantId->get(), $productDetail->getVariantId());
         $this->assertEquals($product->getVariants()[0]->productId->get(), $productDetail->getProductId());
         $this->assertTrue($productDetail->isAvailable());
-        $this->assertEquals('€ 1,20', $productDetail->getUnitPrice(true));
-        $this->assertEquals('€ 1', $productDetail->getUnitPrice(false));
-        $this->assertEquals('€ 0,96', $productDetail->getSalePrice(true));
-        $this->assertEquals('€ 0,80', $productDetail->getSalePrice(false));
+
+        $this->assertEquals(VariantUnitPrice::fromMoney(Money::EUR('100'), VatPercentage::fromString('20'), false), $productDetail->getUnitPrice());
+        $this->assertEquals(VariantSalePrice::fromMoney(Money::EUR('80'), VatPercentage::fromString('20'), false), $productDetail->getSalePrice());
+        $this->assertEquals(VariantUnitPrice::fromMoney(Money::EUR('20'), VatPercentage::fromString('20'), false), $productDetail->getSaleDiscountPrice());
+        $this->assertEquals('€ 1', $productDetail->getFormattedUnitPriceExcl());
+        $this->assertEquals('€ 1,20', $productDetail->getFormattedUnitPriceIncl());
+        $this->assertEquals('€ 0,80', $productDetail->getFormattedSalePriceExcl());
+        $this->assertEquals('€ 0,96', $productDetail->getFormattedSalePriceIncl());
+        $this->assertEquals('€ 0,20', $productDetail->getFormattedSaleDiscountPriceExcl());
+        $this->assertEquals('€ 0,24', $productDetail->getFormattedSaleDiscountPriceIncl());
+        $this->assertEquals('20', $productDetail->getFormattedVatRate());
+
+        $this->assertTrue($productDetail->onSale());
+        $this->assertEquals(20, $productDetail->getSaleDiscountPercentage());
+
         $this->assertEquals('variant-aaa title nl', $productDetail->getTitle());
 
         $this->assertCount(2, $productDetail->getTaxa());

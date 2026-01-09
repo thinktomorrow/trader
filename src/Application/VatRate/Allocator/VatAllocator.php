@@ -39,9 +39,23 @@ final class VatAllocator
         $itemTotals = $this->collectItemTotalsPerVat($order);
 
         if ($this->sum($itemTotals)->isZero()) {
-            $zero = new VatAllocatedTotalPrice([], Cash::zero(), Cash::zero(), Cash::zero());
+            $zeroItems = new VatAllocatedTotalPrice([], Cash::zero(), Cash::zero(), Cash::zero());
 
-            return new VatAllocatedTotalPrices($zero, $zero, $zero, $zero, $zero);
+            // Service-only: treat as 0% VAT (incl == excl, vat == 0)
+            $shippingTotal = new VatAllocatedTotalPrice([], $shipping, Cash::zero(), $shipping);
+            $paymentTotal = new VatAllocatedTotalPrice([], $payment, Cash::zero(), $payment);
+            $discountTotal = new VatAllocatedTotalPrice([], $discount, Cash::zero(), $discount);
+
+            $totalExcl = $shipping->add($payment)->subtract($discount);
+            $total = new VatAllocatedTotalPrice([], $totalExcl, Cash::zero(), $totalExcl);
+
+            return new VatAllocatedTotalPrices(
+                items: $zeroItems,
+                shipping: $shippingTotal,
+                payment: $paymentTotal,
+                discounts: $discountTotal,
+                total: $total,
+            );
         }
 
         // Allocate excl amounts - Distribute service costs and order-level discounts across VAT groups (pro-rata)

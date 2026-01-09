@@ -13,11 +13,9 @@ interface CartDiscount
 
     public function getDiscountPrice(): DiscountPrice;
 
-    public function getPrice(): string;
+    public function getFormattedDiscountPriceExcl(): string;
 
     public function getPercentage(): string;
-
-    public function includeTax(bool $includeTax = true): void;
 
     public function getTitle(): ?string;
 
