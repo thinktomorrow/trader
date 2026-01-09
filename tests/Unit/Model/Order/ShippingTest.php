@@ -158,7 +158,7 @@ class ShippingTest extends TestCase
         $this->assertCount(1, $shipping->getDiscounts());
 
         $this->assertEquals(DefaultServicePrice::fromExcludingVat(Money::EUR(50)), $shipping->getShippingCost());
-        $this->assertEquals(DefaultDiscountPrice::fromExcludingVat(Money::EUR(15)), $shipping->getSumOfDiscountPrices());
+        $this->assertEquals(DefaultDiscountPrice::fromExcludingVat(Money::EUR(15)), $shipping->getDiscountPrice());
         $this->assertEquals(DefaultServicePrice::fromExcludingVat(Money::EUR(35)), $shipping->getShippingCostTotal());
     }
 }

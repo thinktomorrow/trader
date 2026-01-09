@@ -5,6 +5,7 @@ namespace Tests\Unit\Model\Order;
 
 use Money\Money;
 use Tests\Unit\TestCase;
+use Thinktomorrow\Trader\Application\Cart\RefreshCart\Adjusters\AdjustOrderVatSnapshot;
 use Thinktomorrow\Trader\Domain\Common\Email;
 use Thinktomorrow\Trader\Domain\Common\Price\DefaultServicePrice;
 use Thinktomorrow\Trader\Domain\Model\Customer\CustomerId;
@@ -25,6 +26,7 @@ use Thinktomorrow\Trader\Domain\Model\Order\Shipping\Shipping;
 use Thinktomorrow\Trader\Domain\Model\Order\Shipping\ShippingId;
 use Thinktomorrow\Trader\Domain\Model\Order\State\DefaultOrderState;
 use Thinktomorrow\Trader\Domain\Model\ShippingProfile\ShippingProfileId;
+use Thinktomorrow\Trader\Infrastructure\Test\TestContainer;
 
 class OrderTest extends TestCase
 {
@@ -35,6 +37,8 @@ class OrderTest extends TestCase
             $orderReference = OrderReference::fromString('xx-ref'),
             DefaultOrderState::cart_pending
         );
+
+        (new TestContainer())->get(AdjustOrderVatSnapshot::class)->adjust($order);
 
         $this->assertEquals([
             'order_id' => 'xxx',

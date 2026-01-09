@@ -11,7 +11,10 @@ interface DiscountableItem
 
     public function getDiscountableType(): DiscountableType;
 
-    public function getTotalDiscountPrice(): DiscountPrice;
+    /**
+     * Total sum of all discount prices applied on this item
+     */
+    public function getDiscountPrice(): DiscountPrice;
 
     /**
      * @return Discount[]

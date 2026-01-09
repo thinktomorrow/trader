@@ -31,31 +31,49 @@ interface MerchantOrder
     /** The quantity of all items combined */
     public function getQuantity(): int;
 
-    public function includeTax(bool $includeTax = true): void;
+    public function getSubtotalExcl(): Money;
 
-    public function getTotalPrice(?bool $includeTax = null): string;
+    public function getSubtotalIncl(): Money;
 
-    public function getSubtotalPrice(?bool $includeTax = null): string;
+    public function getShippingCostExcl(): Money;
 
-    public function getShippingCost(?bool $includeTax = null): ?string;
+    public function getShippingCostIncl(): Money;
 
-    public function getPaymentCost(?bool $includeTax = null): ?string;
+    public function getPaymentCostExcl(): Money;
 
-    public function getDiscountPrice(?bool $includeTax = null): ?string;
+    public function getPaymentCostIncl(): Money;
 
-    public function getTaxPrice(): string;
+    public function getDiscountTotalExcl(): Money;
 
-    public function getTotalPriceAsMoney(?bool $includeTax = null): Money;
+    public function getDiscountTotalIncl(): Money;
 
-    public function getSubtotalPriceAsMoney(?bool $includeTax = null): Money;
+    public function getTotalExcl(): Money;
 
-    public function getShippingCostAsMoney(?bool $includeTax = null): Money;
+    public function getTotalVat(): Money;
 
-    public function getPaymentCostAsMoney(?bool $includeTax = null): Money;
+    public function getTotalIncl(): Money;
 
-    public function getDiscountPriceAsMoney(?bool $includeTax = null): Money;
+    public function getFormattedSubtotalExcl(): string;
 
-    public function getTaxPriceAsMoney(): Money;
+    public function getFormattedSubtotalIncl(): string;
+
+    public function getFormattedShippingCostExcl(): string;
+
+    public function getFormattedShippingCostIncl(): string;
+
+    public function getFormattedPaymentCostExcl(): string;
+
+    public function getFormattedPaymentCostIncl(): string;
+
+    public function getFormattedDiscountTotalExcl(): string;
+
+    public function getFormattedDiscountTotalIncl(): string;
+
+    public function getFormattedTotalExcl(): string;
+
+    public function getFormattedTotalVat(): string;
+
+    public function getFormattedTotalIncl(): string;
 
     public function getShopper(): MerchantOrderShopper;
 

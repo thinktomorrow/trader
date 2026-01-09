@@ -13,7 +13,6 @@ use Thinktomorrow\Trader\Domain\Model\Order\Discount\Discount;
 use Thinktomorrow\Trader\Domain\Model\Order\Discount\DiscountableId;
 use Thinktomorrow\Trader\Domain\Model\Order\Discount\DiscountableItem;
 use Thinktomorrow\Trader\Domain\Model\Order\Discount\DiscountableType;
-use Thinktomorrow\Trader\Domain\Model\Order\Discount\GetValidatedTotalDiscountPrice;
 use Thinktomorrow\Trader\Domain\Model\Order\Discount\HasDiscounts;
 use Thinktomorrow\Trader\Domain\Model\Order\OrderId;
 use Thinktomorrow\Trader\Domain\Model\ShippingProfile\ShippingProfileId;
@@ -78,7 +77,7 @@ final class Shipping implements ChildAggregate, DiscountableItem
 
     public function getShippingCostTotal(): ServicePrice
     {
-        return $this->shippingCost->applyDiscount($this->getTotalDiscountPrice());
+        return $this->shippingCost->applyDiscount($this->getDiscountPrice());
     }
 
     public function getMappedData(): array
@@ -92,7 +91,7 @@ final class Shipping implements ChildAggregate, DiscountableItem
             'shipping_state' => $this->shippingState->getValueAsString(),
             // Always store excluding vat cost, vat is calculated based on the products in the order.
             'cost_excl' => $this->shippingCost->getExcludingVat()->getAmount(),
-            'discount_excl' => $this->getTotalDiscountPrice()->getExcludingVat()->getAmount(),
+            'discount_excl' => $this->getDiscountPrice()->getExcludingVat()->getAmount(),
             'total_excl' => $this->getShippingCostTotal()->getExcludingVat()->getAmount(),
             'data' => json_encode($data),
         ];
@@ -124,9 +123,9 @@ final class Shipping implements ChildAggregate, DiscountableItem
         return $shipping;
     }
 
-    public function getTotalDiscountPrice(): DiscountPrice
+    public function getDiscountPrice(): DiscountPrice
     {
-        return GetValidatedTotalDiscountPrice::get($this->shippingCost, $this);
+        return $this->calculateDiscountPrice($this->shippingCost->getExcludingVat());
     }
 
     public function getDiscountableId(): DiscountableId

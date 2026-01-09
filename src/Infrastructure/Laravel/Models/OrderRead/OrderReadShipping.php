@@ -55,7 +55,6 @@ abstract class OrderReadShipping
 
     public function getDiscounts(): iterable
     {
-        // TODO: Implement getDiscounts() method.
         return $this->discounts;
     }
 

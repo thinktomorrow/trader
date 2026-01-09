@@ -3,7 +3,7 @@ declare(strict_types=1);
 
 namespace Thinktomorrow\Trader\Application\Cart\Read;
 
-use Thinktomorrow\Trader\Domain\Model\Order\Discount\DiscountTotal;
+use Thinktomorrow\Trader\Domain\Common\Price\DiscountPrice;
 
 interface CartDiscount
 {
@@ -11,7 +11,7 @@ interface CartDiscount
 
     public function getDiscountId(): string;
 
-    public function getDiscountTotal(): DiscountTotal;
+    public function getDiscountPrice(): DiscountPrice;
 
     public function getPrice(): string;
 

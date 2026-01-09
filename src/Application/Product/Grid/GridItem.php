@@ -3,9 +3,11 @@ declare(strict_types=1);
 
 namespace Thinktomorrow\Trader\Application\Product\Grid;
 
-use Money\Money;
 use Thinktomorrow\Trader\Application\Product\Taxa\ProductTaxonItem;
 use Thinktomorrow\Trader\Application\Product\Taxa\VariantTaxonItem;
+use Thinktomorrow\Trader\Domain\Common\Price\ItemPrice;
+use Thinktomorrow\Trader\Domain\Model\Product\Variant\VariantSalePrice;
+use Thinktomorrow\Trader\Domain\Model\Product\Variant\VariantUnitPrice;
 
 /**
  * A grid item a product variant for the grid. If a variant is set to be show_in_grid,
@@ -39,19 +41,27 @@ interface GridItem
 
     public function isAvailable(): bool;
 
-    public function getUnitPrice(): string;
+    public function getUnitPrice(): VariantUnitPrice;
 
-    public function getSalePrice(): string;
+    public function getSalePrice(): VariantSalePrice;
 
-    public function getUnitPriceAsMoney(): Money;
+    public function getSaleDiscountPrice(): ItemPrice;
 
-    public function getSalePriceAsMoney(): Money;
+    public function getFormattedUnitPriceExcl(): string;
 
-    public function getTaxRateAsString(): string;
+    public function getFormattedUnitPriceIncl(): string;
+
+    public function getFormattedSalePriceExcl(): string;
+
+    public function getFormattedSalePriceIncl(): string;
+
+    public function getFormattedVatRate(): string;
 
     public function onSale(): bool;
 
-    public function getSaleDiscount(): string;
+    public function getFormattedSaleDiscountPriceExcl(): string;
+
+    public function getFormattedSaleDiscountPriceIncl(): string;
 
     public function getSaleDiscountPercentage(): int;
 

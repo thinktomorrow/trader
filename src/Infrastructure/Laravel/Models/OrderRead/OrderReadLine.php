@@ -4,7 +4,6 @@ declare(strict_types=1);
 namespace Thinktomorrow\Trader\Infrastructure\Laravel\Models\OrderRead;
 
 use Assert\Assertion;
-use Money\Money;
 use Thinktomorrow\Trader\Application\Common\RendersData;
 use Thinktomorrow\Trader\Application\Common\RendersMoney;
 use Thinktomorrow\Trader\Domain\Common\Vat\VatPercentage;
@@ -48,14 +47,8 @@ abstract class OrderReadLine
 
         $line->line_id = $state['line_id'];
 
-        $line->unitPriceExcl = Money::EUR($state['unit_price_excl']);
-        $line->unitPriceIncl = Money::EUR($state['unit_price_incl']);
-        $line->totalPriceExcl = Money::EUR($state['total_excl']);
-        $line->totalPriceIncl = Money::EUR($state['total_incl']);
-        $line->totalVat = Money::EUR($state['total_vat']);
+        $line->initializeLineTotalsFromState($state);
         $line->vatRate = VatPercentage::fromString($state['tax_rate']);
-        $line->discountPriceExcl = Money::EUR($state['discount_excl']);
-        $line->discountPriceIncl = Money::EUR($state['discount_incl']);
 
         $line->quantity = $state['quantity'];
         $line->discounts = $discounts;

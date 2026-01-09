@@ -2,7 +2,7 @@
 
 namespace Thinktomorrow\Trader\Application\Common;
 
-use Money\Money;
+use Thinktomorrow\Trader\Domain\Common\Price\ItemPrice;
 use Thinktomorrow\Trader\Domain\Model\Product\Variant\VariantSalePrice;
 use Thinktomorrow\Trader\Domain\Model\Product\Variant\VariantUnitPrice;
 
@@ -15,20 +15,56 @@ trait RendersVariantPrices
 
     protected VariantUnitPrice $unitPrice;
 
-    public function getSalePrice(bool $includeTax = true): string
+    public function getUnitPrice(): VariantUnitPrice
+    {
+        return $this->unitPrice;
+    }
+
+    public function getSalePrice(): VariantSalePrice
+    {
+        return $this->salePrice;
+    }
+
+    public function getSaleDiscountPrice(): ItemPrice
+    {
+        return $this->unitPrice->subtract($this->salePrice);
+    }
+
+    public function getFormattedUnitPriceExcl(): string
     {
         return $this->renderMoney(
-            $this->getSalePriceAsMoney($includeTax),
+            $this->getUnitPrice()->getExcludingVat(),
             $this->getLocale()
         );
     }
 
-    public function getUnitPrice(bool $includeTax = true): string
+    public function getFormattedUnitPriceIncl(): string
     {
         return $this->renderMoney(
-            $this->getUnitPriceAsMoney($includeTax),
+            $this->getUnitPrice()->getIncludingVat(),
             $this->getLocale()
         );
+    }
+
+    public function getFormattedSalePriceExcl(): string
+    {
+        return $this->renderMoney(
+            $this->getSalePrice()->getExcludingVat(),
+            $this->getLocale()
+        );
+    }
+
+    public function getFormattedSalePriceIncl(): string
+    {
+        return $this->renderMoney(
+            $this->getSalePrice()->getIncludingVat(),
+            $this->getLocale()
+        );
+    }
+
+    public function getFormattedVatRate(): string
+    {
+        return $this->salePrice->getVatPercentage()->get();
     }
 
     public function onSale(): bool
@@ -36,48 +72,31 @@ trait RendersVariantPrices
         return $this->salePrice->getExcludingVat()->lessThan($this->unitPrice->getExcludingVat());
     }
 
-    public function getSaleDiscount(): string
+    public function getFormattedSaleDiscountPriceExcl(): string
     {
         return $this->renderMoney(
-            $this->getUnitPriceAsMoney()->subtract($this->getSalePriceAsMoney()),
+            $this->getSaleDiscountPrice()->getExcludingVat(),
+            $this->getLocale()
+        );
+    }
+
+    public function getFormattedSaleDiscountPriceIncl(): string
+    {
+        return $this->renderMoney(
+            $this->getSaleDiscountPrice()->getIncludingVat(),
             $this->getLocale()
         );
     }
 
     public function getSaleDiscountPercentage(): int
     {
-        $unitPrice = $this->getUnitPriceAsMoney()->getAmount();
-        $salePrice = $this->getSalePriceAsMoney()->getAmount();
+        $unitPrice = $this->getUnitPrice()->getExcludingVat()->getAmount();
+        $salePrice = $this->getSalePrice()->getExcludingVat()->getAmount();
 
         if ($unitPrice == 0) {
             return 0;
         }
 
         return (int)round((($unitPrice - $salePrice) / $unitPrice) * 100, 0);
-    }
-
-    public function getUnitPriceAsMoney(bool $includeTax = true): Money
-    {
-        return $includeTax ? $this->unitPrice->getIncludingVat() : $this->unitPrice->getExcludingVat();
-    }
-
-    public function getSalePriceAsMoney(bool $includeTax = true): Money
-    {
-        return $includeTax ? $this->salePrice->getIncludingVat() : $this->salePrice->getExcludingVat();
-    }
-
-    public function getUnitPriceAsPrice(): VariantUnitPrice
-    {
-        return $this->unitPrice;
-    }
-
-    public function getSalePriceAsPrice(): VariantSalePrice
-    {
-        return $this->salePrice;
-    }
-
-    public function getTaxRateAsString(): string
-    {
-        return $this->salePrice->getVatPercentage()->get();
     }
 }

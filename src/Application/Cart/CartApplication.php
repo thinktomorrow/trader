@@ -13,7 +13,7 @@ use Thinktomorrow\Trader\Application\Cart\PaymentMethod\UpdatePaymentMethodOnOrd
 use Thinktomorrow\Trader\Application\Cart\RefreshCart\Adjusters\AdjustDiscounts;
 use Thinktomorrow\Trader\Application\Cart\RefreshCart\Adjusters\AdjustLine;
 use Thinktomorrow\Trader\Application\Cart\RefreshCart\Adjusters\AdjustLines;
-use Thinktomorrow\Trader\Application\Cart\RefreshCart\Adjusters\AdjustOrderTotals;
+use Thinktomorrow\Trader\Application\Cart\RefreshCart\Adjusters\AdjustOrderVatSnapshot;
 use Thinktomorrow\Trader\Application\Cart\RefreshCart\Adjusters\AdjustShipping;
 use Thinktomorrow\Trader\Application\Cart\RefreshCart\Adjusters\AdjustVatRates;
 use Thinktomorrow\Trader\Application\Cart\RefreshCart\RefreshCart;
@@ -70,9 +70,8 @@ final class CartApplication
             $this->container->get(AdjustLines::class),
             $this->container->get(AdjustShipping::class),
             $this->container->get(AdjustVatRates::class),
-            $this->container->get(AdjustOrderTotals::class), // First adjust totals to reset before discounts can be applied because they rely on subtotals
             $this->container->get(AdjustDiscounts::class),
-            $this->container->get(AdjustOrderTotals::class),
+            $this->container->get(AdjustOrderVatSnapshot::class),
         ]);
 
         $this->orderRepository->save($order);
@@ -155,6 +154,9 @@ final class CartApplication
 
         $order->updateLinePersonalisations($lineId, $linePersonalisations);
 
+        // Recalculate VAT snapshot
+        $this->container->get(AdjustOrderVatSnapshot::class)->adjust($order);
+
         $this->orderRepository->save($order);
 
         $this->eventDispatcher->dispatchAll($order->releaseEvents());
@@ -174,8 +176,10 @@ final class CartApplication
 
         $this->adjustLine->adjust($order, $order->findLine($changeLineQuantity->getLineId()));
 
-        $this->orderRepository->save($order);
+        // Recalculate VAT snapshot
+        $this->container->get(AdjustOrderVatSnapshot::class)->adjust($order);
 
+        $this->orderRepository->save($order);
 
         $this->eventDispatcher->dispatchAll($order->releaseEvents());
     }
@@ -210,8 +214,10 @@ final class CartApplication
             $removeLine->getLineId(),
         );
 
-        $this->orderRepository->save($order);
+        // Recalculate VAT snapshot
+        $this->container->get(AdjustOrderVatSnapshot::class)->adjust($order);
 
+        $this->orderRepository->save($order);
 
         $this->eventDispatcher->dispatchAll($order->releaseEvents());
     }
@@ -256,8 +262,10 @@ final class CartApplication
 
         $this->updateShippingProfileOnOrder->handle($order, $chooseShippingProfile->getShippingProfileId());
 
-        $this->orderRepository->save($order);
+        // Recalculate VAT snapshot
+        $this->container->get(AdjustOrderVatSnapshot::class)->adjust($order);
 
+        $this->orderRepository->save($order);
 
         $this->eventDispatcher->dispatchAll($order->releaseEvents());
     }
@@ -267,6 +275,9 @@ final class CartApplication
         $order = $this->orderRepository->findForCart($choosePaymentMethod->getOrderId());
 
         $this->updatePaymentMethodOnOrder->handle($order, $choosePaymentMethod->getPaymentMethodId());
+
+        // Recalculate VAT snapshot
+        $this->container->get(AdjustOrderVatSnapshot::class)->adjust($order);
 
         $this->orderRepository->save($order);
 
@@ -293,6 +304,9 @@ final class CartApplication
 
         $shopper->addData($updateShopper->getData());
         $order->updateShopper($shopper);
+
+        // Recalculate VAT snapshot
+        $this->container->get(AdjustOrderVatSnapshot::class)->adjust($order);
 
         $this->orderRepository->save($order);
 
@@ -462,6 +476,9 @@ final class CartApplication
         foreach ($order->getPayments() as $payment) {
             $order->deletePayment($payment->paymentId);
         }
+
+        // Recalculate VAT snapshot
+        $this->container->get(AdjustOrderVatSnapshot::class)->adjust($order);
 
         $this->orderRepository->save($order);
 

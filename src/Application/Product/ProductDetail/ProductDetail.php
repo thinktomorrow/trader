@@ -2,10 +2,10 @@
 
 namespace Thinktomorrow\Trader\Application\Product\ProductDetail;
 
-use Money\Money;
 use Thinktomorrow\Trader\Application\Product\Taxa\ProductTaxonItem;
 use Thinktomorrow\Trader\Application\Product\Taxa\VariantTaxonItem;
 use Thinktomorrow\Trader\Application\Stock\Read\Stockable;
+use Thinktomorrow\Trader\Domain\Common\Price\ItemPrice;
 use Thinktomorrow\Trader\Domain\Model\Product\Variant\VariantSalePrice;
 use Thinktomorrow\Trader\Domain\Model\Product\Variant\VariantUnitPrice;
 
@@ -53,23 +53,27 @@ interface ProductDetail extends Stockable
 
     public function isAvailable(): bool;
 
-    public function getUnitPrice(): string;
+    public function getUnitPrice(): VariantUnitPrice;
 
-    public function getSalePrice(): string;
+    public function getSalePrice(): VariantSalePrice;
 
-    public function getUnitPriceAsMoney(): Money;
+    public function getSaleDiscountPrice(): ItemPrice;
 
-    public function getSalePriceAsMoney(): Money;
+    public function getFormattedUnitPriceExcl(): string;
 
-    public function getUnitPriceAsPrice(): VariantUnitPrice;
+    public function getFormattedUnitPriceIncl(): string;
 
-    public function getSalePriceAsPrice(): VariantSalePrice;
+    public function getFormattedSalePriceExcl(): string;
 
-    public function getTaxRateAsString(): string;
+    public function getFormattedSalePriceIncl(): string;
+
+    public function getFormattedVatRate(): string;
 
     public function onSale(): bool;
 
-    public function getSaleDiscount(): string;
+    public function getFormattedSaleDiscountPriceExcl(): string;
+
+    public function getFormattedSaleDiscountPriceIncl(): string;
 
     public function getSaleDiscountPercentage(): int;
 

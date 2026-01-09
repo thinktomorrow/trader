@@ -8,7 +8,7 @@ use Tests\Infrastructure\TestCase;
 use Thinktomorrow\Trader\Application\Product\ProductDetail\ProductDetail;
 use Thinktomorrow\Trader\Domain\Model\Product\Exceptions\CouldNotFindVariant;
 use Thinktomorrow\Trader\Domain\Model\Product\ProductState;
-use Thinktomorrow\Trader\Testing\Support\Catalog;
+use Thinktomorrow\Trader\Testing\Catalog\CatalogContext;
 
 final class ProductDetailRepositoryTest extends TestCase
 {
@@ -16,20 +16,20 @@ final class ProductDetailRepositoryTest extends TestCase
 
     public function test_it_can_find_a_product()
     {
-        foreach (Catalog::drivers() as $catalog) {
+        foreach (CatalogContext::drivers() as $catalog) {
 
             $catalog->dontPersist();
 
             foreach ($catalog->products() as $product) {
 
-                if (! $product->hasVariants()) {
+                if (!$product->hasVariants()) {
                     continue;
                 }
 
-                $catalog->repos->productRepository()->save($product);
+                $catalog->repos()->productRepository()->save($product);
                 $product->releaseEvents();
 
-                $this->assertInstanceOf(ProductDetail::class, $catalog->repos->productDetailRepository()->findProductDetail($product->getVariants()[0]->variantId));
+                $this->assertInstanceOf(ProductDetail::class, $catalog->findProductDetail($product->getVariants()[0]->variantId));
             }
         }
     }
@@ -39,13 +39,13 @@ final class ProductDetailRepositoryTest extends TestCase
         $expectedCount = 0;
         $productsNotFound = 0;
 
-        foreach (Catalog::drivers() as $catalog) {
+        foreach (CatalogContext::drivers() as $catalog) {
 
             $catalog->dontPersist();
 
             foreach ($catalog->products() as $product) {
 
-                if (! $product->hasVariants()) {
+                if (!$product->hasVariants()) {
                     continue;
                 }
 
@@ -53,11 +53,11 @@ final class ProductDetailRepositoryTest extends TestCase
 
                 $product->updateState(ProductState::offline);
 
-                $catalog->repos->productRepository()->save($product);
+                $catalog->repos()->productRepository()->save($product);
                 $product->releaseEvents();
 
                 try {
-                    $catalog->repos->productDetailRepository()->findProductDetail($product->getVariants()[0]->variantId);
+                    $catalog->findProductDetail($product->getVariants()[0]->variantId);
                 } catch (CouldNotFindVariant $e) {
                     $productsNotFound++;
                 }
@@ -71,23 +71,23 @@ final class ProductDetailRepositoryTest extends TestCase
     {
         $productsNotFound = 0;
 
-        foreach (Catalog::drivers() as $catalog) {
+        foreach (CatalogContext::drivers() as $catalog) {
 
             $catalog->dontPersist();
 
             foreach ($catalog->products() as $product) {
 
-                if (! $product->hasVariants()) {
+                if (!$product->hasVariants()) {
                     continue;
                 }
 
                 $product->updateState(ProductState::offline);
 
-                $catalog->repos->productRepository()->save($product);
+                $catalog->repos()->productRepository()->save($product);
                 $product->releaseEvents();
 
                 try {
-                    $catalog->repos->productDetailRepository()->findProductDetail($product->getVariants()[0]->variantId, true);
+                    $catalog->repos()->productDetailRepository()->findProductDetail($product->getVariants()[0]->variantId, true);
                 } catch (CouldNotFindVariant $e) {
                     $productsNotFound++;
                 }

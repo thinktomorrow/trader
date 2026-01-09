@@ -5,11 +5,14 @@ namespace Tests\Unit\Model\Order;
 
 use Money\Money;
 use Tests\Unit\TestCase;
+use Thinktomorrow\Trader\Application\Cart\RefreshCart\Adjusters\AdjustOrderVatSnapshot;
 use Thinktomorrow\Trader\Domain\Common\Cash\Cash;
+use Thinktomorrow\Trader\Domain\Common\Vat\VatPercentage;
 use Thinktomorrow\Trader\Domain\Model\Order\Order;
 use Thinktomorrow\Trader\Domain\Model\Order\OrderId;
 use Thinktomorrow\Trader\Domain\Model\Order\OrderReference;
 use Thinktomorrow\Trader\Domain\Model\Order\State\DefaultOrderState;
+use Thinktomorrow\Trader\Infrastructure\Test\TestContainer;
 
 class OrderTotalsTest extends TestCase
 {
@@ -24,30 +27,44 @@ class OrderTotalsTest extends TestCase
         $this->assertEquals(Cash::zero(), $order->getSubtotalExcl());
         $this->assertEquals(Cash::zero(), $order->getSubtotalIncl());
         $this->assertEquals(Cash::zero(), $order->getShippingCostExcl());
-        $this->assertEquals(Cash::zero(), $order->getShippingCostIncl());
         $this->assertEquals(Cash::zero(), $order->getPaymentCostExcl());
-        $this->assertEquals(Cash::zero(), $order->getPaymentCostIncl());
         $this->assertEquals(Cash::zero(), $order->getDiscountTotalExcl());
-        $this->assertEquals(Cash::zero(), $order->getDiscountTotalIncl());
         $this->assertEquals(Cash::zero(), $order->getTotalExcl());
-        $this->assertEquals(Cash::zero(), $order->getTotalVat());
-        $this->assertEquals(Cash::zero(), $order->getTotalIncl());
     }
 
-    public function test_it_can_get_persisted_totals()
+    public function test_it_can_get_calculated_totals()
     {
         $order = $this->orderContext->createDefaultOrder();
 
-        $this->assertEquals(Money::EUR('82500'), $order->getSubtotalExcl());
-        $this->assertEquals(Money::EUR('100000'), $order->getSubtotalIncl());
-        $this->assertEquals(Money::EUR('4132'), $order->getShippingCostExcl());
-        $this->assertEquals(Money::EUR('5000'), $order->getShippingCostIncl());
-        $this->assertEquals(Money::EUR('1653'), $order->getPaymentCostExcl());
-        $this->assertEquals(Money::EUR('2000'), $order->getPaymentCostIncl());
-        $this->assertEquals(Money::EUR('5785'), $order->getDiscountTotalExcl());
-        $this->assertEquals(Money::EUR('7000'), $order->getDiscountTotalIncl());
-        $this->assertEquals(Money::EUR('82500'), $order->getTotalExcl());
-        $this->assertEquals(Money::EUR('17500'), $order->getTotalVat());
-        $this->assertEquals(Money::EUR('100000'), $order->getTotalIncl());
+        $this->assertEquals(Money::EUR('166'), $order->getSubtotalExcl());
+        $this->assertEquals(Money::EUR('200'), $order->getSubtotalIncl());
+        $this->assertEquals(Money::EUR('50'), $order->getShippingCostExcl());
+        $this->assertEquals(Money::EUR('50'), $order->getPaymentCostExcl());
+        $this->assertEquals(Money::EUR('15'), $order->getDiscountTotalExcl());
+        $this->assertEquals(Money::EUR('251'), $order->getTotalExcl());
+    }
+
+    public function test_it_can_get_totals_incl_from_snapshot()
+    {
+        $order = $this->orderContext->createDefaultOrder();
+
+        (new TestContainer())->get(AdjustOrderVatSnapshot::class)->adjust($order);
+
+        $this->assertEquals(Money::EUR('200'), $order->getSubtotalIncl());
+        $this->assertEquals(Money::EUR('61'), $order->getShippingCostIncl());
+        $this->assertEquals(Money::EUR('61'), $order->getPaymentCostIncl());
+        $this->assertEquals(Money::EUR('18'), $order->getDiscountTotalIncl());
+        $this->assertEquals(Money::EUR('53'), $order->getTotalVat());
+        $this->assertEquals(Money::EUR('304'), $order->getTotalIncl());
+
+        $vatLines = $order->getVatLines();
+
+        $this->assertEquals(1, count($vatLines));
+
+        $line = $vatLines[0];
+
+        $this->assertEquals(Money::EUR(251), $line->getTaxableBase());
+        $this->assertEquals(Money::EUR(53), $line->getVatAmount());
+        $this->assertEquals(VatPercentage::fromString('21'), $line->getVatPercentage());
     }
 }

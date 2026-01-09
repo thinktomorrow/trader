@@ -13,7 +13,6 @@ use Thinktomorrow\Trader\Domain\Model\Order\Discount\Discount;
 use Thinktomorrow\Trader\Domain\Model\Order\Discount\DiscountableId;
 use Thinktomorrow\Trader\Domain\Model\Order\Discount\DiscountableItem;
 use Thinktomorrow\Trader\Domain\Model\Order\Discount\DiscountableType;
-use Thinktomorrow\Trader\Domain\Model\Order\Discount\GetValidatedTotalDiscountPrice;
 use Thinktomorrow\Trader\Domain\Model\Order\Discount\HasDiscounts;
 use Thinktomorrow\Trader\Domain\Model\Order\OrderId;
 use Thinktomorrow\Trader\Domain\Model\PaymentMethod\PaymentMethodId;
@@ -78,12 +77,12 @@ class Payment implements ChildAggregate, DiscountableItem
 
     public function getPaymentCostTotal(): ServicePrice
     {
-        return $this->paymentCost->applyDiscount($this->getTotalDiscountPrice());
+        return $this->paymentCost->applyDiscount($this->getDiscountPrice());
     }
 
-    public function getTotalDiscountPrice(): DiscountPrice
+    public function getDiscountPrice(): DiscountPrice
     {
-        return GetValidatedTotalDiscountPrice::get($this->paymentCost, $this);
+        return $this->calculateDiscountPrice($this->paymentCost->getExcludingVat());
     }
 
     public function getMappedData(): array
@@ -96,7 +95,7 @@ class Payment implements ChildAggregate, DiscountableItem
             'payment_method_id' => $this->paymentMethodId?->get(),
             'payment_state' => $this->paymentState->getValueAsString(),
             'cost_excl' => $this->paymentCost->getExcludingVat()->getAmount(),
-            'discount_excl' => $this->getTotalDiscountPrice()->getExcludingVat()->getAmount(),
+            'discount_excl' => $this->getDiscountPrice()->getExcludingVat()->getAmount(),
             'total_excl' => $this->getPaymentCostTotal()->getExcludingVat()->getAmount(),
             'data' => json_encode($data),
         ];

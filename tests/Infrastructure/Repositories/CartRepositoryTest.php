@@ -3,7 +3,6 @@ declare(strict_types=1);
 
 namespace Tests\Infrastructure\Repositories;
 
-use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\Infrastructure\TestCase;
 use Thinktomorrow\Trader\Application\Cart\Read\Cart;
 use Thinktomorrow\Trader\Domain\Common\Cash\Cash;
@@ -18,27 +17,19 @@ use Thinktomorrow\Trader\Infrastructure\Laravel\Repositories\MysqlOrderRepositor
 use Thinktomorrow\Trader\Infrastructure\Test\Repositories\InMemoryCartRepository;
 use Thinktomorrow\Trader\Infrastructure\Test\Repositories\InMemoryOrderRepository;
 use Thinktomorrow\Trader\Infrastructure\Test\TestContainer;
+use Thinktomorrow\Trader\Testing\Order\OrderContext;
 
 final class CartRepositoryTest extends TestCase
 {
-    use RefreshDatabase;
-    use PrepareWorld;
-
     public function test_it_can_find_a_cart()
     {
-        $order = $this->orderContext->createDefaultOrder();
+        foreach (OrderContext::drivers() as $orderContext) {
+            $order = $orderContext->createDefaultOrder();
 
-        foreach ($this->orderRepositories() as $i => $orderRepository) {
-            $this->prepareWorldForOrder($i);
-
-            $orderRepository->save($order);
-
-            $cartRepository = iterator_to_array($this->cartRepositories())[$i];
-
-            $cart = $cartRepository->findCart($order->orderId);
+            $cart = $orderContext->findCart($order->orderId);
 
             $this->assertInstanceOf(Cart::class, $cart);
-            $this->assertCount(1, $cart->getLines());
+            $this->assertCount(2, $cart->getLines());
             $this->assertEquals(
                 Cash::from($order->getTotal()->getIncludingVat())->toLocalizedFormat(Locale::fromString('nl', 'BE')),
                 $cart->getTotalPrice()

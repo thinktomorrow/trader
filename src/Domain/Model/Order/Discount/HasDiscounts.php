@@ -2,6 +2,7 @@
 
 namespace Thinktomorrow\Trader\Domain\Model\Order\Discount;
 
+use Money\Money;
 use Thinktomorrow\Trader\Domain\Common\Price\DefaultDiscountPrice;
 use Thinktomorrow\Trader\Domain\Common\Price\DiscountPrice;
 
@@ -10,13 +11,17 @@ trait HasDiscounts
     /** @var Discount[] */
     private array $discounts = [];
 
-    public function getSumOfDiscountPrices(): DiscountPrice
+    protected function calculateDiscountPrice(Money $base): DiscountPrice
     {
         $totalDiscount = DefaultDiscountPrice::zero();
 
         /** @var Discount $discount */
         foreach ($this->discounts as $discount) {
             $totalDiscount = $totalDiscount->add($discount->getDiscountPrice());
+        }
+
+        if ($totalDiscount->getExcludingVat()->greaterThanOrEqual($base)) {
+            return DefaultDiscountPrice::fromExcludingVat($base);
         }
 
         return $totalDiscount;

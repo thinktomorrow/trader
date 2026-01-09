@@ -16,7 +16,6 @@ use Thinktomorrow\Trader\Domain\Model\Order\Discount\Discount;
 use Thinktomorrow\Trader\Domain\Model\Order\Discount\DiscountableId;
 use Thinktomorrow\Trader\Domain\Model\Order\Discount\DiscountableItem;
 use Thinktomorrow\Trader\Domain\Model\Order\Discount\DiscountableType;
-use Thinktomorrow\Trader\Domain\Model\Order\Discount\GetValidatedTotalDiscountPrice;
 use Thinktomorrow\Trader\Domain\Model\Order\Discount\HasDiscounts;
 use Thinktomorrow\Trader\Domain\Model\Order\Line\Personalisations\HasPersonalisations;
 use Thinktomorrow\Trader\Domain\Model\Order\Line\Personalisations\LinePersonalisation;
@@ -77,12 +76,7 @@ final class Line implements ChildAggregate, DiscountableItem
 
     public function getDiscountPrice(): DiscountPrice
     {
-        return GetValidatedTotalDiscountPrice::get($this->unitPrice, $this);
-    }
-
-    public function getTotalDiscountPrice(): DiscountPrice
-    {
-        throw new \Exception('Use getDiscountPrice() instead of getTotalDiscountPrice() on Line.');
+        return $this->calculateDiscountPrice($this->unitPrice->getExcludingVat());
     }
 
     public function getDiscountPriceExcl(): Money

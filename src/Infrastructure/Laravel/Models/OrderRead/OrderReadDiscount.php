@@ -7,7 +7,6 @@ use Thinktomorrow\Trader\Application\Common\RendersData;
 use Thinktomorrow\Trader\Application\Common\RendersMoney;
 use Thinktomorrow\Trader\Domain\Common\Cash\Percentage;
 use Thinktomorrow\Trader\Domain\Common\Price\DiscountPrice;
-use Thinktomorrow\Trader\Domain\Model\Order\Discount\DiscountTotal;
 
 abstract class OrderReadDiscount
 {
@@ -18,9 +17,6 @@ abstract class OrderReadDiscount
     protected Percentage $percentage;
     protected string $discount_id;
     protected array $data;
-
-    // General flag for all line prices to render with or without tax.
-    protected bool $include_tax = true;
 
     final public function __construct()
     {
@@ -43,22 +39,9 @@ abstract class OrderReadDiscount
         return $this->discount_id;
     }
 
-    public function getDiscountTotal(): DiscountTotal
+    public function getDiscountPrice(): DiscountPrice
     {
         return $this->total;
-    }
-
-    public function includeTax(bool $includeTax = true): void
-    {
-        $this->include_tax = $includeTax;
-    }
-
-    public function getPrice(): string
-    {
-        return $this->renderMoney(
-            $this->include_tax ? $this->total->getIncludingVat() : $this->total->getExcludingVat(),
-            $this->getLocale()
-        );
     }
 
     public function getPercentage(): string

@@ -6,13 +6,13 @@ namespace Tests\Infrastructure\Repositories;
 use Tests\Infrastructure\TestCase;
 use Thinktomorrow\Trader\Domain\Model\Product\ProductTaxa\ProductTaxon;
 use Thinktomorrow\Trader\Domain\Model\Product\ProductTaxa\VariantProperty;
-use Thinktomorrow\Trader\Testing\Support\Catalog;
+use Thinktomorrow\Trader\Testing\Catalog\CatalogContext;
 
 final class ProductTaxonRepositoryTest extends TestCase
 {
     public function test_it_can_get_product_taxa_by_product()
     {
-        foreach (Catalog::drivers() as $catalog) {
+        foreach (CatalogContext::drivers() as $catalog) {
 
             $catalog->dontPersist();
 
@@ -20,10 +20,10 @@ final class ProductTaxonRepositoryTest extends TestCase
 
                 $originalProductTaxa = $product->getProductTaxa();
 
-                $catalog->repos->productRepository()->save($product);
+                $catalog->repos()->productRepository()->save($product);
                 $product->releaseEvents();
 
-                $product = $catalog->repos->productRepository()->find($product->productId);
+                $product = $catalog->repos()->productRepository()->find($product->productId);
 
                 $this->assertCount(count($originalProductTaxa), $product->getProductTaxa());
                 $this->assertContainsOnlyInstancesOf(ProductTaxon::class, $product->getProductTaxa());
@@ -31,8 +31,8 @@ final class ProductTaxonRepositoryTest extends TestCase
                 if (count($originalProductTaxa) > 0) {
                     $this->assertEquals($product->productId->get(), $product->getProductTaxa()[0]->productId);
                     $this->assertEqualsCanonicalizing(
-                        array_map(fn ($productTaxon) => $productTaxon->taxonId->get(), $originalProductTaxa),
-                        array_map(fn ($productTaxon) => $productTaxon->taxonId->get(), $product->getProductTaxa())
+                        array_map(fn($productTaxon) => $productTaxon->taxonId->get(), $originalProductTaxa),
+                        array_map(fn($productTaxon) => $productTaxon->taxonId->get(), $product->getProductTaxa())
                     );
                 }
             }
@@ -41,7 +41,7 @@ final class ProductTaxonRepositoryTest extends TestCase
 
     public function test_it_can_get_variant_properties_by_product()
     {
-        foreach (Catalog::drivers() as $catalog) {
+        foreach (CatalogContext::drivers() as $catalog) {
 
             $catalog->dontPersist();
 
@@ -49,10 +49,10 @@ final class ProductTaxonRepositoryTest extends TestCase
 
                 $count = count($product->getVariantProperties());
 
-                $catalog->repos->productRepository()->save($product);
+                $catalog->repos()->productRepository()->save($product);
                 $product->releaseEvents();
 
-                $product = $catalog->repos->productRepository()->find($product->productId);
+                $product = $catalog->repos()->productRepository()->find($product->productId);
 
                 $this->assertCount($count, $product->getVariantProperties());
                 $this->assertContainsOnlyInstancesOf(VariantProperty::class, $product->getVariantProperties());
@@ -67,13 +67,13 @@ final class ProductTaxonRepositoryTest extends TestCase
 
     public function test_it_can_get_variant_properties_by_variant()
     {
-        foreach (Catalog::drivers() as $catalog) {
+        foreach (CatalogContext::drivers() as $catalog) {
 
             $catalog->dontPersist();
 
             foreach ($catalog->products() as $product) {
 
-                if (! $product->hasVariants()) {
+                if (!$product->hasVariants()) {
                     continue;
                 }
 
@@ -81,10 +81,10 @@ final class ProductTaxonRepositoryTest extends TestCase
 
                 $count = count($variant->getVariantProperties());
 
-                $catalog->repos->productRepository()->save($product);
+                $catalog->repos()->productRepository()->save($product);
                 $product->releaseEvents();
 
-                $variant = $catalog->repos->productRepository()->find($product->productId)->getVariants()[0];
+                $variant = $catalog->repos()->productRepository()->find($product->productId)->getVariants()[0];
 
                 $this->assertCount($count, $variant->getVariantProperties());
                 $this->assertContainsOnlyInstancesOf(\Thinktomorrow\Trader\Domain\Model\Product\VariantTaxa\VariantProperty::class, $variant->getVariantProperties());

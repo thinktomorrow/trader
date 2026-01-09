@@ -171,7 +171,7 @@ class OrderLineTest extends TestCase
         $line->addDiscount($discount);
 
         $this->assertEquals(DefaultItemPrice::fromExcludingVat(Money::EUR(83), VatPercentage::fromString('21')), $line->getUnitPrice());
-        $this->assertEquals(DefaultDiscountPrice::fromExcludingVat(Money::EUR(15)), $line->getSumOfDiscountPrices());
+        $this->assertEquals(DefaultDiscountPrice::fromExcludingVat(Money::EUR(15)), $line->getDiscountPrice());
         $this->assertEquals(DefaultItemPrice::fromExcludingVat(Money::EUR(68), VatPercentage::fromString('21')), $line->getTotal());
     }
 }

@@ -4,26 +4,11 @@ declare(strict_types=1);
 namespace Tests\Infrastructure;
 
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Money\Money;
 use Tests\TestHelpers;
-use Thinktomorrow\Trader\Domain\Common\Email;
-use Thinktomorrow\Trader\Domain\Common\Locale;
-use Thinktomorrow\Trader\Domain\Model\Country\Country;
-use Thinktomorrow\Trader\Domain\Model\Country\CountryId;
-use Thinktomorrow\Trader\Domain\Model\Country\CountryRepository;
-use Thinktomorrow\Trader\Domain\Model\Customer\Customer;
-use Thinktomorrow\Trader\Domain\Model\Customer\CustomerId;
-use Thinktomorrow\Trader\Domain\Model\Customer\CustomerRepository;
-use Thinktomorrow\Trader\Domain\Model\PaymentMethod\PaymentMethod;
-use Thinktomorrow\Trader\Domain\Model\PaymentMethod\PaymentMethodId;
-use Thinktomorrow\Trader\Domain\Model\PaymentMethod\PaymentMethodRepository;
-use Thinktomorrow\Trader\Domain\Model\Product\ProductRepository;
-use Thinktomorrow\Trader\Domain\Model\Promo\PromoRepository;
-use Thinktomorrow\Trader\Domain\Model\ShippingProfile\ShippingProfile;
-use Thinktomorrow\Trader\Domain\Model\ShippingProfile\ShippingProfileId;
-use Thinktomorrow\Trader\Domain\Model\ShippingProfile\ShippingProfileRepository;
 use Thinktomorrow\Trader\Infrastructure\Laravel\TraderServiceProvider;
 use Thinktomorrow\Trader\Infrastructure\Shop\ShopServiceProvider;
+use Thinktomorrow\Trader\Testing\Catalog\CatalogContext;
+use Thinktomorrow\Trader\Testing\Order\OrderContext;
 use Thinktomorrow\Trader\Testing\Support\Catalog;
 use Thinktomorrow\Trader\Testing\Support\Shop;
 
@@ -31,6 +16,9 @@ abstract class TestCase extends \Orchestra\Testbench\TestCase
 {
     use TestHelpers;
     use RefreshDatabase;
+
+    protected CatalogContext $catalogContext;
+    protected OrderContext $orderContext;
 
     protected function getEnvironmentSetUp($app)
     {
@@ -51,9 +39,11 @@ abstract class TestCase extends \Orchestra\Testbench\TestCase
     {
         parent::setUp();
 
-        Shop::setUp();
+        CatalogContext::setUp();
+        OrderContext::setUp();
 
-        Catalog::setUp();
+        $this->catalogContext = CatalogContext::mysql();
+        $this->orderContext = OrderContext::mysql();
     }
 
     public function getPackageProviders($app)
@@ -66,40 +56,6 @@ abstract class TestCase extends \Orchestra\Testbench\TestCase
 
     protected function tearDown(): void
     {
-        Catalog::tearDown();
-
-        Shop::tearDown();
-
         parent::tearDown();
-    }
-
-    /**
-     * Create the minimum requires domain integrity to avoid mysql db FK failure
-     * @return void
-     */
-    protected function buildWorldForDefaultOrder(): void
-    {
-        $product = $this->createProductWithPersonalisations();
-        app(ProductRepository::class)->save($product);
-
-        $promo = $this->createPromo([], [
-            $this->orderContext->createOrderDiscount(),
-        ]);
-        app(PromoRepository::class)->save($promo);
-
-        $shippingProfile = ShippingProfile::create(ShippingProfileId::fromString('ppp'), true);
-        app(ShippingProfileRepository::class)->save($shippingProfile);
-
-        $paymentMethod = PaymentMethod::create(PaymentMethodId::fromString('mmm'), Money::EUR(10));
-        app(PaymentMethodRepository::class)->save($paymentMethod);
-
-        $country = Country::create(CountryId::fromString('BE'), []);
-        app(CountryRepository::class)->save($country);
-
-        $country = Country::create(CountryId::fromString('NL'), []);
-        app(CountryRepository::class)->save($country);
-
-        $customer = Customer::create(CustomerId::fromString('ccc-123'), Email::fromString('ben@thinktomorrow.be'), false, Locale::fromString('nl'));
-        app(CustomerRepository::class)->save($customer);
     }
 }

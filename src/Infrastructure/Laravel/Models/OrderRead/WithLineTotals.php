@@ -14,6 +14,17 @@ trait WithLineTotals
     protected Money $totalVat;
     protected Money $totalPriceIncl;
 
+    protected function initializeLineTotalsFromState(array $state): void
+    {
+        $this->unitPriceExcl = Money::EUR($state['unit_price_excl']);
+        $this->unitPriceIncl = Money::EUR($state['unit_price_incl']);
+        $this->totalPriceExcl = Money::EUR($state['total_excl']);
+        $this->totalPriceIncl = Money::EUR($state['total_incl']);
+        $this->totalVat = Money::EUR($state['total_vat']);
+        $this->discountPriceExcl = Money::EUR($state['discount_excl']);
+        $this->discountPriceIncl = Money::EUR($state['discount_incl']);
+    }
+
     public function getUnitPriceExcl(): Money
     {
         return $this->unitPriceExcl;

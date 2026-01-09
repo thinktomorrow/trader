@@ -30,6 +30,8 @@ interface ItemPrice extends PriceWithVat
 
     public function getVatPercentage(): VatPercentage;
 
+    public function subtract(ItemPrice $price): static;
+
     public function multiply(int $quantity): static;
 
     public function applyDiscount(DiscountPrice $discount): static;

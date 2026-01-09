@@ -36,8 +36,8 @@ class GridItemTest extends ProductContext
         $this->assertEquals('€ 8,26', $gridItem->getUnitPrice(false));
         $this->assertEquals('€ 8', $gridItem->getSalePrice());
         $this->assertEquals('€ 6,61', $gridItem->getSalePrice(false));
-        $this->assertEquals('21', $gridItem->getTaxRateAsString());
+        $this->assertEquals('21', $gridItem->getFormattedVatRate());
         $this->assertTrue($gridItem->onSale());
-        $this->assertEquals('€ 2', $gridItem->getSaleDiscount());
+        $this->assertEquals('€ 2', $gridItem->getFormattedSaleDiscount());
     }
 }

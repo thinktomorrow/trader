@@ -87,6 +87,35 @@ class DefaultItemPrice implements ItemPrice
         return $this->vatPercentage;
     }
 
+    public function subtract(ItemPrice $price): static
+    {
+        if (!$this->vatPercentage->equals($price->getVatPercentage())) {
+            throw new \InvalidArgumentException(
+                'Cannot subtract ItemPrice with different VAT percentage (' .
+                $price->getVatPercentage()->get() . '% given, ' .
+                $this->vatPercentage->get() . '% expected).'
+            );
+        }
+
+        $newExcluding = $this->excludingVat->subtract($price->getExcludingVat());
+
+        if ($newExcluding->isNegative()) {
+            throw new PriceCannotBeNegative(
+                'Subtracting the price would result in a negative excluding VAT amount: ' .
+                $newExcluding->getAmount()
+            );
+        }
+
+        $self = new static($newExcluding, $this->vatPercentage);
+
+        if ($this->includingVatOriginal) {
+            $newIncluding = $this->includingVatOriginal->subtract($price->getIncludingVat());
+            $self->includingVatOriginal = $newIncluding;
+        }
+
+        return $self;
+    }
+
     public function multiply(int $quantity): static
     {
         $self = new static(

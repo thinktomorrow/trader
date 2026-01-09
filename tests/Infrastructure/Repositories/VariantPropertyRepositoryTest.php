@@ -5,14 +5,12 @@ namespace Tests\Infrastructure\Repositories;
 
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\Infrastructure\TestCase;
-use Thinktomorrow\Trader\Domain\Model\Product\VariantTaxa\VariantProperty;
 use Thinktomorrow\Trader\Domain\Model\Product\VariantTaxa\VariantTaxon;
-use Thinktomorrow\Trader\Domain\Model\Taxon\TaxonId;
+use Thinktomorrow\Trader\Domain\Model\Taxonomy\TaxonomyType;
 use Thinktomorrow\Trader\Infrastructure\Laravel\Repositories\MysqlProductRepository;
 use Thinktomorrow\Trader\Infrastructure\Laravel\Repositories\MysqlTaxonomyRepository;
 use Thinktomorrow\Trader\Infrastructure\Laravel\Repositories\MysqlTaxonRepository;
 use Thinktomorrow\Trader\Infrastructure\Laravel\Repositories\MysqlVariantPropertyRepository;
-use Thinktomorrow\Trader\Infrastructure\Laravel\Repositories\MysqlVariantRepository;
 use Thinktomorrow\Trader\Infrastructure\Test\TestContainer;
 
 final class VariantPropertyRepositoryTest extends TestCase
@@ -29,15 +27,23 @@ final class VariantPropertyRepositoryTest extends TestCase
 
         $this->taxonRepository = new MysqlTaxonRepository();
         $this->taxonomyRepository = new MysqlTaxonomyRepository(new TestContainer());
-        $this->catalogContext->repos()->productRepository() = new MysqlProductRepository(new MysqlVariantRepository(new TestContainer()));
     }
 
     public function test_it_can_check_if_variant_property_combination_exists()
     {
-        $this->createAndSaveTaxonomiesAndTaxa();
-        $product = $this->createProductWithProductVariantProperties();
-        $this->catalogContext->repos()->productRepository()->save($product);
+        $this->catalogContext->createTaxonomy('taxonomy-aaa', TaxonomyType::variant_property->value);
+        $taxonomy2 = $this->catalogContext->createTaxonomy('taxonomy-bbb', TaxonomyType::variant_property->value);
+        $taxon = $this->catalogContext->createTaxon();
+        $taxon2 = $this->catalogContext->createTaxon('taxon-bbb');
+        $taxon3 = $this->catalogContext->createTaxon('taxon-ccc', $taxonomy2->taxonomyId->get());
 
+        $product = $this->catalogContext->createProduct();
+        $variantId = $product->getVariants()[0]->variantId;
+
+        $this->catalogContext->linkVariantToTaxon($product->productId->get(), $variantId->get(), $taxon->taxonId->get());
+        $this->catalogContext->linkVariantToTaxon($product->productId->get(), $variantId->get(), $taxon3->taxonId->get());
+
+        $product = $this->catalogContext->findProduct($product->productId);
         $variant = $product->getVariants()[0];
 
         foreach ($this->repositories() as $repository) {
@@ -50,19 +56,27 @@ final class VariantPropertyRepositoryTest extends TestCase
             // Passed variant is ignored in the check
             $this->assertFalse($repository->doesUniqueVariantPropertyCombinationExist($product->productId->get(), $taxonIds, $variant->variantId->get()));
 
-            $this->assertFalse($repository->doesUniqueVariantPropertyCombinationExist($product->productId->get(), ['aaa']));
-            $this->assertFalse($repository->doesUniqueVariantPropertyCombinationExist($product->productId->get(), ['aaa', 'bbb']));
+            $this->assertFalse($repository->doesUniqueVariantPropertyCombinationExist($product->productId->get(), ['taxon-aaa']));
+            $this->assertFalse($repository->doesUniqueVariantPropertyCombinationExist($product->productId->get(), ['taxon-bbb', 'taxon-ccc']));
         }
     }
 
     public function test_it_checks_various_variant_property_combinations()
     {
-        $this->createAndSaveTaxonomiesAndTaxa();
-        $product = $this->createProductWithProductVariantProperties();
-        $this->catalogContext->repos()->productRepository()->save($product);
+        $this->catalogContext->createTaxonomy('taxonomy-aaa', TaxonomyType::variant_property->value);
+        $taxonomy2 = $this->catalogContext->createTaxonomy('taxonomy-bbb', TaxonomyType::variant_property->value);
+        $taxon = $this->catalogContext->createTaxon('taxon-aaa');
+        $taxon2 = $this->catalogContext->createTaxon('taxon-bbb');
+        $taxon3 = $this->catalogContext->createTaxon('taxon-ccc', $taxonomy2->taxonomyId->get());
 
+        $product = $this->catalogContext->createProduct();
+        $variantId = $product->getVariants()[0]->variantId;
+
+        $this->catalogContext->linkVariantToTaxon($product->productId->get(), $variantId->get(), $taxon->taxonId->get());
+        $this->catalogContext->linkVariantToTaxon($product->productId->get(), $variantId->get(), $taxon3->taxonId->get());
+
+        $product = $this->catalogContext->findProduct($product->productId);
         $repository = new MysqlVariantPropertyRepository();
-
         $variants = $product->getVariants();
         $variantA = $variants[0];
 
@@ -72,8 +86,9 @@ final class VariantPropertyRepositoryTest extends TestCase
         //        $this->assertFalse($repository->doesUniqueVariantPropertyCombinationExist($product->productId->get(), $taxonIdsA, $variantA->variantId->get()));
 
         // Maak een tweede variant met exact dezelfde set
-        $product->createVariant($this->createVariantWithVariantProperty('zzz'));
-        $this->catalogContext->repos()->productRepository()->save($product);
+        $variantB = $this->catalogContext->createVariant($product->productId->get(), 'variant-bbb');
+        $this->catalogContext->linkVariantToTaxon($product->productId->get(), $variantB->variantId->get(), $taxon->taxonId->get());
+        $this->catalogContext->linkVariantToTaxon($product->productId->get(), $variantB->variantId->get(), $taxon3->taxonId->get());
 
         // Case 2: duplicate already exists
         $this->assertTrue($repository->doesUniqueVariantPropertyCombinationExist($product->productId->get(), $taxonIdsA));
@@ -82,26 +97,46 @@ final class VariantPropertyRepositoryTest extends TestCase
         $this->assertTrue($repository->doesUniqueVariantPropertyCombinationExist($product->productId->get(), $taxonIdsA, $variantA->variantId->get()));
 
         // Case 3: superset => false
-        $extra = array_merge($taxonIdsA, ['yyy']);
+        $extra = array_merge($taxonIdsA, ['taxon-extra']);
         $this->assertFalse($repository->doesUniqueVariantPropertyCombinationExist($product->productId->get(), $extra));
 
         // Case 4: completely different => false
-        $this->assertFalse($repository->doesUniqueVariantPropertyCombinationExist($product->productId->get(), ['zzz', 'yyy']));
+        $this->assertFalse($repository->doesUniqueVariantPropertyCombinationExist($product->productId->get(), ['zzz', 'taxon-aaa']));
 
         // Case 5: empty array => false
         $this->assertFalse($repository->doesUniqueVariantPropertyCombinationExist($product->productId->get(), []));
 
         // Case 6: multiple overlapping variants
-        $variantB = $this->createVariant('aaa');
-        $variantB->updateVariantProperties([
-            VariantProperty::create($variantB->variantId, TaxonId::fromString('yyy')),
-        ]);
-        $product->createVariant($variantB);
-        $this->catalogContext->repos()->productRepository()->save($product);
+        $variantC = $this->catalogContext->createVariant($product->productId->get(), 'variant-ccc');
+        $this->catalogContext->linkVariantToTaxon(
+            $product->productId->get(),
+            $variantC->variantId->get(),
+            'taxon-aaa'
+        );
 
-        $this->assertTrue($repository->doesUniqueVariantPropertyCombinationExist($product->productId->get(), ['yyy']));
-        $this->assertFalse($repository->doesUniqueVariantPropertyCombinationExist($product->productId->get(), ['yyy'], $variantB->variantId->get()));
-        $this->assertFalse($repository->doesUniqueVariantPropertyCombinationExist($product->productId->get(), [$taxonIdsA[0], 'yyy']));
+        $this->assertTrue(
+            $repository->doesUniqueVariantPropertyCombinationExist(
+                $product->productId->get(),
+                ['taxon-aaa']
+            )
+        );
+
+        // exclude self => false
+        $this->assertFalse(
+            $repository->doesUniqueVariantPropertyCombinationExist(
+                $product->productId->get(),
+                ['taxon-aaa'],
+                $variantC->variantId->get()
+            )
+        );
+
+        // partial overlap is NOT exact match
+        $this->assertFalse(
+            $repository->doesUniqueVariantPropertyCombinationExist(
+                $product->productId->get(),
+                ['taxon-aaa', 'taxon-bbb']
+            )
+        );
     }
 
     private static function repositories(): \Generator

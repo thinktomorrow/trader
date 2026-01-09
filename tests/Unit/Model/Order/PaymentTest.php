@@ -158,7 +158,7 @@ class PaymentTest extends TestCase
         $this->assertCount(1, $payment->getDiscounts());
 
         $this->assertEquals(DefaultServicePrice::fromExcludingVat(Money::EUR(50)), $payment->getPaymentCost());
-        $this->assertEquals(DefaultDiscountPrice::fromExcludingVat(Money::EUR(15)), $payment->getSumOfDiscountPrices());
+        $this->assertEquals(DefaultDiscountPrice::fromExcludingVat(Money::EUR(15)), $payment->getDiscountPrice());
         $this->assertEquals(DefaultServicePrice::fromExcludingVat(Money::EUR(35)), $payment->getPaymentCostTotal());
     }
 }

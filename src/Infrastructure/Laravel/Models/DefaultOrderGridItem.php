@@ -3,18 +3,17 @@ declare(strict_types=1);
 
 namespace Thinktomorrow\Trader\Infrastructure\Laravel\Models;
 
-use Money\Money;
 use Thinktomorrow\Trader\Application\Common\HasLocale;
 use Thinktomorrow\Trader\Application\Common\RendersMoney;
 use Thinktomorrow\Trader\Application\Order\Grid\OrderGridItem;
-use Thinktomorrow\Trader\Domain\Model\Order\WithOrderTotals;
 use Thinktomorrow\Trader\Infrastructure\Laravel\Models\OrderRead\WithFormattedOrderTotals;
+use Thinktomorrow\Trader\Infrastructure\Laravel\Models\OrderRead\WithImmutableOrderTotals;
 
 class DefaultOrderGridItem implements OrderGridItem
 {
     use RendersMoney;
     use HasLocale;
-    use WithOrderTotals;
+    use WithImmutableOrderTotals;
     use WithFormattedOrderTotals;
 
     protected string $order_id;
@@ -46,17 +45,7 @@ class DefaultOrderGridItem implements OrderGridItem
         $gridItem->paid_at = isset($state['paid_at']) ? new \DateTime($state['paid_at']) : null;
         $gridItem->delivered_at = isset($state['delivered_at']) ? new \DateTime($state['delivered_at']) : null;
 
-        $gridItem->totalExcl = Money::EUR($state['total_excl']);
-        $gridItem->totalIncl = Money::EUR($state['total_incl']);
-        $gridItem->totalVat = Money::EUR($state['total_vat']);
-        $gridItem->subtotalExcl = Money::EUR($state['subtotal_excl']);
-        $gridItem->subtotalIncl = Money::EUR($state['subtotal_incl']);
-        $gridItem->discountExcl = Money::EUR($state['discount_excl']);
-        $gridItem->discountIncl = Money::EUR($state['discount_incl']);
-        $gridItem->shippingExcl = Money::EUR($state['shipping_cost_excl']);
-        $gridItem->shippingIncl = Money::EUR($state['shipping_cost_incl']);
-        $gridItem->paymentExcl = Money::EUR($state['payment_cost_excl']);
-        $gridItem->paymentIncl = Money::EUR($state['payment_cost_incl']);
+        $gridItem->initializeOrderTotalsFromState($state);
 
         $gridItem->shopperData = [
             'email' => $shopperState['email'] ?? null,
