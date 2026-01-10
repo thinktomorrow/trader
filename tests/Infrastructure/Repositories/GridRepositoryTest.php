@@ -3,40 +3,29 @@ declare(strict_types=1);
 
 namespace Tests\Infrastructure\Repositories;
 
-use Illuminate\Foundation\Testing\RefreshDatabase;
 use Money\Money;
 use Tests\Infrastructure\TestCase;
 use Thinktomorrow\Trader\Application\Product\Grid\GridItem;
-use Thinktomorrow\Trader\Application\Product\ProductApplication;
 use Thinktomorrow\Trader\Application\Product\Taxa\ProductTaxonItem;
-use Thinktomorrow\Trader\Application\Taxon\TaxonApplication;
-use Thinktomorrow\Trader\Application\Taxonomy\TaxonomyApplication;
-use Thinktomorrow\Trader\Infrastructure\Laravel\Models\DefaultGridItem;
-use Thinktomorrow\Trader\Infrastructure\Laravel\Repositories\MysqlGridRepository;
-use Thinktomorrow\Trader\Infrastructure\Laravel\Repositories\MysqlProductRepository;
-use Thinktomorrow\Trader\Infrastructure\Laravel\Repositories\MysqlTaxonomyRepository;
-use Thinktomorrow\Trader\Infrastructure\Laravel\Repositories\MysqlTaxonRepository;
-use Thinktomorrow\Trader\Infrastructure\Laravel\Repositories\MysqlTaxonTreeRepository;
-use Thinktomorrow\Trader\Infrastructure\Laravel\Repositories\MysqlVariantRepository;
-use Thinktomorrow\Trader\Infrastructure\Test\EventDispatcherSpy;
-use Thinktomorrow\Trader\Infrastructure\Test\TestContainer;
-use Thinktomorrow\Trader\Infrastructure\Test\TestTraderConfig;
-use Thinktomorrow\Trader\Infrastructure\Vine\VineFlattenedTaxonIds;
+use Thinktomorrow\Trader\Testing\Catalog\CatalogContext;
 
 class GridRepositoryTest extends TestCase
 {
-    use RefreshDatabase;
-
     protected function setUp(): void
     {
         parent::setUp();
-
-        $this->createMysqlCatalog();
     }
 
     public function test_it_can_fetch_grid_item()
     {
-        $gridItems = $this->getMysqlGridRepository()->getResults();
+        $catalog = CatalogContext::mysql();
+
+        $catalog->createTaxonomy();
+        $taxon = $catalog->createTaxon();
+        $product = $catalog->createProduct();
+        $catalog->linkVariantToTaxon($product->productId->get(), $product->getVariants()[0]->variantId->get(), $taxon->taxonId->get());
+
+        $gridItems = $catalog->repos()->gridRepository()->getResults();
 
         /** @var GridItem $gridItem */
         $gridItem = $gridItems->first();
@@ -73,7 +62,7 @@ class GridRepositoryTest extends TestCase
         /** @var GridItem $gridItem */
         $gridItem = $gridItems->first();
 
-        $this->assertCount(1, array_filter($gridItem->getTaxa(), fn (ProductTaxonItem $taxon) => $taxon->showsInGrid()));
+        $this->assertCount(1, array_filter($gridItem->getTaxa(), fn(ProductTaxonItem $taxon) => $taxon->showsInGrid()));
         $this->assertCount(0, $gridItem->getGridCategories());
         $this->assertCount(1, $gridItem->getGridProductProperties());
         $this->assertCount(0, $gridItem->getGridVariantProperties());
@@ -188,7 +177,7 @@ class GridRepositoryTest extends TestCase
 
         $this->assertCount(3, $gridItems);
 
-        $titles = $gridItems->map(fn ($gridItem) => $gridItem->getTitle());
+        $titles = $gridItems->map(fn($gridItem) => $gridItem->getTitle());
 
         $expected = $titles->toArray();
         natcasesort($expected);
@@ -202,43 +191,11 @@ class GridRepositoryTest extends TestCase
 
         $this->assertCount(3, $gridItems);
 
-        $titles = $gridItems->map(fn ($gridItem) => $gridItem->getTitle());
+        $titles = $gridItems->map(fn($gridItem) => $gridItem->getTitle());
 
         $expected = $titles->toArray();
         natcasesort($expected);
 
         $this->assertEquals(array_reverse($expected), $titles->toArray());
-    }
-
-    protected function createMysqlCatalog()
-    {
-        $taxonApplication = new TaxonApplication(
-            new TestTraderConfig(),
-            new EventDispatcherSpy(),
-            new MysqlTaxonRepository(),
-        );
-
-        $this->createCatalog(
-            new TaxonomyApplication(new TestTraderConfig(), new EventDispatcherSpy(), new MysqlTaxonomyRepository()),
-            $taxonApplication,
-            new ProductApplication(
-                new TestTraderConfig(),
-                new EventDispatcherSpy(),
-                new MysqlProductRepository(new MysqlVariantRepository(new TestContainer())),
-                new MysqlVariantRepository(new TestContainer()),
-            ),
-            new MysqlProductRepository(new MysqlVariantRepository(new TestContainer()))
-        );
-    }
-
-    private function getMysqlGridRepository()
-    {
-        (new TestContainer())->add(GridItem::class, DefaultGridItem::class);
-
-        return new MysqlGridRepository(
-            new TestContainer(),
-            new TestTraderConfig(),
-            new VineFlattenedTaxonIds(new MysqlTaxonTreeRepository(new TestContainer(), new TestTraderConfig()))
-        );
     }
 }

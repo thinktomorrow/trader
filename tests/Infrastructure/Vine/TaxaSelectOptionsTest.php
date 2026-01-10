@@ -4,20 +4,20 @@ declare(strict_types=1);
 namespace Tests\Infrastructure\Vine;
 
 use Tests\Infrastructure\TestCase;
-use Thinktomorrow\Trader\Testing\Support\Catalog;
+use Thinktomorrow\Trader\Testing\Catalog\CatalogContext;
 
 final class TaxaSelectOptionsTest extends TestCase
 {
     public function test_it_can_retrieve_options()
     {
-        foreach (Catalog::drivers() as $catalog) {
+        foreach (CatalogContext::drivers() as $catalog) {
 
             // Catalog setup
             $catalog->createTaxonomy();
             $taxon = $catalog->createTaxon();
 
             // Compose options
-            $options = $catalog->repos->taxaSelectOptions()->getByTaxonomy('taxonomy-aaa');
+            $options = $catalog->repos()->taxaSelectOptions()->getByTaxonomy('taxonomy-aaa');
 
             $this->assertCount(1, $options);
             $this->assertEquals([
@@ -28,7 +28,7 @@ final class TaxaSelectOptionsTest extends TestCase
 
     public function test_it_can_retrieve_tree_as_options()
     {
-        foreach (Catalog::drivers() as $catalog) {
+        foreach (CatalogContext::drivers() as $catalog) {
 
             // Catalog setup
             $catalog->createTaxonomy();
@@ -37,7 +37,7 @@ final class TaxaSelectOptionsTest extends TestCase
             $taxon3 = $catalog->createTaxon('taxon-ccc', 'taxonomy-aaa', $taxon2->taxonId->get());
 
             // Compose options
-            $options = $catalog->repos->taxaSelectOptions()->getByTaxonomy('taxonomy-aaa');
+            $options = $catalog->repos()->taxaSelectOptions()->getByTaxonomy('taxonomy-aaa');
 
             $this->assertCount(3, $options);
             $this->assertEquals([
@@ -50,7 +50,7 @@ final class TaxaSelectOptionsTest extends TestCase
 
     public function test_it_can_retrieve_options_for_multiselect()
     {
-        foreach (Catalog::drivers() as $catalog) {
+        foreach (CatalogContext::drivers() as $catalog) {
 
             // Catalog setup
             $catalog->createTaxonomy();
@@ -59,7 +59,7 @@ final class TaxaSelectOptionsTest extends TestCase
             $taxon3 = $catalog->createTaxon('taxon-ccc', 'taxonomy-aaa', $taxon2->taxonId->get());
 
             // Compose options
-            $options = $catalog->repos->taxaSelectOptions()->getForMultiselectByTaxonomy('taxonomy-aaa');
+            $options = $catalog->repos()->taxaSelectOptions()->getForMultiselectByTaxonomy('taxonomy-aaa');
 
             $this->assertCount(3, $options);
             $this->assertEquals([

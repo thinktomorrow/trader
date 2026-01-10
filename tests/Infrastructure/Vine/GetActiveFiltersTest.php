@@ -4,13 +4,13 @@ declare(strict_types=1);
 namespace Tests\Infrastructure\Vine;
 
 use Tests\Infrastructure\TestCase;
-use Thinktomorrow\Trader\Testing\Support\Catalog;
+use Thinktomorrow\Trader\Testing\Catalog\CatalogContext;
 
 final class GetActiveFiltersTest extends TestCase
 {
     public function test_it_can_get_active_filters()
     {
-        foreach (Catalog::drivers() as $catalog) {
+        foreach (CatalogContext::drivers() as $catalog) {
 
             // Create catalog
             $catalog->createTaxonomy();
@@ -22,8 +22,8 @@ final class GetActiveFiltersTest extends TestCase
             $catalog->linkProductToTaxon($product->productId->get(), $taxon2->taxonId->get());
 
             // Fetch active filters
-            $activeFilters = $catalog->repos->taxonFilters()->getActiveFilters(
-                ['taxon-1-key-nl', 'taxon-2-key-nl'],
+            $activeFilters = $catalog->repos()->taxonFilters()->getActiveFilters(
+                ['taxon-1', 'taxon-2'],
                 []
             );
 
@@ -35,7 +35,7 @@ final class GetActiveFiltersTest extends TestCase
 
     public function test_active_filter_returns_only_subfilters()
     {
-        foreach (Catalog::drivers() as $catalog) {
+        foreach (CatalogContext::drivers() as $catalog) {
 
             // Create catalog
             $taxonomy = $catalog->createTaxonomy();
@@ -47,7 +47,7 @@ final class GetActiveFiltersTest extends TestCase
             $catalog->linkProductToTaxon($product->productId->get(), $taxon2->taxonId->get());
 
             // Fetch active filters
-            $activeFilters = $catalog->repos->taxonFilters()->getActiveFilters(
+            $activeFilters = $catalog->repos()->taxonFilters()->getActiveFilters(
                 ['taxon-1-key-nl'],
                 ['taxon-2-key-nl']
             );
@@ -59,7 +59,7 @@ final class GetActiveFiltersTest extends TestCase
 
     public function test_scoped_taxon_can_be_passed_as_active_filter()
     {
-        foreach (Catalog::drivers() as $catalog) {
+        foreach (CatalogContext::drivers() as $catalog) {
 
             // Create catalog
             $taxonomy = $catalog->createTaxonomy();
@@ -71,8 +71,8 @@ final class GetActiveFiltersTest extends TestCase
             $catalog->linkProductToTaxon($product->productId->get(), $taxon2->taxonId->get());
 
             // Fetch active filters
-            $activeFilters = $catalog->repos->taxonFilters()->getActiveFilters(
-                ['taxon-1-key-nl'],
+            $activeFilters = $catalog->repos()->taxonFilters()->getActiveFilters(
+                ['taxon-1'],
                 ['taxon-1-key-nl', 'taxon-2-key-nl']
             );
 
@@ -83,7 +83,7 @@ final class GetActiveFiltersTest extends TestCase
 
     public function test_it_keeps_main_taxon_as_filter_when_the_active_filters_are_no_children_of_main_taxon()
     {
-        foreach (Catalog::drivers() as $catalog) {
+        foreach (CatalogContext::drivers() as $catalog) {
 
             // Create catalog
             $taxonomy = $catalog->createTaxonomy();
@@ -95,8 +95,8 @@ final class GetActiveFiltersTest extends TestCase
             $catalog->linkProductToTaxon($product->productId->get(), $taxon2->taxonId->get());
 
             // Fetch active filters
-            $activeFilters = $catalog->repos->taxonFilters()->getActiveFilters(
-                ['taxon-1-key-nl'],
+            $activeFilters = $catalog->repos()->taxonFilters()->getActiveFilters(
+                ['taxon-1'],
                 ['taxon-2-key-nl']
             );
 
@@ -108,9 +108,9 @@ final class GetActiveFiltersTest extends TestCase
 
     public function test_it_returns_empty_active_filter_if_taxon_key_does_not_exist()
     {
-        foreach (Catalog::drivers() as $catalog) {
+        foreach (CatalogContext::drivers() as $catalog) {
 
-            $activeFilters = $catalog->repos->taxonFilters()->getActiveFilters(
+            $activeFilters = $catalog->repos()->taxonFilters()->getActiveFilters(
                 ['xxx'],
                 []
             );
@@ -121,8 +121,8 @@ final class GetActiveFiltersTest extends TestCase
 
     public function test_it_returns_empty_if_no_scoped_taxa_given()
     {
-        foreach (Catalog::drivers() as $catalog) {
-            $activeFilters = $catalog->repos->taxonFilters()->getActiveFilters(
+        foreach (CatalogContext::drivers() as $catalog) {
+            $activeFilters = $catalog->repos()->taxonFilters()->getActiveFilters(
                 [],
                 []
             );
@@ -133,15 +133,15 @@ final class GetActiveFiltersTest extends TestCase
 
     public function test_it_returns_only_scoped_if_active_taxa_do_not_exist()
     {
-        foreach (Catalog::drivers() as $catalog) {
+        foreach (CatalogContext::drivers() as $catalog) {
             $taxonomy = $catalog->createTaxonomy();
             $taxon = $catalog->createTaxon('taxon-1');
 
             $product = $catalog->createProduct();
             $catalog->linkProductToTaxon($product->productId->get(), $taxon->taxonId->get());
 
-            $activeFilters = $catalog->repos->taxonFilters()->getActiveFilters(
-                ['taxon-1-key-nl'],
+            $activeFilters = $catalog->repos()->taxonFilters()->getActiveFilters(
+                ['taxon-1'],
                 ['nonexistent-key']
             );
 
@@ -152,7 +152,7 @@ final class GetActiveFiltersTest extends TestCase
 
     public function test_it_combines_child_and_unrelated_active_filters()
     {
-        foreach (Catalog::drivers() as $catalog) {
+        foreach (CatalogContext::drivers() as $catalog) {
             $taxonomy = $catalog->createTaxonomy();
             $taxon1 = $catalog->createTaxon('taxon-1');
             $taxonChild = $catalog->createTaxon('taxon-child', $taxonomy->taxonomyId->get(), $taxon1->taxonId->get());
@@ -163,8 +163,8 @@ final class GetActiveFiltersTest extends TestCase
             $catalog->linkProductToTaxon($product->productId->get(), $taxonChild->taxonId->get());
             $catalog->linkProductToTaxon($product->productId->get(), $taxonUnrelated->taxonId->get());
 
-            $activeFilters = $catalog->repos->taxonFilters()->getActiveFilters(
-                ['taxon-1-key-nl'],
+            $activeFilters = $catalog->repos()->taxonFilters()->getActiveFilters(
+                ['taxon-1'],
                 ['taxon-child-key-nl', 'taxon-unrelated-key-nl']
             );
 
@@ -176,15 +176,15 @@ final class GetActiveFiltersTest extends TestCase
 
     public function test_it_deduplicates_active_filters()
     {
-        foreach (Catalog::drivers() as $catalog) {
+        foreach (CatalogContext::drivers() as $catalog) {
             $catalog->createTaxonomy();
             $taxon = $catalog->createTaxon('taxon-1');
 
             $product = $catalog->createProduct();
             $catalog->linkProductToTaxon($product->productId->get(), $taxon->taxonId->get());
 
-            $activeFilters = $catalog->repos->taxonFilters()->getActiveFilters(
-                ['taxon-1-key-nl'],
+            $activeFilters = $catalog->repos()->taxonFilters()->getActiveFilters(
+                ['taxon-1'],
                 ['taxon-1-key-nl', 'taxon-1-key-nl']
             );
 

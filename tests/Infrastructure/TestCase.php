@@ -9,8 +9,6 @@ use Thinktomorrow\Trader\Infrastructure\Laravel\TraderServiceProvider;
 use Thinktomorrow\Trader\Infrastructure\Shop\ShopServiceProvider;
 use Thinktomorrow\Trader\Testing\Catalog\CatalogContext;
 use Thinktomorrow\Trader\Testing\Order\OrderContext;
-use Thinktomorrow\Trader\Testing\Support\Catalog;
-use Thinktomorrow\Trader\Testing\Support\Shop;
 
 abstract class TestCase extends \Orchestra\Testbench\TestCase
 {
@@ -56,6 +54,9 @@ abstract class TestCase extends \Orchestra\Testbench\TestCase
 
     protected function tearDown(): void
     {
+        CatalogContext::tearDown();
+        OrderContext::tearDown();
+
         parent::tearDown();
     }
 }

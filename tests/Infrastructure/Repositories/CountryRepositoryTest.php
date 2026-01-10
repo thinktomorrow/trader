@@ -3,56 +3,56 @@ declare(strict_types=1);
 
 namespace Tests\Infrastructure\Repositories;
 
-use Illuminate\Foundation\Testing\RefreshDatabase;
-use PHPUnit\Framework\Attributes\DataProvider;
 use Tests\Infrastructure\TestCase;
-use Thinktomorrow\Trader\Domain\Model\Country\Country;
 use Thinktomorrow\Trader\Domain\Model\Country\CountryId;
 use Thinktomorrow\Trader\Domain\Model\Country\Exceptions\CouldNotFindCountry;
-use Thinktomorrow\Trader\Infrastructure\Laravel\Repositories\MysqlCountryRepository;
-use Thinktomorrow\Trader\Infrastructure\Test\Repositories\InMemoryCountryRepository;
+use Thinktomorrow\Trader\Testing\Order\OrderContext;
 
 class CountryRepositoryTest extends TestCase
 {
-    use RefreshDatabase;
-
-    #[DataProvider('countries')]
-    public function test_it_can_save_and_find_a_country(Country $country)
+    public function test_it_can_save_and_find_a_country()
     {
-        foreach ($this->repositories() as $repository) {
-            $repository->save($country);
+        foreach (OrderContext::drivers() as $orderContext) {
+            $repository = $orderContext->repos()->countryRepository();
+
+            $country = $orderContext->createCountry('BE');
             $country->releaseEvents();
 
             $this->assertEquals($country, $repository->find($country->countryId));
         }
     }
 
-    #[DataProvider('countries')]
-    public function test_it_can_delete_a_country(Country $country)
+    public function test_it_can_delete_a_country()
     {
-        $countrysNotFound = 0;
+        $countriesNotFound = 0;
 
-        foreach ($this->repositories() as $repository) {
-            $repository->save($country);
+        foreach (OrderContext::drivers() as $orderContext) {
+
+            $repository = $orderContext->repos()->countryRepository();
+
+            $country = $orderContext->createCountry('BE');
+
+
             $repository->delete($country->countryId);
 
             try {
                 $repository->find($country->countryId);
             } catch (CouldNotFindCountry $e) {
-                $countrysNotFound++;
+                $countriesNotFound++;
             }
         }
 
-        $this->assertEquals(count(iterator_to_array($this->repositories())), $countrysNotFound);
+        $this->assertEquals(count(OrderContext::drivers()), $countriesNotFound);
     }
 
     public function test_it_can_get_available_billing_countries()
     {
-        foreach ($this->repositories() as $i => $repository) {
-            $country = $this->createCountry(['country_id' => 'BE']);
-            $country2 = $this->createCountry(['country_id' => 'NL']);
-            $repository->save($country);
-            $repository->save($country2);
+        foreach (OrderContext::drivers() as $orderContext) {
+
+            $repository = $orderContext->repos()->countryRepository();
+
+            $country = $orderContext->createCountry('BE');
+            $country2 = $orderContext->createCountry('NL');
 
             $this->assertEquals([
                 \Thinktomorrow\Trader\Application\Country\Country::fromMappedData($country->getMappedData()),
@@ -63,28 +63,16 @@ class CountryRepositoryTest extends TestCase
 
     public function test_it_can_find_billing_country()
     {
-        foreach ($this->repositories() as $i => $repository) {
-            $country = $this->createCountry(['country_id' => 'BE']);
-            $repository->save($country);
+        foreach (OrderContext::drivers() as $orderContext) {
+
+            $repository = $orderContext->repos()->countryRepository();
+
+            $country = $orderContext->createCountry('BE');
 
             $this->assertEquals(
                 \Thinktomorrow\Trader\Application\Country\Country::fromMappedData($country->getMappedData()),
                 $repository->findBillingCountry(CountryId::fromString('BE'))
             );
         }
-    }
-
-    private static function repositories(): \Generator
-    {
-        yield new InMemoryCountryRepository();
-        yield new MysqlCountryRepository();
-    }
-
-    public static function countries(): \Generator
-    {
-        yield [static::createCountry()];
-
-        $country = static::createCountry(['data' => json_encode(['foo' => 'bar'])]);
-        yield [$country];
     }
 }

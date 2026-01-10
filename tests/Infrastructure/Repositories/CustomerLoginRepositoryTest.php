@@ -3,62 +3,20 @@ declare(strict_types=1);
 
 namespace Tests\Infrastructure\Repositories;
 
-use Illuminate\Foundation\Testing\RefreshDatabase;
-use PHPUnit\Framework\Attributes\DataProvider;
 use Tests\Infrastructure\TestCase;
-use Thinktomorrow\Trader\Domain\Common\Email;
-use Thinktomorrow\Trader\Domain\Model\Customer\CustomerId;
-use Thinktomorrow\Trader\Domain\Model\CustomerLogin\CustomerLogin;
-use Thinktomorrow\Trader\Infrastructure\Laravel\Repositories\MysqlCustomerLoginRepository;
-use Thinktomorrow\Trader\Infrastructure\Laravel\Repositories\MysqlCustomerRepository;
-use Thinktomorrow\Trader\Infrastructure\Test\TestContainer;
+use Thinktomorrow\Trader\Testing\Order\OrderContext;
 
 final class CustomerLoginRepositoryTest extends TestCase
 {
-    use RefreshDatabase;
-    use PrepareWorld;
-
-    #[DataProvider('entities')]
-    public function test_it_can_save_an_customer(CustomerLogin $customerLogin)
+    public function test_it_can_save_and_find_a_customer_login()
     {
-        (new MysqlCustomerRepository(new TestContainer()))->save($this->createCustomer());
+        foreach (OrderContext::drivers() as $orderContext) {
+            $repository = $orderContext->repos()->customerLoginRepository();
 
-        foreach ($this->repositories() as $i => $customerRepository) {
-            $this->prepareCustomer($i);
-            $customerRepository->save($customerLogin);
-            $customerLogin->releaseEvents();
+            $customer = $orderContext->createCustomer();
+            $customerLogin = $orderContext->createCustomerLogin($customer);
 
-            $this->assertEquals($customerLogin, $customerRepository->find($customerLogin->customerId));
+            $this->assertEquals($customerLogin, $repository->find($customerLogin->customerId));
         }
-    }
-
-    #[DataProvider('entities')]
-    public function test_it_can_find_an_customer_login(CustomerLogin $customerLogin)
-    {
-        (new MysqlCustomerRepository(new TestContainer()))->save($this->createCustomer());
-
-        foreach ($this->repositories() as $i => $customerRepository) {
-            $this->prepareCustomer($i);
-            $customerRepository->save($customerLogin);
-            $customerLogin->releaseEvents();
-
-            $this->assertEquals($customerLogin, $customerRepository->find($customerLogin->customerId));
-        }
-    }
-
-    private static function repositories(): \Generator
-    {
-        yield new MysqlCustomerLoginRepository();
-    }
-
-    public static function entities(): \Generator
-    {
-        yield [static::createCustomerLogin()];
-
-        yield [CustomerLogin::create(
-            CustomerId::fromString('ccc-123'),
-            Email::fromString('ben@thinktomorrow.be'),
-            'xxx'
-        )];
     }
 }

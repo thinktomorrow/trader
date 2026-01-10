@@ -1,18 +1,18 @@
 <?php
 declare(strict_types=1);
 
-namespace Tests\Infrastructure\Repositories;
+namespace Infrastructure\Auth;
 
-use function bcrypt;
 use Carbon\Carbon;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Notification;
-use function route;
 use Tests\Infrastructure\TestCase;
 use Thinktomorrow\Trader\Infrastructure\Shop\CustomerAuth\CustomerModel;
 use Thinktomorrow\Trader\Infrastructure\Shop\CustomerAuth\Notifications\ResetCustomerPasswordNotification;
+use function bcrypt;
+use function route;
 
 class CustomerPasswordResetTest extends TestCase
 {
