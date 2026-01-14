@@ -17,7 +17,7 @@ final class ProductDetailRepositoryTaxaTest extends TestCase
 
             foreach ($catalog->products() as $product) {
 
-                if (!$product->hasVariants()) {
+                if (! $product->hasVariants()) {
                     continue;
                 }
 
@@ -34,8 +34,8 @@ final class ProductDetailRepositoryTaxaTest extends TestCase
                 if (count($originalProductTaxa) > 0) {
                     $this->assertEquals($product->productId->get(), $productDetail->getTaxa()[0]->getProductId());
                     $this->assertEqualsCanonicalizing(
-                        array_map(fn($productTaxon) => $productTaxon->taxonId->get(), $originalProductTaxa),
-                        array_map(fn($productTaxon) => $productTaxon->getTaxonId(), $productDetail->getTaxa())
+                        array_map(fn ($productTaxon) => $productTaxon->taxonId->get(), $originalProductTaxa),
+                        array_map(fn ($productTaxon) => $productTaxon->getTaxonId(), $productDetail->getTaxa())
                     );
                 }
             }
@@ -50,7 +50,7 @@ final class ProductDetailRepositoryTaxaTest extends TestCase
 
             foreach ($catalog->products() as $product) {
 
-                if (!$product->hasVariants()) {
+                if (! $product->hasVariants()) {
                     continue;
                 }
 
@@ -67,8 +67,8 @@ final class ProductDetailRepositoryTaxaTest extends TestCase
                 if (count($originalProductTaxa) > 0) {
                     $this->assertEquals($product->productId->get(), $productDetail->getTaxa()[0]->getProductId());
                     $this->assertEqualsCanonicalizing(
-                        array_map(fn($productTaxon) => $productTaxon->taxonId->get(), $originalProductTaxa),
-                        array_map(fn($productTaxon) => $productTaxon->getTaxonId(), $productDetail->getTaxa())
+                        array_map(fn ($productTaxon) => $productTaxon->taxonId->get(), $originalProductTaxa),
+                        array_map(fn ($productTaxon) => $productTaxon->getTaxonId(), $productDetail->getTaxa())
                     );
                 }
             }

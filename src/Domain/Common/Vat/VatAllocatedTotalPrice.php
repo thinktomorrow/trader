@@ -92,7 +92,7 @@ final class VatAllocatedTotalPrice
     private function validateLines(array $vatLines): void
     {
         foreach ($vatLines as $line) {
-            if (!$line instanceof VatAllocatedLine) {
+            if (! $line instanceof VatAllocatedLine) {
                 throw new \InvalidArgumentException('vatLines must be an array of VatAllocatedLine instances.');
             }
         }

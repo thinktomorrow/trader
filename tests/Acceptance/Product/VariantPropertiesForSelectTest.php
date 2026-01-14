@@ -22,8 +22,8 @@ class VariantPropertiesForSelectTest extends ProductContext
 
         $this->catalogContext->linkProductToTaxon($product->productId->get(), $taxon->taxonId->get());
         $this->catalogContext->linkProductToTaxon($product->productId->get(), $taxon2->taxonId->get());
-//        $this->catalogContext->linkVariantToTaxon($product->productId->get(), $variantId->get(), $taxon->taxonId->get());
-//        $this->catalogContext->linkVariantToTaxon($product->productId->get(), $variantId->get(), $taxon2->taxonId->get());
+        //        $this->catalogContext->linkVariantToTaxon($product->productId->get(), $variantId->get(), $taxon->taxonId->get());
+        //        $this->catalogContext->linkVariantToTaxon($product->productId->get(), $variantId->get(), $taxon2->taxonId->get());
 
         $values = (new VariantPropertiesForSelect(
             $this->catalogContext->repos()->productRepository(),

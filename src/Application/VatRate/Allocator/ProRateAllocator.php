@@ -110,7 +110,7 @@ class ProRateAllocator
     {
         $currency = $totalToAllocate->getCurrency();
         $result = array_map(
-            fn() => new Money('0', $currency),
+            fn () => new Money('0', $currency),
             $itemTotals
         );
 

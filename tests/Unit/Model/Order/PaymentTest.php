@@ -57,7 +57,7 @@ class PaymentTest extends TestCase
             'total_excl' => '50',
             'data' => json_encode([
                 'title' => ['nl' => 'payment-aaa title nl', 'fr' => 'payment-aaa title fr'],
-                'payment_method_id' => 'payment-method-aaa'
+                'payment_method_id' => 'payment-method-aaa',
             ]),
         ], $payment->getMappedData());
     }

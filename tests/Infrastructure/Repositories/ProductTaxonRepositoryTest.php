@@ -31,8 +31,8 @@ final class ProductTaxonRepositoryTest extends TestCase
                 if (count($originalProductTaxa) > 0) {
                     $this->assertEquals($product->productId->get(), $product->getProductTaxa()[0]->productId);
                     $this->assertEqualsCanonicalizing(
-                        array_map(fn($productTaxon) => $productTaxon->taxonId->get(), $originalProductTaxa),
-                        array_map(fn($productTaxon) => $productTaxon->taxonId->get(), $product->getProductTaxa())
+                        array_map(fn ($productTaxon) => $productTaxon->taxonId->get(), $originalProductTaxa),
+                        array_map(fn ($productTaxon) => $productTaxon->taxonId->get(), $product->getProductTaxa())
                     );
                 }
             }
@@ -73,7 +73,7 @@ final class ProductTaxonRepositoryTest extends TestCase
 
             foreach ($catalog->products() as $product) {
 
-                if (!$product->hasVariants()) {
+                if (! $product->hasVariants()) {
                     continue;
                 }
 

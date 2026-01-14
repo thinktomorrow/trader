@@ -89,7 +89,7 @@ class DefaultItemPrice implements ItemPrice
 
     public function add(ItemPrice $price): static
     {
-        if (!$this->vatPercentage->equals($price->getVatPercentage())) {
+        if (! $this->vatPercentage->equals($price->getVatPercentage())) {
             throw new \InvalidArgumentException(
                 'Cannot add ItemPrice with different VAT percentage (' .
                 $price->getVatPercentage()->get() . '% given, ' .
@@ -110,7 +110,7 @@ class DefaultItemPrice implements ItemPrice
 
     public function subtract(ItemPrice $price): static
     {
-        if (!$this->vatPercentage->equals($price->getVatPercentage())) {
+        if (! $this->vatPercentage->equals($price->getVatPercentage())) {
             throw new \InvalidArgumentException(
                 'Cannot subtract ItemPrice with different VAT percentage (' .
                 $price->getVatPercentage()->get() . '% given, ' .
@@ -157,7 +157,7 @@ class DefaultItemPrice implements ItemPrice
         if ($this->includingVatOriginal) {
 
             // Assert vat percentages match
-            if (!$this->vatPercentage->equals($discount->getVatPercentage())) {
+            if (! $this->vatPercentage->equals($discount->getVatPercentage())) {
                 throw new \InvalidArgumentException(
                     'Cannot apply ItemDiscountPrice with different VAT percentage (' .
                     $discount->getVatPercentage()->get() . '% given, ' .

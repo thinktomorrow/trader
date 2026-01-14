@@ -23,7 +23,7 @@ final class InMemoryTaxonRepository implements TaxonRepository, InMemoryReposito
 
     public function find(TaxonId $taxonId): Taxon
     {
-        if (!isset(static::$taxons[$taxonId->get()])) {
+        if (! isset(static::$taxons[$taxonId->get()])) {
             throw new CouldNotFindTaxon('No taxon found by id ' . $taxonId);
         }
 
@@ -69,7 +69,7 @@ final class InMemoryTaxonRepository implements TaxonRepository, InMemoryReposito
 
     public function delete(TaxonId $taxonId): void
     {
-        if (!isset(static::$taxons[$taxonId->get()])) {
+        if (! isset(static::$taxons[$taxonId->get()])) {
             throw new CouldNotFindTaxon('No taxon found by id ' . $taxonId);
         }
 
@@ -101,7 +101,7 @@ final class InMemoryTaxonRepository implements TaxonRepository, InMemoryReposito
     private function existsByKey(TaxonKeyId $taxonKeyId, TaxonId $allowedTaxonId): bool
     {
         foreach (static::$taxons as $taxon) {
-            if (!$taxon->taxonId->equals($allowedTaxonId) && $taxon->hasTaxonKeyId($taxonKeyId)) {
+            if (! $taxon->taxonId->equals($allowedTaxonId) && $taxon->hasTaxonKeyId($taxonKeyId)) {
                 return true;
             }
         }

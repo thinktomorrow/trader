@@ -150,7 +150,9 @@ final class VatAllocatorTest extends TestCase
     private function line(int $unitExcl, int $qty, string $vat): Line
     {
         return $this->orderContext->createLine(
-            'order-aaa', uniqid('line-', true), [
+            'order-aaa',
+            uniqid('line-', true),
+            [
                 'unit_price_excl' => $unitExcl,
                 'tax_rate' => $vat,
                 'includes_vat' => false,
@@ -159,4 +161,3 @@ final class VatAllocatorTest extends TestCase
         );
     }
 }
-

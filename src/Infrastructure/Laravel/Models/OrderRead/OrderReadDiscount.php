@@ -77,7 +77,7 @@ abstract class OrderReadDiscount
 
     public function getFormattedDiscountPriceIncl(): ?string
     {
-        if (!$this->getDiscountPrice() instanceof ItemDiscountPrice) {
+        if (! $this->getDiscountPrice() instanceof ItemDiscountPrice) {
             return null;
         }
 

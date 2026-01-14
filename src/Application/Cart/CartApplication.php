@@ -57,8 +57,7 @@ final class CartApplication
         private EventDispatcher              $eventDispatcher,
         private VatNumberApplication         $vatNumberApplication,
         private VatExemptionApplication      $vatExemptionApplication,
-    )
-    {
+    ) {
 
     }
 
@@ -146,7 +145,7 @@ final class CartApplication
                 }
             }
 
-            if (!$originalPersonalisation) {
+            if (! $originalPersonalisation) {
                 throw new \InvalidArgumentException('No personalisation found for variant [' . $addLine->getVariantId()->get() . '] by personalisation id [' . $personalisation_id . '].');
             }
 
@@ -340,7 +339,7 @@ final class CartApplication
         $order = $this->orderRepository->findForCart($command->getOrderId());
         $shopper = $order->getShopper();
 
-        if (!$billingAddressCountryId = $order->getBillingAddress()?->getAddress()->countryId) {
+        if (! $billingAddressCountryId = $order->getBillingAddress()?->getAddress()->countryId) {
             return;
         }
 
@@ -400,11 +399,11 @@ final class CartApplication
         $shopper->addData($customer->getData());
         $order->updateShopper($shopper);
 
-        if (!$order->getBillingAddress() && $billingAddress = $customer->getBillingAddress()) {
+        if (! $order->getBillingAddress() && $billingAddress = $customer->getBillingAddress()) {
             $this->chooseCustomerBillingAddress($order, $billingAddress);
         }
 
-        if (!$order->getShippingAddress() && $shippingAddress = $customer->getShippingAddress()) {
+        if (! $order->getShippingAddress() && $shippingAddress = $customer->getShippingAddress()) {
             $this->chooseCustomerShippingAddress($order, $shippingAddress);
         }
 

@@ -88,22 +88,22 @@ class RefreshCartTest extends CartContext
         $this->assertEquals(0, $cart->getSize());
     }
 
-//    public function test_it_can_refresh_discounts()
-//    {
-//    }
-//
-//    public function test_it_can_refresh_shipping_profile_cost()
-//    {
-//    }
-//
-//    public function test_it_can_refresh_payment_method_cost()
-//    {
-//    }
-//
-//    public function test_it_can_find_cart_without_variant_when_variant_is_no_longer_present()
-//    {
-//        // TODO: this should be detected by refresh job of the order. Triggered by variant
-//    }
+    //    public function test_it_can_refresh_discounts()
+    //    {
+    //    }
+    //
+    //    public function test_it_can_refresh_shipping_profile_cost()
+    //    {
+    //    }
+    //
+    //    public function test_it_can_refresh_payment_method_cost()
+    //    {
+    //    }
+    //
+    //    public function test_it_can_find_cart_without_variant_when_variant_is_no_longer_present()
+    //    {
+    //        // TODO: this should be detected by refresh job of the order. Triggered by variant
+    //    }
 
     private function updateVariant(?VariantState $state = null): void
     {

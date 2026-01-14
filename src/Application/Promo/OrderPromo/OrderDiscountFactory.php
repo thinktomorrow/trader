@@ -18,7 +18,7 @@ class OrderDiscountFactory extends Factory
 
     public function make(string $key, array $state, array $aggregateState, $conditionStates): OrderDiscount|LineDiscount
     {
-        $conditions = array_map(fn($conditionState) => $this->applicableConditionFactory->make($conditionState['key'], $conditionState, $state), $conditionStates);
+        $conditions = array_map(fn ($conditionState) => $this->applicableConditionFactory->make($conditionState['key'], $conditionState, $state), $conditionStates);
 
         return $this->findMappable($key)::fromMappedData($state, $aggregateState, $conditions);
     }

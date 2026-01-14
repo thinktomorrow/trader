@@ -13,7 +13,7 @@ class ProductDataTest extends ProductContext
     public function test_it_can_render_localized_data()
     {
         $product = $this->catalogContext->createProduct('product-aaa', null, [], [
-            'content' => ['nl' => 'content nl', 'en' => 'content en']
+            'content' => ['nl' => 'content nl', 'en' => 'content en'],
         ]);
         $variant = $this->catalogContext->createVariant($product->productId->get(), 'variant-aaa', [], [
             'title' => ['nl' => 'title nl', 'en' => 'title en'],

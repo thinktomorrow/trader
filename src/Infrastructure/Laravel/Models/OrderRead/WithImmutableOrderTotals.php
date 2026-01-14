@@ -26,7 +26,7 @@ trait WithImmutableOrderTotals
 
     protected function initializeOrderTotalsFromState(array $state): void
     {
-        $this->vatLines = array_map(fn($vatLineData) => new VatAllocatedLine(
+        $this->vatLines = array_map(fn ($vatLineData) => new VatAllocatedLine(
             Money::EUR($vatLineData['taxable_base']),
             Money::EUR($vatLineData['vat_amount']),
             VatPercentage::fromString($vatLineData['vat_percentage']),

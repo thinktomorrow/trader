@@ -47,7 +47,7 @@ final class VatAllocatedLine
 
     public function add(VatAllocatedLine $other): static
     {
-        if (!$this->vatPercentage->equals($other->vatPercentage)) {
+        if (! $this->vatPercentage->equals($other->vatPercentage)) {
             throw new \InvalidArgumentException('Cannot add VatAllocatedLine with different VAT percentages. ' .
                 'Given: ' . $other->vatPercentage->get() . '%, expected: ' . $this->vatPercentage->get() . '%.');
         }
@@ -61,7 +61,7 @@ final class VatAllocatedLine
 
     public function subtract(VatAllocatedLine $other): static
     {
-        if (!$this->vatPercentage->equals($other->vatPercentage)) {
+        if (! $this->vatPercentage->equals($other->vatPercentage)) {
             throw new \InvalidArgumentException('Cannot subtract VatAllocatedLine with different VAT percentages. ' .
                 'Given: ' . $other->vatPercentage->get() . '%, expected: ' . $this->vatPercentage->get() . '%.');
         }

@@ -23,8 +23,7 @@ final class OrderVatSnapshot
         Money $discountIncl,
         Money $totalVat,
         Money $totalIncl,
-    )
-    {
+    ) {
         $this->vatLines = $vatLines;
         $this->shippingIncl = $shippingIncl;
         $this->paymentIncl = $paymentIncl;
@@ -58,11 +57,10 @@ final class OrderVatSnapshot
         Money $totalVat,
         Money $totalIncl,
         Money $totalExcl
-    ): self
-    {
+    ): self {
 
         // Invariant 1: total_excl + total_vat === total_incl
-        if (!$totalExcl->add($totalVat)->equals($totalIncl)) {
+        if (! $totalExcl->add($totalVat)->equals($totalIncl)) {
             throw new \LogicException(
                 'OrderVatSnapshot invariant violated: total_excl + total_vat must equal total_incl: [' .
                 $totalExcl->getAmount() . '] + [' . $totalVat->getAmount() . '] != [' . $totalIncl->getAmount() . ']'
@@ -73,14 +71,14 @@ final class OrderVatSnapshot
         $vatSum = Money::EUR(0);
 
         foreach ($vatLines as $vatLine) {
-            if (!$vatLine instanceof VatAllocatedLine) {
+            if (! $vatLine instanceof VatAllocatedLine) {
                 throw new \InvalidArgumentException('vatLines must be instances of VatAllocatedLine.');
             }
 
             $vatSum = $vatSum->add($vatLine->getVatAmount());
         }
 
-        if (!$vatSum->equals($totalVat)) {
+        if (! $vatSum->equals($totalVat)) {
             throw new \LogicException(
                 'OrderVatSnapshot invariant violated: sum of vat lines [' .
                 $vatSum->getAmount() . '] does not equal total vat [' . $totalVat->getAmount() . '].'
@@ -100,7 +98,12 @@ final class OrderVatSnapshot
     public static function fromState(array $vatLines, Money $shippingIncl, Money $paymentIncl, Money $discountIncl, Money $totalVat, Money $totalIncl): self
     {
         return new self(
-            $vatLines, $shippingIncl, $paymentIncl, $discountIncl, $totalVat, $totalIncl
+            $vatLines,
+            $shippingIncl,
+            $paymentIncl,
+            $discountIncl,
+            $totalVat,
+            $totalIncl
         );
     }
 
@@ -137,7 +140,7 @@ final class OrderVatSnapshot
 
     public function assertMatchesTotalExcl(Money $totalExcl): void
     {
-        if (!$totalExcl->add($this->totalVat)->equals($this->totalIncl)) {
+        if (! $totalExcl->add($this->totalVat)->equals($this->totalIncl)) {
             throw new \LogicException(
                 'Stored VAT snapshot total incl [' . $this->totalIncl->getAmount() .
                 '] does not match current order totals excl [' .

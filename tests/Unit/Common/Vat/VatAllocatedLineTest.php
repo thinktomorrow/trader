@@ -47,4 +47,3 @@ final class VatAllocatedLineTest extends TestCase
         $this->assertEquals(Money::EUR(1000), $line->getTotalIncludingVat());
     }
 }
-

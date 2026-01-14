@@ -31,7 +31,7 @@ class FindVatRateForOrder
 
     public function findForLine(Order $order, VatPercentage $variantVatPercentage): VatPercentage
     {
-        if (!$this->doesOrderHasBillingCountryOtherThanPrimary($order)) {
+        if (! $this->doesOrderHasBillingCountryOtherThanPrimary($order)) {
             return $variantVatPercentage;
         }
 
@@ -52,29 +52,29 @@ class FindVatRateForOrder
             : $variantVatPercentage;
     }
 
-//    /**
-//     * Shipping cost always uses the standard vat rate.
-//     */
-//    public function findForShippingCost(Order $order): VatPercentage
-//    {
-//        if ($this->allowVatExemption && $this->checkVatExemptionForOrder->verifyForOrder($order)) {
-//            return VatPercentage::zero();
-//        }
-//
-//        return $this->getStandardVatPercentageForOrder($order);
-//    }
-//
-//    /**
-//     * Payment cost always uses the standard vat rate.
-//     */
-//    public function findForPaymentCost(Order $order): VatPercentage
-//    {
-//        if ($this->allowVatExemption && $this->checkVatExemptionForOrder->verifyForOrder($order)) {
-//            return VatPercentage::zero();
-//        }
-//
-//        return $this->getStandardVatPercentageForOrder($order);
-//    }
+    //    /**
+    //     * Shipping cost always uses the standard vat rate.
+    //     */
+    //    public function findForShippingCost(Order $order): VatPercentage
+    //    {
+    //        if ($this->allowVatExemption && $this->checkVatExemptionForOrder->verifyForOrder($order)) {
+    //            return VatPercentage::zero();
+    //        }
+    //
+    //        return $this->getStandardVatPercentageForOrder($order);
+    //    }
+    //
+    //    /**
+    //     * Payment cost always uses the standard vat rate.
+    //     */
+    //    public function findForPaymentCost(Order $order): VatPercentage
+    //    {
+    //        if ($this->allowVatExemption && $this->checkVatExemptionForOrder->verifyForOrder($order)) {
+    //            return VatPercentage::zero();
+    //        }
+    //
+    //        return $this->getStandardVatPercentageForOrder($order);
+    //    }
 
     private function getStandardVatPercentageForOrder(Order $order): VatPercentage
     {
@@ -108,15 +108,15 @@ class FindVatRateForOrder
             return $this->countryVatPerOrder[$order->orderId->get()];
         }
 
-        if (!$billingCountryId = $order->getBillingAddress()?->getAddress()?->countryId) {
+        if (! $billingCountryId = $order->getBillingAddress()?->getAddress()?->countryId) {
             return $this->countryVatPerOrder[$order->orderId->get()] = [];
         }
 
-        if (!$this->doesOrderHasBillingCountryOtherThanPrimary($order)) {
+        if (! $this->doesOrderHasBillingCountryOtherThanPrimary($order)) {
             return $this->countryVatPerOrder[$order->orderId->get()] = [];
         }
 
-        if (!$countryVatRates = $this->vatRateRepository->getVatRatesForCountry($billingCountryId)) {
+        if (! $countryVatRates = $this->vatRateRepository->getVatRatesForCountry($billingCountryId)) {
             return $this->countryVatPerOrder[$order->orderId->get()] = [];
         }
 
@@ -125,7 +125,7 @@ class FindVatRateForOrder
 
     private function doesOrderHasBillingCountryOtherThanPrimary(Order $order): bool
     {
-        if (!$billingCountryId = $order->getBillingAddress()?->getAddress()?->countryId) {
+        if (! $billingCountryId = $order->getBillingAddress()?->getAddress()?->countryId) {
             return false;
         }
 

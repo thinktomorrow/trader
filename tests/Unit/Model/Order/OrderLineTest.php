@@ -83,8 +83,8 @@ class OrderLineTest extends TestCase
                 $order->orderId,
                 LineId::fromString('order-aaa:line-aaa'),
                 PurchasableReference::fromString('variant@variant-aaa'),
-            )
-            , last($order->releaseEvents())
+            ),
+            last($order->releaseEvents())
         );
     }
 

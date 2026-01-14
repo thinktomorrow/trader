@@ -18,7 +18,7 @@ class MysqlCountryRepository implements CountryRepository, BillingCountryReposit
     {
         $state = $country->getMappedData();
 
-        if (!$this->exists($country->countryId)) {
+        if (! $this->exists($country->countryId)) {
             DB::table(static::$countryTable)->insert($state);
         } else {
             DB::table(static::$countryTable)->where('country_id', $country->countryId->get())->update($state);
@@ -36,7 +36,7 @@ class MysqlCountryRepository implements CountryRepository, BillingCountryReposit
             ->where(static::$countryTable . '.country_id', $countryId->get())
             ->first();
 
-        if (!$countryState) {
+        if (! $countryState) {
             throw new CouldNotFindCountry('No country found by id [' . $countryId->get() . ']');
         }
 
@@ -54,10 +54,10 @@ class MysqlCountryRepository implements CountryRepository, BillingCountryReposit
             ->where('active', '1')
             ->orderBy('order_column')
             ->get()
-            ->map(fn($item) => (array)$item)
+            ->map(fn ($item) => (array)$item)
             ->toArray();
 
-        return array_map(fn($countryState) => \Thinktomorrow\Trader\Application\Country\Country::fromMappedData($countryState), $countryStates);
+        return array_map(fn ($countryState) => \Thinktomorrow\Trader\Application\Country\Country::fromMappedData($countryState), $countryStates);
     }
 
     public function findBillingCountry(CountryId $countryId): \Thinktomorrow\Trader\Application\Country\Country

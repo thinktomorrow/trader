@@ -29,7 +29,7 @@ class CountryTest extends TestCase
     {
         $country = Country::fromMappedData([
             'country_id' => 'BE',
-            'data' => json_encode(['foo' => 'bar'])
+            'data' => json_encode(['foo' => 'bar']),
         ]);
 
         $this->assertEquals(CountryId::fromString('BE'), $country->countryId);

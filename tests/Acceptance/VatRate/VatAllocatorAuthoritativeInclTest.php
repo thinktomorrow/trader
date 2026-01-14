@@ -26,7 +26,9 @@ final class VatAllocatorAuthoritativeInclTest extends TestCase
         );
 
         $line = $this->orderContext->createLine(
-            'order-aaa', 'line-aaa', [
+            'order-aaa',
+            'line-aaa',
+            [
                 'unit_price_incl' => $unitIncl,
                 'tax_rate' => $vatRate,
                 'includes_vat' => true,
@@ -72,4 +74,3 @@ final class VatAllocatorAuthoritativeInclTest extends TestCase
         ];
     }
 }
-

@@ -105,9 +105,8 @@ final class ProRateAllocatorTest extends TestCase
         array $items,
         int   $toAllocate,
         array $expected
-    ): void
-    {
-        $moneyItems = array_map(fn($v) => Money::EUR($v), $items);
+    ): void {
+        $moneyItems = array_map(fn ($v) => Money::EUR($v), $items);
         $total = Money::EUR($toAllocate);
 
         $result = $this->allocator->allocate($moneyItems, $total);

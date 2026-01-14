@@ -122,8 +122,8 @@ final class ShippingProfile implements Aggregate
     public function getChildEntities(): array
     {
         return [
-            Tariff::class => array_map(fn(Tariff $tariff) => $tariff->getMappedData(), $this->tariffs),
-            CountryId::class => array_map(fn(CountryId $countryId) => $countryId->get(), $this->countryIds),
+            Tariff::class => array_map(fn (Tariff $tariff) => $tariff->getMappedData(), $this->tariffs),
+            CountryId::class => array_map(fn (CountryId $countryId) => $countryId->get(), $this->countryIds),
         ];
     }
 
@@ -136,8 +136,8 @@ final class ShippingProfile implements Aggregate
         $shippingProfile->requiresAddress = $state['requires_address'];
         $shippingProfile->data = json_decode($state['data'], true);
 
-        $shippingProfile->tariffs = array_map(fn($tariffState) => Tariff::fromMappedData($tariffState, $state), $childEntities[Tariff::class]);
-        $shippingProfile->countryIds = array_map(fn($countryState) => CountryId::fromString($countryState['country_id']), $childEntities[CountryId::class]);
+        $shippingProfile->tariffs = array_map(fn ($tariffState) => Tariff::fromMappedData($tariffState, $state), $childEntities[Tariff::class]);
+        $shippingProfile->countryIds = array_map(fn ($countryState) => CountryId::fromString($countryState['country_id']), $childEntities[CountryId::class]);
 
         return $shippingProfile;
     }

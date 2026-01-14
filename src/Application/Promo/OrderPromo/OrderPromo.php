@@ -71,7 +71,7 @@ class OrderPromo
 
     public function getCombinedDiscountPrice(Order $order): DiscountPrice
     {
-        return array_reduce($this->discounts, fn($carry, OrderDiscount $discount) => $discount->getCombinedDiscountPrice($order), DefaultDiscountPrice::zero());
+        return array_reduce($this->discounts, fn ($carry, OrderDiscount $discount) => $discount->getCombinedDiscountPrice($order), DefaultDiscountPrice::zero());
     }
 
     public static function fromMappedData(array $state, array $childEntities = []): static
@@ -92,7 +92,7 @@ class OrderPromo
     private static function validateDiscounts($discounts): void
     {
         foreach ($discounts as $discount) {
-            if (!$discount instanceof OrderDiscount && !$discount instanceof LineDiscount) {
+            if (! $discount instanceof OrderDiscount && ! $discount instanceof LineDiscount) {
                 throw new \InvalidArgumentException('Invalid discount type [' . $discount::class . '] provided in child entities for OrderPromo.');
             }
         }

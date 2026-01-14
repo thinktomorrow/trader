@@ -121,4 +121,3 @@ final class VatAllocatedTotalPriceTest extends TestCase
         );
     }
 }
-

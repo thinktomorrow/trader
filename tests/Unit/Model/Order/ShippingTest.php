@@ -57,7 +57,7 @@ class ShippingTest extends TestCase
             'total_excl' => '50',
             'data' => json_encode([
                 'title' => ['nl' => 'shipping-aaa title nl', 'fr' => 'shipping-aaa title fr'],
-                'shipping_profile_id' => 'shipping-profile-aaa'
+                'shipping_profile_id' => 'shipping-profile-aaa',
             ]),
         ], $shipping->getMappedData());
     }

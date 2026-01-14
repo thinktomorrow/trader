@@ -31,7 +31,7 @@ class UpdatePaymentMethodOnOrder
     {
         $paymentMethod = $this->paymentMethodRepository->find($paymentMethodId);
 
-        if (!$this->verifyPaymentMethodForCart->verify($order, $paymentMethod)) {
+        if (! $this->verifyPaymentMethodForCart->verify($order, $paymentMethod)) {
             $this->removePaymentMethodFromOrder($order);
 
             return;

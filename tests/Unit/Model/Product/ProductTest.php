@@ -43,8 +43,9 @@ class ProductTest extends TestCase
         ], $product->getMappedData());
 
         $this->assertEquals(
-            new ProductCreated(ProductId::fromString('product-aaa'))
-            , $product->releaseEvents()[0]);
+            new ProductCreated(ProductId::fromString('product-aaa')),
+            $product->releaseEvents()[0]
+        );
     }
 
     public function test_it_can_be_build_from_raw_data()

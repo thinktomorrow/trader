@@ -83,36 +83,36 @@ trait WithFormattedLineTotals
         return $this->vatRate->get();
     }
 
-//    public function getFormattedUnitPrice(): string
-//    {
-//        return $this->renderMoney(
-//            $this->include_tax ? $this->getUnitPriceIncl() : $this->getUnitPriceExcl(),
-//            $this->getLocale()
-//        );
-//    }
-//
-//    public function getFormattedDiscountPrice(): string
-//    {
-//        return $this->renderMoney(
-//            $this->include_tax ? $this->getDiscountPriceIncl() : $this->getDiscountPriceExcl(),
-//            $this->getLocale()
-//        );
-//    }
-//
-//    public function getFormattedTotalPrice(): string
-//    {
-//        return $this->renderMoney(
-//            $this->include_tax ? $this->getTotalPriceIncl() : $this->getTotalPriceExcl(),
-//            $this->getLocale()
-//        );
-//    }
-//
-//    public function getFormattedSubtotalPrice(): string
-//    {
-//        $subtotal = $this->include_tax
-//            ? $this->getTotalPriceIncl()->subtract($this->getDiscountPriceIncl())
-//            : $this->getTotalPriceExcl()->subtract($this->getDiscountPriceExcl());
-//
-//        return $this->renderMoney($subtotal, $this->getLocale());
-//    }
+    //    public function getFormattedUnitPrice(): string
+    //    {
+    //        return $this->renderMoney(
+    //            $this->include_tax ? $this->getUnitPriceIncl() : $this->getUnitPriceExcl(),
+    //            $this->getLocale()
+    //        );
+    //    }
+    //
+    //    public function getFormattedDiscountPrice(): string
+    //    {
+    //        return $this->renderMoney(
+    //            $this->include_tax ? $this->getDiscountPriceIncl() : $this->getDiscountPriceExcl(),
+    //            $this->getLocale()
+    //        );
+    //    }
+    //
+    //    public function getFormattedTotalPrice(): string
+    //    {
+    //        return $this->renderMoney(
+    //            $this->include_tax ? $this->getTotalPriceIncl() : $this->getTotalPriceExcl(),
+    //            $this->getLocale()
+    //        );
+    //    }
+    //
+    //    public function getFormattedSubtotalPrice(): string
+    //    {
+    //        $subtotal = $this->include_tax
+    //            ? $this->getTotalPriceIncl()->subtract($this->getDiscountPriceIncl())
+    //            : $this->getTotalPriceExcl()->subtract($this->getDiscountPriceExcl());
+    //
+    //        return $this->renderMoney($subtotal, $this->getLocale());
+    //    }
 }

@@ -122,31 +122,31 @@ class FindVatRateForOrderTest extends VatRateContext
         ], ['order_id' => 'xxx']));
 
         return $order;
-//
-//        // Create an order if not already
-//        try {
-//            return $this->orderContext->findOrder(OrderId::fromString('xxx'));
-//        } catch (CouldNotFindOrder $e) {
-//
-//            $order = Order::create(
-//                OrderId::fromString('xxx'),
-//                OrderReference::fromString('xx-ref'),
-//                DefaultOrderState::cart_pending,
-//            );
-//
-//            $order->updateBillingAddress(BillingAddress::fromMappedData([
-//                'country_id' => $billingCountryId,
-//                'line_1' => 'street 123',
-//                'line_2' => 'bus 456',
-//                'postal_code' => '2200',
-//                'city' => 'Herentals',
-//                'data' => json_encode([]),
-//            ], ['order_id' => 'xxx']));
-//
-//            $this->orderContext->repos()->orderRepository()->save($order);
-//
-//            return $order;
-//        }
+        //
+        //        // Create an order if not already
+        //        try {
+        //            return $this->orderContext->findOrder(OrderId::fromString('xxx'));
+        //        } catch (CouldNotFindOrder $e) {
+        //
+        //            $order = Order::create(
+        //                OrderId::fromString('xxx'),
+        //                OrderReference::fromString('xx-ref'),
+        //                DefaultOrderState::cart_pending,
+        //            );
+        //
+        //            $order->updateBillingAddress(BillingAddress::fromMappedData([
+        //                'country_id' => $billingCountryId,
+        //                'line_1' => 'street 123',
+        //                'line_2' => 'bus 456',
+        //                'postal_code' => '2200',
+        //                'city' => 'Herentals',
+        //                'data' => json_encode([]),
+        //            ], ['order_id' => 'xxx']));
+        //
+        //            $this->orderContext->repos()->orderRepository()->save($order);
+        //
+        //            return $order;
+        //        }
     }
 
     private function createVatRate(string $countryId, string $vatPercentage, bool $isStandard = true): VatRate
