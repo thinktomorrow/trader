@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace Thinktomorrow\Trader\Domain\Model\Order\Discount;
 
 use Thinktomorrow\Trader\Domain\Common\Price\DiscountPrice;
+use Thinktomorrow\Trader\Domain\Common\Price\ItemDiscountPrice;
 
 interface DiscountableItem
 {
@@ -14,7 +15,7 @@ interface DiscountableItem
     /**
      * Total sum of all discount prices applied on this item
      */
-    public function getDiscountPrice(): DiscountPrice;
+    public function getDiscountPrice(): DiscountPrice|ItemDiscountPrice;
 
     /**
      * @return Discount[]

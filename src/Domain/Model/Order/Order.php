@@ -3,10 +3,13 @@ declare(strict_types=1);
 
 namespace Thinktomorrow\Trader\Domain\Model\Order;
 
+use Money\Money;
 use Thinktomorrow\Trader\Domain\Common\Entity\Aggregate;
 use Thinktomorrow\Trader\Domain\Common\Entity\HasData;
 use Thinktomorrow\Trader\Domain\Common\Event\RecordsEvents;
 use Thinktomorrow\Trader\Domain\Common\Price\DiscountPrice;
+use Thinktomorrow\Trader\Domain\Common\Vat\VatAllocatedLine;
+use Thinktomorrow\Trader\Domain\Common\Vat\VatPercentage;
 use Thinktomorrow\Trader\Domain\Model\Order\Address\BillingAddress;
 use Thinktomorrow\Trader\Domain\Model\Order\Address\ShippingAddress;
 use Thinktomorrow\Trader\Domain\Model\Order\Discount\Discount;
@@ -322,7 +325,55 @@ final class Order implements Aggregate, DiscountableItem
         $order->orderEvents = array_map(fn($orderEventState) => OrderEvent::fromMappedData($orderEventState, $state), $childEntities[OrderEvent::class]);
 
         $order->initializeVatSnapshotFromState($state);
-        
+
+        return $order;
+    }
+
+    /**
+     * Duplicate of fromMappedData but without VAT snapshot validation
+     * Allows for migration to snapshot orders
+     */
+    public static function fromMappedDataWithoutVatValidation(array $state, array $childEntities = []): static
+    {
+        $order = new static();
+
+        if (!$state['order_state'] instanceof OrderState) {
+            throw new \InvalidArgumentException('Order state is expected to be instance of OrderState. Instead ' . gettype($state['order_state']) . ' is passed.');
+        }
+
+        $order->orderId = OrderId::fromString($state['order_id']);
+        $order->orderReference = OrderReference::fromString($state['order_ref']);
+        $order->invoiceReference = $state['invoice_ref'] ? InvoiceReference::fromString($state['invoice_ref']) : null;
+        $order->orderState = $state['order_state'];
+
+        $order->discounts = array_map(fn($discountState) => Discount::fromMappedData($discountState, $state), $childEntities[Discount::class]);
+        $order->lines = array_map(fn($lineState) => Line::fromMappedData($lineState, $state, [
+            Discount::class => $lineState[Discount::class],
+            LinePersonalisation::class => $lineState[LinePersonalisation::class],
+        ]), $childEntities[Line::class]);
+        $order->shippings = array_map(fn($shippingState) => Shipping::fromMappedData($shippingState, $state, [Discount::class => $shippingState[Discount::class]]), $childEntities[Shipping::class]);
+        $order->payments = array_map(fn($paymentState) => Payment::fromMappedData($paymentState, $state, [Discount::class => $paymentState[Discount::class]]), $childEntities[Payment::class]);
+        $order->shippingAddress = $childEntities[ShippingAddress::class] ? ShippingAddress::fromMappedData($childEntities[ShippingAddress::class], $state) : null;
+        $order->billingAddress = $childEntities[BillingAddress::class] ? BillingAddress::fromMappedData($childEntities[BillingAddress::class], $state) : null;
+        $order->shopper = $childEntities[Shopper::class] ? Shopper::fromMappedData($childEntities[Shopper::class], $state) : null;
+        $order->data = json_decode($state['data'], true);
+        $order->orderEvents = array_map(fn($orderEventState) => OrderEvent::fromMappedData($orderEventState, $state), $childEntities[OrderEvent::class]);
+
+        $vatLines = array_map(fn($vatLineData) => new VatAllocatedLine(
+            Money::EUR($vatLineData['taxable_base']),
+            Money::EUR($vatLineData['vat_amount']),
+            VatPercentage::fromString($vatLineData['vat_percentage']),
+        ), json_decode($state['vat_lines'], true));
+
+        $order->vatSnapshot = OrderVatSnapshot::fromState(
+            vatLines: $vatLines,
+            shippingIncl: Money::EUR($state['shipping_cost_incl']),
+            paymentIncl: Money::EUR($state['payment_cost_incl']),
+            discountIncl: Money::EUR($state['discount_incl']),
+            totalVat: Money::EUR($state['total_vat']),
+            totalIncl: Money::EUR($state['total_incl']),
+        );
+
         return $order;
     }
 

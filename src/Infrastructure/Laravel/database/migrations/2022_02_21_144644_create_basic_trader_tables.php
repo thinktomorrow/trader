@@ -250,13 +250,20 @@ return new class extends Migration {
             $table->string('invoice_ref', 60)->nullable()->unique();
             $table->string('order_state', 32);
 
-            $table->integer('total')->unsigned();
-            $table->boolean('includes_vat');
-            $table->integer('tax_total')->unsigned();
-            $table->integer('subtotal')->unsigned();
-            $table->integer('discount_total')->unsigned();
-            $table->integer('shipping_cost')->unsigned();
-            $table->integer('payment_cost')->unsigned();
+            // Totals
+            $table->unsignedBigInteger('total_excl')->nullable();
+            $table->unsignedBigInteger('total_incl')->nullable();
+            $table->unsignedBigInteger('total_vat')->nullable();
+            $table->json('vat_lines')->nullable();
+            $table->unsignedBigInteger('subtotal_excl')->nullable();
+            $table->unsignedBigInteger('subtotal_incl')->nullable();
+            $table->unsignedBigInteger('discount_excl')->nullable();
+            $table->unsignedBigInteger('discount_incl')->nullable();
+            $table->unsignedBigInteger('shipping_cost_excl')->nullable();
+            $table->unsignedBigInteger('shipping_cost_incl')->nullable();
+            $table->unsignedBigInteger('payment_cost_excl')->nullable();
+            $table->unsignedBigInteger('payment_cost_incl')->nullable();
+
             $table->timestamp('created_at')->nullable();
             $table->timestamp('updated_at')->nullable();
             $table->timestamp('confirmed_at')->nullable(); // TODO: These should be based on the events?
@@ -269,14 +276,20 @@ return new class extends Migration {
             $table->char('order_id', 36)->index();
             $table->char('line_id', 36)->primary();
             $table->string('purchasable_reference', 255)->nullable(); // reference to original/current product
-            $table->integer('total')->unsigned();
-            $table->integer('discount_total')->unsigned();
-            $table->integer('tax_total')->unsigned();
+
             $table->smallInteger('quantity')->unsigned();
             $table->boolean('reduced_from_stock')->default(0);
-            $table->integer('line_price')->unsigned();
+
+            $table->bigInteger('unit_price_excl')->unsigned()->nullable();
+            $table->bigInteger('unit_price_incl')->unsigned()->nullable();
+            $table->bigInteger('total_excl')->unsigned()->nullable();
+            $table->bigInteger('total_vat')->unsigned()->nullable();
+            $table->bigInteger('total_incl')->unsigned()->nullable();
+            $table->bigInteger('discount_excl')->unsigned()->default(0);
+            $table->bigInteger('discount_incl')->unsigned()->default(0);
             $table->string('tax_rate');
             $table->boolean('includes_vat');
+
             $table->json('data')->nullable(); // Contains historic product data like name
 
             $table->foreign('order_id')->references('order_id')->on(static::PREFIX . 'orders')->onDelete('cascade');
@@ -302,9 +315,10 @@ return new class extends Migration {
             $table->char('shipping_profile_id', 36)->nullable()->index();
             $table->string('shipping_state', 32);
 
-            $table->integer('cost')->unsigned();
-            $table->string('tax_rate');
-            $table->boolean('includes_vat');
+            $table->bigInteger('cost_excl')->unsigned()->nullable();
+            $table->bigInteger('total_excl')->unsigned()->nullable();
+            $table->bigInteger('discount_excl')->unsigned()->default(0);
+
             $table->json('data')->nullable();
 
             $table->foreign('order_id')->references('order_id')->on(static::PREFIX . 'orders')->onDelete('cascade');
@@ -317,9 +331,10 @@ return new class extends Migration {
             $table->char('payment_method_id', 36)->nullable()->index();
             $table->string('payment_state', 32);
 
-            $table->integer('cost')->unsigned();
-            $table->string('tax_rate');
-            $table->boolean('includes_vat');
+            $table->bigInteger('cost_excl')->unsigned()->nullable();
+            $table->bigInteger('total_excl')->unsigned()->nullable();
+            $table->bigInteger('discount_excl')->unsigned()->default(0);
+
             $table->json('data')->nullable();
 
             $table->foreign('order_id')->references('order_id')->on(static::PREFIX . 'orders')->onDelete('cascade');
@@ -357,9 +372,9 @@ return new class extends Migration {
             $table->char('discountable_id', 36);
             $table->char('promo_id', 36)->nullable()->index(); // Refers to original promo
             $table->char('promo_discount_id', 36)->nullable()->index(); // Refers to original promo discount
-            $table->integer('total')->unsigned();
-            $table->string('tax_rate');
-            $table->boolean('includes_vat');
+            $table->integer('total_excl')->unsignedBigInteger();
+            $table->integer('total_incl')->unsignedBigInteger()->nullable();
+            $table->string('vat_rate')->nullable();
             $table->json('data')->nullable();
 
             $table->foreign('order_id')->references('order_id')->on(static::PREFIX . 'orders')->onDelete('cascade');
@@ -389,6 +404,7 @@ return new class extends Migration {
             $table->char('promo_id', 36)->primary();
             $table->string('coupon_code')->nullable()->unique();
             $table->boolean('is_combinable')->default(0);
+            $table->boolean('is_system_promo')->default(0);
             $table->string('state', 32);
             $table->dateTime('start_at')->nullable();
             $table->dateTime('end_at')->nullable();

@@ -12,7 +12,7 @@ use Thinktomorrow\Trader\Domain\Model\Order\Discount\DiscountableItem;
 use Thinktomorrow\Trader\Domain\Model\Order\Order;
 use Thinktomorrow\Trader\Domain\Model\Promo\Discounts\PercentageOffDiscount;
 
-class PercentageOffOrderDiscount extends BaseDiscount implements OrderDiscount
+class PercentageOffOrderDiscount extends BaseOrderDiscount implements OrderDiscount
 {
     private Percentage $percentage;
 

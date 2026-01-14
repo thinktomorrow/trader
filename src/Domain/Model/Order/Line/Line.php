@@ -9,6 +9,7 @@ use Thinktomorrow\Trader\Domain\Common\Entity\ChildAggregate;
 use Thinktomorrow\Trader\Domain\Common\Entity\HasData;
 use Thinktomorrow\Trader\Domain\Common\Price\DefaultItemPrice;
 use Thinktomorrow\Trader\Domain\Common\Price\DiscountPrice;
+use Thinktomorrow\Trader\Domain\Common\Price\ItemDiscountPrice;
 use Thinktomorrow\Trader\Domain\Common\Price\ItemPrice;
 use Thinktomorrow\Trader\Domain\Common\Price\WithAuthoritativeIncl;
 use Thinktomorrow\Trader\Domain\Common\Vat\VatPercentage;
@@ -63,10 +64,16 @@ final class Line implements ChildAggregate, DiscountableItem
         return $this->unitPrice;
     }
 
+    public function getDiscountedUnitPrice(): ItemPrice
+    {
+        $unitDiscount = $this->calculateItemDiscountPrice($this->getUnitPrice());
+
+        return $this->unitPrice->applyDiscount($unitDiscount);
+    }
+
     public function getTotal(): ItemPrice
     {
-        return $this->getSubTotal()
-            ->applyDiscount($this->getDiscountPrice());
+        return $this->getDiscountedUnitPrice()->multiply($this->quantity->asInt());
     }
 
     public function getSubTotal(): ItemPrice
@@ -74,9 +81,15 @@ final class Line implements ChildAggregate, DiscountableItem
         return $this->unitPrice->multiply($this->quantity->asInt());
     }
 
-    public function getDiscountPrice(): DiscountPrice
+    public function getDiscountPrice(): DiscountPrice|ItemDiscountPrice
     {
-        return $this->calculateDiscountPrice($this->unitPrice->getExcludingVat());
+        return $this->calculateItemDiscountPrice($this->getSubTotal());
+
+        $unitDiscount = $this->calculateItemDiscountPrice(
+            $this->unitPrice
+        );
+
+        return $unitDiscount->multiply($this->quantity->asInt());
     }
 
     public function getDiscountPriceExcl(): Money
@@ -86,15 +99,14 @@ final class Line implements ChildAggregate, DiscountableItem
 
     public function getDiscountPriceIncl(): Money
     {
-        return Cash::from($this->getDiscountPrice()->getExcludingVat())->addPercentage(
-            $this->unitPrice->getVatPercentage()->toPercentage()
-        );
+        return $this->getDiscountPrice()->getIncludingVat();
+//
+//        return $this->unitPrice
+//            ->multiply($this->quantity->asInt())
+//            ->getIncludingVat()
+//            ->subtract($discountedUnit->multiply($this->quantity->asInt())->getIncludingVat());
     }
 
-//    public function getTaxTotal(): Money
-//    {
-//        return $this->getTotal()->getVatTotal();
-//    }
 
     public function getQuantity(): Quantity
     {
@@ -166,15 +178,15 @@ final class Line implements ChildAggregate, DiscountableItem
         $line->orderId = OrderId::fromString($aggregateState['order_id']);
         $line->lineId = LineId::fromString($state['line_id']);
 
-        $line->unitPrice = $line->authoritativeIncl()
-            ? DefaultItemPrice::fromMoney(Cash::make($state['unit_price_incl']), VatPercentage::fromString($state['tax_rate']), true)
-            : DefaultItemPrice::fromMoney(Cash::make($state['unit_price_excl']), VatPercentage::fromString($state['tax_rate']), false);
-
         $line->quantity = Quantity::fromInt($state['quantity']);
         $line->reducedFromStock = $state['reduced_from_stock'];
         $line->discounts = array_map(fn($discountState) => Discount::fromMappedData($discountState, $state), $childEntities[Discount::class]);
         $line->personalisations = array_map(fn($personalisationState) => LinePersonalisation::fromMappedData($personalisationState, $state), $childEntities[LinePersonalisation::class]);
         $line->data = json_decode($state['data'], true);
+
+        $line->unitPrice = $line->authoritativeIncl()
+            ? DefaultItemPrice::fromMoney(Cash::make($state['unit_price_incl']), VatPercentage::fromString($state['tax_rate']), true)
+            : DefaultItemPrice::fromMoney(Cash::make($state['unit_price_excl']), VatPercentage::fromString($state['tax_rate']), false);
 
         return $line;
     }

@@ -142,8 +142,8 @@ final class ItemPriceIncludingVatOriginalTest extends TestCase
             false
         );
 
-        $this->assertTrue($incl->includingIsAuthoritative());
-        $this->assertFalse($excl->includingIsAuthoritative());
+        $this->assertTrue($incl->isIncludingVatAuthoritative());
+        $this->assertFalse($excl->isIncludingVatAuthoritative());
     }
 
     public function test_original_including_vat_survives_multiple_operations(): void

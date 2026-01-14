@@ -3,7 +3,7 @@ declare(strict_types=1);
 
 namespace Thinktomorrow\Trader\Application\Promo\OrderPromo;
 
-use Assert\Assertion;
+use Thinktomorrow\Trader\Application\Promo\LinePromo\LineDiscount;
 use Thinktomorrow\Trader\Domain\Common\Entity\HasData;
 use Thinktomorrow\Trader\Domain\Common\Price\DefaultDiscountPrice;
 use Thinktomorrow\Trader\Domain\Common\Price\DiscountPrice;
@@ -76,7 +76,7 @@ class OrderPromo
 
     public static function fromMappedData(array $state, array $childEntities = []): static
     {
-        Assertion::allIsInstanceOf($childEntities[OrderDiscount::class], OrderDiscount::class);
+        self::validateDiscounts($childEntities[OrderDiscount::class]);
 
         $promo = new static();
 
@@ -87,5 +87,14 @@ class OrderPromo
         $promo->discounts = $childEntities[OrderDiscount::class];
 
         return $promo;
+    }
+
+    private static function validateDiscounts($discounts): void
+    {
+        foreach ($discounts as $discount) {
+            if (!$discount instanceof OrderDiscount && !$discount instanceof LineDiscount) {
+                throw new \InvalidArgumentException('Invalid discount type [' . $discount::class . '] provided in child entities for OrderPromo.');
+            }
+        }
     }
 }

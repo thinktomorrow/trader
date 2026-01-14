@@ -38,7 +38,7 @@ final class VatAllocator
         // Item bases per VAT
         $itemTotals = $this->collectItemTotalsPerVat($order);
 
-        if ($this->sum($itemTotals)->isZero()) {
+        if ($this->sumExcl($itemTotals)->isZero()) {
             $zeroItems = new VatAllocatedTotalPrice([], Cash::zero(), Cash::zero(), Cash::zero());
 
             // Service-only: treat as 0% VAT (incl == excl, vat == 0)
@@ -74,22 +74,44 @@ final class VatAllocator
             $discount
         );
 
-        // Final taxable bases for TOTAL
-        $totalBases = [];
-        foreach ($itemTotals as $rate => $itemsExcl) {
-            $totalBases[$rate] = $itemsExcl
-                ->add($shippingAlloc[$rate])
-                ->add($paymentAlloc[$rate])
-                ->subtract($discountAlloc[$rate]);
-        }
+        $itemsTotal = $this->buildAllocatedItemTotal($itemTotals);
+        $shippingTotal = $this->buildAllocatedServiceTotal($shippingAlloc);
+        $paymentTotal = $this->buildAllocatedServiceTotal($paymentAlloc);
+        $discountTotal = $this->buildAllocatedServiceTotal($discountAlloc);
 
         // 4) Build all allocated totals
         return new VatAllocatedTotalPrices(
-            items: $this->buildAllocatedTotal($itemTotals, $this->authoritativeItemsIncl($order)),
-            shipping: $this->buildAllocatedTotal($shippingAlloc),
-            payment: $this->buildAllocatedTotal($paymentAlloc),
-            discounts: $this->buildAllocatedTotal($discountAlloc),
-            total: $this->buildAllocatedTotal($totalBases),
+            items: $itemsTotal,
+            shipping: $shippingTotal,
+            payment: $paymentTotal,
+            discounts: $discountTotal,
+            total: $this->buildAllocatedTotal($itemsTotal, $shippingTotal, $paymentTotal, $discountTotal)
+        );
+    }
+
+    private function buildAllocatedItemTotal(array $itemTotalsPerRate): VatAllocatedTotalPrice
+    {
+        $vatLines = [];
+        $totalExcl = Cash::zero();
+        $totalIncl = Cash::zero();
+
+        foreach ($itemTotalsPerRate as $rate => $totalPrice) {
+            $totalExcl = $totalExcl->add($totalPrice->getExcludingVat());
+            $totalIncl = $totalIncl->add($totalPrice->getIncludingVat());
+
+            $vatPercentage = VatPercentage::fromString($rate);
+            $vat = $totalPrice->getIncludingVat()->subtract($totalPrice->getExcludingVat());
+
+            $vatLines[] = new VatAllocatedLine($totalPrice->getExcludingVat(), $vat, $vatPercentage);
+        }
+
+        $totalVat = $totalIncl->subtract($totalExcl);
+
+        return new VatAllocatedTotalPrice(
+            $vatLines,
+            $totalExcl,
+            $totalVat,
+            $totalIncl
         );
     }
 
@@ -100,17 +122,18 @@ final class VatAllocator
      * The customer-facing including-VAT total can be set as authoritative.
      * Any rounding difference is then absorbed by the VAT amount.
      *
-     * @param array $basesPerRate
+     * @param array $amountsExclPerRate
      * @param Money|null $authoritativeIncl
      * @return VatAllocatedTotalPrice
      */
-    private function buildAllocatedTotal(array $basesPerRate, ?Money $authoritativeIncl = null): VatAllocatedTotalPrice
+    private function buildAllocatedServiceTotal(array $amountsExclPerRate): VatAllocatedTotalPrice
     {
         $vatLines = [];
         $totalExcl = Cash::zero();
         $totalVat = Cash::zero();
 
-        foreach ($basesPerRate as $rate => $base) {
+        foreach ($amountsExclPerRate as $rate => $base) {
+
             $vatPercentage = VatPercentage::fromString($rate);
 
             $vat = Cash::from($base)
@@ -123,11 +146,56 @@ final class VatAllocator
             $totalVat = $totalVat->add($vat);
         }
 
-        if ($authoritativeIncl) {
-            $totalIncl = $authoritativeIncl;
-            $totalVat = $totalIncl->subtract($totalExcl);
-        } else {
-            $totalIncl = $totalExcl->add($totalVat);
+        $totalIncl = $totalExcl->add($totalVat);
+
+        return new VatAllocatedTotalPrice(
+            $vatLines,
+            $totalExcl,
+            $totalVat,
+            $totalIncl
+        );
+    }
+
+    private function buildAllocatedTotal(VatAllocatedTotalPrice $itemTotal, VatAllocatedTotalPrice $shippingTotal, VatAllocatedTotalPrice $paymentTotal, VatAllocatedTotalPrice $orderDiscountTotal): VatAllocatedTotalPrice
+    {
+        $totalExcl = Cash::zero()
+            ->add($itemTotal->getTotalExcludingVat())
+            ->add($shippingTotal->getTotalExcludingVat())
+            ->add($paymentTotal->getTotalExcludingVat())
+            ->subtract($orderDiscountTotal->getTotalExcludingVat());
+
+        $totalIncl = Cash::zero()
+            ->add($itemTotal->getTotalIncludingVat())
+            ->add($shippingTotal->getTotalIncludingVat())
+            ->add($paymentTotal->getTotalIncludingVat())
+            ->subtract($orderDiscountTotal->getTotalIncludingVat());
+
+        $totalVat = Cash::zero()
+            ->add($itemTotal->getTotalVat())
+            ->add($shippingTotal->getTotalVat())
+            ->add($paymentTotal->getTotalVat())
+            ->subtract($orderDiscountTotal->getTotalVat());
+
+        $vatLines = [];
+
+        foreach ([$itemTotal->getVatLines(), $shippingTotal->getVatLines(), $paymentTotal->getVatLines()] as $vatLinesPart) {
+            foreach ($vatLinesPart as $vatLine) {
+                $vatPercentage = $vatLine->getVatPercentage()->get();
+
+                if (!isset($vatLines[$vatPercentage])) {
+                    $vatLines[$vatPercentage] = $vatLine;
+                } else {
+                    $vatLines[$vatPercentage] = $vatLines[$vatPercentage]->add($vatLine);
+                }
+            }
+        }
+
+        foreach ($orderDiscountTotal->getVatLines() as $vatLine) {
+            $vatPercentage = $vatLine->getVatPercentage()->get();
+
+            if (isset($vatLines[$vatPercentage])) {
+                $vatLines[$vatPercentage] = $vatLines[$vatPercentage]->subtract($vatLine);
+            }
         }
 
         return new VatAllocatedTotalPrice(
@@ -147,41 +215,32 @@ final class VatAllocator
             $vatRate = $line->getTotal()->getVatPercentage()->get();
 
             if (!isset($results[$vatRate])) {
-                $results[$vatRate] = Cash::zero();
+                $results[$vatRate] = $itemPrice;
+            } else {
+                $results[$vatRate] = $results[$vatRate]->add($itemPrice);
             }
-
-            $results[$vatRate] = $results[$vatRate]
-                ->add($itemPrice->getExcludingVat());
         }
 
         return $results;
     }
 
-    private function authoritativeItemsIncl(Order $order): ?Money
+    private function sumExcl(array $itemPrices): Money
     {
         $sum = Cash::zero();
-        $hasAuthoritative = false;
 
-        foreach ($order->getLines() as $line) {
-            $item = $line->getTotal();
-
-            $sum = $sum->add($item->getIncludingVat());
-
-            if ($item->includingIsAuthoritative()) {
-                $hasAuthoritative = true;
-            }
+        foreach ($itemPrices as $price) {
+            $sum = $sum->add($price->getExcludingVat());
         }
 
-        return $hasAuthoritative ? $sum : null;
+        return $sum;
     }
 
-
-    private function sum(array $amounts): Money
+    private function sumIncl(array $itemPrices): Money
     {
         $sum = Cash::zero();
 
-        foreach ($amounts as $money) {
-            $sum = $sum->add($money);
+        foreach ($itemPrices as $price) {
+            $sum = $sum->add($price->getIncludingVat());
         }
 
         return $sum;

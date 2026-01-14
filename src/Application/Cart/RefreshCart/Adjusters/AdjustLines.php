@@ -46,9 +46,17 @@ class AdjustLines implements Adjuster
             }
 
             // Price can be changed in the meanwhile
-            if (!$line->getUnitPrice()->getExcludingVat()->equals($variant->getSalePrice()->getExcludingVat())) {
-                $line->updatePrice($variant->getSalePrice());
+            if (!$line->getUnitPrice()->getExcludingVat()->equals($variant->getUnitPrice()->getExcludingVat())) {
+                $line->updatePrice($variant->getUnitPrice());
             }
+
+            // Update sale price reference - so the system sale price discount can be recalculated
+            $line->addData([
+                'unit_price_excl' => $variant->getUnitPrice()->getExcludingVat()->getAmount(),
+                'unit_price_incl' => $variant->getUnitPrice()->getIncludingVat()->getAmount(),
+                'sale_price_excl' => $variant->getSalePrice()?->getExcludingVat()?->getAmount(),
+                'sale_price_incl' => $variant->getSalePrice()?->getIncludingVat()?->getAmount(),
+            ]);
 
             // AdjustTax
 

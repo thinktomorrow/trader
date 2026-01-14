@@ -33,6 +33,18 @@ final class OrderVatSnapshot
         $this->totalIncl = $totalIncl;
     }
 
+    public static function empty(): self
+    {
+        return new self(
+            [],
+            Money::EUR(0),
+            Money::EUR(0),
+            Money::EUR(0),
+            Money::EUR(0),
+            Money::EUR(0),
+        );
+    }
+
     /**
      * Factory used by application layer (VatAllocator)
      *
@@ -48,6 +60,7 @@ final class OrderVatSnapshot
         Money $totalExcl
     ): self
     {
+
         // Invariant 1: total_excl + total_vat === total_incl
         if (!$totalExcl->add($totalVat)->equals($totalIncl)) {
             throw new \LogicException(

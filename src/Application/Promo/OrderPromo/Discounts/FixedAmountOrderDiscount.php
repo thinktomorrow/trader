@@ -12,7 +12,7 @@ use Thinktomorrow\Trader\Domain\Model\Order\Discount\DiscountableItem;
 use Thinktomorrow\Trader\Domain\Model\Order\Order;
 use Thinktomorrow\Trader\Domain\Model\Promo\Discounts\FixedAmountDiscount;
 
-class FixedAmountOrderDiscount extends BaseDiscount implements OrderDiscount
+class FixedAmountOrderDiscount extends BaseOrderDiscount implements OrderDiscount
 {
     private Money $amount;
 

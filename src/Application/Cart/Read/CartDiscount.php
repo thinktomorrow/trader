@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace Thinktomorrow\Trader\Application\Cart\Read;
 
 use Thinktomorrow\Trader\Domain\Common\Price\DiscountPrice;
+use Thinktomorrow\Trader\Domain\Common\Price\ItemDiscountPrice;
 
 interface CartDiscount
 {
@@ -11,7 +12,7 @@ interface CartDiscount
 
     public function getDiscountId(): string;
 
-    public function getDiscountPrice(): DiscountPrice;
+    public function getDiscountPrice(): DiscountPrice|ItemDiscountPrice;
 
     public function getFormattedDiscountPriceExcl(): string;
 

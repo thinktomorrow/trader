@@ -87,6 +87,27 @@ class DefaultItemPrice implements ItemPrice
         return $this->vatPercentage;
     }
 
+    public function add(ItemPrice $price): static
+    {
+        if (!$this->vatPercentage->equals($price->getVatPercentage())) {
+            throw new \InvalidArgumentException(
+                'Cannot add ItemPrice with different VAT percentage (' .
+                $price->getVatPercentage()->get() . '% given, ' .
+                $this->vatPercentage->get() . '% expected).'
+            );
+        }
+
+        $newExcluding = $this->excludingVat->add($price->getExcludingVat());
+
+        $self = new static($newExcluding, $this->vatPercentage);
+
+        if ($this->includingVatOriginal) {
+            $self->includingVatOriginal = $this->includingVatOriginal->add($price->getIncludingVat());
+        }
+
+        return $self;
+    }
+
     public function subtract(ItemPrice $price): static
     {
         if (!$this->vatPercentage->equals($price->getVatPercentage())) {
@@ -130,9 +151,42 @@ class DefaultItemPrice implements ItemPrice
         return $self;
     }
 
-    public function applyDiscount(DiscountPrice $discount): static
+    public function applyDiscount(ItemDiscountPrice $discount): static
     {
-        $newExcluding = $this->excludingVat->subtract($discount->getExcludingVat());
+        // Including VAT authoritative
+        if ($this->includingVatOriginal) {
+
+            // Assert vat percentages match
+            if (!$this->vatPercentage->equals($discount->getVatPercentage())) {
+                throw new \InvalidArgumentException(
+                    'Cannot apply ItemDiscountPrice with different VAT percentage (' .
+                    $discount->getVatPercentage()->get() . '% given, ' .
+                    $this->vatPercentage->get() . '% expected).'
+                );
+            }
+
+            $discountIncl = $discount->getIncludingVat();
+
+            $newIncluding = $this->includingVatOriginal->subtract($discountIncl);
+
+            if ($newIncluding->isNegative()) {
+                throw new PriceCannotBeNegative(
+                    'Applying the discount would result in a negative including VAT amount: ' .
+                    $newIncluding->getAmount()
+                );
+            }
+
+            return static::fromMoney(
+                $newIncluding,
+                $this->vatPercentage,
+                true
+            );
+        }
+
+        // Excluding VAT authoritative
+        $newExcluding = $this->excludingVat->subtract(
+            $discount->getExcludingVat()
+        );
 
         if ($newExcluding->isNegative()) {
             throw new PriceCannotBeNegative(
@@ -141,17 +195,7 @@ class DefaultItemPrice implements ItemPrice
             );
         }
 
-        $self = new static($newExcluding, $this->vatPercentage);
-
-        if ($this->includingVatOriginal) {
-
-            $discountIncludingVat = Cash::from($discount->getExcludingVat())->addPercentage($this->vatPercentage->toPercentage());
-
-            $newIncluding = $this->includingVatOriginal->subtract($discountIncludingVat);
-            $self->includingVatOriginal = $newIncluding;
-        }
-
-        return $self;
+        return new static($newExcluding, $this->vatPercentage);
     }
 
     public function changeVatPercentage(VatPercentage $vatPercentage): static
@@ -159,7 +203,7 @@ class DefaultItemPrice implements ItemPrice
         return new static($this->excludingVat, $vatPercentage);
     }
 
-    public function includingIsAuthoritative(): bool
+    public function isIncludingVatAuthoritative(): bool
     {
         return $this->includingVatOriginal !== null;
     }

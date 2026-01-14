@@ -35,6 +35,16 @@ trait WithLineTotals
         return $this->unitPriceIncl;
     }
 
+    public function getDiscountedUnitPriceExcl(): Money
+    {
+        return $this->totalPriceExcl->divide($this->quantity);
+    }
+
+    public function getDiscountedUnitPriceIncl(): Money
+    {
+        return $this->totalPriceIncl->divide($this->quantity);
+    }
+
     public function getDiscountPriceExcl(): Money
     {
         return $this->discountPriceExcl;

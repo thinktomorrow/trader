@@ -9,7 +9,10 @@ use Thinktomorrow\Trader\Domain\Common\Cash\Percentage;
 use Thinktomorrow\Trader\Domain\Common\Entity\ChildEntity;
 use Thinktomorrow\Trader\Domain\Common\Entity\HasData;
 use Thinktomorrow\Trader\Domain\Common\Price\DefaultDiscountPrice;
+use Thinktomorrow\Trader\Domain\Common\Price\DefaultItemDiscountPrice;
 use Thinktomorrow\Trader\Domain\Common\Price\DiscountPrice;
+use Thinktomorrow\Trader\Domain\Common\Price\ItemDiscountPrice;
+use Thinktomorrow\Trader\Domain\Common\Vat\VatPercentage;
 use Thinktomorrow\Trader\Domain\Model\Order\OrderId;
 use Thinktomorrow\Trader\Domain\Model\Promo\DiscountId as PromoDiscountId;
 use Thinktomorrow\Trader\Domain\Model\Promo\PromoId;
@@ -24,7 +27,7 @@ final class Discount implements ChildEntity
     public readonly DiscountableId $discountableId;
     public readonly ?PromoId $promoId;
     public readonly ?PromoDiscountId $promoDiscountId;
-    private readonly DiscountPrice $discountPrice;
+    private readonly DiscountPrice|ItemDiscountPrice $discountPrice;
 
     private function __construct()
     {
@@ -33,7 +36,7 @@ final class Discount implements ChildEntity
     /**
      * The discount amount (excluding VAT).
      */
-    public function getDiscountPrice(): DiscountPrice
+    public function getDiscountPrice(): DiscountPrice|ItemDiscountPrice
     {
         return $this->discountPrice;
     }
@@ -57,12 +60,14 @@ final class Discount implements ChildEntity
             'discount_id' => $this->discountId->get(),
             'promo_id' => $this->promoId?->get(),
             'promo_discount_id' => $this->promoDiscountId?->get(),
-            'total' => $this->discountPrice->getExcludingVat()->getAmount(),
+            'total_excl' => $this->discountPrice->getExcludingVat()->getAmount(),
+            'total_incl' => $this->discountPrice instanceof ItemDiscountPrice && $this->discountPrice->isIncludingVatAuthoritative() ? $this->discountPrice->getIncludingVat()->getAmount() : null,
+            'vat_rate' => $this->discountPrice instanceof ItemDiscountPrice ? $this->discountPrice->getVatPercentage()->get() : null,
             'data' => json_encode($data),
         ];
     }
 
-    public static function create(OrderId $orderId, DiscountId $discountId, DiscountableType $discountableType, DiscountableId $discountableId, PromoId $promoId, PromoDiscountId $promoDiscountId, DiscountPrice $discountPrice, array $data): static
+    public static function create(OrderId $orderId, DiscountId $discountId, DiscountableType $discountableType, DiscountableId $discountableId, PromoId $promoId, PromoDiscountId $promoDiscountId, DiscountPrice|ItemDiscountPrice $discountPrice, array $data): static
     {
         $discount = new static();
 
@@ -88,8 +93,25 @@ final class Discount implements ChildEntity
         $discount->discountableId = DiscountableId::fromString($state['discountable_id']);
         $discount->promoId = $state['promo_id'] ? PromoId::fromString($state['promo_id']) : null;
         $discount->promoDiscountId = $state['promo_discount_id'] ? PromoDiscountId::fromString($state['promo_discount_id']) : null;
-        $discount->discountPrice = DefaultDiscountPrice::fromExcludingVat(Money::EUR($state['total']));
         $discount->data = json_decode($state['data'], true);
+
+        if ($discount->discountableType == DiscountableType::line) {
+
+            if (isset($state['total_incl']) && $state['total_incl'] !== null) {
+                $discount->discountPrice = DefaultItemDiscountPrice::fromIncludingVat(
+                    Money::EUR($state['total_incl']),
+                    VatPercentage::fromString($state['vat_rate'])
+                );
+            } else {
+                $discount->discountPrice = DefaultItemDiscountPrice::fromExcludingVat(
+                    Money::EUR($state['total_excl']),
+                    VatPercentage::fromString($state['vat_rate'])
+                );
+            }
+
+        } else {
+            $discount->discountPrice = DefaultDiscountPrice::fromExcludingVat(Money::EUR($state['total_excl']));
+        }
 
         return $discount;
     }

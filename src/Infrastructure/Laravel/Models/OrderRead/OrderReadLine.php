@@ -46,20 +46,20 @@ abstract class OrderReadLine
         }
 
         $line->line_id = $state['line_id'];
-
-        $line->initializeLineTotalsFromState($state);
-        $line->vatRate = VatPercentage::fromString($state['tax_rate']);
-
         $line->quantity = $state['quantity'];
+        $line->vatRate = VatPercentage::fromString($state['tax_rate']);
         $line->discounts = $discounts;
+        
+        $line->initializeLineTotalsFromState($state);
+
         $line->personalisations = $personalisations;
         $line->images = [];
 
         $line->data = json_decode($state['data'], true);
         $line->purchasableData = $line->getData('purchasable_data', []);
 
-        Assertion::keyIsset($line->data, 'unit_price_excluding_vat');
-        Assertion::keyIsset($line->data, 'unit_price_including_vat');
+        Assertion::keyIsset($line->data, 'unit_price_excl');
+        Assertion::keyIsset($line->data, 'unit_price_incl');
 
         $line->variant_id = $line->purchasableReference->isVariant() ? $line->purchasableReference->getId() : $line->data('variant_id');
         $line->product_id = $line->data('product_id');

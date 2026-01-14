@@ -7,6 +7,10 @@ use Illuminate\Support\Facades\Schema;
 return new class extends Migration {
     public function up(): void
     {
+        if (Schema::hasColumn('trader_orders', 'total_excl')) {
+            return;
+        }
+
         Schema::table('trader_orders', function (Blueprint $table) {
 
             // Totals
@@ -41,6 +45,7 @@ return new class extends Migration {
             $table->bigInteger('total_incl')->unsigned()->nullable();
 
             $table->bigInteger('discount_excl')->unsigned()->default(0);
+            $table->bigInteger('discount_incl')->unsigned()->default(0);
         });
 
         Schema::table('trader_order_shipping', function (Blueprint $table) {
@@ -53,6 +58,12 @@ return new class extends Migration {
             $table->bigInteger('cost_excl')->unsigned()->nullable();
             $table->bigInteger('total_excl')->unsigned()->nullable();
             $table->bigInteger('discount_excl')->unsigned()->default(0);
+        });
+
+        Schema::table('trader_order_discounts', function (Blueprint $table) {
+            $table->integer('total_excl')->unsignedBigInteger();
+            $table->integer('total_incl')->unsignedBigInteger()->nullable();
+            $table->string('vat_rate')->nullable();
         });
     }
 

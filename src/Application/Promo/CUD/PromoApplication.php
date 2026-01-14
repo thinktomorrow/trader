@@ -41,6 +41,22 @@ class PromoApplication
         return $promoId;
     }
 
+    public function createSystemPromo(CreateSystemPromo $command): PromoId
+    {
+        $promoId = $command->getSystemPromoId();
+
+        $promo = Promo::create($promoId, null, null, null, $command->isCombinable());
+        $promo->addData($command->getData());
+
+        $promo->setAsSystemPromo();
+
+        $this->promoRepository->save($promo);
+
+        $this->eventDispatcher->dispatchAll($promo->releaseEvents());
+
+        return $promoId;
+    }
+
     public function updatePromo(UpdatePromo $command): void
     {
         $promo = $this->promoRepository->find($command->getPromoId());

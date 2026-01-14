@@ -11,7 +11,7 @@ trait WithAuthoritativeIncl
         return $this->authoritativeIncl;
     }
 
-    protected function setAuthoritativeIncl(bool $authoritativeIncl): void
+    public function setAuthoritativeIncl(bool $authoritativeIncl): void
     {
         $this->authoritativeIncl = $authoritativeIncl;
     }

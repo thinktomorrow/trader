@@ -13,7 +13,7 @@ use Thinktomorrow\Trader\Domain\Model\Order\Order;
 use Thinktomorrow\Trader\Domain\Model\Promo\DiscountId as PromoDiscountId;
 use Thinktomorrow\Trader\Domain\Model\Promo\PromoId;
 
-abstract class BaseDiscount
+abstract class BaseOrderDiscount
 {
     protected readonly PromoId $promoId;
     protected readonly PromoDiscountId $promoDiscountId;
@@ -73,6 +73,4 @@ abstract class BaseDiscount
     {
         return $this->getDiscountPrice($order, $order);
     }
-
-    abstract public function getDiscountPrice(Order $order, DiscountableItem $discountable): DiscountPrice;
 }

@@ -18,6 +18,13 @@ class Promo implements Aggregate
     private PromoState $state;
     private ?string $coupon_code;
     private bool $isCombinable;
+
+    /**
+     * System promo is a fixed promo that cannot be managed
+     * by admin and is set via the codebase.
+     */
+    private bool $isSystemPromo = false;
+
     private ?\DateTime $startAt;
     private ?\DateTime $endAt;
 
@@ -41,12 +48,26 @@ class Promo implements Aggregate
     }
 
     /**
+     * System promo is a fixed promo that cannot be managed
+     * by admin and is set via the codebase.
+     */
+    public function isSystemPromo(): bool
+    {
+        return $this->isSystemPromo;
+    }
+
+    public function setAsSystemPromo(): void
+    {
+        $this->isSystemPromo = true;
+    }
+
+    /**
      * Having a coupon code denotes the difference between an automatic applicable promo or
      * a promo that can only be applied when manually entering the corresponding code.
      */
     public function hasCouponCode(): bool
     {
-        return ! ! $this->coupon_code;
+        return !!$this->coupon_code;
     }
 
     public function getCouponCode(): ?string
@@ -102,6 +123,7 @@ class Promo implements Aggregate
             'promo_id' => $this->promoId->get(),
             'state' => $this->state->value,
             'is_combinable' => $this->isCombinable,
+            'is_system_promo' => $this->isSystemPromo,
             'coupon_code' => $this->coupon_code,
             'start_at' => $this->startAt?->format('Y-m-d H:i:s'),
             'end_at' => $this->endAt?->format('Y-m-d H:i:s'),
@@ -112,7 +134,7 @@ class Promo implements Aggregate
     public function getChildEntities(): array
     {
         return [
-            Discount::class => array_map(fn (Discount $discount) => $discount->getMappedData(), $this->discounts),
+            Discount::class => array_map(fn(Discount $discount) => $discount->getMappedData(), $this->discounts),
         ];
     }
 
@@ -125,6 +147,7 @@ class Promo implements Aggregate
         $promo->promoId = PromoId::fromString($state['promo_id']);
         $promo->state = PromoState::from($state['state']);
         $promo->isCombinable = $state['is_combinable'];
+        $promo->isSystemPromo = $state['is_system_promo'];
         $promo->coupon_code = $state['coupon_code'];
         $promo->startAt = $state['start_at'] ? \DateTime::createFromFormat('Y-m-d H:i:s', $state['start_at']) : null;
         $promo->endAt = $state['end_at'] ? \DateTime::createFromFormat('Y-m-d H:i:s', $state['end_at']) : null;

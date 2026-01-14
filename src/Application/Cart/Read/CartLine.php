@@ -17,9 +17,15 @@ interface CartLine
 
     public function getUnitPriceIncl(): Money;
 
+    public function getDiscountedUnitPriceExcl(): Money;
+
+    public function getDiscountedUnitPriceIncl(): Money;
+
     public function getDiscountPriceExcl(): Money;
 
     public function getDiscountPriceIncl(): Money;
+
+    public function getDiscountPercentage(): int;
 
     public function getTotalPriceExcl(): Money;
 
@@ -30,6 +36,10 @@ interface CartLine
     public function getFormattedUnitPriceExcl(): string;
 
     public function getFormattedUnitPriceIncl(): string;
+
+    public function getFormattedDiscountedUnitPriceExcl(): string;
+
+    public function getFormattedDiscountedUnitPriceIncl(): string;
 
     public function getFormattedDiscountPriceExcl(): string;
 

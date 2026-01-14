@@ -14,18 +14,24 @@ class GridRepositoryTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
-    }
 
-    public function test_it_can_fetch_grid_item()
-    {
         $catalog = CatalogContext::mysql();
 
         $catalog->createTaxonomy();
         $taxon = $catalog->createTaxon();
+        $taxonChild = $catalog->createTaxon('taxon-bbb', 'taxonomy-aaa', $taxon->taxonId->get());
         $product = $catalog->createProduct();
-        $catalog->linkVariantToTaxon($product->productId->get(), $product->getVariants()[0]->variantId->get(), $taxon->taxonId->get());
 
-        $gridItems = $catalog->repos()->gridRepository()->getResults();
+        $productB = $catalog->createProduct('product-bbb', null);
+        $variantB = $catalog->createVariant($productB->productId->get(), 'variant-bbb', ['show_in_grid' => false]);
+
+        $catalog->linkVariantToTaxon($product->productId->get(), $product->getVariants()[0]->variantId->get(), $taxonChild->taxonId->get());
+        $catalog->linkVariantToTaxon($productB->productId->get(), $variantB->variantId->get(), $taxonChild->taxonId->get());
+    }
+
+    public function test_it_can_fetch_grid_item()
+    {
+        $gridItems = CatalogContext::mysql()->repos()->gridRepository()->getResults();
 
         /** @var GridItem $gridItem */
         $gridItem = $gridItems->first();
@@ -38,7 +44,7 @@ class GridRepositoryTest extends TestCase
 
     public function test_it_can_fetch_taxa_per_grid_item()
     {
-        $gridItems = $this->getMysqlGridRepository()->getResults();
+        $gridItems = CatalogContext::mysql()->repos()->gridRepository()->getResults();
 
         /** @var GridItem $gridItem */
         $gridItem = $gridItems->first();
@@ -46,25 +52,25 @@ class GridRepositoryTest extends TestCase
         $this->assertNotEmpty($gridItem->getTaxa());
         $this->assertInstanceOf(ProductTaxonItem::class, $gridItem->getTaxa()[0]);
 
-        $this->assertEquals('foobar', $gridItem->getTaxa()[0]->getKey('nl'));
-        $this->assertEquals('foobar', $gridItem->getTaxa()[0]->getUrl('nl'));
-        $this->assertEquals('foobar nl', $gridItem->getTaxa()[0]->getLabel('nl'));
+        $this->assertEquals('taxon-bbb-key-nl', $gridItem->getTaxa()[0]->getKey('nl'));
+        $this->assertEquals('taxon-bbb-key-nl', $gridItem->getTaxa()[0]->getUrl('nl'));
+        $this->assertEquals('taxon-bbb title nl', $gridItem->getTaxa()[0]->getLabel('nl'));
 
-        $this->assertEquals('foobar', $gridItem->getTaxa()[0]->getKey('en'));
-        $this->assertEquals('foobar', $gridItem->getTaxa()[0]->getUrl('en'));
-        $this->assertEquals('foobar en', $gridItem->getTaxa()[0]->getLabel('en'));
+        $this->assertEquals('taxon-bbb-key-fr', $gridItem->getTaxa()[0]->getKey('fr'));
+        $this->assertEquals('taxon-bbb-key-fr', $gridItem->getTaxa()[0]->getUrl('fr'));
+        $this->assertEquals('taxon-bbb title fr', $gridItem->getTaxa()[0]->getLabel('fr'));
     }
 
     public function test_it_can_fetch_taxa_that_are_shown_in_grid(): void
     {
-        $gridItems = $this->getMysqlGridRepository()->getResults();
+        $gridItems = CatalogContext::mysql()->repos()->gridRepository()->getResults();
 
         /** @var GridItem $gridItem */
         $gridItem = $gridItems->first();
 
         $this->assertCount(1, array_filter($gridItem->getTaxa(), fn(ProductTaxonItem $taxon) => $taxon->showsInGrid()));
-        $this->assertCount(0, $gridItem->getGridCategories());
-        $this->assertCount(1, $gridItem->getGridProductProperties());
+        $this->assertCount(1, $gridItem->getGridCategories());
+        $this->assertCount(0, $gridItem->getGridProductProperties());
         $this->assertCount(0, $gridItem->getGridVariantProperties());
         $this->assertCount(0, $gridItem->getGridCollections());
         $this->assertCount(0, $gridItem->getGridTags());
@@ -74,76 +80,82 @@ class GridRepositoryTest extends TestCase
 
     public function test_it_only_fetches_grid_products()
     {
-        $gridItems = $this->getMysqlGridRepository()->getResults();
+        $gridItems = CatalogContext::mysql()->repos()->gridRepository()->getResults();
 
-        $this->assertCount(3, $gridItems);
+        $this->assertCount(1, $gridItems);
     }
 
     public function test_it_can_filter_by_minimum_sale_price()
     {
-        $gridItems = $this->getMysqlGridRepository()->filterByPrice('251')->getResults();
+        $gridItems = CatalogContext::mysql()->repos()->gridRepository()->filterByPrice('79')->getResults();
 
         $this->assertCount(1, $gridItems);
-        $this->assertTrue($gridItems->first()->getSalePriceAsMoney()->greaterThan(Money::EUR(251)));
+        $this->assertTrue($gridItems->first()->getSalePrice()->getExcludingVat()->greaterThan(Money::EUR(79)));
     }
 
     public function test_it_can_filter_by_maximum_sale_price()
     {
-        $gridItems = $this->getMysqlGridRepository()->filterByPrice(null, '251')->getResults();
+        $gridItems = CatalogContext::mysql()->repos()->gridRepository()->filterByPrice(null, '101')->getResults();
 
-        $this->assertCount(2, $gridItems);
-        $this->assertTrue($gridItems[0]->getSalePriceAsMoney()->lessThan(Money::EUR(251)));
-        $this->assertTrue($gridItems[1]->getSalePriceAsMoney()->lessThan(Money::EUR(251)));
+        $this->assertCount(1, $gridItems);
+        $this->assertTrue($gridItems[0]->getSalePrice()->getExcludingVat()->lessThan(Money::EUR(101)));
     }
 
     public function test_it_can_filter_by_price_range()
     {
-        $gridItems = $this->getMysqlGridRepository()->filterByPrice('101', '251')->getResults();
+        $gridItems = CatalogContext::mysql()->repos()->gridRepository()->filterByPrice('79', '81')->getResults();
 
         $this->assertCount(1, $gridItems);
-        $this->assertTrue($gridItems[0]->getSalePriceAsMoney()->greaterThan(Money::EUR(101)));
-        $this->assertTrue($gridItems[0]->getSalePriceAsMoney()->lessThan(Money::EUR(251)));
+        $this->assertTrue($gridItems[0]->getSalePrice()->getExcludingVat()->greaterThan(Money::EUR(79)));
+        $this->assertTrue($gridItems[0]->getSalePrice()->getExcludingVat()->lessThan(Money::EUR(81)));
     }
 
     public function test_it_can_filter_by_exact_search_term()
     {
-        $gridItems = $this->getMysqlGridRepository()->filterByTerm('product one')->getResults();
+        $gridItems = CatalogContext::mysql()->repos()->gridRepository()->filterByTerm('product-aaa title nl')->getResults();
 
         $this->assertCount(1, $gridItems);
-        $this->assertEquals('product one', $gridItems->first()->getTitle());
+        $this->assertEquals('product-aaa title nl', $gridItems->first()->getTitle());
     }
 
     public function test_it_can_filter_by_partial_search_term()
     {
-        $gridItems = $this->getMysqlGridRepository()->filterByTerm('one')->getResults();
+        $gridItems = CatalogContext::mysql()->repos()->gridRepository()->filterByTerm('title nl')->getResults();
 
         $this->assertCount(1, $gridItems);
-        $this->assertEquals('product one', $gridItems->first()->getTitle());
+        $this->assertEquals('product-aaa title nl', $gridItems->first()->getTitle());
     }
 
     public function test_it_can_filter_by_taxon()
     {
-        $gridItems = $this->getMysqlGridRepository()->filterByTaxonKeys(['foobar-child'])->getResults();
+        $gridItems = CatalogContext::mysql()->repos()->gridRepository()->filterByTaxonKeys(['foobadfqfqsdfqsdr-child'])->getResults();
 
         $this->assertCount(1, $gridItems);
     }
 
+    public function test_when_filtering_unknown_taxon_no_results_are_returned()
+    {
+        $gridItems = CatalogContext::mysql()->repos()->gridRepository()->filterByTaxonKeys(['unknown'])->getResults();
+
+        $this->assertCount(0, $gridItems);
+    }
+
     public function test_when_filtering_taxon_all_child_taxa_are_included_in_the_search()
     {
-        $gridItems = $this->getMysqlGridRepository()->filterByTaxonKeys(['foobar'])->getResults();
+        $gridItems = CatalogContext::mysql()->repos()->gridRepository()->filterByTaxonKeys(['fdfqsdfoobar'])->getResults();
 
-        $this->assertCount(2, $gridItems);
+        $this->assertCount(1, $gridItems);
     }
 
     public function test_it_can_sort_by_sale_price()
     {
-        $gridItems = $this->getMysqlGridRepository()->sortByPrice()->getResults();
+        $gridItems = CatalogContext::mysql()->repos()->gridRepository()->sortByPrice()->getResults();
 
         $this->assertCount(3, $gridItems);
 
         $previousSalePrice = null;
         foreach ($gridItems as $gridItem) {
-            $salePrice = $gridItem->getSalePriceAsMoney()->getAmount();
+            $salePrice = $gridItem->getSalePrice()->getExcludingVat()->getAmount();
 
             if ($previousSalePrice) {
                 $this->assertGreaterThanOrEqual($previousSalePrice, $salePrice);
@@ -155,13 +167,13 @@ class GridRepositoryTest extends TestCase
 
     public function test_it_can_sort_by_descending_sale_price()
     {
-        $gridItems = $this->getMysqlGridRepository()->sortByPriceDesc()->getResults();
+        $gridItems = CatalogContext::mysql()->repos()->gridRepository()->sortByPriceDesc()->getResults();
 
         $this->assertCount(3, $gridItems);
 
         $previousSalePrice = null;
         foreach ($gridItems as $gridItem) {
-            $salePrice = $gridItem->getSalePriceAsMoney()->getAmount();
+            $salePrice = $gridItem->getSalePrice()->getExcludingVat()->getAmount();
 
             if ($previousSalePrice) {
                 $this->assertLessThanOrEqual($previousSalePrice, $salePrice);
@@ -173,7 +185,7 @@ class GridRepositoryTest extends TestCase
 
     public function test_it_can_sort_by_product_title()
     {
-        $gridItems = $this->getMysqlGridRepository()->sortByLabel()->getResults();
+        $gridItems = CatalogContext::mysql()->repos()->gridRepository()->sortByLabel()->getResults();
 
         $this->assertCount(3, $gridItems);
 
@@ -187,7 +199,7 @@ class GridRepositoryTest extends TestCase
 
     public function test_it_can_sort_by_descending_label()
     {
-        $gridItems = $this->getMysqlGridRepository()->sortByLabelDesc()->getResults();
+        $gridItems = CatalogContext::mysql()->repos()->gridRepository()->sortByLabelDesc()->getResults();
 
         $this->assertCount(3, $gridItems);
 

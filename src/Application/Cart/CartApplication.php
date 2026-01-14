@@ -87,6 +87,8 @@ final class CartApplication
             $this->container->get(OrderState::class)::getDefaultState()
         );
 
+        $this->container->get(AdjustOrderVatSnapshot::class)->adjust($order);
+
         $this->orderRepository->save($order);
 
         $this->eventDispatcher->dispatchAll($order->releaseEvents());
@@ -103,8 +105,8 @@ final class CartApplication
         $variant = $this->findVariantDetailsForCart->findVariantForCart($addLine->getVariantId());
 
         $itemPrice = DefaultItemPrice::fromMoney(
-            $this->config->includeVatInPrices() ? $variant->getSalePrice()->getIncludingVat() : $variant->getSalePrice()->getExcludingVat(),
-            $variant->getSalePrice()->getVatPercentage(),
+            $this->config->includeVatInPrices() ? $variant->getUnitPrice()->getIncludingVat() : $variant->getUnitPrice()->getExcludingVat(),
+            $variant->getUnitPrice()->getVatPercentage(),
             $this->config->includeVatInPrices()
         );
 
@@ -118,10 +120,16 @@ final class CartApplication
                 'title' => $variant->getTitle($addLine->getData()['locale'] ?? null),
                 'taxa' => $variant->getTaxa(),
                 'product_id' => $variant->getProductId()->get(),
-                'unit_price_excluding_vat' => $variant->getUnitPrice()->getExcludingVat()->getAmount(),
-                'unit_price_including_vat' => $variant->getUnitPrice()->getIncludingVat()->getAmount(),
+                'unit_price_excl' => $variant->getUnitPrice()->getExcludingVat()->getAmount(),
+                'unit_price_incl' => $variant->getUnitPrice()->getIncludingVat()->getAmount(),
+                'sale_price_excl' => $variant->getSalePrice()->getExcludingVat()->getAmount(),
+                'sale_price_incl' => $variant->getSalePrice()->getIncludingVat()->getAmount(),
             ])
         );
+
+        if ($this->config->includeVatInPrices()) {
+            $line->setAuthoritativeIncl(true);
+        }
 
         $order->addOrUpdateLine($line);
 

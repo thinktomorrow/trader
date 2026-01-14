@@ -6,6 +6,7 @@ namespace Thinktomorrow\Trader\Domain\Common\Price;
 use Money\Money;
 use Thinktomorrow\Trader\Domain\Common\Cash\Cash;
 use Thinktomorrow\Trader\Domain\Common\Price\Exceptions\PriceCannotBeNegative;
+use Thinktomorrow\Trader\Domain\Common\Vat\VatPercentage;
 
 class DefaultDiscountPrice implements DiscountPrice
 {
@@ -25,6 +26,14 @@ class DefaultDiscountPrice implements DiscountPrice
         return new static($amount);
     }
 
+    public static function fromIncludingVat(Money $includingVat, VatPercentage $vatPercentage): static
+    {
+        $excludingVat = Cash::from($includingVat)
+            ->subtractPercentage($vatPercentage->get());
+
+        return new self($excludingVat);
+    }
+
     public static function zero(): static
     {
         return new static(Cash::zero());
@@ -35,8 +44,19 @@ class DefaultDiscountPrice implements DiscountPrice
         return $this->excludingVat;
     }
 
+    public function getIncludingVat(VatPercentage $vatPercentage): Money
+    {
+        return Cash::from($this->excludingVat)
+            ->addPercentage($vatPercentage->toPercentage());
+    }
+
     public function add(DiscountPrice $discountPrice): static
     {
         return new static($this->excludingVat->add($discountPrice->getExcludingVat()));
+    }
+
+    public function multiply(int $quantity): static
+    {
+        return new static($this->excludingVat->multiply($quantity));
     }
 }

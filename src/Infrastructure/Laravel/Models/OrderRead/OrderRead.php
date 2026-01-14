@@ -55,6 +55,7 @@ abstract class OrderRead
 
         $order->orderId = $state['order_id'];
         $order->state = $state['order_state'];
+        $order->state = $state['order_state'];
         $order->orderReference = $state['order_ref'];
         $order->invoiceReference = $state['invoice_ref'];
 

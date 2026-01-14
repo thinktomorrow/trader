@@ -53,8 +53,6 @@ trait WithOrderTotals
             totalVat: Money::EUR($state['total_vat']),
             totalIncl: Money::EUR($state['total_incl']),
         );
-
-        $this->vatSnapshot->assertMatchesTotalExcl($this->getTotalExcl());
     }
 
     protected function getOrderTotalsState(): array
@@ -62,6 +60,8 @@ trait WithOrderTotals
         if (!$this->vatSnapshot) {
             throw new VatSnapshotNotCalculated('Cannot get order totals state when VAT snapshot is not calculated.');
         }
+
+        $this->vatSnapshot->assertMatchesTotalExcl($this->getTotalExcl());
 
         return [
             // From Order totals calculations

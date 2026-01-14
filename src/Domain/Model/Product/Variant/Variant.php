@@ -99,7 +99,7 @@ final class Variant implements ChildAggregate
 
     public function getMappedData(): array
     {
-        $includeVat = $this->unitPrice->includingIsAuthoritative();
+        $includeVat = $this->unitPrice->isIncludingVatAuthoritative();
 
         return [
             'product_id' => $this->productId->get(),

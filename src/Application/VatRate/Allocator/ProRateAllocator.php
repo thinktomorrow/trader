@@ -4,6 +4,7 @@ namespace Thinktomorrow\Trader\Application\VatRate\Allocator;
 
 use Money\Money;
 use Thinktomorrow\Trader\Domain\Common\Cash\Cash;
+use Thinktomorrow\Trader\Domain\Common\Price\ItemPrice;
 
 class ProRateAllocator
 {
@@ -17,12 +18,12 @@ class ProRateAllocator
      * - som(allocaties) === $totalToAllocate
      * - geen verloren centen / remainders
      *
-     * @param array<string, Money> $itemTotals bv. ['21' => Money(10000), '6' => Money(5000)]
+     * @param array<string, ItemPrice> $itemTotalsPerRate bv. ['21' => ItemPrice(1210), '9' => ItemPrice(1090)]
      * @param Money $totalToAllocate bv. Money(1000)
      *
      * @return array<string, Money>
      */
-    public function allocate(array $itemTotals, Money $totalToAllocate): array
+    public function allocate(array $itemTotalsPerRate, Money $totalToAllocate): array
     {
         /**
          * Edge cases:
@@ -30,10 +31,10 @@ class ProRateAllocator
          * - nothing to allocate (no shipping, payment costs and no discounts).
          */
         if ($totalToAllocate->isZero()) {
-            return $this->mapToZero($totalToAllocate, $itemTotals);
+            return $this->mapToZero($totalToAllocate, $itemTotalsPerRate);
         }
 
-        $sum = $this->sum($itemTotals);
+        $sum = $this->sumItemsExcl($itemTotalsPerRate);
 
         /**
          * Edge cases:
@@ -46,9 +47,9 @@ class ProRateAllocator
          * In these cases, we allocate the full amount to the first VAT rate.
          */
         if ($sum->isZero()) {
-            $result = $this->mapToZero($totalToAllocate, $itemTotals);
+            $result = $this->mapToZero($totalToAllocate, $itemTotalsPerRate);
 
-            $firstKey = array_key_first($itemTotals);
+            $firstKey = array_key_first($itemTotalsPerRate);
             $result[$firstKey] = $totalToAllocate;
 
             return $result;
@@ -60,9 +61,9 @@ class ProRateAllocator
         $allocatedSum = new Money('0', $currency);
 
         // 1) voorlopige allocaties (floor per ratio)
-        foreach ($itemTotals as $rate => $value) {
+        foreach ($itemTotalsPerRate as $rate => $itemPricePerRate) {
             $ratio = bcdiv(
-                (string)$value->getAmount(),
+                (string)$itemPricePerRate->getExcludingVat()->getAmount(),
                 (string)$sum->getAmount(),
                 12 // genoeg precisie voor ratio
             );
@@ -116,12 +117,12 @@ class ProRateAllocator
         return $result;
     }
 
-    private function sum(array $amounts): Money
+    private function sumItemsExcl(array $itemPricesPerRate): Money
     {
         $sum = Cash::zero();
 
-        foreach ($amounts as $money) {
-            $sum = $sum->add($money);
+        foreach ($itemPricesPerRate as $itemPrice) {
+            $sum = $sum->add($itemPrice->getExcludingVat());
         }
 
         return $sum;

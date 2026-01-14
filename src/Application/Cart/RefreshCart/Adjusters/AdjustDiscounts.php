@@ -3,19 +3,22 @@ declare(strict_types=1);
 
 namespace Thinktomorrow\Trader\Application\Cart\RefreshCart\Adjusters;
 
+use Psr\Container\ContainerInterface;
 use Thinktomorrow\Trader\Application\Cart\RefreshCart\Adjuster;
-use Thinktomorrow\Trader\Application\Promo\OrderPromo\ApplyPromoToOrder;
+use Thinktomorrow\Trader\Application\Promo\ApplyPromoToOrder;
 use Thinktomorrow\Trader\Application\Promo\OrderPromo\OrderPromo;
 use Thinktomorrow\Trader\Application\Promo\OrderPromo\OrderPromoRepository;
 use Thinktomorrow\Trader\Domain\Model\Order\Order;
 
 class AdjustDiscounts implements Adjuster
 {
+    private ContainerInterface $container;
     private OrderPromoRepository $orderPromoRepository;
     private ApplyPromoToOrder $applyPromoToOrder;
 
-    public function __construct(OrderPromoRepository $orderPromoRepository, ApplyPromoToOrder $applyPromoToOrder)
+    public function __construct(ContainerInterface $container, OrderPromoRepository $orderPromoRepository, ApplyPromoToOrder $applyPromoToOrder)
     {
+        $this->container = $container;
         $this->orderPromoRepository = $orderPromoRepository;
         $this->applyPromoToOrder = $applyPromoToOrder;
     }
@@ -40,7 +43,7 @@ class AdjustDiscounts implements Adjuster
             $order->removeEnteredCouponCode();
         }
 
-        $promos = $this->orderPromoRepository->getAvailableOrderPromos();
+        $promos = array_merge($this->orderPromoRepository->getAvailableOrderPromos());
 
         // Sort them by highest impact
         usort($promos, function (OrderPromo $a, OrderPromo $b) use ($order) {

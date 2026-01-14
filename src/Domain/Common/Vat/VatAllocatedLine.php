@@ -44,4 +44,32 @@ final class VatAllocatedLine
     {
         return $this->taxableBase->add($this->vatAmount);
     }
+
+    public function add(VatAllocatedLine $other): static
+    {
+        if (!$this->vatPercentage->equals($other->vatPercentage)) {
+            throw new \InvalidArgumentException('Cannot add VatAllocatedLine with different VAT percentages. ' .
+                'Given: ' . $other->vatPercentage->get() . '%, expected: ' . $this->vatPercentage->get() . '%.');
+        }
+
+        return new static(
+            $this->taxableBase->add($other->taxableBase),
+            $this->vatAmount->add($other->vatAmount),
+            $this->vatPercentage
+        );
+    }
+
+    public function subtract(VatAllocatedLine $other): static
+    {
+        if (!$this->vatPercentage->equals($other->vatPercentage)) {
+            throw new \InvalidArgumentException('Cannot subtract VatAllocatedLine with different VAT percentages. ' .
+                'Given: ' . $other->vatPercentage->get() . '%, expected: ' . $this->vatPercentage->get() . '%.');
+        }
+
+        return new static(
+            $this->taxableBase->subtract($other->taxableBase),
+            $this->vatAmount->subtract($other->vatAmount),
+            $this->vatPercentage
+        );
+    }
 }
