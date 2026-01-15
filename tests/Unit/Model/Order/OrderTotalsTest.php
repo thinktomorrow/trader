@@ -54,17 +54,17 @@ class OrderTotalsTest extends TestCase
         $this->assertEquals(Money::EUR('61'), $order->getShippingCostIncl());
         $this->assertEquals(Money::EUR('61'), $order->getPaymentCostIncl());
         $this->assertEquals(Money::EUR('18'), $order->getDiscountTotalIncl());
-        $this->assertEquals(Money::EUR('53'), $order->getTotalVat());
-        $this->assertEquals(Money::EUR('304'), $order->getTotalIncl());
+        $this->assertEquals(Money::EUR('54'), $order->getTotalVat());
+        $this->assertEquals(Money::EUR('305'), $order->getTotalIncl());
 
         $vatLines = $order->getVatLines();
 
         $this->assertEquals(1, count($vatLines));
 
-        $line = $vatLines[0];
+        $vatLine = $vatLines[21]; // Keys are vat percentages
 
-        $this->assertEquals(Money::EUR(251), $line->getTaxableBase());
-        $this->assertEquals(Money::EUR(53), $line->getVatAmount());
-        $this->assertEquals(VatPercentage::fromString('21'), $line->getVatPercentage());
+        $this->assertEquals(Money::EUR(251), $vatLine->getTaxableBase());
+        $this->assertEquals(Money::EUR(54), $vatLine->getVatAmount());
+        $this->assertEquals(VatPercentage::fromString('21'), $vatLine->getVatPercentage());
     }
 }

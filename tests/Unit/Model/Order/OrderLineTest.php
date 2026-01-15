@@ -5,7 +5,7 @@ namespace Tests\Unit\Model\Order;
 
 use Money\Money;
 use Tests\Unit\TestCase;
-use Thinktomorrow\Trader\Domain\Common\Price\DefaultDiscountPrice;
+use Thinktomorrow\Trader\Domain\Common\Price\DefaultItemDiscountPrice;
 use Thinktomorrow\Trader\Domain\Common\Price\DefaultItemPrice;
 use Thinktomorrow\Trader\Domain\Common\Vat\VatPercentage;
 use Thinktomorrow\Trader\Domain\Model\Order\Events\LineAdded;
@@ -171,7 +171,7 @@ class OrderLineTest extends TestCase
         $line->addDiscount($discount);
 
         $this->assertEquals(DefaultItemPrice::fromExcludingVat(Money::EUR(83), VatPercentage::fromString('21')), $line->getUnitPrice());
-        $this->assertEquals(DefaultDiscountPrice::fromExcludingVat(Money::EUR(15)), $line->getDiscountPrice());
+        $this->assertEquals(DefaultItemDiscountPrice::fromExcludingVat(Money::EUR(15), VatPercentage::fromString('21')), $line->getDiscountPrice());
         $this->assertEquals(DefaultItemPrice::fromExcludingVat(Money::EUR(68), VatPercentage::fromString('21')), $line->getTotal());
     }
 }

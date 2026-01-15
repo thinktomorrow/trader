@@ -97,6 +97,10 @@ final class Discount implements ChildEntity
 
         if ($discount->discountableType == DiscountableType::line) {
 
+            if(!isset($state['vat_rate'])) {
+                throw new \InvalidArgumentException('vat_rate is required for line discounts');
+            }
+
             if (isset($state['total_incl']) && $state['total_incl'] !== null) {
                 $discount->discountPrice = DefaultItemDiscountPrice::fromIncludingVat(
                     Money::EUR($state['total_incl']),

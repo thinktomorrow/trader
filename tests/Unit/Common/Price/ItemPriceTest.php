@@ -6,7 +6,7 @@ namespace Tests\Unit\Common\Price;
 use Money\Money;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
-use Thinktomorrow\Trader\Domain\Common\Price\DefaultDiscountPrice;
+use Thinktomorrow\Trader\Domain\Common\Price\DefaultItemDiscountPrice;
 use Thinktomorrow\Trader\Domain\Common\Price\DefaultItemPrice;
 use Thinktomorrow\Trader\Domain\Common\Price\Exceptions\PriceCannotBeNegative;
 use Thinktomorrow\Trader\Domain\Common\Vat\VatPercentage;
@@ -134,7 +134,7 @@ class ItemPriceTest extends TestCase
             false
         );
 
-        $discount = DefaultDiscountPrice::fromExcludingVat(Money::EUR(500));
+        $discount = DefaultItemDiscountPrice::fromExcludingVat(Money::EUR(500), $object->getVatPercentage());
 
         $this->expectException(PriceCannotBeNegative::class);
 

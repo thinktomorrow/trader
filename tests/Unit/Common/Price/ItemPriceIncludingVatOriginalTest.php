@@ -4,7 +4,7 @@ namespace Tests\Unit\Common\Price;
 
 use Money\Money;
 use PHPUnit\Framework\TestCase;
-use Thinktomorrow\Trader\Domain\Common\Price\DefaultDiscountPrice;
+use Thinktomorrow\Trader\Domain\Common\Price\DefaultItemDiscountPrice;
 use Thinktomorrow\Trader\Domain\Common\Price\DefaultItemPrice;
 use Thinktomorrow\Trader\Domain\Common\Vat\VatPercentage;
 
@@ -96,7 +96,7 @@ final class ItemPriceIncludingVatOriginalTest extends TestCase
         );
 
         // €1.00 excl discount
-        $discount = DefaultDiscountPrice::fromExcludingVat(Money::EUR(100));
+        $discount = DefaultItemDiscountPrice::fromExcludingVat(Money::EUR(100), $item->getVatPercentage());
 
         $result = $item->applyDiscount($discount);
 
@@ -116,7 +116,7 @@ final class ItemPriceIncludingVatOriginalTest extends TestCase
         );
 
         // €0.50 excl discount
-        $discount = DefaultDiscountPrice::fromExcludingVat(Money::EUR(50));
+        $discount = DefaultItemDiscountPrice::fromExcludingVat(Money::EUR(50), $item->getVatPercentage());
 
         $result = $item
             ->multiply(2)          // €20.00 incl
@@ -154,7 +154,7 @@ final class ItemPriceIncludingVatOriginalTest extends TestCase
             true
         );
 
-        $discount = DefaultDiscountPrice::fromExcludingVat(Money::EUR(1));
+        $discount = DefaultItemDiscountPrice::fromExcludingVat(Money::EUR(1), $item->getVatPercentage());
 
         $result = $item
             ->multiply(3)

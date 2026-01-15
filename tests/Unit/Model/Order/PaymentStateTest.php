@@ -56,7 +56,7 @@ class PaymentStateTest extends TestCase
         $merchantOrderPayment = DefaultMerchantOrderPayment::fromMappedData(array_merge($this->payment->getMappedData(), [
             'cost' => $this->payment->getPaymentCost(),
             'payment_state' => $this->payment->getPaymentState(),
-        ]), $this->order->getMappedData(), []);
+        ]), ['order_id' => $this->order->orderId->get()], []);
         $this->assertTrue($this->machine->can($merchantOrderPayment, 'pay'));
         $this->assertFalse($this->machine->can($merchantOrderPayment, 'initialize'));
 

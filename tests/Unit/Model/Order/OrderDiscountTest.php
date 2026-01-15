@@ -39,6 +39,8 @@ class OrderDiscountTest extends TestCase
             'promo_id' => $promoId->get(),
             'promo_discount_id' => $promoDiscountId->get(),
             'total_excl' => $discountTotal->getExcludingVat()->getAmount(),
+            'total_incl' => null,
+            'vat_rate' => null,
             'data' => json_encode(['foo' => 'bar', 'promo_id' => $promoId->get(), 'promo_discount_id' => $promoDiscountId->get()]),
         ], $discount->getMappedData());
     }

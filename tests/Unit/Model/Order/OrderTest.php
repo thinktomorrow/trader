@@ -132,7 +132,7 @@ class OrderTest extends TestCase
             'postal_code' => '1000',
             'city' => 'Amsterdam',
             'data' => json_encode(['foo' => 'bar']),
-        ], $order->getMappedData());
+        ], ['order_id' => $order->orderId->get()]);
 
         $order->updateShippingAddress($shippingAddress);
 
@@ -153,7 +153,7 @@ class OrderTest extends TestCase
             'postal_code' => '3000',
             'city' => 'Paris',
             'data' => json_encode(['foo' => 'bar']),
-        ], $order->getMappedData());
+        ], ['order_id' => $order->orderId->get()]);
 
         $order->updateBillingAddress($billingAddress);
 
@@ -180,7 +180,7 @@ class OrderTest extends TestCase
         $order->addData(['bar' => 'baz']);
         $order->addData(['foo' => 'bar', 'bar' => 'boo']);
 
-        $this->assertEquals(json_encode(['bar' => 'boo', 'foo' => 'bar']), $order->getMappedData()['data']);
+        $this->assertEquals(['bar' => 'boo', 'foo' => 'bar'], $order->getData());
     }
 
     public function test_it_can_delete_data()
@@ -190,7 +190,7 @@ class OrderTest extends TestCase
         $order->addData(['foo' => 'bar', 'bar' => 'boo']);
         $order->deleteData('bar');
 
-        $this->assertEquals(json_encode(['foo' => 'bar']), $order->getMappedData()['data']);
+        $this->assertEquals(['foo' => 'bar'], $order->getData());
     }
 
     public function test_it_can_add_log_entry()
@@ -211,11 +211,11 @@ class OrderTest extends TestCase
 
         $this->assertTrue($order->isVatExempt());
 
-        $this->assertTrue(json_decode($order->getMappedData()['data'], true)['is_vat_exempt']);
+        $this->assertTrue($order->getData('is_vat_exempt'));
 
         $order->setVatExempt(false);
 
         $this->assertFalse($order->isVatExempt());
-        $this->assertFalse(json_decode($order->getMappedData()['data'], true)['is_vat_exempt']);
+        $this->assertFalse($order->getData('is_vat_exempt'));
     }
 }

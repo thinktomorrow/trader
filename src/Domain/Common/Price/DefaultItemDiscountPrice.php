@@ -41,7 +41,7 @@ class DefaultItemDiscountPrice implements ItemDiscountPrice
     public static function fromIncludingVat(Money $includingVat, VatPercentage $vatPercentage): static
     {
         $excludingVat = Cash::from($includingVat)
-            ->subtractPercentage($vatPercentage->get());
+            ->subtractTaxPercentage($vatPercentage->toPercentage());
 
         $model = new self($excludingVat, $vatPercentage);
 
