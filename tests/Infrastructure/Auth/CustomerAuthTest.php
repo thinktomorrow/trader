@@ -30,18 +30,17 @@ class CustomerAuthTest extends TestCase
     }
 
 
-    public function test_it_returns_a_json_error_if_unauthenticated_request_expects_json_response()
+    public function test_it_redirects_if_unauthenticated_customer()
     {
-        $response = $this->get(route('customer.index'), [
-            'Accept' => 'application/json',
-        ]);
+        $response = $this->get(route('customer.index'));
 
-        $response->assertStatus(401);
+        $response->assertRedirect(route('customer.login'));
     }
 
     public function test_entering_valid_login_credentials_lets_you_pass()
     {
-        $customer = $this->createACustomerLogin();
+        $customer = $this->orderContext->createCustomer();
+        $customerLogin = $this->orderContext->createCustomerLogin($customer);
 
         $response = $this->post(route('customer.login.store'), [
             'email' => 'ben@thinktomorrow.be',
@@ -59,7 +58,8 @@ class CustomerAuthTest extends TestCase
     {
         Event::fake();
 
-        $this->createACustomerLogin();
+        $customer = $this->orderContext->createCustomer();
+        $customerLogin = $this->orderContext->createCustomerLogin($customer);
 
         $this->post(route('customer.login.store'), [
             'email' => 'ben@thinktomorrow.be',
@@ -71,7 +71,8 @@ class CustomerAuthTest extends TestCase
 
     public function test_entering_invalid_login_credentials_keeps_you_out()
     {
-        $this->createACustomerLogin();
+        $customer = $this->orderContext->createCustomer();
+        $customerLogin = $this->orderContext->createCustomerLogin($customer);
 
         // Enter invalid credentials
         $response = $this->post(route('customer.login.store'), [
@@ -86,7 +87,8 @@ class CustomerAuthTest extends TestCase
 
     public function test_it_displays_customer_page_for_authenticated()
     {
-        $customer = $this->createACustomerLogin();
+        $customer = $this->orderContext->createCustomer();
+        $customerLogin = $this->orderContext->createCustomerLogin($customer);
 
         $response = $this->actingAs(CustomerModel::first(), 'customer')
             ->get(route('customer.index'));
@@ -97,7 +99,8 @@ class CustomerAuthTest extends TestCase
 
     public function test_it_redirects_authenticated_customer_to_intended_page()
     {
-        $this->createACustomerLogin();
+        $customer = $this->orderContext->createCustomer();
+        $customerLogin = $this->orderContext->createCustomerLogin($customer);
 
         $this->get(route('customer.orders'))
             ->assertRedirect(route('customer.login'));
@@ -110,14 +113,10 @@ class CustomerAuthTest extends TestCase
         $response->assertRedirect(route('customer.orders'));
     }
 
-    public function test_customer_is_attached_to_current_cart_after_login()
-    {
-        $this->markTestSkipped();
-    }
-
     public function test_it_can_log_out()
     {
-        $customer = $this->createACustomerLogin();
+        $customer = $this->orderContext->createCustomer();
+        $customerLogin = $this->orderContext->createCustomerLogin($customer);
 
         Auth::guard('customer')->login(CustomerModel::first());
         $this->assertEquals($customer->customerId->get(), Auth::guard('customer')->user()->customer_id);
@@ -133,7 +132,8 @@ class CustomerAuthTest extends TestCase
     {
         Event::fake();
 
-        $customer = $this->createACustomerLogin();
+        $customer = $this->orderContext->createCustomer();
+        $customerLogin = $this->orderContext->createCustomerLogin($customer);
 
         Auth::guard('customer')->login(CustomerModel::first());
         $this->assertEquals($customer->customerId->get(), Auth::guard('customer')->user()->customer_id);
@@ -145,7 +145,8 @@ class CustomerAuthTest extends TestCase
 
     public function test_it_will_redirect_if_logged_in_when_trying_to_log_in()
     {
-        $customer = $this->createACustomerLogin();
+        $customer = $this->orderContext->createCustomer();
+        $customerLogin = $this->orderContext->createCustomerLogin($customer);
 
         Auth::guard('customer')->login(CustomerModel::first());
 

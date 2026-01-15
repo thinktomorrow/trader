@@ -61,7 +61,7 @@ class CustomerEmailVerificationTest extends TestCase
 
         $response = $this->get($verificationUrl);
 
-        $response->assertRedirect(route('customer.index'));
+        $response->assertRedirect(route('customer.login'));
 
         $this->assertNotNull($customer->fresh()->email_verified_at);
         Event::assertDispatched(Verified::class);
@@ -80,7 +80,8 @@ class CustomerEmailVerificationTest extends TestCase
 
         $response = $this->get($invalidUrl);
 
-        $response->assertStatus(403);
+        $response->assertRedirect(route('customer.verification.show'));
+
         $this->assertNull($customer->fresh()->email_verified_at);
     }
 
@@ -105,10 +106,10 @@ class CustomerEmailVerificationTest extends TestCase
         $model->email_verified_at = null;
         $model->is_business = false;
         $model->locale = 'en';
-        $model->data = json_encode([
+        $model->data = [
             'firstname' => 'Unverified',
             'lastname' => 'Customer',
-        ]);
+        ];
         $model->save();
 
         return $model;

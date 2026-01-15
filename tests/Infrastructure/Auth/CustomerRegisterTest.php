@@ -7,10 +7,12 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Event;
-use function route;
+use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Notification;
 use Tests\Infrastructure\TestCase;
 use Thinktomorrow\Trader\Domain\Model\Customer\Events\CustomerHasLoggedIn;
 use Thinktomorrow\Trader\Infrastructure\Shop\CustomerAuth\CustomerModel;
+use function route;
 
 class CustomerRegisterTest extends TestCase
 {
@@ -19,6 +21,9 @@ class CustomerRegisterTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
+
+        Mail::fake();
+        Notification::fake();
 
         $this->app['view']->addLocation(__DIR__ . '/views');
         $this->app['view']->addNamespace('trader', __DIR__ . '/views/shop');
@@ -33,6 +38,7 @@ class CustomerRegisterTest extends TestCase
 
     public function test_it_can_register_a_new_customer()
     {
+        $this->disableExceptionHandling();
         Event::fake();
 
         $response = $this->post(route('customer.register.store'), [
@@ -54,11 +60,10 @@ class CustomerRegisterTest extends TestCase
 
         $customer = CustomerModel::first();
 
-        $this->assertTrue(Auth::guard('customer')->check());
-        $this->assertEquals($customer->customer_id, Auth::guard('customer')->id());
+        $this->assertFalse(Auth::guard('customer')->check());
 
-        $response->assertRedirect(route('customer.index'));
-        Event::assertDispatched(CustomerHasLoggedIn::class);
+        $response->assertRedirect(route('customer.login'));
+        Event::assertNotDispatched(CustomerHasLoggedIn::class);
     }
 
     public function test_it_requires_all_fields()
@@ -70,11 +75,12 @@ class CustomerRegisterTest extends TestCase
         $this->assertCount(0, CustomerModel::all());
     }
 
-    public function test_it_requires_unique_email()
+    public function test_it_avoids_displaying_email_error()
     {
-        $this->createDummyCustomer();
+        $customer = $this->orderContext->createCustomer();
+        $this->orderContext->createCustomerLogin($customer);
 
-        $response = $this->from(route('customer.register'))->post(route('customer.register.store'), [
+        $response = $this->post(route('customer.register.store'), [
             'firstname' => 'Ben',
             'lastname' => 'Doe',
             'email' => 'ben@thinktomorrow.be',
@@ -82,8 +88,25 @@ class CustomerRegisterTest extends TestCase
             'password_confirmation' => 'secret123',
         ]);
 
+        $response->assertRedirect(route('customer.login'));
+        $response->assertSessionHas('status');
+        $response->assertSessionHasNoErrors();
+
+        $this->assertDatabaseCount('trader_customers', 1);
+    }
+
+    public function test_it_validates_register_request()
+    {
+        $response = $this->from(route('customer.register'))->post(route('customer.register.store'), [
+            'firstname' => null,
+            'lastname' => 'Doe',
+            'email' => 'ben@thinktomorrow.be',
+            'password' => 'secret123',
+            'password_confirmation' => 'secret123',
+        ]);
+
         $response->assertRedirect(route('customer.register'));
-        $response->assertSessionHasErrors(['email']);
+        $response->assertSessionHasErrors(['firstname']);
     }
 
     public function test_it_requires_password_confirmation_to_match()
@@ -103,11 +126,12 @@ class CustomerRegisterTest extends TestCase
 
     public function test_it_redirects_authenticated_customers_away_from_register_page()
     {
-        $this->disableExceptionHandling();
-        
-        $customer = $this->createDummyCustomer();
+        $customer = $this->orderContext->createCustomer();
+        $customerLogin = $this->orderContext->createCustomerLogin($customer);
 
-        $this->actingAs($customer, 'customer');
+        $customerModel = CustomerModel::find($customer->customerId->get());
+
+        $this->actingAs($customerModel, 'customer');
         $response = $this->get(route('customer.register'));
 
         $response->assertRedirect(route('customer.index'));

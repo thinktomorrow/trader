@@ -3,16 +3,16 @@ declare(strict_types=1);
 
 namespace Infrastructure\Auth;
 
-use function bcrypt;
 use Carbon\Carbon;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Notification;
-use function route;
 use Tests\Infrastructure\TestCase;
 use Thinktomorrow\Trader\Infrastructure\Shop\CustomerAuth\CustomerModel;
 use Thinktomorrow\Trader\Infrastructure\Shop\CustomerAuth\Notifications\ResetCustomerPasswordNotification;
+use function bcrypt;
+use function route;
 
 class CustomerPasswordResetTest extends TestCase
 {
@@ -22,7 +22,8 @@ class CustomerPasswordResetTest extends TestCase
     {
         Notification::fake();
 
-        $customer = $this->createACustomerLogin();
+        $customer = $this->orderContext->createCustomer();
+        $customerLogin = $this->orderContext->createCustomerLogin($customer);
 
         $response = $this->post(route('customer.password.email'), [
             'email' => 'ben@thinktomorrow.be',
@@ -44,7 +45,8 @@ class CustomerPasswordResetTest extends TestCase
     {
         Notification::fake();
 
-        $this->createACustomerLogin();
+        $customer = $this->orderContext->createCustomer();
+        $customerLogin = $this->orderContext->createCustomerLogin($customer);
 
         $response = $this->post(route('customer.password.email'), [
             'email' => 'fake@example.com',
@@ -61,7 +63,8 @@ class CustomerPasswordResetTest extends TestCase
         $this->disableExceptionHandling();
 
         Notification::fake();
-        $this->createACustomerLogin();
+        $customer = $this->orderContext->createCustomer();
+        $customerLogin = $this->orderContext->createCustomerLogin($customer);
 
         // Create reset token manually so we can check the token
         DB::insert('INSERT INTO trader_customer_password_resets (email, token, created_at) VALUES(?, ?, ?)', [

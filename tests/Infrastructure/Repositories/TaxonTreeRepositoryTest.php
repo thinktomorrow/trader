@@ -3,9 +3,7 @@ declare(strict_types=1);
 
 namespace Tests\Infrastructure\Repositories;
 
-use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\Infrastructure\TestCase;
-use Tests\Infrastructure\Vine\TaxonHelpers;
 use Thinktomorrow\Trader\Application\Taxon\Tree\TaxonNode;
 use Thinktomorrow\Trader\Infrastructure\Laravel\Repositories\MemoizedMysqlTaxonTreeRepository;
 use Thinktomorrow\Trader\Infrastructure\Laravel\Repositories\MysqlTaxonTreeRepository;
@@ -15,9 +13,6 @@ use Thinktomorrow\Trader\Infrastructure\Test\TestTraderConfig;
 
 final class TaxonTreeRepositoryTest extends TestCase
 {
-    use RefreshDatabase;
-    use TaxonHelpers;
-
     protected function tearDown(): void
     {
         MemoizedMysqlTaxonTreeRepository::clear();
