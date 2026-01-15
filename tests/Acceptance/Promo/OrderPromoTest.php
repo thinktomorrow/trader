@@ -33,7 +33,7 @@ class OrderPromoTest extends TestCase
         $this->assertEquals('foobar', $order->getEnteredCouponCode());
         $this->assertCount(1, $order->getDiscounts());
 
-//        $this->orderContext->refreshOrder($order->orderId->get());
+        //        $this->orderContext->refreshOrder($order->orderId->get());
 
         $cart = $this->orderContext->findCart($order->orderId);
         $this->assertCount(1, $cart->getDiscounts());

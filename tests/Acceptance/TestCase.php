@@ -20,7 +20,7 @@ class TestCase extends \PHPUnit\Framework\TestCase
         DefaultLocale::set(Locale::fromString('nl'));
 
         DataRenderer::setDataResolver(function (array $data, string $key, ?string $language = null, $default = null) {
-            if (!$language) {
+            if (! $language) {
                 $language = 'nl';
             }
 

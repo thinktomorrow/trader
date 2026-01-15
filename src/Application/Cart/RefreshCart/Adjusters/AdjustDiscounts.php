@@ -56,13 +56,14 @@ class AdjustDiscounts implements Adjuster
             // First promo in the group always applies
             if (count($processedPromoIds) === 0) {
                 $this->applyPromo($order, $promo, $processedPromoIds, $processedCombinablePromoIds);
+
                 continue;
             }
 
             // Check if all existing promos are combinable
             $allExistingAreCombinable = count($processedPromoIds) === count($processedCombinablePromoIds);
 
-            if (!$allExistingAreCombinable || !$promo->isCombinable()) {
+            if (! $allExistingAreCombinable || ! $promo->isCombinable()) {
                 continue;
             }
 
@@ -97,7 +98,7 @@ class AdjustDiscounts implements Adjuster
     private function areExistingPromosCombinable(Order $order, array $combinablePromoIds)
     {
         foreach ($this->getExistingPromoIds($order) as $existingPromoId) {
-            if (!in_array($existingPromoId, $combinablePromoIds)) {
+            if (! in_array($existingPromoId, $combinablePromoIds)) {
                 return false;
             }
         }
@@ -157,13 +158,13 @@ class AdjustDiscounts implements Adjuster
     {
         $couponPromo = $order->getEnteredCouponCode() ? $this->orderPromoRepository->findOrderPromoByCouponCode($order->getEnteredCouponCode()) : null;
 
-        if (!$couponPromo) {
+        if (! $couponPromo) {
             $order->removeEnteredCouponCode();
         }
 
         $promos = array_filter(
             $this->orderPromoRepository->getAvailableOrderPromos(),
-            fn(OrderPromo $promo) => !$promo->isSystemPromo()
+            fn (OrderPromo $promo) => ! $promo->isSystemPromo()
         );
 
         // Sort marketing promos by highest impact

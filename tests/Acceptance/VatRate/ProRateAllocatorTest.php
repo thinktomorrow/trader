@@ -120,8 +120,7 @@ final class ProRateAllocatorTest extends TestCase
         array $items,
         int   $toAllocate,
         array $expected
-    ): void
-    {
+    ): void {
         // Map items to DefaultItemPrices
         $itemPrices = [];
 

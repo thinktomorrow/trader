@@ -113,7 +113,7 @@ class ProRateAllocator
     {
         $currency = $totalToAllocate->getCurrency();
         $result = array_map(
-            fn() => new Money('0', $currency),
+            fn () => new Money('0', $currency),
             $itemTotals
         );
 
@@ -142,7 +142,7 @@ class ProRateAllocator
     private function assertItemTotalsAreKeyedWithRates(array $itemTotalsPerRate): void
     {
         foreach ($itemTotalsPerRate as $rate => $itemTotal) {
-            if (!is_string($rate) && !is_int($rate)) {
+            if (! is_string($rate) && ! is_int($rate)) {
                 throw new \InvalidArgumentException('itemTotalsPerRate must be an array keyed by VAT rates. Got key ' . gettype($rate));
             }
 
@@ -155,7 +155,7 @@ class ProRateAllocator
     private function assertItemTotalsAreInstanceOfItemPrice(array $itemTotalsPerRate): void
     {
         foreach ($itemTotalsPerRate as $itemTotal) {
-            if (!$itemTotal instanceof ItemPrice) {
+            if (! $itemTotal instanceof ItemPrice) {
                 throw new \InvalidArgumentException('itemTotalsPerRate must be an array of ItemPrice instances. Got ' . $itemTotal::class);
             }
         }

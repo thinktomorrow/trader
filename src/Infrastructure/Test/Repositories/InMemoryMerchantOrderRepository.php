@@ -36,7 +36,7 @@ class InMemoryMerchantOrderRepository implements MerchantOrderRepository, InMemo
 {
     public function findMerchantOrder(OrderId $orderId): MerchantOrder
     {
-        if (!isset(InMemoryOrderRepository::$orders[$orderId->get()])) {
+        if (! isset(InMemoryOrderRepository::$orders[$orderId->get()])) {
             throw new CouldNotFindOrder('No order found by id ' . $orderId);
         }
 
@@ -49,13 +49,13 @@ class InMemoryMerchantOrderRepository implements MerchantOrderRepository, InMemo
             'order_state' => $order->getOrderState(),
         ]);
 
-        $lines = array_map(fn(Line $line) => DefaultMerchantOrderLine::fromMappedData(
+        $lines = array_map(fn (Line $line) => DefaultMerchantOrderLine::fromMappedData(
             array_merge($line->getMappedData(), []),
             $orderState,
-            array_map(fn(Discount $discount) => DefaultMerchantOrderDiscount::fromMappedData(array_merge($discount->getMappedData(), [
+            array_map(fn (Discount $discount) => DefaultMerchantOrderDiscount::fromMappedData(array_merge($discount->getMappedData(), [
                 'percentage' => $discount->getPercentage($line->getSubTotal()->getExcludingVat()),
             ]), $orderState), $line->getDiscounts()),
-            array_map(fn(LinePersonalisation $linePersonalisation) => DefaultMerchantOrderLinePersonalisation::fromMappedData(array_merge($linePersonalisation->getMappedData(), [
+            array_map(fn (LinePersonalisation $linePersonalisation) => DefaultMerchantOrderLinePersonalisation::fromMappedData(array_merge($linePersonalisation->getMappedData(), [
                 //
             ]), $line->getMappedData()), $line->getPersonalisations())
         ), $order->getLines());
@@ -70,22 +70,22 @@ class InMemoryMerchantOrderRepository implements MerchantOrderRepository, InMemo
             $orderState
         ) : null;
 
-        $shippings = array_map(fn($shipping) => DefaultMerchantOrderShipping::fromMappedData(
+        $shippings = array_map(fn ($shipping) => DefaultMerchantOrderShipping::fromMappedData(
             array_merge($shipping->getMappedData(), [
                 'shipping_state' => $shipping->getShippingState(),
             ]),
             $orderState,
-            array_map(fn(Discount $discount) => DefaultMerchantOrderDiscount::fromMappedData(array_merge($discount->getMappedData(), [
+            array_map(fn (Discount $discount) => DefaultMerchantOrderDiscount::fromMappedData(array_merge($discount->getMappedData(), [
                 'percentage' => $discount->getPercentage($shipping->getShippingCost()->getExcludingVat()),
             ]), $orderState), $shipping->getDiscounts())// TODO: cart shipping discounts
         ), $order->getShippings());
 
-        $payments = array_map(fn($payment) => DefaultMerchantOrderPayment::fromMappedData(
+        $payments = array_map(fn ($payment) => DefaultMerchantOrderPayment::fromMappedData(
             array_merge($payment->getMappedData(), [
                 'payment_state' => $payment->getPaymentState(),
             ]),
             $orderState,
-            array_map(fn(Discount $discount) => DefaultMerchantOrderDiscount::fromMappedData(array_merge($discount->getMappedData(), [
+            array_map(fn (Discount $discount) => DefaultMerchantOrderDiscount::fromMappedData(array_merge($discount->getMappedData(), [
                 'percentage' => $discount->getPercentage($payment->getPaymentCost()->getExcludingVat()),
             ]), $orderState), $payment->getDiscounts())// TODO: cart payment discounts
         ), $order->getPayments());
@@ -95,7 +95,7 @@ class InMemoryMerchantOrderRepository implements MerchantOrderRepository, InMemo
             $orderState,
         ) : null;
 
-        $logEntries = array_map(fn(OrderEvent $logEntry) => DefaultMerchantOrderEvent::fromMappedData(
+        $logEntries = array_map(fn (OrderEvent $logEntry) => DefaultMerchantOrderEvent::fromMappedData(
             $logEntry->getMappedData(),
             $orderState,
         ), $order->getOrderEvents());
@@ -111,7 +111,7 @@ class InMemoryMerchantOrderRepository implements MerchantOrderRepository, InMemo
                 MerchantOrderShopper::class => $shopper,
                 MerchantOrderEvent::class => $logEntries,
             ],
-            array_map(fn(Discount $discount) => DefaultMerchantOrderDiscount::fromMappedData(array_merge($discount->getMappedData(), [
+            array_map(fn (Discount $discount) => DefaultMerchantOrderDiscount::fromMappedData(array_merge($discount->getMappedData(), [
                 'percentage' => $discount->getPercentage($order->getSubtotalExcl()),
             ]), $orderState), $order->getDiscounts()), // TODO: cart discounts
         );
