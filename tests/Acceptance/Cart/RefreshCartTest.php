@@ -109,8 +109,9 @@ class RefreshCartTest extends CartContext
     {
         $product = $this->catalogContext->repos()->productRepository()->find(ProductId::fromString('aaa'));
         $variant = $product->getVariants()[0];
+
         $variant->updatePrice(VariantUnitPrice::fromMoney(
-            $variant->getSalePrice()->getExcludingVat(),
+            $variant->getSalePrice()->multiply(3)->getExcludingVat(), // Must be higher than sale price or else discount will not apply
             $variant->getSalePrice()->getVatPercentage(),
             false
         ), $variant->getSalePrice()->multiply(2));
@@ -120,5 +121,7 @@ class RefreshCartTest extends CartContext
         }
 
         $product->updateVariant($variant);
+
+        $this->catalogContext->saveProduct($product);
     }
 }

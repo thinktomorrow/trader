@@ -38,12 +38,39 @@ final class MysqlPromoRepository implements PromoRepository, OrderPromoRepositor
         $this->orderDiscountFactory = $orderDiscountFactory;
     }
 
+    public function getAvailableSystemPromos(): array
+    {
+        $results = $this->baseActiveQuery()
+            ->where('is_system_promo', true)
+            ->get();
+
+        return $this->composeOrderPromosFromResults($results);
+    }
+
     public function getAvailableOrderPromos(): array
     {
         $results = $this->baseActiveQuery()
             ->whereNull('coupon_code')
             ->get();
 
+        return $this->composeOrderPromosFromResults($results);
+    }
+
+    public function findOrderPromoByCouponCode(string $couponCode): ?OrderPromo
+    {
+        $result = $this->baseActiveQuery()
+            ->where('coupon_code', $couponCode)
+            ->first();
+
+        if (!$result) {
+            return null;
+        }
+
+        return $this->composeOrderPromosFromResults(collect($result))[0];
+    }
+
+    private function composeOrderPromosFromResults(Collection $results): array
+    {
         $discountStates = $this->getDiscountStates($results->pluck('promo_id')->toArray());
 
         return array_map(function ($promoResult) use ($discountStates) {
@@ -55,26 +82,6 @@ final class MysqlPromoRepository implements PromoRepository, OrderPromoRepositor
                 OrderDiscount::class => $this->makeDiscounts($discountStates, $promoResult, $this->orderDiscountFactory),
             ]);
         }, $results->toArray());
-    }
-
-    public function findOrderPromoByCouponCode(string $couponCode): ?OrderPromo
-    {
-        $result = $this->baseActiveQuery()
-            ->where('coupon_code', $couponCode)
-            ->first();
-
-        if (! $result) {
-            return null;
-        }
-        $result = (array)$result;
-
-        $discountStates = $this->getDiscountStates($result['promo_id']);
-
-        return OrderPromo::fromMappedData(array_merge($result, [
-            'is_combinable' => (bool)$result['is_combinable'],
-        ]), [
-            OrderDiscount::class => $this->makeDiscounts($discountStates, $result, $this->orderDiscountFactory),
-        ]);
     }
 
     private function baseActiveQuery(): Builder
@@ -97,7 +104,7 @@ final class MysqlPromoRepository implements PromoRepository, OrderPromoRepositor
     {
         $state = $promo->getMappedData();
 
-        if (! $this->exists($promo->promoId)) {
+        if (!$this->exists($promo->promoId)) {
             DB::table(static::$promoTable)->insert($state);
         } else {
             DB::table(static::$promoTable)
@@ -110,7 +117,7 @@ final class MysqlPromoRepository implements PromoRepository, OrderPromoRepositor
 
     private function upsertDiscounts(Promo $promo): void
     {
-        $discountIds = array_map(fn ($discount) => $discount->discountId->get(), $promo->getDiscounts());
+        $discountIds = array_map(fn($discount) => $discount->discountId->get(), $promo->getDiscounts());
 
         $existingDiscountIds = DB::table(static::$promoDiscountTable)
             ->where('promo_id', $promo->promoId)
@@ -135,7 +142,7 @@ final class MysqlPromoRepository implements PromoRepository, OrderPromoRepositor
                 ], $discount->getMappedData());
 
             DB::table(static::$promoConditionTable)->insert(
-                array_map(fn ($conditionState) => array_merge($conditionState, [
+                array_map(fn($conditionState) => array_merge($conditionState, [
                     'discount_id' => $discount->discountId->get(),
                 ]), $discount->getChildEntities()[Condition::class])
             );
@@ -155,7 +162,7 @@ final class MysqlPromoRepository implements PromoRepository, OrderPromoRepositor
             ->where('promo_id', $promoId->get())
             ->first();
 
-        if (! $promoState) {
+        if (!$promoState) {
             throw new CouldNotFindPromo('No promo found by id [' . $promoId->get() . ']');
         }
 
@@ -190,12 +197,12 @@ final class MysqlPromoRepository implements PromoRepository, OrderPromoRepositor
         return $discountResults
             ->where('promo_id', $promoState['promo_id'])
             ->groupBy('discount_id')
-            ->reject(fn (Collection $group) => $group->isEmpty())
+            ->reject(fn(Collection $group) => $group->isEmpty())
             ->map(function (Collection $group) use ($promoState, $factory) {
                 $conditionStates = $group
-                    ->reject(fn ($item) => ! $item->condition_key)
-                    ->map(fn ($item) => (array)$item)
-                    ->map(fn ($conditionState) => array_merge($conditionState, [
+                    ->reject(fn($item) => !$item->condition_key)
+                    ->map(fn($item) => (array)$item)
+                    ->map(fn($conditionState) => array_merge($conditionState, [
                         'key' => $conditionState['condition_key'],
                         'data' => $conditionState['condition_data'],
                     ]))
@@ -215,7 +222,7 @@ final class MysqlPromoRepository implements PromoRepository, OrderPromoRepositor
         $discountIds = DB::table(static::$promoDiscountTable)
             ->where('promo_id', $promoId->get())
             ->get()
-            ->map(fn ($discount) => $discount->discount_id)->toArray();
+            ->map(fn($discount) => $discount->discount_id)->toArray();
 
         DB::table(static::$promoConditionTable)->whereIn('discount_id', $discountIds)->delete();
         DB::table(static::$promoDiscountTable)->whereIn('discount_id', $discountIds)->delete();

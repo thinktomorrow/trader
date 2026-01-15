@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace Thinktomorrow\Trader\Infrastructure\Test\Repositories;
 
+use Thinktomorrow\Trader\Application\Cart\RefreshCart\Adjusters\AdjustOrderVatSnapshot;
 use Thinktomorrow\Trader\Application\Order\MerchantOrder\MerchantOrder;
 use Thinktomorrow\Trader\Application\Order\MerchantOrder\MerchantOrderBillingAddress;
 use Thinktomorrow\Trader\Application\Order\MerchantOrder\MerchantOrderEvent;
@@ -29,28 +30,32 @@ use Thinktomorrow\Trader\Infrastructure\Laravel\Models\MerchantOrder\DefaultMerc
 use Thinktomorrow\Trader\Infrastructure\Laravel\Models\MerchantOrder\DefaultMerchantOrderShipping;
 use Thinktomorrow\Trader\Infrastructure\Laravel\Models\MerchantOrder\DefaultMerchantOrderShippingAddress;
 use Thinktomorrow\Trader\Infrastructure\Laravel\Models\MerchantOrder\DefaultMerchantOrderShopper;
+use Thinktomorrow\Trader\Infrastructure\Test\TestContainer;
 
 class InMemoryMerchantOrderRepository implements MerchantOrderRepository, InMemoryRepository
 {
     public function findMerchantOrder(OrderId $orderId): MerchantOrder
     {
-        if (! isset(InMemoryOrderRepository::$orders[$orderId->get()])) {
+        if (!isset(InMemoryOrderRepository::$orders[$orderId->get()])) {
             throw new CouldNotFindOrder('No order found by id ' . $orderId);
         }
 
         $order = InMemoryOrderRepository::$orders[$orderId->get()];
 
+        // Since we rely on the vat order snapshot for prices, we need to provide a vat snapshot state to the order read models.
+        (new TestContainer())->get(AdjustOrderVatSnapshot::class)->adjust($order);
+
         $orderState = array_merge($order->getMappedData(), [
             'order_state' => $order->getOrderState(),
         ]);
 
-        $lines = array_map(fn (Line $line) => DefaultMerchantOrderLine::fromMappedData(
+        $lines = array_map(fn(Line $line) => DefaultMerchantOrderLine::fromMappedData(
             array_merge($line->getMappedData(), []),
             $orderState,
-            array_map(fn (Discount $discount) => DefaultMerchantOrderDiscount::fromMappedData(array_merge($discount->getMappedData(), [
+            array_map(fn(Discount $discount) => DefaultMerchantOrderDiscount::fromMappedData(array_merge($discount->getMappedData(), [
                 'percentage' => $discount->getPercentage($line->getSubTotal()->getExcludingVat()),
             ]), $orderState), $line->getDiscounts()),
-            array_map(fn (LinePersonalisation $linePersonalisation) => DefaultMerchantOrderLinePersonalisation::fromMappedData(array_merge($linePersonalisation->getMappedData(), [
+            array_map(fn(LinePersonalisation $linePersonalisation) => DefaultMerchantOrderLinePersonalisation::fromMappedData(array_merge($linePersonalisation->getMappedData(), [
                 //
             ]), $line->getMappedData()), $line->getPersonalisations())
         ), $order->getLines());
@@ -65,22 +70,22 @@ class InMemoryMerchantOrderRepository implements MerchantOrderRepository, InMemo
             $orderState
         ) : null;
 
-        $shippings = array_map(fn ($shipping) => DefaultMerchantOrderShipping::fromMappedData(
+        $shippings = array_map(fn($shipping) => DefaultMerchantOrderShipping::fromMappedData(
             array_merge($shipping->getMappedData(), [
                 'shipping_state' => $shipping->getShippingState(),
             ]),
             $orderState,
-            array_map(fn (Discount $discount) => DefaultMerchantOrderDiscount::fromMappedData(array_merge($discount->getMappedData(), [
+            array_map(fn(Discount $discount) => DefaultMerchantOrderDiscount::fromMappedData(array_merge($discount->getMappedData(), [
                 'percentage' => $discount->getPercentage($shipping->getShippingCost()->getExcludingVat()),
             ]), $orderState), $shipping->getDiscounts())// TODO: cart shipping discounts
         ), $order->getShippings());
 
-        $payments = array_map(fn ($payment) => DefaultMerchantOrderPayment::fromMappedData(
+        $payments = array_map(fn($payment) => DefaultMerchantOrderPayment::fromMappedData(
             array_merge($payment->getMappedData(), [
                 'payment_state' => $payment->getPaymentState(),
             ]),
             $orderState,
-            array_map(fn (Discount $discount) => DefaultMerchantOrderDiscount::fromMappedData(array_merge($discount->getMappedData(), [
+            array_map(fn(Discount $discount) => DefaultMerchantOrderDiscount::fromMappedData(array_merge($discount->getMappedData(), [
                 'percentage' => $discount->getPercentage($payment->getPaymentCost()->getExcludingVat()),
             ]), $orderState), $payment->getDiscounts())// TODO: cart payment discounts
         ), $order->getPayments());
@@ -90,7 +95,7 @@ class InMemoryMerchantOrderRepository implements MerchantOrderRepository, InMemo
             $orderState,
         ) : null;
 
-        $logEntries = array_map(fn (OrderEvent $logEntry) => DefaultMerchantOrderEvent::fromMappedData(
+        $logEntries = array_map(fn(OrderEvent $logEntry) => DefaultMerchantOrderEvent::fromMappedData(
             $logEntry->getMappedData(),
             $orderState,
         ), $order->getOrderEvents());
@@ -106,7 +111,7 @@ class InMemoryMerchantOrderRepository implements MerchantOrderRepository, InMemo
                 MerchantOrderShopper::class => $shopper,
                 MerchantOrderEvent::class => $logEntries,
             ],
-            array_map(fn (Discount $discount) => DefaultMerchantOrderDiscount::fromMappedData(array_merge($discount->getMappedData(), [
+            array_map(fn(Discount $discount) => DefaultMerchantOrderDiscount::fromMappedData(array_merge($discount->getMappedData(), [
                 'percentage' => $discount->getPercentage($order->getSubtotalExcl()),
             ]), $orderState), $order->getDiscounts()), // TODO: cart discounts
         );

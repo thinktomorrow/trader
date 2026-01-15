@@ -28,7 +28,9 @@ class UpdateAddressTest extends CartContext
 
         $order = $this->orderContext->findOrder($order->orderId);
 
-        $this->assertEquals(new Address(CountryId::fromString('NL'), 'line-1 updated', 'line-2', 'postal-code', 'city', ), $order->getShippingAddress()->getAddress());
+        $this->assertEquals(new Address(CountryId::fromString('NL'), 'line-1 updated', 'line-2', 'postal-code', 'city',), $order->getShippingAddress()->getAddress());
+
+        $lastEvent = last($this->orderContext->apps()->getEventDispatcher()->releaseDispatchedEvents());
 
         $this->assertEquals(new ShippingAddressUpdatedByMerchant($order->orderId, [
             'country_id' => ['old' => 'BE', 'new' => 'NL'],
@@ -36,7 +38,7 @@ class UpdateAddressTest extends CartContext
             'line2' => ['old' => null, 'new' => 'line-2'],
             'postal_code' => ['old' => '2200', 'new' => 'postal-code'],
             'city' => ['old' => 'Herentals', 'new' => 'city'],
-        ], []), $this->orderContext->apps()->getEventDispatcher()->releaseDispatchedEvents()[2]);
+        ], []), $lastEvent);
     }
 
     public function test_merchant_can_change_billing_address()
@@ -54,14 +56,16 @@ class UpdateAddressTest extends CartContext
 
         $order = $this->orderContext->findOrder($order->orderId);
 
-        $this->assertEquals(new Address(CountryId::fromString('NL'), 'line-1 updated', 'line-2', 'postal-code', 'city', ), $order->getBillingAddress()->getAddress());
+        $this->assertEquals(new Address(CountryId::fromString('NL'), 'line-1 updated', 'line-2', 'postal-code', 'city',), $order->getBillingAddress()->getAddress());
+
+        $lastEvent = last($this->orderContext->apps()->getEventDispatcher()->releaseDispatchedEvents());
 
         $this->assertEquals(new BillingAddressUpdatedByMerchant($order->orderId, [
             'line1' => ['old' => 'Example 12', 'new' => 'line-1 updated'],
             'line2' => ['old' => null, 'new' => 'line-2'],
             'postal_code' => ['old' => '1000', 'new' => 'postal-code'],
             'city' => ['old' => 'Amsterdam', 'new' => 'city'],
-        ], []), $this->orderContext->apps()->getEventDispatcher()->releaseDispatchedEvents()[2]);
+        ], []), $lastEvent);
     }
 
     public function test_if_shipping_address_is_not_changed_no_event_is_triggered()
@@ -80,6 +84,8 @@ class UpdateAddressTest extends CartContext
         ];
 
         $this->orderContext->apps()->merchantOrderApplication()->updateShippingAddress(new UpdateShippingAddress(...$values), []);
+
+        $events = $this->orderContext->apps()->getEventDispatcher()->releaseDispatchedEvents();
 
         $this->assertCount(0, $this->orderContext->apps()->getEventDispatcher()->releaseDispatchedEvents());
     }

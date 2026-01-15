@@ -25,13 +25,13 @@ class AdjustLines implements Adjuster
     public function adjust(Order $order): void
     {
         // Extract all the variants in the cart
-        $variantLines = array_filter($order->getLines(), fn (Line $line) => $line->getPurchasableReference()->isVariant());
-        $variantIds = array_map(fn (Line $line) => $line->getPurchasableReference()->getId(), $variantLines);
+        $variantLines = array_filter($order->getLines(), fn(Line $line) => $line->getPurchasableReference()->isVariant());
+        $variantIds = array_map(fn(Line $line) => $line->getPurchasableReference()->getId(), $variantLines);
         $variants = $this->variantForCartRepository->findAllVariantsForCart($variantIds);
 
         foreach ($order->getLines() as $line) {
             // No longer there? Maybe deleted.
-            if (! $variant = $this->findVariant($variants, VariantId::fromString($line->getPurchasableReference()->getId()))) {
+            if (!$variant = $this->findVariant($variants, VariantId::fromString($line->getPurchasableReference()->getId()))) {
                 $order->deleteLine($line->lineId);
 
                 // TODO: event + note
@@ -39,14 +39,14 @@ class AdjustLines implements Adjuster
             }
 
             // Variant can be no longer available due to stock or whatever...
-            if (! in_array($variant->getState(), VariantState::availableStates())) {
+            if (!in_array($variant->getState(), VariantState::availableStates())) {
                 $order->deleteLine($line->lineId);
 
                 continue;
             }
 
             // Price can be changed in the meanwhile
-            if (! $line->getUnitPrice()->getExcludingVat()->equals($variant->getUnitPrice()->getExcludingVat())) {
+            if (!$line->getUnitPrice()->getExcludingVat()->equals($variant->getUnitPrice()->getExcludingVat())) {
                 $line->updatePrice($variant->getUnitPrice());
             }
 
@@ -57,8 +57,6 @@ class AdjustLines implements Adjuster
                 'sale_price_excl' => $variant->getSalePrice()?->getExcludingVat()?->getAmount(),
                 'sale_price_incl' => $variant->getSalePrice()?->getIncludingVat()?->getAmount(),
             ]);
-
-            // AdjustTax
 
             $this->adjustLine->adjust($order, $line);
         }

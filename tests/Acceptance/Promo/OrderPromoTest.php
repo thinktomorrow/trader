@@ -33,6 +33,44 @@ class OrderPromoTest extends TestCase
         $this->assertEquals('foobar', $order->getEnteredCouponCode());
         $this->assertCount(1, $order->getDiscounts());
 
+//        $this->orderContext->refreshOrder($order->orderId->get());
+
+        $cart = $this->orderContext->findCart($order->orderId);
+        $this->assertCount(1, $cart->getDiscounts());
+
+        $this->assertEquals(Money::EUR(80), $order->getSubTotalExcl());
+        $this->assertEquals(Money::EUR(12), $order->getDiscountTotalExcl());
+        $this->assertEquals(Money::EUR(68), $order->getTotalExcl());
+    }
+
+    public function test_it_can_combine_coupon_promo_with_saleprice_line_promo()
+    {
+        $this->orderContext->createPromo('promo-aaa', [
+            'coupon_code' => 'foobar',
+        ], [
+            $this->orderContext->createPromoDiscount(),
+        ]);
+
+        // Required for refresh order to work properly (line will be deleted is no related variant is found)
+        $this->catalogContext->createProduct();
+        $order = $this->orderContext->createEmptyOrder();
+        $line = $this->orderContext->createLine();
+        $this->orderContext->addLineToOrder($order, $line);
+        $order = $this->orderContext->refreshOrder($order->orderId->get());
+
+        $this->orderContext->apps()->couponPromoApplication()->enterCoupon(new EnterCoupon($order->orderId->get(), 'foobar'));
+
+        $this->orderContext->refreshOrder($order->orderId->get());
+
+        $order = $this->orderContext->findOrder($order->orderId);
+
+        $this->assertEquals('foobar', $order->getEnteredCouponCode());
+
+        $this->assertCount(1, $order->getLines()[0]->getDiscounts());
+        $this->assertCount(1, $order->getDiscounts());
+
+        $this->orderContext->refreshOrder($order->orderId->get());
+
         $cart = $this->orderContext->findCart($order->orderId);
         $this->assertCount(1, $cart->getDiscounts());
 

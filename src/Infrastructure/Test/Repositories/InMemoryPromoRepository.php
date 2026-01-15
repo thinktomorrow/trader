@@ -41,7 +41,7 @@ final class InMemoryPromoRepository implements PromoRepository, OrderPromoReposi
 
     public function find(PromoId $promoId): Promo
     {
-        if (! isset(static::$promos[$promoId->get()])) {
+        if (!isset(static::$promos[$promoId->get()])) {
             throw new CouldNotFindPromo('No promo found by id ' . $promoId);
         }
 
@@ -50,7 +50,7 @@ final class InMemoryPromoRepository implements PromoRepository, OrderPromoReposi
 
     public function delete(PromoId $promoId): void
     {
-        if (! isset(static::$promos[$promoId->get()])) {
+        if (!isset(static::$promos[$promoId->get()])) {
             throw new CouldNotFindPromo('No promo found by id ' . $promoId);
         }
 
@@ -78,12 +78,26 @@ final class InMemoryPromoRepository implements PromoRepository, OrderPromoReposi
         static::$promos = [];
     }
 
+    public function getAvailableSystemPromos(): array
+    {
+        $result = [];
+
+        foreach ($this->filterActivePromos() as $promo) {
+            if (!$promo->isSystemPromo()) {
+                continue;
+            }
+            $result[] = $this->createApplicablePromoFromPromo($promo);
+        }
+
+        return $result;
+    }
+
     public function getAvailableOrderPromos(): array
     {
         $result = [];
 
         foreach ($this->filterActivePromos() as $promo) {
-            if ($promo->hasCouponCode()) {
+            if ($promo->hasCouponCode() || $promo->isSystemPromo()) {
                 continue;
             }
             $result[] = $this->createApplicablePromoFromPromo($promo);
@@ -108,7 +122,7 @@ final class InMemoryPromoRepository implements PromoRepository, OrderPromoReposi
         $result = [];
 
         foreach (static::$promos as $promo) {
-            if (! in_array($promo->getState(), PromoState::onlineStates())) {
+            if (!in_array($promo->getState(), PromoState::onlineStates())) {
                 continue;
             }
 
@@ -134,11 +148,11 @@ final class InMemoryPromoRepository implements PromoRepository, OrderPromoReposi
         return OrderPromo::fromMappedData(
             $promo->getMappedData(),
             [
-                OrderDiscount::class => array_map(fn (Discount $discount) => $this->orderDiscountFactory->make(
+                OrderDiscount::class => array_map(fn(Discount $discount) => $this->orderDiscountFactory->make(
                     $discount::getMapKey(),
                     $discount->getMappedData(),
                     $promo->getMappedData(),
-                    array_map(fn (Condition $condition) => $condition->getMappedData(), $discount->getConditions())
+                    array_map(fn(Condition $condition) => $condition->getMappedData(), $discount->getConditions())
                 ), $promo->getDiscounts()),
             ]
         );

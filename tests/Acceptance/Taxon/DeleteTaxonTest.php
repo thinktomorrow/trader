@@ -4,7 +4,6 @@ declare(strict_types=1);
 namespace Tests\Acceptance\Taxon;
 
 use Tests\Acceptance\TestCase;
-use Tests\Infrastructure\Vine\TaxonHelpers;
 use Thinktomorrow\Trader\Application\Taxon\CreateTaxon;
 use Thinktomorrow\Trader\Application\Taxon\DeleteTaxon;
 use Thinktomorrow\Trader\Domain\Model\Taxon\Events\TaxonDeleted;
@@ -12,8 +11,6 @@ use Thinktomorrow\Trader\Domain\Model\Taxon\Exceptions\CouldNotFindTaxon;
 
 class DeleteTaxonTest extends TestCase
 {
-    use TaxonHelpers;
-
     public function test_it_can_delete_taxon()
     {
         $taxonId = $this->catalogContext->apps()->taxonApplication()->createTaxon(new CreateTaxon('bbb', 'taxon-key', 'nl', []));

@@ -25,6 +25,9 @@ class ProRateAllocator
      */
     public function allocate(array $itemTotalsPerRate, Money $totalToAllocate): array
     {
+        $this->assertItemTotalsAreInstanceOfItemPrice($itemTotalsPerRate);
+        $this->assertItemTotalsAreKeyedWithRates($itemTotalsPerRate);
+
         /**
          * Edge cases:
          *
@@ -110,7 +113,7 @@ class ProRateAllocator
     {
         $currency = $totalToAllocate->getCurrency();
         $result = array_map(
-            fn () => new Money('0', $currency),
+            fn() => new Money('0', $currency),
             $itemTotals
         );
 
@@ -134,5 +137,27 @@ class ProRateAllocator
     private function truncateTowardZero(float $value): int
     {
         return $value >= 0 ? (int)floor($value) : (int)ceil($value);
+    }
+
+    private function assertItemTotalsAreKeyedWithRates(array $itemTotalsPerRate): void
+    {
+        foreach ($itemTotalsPerRate as $rate => $itemTotal) {
+            if (!is_string($rate) && !is_int($rate)) {
+                throw new \InvalidArgumentException('itemTotalsPerRate must be an array keyed by VAT rates. Got key ' . gettype($rate));
+            }
+
+            if ($itemTotal->getVatPercentage()->get() !== (string)$rate) {
+                throw new \InvalidArgumentException('itemTotalsPerRate key must match ItemPrice VAT rate. Got key ' . $rate . ' but ItemPrice has VAT rate ' . $itemTotal->getVatPercentage()->get());
+            }
+        }
+    }
+
+    private function assertItemTotalsAreInstanceOfItemPrice(array $itemTotalsPerRate): void
+    {
+        foreach ($itemTotalsPerRate as $itemTotal) {
+            if (!$itemTotal instanceof ItemPrice) {
+                throw new \InvalidArgumentException('itemTotalsPerRate must be an array of ItemPrice instances. Got ' . $itemTotal::class);
+            }
+        }
     }
 }

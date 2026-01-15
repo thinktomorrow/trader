@@ -5,6 +5,7 @@ namespace Thinktomorrow\Trader\Application\Promo\CUD;
 
 use Thinktomorrow\Trader\Domain\Common\Event\EventDispatcher;
 use Thinktomorrow\Trader\Domain\Model\Promo\DiscountFactory;
+use Thinktomorrow\Trader\Domain\Model\Promo\Discounts\SalePriceSystemDiscount;
 use Thinktomorrow\Trader\Domain\Model\Promo\Events\PromoDeleted;
 use Thinktomorrow\Trader\Domain\Model\Promo\Promo;
 use Thinktomorrow\Trader\Domain\Model\Promo\PromoId;
@@ -55,6 +56,33 @@ class PromoApplication
         $this->eventDispatcher->dispatchAll($promo->releaseEvents());
 
         return $promoId;
+    }
+
+    /**
+     * The system promo that applies sale prices throughout the system.
+     * Without this promo, sale prices would not be applied. This
+     * allows to apply other discounts and ignore sale prices
+     */
+    public function createSalePriceSystemPromo(): void
+    {
+        $promoId = $this->createSystemPromo(new CreateSystemPromo('system_sale_price', true, []));
+
+        $this->updatePromo(new UpdatePromo(
+            $promoId->get(),
+            null,
+            null,
+            null,
+            true,
+            [
+                [
+                    'discountId' => SalePriceSystemDiscount::getMapKey(),
+                    'key' => SalePriceSystemDiscount::getMapKey(),
+                    'conditions' => [],
+                    'data' => [],
+                ],
+            ],
+            []
+        ));
     }
 
     public function updatePromo(UpdatePromo $command): void

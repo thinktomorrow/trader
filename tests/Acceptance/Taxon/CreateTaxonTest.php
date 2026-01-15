@@ -4,15 +4,12 @@ declare(strict_types=1);
 namespace Tests\Acceptance\Taxon;
 
 use Tests\Acceptance\TestCase;
-use Tests\Infrastructure\Vine\TaxonHelpers;
 use Thinktomorrow\Trader\Application\Taxon\CreateTaxon;
 use Thinktomorrow\Trader\Domain\Common\Locale;
 use Thinktomorrow\Trader\Domain\Model\Taxon\Exceptions\CouldNotCreateTaxon;
 
 class CreateTaxonTest extends TestCase
 {
-    use TaxonHelpers;
-
     public function test_it_can_create_a_taxon()
     {
         $taxonId = $this->catalogContext->apps()->taxonApplication()->createTaxon(new CreateTaxon('bbb', 'taxon-key', 'nl', ['foo' => 'bar']));

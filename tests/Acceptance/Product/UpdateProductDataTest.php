@@ -23,7 +23,7 @@ class UpdateProductDataTest extends ProductContext
 
         $product = $this->catalogContext->repos()->productRepository()->find($productId);
 
-        $this->assertEquals(json_encode($dataPayload), $product->getMappedData()['data']);
+        $this->assertEquals(['title' => ['nl' => 'product-aaa title nl', 'fr' => 'product-aaa title fr'], ...$dataPayload], $product->getData());
 
         $this->assertEquals([
             new ProductDataUpdated($productId),
@@ -40,7 +40,7 @@ class UpdateProductDataTest extends ProductContext
 
         $product = $this->catalogContext->repos()->productRepository()->find($productId);
 
-        $this->assertEquals(json_encode(['foo' => ['nl' => 'baz']]), $product->getMappedData()['data']);
+        $this->assertEquals(['title' => ['nl' => 'product-aaa title nl', 'fr' => 'product-aaa title fr'], 'foo' => ['nl' => 'baz']], $product->getData());
     }
 
     public function test_it_does_not_remove_data_not_in_payload()
@@ -52,6 +52,6 @@ class UpdateProductDataTest extends ProductContext
 
         $product = $this->catalogContext->repos()->productRepository()->find($productId);
 
-        $this->assertEquals(json_encode(['foo' => 'bar', 'label' => ['nl' => 'baz']]), $product->getMappedData()['data']);
+        $this->assertEquals(json_encode(['title' => ['nl' => 'product-aaa title nl', 'fr' => 'product-aaa title fr'], 'foo' => 'bar', 'label' => ['nl' => 'baz']]), $product->getMappedData()['data']);
     }
 }

@@ -41,8 +41,8 @@ class MerchantOrderTest extends CartContext
         $this->assertEquals(Money::EUR('15'), $order->getDiscountTotalExcl());
         $this->assertEquals(Money::EUR('18'), $order->getDiscountTotalIncl());
         $this->assertEquals(Money::EUR('251'), $order->getTotalExcl());
-        $this->assertEquals(Money::EUR('53'), $order->getTotalVat());
-        $this->assertEquals(Money::EUR('304'), $order->getTotalIncl());
+        $this->assertEquals(Money::EUR('54'), $order->getTotalVat());
+        $this->assertEquals(Money::EUR('305'), $order->getTotalIncl());
     }
 
     public function test_it_can_get_formatted_totals()
@@ -63,8 +63,8 @@ class MerchantOrderTest extends CartContext
         $this->assertEquals('€ 0,15', $order->getFormattedDiscountTotalExcl());
         $this->assertEquals('€ 0,18', $order->getFormattedDiscountTotalIncl());
         $this->assertEquals('€ 2,51', $order->getFormattedTotalExcl());
-        $this->assertEquals('€ 0,53', $order->getFormattedTotalVat());
-        $this->assertEquals('€ 3,04', $order->getFormattedTotalIncl());
+        $this->assertEquals('€ 0,54', $order->getFormattedTotalVat());
+        $this->assertEquals('€ 3,05', $order->getFormattedTotalIncl());
     }
 
     public function test_as_a_merchant_i_need_to_be_able_to_see_each_line_of_the_order()

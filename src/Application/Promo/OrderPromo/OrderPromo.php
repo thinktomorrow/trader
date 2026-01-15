@@ -16,6 +16,7 @@ class OrderPromo
 
     public readonly PromoId $promoId;
     private bool $isCombinable;
+    private bool $isSystemPromo;
     private ?string $coupon_code;
 
     /** @var OrderDiscount[] */
@@ -31,47 +32,19 @@ class OrderPromo
         return $this->coupon_code;
     }
 
-    //    public function apply(Order $order): void
-    //    {
-    //        $hasBeenApplied = false;
-    //
-    //        // TODO: check if order is in customer hands still? Or can admin add promo afterwards??
-    //
-    //        // Loop over different discountables
-    //        foreach ($this->discounts as $discount) {
-    //            foreach ($order->getShippings() as $shipping) {
-    //                if ($discount->isApplicable($order, $shipping)) {
-    //                    $discount->apply($order, $shipping);
-    //                    $hasBeenApplied = true;
-    //                }
-    //            }
-    //
-    //            foreach ($order->getLines() as $line) {
-    //                if ($discount->isApplicable($order, $line)) {
-    //                    $discount->apply($order, $line);
-    //                    $hasBeenApplied = true;
-    //                }
-    //            }
-    //
-    //            if ($discount->isApplicable($order, $order)) {
-    //                $discount->apply($order, $order);
-    //                $hasBeenApplied = true;
-    //            }
-    //        }
-    //
-    //        if ($this->coupon_code && $hasBeenApplied) {
-    //            $order->setEnteredCouponCode($this->coupon_code);
-    //        }
-    //    }
-
     public function isCombinable(): bool
     {
         return $this->isCombinable;
     }
 
+    public function isSystemPromo(): bool
+    {
+        return $this->isSystemPromo;
+    }
+
     public function getCombinedDiscountPrice(Order $order): DiscountPrice
     {
-        return array_reduce($this->discounts, fn ($carry, OrderDiscount $discount) => $discount->getCombinedDiscountPrice($order), DefaultDiscountPrice::zero());
+        return array_reduce($this->discounts, fn($carry, OrderDiscount $discount) => $discount->getCombinedDiscountPrice($order), DefaultDiscountPrice::zero());
     }
 
     public static function fromMappedData(array $state, array $childEntities = []): static
@@ -82,6 +55,7 @@ class OrderPromo
 
         $promo->promoId = PromoId::fromString($state['promo_id']);
         $promo->isCombinable = $state['is_combinable'];
+        $promo->isSystemPromo = $state['is_system_promo'];
         $promo->coupon_code = $state['coupon_code'];
         $promo->data = json_decode($state['data'], true);
         $promo->discounts = $childEntities[OrderDiscount::class];
@@ -92,7 +66,7 @@ class OrderPromo
     private static function validateDiscounts($discounts): void
     {
         foreach ($discounts as $discount) {
-            if (! $discount instanceof OrderDiscount && ! $discount instanceof LineDiscount) {
+            if (!$discount instanceof OrderDiscount && !$discount instanceof LineDiscount) {
                 throw new \InvalidArgumentException('Invalid discount type [' . $discount::class . '] provided in child entities for OrderPromo.');
             }
         }

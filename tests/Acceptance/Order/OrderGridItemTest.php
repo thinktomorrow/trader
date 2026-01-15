@@ -45,8 +45,8 @@ class OrderGridItemTest extends TestCase
         $this->assertEquals(Money::EUR('15'), $order->getDiscountTotalExcl());
         $this->assertEquals(Money::EUR('18'), $order->getDiscountTotalIncl());
         $this->assertEquals(Money::EUR('251'), $order->getTotalExcl());
-        $this->assertEquals(Money::EUR('53'), $order->getTotalVat());
-        $this->assertEquals(Money::EUR('304'), $order->getTotalIncl());
+        $this->assertEquals(Money::EUR('54'), $order->getTotalVat());
+        $this->assertEquals(Money::EUR('305'), $order->getTotalIncl());
     }
 
     public function test_it_can_return_formatted_prices()
@@ -69,13 +69,16 @@ class OrderGridItemTest extends TestCase
         $this->assertEquals('€ 0,15', $order->getFormattedDiscountTotalExcl());
         $this->assertEquals('€ 0,18', $order->getFormattedDiscountTotalIncl());
         $this->assertEquals('€ 2,51', $order->getFormattedTotalExcl());
-        $this->assertEquals('€ 0,53', $order->getFormattedTotalVat());
-        $this->assertEquals('€ 3,04', $order->getFormattedTotalIncl());
+        $this->assertEquals('€ 0,54', $order->getFormattedTotalVat());
+        $this->assertEquals('€ 3,05', $order->getFormattedTotalIncl());
     }
 
     public function test_it_can_get_important_timestamps()
     {
-        $gridItem = DefaultOrderGridItem::fromMappedData(array_merge($this->orderContext->createDefaultOrder()->getMappedData(), [
+        $order = $this->orderContext->createDefaultOrder();
+        $this->orderContext->refreshOrder($order->orderId); // Because we get mapped data
+
+        $gridItem = DefaultOrderGridItem::fromMappedData(array_merge($order->getMappedData(), [
             'confirmed_at' => $confirmed_at = '2022-02-02 10:10:10',
             'paid_at' => $paid_at = '2022-02-03 10:10:10',
             'delivered_at' => $delivered_at = '2022-02-04 10:10:10',
@@ -88,7 +91,10 @@ class OrderGridItemTest extends TestCase
 
     public function test_it_can_get_shopper_details()
     {
-        $gridItem = DefaultOrderGridItem::fromMappedData(array_merge($this->orderContext->createDefaultOrder()->getMappedData(), [
+        $order = $this->orderContext->createDefaultOrder();
+        $this->orderContext->refreshOrder($order->orderId); // Because we get mapped data
+
+        $gridItem = DefaultOrderGridItem::fromMappedData(array_merge($order->getMappedData(), [
         ]), [
             'email' => 'ben@thinktomorrow.be',
             'is_business' => true,

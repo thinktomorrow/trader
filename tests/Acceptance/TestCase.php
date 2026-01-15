@@ -15,17 +15,12 @@ class TestCase extends \PHPUnit\Framework\TestCase
     protected CatalogContext $catalogContext;
     protected OrderContext $orderContext;
 
-    //    protected InMemoryOrderRepository $orderRepository;
-    //    protected InMemoryPaymentMethodRepository $paymentMethodRepository;
-
     protected function setUp(): void
     {
-        //        $this->addInstancesToContainer();
-
         DefaultLocale::set(Locale::fromString('nl'));
 
         DataRenderer::setDataResolver(function (array $data, string $key, ?string $language = null, $default = null) {
-            if (! $language) {
+            if (!$language) {
                 $language = 'nl';
             }
 
@@ -43,6 +38,8 @@ class TestCase extends \PHPUnit\Framework\TestCase
 
         $this->catalogContext = CatalogContext::inMemory();
         $this->orderContext = OrderContext::inMemory();
+        
+        $this->orderContext->createSalePriceSystemPromo();
     }
 
     protected function tearDown(): void

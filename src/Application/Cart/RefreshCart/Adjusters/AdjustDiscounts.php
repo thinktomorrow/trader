@@ -28,48 +28,60 @@ class AdjustDiscounts implements Adjuster
         // Dang
         $this->deleteAllDiscounts($order);
 
+        // System promos
+        $systemPromos = $this->orderPromoRepository->getAvailableSystemPromos();
+
+        // Coupon / Marketing promos
+        $promos = $this->getMarketingPromos($order);
+
+        $this->processPromos($order, $systemPromos);
+        $this->processPromos($order, $promos);
+    }
+
+    /**
+     * Process promos per 'group' meaning the is_combinable flag is considered within the group.
+     * The combinable flag does not apply between groups.
+     * This allows for system promo's to be always combined with marketing promos.
+     *
+     * @param Order $order
+     * @param array $promos
+     * @return void
+     */
+    private function processPromos(Order $order, array $promos)
+    {
+        $processedPromoIds = [];
+
         // Keep track of the promos that are considered combinable with other combinable promos
-        $combinablePromoIds = [];
-
-        // If coupon is given on cart, we'll refresh that promo first
-        if ($order->getEnteredCouponCode() && $couponPromo = $this->orderPromoRepository->findOrderPromoByCouponCode($order->getEnteredCouponCode())) {
-
-            $this->applyPromoToOrder->apply($order, $couponPromo->getDiscounts());
-
-            if ($couponPromo->isCombinable()) {
-                $combinablePromoIds[] = $couponPromo->promoId;
-            }
-        } else {
-            $order->removeEnteredCouponCode();
-        }
-
-        $promos = array_merge($this->orderPromoRepository->getAvailableOrderPromos());
-
-        // Sort them by highest impact
-        usort($promos, function (OrderPromo $a, OrderPromo $b) use ($order) {
-            $aValue = $a->getCombinedDiscountPrice($order)->getExcludingVat()->getAmount();
-            $bValue = $b->getCombinedDiscountPrice($order)->getExcludingVat()->getAmount();
-
-            return $bValue <=> $aValue; // DESC
-        });
+        $processedCombinablePromoIds = [];
 
         foreach ($promos as $promo) {
-            if ($promo->isCombinable()) {
-                $combinablePromoIds[] = $promo->promoId;
-            }
 
-            // Check if existing promos are combinable
-            if (! $this->areExistingPromosCombinable($order, $combinablePromoIds)) {
-                break;
-            }
-
-            // Check if this promo is combinable when there are already promos on the order present
-            if ($this->hasPromo($order) && ! $promo->isCombinable()) {
+            // First promo in the group always applies
+            if (count($processedPromoIds) === 0) {
+                $this->applyPromo($order, $promo, $processedPromoIds, $processedCombinablePromoIds);
                 continue;
             }
 
-            $this->applyPromoToOrder->apply($order, $promo->getDiscounts(), $promo->getCouponCode());
+            // Check if all existing promos are combinable
+            $allExistingAreCombinable = count($processedPromoIds) === count($processedCombinablePromoIds);
+
+            if (!$allExistingAreCombinable || !$promo->isCombinable()) {
+                continue;
+            }
+
+            $this->applyPromo($order, $promo, $processedPromoIds, $processedCombinablePromoIds);
         }
+    }
+
+    private function applyPromo(Order $order, OrderPromo $promo, array &$processedPromoIds, array &$processedCombinablePromoIds): void
+    {
+        $processedPromoIds[] = $promo->promoId;
+
+        if ($promo->isCombinable()) {
+            $processedCombinablePromoIds[] = $promo->promoId;
+        }
+
+        $this->applyPromoToOrder->apply($order, $promo->getDiscounts(), $promo->getCouponCode());
     }
 
     private function deleteAllDiscounts(Order $order)
@@ -88,7 +100,7 @@ class AdjustDiscounts implements Adjuster
     private function areExistingPromosCombinable(Order $order, array $combinablePromoIds)
     {
         foreach ($this->getExistingPromoIds($order) as $existingPromoId) {
-            if (! in_array($existingPromoId, $combinablePromoIds)) {
+            if (!in_array($existingPromoId, $combinablePromoIds)) {
                 return false;
             }
         }
@@ -138,5 +150,38 @@ class AdjustDiscounts implements Adjuster
         };
 
         return array_unique($promoIds);
+    }
+
+    /**
+     * @param Order $order
+     * @return OrderPromo[]
+     */
+    public function getMarketingPromos(Order $order): array
+    {
+        $couponPromo = $order->getEnteredCouponCode() ? $this->orderPromoRepository->findOrderPromoByCouponCode($order->getEnteredCouponCode()) : null;
+
+        if (!$couponPromo) {
+            $order->removeEnteredCouponCode();
+        }
+
+        $promos = array_filter(
+            $this->orderPromoRepository->getAvailableOrderPromos(),
+            fn(OrderPromo $promo) => !$promo->isSystemPromo()
+        );
+
+        // Sort marketing promos by highest impact
+        usort($promos, function (OrderPromo $a, OrderPromo $b) use ($order) {
+            $aValue = $a->getCombinedDiscountPrice($order)->getExcludingVat()->getAmount();
+            $bValue = $b->getCombinedDiscountPrice($order)->getExcludingVat()->getAmount();
+
+            return $bValue <=> $aValue; // DESC
+        });
+
+        // If coupon is given on cart, we'll refresh that promo first
+        if ($couponPromo) {
+            return array_merge([$couponPromo], $promos);
+        }
+
+        return $promos;
     }
 }

@@ -4,15 +4,12 @@ declare(strict_types=1);
 namespace Tests\Acceptance\Taxon;
 
 use Tests\Acceptance\TestCase;
-use Tests\Infrastructure\Vine\TaxonHelpers;
 use Thinktomorrow\Trader\Application\Taxon\CreateTaxon;
 use Thinktomorrow\Trader\Application\Taxon\MoveTaxon;
 use Thinktomorrow\Trader\Domain\Model\Taxon\Exceptions\CouldNotMoveTaxon;
 
 class MoveTaxonTest extends TestCase
 {
-    use TaxonHelpers;
-
     public function test_it_can_move_a_taxon_to_root()
     {
         $taxonRootId = $this->catalogContext->apps()->taxonApplication()->createTaxon(new CreateTaxon('bbb', 'taxon-key-root', 'nl', []));

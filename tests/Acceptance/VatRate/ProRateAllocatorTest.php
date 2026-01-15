@@ -6,6 +6,8 @@ use Money\Money;
 use PHPUnit\Framework\Attributes\DataProvider;
 use Tests\Unit\TestCase;
 use Thinktomorrow\Trader\Application\VatRate\Allocator\ProRateAllocator;
+use Thinktomorrow\Trader\Domain\Common\Price\DefaultItemPrice;
+use Thinktomorrow\Trader\Domain\Common\Vat\VatPercentage;
 
 final class ProRateAllocatorTest extends TestCase
 {
@@ -19,8 +21,8 @@ final class ProRateAllocatorTest extends TestCase
     public function test_it_allocates_pro_rata_and_preserves_total(): void
     {
         $items = [
-            '21' => Money::EUR(10000),
-            '6' => Money::EUR(5000),
+            '21' => DefaultItemPrice::fromExcludingVat(Money::EUR(10000), VatPercentage::fromString('21')),
+            '6' => DefaultItemPrice::fromExcludingVat(Money::EUR(5000), VatPercentage::fromString('6')),
         ];
 
         $toAllocate = Money::EUR(1000);
@@ -36,11 +38,24 @@ final class ProRateAllocatorTest extends TestCase
         );
     }
 
+    public function test_it_protects_against_mismatch_of_vat_percentage(): void
+    {
+        $this->expectException(\InvalidArgumentException::class);
+
+        $items = [
+            '21' => DefaultItemPrice::fromExcludingVat(Money::EUR(10), VatPercentage::fromString('6')),
+        ];
+
+        $toAllocate = Money::EUR(100);
+
+        $this->allocator->allocate($items, $toAllocate);
+    }
+
     public function test_it_distributes_remainder_in_input_order(): void
     {
         $items = [
-            '21' => Money::EUR(1),
-            '6' => Money::EUR(1),
+            '21' => DefaultItemPrice::fromExcludingVat(Money::EUR(1), VatPercentage::fromString('21')),
+            '6' => DefaultItemPrice::fromExcludingVat(Money::EUR(1), VatPercentage::fromString('6')),
         ];
 
         $toAllocate = Money::EUR(1);
@@ -54,8 +69,8 @@ final class ProRateAllocatorTest extends TestCase
     public function test_zero_allocation_returns_zero_for_all_groups(): void
     {
         $items = [
-            '21' => Money::EUR(1000),
-            '6' => Money::EUR(1000),
+            '21' => DefaultItemPrice::fromExcludingVat(Money::EUR(10000), VatPercentage::fromString('21')),
+            '6' => DefaultItemPrice::fromExcludingVat(Money::EUR(10000), VatPercentage::fromString('6')),
         ];
 
         $result = $this->allocator->allocate($items, Money::EUR(0));
@@ -67,8 +82,8 @@ final class ProRateAllocatorTest extends TestCase
     public function test_allocation_when_item_totals_are_zero(): void
     {
         $items = [
-            '21' => Money::EUR(0),
-            '6' => Money::EUR(0),
+            '21' => DefaultItemPrice::fromExcludingVat(Money::EUR(0), VatPercentage::fromString('21')),
+            '6' => DefaultItemPrice::fromExcludingVat(Money::EUR(0), VatPercentage::fromString('6')),
         ];
 
         $toAllocate = Money::EUR(500);
@@ -83,8 +98,8 @@ final class ProRateAllocatorTest extends TestCase
     public function test_negative_allocation_is_supported(): void
     {
         $items = [
-            '21' => Money::EUR(10000),
-            '6' => Money::EUR(5000),
+            '21' => DefaultItemPrice::fromExcludingVat(Money::EUR(10000), VatPercentage::fromString('21')),
+            '6' => DefaultItemPrice::fromExcludingVat(Money::EUR(5000), VatPercentage::fromString('6')),
         ];
 
         $toAllocate = Money::EUR(-1000);
@@ -105,11 +120,18 @@ final class ProRateAllocatorTest extends TestCase
         array $items,
         int   $toAllocate,
         array $expected
-    ): void {
-        $moneyItems = array_map(fn ($v) => Money::EUR($v), $items);
+    ): void
+    {
+        // Map items to DefaultItemPrices
+        $itemPrices = [];
+
+        foreach ($items as $rate => $amount) {
+            $itemPrices[$rate] = DefaultItemPrice::fromExcludingVat(Money::EUR($amount), VatPercentage::fromString($rate));
+        }
+
         $total = Money::EUR($toAllocate);
 
-        $result = $this->allocator->allocate($moneyItems, $total);
+        $result = $this->allocator->allocate($itemPrices, $total);
 
         foreach ($expected as $rate => $amount) {
             $this->assertEquals(
@@ -235,9 +257,9 @@ final class ProRateAllocatorTest extends TestCase
     public function test_remainder_never_exceeds_number_of_groups_positive(): void
     {
         $items = [
-            '21' => Money::EUR(1),
-            '6' => Money::EUR(1),
-            '12' => Money::EUR(1),
+            '21' => DefaultItemPrice::fromExcludingVat(Money::EUR(1), VatPercentage::fromString('21')),
+            '6' => DefaultItemPrice::fromExcludingVat(Money::EUR(1), VatPercentage::fromString('6')),
+            '12' => DefaultItemPrice::fromExcludingVat(Money::EUR(1), VatPercentage::fromString('12')),
         ];
 
         $toAllocate = Money::EUR(10);
@@ -255,9 +277,9 @@ final class ProRateAllocatorTest extends TestCase
     public function test_remainder_never_exceeds_number_of_groups_negative(): void
     {
         $items = [
-            '21' => Money::EUR(1),
-            '6' => Money::EUR(1),
-            '12' => Money::EUR(1),
+            '21' => DefaultItemPrice::fromExcludingVat(Money::EUR(1), VatPercentage::fromString('21')),
+            '6' => DefaultItemPrice::fromExcludingVat(Money::EUR(1), VatPercentage::fromString('6')),
+            '12' => DefaultItemPrice::fromExcludingVat(Money::EUR(1), VatPercentage::fromString('12')),
         ];
 
         $toAllocate = Money::EUR(-10);
@@ -275,9 +297,9 @@ final class ProRateAllocatorTest extends TestCase
     public function test_extreme_ratio_does_not_break_remainder_distribution(): void
     {
         $items = [
-            '21' => Money::EUR(999999),
-            '6' => Money::EUR(1),
-            '12' => Money::EUR(1),
+            '21' => DefaultItemPrice::fromExcludingVat(Money::EUR(999999), VatPercentage::fromString('21')),
+            '6' => DefaultItemPrice::fromExcludingVat(Money::EUR(1), VatPercentage::fromString('6')),
+            '12' => DefaultItemPrice::fromExcludingVat(Money::EUR(1), VatPercentage::fromString('12')),
         ];
 
         $toAllocate = Money::EUR(5);
@@ -292,10 +314,10 @@ final class ProRateAllocatorTest extends TestCase
     public function test_all_zero_initial_allocations_large_remainder(): void
     {
         $items = [
-            '21' => Money::EUR(1),
-            '6' => Money::EUR(1),
-            '12' => Money::EUR(1),
-            '0' => Money::EUR(1),
+            '21' => DefaultItemPrice::fromExcludingVat(Money::EUR(1), VatPercentage::fromString('21')),
+            '6' => DefaultItemPrice::fromExcludingVat(Money::EUR(1), VatPercentage::fromString('6')),
+            '12' => DefaultItemPrice::fromExcludingVat(Money::EUR(1), VatPercentage::fromString('12')),
+            '0' => DefaultItemPrice::fromExcludingVat(Money::EUR(1), VatPercentage::fromString('0')),
         ];
 
         $toAllocate = Money::EUR(3);
@@ -311,9 +333,9 @@ final class ProRateAllocatorTest extends TestCase
     public function test_remainder_equal_to_key_count(): void
     {
         $items = [
-            '21' => Money::EUR(10),
-            '6' => Money::EUR(10),
-            '12' => Money::EUR(10),
+            '21' => DefaultItemPrice::fromExcludingVat(Money::EUR(10), VatPercentage::fromString('21')),
+            '6' => DefaultItemPrice::fromExcludingVat(Money::EUR(10), VatPercentage::fromString('6')),
+            '12' => DefaultItemPrice::fromExcludingVat(Money::EUR(10), VatPercentage::fromString('12')),
         ];
 
         $toAllocate = Money::EUR(3);
@@ -329,10 +351,10 @@ final class ProRateAllocatorTest extends TestCase
     {
         for ($i = 0; $i < 200; $i++) {
             $items = [
-                '21' => Money::EUR(random_int(0, 10000)),
-                '6' => Money::EUR(random_int(0, 10000)),
-                '12' => Money::EUR(random_int(0, 10000)),
-                '0' => Money::EUR(random_int(0, 10000)),
+                '21' => DefaultItemPrice::fromExcludingVat(Money::EUR(random_int(0, 10000)), VatPercentage::fromString('21')),
+                '6' => DefaultItemPrice::fromExcludingVat(Money::EUR(random_int(0, 10000)), VatPercentage::fromString('6')),
+                '12' => DefaultItemPrice::fromExcludingVat(Money::EUR(random_int(0, 10000)), VatPercentage::fromString('12')),
+                '0' => DefaultItemPrice::fromExcludingVat(Money::EUR(random_int(0, 10000)), VatPercentage::fromString('0')),
             ];
 
             $toAllocate = Money::EUR(random_int(-10000, 10000));
