@@ -30,7 +30,7 @@ class ApplyPromoToOrder
         $hasBeenApplied = false;
 
         // Check if order is in customer hands still. Or can admin add promo afterwards?
-        if (!$order->getOrderState()->inCustomerHands()) {
+        if (! $order->getOrderState()->inCustomerHands()) {
             return;
         }
 
@@ -72,7 +72,7 @@ class ApplyPromoToOrder
     private static function validateDiscounts($discounts): void
     {
         foreach ($discounts as $discount) {
-            if (!$discount instanceof OrderDiscount && !$discount instanceof LineDiscount) {
+            if (! $discount instanceof OrderDiscount && ! $discount instanceof LineDiscount) {
                 throw new \InvalidArgumentException('Invalid discount type [' . $discount::class . '] provided in child entities for OrderPromo.');
             }
         }

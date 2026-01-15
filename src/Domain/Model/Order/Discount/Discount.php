@@ -97,7 +97,7 @@ final class Discount implements ChildEntity
 
         if ($discount->discountableType == DiscountableType::line) {
 
-            if(!isset($state['vat_rate'])) {
+            if (! isset($state['vat_rate'])) {
                 throw new \InvalidArgumentException('vat_rate is required for line discounts');
             }
 

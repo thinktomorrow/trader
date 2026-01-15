@@ -202,7 +202,7 @@ abstract class CartContext extends TestCase
             }
         }
 
-        if (!$checkFlag) {
+        if (! $checkFlag) {
             throw new \Exception('Cartitem presence check failed. No line found by ' . $productVariantId);
         }
     }
@@ -228,7 +228,7 @@ abstract class CartContext extends TestCase
             }
         }
 
-        if (!$checkFlag) {
+        if (! $checkFlag) {
             throw new \Exception('Cartitem presence check failed. No line found by ' . $productVariantId);
         }
     }
@@ -384,7 +384,7 @@ abstract class CartContext extends TestCase
             }
         }
 
-        if (!$line) {
+        if (! $line) {
             throw new \Exception('No line found by ' . $productVariantId);
         }
 

@@ -28,7 +28,7 @@ class UpdateAddressTest extends CartContext
 
         $order = $this->orderContext->findOrder($order->orderId);
 
-        $this->assertEquals(new Address(CountryId::fromString('NL'), 'line-1 updated', 'line-2', 'postal-code', 'city',), $order->getShippingAddress()->getAddress());
+        $this->assertEquals(new Address(CountryId::fromString('NL'), 'line-1 updated', 'line-2', 'postal-code', 'city', ), $order->getShippingAddress()->getAddress());
 
         $lastEvent = last($this->orderContext->apps()->getEventDispatcher()->releaseDispatchedEvents());
 
@@ -56,7 +56,7 @@ class UpdateAddressTest extends CartContext
 
         $order = $this->orderContext->findOrder($order->orderId);
 
-        $this->assertEquals(new Address(CountryId::fromString('NL'), 'line-1 updated', 'line-2', 'postal-code', 'city',), $order->getBillingAddress()->getAddress());
+        $this->assertEquals(new Address(CountryId::fromString('NL'), 'line-1 updated', 'line-2', 'postal-code', 'city', ), $order->getBillingAddress()->getAddress());
 
         $lastEvent = last($this->orderContext->apps()->getEventDispatcher()->releaseDispatchedEvents());
 
