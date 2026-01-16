@@ -20,13 +20,23 @@ class GridRepositoryTest extends TestCase
         $catalog->createTaxonomy();
         $taxon = $catalog->createTaxon();
         $taxonChild = $catalog->createTaxon('taxon-bbb', 'taxonomy-aaa', $taxon->taxonId->get());
+        $taxonChild2 = $catalog->createTaxon('taxon-ccc', 'taxonomy-aaa', $taxon->taxonId->get());
+
         $product = $catalog->createProduct();
 
         $productB = $catalog->createProduct('product-bbb', null);
         $variantB = $catalog->createVariant($productB->productId->get(), 'variant-bbb', ['show_in_grid' => false]);
 
-        $catalog->linkVariantToTaxon($product->productId->get(), $product->getVariants()[0]->variantId->get(), $taxonChild->taxonId->get());
-        $catalog->linkVariantToTaxon($productB->productId->get(), $variantB->variantId->get(), $taxonChild->taxonId->get());
+        $productC = $catalog->createProduct('product-ccc', null);
+        $variantC = $catalog->createVariant($productC->productId->get(), 'variant-ccc', [
+            'unit_price' => 200,
+            'sale_price' => 160,
+            'includes_vat' => true,
+        ]);
+
+        $catalog->linkProductToTaxon($product->productId->get(), $taxonChild->taxonId->get());
+        $catalog->linkProductToTaxon($productB->productId->get(), $taxonChild->taxonId->get());
+        $catalog->linkProductToTaxon($productC->productId->get(), $taxonChild2->taxonId->get());
     }
 
     public function test_it_can_fetch_grid_item()
@@ -68,7 +78,7 @@ class GridRepositoryTest extends TestCase
         /** @var GridItem $gridItem */
         $gridItem = $gridItems->first();
 
-        $this->assertCount(1, array_filter($gridItem->getTaxa(), fn (ProductTaxonItem $taxon) => $taxon->showsInGrid()));
+        $this->assertCount(1, array_filter($gridItem->getTaxa(), fn(ProductTaxonItem $taxon) => $taxon->showsInGrid()));
         $this->assertCount(1, $gridItem->getGridCategories());
         $this->assertCount(0, $gridItem->getGridProductProperties());
         $this->assertCount(0, $gridItem->getGridVariantProperties());
@@ -82,15 +92,15 @@ class GridRepositoryTest extends TestCase
     {
         $gridItems = CatalogContext::mysql()->repos()->gridRepository()->getResults();
 
-        $this->assertCount(1, $gridItems);
+        $this->assertCount(2, $gridItems);
     }
 
     public function test_it_can_filter_by_minimum_sale_price()
     {
-        $gridItems = CatalogContext::mysql()->repos()->gridRepository()->filterByPrice('79')->getResults();
+        $gridItems = CatalogContext::mysql()->repos()->gridRepository()->filterByPrice('159')->getResults();
 
         $this->assertCount(1, $gridItems);
-        $this->assertTrue($gridItems->first()->getSalePrice()->getExcludingVat()->greaterThan(Money::EUR(79)));
+        $this->assertTrue($gridItems->first()->getSalePrice()->getIncludingVat()->equals(Money::EUR(160)));
     }
 
     public function test_it_can_filter_by_maximum_sale_price()
@@ -122,15 +132,20 @@ class GridRepositoryTest extends TestCase
     {
         $gridItems = CatalogContext::mysql()->repos()->gridRepository()->filterByTerm('title nl')->getResults();
 
+        $this->assertCount(2, $gridItems);
+
+        $gridItems = CatalogContext::mysql()->repos()->gridRepository()->filterByTerm('product-aaa')->getResults();
+
         $this->assertCount(1, $gridItems);
         $this->assertEquals('product-aaa title nl', $gridItems->first()->getTitle());
     }
 
     public function test_it_can_filter_by_taxon()
     {
-        $gridItems = CatalogContext::mysql()->repos()->gridRepository()->filterByTaxonKeys(['foobadfqfqsdfqsdr-child'])->getResults();
+        $gridItems = CatalogContext::mysql()->repos()->gridRepository()->filterByTaxonKeys(['taxon-bbb-key-nl'])->getResults();
 
         $this->assertCount(1, $gridItems);
+        $this->assertEquals('product-aaa', $gridItems->first()->getProductId());
     }
 
     public function test_when_filtering_unknown_taxon_no_results_are_returned()
@@ -142,16 +157,16 @@ class GridRepositoryTest extends TestCase
 
     public function test_when_filtering_taxon_all_child_taxa_are_included_in_the_search()
     {
-        $gridItems = CatalogContext::mysql()->repos()->gridRepository()->filterByTaxonKeys(['fdfqsdfoobar'])->getResults();
+        $gridItems = CatalogContext::mysql()->repos()->gridRepository()->filterByTaxonKeys(['taxon-aaa-key-nl'])->getResults();
 
-        $this->assertCount(1, $gridItems);
+        $this->assertCount(2, $gridItems);
     }
 
     public function test_it_can_sort_by_sale_price()
     {
         $gridItems = CatalogContext::mysql()->repos()->gridRepository()->sortByPrice()->getResults();
 
-        $this->assertCount(3, $gridItems);
+        $this->assertCount(2, $gridItems);
 
         $previousSalePrice = null;
         foreach ($gridItems as $gridItem) {
@@ -169,7 +184,7 @@ class GridRepositoryTest extends TestCase
     {
         $gridItems = CatalogContext::mysql()->repos()->gridRepository()->sortByPriceDesc()->getResults();
 
-        $this->assertCount(3, $gridItems);
+        $this->assertCount(2, $gridItems);
 
         $previousSalePrice = null;
         foreach ($gridItems as $gridItem) {
@@ -187,9 +202,9 @@ class GridRepositoryTest extends TestCase
     {
         $gridItems = CatalogContext::mysql()->repos()->gridRepository()->sortByLabel()->getResults();
 
-        $this->assertCount(3, $gridItems);
+        $this->assertCount(2, $gridItems);
 
-        $titles = $gridItems->map(fn ($gridItem) => $gridItem->getTitle());
+        $titles = $gridItems->map(fn($gridItem) => $gridItem->getTitle());
 
         $expected = $titles->toArray();
         natcasesort($expected);
@@ -201,9 +216,9 @@ class GridRepositoryTest extends TestCase
     {
         $gridItems = CatalogContext::mysql()->repos()->gridRepository()->sortByLabelDesc()->getResults();
 
-        $this->assertCount(3, $gridItems);
+        $this->assertCount(2, $gridItems);
 
-        $titles = $gridItems->map(fn ($gridItem) => $gridItem->getTitle());
+        $titles = $gridItems->map(fn($gridItem) => $gridItem->getTitle());
 
         $expected = $titles->toArray();
         natcasesort($expected);
