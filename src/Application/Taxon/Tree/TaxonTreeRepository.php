@@ -8,7 +8,7 @@ interface TaxonTreeRepository
 {
     public function findTaxonById(string $taxonId): TaxonNode;
 
-    public function findTaxonByKey(string $key): TaxonNode;
+    public function findTaxonByKey(string $key): ?TaxonNode;
 
     public function getTree(): TaxonTree;
 

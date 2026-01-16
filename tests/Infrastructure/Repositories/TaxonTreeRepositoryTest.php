@@ -5,59 +5,115 @@ namespace Tests\Infrastructure\Repositories;
 
 use Tests\Infrastructure\TestCase;
 use Thinktomorrow\Trader\Application\Taxon\Tree\TaxonNode;
-use Thinktomorrow\Trader\Infrastructure\Laravel\Repositories\MemoizedMysqlTaxonTreeRepository;
-use Thinktomorrow\Trader\Infrastructure\Laravel\Repositories\MysqlTaxonTreeRepository;
-use Thinktomorrow\Trader\Infrastructure\Test\Repositories\InMemoryTaxonTreeRepository;
-use Thinktomorrow\Trader\Infrastructure\Test\TestContainer;
-use Thinktomorrow\Trader\Infrastructure\Test\TestTraderConfig;
+use Thinktomorrow\Trader\Domain\Common\Locale;
+use Thinktomorrow\Trader\Testing\Catalog\CatalogContext;
 
 final class TaxonTreeRepositoryTest extends TestCase
 {
-    protected function tearDown(): void
+    protected function setUp(): void
     {
-        MemoizedMysqlTaxonTreeRepository::clear();
-
-        parent::tearDown();
+        parent::setUp();
     }
 
     public function test_it_can_get_the_entire_tree()
     {
-        $this->createDefaultTaxons();
+        foreach (CatalogContext::drivers() as $catalog) {
 
-        foreach ($this->repositories() as $repository) {
+            $this->createTree($catalog);
+
+            $repository = $catalog->repos()->taxonTreeRepository();
+
             $this->assertContainsOnlyInstancesOf(TaxonNode::class, $repository->getTree());
             $this->assertEquals(3, $repository->getTree()->count());
-            $this->assertEquals(8, $repository->getTree()->total());
+            $this->assertEquals(7, $repository->getTree()->total());
         }
     }
 
     public function test_it_can_get_the_tree_per_taxonomy()
     {
-        $this->createDefaultTaxons();
+        foreach (CatalogContext::drivers() as $catalog) {
 
-        foreach ($this->repositories() as $repository) {
-            $this->assertContainsOnlyInstancesOf(TaxonNode::class, $repository->getTreeByTaxonomy('bbb'));
+            $this->createTree($catalog);
 
-            $this->assertEquals(2, $repository->getTreeByTaxonomy('bbb')->count());
-            $this->assertEquals(6, $repository->getTreeByTaxonomy('bbb')->total());
-            $this->assertEquals(1, $repository->getTreeByTaxonomy('ccc')->count());
-            $this->assertEquals(2, $repository->getTreeByTaxonomy('ccc')->total());
+            $repository = $catalog->repos()->taxonTreeRepository();
+
+            $this->assertContainsOnlyInstancesOf(TaxonNode::class, $repository->getTreeByTaxonomy('taxonomy-aaa'));
+
+            $this->assertEquals(2, $repository->getTreeByTaxonomy('taxonomy-aaa')->count());
+            $this->assertEquals(5, $repository->getTreeByTaxonomy('taxonomy-aaa')->total());
+            $this->assertEquals(1, $repository->getTreeByTaxonomy('taxonomy-bbb')->count());
+            $this->assertEquals(2, $repository->getTreeByTaxonomy('taxonomy-bbb')->total());
+        }
+    }
+
+    public function test_it_can_get_the_tree_per_taxonomies()
+    {
+        foreach (CatalogContext::drivers() as $catalog) {
+
+            $this->createTree($catalog);
+
+            $repository = $catalog->repos()->taxonTreeRepository();
+
+            $results = $repository->getTreeByTaxonomies(['taxonomy-aaa', 'taxonomy-bbb']);
+
+            $this->assertContainsOnlyInstancesOf(TaxonNode::class, $results);
+
+            $this->assertEquals(3, $results->count());
+            $this->assertEquals(7, $results->total());
+        }
+    }
+
+    public function test_it_can_find_taxon_by_id()
+    {
+        foreach (CatalogContext::drivers() as $catalog) {
+
+            $this->createTree($catalog);
+
+            $repository = $catalog->repos()->taxonTreeRepository();
+
+            $this->assertNotNull($repository->findTaxonById('taxon-ddd'));
+            $this->assertNotNull($repository->findTaxonById('taxon-fff'));
         }
     }
 
     public function test_it_can_find_taxon_by_key()
     {
-        $this->createDefaultTaxons();
+        foreach (CatalogContext::drivers() as $catalog) {
 
-        foreach ($this->repositories() as $repository) {
-            $this->assertNotNull($repository->findTaxonByKey('taxon-fifth'));
+            $this->createTree($catalog);
+
+            $repository = $catalog->repos()->taxonTreeRepository();
+
+            $this->assertNotNull($repository->findTaxonByKey('taxon-ddd-key-nl'));
+            $this->assertNotNull($repository->findTaxonByKey('taxon-fff-key-nl'));
         }
     }
 
-    private static function repositories(): \Generator
+    public function test_it_can_find_taxon_by_key_per_locale()
     {
-        yield new InMemoryTaxonTreeRepository(new TestContainer(), new TestTraderConfig());
-        yield $mysqlTaxonTreeRepo = new MysqlTaxonTreeRepository(new TestContainer(), new TestTraderConfig());
-        yield new MemoizedMysqlTaxonTreeRepository($mysqlTaxonTreeRepo, new TestTraderConfig());
+        foreach (CatalogContext::drivers() as $catalog) {
+
+            $this->createTree($catalog);
+
+            $repository = $catalog->repos()->taxonTreeRepository();
+            $repository->setLocale(Locale::fromString('fr'));
+
+            $this->assertNotNull($repository->findTaxonByKey('taxon-ddd-key-fr'));
+            $this->assertNull($repository->findTaxonByKey('taxon-ddd-key-nl'));
+        }
+    }
+
+    private function createTree(CatalogContext $catalog): void
+    {
+        $catalog->createTaxonomy('taxonomy-aaa');
+        $taxonA = $catalog->createTaxon('taxon-aaa', 'taxonomy-aaa');
+        $taxonB = $catalog->createTaxon('taxon-bbb', 'taxonomy-aaa', $taxonA->taxonId->get());
+        $taxonC = $catalog->createTaxon('taxon-ccc', 'taxonomy-aaa', $taxonA->taxonId->get());
+        $taxonD = $catalog->createTaxon('taxon-ddd', 'taxonomy-aaa');
+        $taxonE = $catalog->createTaxon('taxon-eee', 'taxonomy-aaa', $taxonD->taxonId->get());
+
+        $catalog->createTaxonomy('taxonomy-bbb');
+        $taxonF = $catalog->createTaxon('taxon-fff', 'taxonomy-bbb');
+        $taxonG = $catalog->createTaxon('taxon-ggg', 'taxonomy-bbb', $taxonF->taxonId->get());
     }
 }

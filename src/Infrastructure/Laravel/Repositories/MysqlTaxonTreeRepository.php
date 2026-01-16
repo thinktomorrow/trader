@@ -51,10 +51,10 @@ class MysqlTaxonTreeRepository implements CategoryRepository, TaxonTreeRepositor
     public function findTaxonById(string $taxonId): TaxonNode
     {
         /** @var TaxonNode $taxonNode */
-        $taxonNode = $this->getTree()->find(fn (TaxonNode $taxonNode) => $taxonNode->getId() == $taxonId);
+        $taxonNode = $this->getTree()->find(fn(TaxonNode $taxonNode) => $taxonNode->getId() == $taxonId);
 
-        if (! $taxonNode) {
-            throw new CouldNotFindTaxon('No taxon record found by id '.$taxonId);
+        if (!$taxonNode) {
+            throw new CouldNotFindTaxon('No taxon record found by id ' . $taxonId);
         }
 
         return $taxonNode;
@@ -64,13 +64,13 @@ class MysqlTaxonTreeRepository implements CategoryRepository, TaxonTreeRepositor
      * This searches the taxon by the localized key. Keep in mind that this only finds the taxon
      * if the key is present for the current set locale as getKey() returns the localized key.
      */
-    public function findTaxonByKey(string $key): TaxonNode
+    public function findTaxonByKey(string $key): ?TaxonNode
     {
         /** @var TaxonNode $taxonNode */
-        $taxonNode = $this->getTree()->find(fn (TaxonNode $taxonNode) => $taxonNode->getKey() == $key);
+        $taxonNode = $this->getTree()->find(fn(TaxonNode $taxonNode) => $taxonNode->getKey() == $key);
 
-        if (! $taxonNode) {
-            throw new CouldNotFindTaxon('No taxon record found by key '.$key);
+        if (!$taxonNode) {
+            return null;
         }
 
         return $taxonNode;
@@ -100,7 +100,7 @@ class MysqlTaxonTreeRepository implements CategoryRepository, TaxonTreeRepositor
 
     private function composeTree(?array $taxonomyIds = null): TaxonTree
     {
-        $memoizeKey = $this->locale->get().($taxonomyIds ? '_'.implode('_', $taxonomyIds) : '');
+        $memoizeKey = $this->locale->get() . ($taxonomyIds ? '_' . implode('_', $taxonomyIds) : '');
 
         if ($this->memoized && isset($this->trees[$memoizeKey])) {
             return $this->trees[$memoizeKey];
@@ -108,7 +108,7 @@ class MysqlTaxonTreeRepository implements CategoryRepository, TaxonTreeRepositor
 
         $this->trees[$memoizeKey] = TaxonTree::fromIterable($this->getTaxonNodes($taxonomyIds))
             ->sort('order')
-            ->eachRecursive(fn (TaxonNode $node) => $node->setLocale($this->locale));
+            ->eachRecursive(fn(TaxonNode $node) => $node->setLocale($this->locale));
 
         return $this->trees[$memoizeKey];
     }
@@ -137,10 +137,10 @@ class MysqlTaxonTreeRepository implements CategoryRepository, TaxonTreeRepositor
 
         $results = DB::table(static::$taxonTable)
             ->when($taxonomyIds, function ($query) use ($taxonomyIds) {
-                return $query->whereIn(static::$taxonTable.'.taxonomy_id', (array) $taxonomyIds);
+                return $query->whereIn(static::$taxonTable . '.taxonomy_id', (array)$taxonomyIds);
             })
-            ->leftJoin(static::$taxonKeysTable, static::$taxonTable.'.taxon_id', '=', static::$taxonKeysTable.'.taxon_id')
-            ->select(static::$taxonTable.'.*')
+            ->leftJoin(static::$taxonKeysTable, static::$taxonTable . '.taxon_id', '=', static::$taxonKeysTable . '.taxon_id')
+            ->select(static::$taxonTable . '.*')
             ->addSelect(DB::raw("GROUP_CONCAT(DISTINCT {$this->composeTaxonKeysSelect()}) AS taxon_keys"))
             ->addSelect(DB::raw('(
                 SELECT GROUP_CONCAT(DISTINCT CONCAT_WS(":", p.product_id, v.variant_id))
@@ -150,8 +150,8 @@ class MysqlTaxonTreeRepository implements CategoryRepository, TaxonTreeRepositor
                 JOIN trader_taxa t ON t.taxon_id = tp.taxon_id
                 JOIN trader_taxonomies tax ON t.taxonomy_id = tax.taxonomy_id
                 WHERE t.taxon_id = trader_taxa.taxon_id
-                  AND p.state IN ('.implode(',', array_map(fn ($s) => DB::getPdo()->quote($s->value), ProductState::onlineStates())).')
-                    AND tax.type <> '.DB::getPdo()->quote(TaxonomyType::variant_property->value).'
+                  AND p.state IN (' . implode(',', array_map(fn($s) => DB::getPdo()->quote($s->value), ProductState::onlineStates())) . ')
+                    AND tax.type <> ' . DB::getPdo()->quote(TaxonomyType::variant_property->value) . '
                     AND v.show_in_grid = 1
             ) AS grid_product_ids'))
             ->addSelect(DB::raw('(
@@ -162,7 +162,7 @@ class MysqlTaxonTreeRepository implements CategoryRepository, TaxonTreeRepositor
                 JOIN trader_taxa t ON t.taxon_id = tv.taxon_id
                 JOIN trader_taxonomies tax ON t.taxonomy_id = tax.taxonomy_id
                 WHERE t.taxon_id = trader_taxa.taxon_id
-                  AND p.state IN ('.implode(',', array_map(fn ($s) => DB::getPdo()->quote($s->value), ProductState::onlineStates())).')
+                  AND p.state IN (' . implode(',', array_map(fn($s) => DB::getPdo()->quote($s->value), ProductState::onlineStates())) . ')
                     AND v.show_in_grid = 1
             ) AS grid_variant_ids'))
             ->addSelect(DB::raw('(
@@ -171,7 +171,7 @@ class MysqlTaxonTreeRepository implements CategoryRepository, TaxonTreeRepositor
                 JOIN trader_taxa t ON tp.taxon_id = t.taxon_id
                 JOIN trader_taxonomies tax ON t.taxonomy_id = tax.taxonomy_id
                 WHERE tp.taxon_id = trader_taxa.taxon_id
-                  AND tax.type <> '.DB::getPdo()->quote(TaxonomyType::variant_property->value).'
+                  AND tax.type <> ' . DB::getPdo()->quote(TaxonomyType::variant_property->value) . '
             ) AS product_ids'))
 //            ->addSelect(DB::raw('(
 //                SELECT GROUP_CONCAT(DISTINCT p.product_id)
@@ -194,14 +194,14 @@ class MysqlTaxonTreeRepository implements CategoryRepository, TaxonTreeRepositor
 //                  AND p.state IN (' . implode(',', array_map(fn($state) => DB::getPdo()->quote($state->value), ProductState::onlineStates())) . ')
 //                  AND tax.type = ' . DB::getPdo()->quote(TaxonomyType::variant_property->value) . '
 //            ) AS online_variant_ids'))
-            ->groupBy(static::$taxonTable.'.taxon_id')
-            ->orderBy(static::$taxonTable.'.order')
+            ->groupBy(static::$taxonTable . '.taxon_id')
+            ->orderBy(static::$taxonTable . '.order')
             ->get();
 
         $taxonNodeClass = $this->container->get(TaxonNode::class);
 
         return TaxonNodes::fromType(
-            $results->map(fn ($row) => $taxonNodeClass::fromMappedData((array) $row, $this->extractTaxonKeys((array) $row)))->all()
+            $results->map(fn($row) => $taxonNodeClass::fromMappedData((array)$row, $this->extractTaxonKeys((array)$row)))->all()
         );
     }
 }

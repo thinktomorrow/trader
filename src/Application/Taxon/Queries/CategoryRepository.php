@@ -6,5 +6,5 @@ use Thinktomorrow\Trader\Application\Taxon\Tree\TaxonNode;
 
 interface CategoryRepository
 {
-    public function findTaxonByKey(string $key): TaxonNode;
+    public function findTaxonByKey(string $key): ?TaxonNode;
 }
