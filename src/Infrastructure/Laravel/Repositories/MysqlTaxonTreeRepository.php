@@ -51,9 +51,9 @@ class MysqlTaxonTreeRepository implements CategoryRepository, TaxonTreeRepositor
     public function findTaxonById(string $taxonId): TaxonNode
     {
         /** @var TaxonNode $taxonNode */
-        $taxonNode = $this->getTree()->find(fn(TaxonNode $taxonNode) => $taxonNode->getId() == $taxonId);
+        $taxonNode = $this->getTree()->find(fn (TaxonNode $taxonNode) => $taxonNode->getId() == $taxonId);
 
-        if (!$taxonNode) {
+        if (! $taxonNode) {
             throw new CouldNotFindTaxon('No taxon record found by id ' . $taxonId);
         }
 
@@ -67,9 +67,9 @@ class MysqlTaxonTreeRepository implements CategoryRepository, TaxonTreeRepositor
     public function findTaxonByKey(string $key): ?TaxonNode
     {
         /** @var TaxonNode $taxonNode */
-        $taxonNode = $this->getTree()->find(fn(TaxonNode $taxonNode) => $taxonNode->getKey() == $key);
+        $taxonNode = $this->getTree()->find(fn (TaxonNode $taxonNode) => $taxonNode->getKey() == $key);
 
-        if (!$taxonNode) {
+        if (! $taxonNode) {
             return null;
         }
 
@@ -108,7 +108,7 @@ class MysqlTaxonTreeRepository implements CategoryRepository, TaxonTreeRepositor
 
         $this->trees[$memoizeKey] = TaxonTree::fromIterable($this->getTaxonNodes($taxonomyIds))
             ->sort('order')
-            ->eachRecursive(fn(TaxonNode $node) => $node->setLocale($this->locale));
+            ->eachRecursive(fn (TaxonNode $node) => $node->setLocale($this->locale));
 
         return $this->trees[$memoizeKey];
     }
@@ -150,7 +150,7 @@ class MysqlTaxonTreeRepository implements CategoryRepository, TaxonTreeRepositor
                 JOIN trader_taxa t ON t.taxon_id = tp.taxon_id
                 JOIN trader_taxonomies tax ON t.taxonomy_id = tax.taxonomy_id
                 WHERE t.taxon_id = trader_taxa.taxon_id
-                  AND p.state IN (' . implode(',', array_map(fn($s) => DB::getPdo()->quote($s->value), ProductState::onlineStates())) . ')
+                  AND p.state IN (' . implode(',', array_map(fn ($s) => DB::getPdo()->quote($s->value), ProductState::onlineStates())) . ')
                     AND tax.type <> ' . DB::getPdo()->quote(TaxonomyType::variant_property->value) . '
                     AND v.show_in_grid = 1
             ) AS grid_product_ids'))
@@ -162,7 +162,7 @@ class MysqlTaxonTreeRepository implements CategoryRepository, TaxonTreeRepositor
                 JOIN trader_taxa t ON t.taxon_id = tv.taxon_id
                 JOIN trader_taxonomies tax ON t.taxonomy_id = tax.taxonomy_id
                 WHERE t.taxon_id = trader_taxa.taxon_id
-                  AND p.state IN (' . implode(',', array_map(fn($s) => DB::getPdo()->quote($s->value), ProductState::onlineStates())) . ')
+                  AND p.state IN (' . implode(',', array_map(fn ($s) => DB::getPdo()->quote($s->value), ProductState::onlineStates())) . ')
                     AND v.show_in_grid = 1
             ) AS grid_variant_ids'))
             ->addSelect(DB::raw('(
@@ -201,7 +201,7 @@ class MysqlTaxonTreeRepository implements CategoryRepository, TaxonTreeRepositor
         $taxonNodeClass = $this->container->get(TaxonNode::class);
 
         return TaxonNodes::fromType(
-            $results->map(fn($row) => $taxonNodeClass::fromMappedData((array)$row, $this->extractTaxonKeys((array)$row)))->all()
+            $results->map(fn ($row) => $taxonNodeClass::fromMappedData((array)$row, $this->extractTaxonKeys((array)$row)))->all()
         );
     }
 }

@@ -39,9 +39,9 @@ class MemoizedMysqlTaxonTreeRepository implements CategoryRepository, TaxonTreeR
     public function findTaxonById(string $taxonId): TaxonNode
     {
         /** @var TaxonNode $taxonNode */
-        $taxonNode = $this->getTree()->find(fn(TaxonNode $taxonNode) => $taxonNode->getId() == $taxonId);
+        $taxonNode = $this->getTree()->find(fn (TaxonNode $taxonNode) => $taxonNode->getId() == $taxonId);
 
-        if (!$taxonNode) {
+        if (! $taxonNode) {
             throw new CouldNotFindTaxon('No taxon record found by id ' . $taxonId);
         }
 
@@ -51,9 +51,9 @@ class MemoizedMysqlTaxonTreeRepository implements CategoryRepository, TaxonTreeR
     public function findTaxonByKey(string $key): ?TaxonNode
     {
         /** @var TaxonNode $taxonNode */
-        $taxonNode = $this->getTree()->find(fn(TaxonNode $taxonNode) => $taxonNode->getKey() == $key);
+        $taxonNode = $this->getTree()->find(fn (TaxonNode $taxonNode) => $taxonNode->getKey() == $key);
 
-        if (!$taxonNode) {
+        if (! $taxonNode) {
             return null;
         }
 
