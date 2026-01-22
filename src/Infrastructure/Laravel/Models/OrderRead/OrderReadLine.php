@@ -57,8 +57,8 @@ abstract class OrderReadLine
         $line->data = json_decode($state['data'], true);
         $line->purchasableData = $line->getData('purchasable_data', []);
 
-//        Assertion::keyIsset($line->data, 'unit_price_excl');
-//        Assertion::keyIsset($line->data, 'unit_price_incl');
+        //        Assertion::keyIsset($line->data, 'unit_price_excl');
+        //        Assertion::keyIsset($line->data, 'unit_price_incl');
 
         $line->variant_id = $line->purchasableReference->isVariant() ? $line->purchasableReference->getId() : $line->data('variant_id');
         $line->product_id = $line->data('product_id');
@@ -128,7 +128,7 @@ abstract class OrderReadLine
 
     public function getData(?string $key = null, $default = null): mixed
     {
-        if (!$key) {
+        if (! $key) {
             return $this->data;
         }
 
