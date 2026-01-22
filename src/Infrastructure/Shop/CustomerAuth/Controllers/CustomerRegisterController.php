@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Thinktomorrow\Trader\Infrastructure\Shop\CustomerAuth\Controllers;
@@ -19,8 +20,8 @@ class CustomerRegisterController extends Controller
     use ValidatesRequests;
 
     public function __construct(
-        private CustomerApplication     $customerApplication,
-        private CustomerRepository      $customerRepository,
+        private CustomerApplication $customerApplication,
+        private CustomerRepository $customerRepository,
         private CustomerLoginRepository $customerLoginRepository,
     ) {
         $this->middleware('customer-guest');
@@ -41,7 +42,7 @@ class CustomerRegisterController extends Controller
             'password' => ['required', 'string', 'min:8', 'confirmed'],
             'company' => ['required_if:is_business,true', 'nullable', 'max:200'],
         ], [
-            'company.required_if' => __('trader-auth.register.validation.company_required'),
+            'company.required_if' => __('auth.register.validation.company_required'),
         ]);
 
         $existingCustomer = CustomerModel::where('email', $request->email)->first();
@@ -50,7 +51,7 @@ class CustomerRegisterController extends Controller
             // Maak nieuwe klant aan
             $customerId = $this->customerApplication->registerCustomer(new RegisterCustomer(
                 $request->email,
-                ! ! $request->is_business,
+                (bool) $request->is_business,
                 app()->getLocale(),
                 [
                     'firstname' => $request->firstname,
@@ -88,6 +89,6 @@ class CustomerRegisterController extends Controller
 
         return redirect()
             ->to($redirect)
-            ->with('status', __('trader-auth.verify.pending_verification'));
+            ->with('status', __('auth.verify.pending_verification'));
     }
 }

@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Thinktomorrow\Trader\Infrastructure\Shop\CustomerAuth\Notifications;
@@ -19,6 +20,7 @@ class VerifyEmailNotification extends VerifyEmail implements ShouldQueue
     use SerializesModels;
 
     private TraderConfig $traderConfig;
+
     private CustomerRead $customer;
 
     public function __construct(TraderConfig $traderConfig, CustomerRead $customer)
@@ -37,7 +39,7 @@ class VerifyEmailNotification extends VerifyEmail implements ShouldQueue
         $verificationUrl = $this->verificationUrl($notifiable);
 
         return new MailMessage()
-            ->subject(trans('trader-mails.verify.subject'))
+            ->subject(trans('mails.verify.subject'))
             ->from($this->traderConfig->getWebmasterEmail(), $this->traderConfig->getWebmasterName())
             ->view('trader::customer.auth.verification-mail', [
                 'customer' => $this->customer,

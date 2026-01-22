@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Thinktomorrow\Trader\Infrastructure\Shop\CustomerAuth\Middleware;
@@ -17,6 +18,6 @@ class CustomerValidateSignature extends ValidateSignature
         }
 
         return redirect()->route('customer.verification.show')
-            ->with('status', trans('trader-auth.verify.invalid_verification'));
+            ->with('status', trans('auth.verify.invalid_verification'));
     }
 }
