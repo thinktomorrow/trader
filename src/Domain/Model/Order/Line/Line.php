@@ -150,8 +150,8 @@ final class Line implements ChildAggregate, DiscountableItem
     public function getChildEntities(): array
     {
         return [
-            LinePersonalisation::class => array_map(fn($personalisation) => $personalisation->getMappedData(), $this->personalisations),
-            Discount::class => array_map(fn($discount) => $discount->getMappedData(), $this->discounts),
+            LinePersonalisation::class => array_map(fn ($personalisation) => $personalisation->getMappedData(), $this->personalisations),
+            Discount::class => array_map(fn ($discount) => $discount->getMappedData(), $this->discounts),
         ];
     }
 
@@ -176,8 +176,8 @@ final class Line implements ChildAggregate, DiscountableItem
 
         $line->quantity = Quantity::fromInt($state['quantity']);
         $line->reducedFromStock = $state['reduced_from_stock'];
-        $line->discounts = array_map(fn($discountState) => Discount::fromMappedData($discountState, $state), $childEntities[Discount::class]);
-        $line->personalisations = array_map(fn($personalisationState) => LinePersonalisation::fromMappedData($personalisationState, $state), $childEntities[LinePersonalisation::class]);
+        $line->discounts = array_map(fn ($discountState) => Discount::fromMappedData($discountState, $state), $childEntities[Discount::class]);
+        $line->personalisations = array_map(fn ($personalisationState) => LinePersonalisation::fromMappedData($personalisationState, $state), $childEntities[LinePersonalisation::class]);
         $line->data = json_decode($state['data'], true);
 
         $line->unitPrice = $line->authoritativeIncl()
