@@ -3,6 +3,7 @@
 namespace Thinktomorrow\Trader\Application\Order\MerchantOrder;
 
 use Money\Money;
+use Thinktomorrow\Trader\Domain\Common\Vat\VatPercentage;
 use Thinktomorrow\Trader\Domain\Model\Order\Line\PurchasableReference;
 
 interface MerchantOrderLine
@@ -32,6 +33,8 @@ interface MerchantOrderLine
     public function getTotalPriceExcl(): Money;
 
     public function getTotalVat(): Money;
+
+    public function getVatPercentage(): VatPercentage;
 
     public function getTotalPriceIncl(): Money;
 

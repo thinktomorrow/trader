@@ -22,7 +22,7 @@ class RefreshCartVatTest extends CartContext
 
         // Check unchanged line first
         $cart = $this->orderContext->repos()->cartRepository()->findCart(OrderId::fromString('xxx'));
-        $lineTaxRate = $cart->getLines()[0]->getVatRate();
+        $lineTaxRate = $cart->getLines()[0]->getVatPercentage();
         $this->assertEquals('20', $lineTaxRate->get());
 
         // Change billing country to NL
@@ -31,7 +31,7 @@ class RefreshCartVatTest extends CartContext
         $this->orderContext->apps()->cartApplication()->refresh(new RefreshCart('xxx'));
 
         $cart = $this->orderContext->repos()->cartRepository()->findCart(OrderId::fromString('xxx'));
-        $lineTaxRate = $cart->getLines()[0]->getVatRate();
+        $lineTaxRate = $cart->getLines()[0]->getVatPercentage();
         $this->assertEquals('10', $lineTaxRate->get());
     }
 
@@ -47,7 +47,7 @@ class RefreshCartVatTest extends CartContext
 
         // Check unchanged line first
         $cart = $this->orderContext->repos()->cartRepository()->findCart(OrderId::fromString('xxx'));
-        $lineTaxRate = $cart->getLines()[0]->getVatRate();
+        $lineTaxRate = $cart->getLines()[0]->getVatPercentage();
         $this->assertEquals('20', $lineTaxRate->get());
 
         // Change billing country to NL
@@ -56,7 +56,7 @@ class RefreshCartVatTest extends CartContext
         $this->orderContext->apps()->cartApplication()->refresh(new RefreshCart('xxx'));
 
         $cart = $this->orderContext->repos()->cartRepository()->findCart(OrderId::fromString('xxx'));
-        $lineTaxRate = $cart->getLines()[0]->getVatRate();
+        $lineTaxRate = $cart->getLines()[0]->getVatPercentage();
         $this->assertEquals('15', $lineTaxRate->get());
     }
 
@@ -68,7 +68,7 @@ class RefreshCartVatTest extends CartContext
 
         // Check unchanged line first
         $cart = $this->orderContext->repos()->cartRepository()->findCart(OrderId::fromString('xxx'));
-        $lineTaxRate = $cart->getLines()[0]->getVatRate();
+        $lineTaxRate = $cart->getLines()[0]->getVatPercentage();
         $this->assertEquals('20', $lineTaxRate->get());
 
         $this->givenOrderHasABillingCountry('FR');
@@ -76,7 +76,7 @@ class RefreshCartVatTest extends CartContext
         $this->orderContext->apps()->cartApplication()->refresh(new RefreshCart('xxx'));
         $cart = $this->orderContext->repos()->cartRepository()->findCart(OrderId::fromString('xxx'));
 
-        $lineTaxRate = $cart->getLines()[0]->getVatRate();
+        $lineTaxRate = $cart->getLines()[0]->getVatPercentage();
         $this->assertEquals('20', $lineTaxRate->get());
     }
 }
