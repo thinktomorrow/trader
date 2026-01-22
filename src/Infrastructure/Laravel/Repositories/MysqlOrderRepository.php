@@ -64,7 +64,7 @@ class MysqlOrderRepository implements OrderRepository, InvoiceRepository
     {
         $state = $order->getMappedData();
 
-        if (! $this->exists($order->orderId)) {
+        if (!$this->exists($order->orderId)) {
             DB::table(static::$orderTable)->insert(array_merge($state, [
                 'created_at' => Carbon::now(),
                 'updated_at' => Carbon::now(),
@@ -87,7 +87,7 @@ class MysqlOrderRepository implements OrderRepository, InvoiceRepository
 
     private function upsertLines(Order $order): void
     {
-        $lineIds = array_map(fn ($lineState) => $lineState['line_id'], $order->getChildEntities()[Line::class]);
+        $lineIds = array_map(fn($lineState) => $lineState['line_id'], $order->getChildEntities()[Line::class]);
 
         DB::table(static::$orderLinesTable)
             ->where('order_id', $order->orderId->get())
@@ -125,7 +125,7 @@ class MysqlOrderRepository implements OrderRepository, InvoiceRepository
 
         DB::table(static::$orderDiscountsTable)
             ->where('order_id', $order->orderId->get())
-            ->whereNotIn('discount_id', array_map(fn ($discountState) => $discountState['discount_id'], $discountStates))
+            ->whereNotIn('discount_id', array_map(fn($discountState) => $discountState['discount_id'], $discountStates))
             ->delete();
 
         foreach ($discountStates as $discountState) {
@@ -149,7 +149,7 @@ class MysqlOrderRepository implements OrderRepository, InvoiceRepository
 
         DB::table(static::$orderLinePersonalisationsTable)
             ->where('order_id', $order->orderId->get())
-            ->whereNotIn('line_personalisation_id', array_map(fn ($personalisationsState) => $personalisationsState['line_personalisation_id'], $personalisationStates))
+            ->whereNotIn('line_personalisation_id', array_map(fn($personalisationsState) => $personalisationsState['line_personalisation_id'], $personalisationStates))
             ->delete();
 
         foreach ($personalisationStates as $personalisationsState) {
@@ -165,7 +165,7 @@ class MysqlOrderRepository implements OrderRepository, InvoiceRepository
 
     private function upsertShippings(Order $order): void
     {
-        $shippingIds = array_map(fn ($shippingState) => $shippingState['shipping_id'], $order->getChildEntities()[Shipping::class]);
+        $shippingIds = array_map(fn($shippingState) => $shippingState['shipping_id'], $order->getChildEntities()[Shipping::class]);
 
         DB::table(static::$orderShippingTable)
             ->where('order_id', $order->orderId->get())
@@ -185,7 +185,7 @@ class MysqlOrderRepository implements OrderRepository, InvoiceRepository
 
     private function upsertPayments(Order $order): void
     {
-        $paymentIds = array_map(fn ($paymentState) => $paymentState['payment_id'], $order->getChildEntities()[Payment::class]);
+        $paymentIds = array_map(fn($paymentState) => $paymentState['payment_id'], $order->getChildEntities()[Payment::class]);
 
         DB::table(static::$orderPaymentTable)
             ->where('order_id', $order->orderId->get())
@@ -232,7 +232,7 @@ class MysqlOrderRepository implements OrderRepository, InvoiceRepository
 
     private function upsertEvents(Order $order): void
     {
-        $orderEventIds = array_map(fn ($orderEvent) => $orderEvent->orderEventId->get(), $order->getOrderEvents());
+        $orderEventIds = array_map(fn($orderEvent) => $orderEvent->orderEventId->get(), $order->getOrderEvents());
 
         DB::table(static::$orderEventsTable)
             ->where('order_id', $order->orderId->get())
@@ -298,50 +298,50 @@ class MysqlOrderRepository implements OrderRepository, InvoiceRepository
             ->where(static::$orderTable . '.order_id', $orderId->get())
             ->first();
 
-        if (! $orderState) {
+        if (!$orderState) {
             throw new CouldNotFindOrder('No order found by id [' . $orderId->get() . ']');
         }
 
         $allDiscountStates = DB::table(static::$orderDiscountsTable)
             ->where(static::$orderDiscountsTable . '.order_id', $orderId->get())
             ->get()
-            ->map(fn ($item) => (array)$item)
-            ->map(fn ($item) => array_merge($item, []));
+            ->map(fn($item) => (array)$item)
+            ->map(fn($item) => array_merge($item, []));
 
         $allPersonalisationStates = DB::table(static::$orderLinePersonalisationsTable)
             ->where(static::$orderLinePersonalisationsTable . '.order_id', $orderId->get())
             ->get()
-            ->map(fn ($item) => (array)$item);
+            ->map(fn($item) => (array)$item);
 
         $lineStates = DB::table(static::$orderLinesTable)
             ->where(static::$orderLinesTable . '.order_id', $orderId->get())
             ->get()
-            ->map(fn ($item) => (array)$item)
-            ->map(fn ($item) => array_merge($item, [
+            ->map(fn($item) => (array)$item)
+            ->map(fn($item) => array_merge($item, [
                 'includes_vat' => (bool)$item['includes_vat'],
                 'reduced_from_stock' => (bool)$item['reduced_from_stock'],
-                Discount::class => $allDiscountStates->filter(fn ($discountState) => $discountState['discountable_type'] == DiscountableType::line->value && $discountState['discountable_id'] == $item['line_id'])->values()->toArray(),
-                LinePersonalisation::class => $allPersonalisationStates->filter(fn ($personalisationState) => $personalisationState['line_id'] == $item['line_id'])->values()->toArray(),
+                Discount::class => $allDiscountStates->filter(fn($discountState) => $discountState['discountable_type'] == DiscountableType::line->value && $discountState['discountable_id'] == $item['line_id'])->values()->toArray(),
+                LinePersonalisation::class => $allPersonalisationStates->filter(fn($personalisationState) => $personalisationState['line_id'] == $item['line_id'])->values()->toArray(),
             ]))
             ->toArray();
 
         $shippingStates = DB::table(static::$orderShippingTable)
             ->where(static::$orderShippingTable . '.order_id', $orderId->get())
             ->get()
-            ->map(fn ($item) => (array)$item)
-            ->map(fn ($item) => array_merge($item, [
+            ->map(fn($item) => (array)$item)
+            ->map(fn($item) => array_merge($item, [
                 'shipping_state' => $this->container->get(ShippingState::class)::fromString($item['shipping_state']),
-                Discount::class => $allDiscountStates->filter(fn ($discountState) => $discountState['discountable_type'] == DiscountableType::shipping->value && $discountState['discountable_id'] == $item['shipping_id'])->values()->toArray(),
+                Discount::class => $allDiscountStates->filter(fn($discountState) => $discountState['discountable_type'] == DiscountableType::shipping->value && $discountState['discountable_id'] == $item['shipping_id'])->values()->toArray(),
             ]))
             ->toArray();
 
         $paymentStates = DB::table(static::$orderPaymentTable)
             ->where(static::$orderPaymentTable . '.order_id', $orderId->get())
             ->get()
-            ->map(fn ($item) => (array)$item)
-            ->map(fn ($item) => array_merge($item, [
+            ->map(fn($item) => (array)$item)
+            ->map(fn($item) => array_merge($item, [
                 'payment_state' => $this->container->get(PaymentState::class)::fromString($item['payment_state']),
-                Discount::class => $allDiscountStates->filter(fn ($discountState) => $discountState['discountable_type'] == DiscountableType::payment->value && $discountState['discountable_id'] == $item['payment_id'])->values()->toArray(),
+                Discount::class => $allDiscountStates->filter(fn($discountState) => $discountState['discountable_type'] == DiscountableType::payment->value && $discountState['discountable_id'] == $item['payment_id'])->values()->toArray(),
             ]))
             ->toArray();
 
@@ -349,14 +349,14 @@ class MysqlOrderRepository implements OrderRepository, InvoiceRepository
             ->where(static::$orderAddressTable . '.order_id', $orderId->get())
             ->get();
 
-        $shippingAddressState = $addressStates->first(fn ($address) => $address->type == AddressType::shipping->value);
-        $billingAddressState = $addressStates->first(fn ($address) => $address->type == AddressType::billing->value);
+        $shippingAddressState = $addressStates->first(fn($address) => $address->type == AddressType::shipping->value);
+        $billingAddressState = $addressStates->first(fn($address) => $address->type == AddressType::billing->value);
 
         $shopperState = DB::table(static::$orderShopperTable)
             ->where(static::$orderShopperTable . '.order_id', $orderId->get())
             ->first();
 
-        if (! is_null($shopperState)) {
+        if (!is_null($shopperState)) {
             $shopperState = $this->prepareShopperStateForModel((array)$shopperState);
 
             $shopperState = array_merge($shopperState, [
@@ -369,12 +369,12 @@ class MysqlOrderRepository implements OrderRepository, InvoiceRepository
             ->where(static::$orderEventsTable . '.order_id', $orderId->get())
             ->orderBy('at', 'ASC')
             ->get()
-            ->map(fn ($item) => (array)$item)
+            ->map(fn($item) => (array)$item)
             ->toArray();
 
         $childEntities = [
             Line::class => $lineStates,
-            Discount::class => $allDiscountStates->filter(fn ($discountState) => $discountState['discountable_type'] == DiscountableType::order->value && $discountState['discountable_id'] == $orderState->order_id)->values()->toArray(),
+            Discount::class => $allDiscountStates->filter(fn($discountState) => $discountState['discountable_type'] == DiscountableType::order->value && $discountState['discountable_id'] == $orderState->order_id)->values()->toArray(),
             Shipping::class => $shippingStates,
             Payment::class => $paymentStates,
             Shopper::class => $shopperState,
@@ -394,7 +394,7 @@ class MysqlOrderRepository implements OrderRepository, InvoiceRepository
     {
         $order = $this->find($orderId);
 
-        if (! $order->inCustomerHands()) {
+        if (!$order->inCustomerHands()) {
             throw new OrderAlreadyInMerchantHands('Cannot fetch order for cart. Order is no longer in customer hands and has already the following state: ' . $order->getOrderState()->value);
         }
 
@@ -417,7 +417,7 @@ class MysqlOrderRepository implements OrderRepository, InvoiceRepository
     {
         $order_id = DB::table(static::$orderTable)->select('order_id')->where('order_ref', $orderReference->get())->first()?->order_id;
 
-        if (! $order_id) {
+        if (!$order_id) {
             throw new CouldNotFindOrder('No order found by order reference ' . $orderReference->get());
         }
 
@@ -433,7 +433,7 @@ class MysqlOrderRepository implements OrderRepository, InvoiceRepository
     {
         $orderReference = null;
 
-        while (! $orderReference || $this->existsReference($orderReference)) {
+        while (!$orderReference || $this->existsReference($orderReference)) {
             $orderReference = OrderReference::fromString($this->traderConfig->getEnvironmentPrefix() . date('ymd') . '-' . str_pad((string)mt_rand(1, 999), 3, "0"));
         }
 
@@ -447,7 +447,7 @@ class MysqlOrderRepository implements OrderRepository, InvoiceRepository
         $invoiceReference = null;
         $append = '';
 
-        while (! $invoiceReference || $this->existsInvoiceReference($invoiceReference)) {
+        while (!$invoiceReference || $this->existsInvoiceReference($invoiceReference)) {
             $invoiceReference = InvoiceReference::fromString($this->traderConfig->getEnvironmentPrefix() . $createInvoiceReference->create()->get() . $append);
             $append = '_' . mt_rand(0, 999);
         }
@@ -459,7 +459,7 @@ class MysqlOrderRepository implements OrderRepository, InvoiceRepository
     {
         $lastInvoiceRef = DB::table(static::$orderTable)->orderBy('invoice_ref', 'DESC')->select('invoice_ref')->first()?->invoice_ref;
 
-        if (! $lastInvoiceRef) {
+        if (!$lastInvoiceRef) {
             return null;
         }
 
