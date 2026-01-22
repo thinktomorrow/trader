@@ -16,7 +16,7 @@ abstract class OrderReadLine
     use WithFormattedLineTotals;
 
     protected string $line_id;
-    protected PurchasableReference $purchasableReference;
+    protected ?PurchasableReference $purchasableReference;
     protected ?string $variant_id;
     protected ?string $product_id;
     protected array $purchasableData;
@@ -42,6 +42,9 @@ abstract class OrderReadLine
             $line->purchasableReference = $state['purchasable_reference'] ? PurchasableReference::fromString($state['purchasable_reference']) : null;
         } elseif (isset($state['variant_id'])) {
             $line->purchasableReference = $state['variant_id'] ? PurchasableReference::fromString('variant@' . $state['variant_id']) : null;
+        } else {
+            // Reference does not exist (anymore)
+            $line->purchasableReference = null;
         }
 
         $line->line_id = $state['line_id'];
@@ -60,7 +63,7 @@ abstract class OrderReadLine
 //        Assertion::keyIsset($line->data, 'unit_price_excl');
 //        Assertion::keyIsset($line->data, 'unit_price_incl');
 
-        $line->variant_id = $line->purchasableReference->isVariant() ? $line->purchasableReference->getId() : $line->data('variant_id');
+        $line->variant_id = $line->purchasableReference?->isVariant() ? $line->purchasableReference->getId() : $line->data('variant_id');
         $line->product_id = $line->data('product_id');
 
         return $line;

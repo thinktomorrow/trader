@@ -53,6 +53,8 @@ interface MerchantOrder
 
     public function getTotalIncl(): Money;
 
+    public function getVatLines(): array;
+
     public function getFormattedSubtotalExcl(): string;
 
     public function getFormattedSubtotalIncl(): string;

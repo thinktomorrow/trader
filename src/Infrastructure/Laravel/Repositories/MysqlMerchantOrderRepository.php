@@ -138,7 +138,7 @@ class MysqlMerchantOrderRepository implements MerchantOrderRepository
                 MerchantOrderEvent::class => $orderEvents,
             ],
             array_map(fn(Discount $discount) => $this->container->get(MerchantOrderDiscount::class)::fromMappedData(array_merge($discount->getMappedData(), [
-                'percentage' => $discount->getPercentage($order->getSubtotal()),
+                'percentage' => $discount->getPercentage($order->getSubtotalExcl()),
             ]), $orderState), $order->getDiscounts()),
         );
     }

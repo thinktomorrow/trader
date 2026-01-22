@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Thinktomorrow\Trader\Application\Product;
@@ -25,19 +26,24 @@ use Thinktomorrow\Trader\TraderConfig;
 class ProductApplication
 {
     private TraderConfig $traderConfig;
+
     private EventDispatcher $eventDispatcher;
+
     private ProductRepository $productRepository;
+
     private VariantRepository $variantRepository;
+
     private TaxonTreeRepository $taxonTreeRepository;
+
     private TaxonomyRepository $taxonomyRepository;
 
     public function __construct(
-        TraderConfig        $traderConfig,
-        EventDispatcher     $eventDispatcher,
-        ProductRepository   $productRepository,
-        VariantRepository   $variantRepository,
+        TraderConfig $traderConfig,
+        EventDispatcher $eventDispatcher,
+        ProductRepository $productRepository,
+        VariantRepository $variantRepository,
         TaxonTreeRepository $taxonTreeRepository,
-        TaxonomyRepository  $taxonomyRepository,
+        TaxonomyRepository $taxonomyRepository,
     ) {
         $this->traderConfig = $traderConfig;
         $this->eventDispatcher = $eventDispatcher;
@@ -64,8 +70,8 @@ class ProductApplication
         $variant = Variant::create(
             $productId,
             $this->variantRepository->nextReference(),
-            $createProduct->getUnitPrice($this->traderConfig->doesPriceInputIncludesVat(), $this->traderConfig->getDefaultCurrency()),
-            $createProduct->getSalePrice($this->traderConfig->doesPriceInputIncludesVat(), $this->traderConfig->getDefaultCurrency()),
+            $createProduct->getUnitPrice($this->traderConfig->doesPriceInputIncludesVat()),
+            $createProduct->getSalePrice($this->traderConfig->doesPriceInputIncludesVat()),
             $createProduct->getSku()
         );
 

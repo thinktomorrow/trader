@@ -42,18 +42,24 @@ class AdjustVatRates implements Adjuster
 
     private function adjustLinePrices(Order $order): void
     {
-        $variantLines = array_filter($order->getLines(), fn (Line $line) => $line->getPurchasableReference()->isVariant());
+        $variantLines = array_filter($order->getLines(), fn(Line $line) => $line->getPurchasableReference()?->isVariant());
 
         foreach ($variantLines as $line) {
 
-            // Get variant of line for original price
-            $variant = $this->variantForCartRepository->findVariantForCart(VariantId::fromString($line->getPurchasableReference()->getId()));
+            // Get variant of line for original vat percentage
+            try {
+                $variant = $this->variantForCartRepository->findVariantForCart(VariantId::fromString($line->getPurchasableReference()->getId()));
+            } catch (\Throwable $e) {
+                // If variant is not found, skip vat adjustment for this line
+                continue;
+            }
+
             $originalVatPercentage = $variant->getSalePrice()->getVatPercentage();
 
             $vatPercentage = $this->findVatRateForOrder->findForLine($order, $originalVatPercentage);
             $linePrice = $line->getUnitPrice();
 
-            if (! $linePrice->getVatPercentage()->equals($vatPercentage)) {
+            if (!$linePrice->getVatPercentage()->equals($vatPercentage)) {
                 $linePrice = $linePrice->changeVatPercentage($vatPercentage);
                 $order->updateLinePrice($line->lineId, $linePrice);
             }

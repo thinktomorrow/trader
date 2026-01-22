@@ -35,13 +35,15 @@ final class Line implements ChildAggregate, DiscountableItem
 
     public readonly LineId $lineId;
 
-    private PurchasableReference $purchasableReference;
+    private ?PurchasableReference $purchasableReference;
 
     private ItemPrice $unitPrice;
 
     private Quantity $quantity;
 
-    private function __construct() {}
+    private function __construct()
+    {
+    }
 
     public static function create(OrderId $orderId, LineId $lineId, PurchasableReference $purchasableReference, ItemPrice $unitPrice, Quantity $quantity, array $data): static
     {
@@ -87,12 +89,6 @@ final class Line implements ChildAggregate, DiscountableItem
     public function getDiscountPrice(): DiscountPrice|ItemDiscountPrice
     {
         return $this->calculateItemDiscountPrice($this->getSubtotal());
-
-        $unitDiscount = $this->calculateItemDiscountPrice(
-            $this->unitPrice
-        );
-
-        return $unitDiscount->multiply($this->quantity->asInt());
     }
 
     public function getDiscountPriceExcl(): Money
@@ -103,11 +99,6 @@ final class Line implements ChildAggregate, DiscountableItem
     public function getDiscountPriceIncl(): Money
     {
         return $this->getDiscountPrice()->getIncludingVat();
-        //
-        //        return $this->unitPrice
-        //            ->multiply($this->quantity->asInt())
-        //            ->getIncludingVat()
-        //            ->subtract($discountedUnit->multiply($this->quantity->asInt())->getIncludingVat());
     }
 
     public function getQuantity(): Quantity
@@ -120,7 +111,7 @@ final class Line implements ChildAggregate, DiscountableItem
         $this->quantity = $quantity;
     }
 
-    public function getPurchasableReference(): PurchasableReference
+    public function getPurchasableReference(): ?PurchasableReference
     {
         return $this->purchasableReference;
     }
@@ -159,8 +150,8 @@ final class Line implements ChildAggregate, DiscountableItem
     public function getChildEntities(): array
     {
         return [
-            LinePersonalisation::class => array_map(fn ($personalisation) => $personalisation->getMappedData(), $this->personalisations),
-            Discount::class => array_map(fn ($discount) => $discount->getMappedData(), $this->discounts),
+            LinePersonalisation::class => array_map(fn($personalisation) => $personalisation->getMappedData(), $this->personalisations),
+            Discount::class => array_map(fn($discount) => $discount->getMappedData(), $this->discounts),
         ];
     }
 
@@ -174,7 +165,10 @@ final class Line implements ChildAggregate, DiscountableItem
         if (isset($state['purchasable_reference'])) {
             $line->purchasableReference = $state['purchasable_reference'] ? PurchasableReference::fromString($state['purchasable_reference']) : null;
         } elseif (isset($state['variant_id'])) {
-            $line->purchasableReference = $state['variant_id'] ? PurchasableReference::fromString('variant@'.$state['variant_id']) : null;
+            $line->purchasableReference = $state['variant_id'] ? PurchasableReference::fromString('variant@' . $state['variant_id']) : null;
+        } else {
+            // Reference does not exist (anymore)
+            $line->purchasableReference = null;
         }
 
         $line->orderId = OrderId::fromString($aggregateState['order_id']);
@@ -182,8 +176,8 @@ final class Line implements ChildAggregate, DiscountableItem
 
         $line->quantity = Quantity::fromInt($state['quantity']);
         $line->reducedFromStock = $state['reduced_from_stock'];
-        $line->discounts = array_map(fn ($discountState) => Discount::fromMappedData($discountState, $state), $childEntities[Discount::class]);
-        $line->personalisations = array_map(fn ($personalisationState) => LinePersonalisation::fromMappedData($personalisationState, $state), $childEntities[LinePersonalisation::class]);
+        $line->discounts = array_map(fn($discountState) => Discount::fromMappedData($discountState, $state), $childEntities[Discount::class]);
+        $line->personalisations = array_map(fn($personalisationState) => LinePersonalisation::fromMappedData($personalisationState, $state), $childEntities[LinePersonalisation::class]);
         $line->data = json_decode($state['data'], true);
 
         $line->unitPrice = $line->authoritativeIncl()
