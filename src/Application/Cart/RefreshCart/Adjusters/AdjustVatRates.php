@@ -42,7 +42,7 @@ class AdjustVatRates implements Adjuster
 
     private function adjustLinePrices(Order $order): void
     {
-        $variantLines = array_filter($order->getLines(), fn(Line $line) => $line->getPurchasableReference()?->isVariant());
+        $variantLines = array_filter($order->getLines(), fn (Line $line) => $line->getPurchasableReference()?->isVariant());
 
         foreach ($variantLines as $line) {
 
@@ -59,7 +59,7 @@ class AdjustVatRates implements Adjuster
             $vatPercentage = $this->findVatRateForOrder->findForLine($order, $originalVatPercentage);
             $linePrice = $line->getUnitPrice();
 
-            if (!$linePrice->getVatPercentage()->equals($vatPercentage)) {
+            if (! $linePrice->getVatPercentage()->equals($vatPercentage)) {
                 $linePrice = $linePrice->changeVatPercentage($vatPercentage);
                 $order->updateLinePrice($line->lineId, $linePrice);
             }
