@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Thinktomorrow\Trader\Domain\Model\Order\Line;
@@ -24,25 +25,27 @@ use Thinktomorrow\Trader\Domain\Model\Order\OrderId;
 
 final class Line implements ChildAggregate, DiscountableItem
 {
-    use WithAuthoritativeIncl;
     use HasData;
     use HasDiscounts;
     use HasPersonalisations;
     use ReducesStock;
+    use WithAuthoritativeIncl;
 
     public readonly OrderId $orderId;
+
     public readonly LineId $lineId;
+
     private PurchasableReference $purchasableReference;
+
     private ItemPrice $unitPrice;
+
     private Quantity $quantity;
 
-    private function __construct()
-    {
-    }
+    private function __construct() {}
 
     public static function create(OrderId $orderId, LineId $lineId, PurchasableReference $purchasableReference, ItemPrice $unitPrice, Quantity $quantity, array $data): static
     {
-        $line = new static();
+        $line = new self;
 
         $line->orderId = $orderId;
         $line->lineId = $lineId;
@@ -76,14 +79,14 @@ final class Line implements ChildAggregate, DiscountableItem
         return $this->getDiscountedUnitPrice()->multiply($this->quantity->asInt());
     }
 
-    public function getSubTotal(): ItemPrice
+    public function getSubtotal(): ItemPrice
     {
         return $this->unitPrice->multiply($this->quantity->asInt());
     }
 
     public function getDiscountPrice(): DiscountPrice|ItemDiscountPrice
     {
-        return $this->calculateItemDiscountPrice($this->getSubTotal());
+        return $this->calculateItemDiscountPrice($this->getSubtotal());
 
         $unitDiscount = $this->calculateItemDiscountPrice(
             $this->unitPrice
@@ -106,7 +109,6 @@ final class Line implements ChildAggregate, DiscountableItem
         //            ->getIncludingVat()
         //            ->subtract($discountedUnit->multiply($this->quantity->asInt())->getIncludingVat());
     }
-
 
     public function getQuantity(): Quantity
     {
@@ -164,7 +166,7 @@ final class Line implements ChildAggregate, DiscountableItem
 
     public static function fromMappedData(array $state, array $aggregateState, array $childEntities = []): static
     {
-        $line = new static();
+        $line = new static;
 
         $line->setAuthoritativeIncl($state['includes_vat']);
 
@@ -172,7 +174,7 @@ final class Line implements ChildAggregate, DiscountableItem
         if (isset($state['purchasable_reference'])) {
             $line->purchasableReference = $state['purchasable_reference'] ? PurchasableReference::fromString($state['purchasable_reference']) : null;
         } elseif (isset($state['variant_id'])) {
-            $line->purchasableReference = $state['variant_id'] ? PurchasableReference::fromString('variant@' . $state['variant_id']) : null;
+            $line->purchasableReference = $state['variant_id'] ? PurchasableReference::fromString('variant@'.$state['variant_id']) : null;
         }
 
         $line->orderId = OrderId::fromString($aggregateState['order_id']);

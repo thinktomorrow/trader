@@ -37,14 +37,6 @@ interface TraderConfig
     public function doesPriceInputIncludesVat(): bool;
 
     /**
-     * Do the tariffs set in the admin include vat or not?
-     * This is mainly for the shipping tariffs.
-     *
-     * @return bool
-     */
-    public function doesTariffInputIncludesVat(): bool;
-
-    /**
      * Prices will be calculated including or excluding vat. This makes sure that calculations are correct
      * and don't cause any rounding errors - which could occur when calculating excluding vat and
      * including the vat afterwards. this can be set according to the visitor demands (b2b or b2c).

@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Thinktomorrow\Trader\Infrastructure\Test\Repositories;
@@ -32,18 +33,18 @@ use Thinktomorrow\Trader\Infrastructure\Laravel\Models\MerchantOrder\DefaultMerc
 use Thinktomorrow\Trader\Infrastructure\Laravel\Models\MerchantOrder\DefaultMerchantOrderShopper;
 use Thinktomorrow\Trader\Infrastructure\Test\TestContainer;
 
-class InMemoryMerchantOrderRepository implements MerchantOrderRepository, InMemoryRepository
+class InMemoryMerchantOrderRepository implements InMemoryRepository, MerchantOrderRepository
 {
     public function findMerchantOrder(OrderId $orderId): MerchantOrder
     {
         if (! isset(InMemoryOrderRepository::$orders[$orderId->get()])) {
-            throw new CouldNotFindOrder('No order found by id ' . $orderId);
+            throw new CouldNotFindOrder('No order found by id '.$orderId);
         }
 
         $order = InMemoryOrderRepository::$orders[$orderId->get()];
 
         // Since we rely on the vat order snapshot for prices, we need to provide a vat snapshot state to the order read models.
-        (new TestContainer())->get(AdjustOrderVatSnapshot::class)->adjust($order);
+        (new TestContainer)->get(AdjustOrderVatSnapshot::class)->adjust($order);
 
         $orderState = array_merge($order->getMappedData(), [
             'order_state' => $order->getOrderState(),
@@ -53,7 +54,7 @@ class InMemoryMerchantOrderRepository implements MerchantOrderRepository, InMemo
             array_merge($line->getMappedData(), []),
             $orderState,
             array_map(fn (Discount $discount) => DefaultMerchantOrderDiscount::fromMappedData(array_merge($discount->getMappedData(), [
-                'percentage' => $discount->getPercentage($line->getSubTotal()->getExcludingVat()),
+                'percentage' => $discount->getPercentage($line->getSubtotal()->getExcludingVat()),
             ]), $orderState), $line->getDiscounts()),
             array_map(fn (LinePersonalisation $linePersonalisation) => DefaultMerchantOrderLinePersonalisation::fromMappedData(array_merge($linePersonalisation->getMappedData(), [
                 //

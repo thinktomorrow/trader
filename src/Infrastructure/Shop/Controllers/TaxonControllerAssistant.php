@@ -38,8 +38,12 @@ trait TaxonControllerAssistant
         try {
             $taxonNode = $this->categoryRepository->setLocale($locale)->findTaxonByKey($taxonKey);
 
+            if (! $taxonNode) {
+                throw new CouldNotFindTaxon('Taxon '.$taxonKey.' not found.');
+            }
+
             if (! $taxonNode->showOnline()) {
-                throw new CouldNotFindTaxon('Taxon ' . $taxonKey . ' is offline.');
+                throw new CouldNotFindTaxon('Taxon '.$taxonKey.' is offline.');
             }
 
             return $taxonNode;
@@ -48,13 +52,13 @@ trait TaxonControllerAssistant
                 throw (new FoundRouteAsRedirect($this->getTaxonUrl($redirect->getLocale(), $redirect->getFrom())))->setRedirect($this->getTaxonUrl($redirect->getLocale(), $redirect->getTo()));
             }
 
-            throw new NotFoundHttpException('No Taxon category found by slug ' . implode('/', $taxonKeys));
+            throw new NotFoundHttpException('No Taxon category found by slug '.implode('/', $taxonKeys));
         }
     }
 
     protected function getTaxonUrl(Locale $locale, string $taxon_key): string
     {
-        return $locale->get() . '/' . $taxon_key;
+        return $locale->get().'/'.$taxon_key;
     }
 
     protected function getProducts(?TaxonNode $taxon, Request $request): LengthAwarePaginator
@@ -65,11 +69,11 @@ trait TaxonControllerAssistant
         // Filter by price range
         if ($request->anyFilled('price-from', 'price-to')) {
             $priceFrom = $request->filled('price-from')
-                ? (string)IntegerConverter::convertDecimalToInteger($request->input('price-from'))
+                ? (string) IntegerConverter::convertDecimalToInteger($request->input('price-from'))
                 : null;
 
             $priceTo = $request->filled('price-to')
-                ? (string)IntegerConverter::convertDecimalToInteger($request->input('price-to'))
+                ? (string) IntegerConverter::convertDecimalToInteger($request->input('price-to'))
                 : null;
 
             if ($priceFrom !== null && $priceTo !== null && $priceFrom > $priceTo) {
@@ -128,7 +132,7 @@ trait TaxonControllerAssistant
      * category (taxon), but excludes further filtering like attributes,
      * options, or other detailed characteristics.
      *
-     * @param TaxonNode|null $taxon Optional taxon to limit the grid to a specific category.
+     * @param  TaxonNode|null  $taxon  Optional taxon to limit the grid to a specific category.
      */
     protected function setBaseProductAndVariantIds(?TaxonNode $taxon): void
     {

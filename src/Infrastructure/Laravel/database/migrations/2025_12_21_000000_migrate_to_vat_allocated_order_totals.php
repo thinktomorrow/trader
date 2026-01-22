@@ -20,7 +20,7 @@ return new class extends Migration {
             $table->json('vat_lines')->nullable()->after('total_vat');
 
             // Subtotal
-            $table->unsignedBigInteger('subtotal_excl')->nullable()->after('total_incl');
+            $table->unsignedBigInteger('subtotal_excl')->nullable()->after('vat_lines');
             $table->unsignedBigInteger('subtotal_incl')->nullable()->after('subtotal_excl');
 
             // Discounts

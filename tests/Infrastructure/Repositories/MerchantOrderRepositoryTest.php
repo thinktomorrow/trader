@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Tests\Infrastructure\Repositories;
@@ -19,8 +20,8 @@ use Thinktomorrow\Trader\Infrastructure\Test\TestContainer;
 
 class MerchantOrderRepositoryTest extends TestCase
 {
-    use RefreshDatabase;
     use PrepareWorld;
+    use RefreshDatabase;
 
     public function test_it_can_find_a_merchantorder()
     {
@@ -44,7 +45,7 @@ class MerchantOrderRepositoryTest extends TestCase
             $this->assertCount(1, $merchantOrder->getLines());
             $this->assertEquals(
                 Cash::from($order->getTotal()->getIncludingVat())->toLocalizedFormat(Locale::fromString('nl', 'BE')),
-                $merchantOrder->getTotalPrice()
+                $merchantOrder->getFormattedTotalIncl()
             );
         }
     }
@@ -83,19 +84,19 @@ class MerchantOrderRepositoryTest extends TestCase
 
     private function orderRepositories(): \Generator
     {
-        yield new InMemoryOrderRepository();
-        yield (new TestContainer())->get(MysqlOrderRepository::class);
+        yield new InMemoryOrderRepository;
+        yield (new TestContainer)->get(MysqlOrderRepository::class);
     }
 
     private function merchantOrderRepositories(): \Generator
     {
-        yield new InMemoryMerchantOrderRepository();
-        yield new MysqlMerchantOrderRepository(new TestContainer(), (new TestContainer())->get(MysqlOrderRepository::class));
+        yield new InMemoryMerchantOrderRepository;
+        yield new MysqlMerchantOrderRepository(new TestContainer, (new TestContainer)->get(MysqlOrderRepository::class));
     }
 
     private function productRepositories(): \Generator
     {
-        yield new InMemoryProductRepository();
-        yield new MysqlProductRepository(new MysqlVariantRepository(new TestContainer()));
+        yield new InMemoryProductRepository;
+        yield new MysqlProductRepository(new MysqlVariantRepository(new TestContainer));
     }
 }

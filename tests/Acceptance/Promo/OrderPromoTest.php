@@ -38,7 +38,7 @@ class OrderPromoTest extends TestCase
         $cart = $this->orderContext->findCart($order->orderId);
         $this->assertCount(1, $cart->getDiscounts());
 
-        $this->assertEquals(Money::EUR(80), $order->getSubTotalExcl());
+        $this->assertEquals(Money::EUR(80), $order->getSubtotalExcl());
         $this->assertEquals(Money::EUR(12), $order->getDiscountTotalExcl());
         $this->assertEquals(Money::EUR(68), $order->getTotalExcl());
     }
@@ -74,7 +74,7 @@ class OrderPromoTest extends TestCase
         $cart = $this->orderContext->findCart($order->orderId);
         $this->assertCount(1, $cart->getDiscounts());
 
-        $this->assertEquals(Money::EUR(80), $order->getSubTotalExcl());
+        $this->assertEquals(Money::EUR(80), $order->getSubtotalExcl());
         $this->assertEquals(Money::EUR(12), $order->getDiscountTotalExcl());
         $this->assertEquals(Money::EUR(68), $order->getTotalExcl());
     }
@@ -262,7 +262,7 @@ class OrderPromoTest extends TestCase
         $order = $this->orderContext->findOrder($order->orderId);
 
         $this->assertCount(1, $order->getDiscounts());
-        $this->assertEquals(Money::EUR(80), $order->getSubTotalExcl());
+        $this->assertEquals(Money::EUR(80), $order->getSubtotalExcl());
         $this->assertEquals(Money::EUR(80), $order->getDiscountTotalExcl());
         $this->assertEquals(Money::EUR(0), $order->getTotalExcl());
     }

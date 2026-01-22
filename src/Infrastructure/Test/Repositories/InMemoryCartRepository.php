@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Thinktomorrow\Trader\Infrastructure\Test\Repositories;
@@ -34,17 +35,17 @@ final class InMemoryCartRepository implements CartRepository, InMemoryRepository
     public function findCart(OrderId $orderId): Cart
     {
         if (! isset(InMemoryOrderRepository::$orders[$orderId->get()])) {
-            throw new CouldNotFindOrder('No order found by id ' . $orderId);
+            throw new CouldNotFindOrder('No order found by id '.$orderId);
         }
 
         $order = InMemoryOrderRepository::$orders[$orderId->get()];
 
         if (! $order->inCustomerHands()) {
-            throw new OrderAlreadyInMerchantHands('Cannot fetch cart. Order is no longer in customer hands and has already the following state: ' . $order->getOrderState()->value);
+            throw new OrderAlreadyInMerchantHands('Cannot fetch cart. Order is no longer in customer hands and has already the following state: '.$order->getOrderState()->value);
         }
 
         // Since we rely on the vat order snapshot for prices, we need to provide a vat snapshot state to the cart read models.
-        (new TestContainer())->get(AdjustOrderVatSnapshot::class)->adjust($order);
+        (new TestContainer)->get(AdjustOrderVatSnapshot::class)->adjust($order);
 
         $orderState = $order->getMappedData();
 
@@ -60,7 +61,7 @@ final class InMemoryCartRepository implements CartRepository, InMemoryRepository
             ]),
             $orderState,
             array_map(fn (Discount $discount) => DefaultCartDiscount::fromMappedData(array_merge($discount->getMappedData(), [
-                'percentage' => $discount->getPercentage($line->getSubTotal()->getExcludingVat()),
+                'percentage' => $discount->getPercentage($line->getSubtotal()->getExcludingVat()),
             ]), $orderState), $line->getDiscounts()),
             array_map(fn (LinePersonalisation $linePersonalisation) => DefaultCartLinePersonalisation::fromMappedData(array_merge($linePersonalisation->getMappedData(), [
                 //

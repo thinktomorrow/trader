@@ -14,6 +14,14 @@ interface TaxonFilters
      */
     public function getAvailableFilters(array $scopedTaxonIds): array;
 
+    /**
+     * Get all root taxa as available filters for the given taxonomy
+     *
+     * @param string $taxonomyId
+     * @return array
+     */
+    public function getAvailableFiltersByRoots(string $taxonomyId): array;
+
     public function getActiveFilters(array $scopedTaxonIds, array $activeTaxonKeys): TaxonTree;
 
     /**
