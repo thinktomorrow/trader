@@ -37,6 +37,11 @@ class Percentage
         return bcdiv($this->value, "100", 4);
     }
 
+    public function toFloat(): float
+    {
+        return (float)$this->toDecimal();
+    }
+
     public function doesItExceeds100(): bool
     {
         return $this->value > 100;
