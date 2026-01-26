@@ -21,7 +21,7 @@ class MerchantOrderTest extends CartContext
 {
     public function test_as_a_merchant_i_need_to_be_able_to_see_the_totals()
     {
-        $order = $this->orderContext->createDefaultOrder();
+        $order = $this->orderContext->createDefaultDiscountedOrder();
 
         (new TestContainer())->get(AdjustOrderVatSnapshot::class)->adjust($order);
         $this->orderContext->saveOrder($order);
@@ -47,7 +47,7 @@ class MerchantOrderTest extends CartContext
 
     public function test_it_can_get_formatted_totals()
     {
-        $order = $this->orderContext->createDefaultOrder();
+        $order = $this->orderContext->createDefaultDiscountedOrder();
 
         (new TestContainer())->get(AdjustOrderVatSnapshot::class)->adjust($order);
         $this->orderContext->saveOrder($order);
@@ -69,7 +69,7 @@ class MerchantOrderTest extends CartContext
 
     public function test_as_a_merchant_i_need_to_be_able_to_see_each_line_of_the_order()
     {
-        $order = $this->orderContext->createDefaultOrder();
+        $order = $this->orderContext->createDefaultDiscountedOrder();
         $order = $this->orderContext->findMerchantOrder($order->orderId->get());
 
         // Line
@@ -103,7 +103,7 @@ class MerchantOrderTest extends CartContext
 
     public function test_as_a_merchant_i_need_to_be_able_to_see_shipping_address()
     {
-        $order = $this->orderContext->createDefaultOrder();
+        $order = $this->orderContext->createDefaultDiscountedOrder();
         $order = $this->orderContext->findMerchantOrder($order->orderId->get());
 
         $this->assertEquals('BE', $order->getShippingAddress()->getCountryId());
@@ -117,7 +117,7 @@ class MerchantOrderTest extends CartContext
 
     public function test_as_a_merchant_i_need_to_be_able_to_see_billing_address()
     {
-        $order = $this->orderContext->createDefaultOrder();
+        $order = $this->orderContext->createDefaultDiscountedOrder();
         $order = $this->orderContext->findMerchantOrder($order->orderId->get());
 
         $this->assertEquals('NL', $order->getBillingAddress()->getCountryId());
@@ -131,7 +131,7 @@ class MerchantOrderTest extends CartContext
 
     public function test_as_a_merchant_i_need_to_be_able_to_see_shipping()
     {
-        $order = $this->orderContext->createDefaultOrder();
+        $order = $this->orderContext->createDefaultDiscountedOrder();
         $order = $this->orderContext->findMerchantOrder($order->orderId->get());
 
         $this->assertInstanceOf(MerchantOrderShipping::class, $order->getShippings()[0]);
@@ -174,7 +174,7 @@ class MerchantOrderTest extends CartContext
         $order = $this->orderContext->findMerchantOrder($order->orderId->get());
 
         $this->assertInstanceOf(MerchantOrderShopper::class, $order->getShopper());
-        $this->assertEquals('ben@thinktomorrow.be', $order->getShopper()->getEmail());
+        $this->assertEquals('order-aaa-shopper-aaa@thinktomorrow.be', $order->getShopper()->getEmail());
         $this->assertFalse($order->getShopper()->isBusiness());
         $this->assertTrue($order->getShopper()->isGuest());
         $this->assertFalse($order->getShopper()->isCustomer());

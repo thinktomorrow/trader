@@ -18,7 +18,7 @@ class OrderGridItemTest extends TestCase
 
     public function test_it_can_create_a_order_grid_item()
     {
-        $order = $this->orderContext->createDefaultOrder();
+        $order = $this->orderContext->createDefaultDiscountedOrder();
 
         // Refresh Vat snapshot
         (new TestContainer())->get(AdjustOrderVatSnapshot::class)->adjust($order);
@@ -51,7 +51,7 @@ class OrderGridItemTest extends TestCase
 
     public function test_it_can_return_formatted_prices()
     {
-        $order = $this->orderContext->createDefaultOrder();
+        $order = $this->orderContext->createDefaultDiscountedOrder();
 
         // Refresh Vat snapshot
         (new TestContainer())->get(AdjustOrderVatSnapshot::class)->adjust($order);

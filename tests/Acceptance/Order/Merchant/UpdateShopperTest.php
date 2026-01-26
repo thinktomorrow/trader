@@ -31,7 +31,7 @@ class UpdateShopperTest extends CartContext
             'foo' => 'baz', 'foz' => 'boss']), $order->getShopper()->getData());
 
         $this->assertEquals(new ShopperUpdatedByMerchant($order->orderId, [
-            'email' => ['old' => 'ben@thinktomorrow.be', 'new' => 'ben-changed@thinktomorrow.be'],
+            'email' => ['old' => 'order-aaa-shopper-aaa@thinktomorrow.be', 'new' => 'ben-changed@thinktomorrow.be'],
             'locale' => ['old' => 'nl-be', 'new' => 'nl'],
             'foo' => ['old' => null, 'new' => 'baz'],
             'foz' => ['old' => null, 'new' => 'boss'],
