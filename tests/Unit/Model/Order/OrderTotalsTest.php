@@ -35,6 +35,7 @@ class OrderTotalsTest extends TestCase
     public function test_it_can_get_calculated_totals()
     {
         $order = $this->orderContext->createDefaultOrder();
+        $this->orderContext->addDiscountToOrder($order, $this->orderContext->createOrderDiscount());
 
         $this->assertEquals(Money::EUR('166'), $order->getSubtotalExcl());
         $this->assertEquals(Money::EUR('200'), $order->getSubtotalIncl());
@@ -47,6 +48,7 @@ class OrderTotalsTest extends TestCase
     public function test_it_can_get_totals_incl_from_snapshot()
     {
         $order = $this->orderContext->createDefaultOrder();
+        $this->orderContext->addDiscountToOrder($order, $this->orderContext->createOrderDiscount());
 
         (new TestContainer())->get(AdjustOrderVatSnapshot::class)->adjust($order);
 

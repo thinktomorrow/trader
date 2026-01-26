@@ -74,7 +74,7 @@ class OrderTest extends TestCase
         $order->updateShopper($shopper);
 
         $this->assertEquals(CustomerId::fromString('zzz'), $order->getShopper()->getCustomerId());
-        $this->assertEquals(Email::fromString('ben@thinktomorrow.be'), $order->getShopper()->getEmail());
+        $this->assertEquals(Email::fromString('order-aaa-shopper-aaa@thinktomorrow.be'), $order->getShopper()->getEmail());
         $this->assertFalse($order->getShopper()->isBusiness());
 
         $this->assertEquals([

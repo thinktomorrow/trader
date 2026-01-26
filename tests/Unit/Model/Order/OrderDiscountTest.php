@@ -52,7 +52,7 @@ class OrderDiscountTest extends TestCase
 
         $order->addDiscount($discount);
 
-        $this->assertCount(2, $order->getChildEntities()[Discount::class]);
+        $this->assertCount(1, $order->getChildEntities()[Discount::class]);
     }
 
     public function test_it_can_add_a_discount_to_payment()
@@ -76,6 +76,7 @@ class OrderDiscountTest extends TestCase
         $discount = $this->orderContext->createOrderDiscount();
 
         $order->addDiscount($discount);
+        $order->addDiscount($discount);
 
         $this->assertCount(1, $order->getChildEntities()[Discount::class]);
     }
@@ -87,6 +88,7 @@ class OrderDiscountTest extends TestCase
         $order = $this->orderContext->createDefaultOrder();
         $discount = $this->orderContext->createOrderDiscount('order-aaa', 'discount-bbb');
 
+        $order->addDiscount($discount);
         $order->addDiscount($discount);
 
         $this->assertCount(1, $order->getChildEntities()[Discount::class]);
@@ -124,6 +126,9 @@ class OrderDiscountTest extends TestCase
     public function test_it_can_delete_a_discount()
     {
         $order = $this->orderContext->createDefaultOrder();
+
+        $discount = $this->orderContext->createOrderDiscount();
+        $order->addDiscount($discount);
 
         $this->assertCount(1, $order->getChildEntities()[Discount::class]);
 
