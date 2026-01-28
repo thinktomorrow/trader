@@ -4,6 +4,15 @@ Important changes will be notified in this file
 
 ## unreleased
 
+- Removed: usage of variantForCartRepository and use ProductDetailRepository everywhere.
+- Added: taxa data to CartLines and MerchantOrderLines.
+- Added: TraderConfig::areItemPricesCalculatedExcludingVat() and TraderConfig::areItemDiscountsCalculatedExcludingVat()
+- Added: LineRead::getFormattedDiscountPercentage(): float;
+- Changed: LineRead::getDiscountPercentage(): float; (previous type was int)
+- Changed: translation keys always prefixed with 'trader-' to avoid conflicts with project translation keys.
+
+## Pending release - 0.8.0
+
 - Changed: now requires PHP 8.4 and Laravel 12
 
 ### Introducing Taxonomy & Taxon setup

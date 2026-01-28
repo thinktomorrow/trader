@@ -13,11 +13,11 @@ class CustomerValidateSignature extends ValidateSignature
     {
         [$relative, $ignore] = $this->parseArguments($args);
 
-        if ($request->hasValidSignatureWhileIgnoring($ignore, ! $relative)) {
+        if ($request->hasValidSignatureWhileIgnoring($ignore, !$relative)) {
             return $next($request);
         }
 
         return redirect()->route('customer.verification.show')
-            ->with('status', trans('auth.verify.invalid_verification'));
+            ->with('status', trans('trader-auth.verify.invalid_verification'));
     }
 }

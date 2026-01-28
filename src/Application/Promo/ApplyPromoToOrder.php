@@ -7,14 +7,12 @@ use Thinktomorrow\Trader\Application\Promo\LinePromo\LineDiscount;
 use Thinktomorrow\Trader\Application\Promo\OrderPromo\OrderDiscount;
 use Thinktomorrow\Trader\Domain\Model\Order\Order;
 use Thinktomorrow\Trader\Domain\Model\Order\OrderRepository;
+use Thinktomorrow\Trader\TraderConfig;
 
 class ApplyPromoToOrder
 {
-    private OrderRepository $orderRepository;
-
-    public function __construct(OrderRepository $orderRepository)
+    public function __construct(private OrderRepository $orderRepository, private TraderConfig $config)
     {
-        $this->orderRepository = $orderRepository;
     }
 
     /**
@@ -30,7 +28,7 @@ class ApplyPromoToOrder
         $hasBeenApplied = false;
 
         // Check if order is in customer hands still. Or can admin add promo afterwards?
-        if (! $order->getOrderState()->inCustomerHands()) {
+        if (!$order->getOrderState()->inCustomerHands()) {
             return;
         }
 
@@ -40,6 +38,9 @@ class ApplyPromoToOrder
             if ($discount instanceof LineDiscount) {
                 foreach ($order->getLines() as $line) {
                     if ($discount->isApplicable($order, $line)) {
+
+                        $discount->setCalculateExcludingVat($this->config->areItemDiscountsCalculatedExcludingVat());
+
                         $discount->apply($order, $line, $this->orderRepository->nextDiscountReference());
                         $hasBeenApplied = true;
                     }
@@ -72,7 +73,7 @@ class ApplyPromoToOrder
     private static function validateDiscounts($discounts): void
     {
         foreach ($discounts as $discount) {
-            if (! $discount instanceof OrderDiscount && ! $discount instanceof LineDiscount) {
+            if (!$discount instanceof OrderDiscount && !$discount instanceof LineDiscount) {
                 throw new \InvalidArgumentException('Invalid discount type [' . $discount::class . '] provided in child entities for OrderPromo.');
             }
         }

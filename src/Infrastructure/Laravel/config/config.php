@@ -50,12 +50,25 @@ return [
     'does_tariff_input_includes_vat' => true,
 
     /**
+     * Show product prices including or excluding vat in the shop.
+     */
+    'include_vat_in_prices' => true,
+
+    /**
      * Prices on the shop will be calculated including or excluding vat. This makes sure that calculations are correct
      * and don't cause any rounding errors - which could occur when calculating excluding vat and including the vat
      * afterward. This can be set according to the visitor demands (b2b or b2c). This also determines how the
      * catalog prices are displayed.
      */
-    'include_vat_in_prices' => true,
+    'calculate_item_prices_excluding_vat' => false,
+
+    /**
+     * Calculate item discounts on the prices including or excluding vat.
+     * This setting is mostly relevant for b2b shops where discounts are
+     * often calculated on the prices excluding vat. Order discounts
+     * are always calculated on the prices excluding vat.
+     */
+    'calculate_item_discounts_excluding_vat' => false,
 
     /**
      * If this is true, the shop allows vat exemption for international business shoppers.

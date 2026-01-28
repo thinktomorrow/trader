@@ -67,6 +67,17 @@ class TraderConfig implements \Thinktomorrow\Trader\TraderConfig
         return config('trader.include_vat_in_prices');
     }
 
+    public function areItemPricesCalculatedExcludingVat(): bool
+    {
+        return config('trader.calculate_item_prices_excluding_vat');
+    }
+
+    public function areItemDiscountsCalculatedExcludingVat(): bool
+    {
+        return config('trader.calculate_item_discounts_excluding_vat');
+    }
+
+
     public function isVatExemptionAllowed(): bool
     {
         return config('trader.allow_vat_exemption', true);

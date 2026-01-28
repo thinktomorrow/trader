@@ -47,14 +47,14 @@ class VerificationController extends Controller
     {
         $customer = CustomerModel::findOrFail($request->route('id'));
 
-        if (! hash_equals((string) $request->route('hash'), sha1($customer->getEmailForVerification()))) {
+        if (!hash_equals((string)$request->route('hash'), sha1($customer->getEmailForVerification()))) {
             throw new AuthorizationException;
         }
         if ($customer->hasVerifiedEmail()) {
             $route = Auth::guard('customer')->check() ? 'customer.index' : 'customer.login';
 
             return redirect()->route($route)
-                ->with('status', trans('auth.verify.already_verified'));
+                ->with('status', trans('trader-auth.verify.already_verified'));
         }
 
         $customer->markEmailAsVerified();
@@ -62,7 +62,7 @@ class VerificationController extends Controller
         event(new \Illuminate\Auth\Events\Verified($customer));
 
         return redirect()->route('customer.login')
-            ->with('status', trans('auth.verify.success_verified'))
+            ->with('status', trans('trader-auth.verify.success_verified'))
             ->with('verified', true);
     }
 

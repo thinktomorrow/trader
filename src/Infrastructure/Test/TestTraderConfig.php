@@ -59,6 +59,16 @@ class TestTraderConfig implements TraderConfig
         return true;
     }
 
+    public function areItemPricesCalculatedExcludingVat(): bool
+    {
+        return false;
+    }
+
+    public function areItemDiscountsCalculatedExcludingVat(): bool
+    {
+        return false;
+    }
+
     public function isVatExemptionAllowed(): bool
     {
         return $this->overwrites['allow_vat_exemption'] ?? true;

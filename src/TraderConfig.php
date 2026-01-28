@@ -37,13 +37,28 @@ interface TraderConfig
     public function doesPriceInputIncludesVat(): bool;
 
     /**
+     * Show product prices including or excluding vat in the shop.
+     *
+     * @return bool
+     */
+    public function includeVatInPrices(): bool;
+
+    /**
      * Prices will be calculated including or excluding vat. This makes sure that calculations are correct
      * and don't cause any rounding errors - which could occur when calculating excluding vat and
      * including the vat afterwards. this can be set according to the visitor demands (b2b or b2c).
      *
      * @return bool
      */
-    public function includeVatInPrices(): bool;
+    public function areItemPricesCalculatedExcludingVat(): bool;
+
+    /**
+     * Calculate item discounts on the prices including or excluding vat.
+     * This setting is mostly relevant for b2b shops where discounts are
+     * often calculated on the prices excluding vat. Order discounts
+     * are always calculated on the prices excluding vat.
+     */
+    public function areItemDiscountsCalculatedExcludingVat(): bool;
 
     /**
      * If this is true, the shop allows vat exemption for international business shoppers.

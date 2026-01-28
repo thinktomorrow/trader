@@ -19,7 +19,9 @@ use Thinktomorrow\Trader\Application\Cart\RefreshCart\Adjusters\AdjustVatRates;
 use Thinktomorrow\Trader\Application\Cart\RefreshCart\RefreshCart;
 use Thinktomorrow\Trader\Application\Cart\RefreshCart\RefreshCartAction;
 use Thinktomorrow\Trader\Application\Cart\ShippingProfile\UpdateShippingProfileOnOrder;
-use Thinktomorrow\Trader\Application\Cart\VariantForCart\VariantForCartRepository;
+use Thinktomorrow\Trader\Application\Product\ProductDetail\ProductDetailRepository;
+use Thinktomorrow\Trader\Application\Product\Taxa\ProductTaxonItem;
+use Thinktomorrow\Trader\Application\Product\Taxa\VariantTaxonItem;
 use Thinktomorrow\Trader\Application\VatNumber\ValidateVatNumber;
 use Thinktomorrow\Trader\Application\VatNumber\VatNumberApplication;
 use Thinktomorrow\Trader\Application\VatNumber\VatNumberValidation;
@@ -46,7 +48,7 @@ final class CartApplication
     public function __construct(
         private TraderConfig                 $config,
         private ContainerInterface           $container,
-        private VariantForCartRepository     $findVariantDetailsForCart,
+        private ProductDetailRepository      $productDetailRepository,
         private AdjustLine                   $adjustLine,
         private OrderRepository              $orderRepository,
         private OrderStateMachine            $orderStateMachine,
@@ -57,7 +59,8 @@ final class CartApplication
         private EventDispatcher              $eventDispatcher,
         private VatNumberApplication         $vatNumberApplication,
         private VatExemptionApplication      $vatExemptionApplication,
-    ) {
+    )
+    {
 
     }
 
@@ -97,17 +100,21 @@ final class CartApplication
 
     public function addLine(AddLine $addLine): OrderId
     {
+        $locale = $addLine->getData()['locale'] ?? null;
+
         $orderId = $addLine->getOrderId();
         $order = $this->orderRepository->findForCart($orderId);
         $lineId = $this->orderRepository->nextLineReference();
 
-        $variant = $this->findVariantDetailsForCart->findVariantForCart($addLine->getVariantId());
+        $product = $this->productDetailRepository->findProductDetail($addLine->getVariantId());
 
         $itemPrice = DefaultItemPrice::fromMoney(
-            $this->config->includeVatInPrices() ? $variant->getUnitPrice()->getIncludingVat() : $variant->getUnitPrice()->getExcludingVat(),
-            $variant->getUnitPrice()->getVatPercentage(),
+            $this->config->includeVatInPrices() ? $product->getUnitPrice()->getIncludingVat() : $product->getUnitPrice()->getExcludingVat(),
+            $product->getUnitPrice()->getVatPercentage(),
             $this->config->includeVatInPrices()
         );
+
+        $taxaData = $this->extractTaxaData($product, $locale);
 
         $line = Line::create(
             $orderId,
@@ -116,13 +123,13 @@ final class CartApplication
             $itemPrice,
             $addLine->getQuantity(),
             array_merge($addLine->getData(), [
-                'title' => $variant->getTitle($addLine->getData()['locale'] ?? null),
-                'taxa' => $variant->getTaxa(),
-                'product_id' => $variant->getProductId()->get(),
-                'unit_price_excl' => $variant->getUnitPrice()->getExcludingVat()->getAmount(),
-                'unit_price_incl' => $variant->getUnitPrice()->getIncludingVat()->getAmount(),
-                'sale_price_excl' => $variant->getSalePrice()->getExcludingVat()->getAmount(),
-                'sale_price_incl' => $variant->getSalePrice()->getIncludingVat()->getAmount(),
+                'title' => $product->getTitle($locale),
+                'taxa' => $taxaData,
+                'product_id' => $product->getProductId(),
+                'unit_price_excl' => $product->getUnitPrice()->getExcludingVat()->getAmount(),
+                'unit_price_incl' => $product->getUnitPrice()->getIncludingVat()->getAmount(),
+                'sale_price_excl' => $product->getSalePrice()->getExcludingVat()->getAmount(),
+                'sale_price_incl' => $product->getSalePrice()->getIncludingVat()->getAmount(),
             ])
         );
 
@@ -145,7 +152,7 @@ final class CartApplication
                 }
             }
 
-            if (! $originalPersonalisation) {
+            if (!$originalPersonalisation) {
                 throw new \InvalidArgumentException('No personalisation found for variant [' . $addLine->getVariantId()->get() . '] by personalisation id [' . $personalisation_id . '].');
             }
 
@@ -339,7 +346,7 @@ final class CartApplication
         $order = $this->orderRepository->findForCart($command->getOrderId());
         $shopper = $order->getShopper();
 
-        if (! $billingAddressCountryId = $order->getBillingAddress()?->getAddress()->countryId) {
+        if (!$billingAddressCountryId = $order->getBillingAddress()?->getAddress()->countryId) {
             return;
         }
 
@@ -399,11 +406,11 @@ final class CartApplication
         $shopper->addData($customer->getData());
         $order->updateShopper($shopper);
 
-        if (! $order->getBillingAddress() && $billingAddress = $customer->getBillingAddress()) {
+        if (!$order->getBillingAddress() && $billingAddress = $customer->getBillingAddress()) {
             $this->chooseCustomerBillingAddress($order, $billingAddress);
         }
 
-        if (! $order->getShippingAddress() && $shippingAddress = $customer->getShippingAddress()) {
+        if (!$order->getShippingAddress() && $shippingAddress = $customer->getShippingAddress()) {
             $this->chooseCustomerShippingAddress($order, $shippingAddress);
         }
 
@@ -490,5 +497,27 @@ final class CartApplication
         $this->orderRepository->save($order);
 
         $this->eventDispatcher->dispatchAll($order->releaseEvents());
+    }
+
+    private function extractTaxaData(\Thinktomorrow\Trader\Application\Product\ProductDetail\ProductDetail $product, ?string $locale): array
+    {
+        $taxaData = [];
+
+        /** @var ProductTaxonItem|VariantTaxonItem $taxa */
+        foreach ($product->getTaxa() as $taxon) {
+            $taxaData[] = [
+                'class_type' => $taxon instanceof VariantTaxonItem ? VariantTaxonItem::class : ProductTaxonItem::class,
+                'taxonomy_id' => $taxon->getTaxonomyId(),
+                'taxonomy_type' => $taxon->getTaxonomyType(),
+                'taxon_id' => $taxon->getTaxonId(),
+                'key' => $taxon->getKey($locale),
+                'url' => $taxon->getUrl($locale),
+                'label' => $taxon->getLabel($locale),
+                'taxonomy_label' => $taxon->getTaxonomyLabel($locale),
+                'data' => $taxon->getData(),
+            ];
+        }
+
+        return $taxaData;
     }
 }

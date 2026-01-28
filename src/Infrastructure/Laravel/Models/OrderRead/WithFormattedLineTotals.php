@@ -34,16 +34,21 @@ trait WithFormattedLineTotals
         return $this->renderMoney($this->getDiscountPriceIncl(), $this->getLocale());
     }
 
-    public function getDiscountPercentage(): int
+    public function getDiscountPercentage(): float
     {
         $unitPrice = $this->getUnitPriceExcl()->getAmount();
         $salePrice = $this->getDiscountedUnitPriceExcl()->getAmount();
 
         if ($unitPrice == 0) {
-            return 0;
+            return 0.0;
         }
 
-        return (int)ceil((($unitPrice - $salePrice) / $unitPrice) * 100);
+        return (($unitPrice - $salePrice) / $unitPrice) * 100;
+    }
+
+    public function getFormattedDiscountPercentage(): float
+    {
+        return round($this->getDiscountPercentage(), 2);
     }
 
     public function getFormattedTotalPriceExcl(): string

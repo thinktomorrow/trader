@@ -39,7 +39,7 @@ class VerifyEmailNotification extends VerifyEmail implements ShouldQueue
         $verificationUrl = $this->verificationUrl($notifiable);
 
         return new MailMessage()
-            ->subject(trans('mails.verify.subject'))
+            ->subject(trans('trader-mails.verify.subject'))
             ->from($this->traderConfig->getWebmasterEmail(), $this->traderConfig->getWebmasterName())
             ->view('trader::customer.auth.verification-mail', [
                 'customer' => $this->customer,

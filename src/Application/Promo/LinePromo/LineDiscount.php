@@ -21,6 +21,11 @@ interface LineDiscount extends Mappable
     public function getDiscountPrice(Order $order, DiscountableItem $discountable): ItemDiscountPrice;
 
     /**
+     * Should the discount be calculated on prices excluding VAT?
+     */
+    public function setCalculateExcludingVat(bool $calculateExcludingVat): void;
+
+    /**
      * The total discount on the order. This is not used in the price calculation, but rather
      * for sorting the available order promos to determine which one has the highest
      * discount impact. This way the visitor receives the best available discount.

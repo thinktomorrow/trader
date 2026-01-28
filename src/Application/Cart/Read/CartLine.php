@@ -25,7 +25,9 @@ interface CartLine
 
     public function getDiscountPriceIncl(): Money;
 
-    public function getDiscountPercentage(): int;
+    public function getFormattedDiscountPercentage(): float;
+
+    public function getDiscountPercentage(): float;
 
     public function getTotalPriceExcl(): Money;
 

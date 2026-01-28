@@ -182,7 +182,7 @@ final class VatAllocator
             foreach ($vatLinesPart as $vatLine) {
                 $vatPercentage = $vatLine->getVatPercentage()->get();
 
-                if (! isset($vatLines[$vatPercentage])) {
+                if (!isset($vatLines[$vatPercentage])) {
                     $vatLines[$vatPercentage] = $vatLine;
                 } else {
                     $vatLines[$vatPercentage] = $vatLines[$vatPercentage]->add($vatLine);
@@ -214,7 +214,7 @@ final class VatAllocator
             $itemPrice = $line->getTotal(); // ItemPrice (item-level)
             $vatRate = $line->getTotal()->getVatPercentage()->get();
 
-            if (! isset($results[$vatRate])) {
+            if (!isset($results[$vatRate])) {
                 $results[$vatRate] = $itemPrice;
             } else {
                 $results[$vatRate] = $results[$vatRate]->add($itemPrice);
