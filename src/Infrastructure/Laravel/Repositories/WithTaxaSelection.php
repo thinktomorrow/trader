@@ -85,8 +85,8 @@ trait WithTaxaSelection
             ->get();
 
         return [
-            ...array_map(fn($state) => $this->container->get(ProductTaxonItem::class)::fromMappedData((array)$state, $this->extractTaxonKeys((array)$state)), $productTaxaStates->all()),
-            ...array_map(fn($state) => $this->container->get(VariantTaxonItem::class)::fromMappedData(array_merge((array)$state, ['product_id' => $product_id]), $this->extractTaxonKeys((array)$state)), $variantTaxaStates->all()),
+            ...array_map(fn ($state) => $this->container->get(ProductTaxonItem::class)::fromMappedData((array)$state, $this->extractTaxonKeys((array)$state)), $productTaxaStates->all()),
+            ...array_map(fn ($state) => $this->container->get(VariantTaxonItem::class)::fromMappedData(array_merge((array)$state, ['product_id' => $product_id]), $this->extractTaxonKeys((array)$state)), $variantTaxaStates->all()),
         ];
     }
 }

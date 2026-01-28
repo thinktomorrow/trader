@@ -25,7 +25,7 @@ trait WithOrderTotals
 
     public function hasUpToDateVatSnapshot(): bool
     {
-        if (!$this->vatSnapshot) {
+        if (! $this->vatSnapshot) {
             return false;
         }
 
@@ -40,7 +40,7 @@ trait WithOrderTotals
 
     protected function initializeVatSnapshotFromState(array $state): void
     {
-        $vatLines = array_map(fn($vatLineData) => new VatAllocatedLine(
+        $vatLines = array_map(fn ($vatLineData) => new VatAllocatedLine(
             Money::EUR($vatLineData['taxable_base']),
             Money::EUR($vatLineData['vat_amount']),
             VatPercentage::fromString($vatLineData['vat_percentage']),
@@ -58,7 +58,7 @@ trait WithOrderTotals
 
     protected function getOrderTotalsState(): array
     {
-        if (!$this->vatSnapshot) {
+        if (! $this->vatSnapshot) {
             throw new VatSnapshotNotCalculated('Cannot get order totals state when VAT snapshot is not calculated.');
         }
 
@@ -79,7 +79,7 @@ trait WithOrderTotals
             'discount_incl' => $this->vatSnapshot->getDiscountIncl()->getAmount(),
             'total_vat' => $this->vatSnapshot->getTotalVat()->getAmount(),
             'total_incl' => $this->vatSnapshot->getTotalIncl()->getAmount(),
-            'vat_lines' => json_encode(array_map(fn(VatAllocatedLine $vatLine) => [
+            'vat_lines' => json_encode(array_map(fn (VatAllocatedLine $vatLine) => [
                 'taxable_base' => $vatLine->getTaxableBase()->getAmount(),
                 'vat_amount' => $vatLine->getVatAmount()->getAmount(),
                 'vat_percentage' => $vatLine->getVatPercentage()->get(),
@@ -152,7 +152,7 @@ trait WithOrderTotals
 
     public function getShippingCostIncl(): Money
     {
-        if (!$this->vatSnapshot) {
+        if (! $this->vatSnapshot) {
             throw new VatSnapshotNotCalculated('Cannot get shipping cost incl. when VAT snapshot is not calculated.');
         }
 
@@ -161,7 +161,7 @@ trait WithOrderTotals
 
     public function getPaymentCostIncl(): Money
     {
-        if (!$this->vatSnapshot) {
+        if (! $this->vatSnapshot) {
             throw new VatSnapshotNotCalculated('Cannot get payment cost incl. when VAT snapshot is not calculated.');
         }
 
@@ -170,7 +170,7 @@ trait WithOrderTotals
 
     public function getDiscountTotalIncl(): Money
     {
-        if (!$this->vatSnapshot) {
+        if (! $this->vatSnapshot) {
             throw new VatSnapshotNotCalculated('Cannot get discount total incl. when VAT snapshot is not calculated.');
         }
 
@@ -179,7 +179,7 @@ trait WithOrderTotals
 
     public function getTotalVat(): Money
     {
-        if (!$this->vatSnapshot) {
+        if (! $this->vatSnapshot) {
             throw new VatSnapshotNotCalculated('Cannot get total VAT when VAT snapshot is not calculated.');
         }
 
@@ -188,7 +188,7 @@ trait WithOrderTotals
 
     public function getTotalIncl(): Money
     {
-        if (!$this->vatSnapshot) {
+        if (! $this->vatSnapshot) {
             throw new VatSnapshotNotCalculated('Cannot get total incl. when VAT snapshot is not calculated.');
         }
 
@@ -197,7 +197,7 @@ trait WithOrderTotals
 
     public function getVatLines(): array
     {
-        if (!$this->vatSnapshot) {
+        if (! $this->vatSnapshot) {
             throw new VatSnapshotNotCalculated('Cannot get VAT lines when VAT snapshot is not calculated.');
         }
 
