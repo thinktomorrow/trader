@@ -40,7 +40,7 @@ class DefaultTaxonNode extends DefaultNode implements TaxonNode
         $this->product_ids = $product_ids;
         $this->grid_product_ids = $grid_product_ids;
         $this->grid_variant_ids = $grid_variant_ids;
-        $this->keys = array_map(fn (TaxonKey $key) => $key, $keys);
+        $this->keys = array_map(fn(TaxonKey $key) => $key, $keys);
         $this->parentId = $parentId;
 
         // Add node entry data so we can use it for sorting.
@@ -108,7 +108,7 @@ class DefaultTaxonNode extends DefaultNode implements TaxonNode
 
     public function getKey(?string $locale = null): ?string
     {
-        if (count($this->keys) < 1 || ! isset($this->keys[0])) {
+        if (count($this->keys) < 1 || !isset($this->keys[0])) {
             return null;
         }
 
@@ -151,8 +151,8 @@ class DefaultTaxonNode extends DefaultNode implements TaxonNode
     public function getGridProductIds(): array
     {
         return array_unique(array_merge(
-            array_map(fn ($ids) => $ids['product_id'], $this->grid_product_ids),
-            array_map(fn ($ids) => $ids['product_id'], $this->grid_variant_ids)
+            array_map(fn($ids) => $ids['product_id'], $this->grid_product_ids),
+            array_map(fn($ids) => $ids['product_id'], $this->grid_variant_ids)
         ));
     }
 
@@ -164,8 +164,8 @@ class DefaultTaxonNode extends DefaultNode implements TaxonNode
     public function getGridVariantIds(): array
     {
         return array_unique(array_merge(
-            array_map(fn ($ids) => $ids['variant_id'], $this->grid_product_ids),
-            array_map(fn ($ids) => $ids['variant_id'], $this->grid_variant_ids)
+            array_map(fn($ids) => $ids['variant_id'], $this->grid_product_ids),
+            array_map(fn($ids) => $ids['variant_id'], $this->grid_variant_ids)
         ));
     }
 
@@ -192,7 +192,7 @@ class DefaultTaxonNode extends DefaultNode implements TaxonNode
         // We remove the productIds that are not in the given productIds array, this way
         // we preserve any duplicates in the productIds array since duplicates are,
         // expected as a product can be present with multiple variants in the grid.
-        return count(array_filter($productIds, fn ($id) => in_array($id, $allProductIds)));
+        return count(array_filter($allProductIds, fn($id) => in_array($id, $productIds)));
     }
 
     /**
@@ -227,7 +227,7 @@ class DefaultTaxonNode extends DefaultNode implements TaxonNode
     {
         $label = $this->getLabel($locale);
 
-        if (! $this->isRootNode()) {
+        if (!$this->isRootNode()) {
             $label = array_reduce(array_reverse($this->getBreadCrumbs()), function ($carry, $taxon) use ($withoutRoot, $locale) {
                 if ($taxon->isRootNode()) {
                     return $withoutRoot ? $carry : $taxon->getLabel($locale) . ': ' . $carry;
@@ -252,7 +252,7 @@ class DefaultTaxonNode extends DefaultNode implements TaxonNode
 
     public function getData(?string $key = null, $default = null): mixed
     {
-        if (! is_null($key)) {
+        if (!is_null($key)) {
             return data_get($this->data, $key, $default);
         }
 
