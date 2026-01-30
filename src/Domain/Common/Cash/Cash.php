@@ -126,6 +126,10 @@ class Cash
 
     private function precisionRound(float $number): int
     {
+        return (int)round($number, 0, PHP_ROUND_HALF_UP);
+
+        return (int)round((float)bcadd((string)$number, '0', 2), 0, PHP_ROUND_HALF_UP);
+
         return (int)round(round($number * 10) / 10);
     }
 

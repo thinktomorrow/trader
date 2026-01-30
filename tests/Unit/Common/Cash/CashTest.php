@@ -91,11 +91,11 @@ class CashTest extends TestCase
 
     public function test_it_can_add_vat_percentage()
     {
-        $money = new Money(11169, new Currency('EUR')); // 0.21 = 2345.49 -> 2346
-        $this->assertEquals(13515, Cash::from($money)->addPercentage(Percentage::fromString('21'))->getAmount());
+        $money = new Money(11169, new Currency('EUR')); // 0.21 = 2345.49 -> 2345
+        $this->assertEquals(13514, Cash::from($money)->addPercentage(Percentage::fromString('21'))->getAmount());
 
-        $money = new Money(11869, new Currency('EUR'));
-        $this->assertEquals(14362, Cash::from($money)->addPercentage(Percentage::fromString('21'))->getAmount());
+        $money = new Money(11869, new Currency('EUR')); // 0.21 = 2492.49 -> 2492
+        $this->assertEquals(14361, Cash::from($money)->addPercentage(Percentage::fromString('21'))->getAmount());
     }
 
     public function test_it_can_get_a_tax_percentage_of_gross_amount()

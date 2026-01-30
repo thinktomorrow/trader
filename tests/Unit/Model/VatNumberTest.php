@@ -81,7 +81,6 @@ class VatNumberTest extends TestCase
     {
         $reflection = new \ReflectionClass(VatNumber::class);
         $method = $reflection->getMethod('findIncludedCountryCode');
-        $method->setAccessible(true);
 
         $this->assertEquals('BE', $method->invoke(null, 'BE0123456789'));
         $this->assertEquals(null, $method->invoke(null, '123456789B01'));
