@@ -97,6 +97,8 @@ trait RendersVariantPrices
             return 0;
         }
 
-        return (int)ceil((($unitPrice - $salePrice) / $unitPrice) * 100);
+        $percentage = (($unitPrice - $salePrice) / $unitPrice) * 100;
+
+        return round($percentage);
     }
 }

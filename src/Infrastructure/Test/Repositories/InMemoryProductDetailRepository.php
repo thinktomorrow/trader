@@ -5,7 +5,9 @@ namespace Thinktomorrow\Trader\Infrastructure\Test\Repositories;
 
 use Thinktomorrow\Trader\Application\Product\ProductDetail\ProductDetailRepository;
 use Thinktomorrow\Trader\Domain\Model\Product\Exceptions\CouldNotFindVariant;
+use Thinktomorrow\Trader\Domain\Model\Product\Product;
 use Thinktomorrow\Trader\Domain\Model\Product\ProductState;
+use Thinktomorrow\Trader\Domain\Model\Product\Variant\Variant;
 use Thinktomorrow\Trader\Domain\Model\Product\Variant\VariantId;
 use Thinktomorrow\Trader\Domain\Model\Stock\StockItem;
 use Thinktomorrow\Trader\Infrastructure\Laravel\Models\DefaultProductDetail;
@@ -25,7 +27,7 @@ final class InMemoryProductDetailRepository implements ProductDetailRepository, 
             'stock_data' => json_encode([]),
         ]);
 
-        if (! $allowOffline && ! in_array($product->getState(), ProductState::onlineStates())) {
+        if (!$allowOffline && !in_array($product->getState(), ProductState::onlineStates())) {
             throw new CouldNotFindVariant('No online variant found by id [' . $variantId->get() . ']');
         }
 
@@ -85,8 +87,24 @@ final class InMemoryProductDetailRepository implements ProductDetailRepository, 
             }
         }
 
+        $personalisations = $this->getPersonalisationsForVariant($variant);
+
         return DefaultProductDetail::fromMappedData(array_merge(($stock->getMappedData()), $variant->getMappedData(), [
             'product_data' => json_encode($product->getData()),
-        ]), $taxa);
+        ]), $taxa, $personalisations);
+    }
+
+    private function getPersonalisationsForVariant(Variant $variant): array
+    {
+        $personalisations = [];
+
+        /** @var Product $product */
+        foreach (InMemoryProductRepository::$products as $product) {
+            if ($product->productId->equals($variant->productId)) {
+                $personalisations = $product->getPersonalisations();
+            }
+        }
+
+        return $personalisations;
     }
 }

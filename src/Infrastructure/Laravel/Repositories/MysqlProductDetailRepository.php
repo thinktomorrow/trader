@@ -8,6 +8,7 @@ use Psr\Container\ContainerInterface;
 use Thinktomorrow\Trader\Application\Product\ProductDetail\ProductDetail;
 use Thinktomorrow\Trader\Application\Product\ProductDetail\ProductDetailRepository;
 use Thinktomorrow\Trader\Domain\Model\Product\Exceptions\CouldNotFindVariant;
+use Thinktomorrow\Trader\Domain\Model\Product\Personalisation\Personalisation;
 use Thinktomorrow\Trader\Domain\Model\Product\ProductState;
 use Thinktomorrow\Trader\Domain\Model\Product\Variant\VariantId;
 
@@ -22,6 +23,7 @@ class MysqlProductDetailRepository implements ProductDetailRepository
     private static string $taxonomyTable = 'trader_taxonomies';
     private static string $taxonTable = 'trader_taxa';
     private static $taxonKeysTable = 'trader_taxa_keys';
+    private static $productPersonalisationsTable = 'trader_product_personalisations';
 
     private ContainerInterface $container;
 
@@ -54,8 +56,15 @@ class MysqlProductDetailRepository implements ProductDetailRepository
 
         $state = (array)$state;
 
+        $personalisationStates = DB::table(static::$productPersonalisationsTable)
+            ->where(static::$productPersonalisationsTable . '.product_id', $state['product_id'])
+            ->get()
+            ->map(fn($item) => (array)$item);
+
+        $personalisations = $personalisationStates->map(fn($personalisationState) => Personalisation::fromMappedData($personalisationState, $state))->all();
+
         return $this->container->get(ProductDetail::class)::fromMappedData(array_merge($state, [
             'includes_vat' => (bool)$state['includes_vat'],
-        ]), $this->getTaxaItems($state['product_id'], $state['variant_id']));
+        ]), $this->getTaxaItems($state['product_id'], $state['variant_id']), $personalisations);
     }
 }

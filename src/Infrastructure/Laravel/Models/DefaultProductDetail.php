@@ -29,6 +29,7 @@ class DefaultProductDetail implements ProductDetail
     protected ProductId $productId;
     protected VariantState $state;
     protected array $taxa;
+    protected array $personalisations;
     protected string $sku;
     protected ?string $ean;
     protected array $data;
@@ -38,7 +39,7 @@ class DefaultProductDetail implements ProductDetail
     {
     }
 
-    public static function fromMappedData(array $state, array $taxa): static
+    public static function fromMappedData(array $state, array $taxa, array $personalisations): static
     {
         $item = new static();
 
@@ -65,6 +66,8 @@ class DefaultProductDetail implements ProductDetail
         }
 
         $item->taxa = $taxa;
+
+        $item->personalisations = $personalisations;
 
         return $item;
     }
@@ -217,6 +220,11 @@ class DefaultProductDetail implements ProductDetail
         return array_filter($this->taxa, function (ProductTaxonItem $taxon) {
             return $taxon->getTaxonomyType() === TaxonomyType::tag->value && $taxon->showOnline();
         });
+    }
+
+    public function getPersonalisations(): array
+    {
+        return $this->personalisations;
     }
 
     public function getData(?string $key = null, $default = null): mixed

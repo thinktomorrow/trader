@@ -6,6 +6,7 @@ use Thinktomorrow\Trader\Application\Product\Taxa\ProductTaxonItem;
 use Thinktomorrow\Trader\Application\Product\Taxa\VariantTaxonItem;
 use Thinktomorrow\Trader\Application\Stock\Read\Stockable;
 use Thinktomorrow\Trader\Domain\Common\Price\ItemPrice;
+use Thinktomorrow\Trader\Domain\Model\Product\Personalisation\Personalisation;
 use Thinktomorrow\Trader\Domain\Model\Product\Variant\VariantSalePrice;
 use Thinktomorrow\Trader\Domain\Model\Product\Variant\VariantUnitPrice;
 
@@ -16,7 +17,7 @@ interface ProductDetail extends Stockable
      * @param array<VariantTaxonItem|ProductTaxonItem> $taxa
      * @return static
      */
-    public static function fromMappedData(array $state, array $taxa): static;
+    public static function fromMappedData(array $state, array $taxa, array $personalisations): static;
 
     public function getVariantId(): string;
 
@@ -101,6 +102,9 @@ interface ProductDetail extends Stockable
      * @return array
      */
     public static function stateSelect(): array;
+
+    /** @return Personalisation[] */
+    public function getPersonalisations(): array;
 
     public function getData(?string $key = null, $default = null): mixed;
 

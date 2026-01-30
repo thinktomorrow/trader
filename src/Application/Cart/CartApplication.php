@@ -146,7 +146,7 @@ final class CartApplication
         foreach ($addLine->getPersonalisations() as $personalisation_id => $personalisation_value) {
             $originalPersonalisation = null;
 
-            foreach ($variant->getPersonalisations() as $personalisation) {
+            foreach ($product->getPersonalisations() as $personalisation) {
                 if ($personalisation->personalisationId->equals(PersonalisationId::fromString($personalisation_id))) {
                     $originalPersonalisation = $personalisation;
                 }

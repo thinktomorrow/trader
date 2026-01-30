@@ -89,6 +89,15 @@ class CashTest extends TestCase
         $this->assertEquals(120, Cash::from($money)->addPercentage(Percentage::fromString('20'))->getAmount());
     }
 
+    public function test_it_can_add_vat_percentage()
+    {
+        $money = new Money(11169, new Currency('EUR')); // 0.21 = 2345.49 -> 2346
+        $this->assertEquals(13515, Cash::from($money)->addPercentage(Percentage::fromString('21'))->getAmount());
+
+        $money = new Money(11869, new Currency('EUR'));
+        $this->assertEquals(14362, Cash::from($money)->addPercentage(Percentage::fromString('21'))->getAmount());
+    }
+
     public function test_it_can_get_a_tax_percentage_of_gross_amount()
     {
         $money = new Money(120, new Currency('EUR'));

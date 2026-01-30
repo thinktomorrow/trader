@@ -154,7 +154,7 @@ class ItemPriceTest extends TestCase
 
         // Expected values calculated externally
         $excl = 2521 * $qty;
-        $incl = (int)round($excl * 1.21);
+        $incl = (int)round(round(($excl * 1.21) * 10) / 10);
         $vat = $incl - $excl;
 
         $this->assertEquals(Money::EUR($excl), $object->getExcludingVat());

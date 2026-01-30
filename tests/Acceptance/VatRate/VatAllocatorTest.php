@@ -136,6 +136,38 @@ final class VatAllocatorTest extends TestCase
         );
     }
 
+    public function test_total_is_consistent_with_rounding(): void
+    {
+        $order = $this->orderWithLines([
+            $this->orderContext->createLine(
+                'order-aaa',
+                'line-aaa',
+                [
+                    'unit_price_excl' => '11169',
+                    'unit_price_incl' => '13515',
+                    'total_excl' => '11169',
+                    'total_incl' => '13515',
+                    'includes_vat' => true,
+                    'tax_rate' => '21',
+                    'quantity' => 1,
+                ]
+            )
+        ]);
+
+        $result = $this->allocator->allocate(
+            $order,
+            Money::EUR(700),  // shipping
+            Money::EUR(0),  // payment
+            Money::EUR(0),  // discount
+        );
+
+        $total = $result->total();
+
+        $this->assertEquals(11869, $total->getTotalExcludingVat()->getAmount());
+        $this->assertEquals(2493, $total->getTotalVat()->getAmount());
+        $this->assertEquals(14362, $total->getTotalIncludingVat()->getAmount()); // Rounded from 14361,49
+    }
+
     private function orderWithLines(array $lines): Order
     {
         $order = $this->orderContext->createEmptyOrder();
@@ -147,15 +179,22 @@ final class VatAllocatorTest extends TestCase
         return $order;
     }
 
-    private function line(int $unitExcl, int $qty, string $vat): Line
+    private function line(int $unitExcl, int $qty, string $vat, bool $includesVat = false): Line
     {
+        $unitExcl = $includesVat ? $unitExcl : $unitExcl * ((1 + (int)$vat) / 100);
+        $unitIncl = !$includesVat ? $unitExcl * ((1 + (int)$vat) / 100) : $unitExcl;
+
         return $this->orderContext->createLine(
             'order-aaa',
             uniqid('line-', true),
             [
                 'unit_price_excl' => $unitExcl,
+                'unit_price_incl' => $unitIncl,
+                'total_excl' => $unitExcl * $qty,
+                'total_incl' => $unitIncl * $qty,
+                'total_vat' => ($unitIncl - $unitExcl) * $qty,
                 'tax_rate' => $vat,
-                'includes_vat' => false,
+                'includes_vat' => $includesVat,
                 'quantity' => $qty,
             ]
         );

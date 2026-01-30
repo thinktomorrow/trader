@@ -24,7 +24,7 @@ class Cash
 
     public static function from($money, ?string $currencyCode = null): self
     {
-        if (! $money instanceof Money) {
+        if (!$money instanceof Money) {
             $money = static::make($money, $currencyCode);
         }
 
@@ -76,7 +76,7 @@ class Cash
 
     public function asPercentage(Money $other, $precision = 2): Percentage
     {
-        if (! $this->money->isSameCurrency($other)) {
+        if (!$this->money->isSameCurrency($other)) {
             throw new \InvalidArgumentException('Money::asPercentage expects Money value of the same currency');
         }
         if ($other->getAmount() <= 0) {
@@ -101,8 +101,6 @@ class Cash
 
         $money = $this->money->multiply($multiplier);
 
-        $money = new Money((int)round((int)$money->getAmount(), $round, $roundMethod), $money->getCurrency());
-
         return $returnAsMoney ? $money : $money->getAmount();
     }
 
@@ -115,7 +113,20 @@ class Cash
             $percentage = $percentage->get();
         }
 
-        return $this->money->add($this->percentage($percentage, $roundMethod));
+        $factor = 1 + ($percentage / 100);
+
+        // Multiply with 2 decimals precision
+        $raw = $this->precisionRound($this->money->getAmount() * $factor);
+
+        return new Money(
+            $raw,
+            $this->money->getCurrency()
+        );
+    }
+
+    private function precisionRound(float $number): int
+    {
+        return (int)round(round($number * 10) / 10);
     }
 
     /**
@@ -175,7 +186,7 @@ class Cash
 
     private function getFormatter(Locale $locale): MoneyFormatter
     {
-        if (! static::$formatter) {
+        if (!static::$formatter) {
             $currencies = new ISOCurrencies();
 
             $numberFormatter = new NumberFormatter($locale->toIso15897(), NumberFormatter::DECIMAL);
