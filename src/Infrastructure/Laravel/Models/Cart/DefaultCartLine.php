@@ -23,8 +23,12 @@ class DefaultCartLine extends OrderReadLine implements CartLine
 
         foreach ($taxa as $taxon) {
 
-            if ($taxon['class_type'] !== VariantTaxonItem::class) continue;
-            if ($taxon['taxonomy_type'] !== TaxonomyType::variant_property->value) continue;
+            if ($taxon['class_type'] !== VariantTaxonItem::class) {
+                continue;
+            }
+            if ($taxon['taxonomy_type'] !== TaxonomyType::variant_property->value) {
+                continue;
+            }
 
             $result[] = [
                 'label' => data_get($taxon, 'data.taxonomy_data.title.' . app()->getLocale()) ?? null,

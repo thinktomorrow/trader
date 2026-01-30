@@ -23,8 +23,7 @@ class CustomerRegisterController extends Controller
         private CustomerApplication     $customerApplication,
         private CustomerRepository      $customerRepository,
         private CustomerLoginRepository $customerLoginRepository,
-    )
-    {
+    ) {
         $this->middleware('customer-guest');
     }
 
@@ -48,7 +47,7 @@ class CustomerRegisterController extends Controller
 
         $existingCustomer = CustomerModel::where('email', $request->email)->first();
 
-        if (!$existingCustomer) {
+        if (! $existingCustomer) {
             // Maak nieuwe klant aan
             $customerId = $this->customerApplication->registerCustomer(new RegisterCustomer(
                 $request->email,
@@ -77,14 +76,14 @@ class CustomerRegisterController extends Controller
 
         } else {
             // Indien klant al bestaat maar nog niet geverifieerd, stuur opnieuw mail
-            if (!$existingCustomer->hasVerifiedEmail()) {
+            if (! $existingCustomer->hasVerifiedEmail()) {
                 $existingCustomer->sendEmailVerificationNotification();
             }
 
             // Indien klant al verified, doen we niets — we geven gewoon dezelfde feedback
         }
 
-        if (!$redirect) {
+        if (! $redirect) {
             $redirect = route('customer.login');
         }
 

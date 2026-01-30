@@ -44,13 +44,13 @@ class MysqlProductDetailRepository implements ProductDetailRepository
             ])
             ->addSelect($this->container->get(ProductDetail::class)::stateSelect());
 
-        if (!$allowOffline) {
+        if (! $allowOffline) {
             $builder->whereIn(static::$productTable . '.state', ProductState::onlineStates());
         }
 
         $state = $builder->first();
 
-        if (!$state) {
+        if (! $state) {
             throw new CouldNotFindVariant('No online variant found by id [' . $variantId->get() . ']');
         }
 
