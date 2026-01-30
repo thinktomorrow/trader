@@ -59,9 +59,9 @@ class MysqlProductDetailRepository implements ProductDetailRepository
         $personalisationStates = DB::table(static::$productPersonalisationsTable)
             ->where(static::$productPersonalisationsTable . '.product_id', $state['product_id'])
             ->get()
-            ->map(fn($item) => (array)$item);
+            ->map(fn ($item) => (array)$item);
 
-        $personalisations = $personalisationStates->map(fn($personalisationState) => Personalisation::fromMappedData($personalisationState, $state))->all();
+        $personalisations = $personalisationStates->map(fn ($personalisationState) => Personalisation::fromMappedData($personalisationState, $state))->all();
 
         return $this->container->get(ProductDetail::class)::fromMappedData(array_merge($state, [
             'includes_vat' => (bool)$state['includes_vat'],
