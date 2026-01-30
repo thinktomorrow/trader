@@ -151,7 +151,7 @@ final class VatAllocatorTest extends TestCase
                     'tax_rate' => '21',
                     'quantity' => 1,
                 ]
-            )
+            ),
         ]);
 
         $result = $this->allocator->allocate(
@@ -182,7 +182,7 @@ final class VatAllocatorTest extends TestCase
     private function line(int $unitExcl, int $qty, string $vat, bool $includesVat = false): Line
     {
         $unitExcl = $includesVat ? $unitExcl : $unitExcl * ((1 + (int)$vat) / 100);
-        $unitIncl = !$includesVat ? $unitExcl * ((1 + (int)$vat) / 100) : $unitExcl;
+        $unitIncl = ! $includesVat ? $unitExcl * ((1 + (int)$vat) / 100) : $unitExcl;
 
         return $this->orderContext->createLine(
             'order-aaa',
