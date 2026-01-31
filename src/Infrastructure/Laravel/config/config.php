@@ -85,6 +85,11 @@ return [
     'category_taxonomy_id' => null,
 
     /**
+     * Show variants in product grid listings by default.
+     */
+    'show_variants_in_grid_by_default' => false,
+
+    /**
      * The mail address that will be used to send
      * the customer password reset mail
      */

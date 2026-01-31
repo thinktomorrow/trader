@@ -88,6 +88,11 @@ class TraderConfig implements \Thinktomorrow\Trader\TraderConfig
         return config('trader.category_taxonomy_id');
     }
 
+    public function showVariantsInGridByDefault(): bool
+    {
+        return config('trader.show_variants_in_grid_by_default', false);
+    }
+
     public function getClassMap(): array
     {
         return config('trader.classmap', []);

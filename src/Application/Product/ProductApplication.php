@@ -38,13 +38,14 @@ class ProductApplication
     private TaxonomyRepository $taxonomyRepository;
 
     public function __construct(
-        TraderConfig $traderConfig,
-        EventDispatcher $eventDispatcher,
-        ProductRepository $productRepository,
-        VariantRepository $variantRepository,
+        TraderConfig        $traderConfig,
+        EventDispatcher     $eventDispatcher,
+        ProductRepository   $productRepository,
+        VariantRepository   $variantRepository,
         TaxonTreeRepository $taxonTreeRepository,
-        TaxonomyRepository $taxonomyRepository,
-    ) {
+        TaxonomyRepository  $taxonomyRepository,
+    )
+    {
         $this->traderConfig = $traderConfig;
         $this->eventDispatcher = $eventDispatcher;
         $this->productRepository = $productRepository;
@@ -101,6 +102,10 @@ class ProductApplication
 
         $variant->addData($createVariant->getData());
 
+        if ($this->traderConfig->showVariantsInGridByDefault()) {
+            $variant->showInGrid();
+        }
+
         $this->productRepository->save($product);
 
         $this->eventDispatcher->dispatchAll($product->releaseEvents());
@@ -115,13 +120,13 @@ class ProductApplication
         // WRONG, WE WANT TO LIMIT IT FOR ALL THE TAXONOMIES WE ARE UPDATING...
         if (count($updateProductTaxa->getScopedTaxonomyIds())) {
             $tree = $this->taxonTreeRepository->getTreeByTaxonomies(
-                array_map(fn ($taxonomyId) => $taxonomyId->get(), $updateProductTaxa->getScopedTaxonomyIds())
+                array_map(fn($taxonomyId) => $taxonomyId->get(), $updateProductTaxa->getScopedTaxonomyIds())
             );
 
-            $allTaxonIdsInSameTaxonomy = $tree->flatten()->pluck(fn ($node) => $node->getId());
+            $allTaxonIdsInSameTaxonomy = $tree->flatten()->pluck(fn($node) => $node->getId());
 
             // Keep all the taxa that do NOT belong to the taxonomy we are updating.
-            $productTaxa = array_filter($product->getProductTaxa(), fn ($taxon) => ! in_array($taxon->taxonId->get(), $allTaxonIdsInSameTaxonomy));
+            $productTaxa = array_filter($product->getProductTaxa(), fn($taxon) => !in_array($taxon->taxonId->get(), $allTaxonIdsInSameTaxonomy));
 
             $newProductTaxa = [...$productTaxa, ...$updateProductTaxa->getProductTaxa()];
         } else {
@@ -129,11 +134,11 @@ class ProductApplication
         }
 
         $taxonomies = $this->taxonomyRepository->findManyByTaxa(
-            array_map(fn ($taxon) => $taxon->taxonId->get(), $newProductTaxa)
+            array_map(fn($taxon) => $taxon->taxonId->get(), $newProductTaxa)
         );
 
-        $variantTaxonomies = array_filter($taxonomies, fn (Taxonomy $taxonomy) => $taxonomy->getType() == TaxonomyType::variant_property);
-        $variantTaxonomyIds = array_map(fn (Taxonomy $taxonomy) => $taxonomy->taxonomyId->get(), $variantTaxonomies);
+        $variantTaxonomies = array_filter($taxonomies, fn(Taxonomy $taxonomy) => $taxonomy->getType() == TaxonomyType::variant_property);
+        $variantTaxonomyIds = array_map(fn(Taxonomy $taxonomy) => $taxonomy->taxonomyId->get(), $variantTaxonomies);
 
         // We need to differentiate between standard Product taxa and Variant taxa.
         foreach ($newProductTaxa as $i => $productTaxon) {

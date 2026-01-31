@@ -69,6 +69,8 @@ interface TraderConfig
 
     public function getMainCategoryTaxonomyId(): ?string;
 
+    public function showVariantsInGridByDefault(): bool;
+
     public function getClassMap(): array;
 
     public function getWebmasterEmail(): string;
