@@ -4,6 +4,7 @@ Important changes will be notified in this file
 
 ## unreleased
 
+- Fixed: product/variant title sorting logic
 - Changed: now requires PHP 8.4 and Laravel 12
 
 ### Introducing Taxonomy & Taxon setup
