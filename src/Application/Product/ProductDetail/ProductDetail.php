@@ -17,7 +17,7 @@ interface ProductDetail extends Stockable
      * @param array<VariantTaxonItem|ProductTaxonItem> $taxa
      * @return static
      */
-    public static function fromMappedData(array $state, array $taxa, array $personalisations): static;
+    public static function fromMappedData(array $state, array $taxa, array $variantKeys, array $personalisations): static;
 
     public function getVariantId(): string;
 
@@ -84,8 +84,6 @@ interface ProductDetail extends Stockable
 
     public function getContent(?string $locale = null): string;
 
-    public function getUrl(?string $locale = null): string;
-
     public function getSku(): string;
 
     public function getEan(): ?string;
@@ -102,6 +100,10 @@ interface ProductDetail extends Stockable
      * @return array
      */
     public static function stateSelect(): array;
+
+    public function getKey(?string $locale = null): ?string;
+
+    public function getUrl(?string $locale = null): string;
 
     /** @return Personalisation[] */
     public function getPersonalisations(): array;

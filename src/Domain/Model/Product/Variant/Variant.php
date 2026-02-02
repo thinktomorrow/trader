@@ -5,8 +5,10 @@ namespace Thinktomorrow\Trader\Domain\Model\Product\Variant;
 
 use Thinktomorrow\Trader\Domain\Common\Entity\ChildAggregate;
 use Thinktomorrow\Trader\Domain\Common\Entity\HasData;
+use Thinktomorrow\Trader\Domain\Common\Event\RecordsEventsForAggregate;
 use Thinktomorrow\Trader\Domain\Model\Product\Personalisation\Personalisation;
 use Thinktomorrow\Trader\Domain\Model\Product\ProductId;
+use Thinktomorrow\Trader\Domain\Model\Product\VariantKey\HasVariantKeys;
 use Thinktomorrow\Trader\Domain\Model\Product\VariantTaxa\HasVariantTaxa;
 use Thinktomorrow\Trader\Domain\Model\Product\VariantTaxa\VariantTaxon;
 use Thinktomorrow\Trader\Domain\Model\Taxonomy\TaxonomyType;
@@ -14,7 +16,9 @@ use Thinktomorrow\Trader\Domain\Model\Taxonomy\TaxonomyType;
 final class Variant implements ChildAggregate
 {
     use HasData;
+    use RecordsEventsForAggregate;
     use HasVariantTaxa;
+    use HasVariantKeys;
 
     public readonly ProductId $productId;
     public readonly VariantId $variantId;
@@ -120,7 +124,7 @@ final class Variant implements ChildAggregate
     {
         return [
             VariantTaxon::class => array_map(
-                fn (VariantTaxon $option) => array_merge($option->getMappedData()),
+                fn(VariantTaxon $option) => array_merge($option->getMappedData()),
                 array_values($this->variantTaxa),
             ),
         ];

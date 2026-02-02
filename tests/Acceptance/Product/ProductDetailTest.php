@@ -6,9 +6,12 @@ namespace Tests\Acceptance\Product;
 use Money\Money;
 use Tests\TestHelpers;
 use Thinktomorrow\Trader\Application\Product\Taxa\ProductTaxonItem;
+use Thinktomorrow\Trader\Domain\Common\Locale;
 use Thinktomorrow\Trader\Domain\Common\Vat\VatPercentage;
 use Thinktomorrow\Trader\Domain\Model\Product\Variant\VariantSalePrice;
 use Thinktomorrow\Trader\Domain\Model\Product\Variant\VariantUnitPrice;
+use Thinktomorrow\Trader\Domain\Model\Product\VariantKey\VariantKey;
+use Thinktomorrow\Trader\Domain\Model\Product\VariantKey\VariantKeyId;
 
 class ProductDetailTest extends ProductContext
 {
@@ -50,6 +53,24 @@ class ProductDetailTest extends ProductContext
 
         $this->assertCount(2, $productDetail->getTaxa());
         $this->assertContainsOnlyInstancesOf(ProductTaxonItem::class, $productDetail->getTaxa());
+    }
+
+    public function test_it_can_get_variant_keys(): void
+    {
+        $product = $this->catalogContext->createProduct();
+        $variant = $product->getVariants()[0];
+        $variant->updateVariantKeys([
+            VariantKey::create($variant->variantId, VariantKeyId::fromString('xxx'), Locale::fromString('nl')),
+            VariantKey::create($variant->variantId, VariantKeyId::fromString('yyy'), Locale::fromString('fr')),
+        ]);
+
+        $product->updateVariant($variant);
+        $this->catalogContext->saveProduct($product);
+
+        $productDetail = $this->catalogContext->repos()->productDetailRepository()->findProductDetail($variant->variantId);
+
+        $this->assertEquals('xxx', $productDetail->getKey('nl'));
+        $this->assertEquals('yyy', $productDetail->getKey('fr'));
     }
 
     public function test_it_can_get_sku_and_ean()

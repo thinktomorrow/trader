@@ -27,7 +27,7 @@ final class InMemoryProductDetailRepository implements ProductDetailRepository, 
             'stock_data' => json_encode([]),
         ]);
 
-        if (! $allowOffline && ! in_array($product->getState(), ProductState::onlineStates())) {
+        if (!$allowOffline && !in_array($product->getState(), ProductState::onlineStates())) {
             throw new CouldNotFindVariant('No online variant found by id [' . $variantId->get() . ']');
         }
 
@@ -87,11 +87,13 @@ final class InMemoryProductDetailRepository implements ProductDetailRepository, 
             }
         }
 
+        $variantKeys = $variant->getVariantKeys();
+
         $personalisations = $this->getPersonalisationsForVariant($variant);
 
         return DefaultProductDetail::fromMappedData(array_merge(($stock->getMappedData()), $variant->getMappedData(), [
             'product_data' => json_encode($product->getData()),
-        ]), $taxa, $personalisations);
+        ]), $taxa, $variantKeys, $personalisations);
     }
 
     private function getPersonalisationsForVariant(Variant $variant): array

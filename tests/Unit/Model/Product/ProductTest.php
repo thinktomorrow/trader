@@ -4,10 +4,13 @@ declare(strict_types=1);
 namespace Tests\Unit\Model\Product;
 
 use Tests\Unit\TestCase;
+use Thinktomorrow\Trader\Domain\Common\Locale;
 use Thinktomorrow\Trader\Domain\Model\Product\Events\ProductCreated;
 use Thinktomorrow\Trader\Domain\Model\Product\Events\ProductDataUpdated;
 use Thinktomorrow\Trader\Domain\Model\Product\Events\VariantCreated;
 use Thinktomorrow\Trader\Domain\Model\Product\Events\VariantDeleted;
+use Thinktomorrow\Trader\Domain\Model\Product\Events\VariantKeyCreated;
+use Thinktomorrow\Trader\Domain\Model\Product\Events\VariantKeyUpdated;
 use Thinktomorrow\Trader\Domain\Model\Product\Events\VariantUpdated;
 use Thinktomorrow\Trader\Domain\Model\Product\Exceptions\CouldNotDeleteVariant;
 use Thinktomorrow\Trader\Domain\Model\Product\Exceptions\CouldNotFindVariantOnProduct;
@@ -25,6 +28,8 @@ use Thinktomorrow\Trader\Domain\Model\Product\Variant\VariantId;
 use Thinktomorrow\Trader\Domain\Model\Product\Variant\VariantSalePrice;
 use Thinktomorrow\Trader\Domain\Model\Product\Variant\VariantState;
 use Thinktomorrow\Trader\Domain\Model\Product\Variant\VariantUnitPrice;
+use Thinktomorrow\Trader\Domain\Model\Product\VariantKey\VariantKey;
+use Thinktomorrow\Trader\Domain\Model\Product\VariantKey\VariantKeyId;
 use Thinktomorrow\Trader\Domain\Model\Product\VariantTaxa\VariantTaxon;
 use Thinktomorrow\Trader\Domain\Model\Taxon\TaxonId;
 use Thinktomorrow\Trader\Domain\Model\Taxon\TaxonState;
@@ -342,5 +347,63 @@ class ProductTest extends TestCase
         $product->deleteVariant(VariantId::fromString('variant-aaa'));
 
         $this->assertCount(1, $product->getVariants());
+    }
+
+    public function test_it_can_release_event_created_variant_key()
+    {
+        $product = Product::create(ProductId::fromString('product-aaa'));
+        $product->createVariant($variant = Variant::create(
+            ProductId::fromString('product-aaa'),
+            VariantId::fromString('variant-aaa'),
+            VariantUnitPrice::fromScalars('100', '20', true),
+            VariantSalePrice::fromScalars('80', '20', true),
+            'sku',
+        ));
+
+        // Drop existing events
+        $product->releaseEvents();
+
+        $variant->updateVariantKeys([
+            $variantKey = VariantKey::create($variant->variantId, VariantKeyId::fromString('xxx'), Locale::fromString('nl_BE')),
+        ]);
+
+        $product->updateVariant($variant);
+
+        $this->assertEquals([
+            new VariantKeyCreated($variant->variantId, Locale::fromString('nl_BE'), VariantKeyId::fromString('xxx')),
+            new VariantUpdated($product->productId, $variant->variantId),
+        ], $product->releaseEvents());
+    }
+
+    public function test_it_can_release_event_updated_variant_key()
+    {
+        $product = Product::create(ProductId::fromString('product-aaa'));
+        $product->createVariant($variant = Variant::create(
+            ProductId::fromString('product-aaa'),
+            VariantId::fromString('variant-aaa'),
+            VariantUnitPrice::fromScalars('100', '20', true),
+            VariantSalePrice::fromScalars('80', '20', true),
+            'sku',
+        ));
+
+        $variant->updateVariantKeys([
+            $variantKey = VariantKey::create($variant->variantId, VariantKeyId::fromString('xxx'), Locale::fromString('nl_BE')),
+        ]);
+
+        // Drop existing events
+        $product->releaseEvents();
+        $variant->releaseEventsForAggregate();
+
+        // Update
+        $variant->updateVariantKeys([
+            $variantKey = VariantKey::create($variant->variantId, VariantKeyId::fromString('yyy'), Locale::fromString('nl_BE')),
+        ]);
+
+        $product->updateVariant($variant);
+
+        $this->assertEquals([
+            new VariantKeyUpdated($variant->variantId, Locale::fromString('nl_BE'), VariantKeyId::fromString('xxx'), VariantKeyId::fromString('yyy')),
+            new VariantUpdated($product->productId, $variant->variantId),
+        ], $product->releaseEvents());
     }
 }

@@ -55,6 +55,19 @@ return new class extends Migration {
             $table->foreign('product_id')->references('product_id')->on(static::PREFIX . 'products')->onDelete('cascade');
         });
 
+        Schema::create(static::PREFIX . 'product_keys', function (Blueprint $table) {
+            $table->string('key', 191);
+            $table->char('product_id', 36)->index();
+            $table->char('variant_id', 36)->index();
+            $table->string('locale', 10);
+
+            $table->primary(['locale', 'key']);
+            $table->unique(['locale', 'variant_id']);
+
+            $table->foreign('product_id')->references('product_id')->on(static::PREFIX . 'products')->onDelete('cascade');
+            $table->foreign('variant_id')->references('variant_id')->on(static::PREFIX . 'product_variants')->onDelete('cascade');
+        });
+
         Schema::create(static::PREFIX . 'product_options', function (Blueprint $table) {
             $table->char('option_id', 36)->primary();
             $table->char('product_id', 36);
@@ -106,11 +119,12 @@ return new class extends Migration {
         });
 
         Schema::create(static::PREFIX . 'taxa_keys', function (Blueprint $table) {
-            $table->string('key', 255);
+            $table->string('key', 191);
             $table->char('taxon_id', 36)->index();
-            $table->string('locale');
+            $table->string('locale', 10);
 
             $table->primary(['locale', 'key']);
+            $table->unique(['locale', 'taxon_id']);
 
             $table->foreign('taxon_id')->references('taxon_id')->on(static::PREFIX . 'taxa')->onDelete('cascade');
         });

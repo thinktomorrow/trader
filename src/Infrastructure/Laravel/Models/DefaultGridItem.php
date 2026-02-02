@@ -14,6 +14,7 @@ use Thinktomorrow\Trader\Domain\Model\Product\Variant\VariantId;
 use Thinktomorrow\Trader\Domain\Model\Product\Variant\VariantSalePrice;
 use Thinktomorrow\Trader\Domain\Model\Product\Variant\VariantState;
 use Thinktomorrow\Trader\Domain\Model\Product\Variant\VariantUnitPrice;
+use Thinktomorrow\Trader\Domain\Model\Product\VariantKey\VariantKey;
 use Thinktomorrow\Trader\Domain\Model\Taxonomy\TaxonomyType;
 
 class DefaultGridItem implements GridItem
@@ -31,11 +32,14 @@ class DefaultGridItem implements GridItem
     /** @var array<ProductTaxonItem|VariantTaxonItem> */
     protected array $taxa;
 
+    /** @var array<VariantKey> */
+    protected array $variantKeys;
+
     final private function __construct()
     {
     }
 
-    public static function fromMappedData(array $state, array $taxa): static
+    public static function fromMappedData(array $state, array $taxa, array $variantKeys): static
     {
         $item = new static();
 
@@ -50,12 +54,13 @@ class DefaultGridItem implements GridItem
         );
 
         foreach ($taxa as $taxon) {
-            if (! ($taxon instanceof ProductTaxonItem)) {
+            if (!($taxon instanceof ProductTaxonItem)) {
                 throw new \InvalidArgumentException('Taxa must be instances of ProductTaxonItem or VariantTaxonItem');
             }
         }
 
         $item->taxa = $taxa;
+        $item->variantKeys = $variantKeys;
 
         return $item;
     }

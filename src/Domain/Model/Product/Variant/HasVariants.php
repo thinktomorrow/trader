@@ -37,6 +37,11 @@ trait HasVariants
             );
         }
 
+        // Any variant events are recorded here
+        foreach ($variant->releaseEventsForAggregate() as $event) {
+            $this->recordEvent($event);
+        }
+
         $this->recordEvent(new VariantCreated($variant->productId, $variant->variantId));
 
         $this->variants[] = $variant;
@@ -64,6 +69,11 @@ trait HasVariants
         }
 
         $this->variants[$variantIndex] = $variant;
+
+        // Any variant events are recorded here
+        foreach ($variant->releaseEventsForAggregate() as $event) {
+            $this->recordEvent($event);
+        }
 
         $this->recordEvent(new VariantUpdated($this->productId, $variant->variantId));
     }

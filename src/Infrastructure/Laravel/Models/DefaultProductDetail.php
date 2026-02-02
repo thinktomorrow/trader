@@ -16,6 +16,7 @@ use Thinktomorrow\Trader\Domain\Model\Product\Variant\VariantId;
 use Thinktomorrow\Trader\Domain\Model\Product\Variant\VariantSalePrice;
 use Thinktomorrow\Trader\Domain\Model\Product\Variant\VariantState;
 use Thinktomorrow\Trader\Domain\Model\Product\Variant\VariantUnitPrice;
+use Thinktomorrow\Trader\Domain\Model\Product\VariantKey\VariantKey;
 use Thinktomorrow\Trader\Domain\Model\Taxonomy\TaxonomyType;
 
 class DefaultProductDetail implements ProductDetail
@@ -35,11 +36,14 @@ class DefaultProductDetail implements ProductDetail
     protected array $data;
     protected iterable $images;
 
+    /** @var VariantKey[] */
+    protected array $keys;
+
     final private function __construct()
     {
     }
 
-    public static function fromMappedData(array $state, array $taxa, array $personalisations): static
+    public static function fromMappedData(array $state, array $taxa, array $variantKeys, array $personalisations): static
     {
         $item = new static();
 
@@ -60,13 +64,13 @@ class DefaultProductDetail implements ProductDetail
         $item->ignore_out_of_stock = (bool)$state['ignore_out_of_stock'];
 
         foreach ($taxa as $taxon) {
-            if (! ($taxon instanceof ProductTaxonItem)) {
+            if (!($taxon instanceof ProductTaxonItem)) {
                 throw new \InvalidArgumentException('Taxa must be instances of ProductTaxonItem or VariantTaxonItem');
             }
         }
 
         $item->taxa = $taxa;
-
+        $item->keys = $variantKeys;
         $item->personalisations = $personalisations;
 
         return $item;
@@ -97,10 +101,10 @@ class DefaultProductDetail implements ProductDetail
             return $variantTitle;
         }
 
-        if (! $variantOptionTitle || $productTitle == $variantOptionTitle) {
+        if (!$variantOptionTitle || $productTitle == $variantOptionTitle) {
             return $productTitle;
         }
-        if (! $productTitle) {
+        if (!$productTitle) {
             return $variantOptionTitle;
         }
 
@@ -125,11 +129,6 @@ class DefaultProductDetail implements ProductDetail
     public function getEan(): ?string
     {
         return $this->ean;
-    }
-
-    public function getUrl(?string $locale = null): string
-    {
-        return '/' . $this->getVariantId();
     }
 
     public function setImages(iterable $images): void
@@ -194,7 +193,7 @@ class DefaultProductDetail implements ProductDetail
     public function getProductVariantProperties(): array
     {
         return array_values(array_filter($this->taxa, function (ProductTaxonItem $taxon) {
-            return (! $taxon instanceof VariantTaxonItem) && $taxon->getTaxonomyType() === TaxonomyType::variant_property->value && $taxon->showOnline();
+            return (!$taxon instanceof VariantTaxonItem) && $taxon->getTaxonomyType() === TaxonomyType::variant_property->value && $taxon->showOnline();
         }));
     }
 
@@ -220,6 +219,28 @@ class DefaultProductDetail implements ProductDetail
         return array_filter($this->taxa, function (ProductTaxonItem $taxon) {
             return $taxon->getTaxonomyType() === TaxonomyType::tag->value && $taxon->showOnline();
         });
+    }
+
+    public function getKey(?string $locale = null): ?string
+    {
+        if (count($this->keys) < 1 || !isset($this->keys[0])) {
+            return null;
+        }
+
+        $locale = $locale ?: $this->getLocale()->get();
+
+        foreach ($this->keys as $key) {
+            if ($key->getLocale()->get() == $locale) {
+                return $key->getKey()->get();
+            }
+        }
+
+        return $this->keys[0]->getKey()->get();
+    }
+
+    public function getUrl(?string $locale = null): string
+    {
+        return '/' . $this->getVariantId() . '/' . $this->getKey($locale) ?? '';
     }
 
     public function getPersonalisations(): array

@@ -180,6 +180,20 @@ class ProductApplication
         $this->eventDispatcher->dispatchAll($product->releaseEvents());
     }
 
+    public function updateVariantKeys(UpdateVariantKeys $command): void
+    {
+        $product = $this->productRepository->find($command->getProductId());
+        $variant = $product->findVariant($command->getVariantId());
+
+        $variant->updateVariantKeys($command->getVariantKeys());
+
+        $product->updateVariant($variant);
+        
+        $this->productRepository->save($product);
+
+        $this->eventDispatcher->dispatchAll($product->releaseEvents());
+    }
+
     public function updateProductPersonalisations(UpdateProductPersonalisations $updateProductPersonalisations): void
     {
         $product = $this->productRepository->find($updateProductPersonalisations->getProductId());

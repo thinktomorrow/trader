@@ -88,6 +88,11 @@ class TestTraderConfig implements TraderConfig
         self::$mainCategoryTaxonomyId = $taxonomyId;
     }
 
+    public function showVariantsInGridByDefault(): bool
+    {
+        return $this->overwrites['show_variants_in_grid'] ?? false;
+    }
+
     public function getClassMap(): array
     {
         return [];

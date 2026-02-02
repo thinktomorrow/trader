@@ -15,7 +15,7 @@ use Thinktomorrow\Trader\Domain\Model\Product\Variant\VariantUnitPrice;
  */
 interface GridItem
 {
-    public static function fromMappedData(array $state, array $taxa): static;
+    public static function fromMappedData(array $state, array $taxa, array $variantKeys): static;
 
     public function getVariantId(): string;
 
