@@ -4,6 +4,12 @@ Important changes will be notified in this file
 
 ## unreleased
 
+## 2026-02-02 - 0.8.1
+
+- Fixed: VAT snapshot adjustment while fetching existing carts
+
+## 2026-02-02 - 0.8.0
+
 - Fixed: product/variant title sorting logic
 - Changed: now requires PHP 8.4 and Laravel 12
 
