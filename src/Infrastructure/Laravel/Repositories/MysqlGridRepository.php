@@ -175,13 +175,19 @@ class MysqlGridRepository implements GridRepository
 
     protected function addSortByLabel($order = 'ASC'): static
     {
+        $productTitleExpr = 'LOWER(json_unquote(json_extract(' . static::$productTable . '.data, "$.title.' . $this->locale->get() . '")))';
+        $variantTitleExpr = 'LOWER(json_unquote(json_extract(' . static::$variantTable . '.data, "$.title.' . $this->locale->get() . '")))';
+
         $this->builder->addSelect(
-            DB::raw('LOWER(json_unquote(json_extract(' . static::$productTable . '.data, "$.title.' . $this->locale->get() . '"))) AS product_title'),
-            DB::raw('LOWER(json_unquote(json_extract(' . static::$variantTable . '.data, "$.title.' . $this->locale->get() . '"))) AS variant_title')
+            DB::raw($productTitleExpr . ' AS product_title'),
+            DB::raw($variantTitleExpr . ' AS variant_title'),
+            DB::raw("COALESCE(
+                NULLIF($variantTitleExpr, 'null'),
+                $productTitleExpr
+            ) AS sort_title")
         );
 
-        $this->builder->orderBy('variant_title', $order);
-        $this->builder->orderBy('product_title', $order);
+        $this->builder->orderBy('sort_title', $order);
 
         return $this;
     }

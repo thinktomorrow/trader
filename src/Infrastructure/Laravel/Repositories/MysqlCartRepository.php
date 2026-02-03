@@ -44,16 +44,14 @@ final class MysqlCartRepository implements CartRepository
     {
         $order = $this->orderRepository->find($orderId);
 
-        if (! $order->inCustomerHands()) {
+        if (!$order->inCustomerHands()) {
             throw new OrderAlreadyInMerchantHands('Cannot fetch cart. Order is no longer in customer hands and has already the following state: ' . $order->getOrderState()->value);
         }
 
         // Since we rely on the vat order snapshot for prices, we need to provide a vat snapshot state to the cart read models.
         $this->container->get(AdjustOrderVatSnapshot::class)->adjust($order);
 
-        $orderState = array_merge($order->getMappedData(), [
-
-        ]);
+        $orderState = $order->getMappedData();
 
         // TODO: how to refresh data based on the latest variant price or actual discounts, ...? not on read but better on a dedicated time in the cart...
         // Need to make note of any change in that case.
