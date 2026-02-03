@@ -59,11 +59,6 @@ class TestTraderConfig implements TraderConfig
         return true;
     }
 
-    public function areItemPricesCalculatedExcludingVat(): bool
-    {
-        return false;
-    }
-
     public function areItemDiscountsCalculatedExcludingVat(): bool
     {
         return false;

@@ -6,7 +6,7 @@ Important changes will be notified in this file
 
 - Removed: usage of variantForCartRepository and use ProductDetailRepository everywhere.
 - Added: taxa data to CartLines and MerchantOrderLines.
-- Added: TraderConfig::areItemPricesCalculatedExcludingVat() and TraderConfig::areItemDiscountsCalculatedExcludingVat()
+- Added: TraderConfig::areItemDiscountsCalculatedExcludingVat()
 - Added: LineRead::getFormattedDiscountPercentage(): float;
 - Changed: LineRead::getDiscountPercentage(): float; (previous type was int)
 - Changed: translation keys always prefixed with 'trader-' to avoid conflicts with project translation keys.
