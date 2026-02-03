@@ -14,7 +14,6 @@ class VariantKeyUpdated
         public readonly Locale       $locale,
         public readonly VariantKeyId $formerVariantKeyId,
         public readonly VariantKeyId $newVariantKeyId,
-    )
-    {
+    ) {
     }
 }

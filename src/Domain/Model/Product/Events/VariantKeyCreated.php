@@ -13,7 +13,6 @@ class VariantKeyCreated
         public readonly VariantId    $variantId,
         public readonly Locale       $locale,
         public readonly VariantKeyId $variantKeyId,
-    )
-    {
+    ) {
     }
 }

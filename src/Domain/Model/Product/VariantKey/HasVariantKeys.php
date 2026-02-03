@@ -48,7 +48,7 @@ trait HasVariantKeys
     {
         $this->assertMatchingVariantId($variantKey);
 
-        if (($existingKey = $this->findVariantKeyByLocale($variantKey->getLocale())) && !$existingKey->getKey()->equals($variantKey->getKey())) {
+        if (($existingKey = $this->findVariantKeyByLocale($variantKey->getLocale())) && ! $existingKey->getKey()->equals($variantKey->getKey())) {
 
             $oldKeyId = $existingKey->getKey();
 
@@ -70,7 +70,7 @@ trait HasVariantKeys
 
     private function assertMatchingVariantId(VariantKey $variantKey): void
     {
-        if (!$variantKey->variantId->equals($this->variantId)) {
+        if (! $variantKey->variantId->equals($this->variantId)) {
             throw new InvalidVariantIdOnVariantKey(sprintf(
                 'Cannot add or update VariantKey. Passed VariantKey has VariantId [%s] that doesn\'t match with VariantId [%s].',
                 $variantKey->variantId->get(),

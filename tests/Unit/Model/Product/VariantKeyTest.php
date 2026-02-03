@@ -44,7 +44,7 @@ class VariantKeyTest extends TestCase
         $this->assertEquals([$variantKeyUpdated], $variant->getVariantKeys());
 
         // TODO: test this from the product aggregate level?
-//        $this->assertEquals([new VariantKeyUpdated($variant->variantId, Locale::fromString('nl_BE'), VariantKeyId::fromString('xxx'), VariantKeyId::fromString('yyy'))], $variant->releaseEvents());
+        //        $this->assertEquals([new VariantKeyUpdated($variant->variantId, Locale::fromString('nl_BE'), VariantKeyId::fromString('xxx'), VariantKeyId::fromString('yyy'))], $variant->releaseEvents());
     }
 
     public function test_it_protects_against_invalid_variant_id_on_variant_key()

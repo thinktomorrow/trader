@@ -44,7 +44,7 @@ final class MysqlCartRepository implements CartRepository
     {
         $order = $this->orderRepository->find($orderId);
 
-        if (!$order->inCustomerHands()) {
+        if (! $order->inCustomerHands()) {
             throw new OrderAlreadyInMerchantHands('Cannot fetch cart. Order is no longer in customer hands and has already the following state: ' . $order->getOrderState()->value);
         }
 

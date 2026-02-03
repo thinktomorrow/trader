@@ -64,7 +64,7 @@ class DefaultProductDetail implements ProductDetail
         $item->ignore_out_of_stock = (bool)$state['ignore_out_of_stock'];
 
         foreach ($taxa as $taxon) {
-            if (!($taxon instanceof ProductTaxonItem)) {
+            if (! ($taxon instanceof ProductTaxonItem)) {
                 throw new \InvalidArgumentException('Taxa must be instances of ProductTaxonItem or VariantTaxonItem');
             }
         }
@@ -101,10 +101,10 @@ class DefaultProductDetail implements ProductDetail
             return $variantTitle;
         }
 
-        if (!$variantOptionTitle || $productTitle == $variantOptionTitle) {
+        if (! $variantOptionTitle || $productTitle == $variantOptionTitle) {
             return $productTitle;
         }
-        if (!$productTitle) {
+        if (! $productTitle) {
             return $variantOptionTitle;
         }
 
@@ -193,7 +193,7 @@ class DefaultProductDetail implements ProductDetail
     public function getProductVariantProperties(): array
     {
         return array_values(array_filter($this->taxa, function (ProductTaxonItem $taxon) {
-            return (!$taxon instanceof VariantTaxonItem) && $taxon->getTaxonomyType() === TaxonomyType::variant_property->value && $taxon->showOnline();
+            return (! $taxon instanceof VariantTaxonItem) && $taxon->getTaxonomyType() === TaxonomyType::variant_property->value && $taxon->showOnline();
         }));
     }
 
@@ -223,7 +223,7 @@ class DefaultProductDetail implements ProductDetail
 
     public function getKey(?string $locale = null): ?string
     {
-        if (count($this->keys) < 1 || !isset($this->keys[0])) {
+        if (count($this->keys) < 1 || ! isset($this->keys[0])) {
             return null;
         }
 

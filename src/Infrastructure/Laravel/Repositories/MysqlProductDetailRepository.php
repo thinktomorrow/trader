@@ -43,7 +43,7 @@ class MysqlProductDetailRepository implements ProductDetailRepository
             ->value('variant_id');
 
         // If no custom key found, we assume the given key is actually the variant ID.
-        if (!$variantId) {
+        if (! $variantId) {
             $variantId = $variantKey;
         }
 
@@ -67,13 +67,13 @@ class MysqlProductDetailRepository implements ProductDetailRepository
             ->addSelect($this->container->get(ProductDetail::class)::stateSelect())
             ->groupBy(static::$variantTable . '.variant_id');
 
-        if (!$allowOffline) {
+        if (! $allowOffline) {
             $builder->whereIn(static::$productTable . '.state', ProductState::onlineStates());
         }
 
         $state = $builder->first();
 
-        if (!$state) {
+        if (! $state) {
             throw new CouldNotFindVariant('No online variant found by id [' . $variantId->get() . ']');
         }
 
@@ -82,14 +82,17 @@ class MysqlProductDetailRepository implements ProductDetailRepository
         $personalisationStates = DB::table(static::$productPersonalisationsTable)
             ->where(static::$productPersonalisationsTable . '.product_id', $state['product_id'])
             ->get()
-            ->map(fn($item) => (array)$item);
+            ->map(fn ($item) => (array)$item);
 
-        $personalisations = $personalisationStates->map(fn($personalisationState) => Personalisation::fromMappedData($personalisationState, $state))->all();
+        $personalisations = $personalisationStates->map(fn ($personalisationState) => Personalisation::fromMappedData($personalisationState, $state))->all();
 
-        return $this->container->get(ProductDetail::class)::fromMappedData(array_merge($state, [
+        return $this->container->get(ProductDetail::class)::fromMappedData(
+            array_merge($state, [
             'includes_vat' => (bool)$state['includes_vat'],
-        ]), $this->getTaxaItems($state['product_id'], $state['variant_id']),
+        ]),
+            $this->getTaxaItems($state['product_id'], $state['variant_id']),
             $this->extractVariantKeys($state),
-            $personalisations);
+            $personalisations
+        );
     }
 }

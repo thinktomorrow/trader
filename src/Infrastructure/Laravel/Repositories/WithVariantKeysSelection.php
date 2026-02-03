@@ -39,7 +39,7 @@ trait WithVariantKeysSelection
         }
 
         // Sort by locale
-        usort($pairs, fn(VariantKey $a, VariantKey $b) => $a->getKey()->get() <=> $b->getKey()->get());
+        usort($pairs, fn (VariantKey $a, VariantKey $b) => $a->getKey()->get() <=> $b->getKey()->get());
 
         return $pairs;
     }
