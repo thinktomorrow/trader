@@ -10,7 +10,7 @@ use Thinktomorrow\Trader\Domain\Model\Product\VariantKey\VariantKeyId;
 class VariantKeyCreated
 {
     public function __construct(
-        public readonly VariantId    $taxonId,
+        public readonly VariantId    $variantId,
         public readonly Locale       $locale,
         public readonly VariantKeyId $variantKeyId,
     )

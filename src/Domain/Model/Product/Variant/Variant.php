@@ -9,6 +9,7 @@ use Thinktomorrow\Trader\Domain\Common\Event\RecordsEventsForAggregate;
 use Thinktomorrow\Trader\Domain\Model\Product\Personalisation\Personalisation;
 use Thinktomorrow\Trader\Domain\Model\Product\ProductId;
 use Thinktomorrow\Trader\Domain\Model\Product\VariantKey\HasVariantKeys;
+use Thinktomorrow\Trader\Domain\Model\Product\VariantKey\VariantKey;
 use Thinktomorrow\Trader\Domain\Model\Product\VariantTaxa\HasVariantTaxa;
 use Thinktomorrow\Trader\Domain\Model\Product\VariantTaxa\VariantTaxon;
 use Thinktomorrow\Trader\Domain\Model\Taxonomy\TaxonomyType;
@@ -151,6 +152,8 @@ final class Variant implements ChildAggregate
                     : VariantTaxon::fromMappedData($childState, $state);
             }
         }
+
+        $variant->variantKeys = $childEntities[VariantKey::class] ?? [];
 
         return $variant;
     }

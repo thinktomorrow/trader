@@ -13,11 +13,11 @@ trait WithVariantKeysSelection
     protected function composeVariantKeysSelect(): string
     {
         if (DB::getDriverName() === 'sqlite') {
-            return "trader_product_keys.key || '::::' || trader_product_keys.locale";
+            return "trader_product_keys.`key` || '::::' || trader_product_keys.locale";
         }
 
         return "CONCAT(
-            trader_product_keys.key, '::::',trader_product_keys.locale
+            trader_product_keys.`key`, '::::',trader_product_keys.locale
         )";
     }
 

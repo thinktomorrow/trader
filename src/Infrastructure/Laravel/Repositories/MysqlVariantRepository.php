@@ -97,7 +97,10 @@ class MysqlVariantRepository implements VariantRepository, VariantForCartReposit
                 ->updateOrInsert([
                     'key' => $variantKey->getKey()->get(),
                     'locale' => $variantKey->getLocale()->get(),
-                ], $variantKey->getMappedData());
+                ], [
+                    'product_id' => $variant->productId->get(),
+                    ...$variantKey->getMappedData()
+                ]);
         }
     }
 
@@ -162,7 +165,7 @@ class MysqlVariantRepository implements VariantRepository, VariantForCartReposit
                     }
                 }
 
-                return [$item, [VariantTaxon::class => $taxaPairs], [VariantKey::class => $this->extractVariantKeys((array)$item)]];
+                return [$item, [VariantTaxon::class => $taxaPairs, VariantKey::class => $this->extractVariantKeys((array)$item)]];
             })
             ->toArray();
 

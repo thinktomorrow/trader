@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\DB;
 use Psr\Container\ContainerInterface;
 use Thinktomorrow\Trader\Application\Product\ProductDetail\ProductDetail;
 use Thinktomorrow\Trader\Application\Product\ProductDetail\ProductDetailRepository;
+use Thinktomorrow\Trader\Domain\Common\Locale;
 use Thinktomorrow\Trader\Domain\Model\Product\Exceptions\CouldNotFindVariant;
 use Thinktomorrow\Trader\Domain\Model\Product\Personalisation\Personalisation;
 use Thinktomorrow\Trader\Domain\Model\Product\ProductState;
@@ -15,6 +16,7 @@ use Thinktomorrow\Trader\Domain\Model\Product\Variant\VariantId;
 class MysqlProductDetailRepository implements ProductDetailRepository
 {
     use WithTaxaSelection;
+    use WithVariantKeysSelection;
 
     private static string $productTable = 'trader_products';
     private static string $variantTable = 'trader_product_variants';
@@ -33,17 +35,37 @@ class MysqlProductDetailRepository implements ProductDetailRepository
         $this->container = $container;
     }
 
+    public function findProductDetailByKey(Locale $locale, string $variantKey, bool $allowOffline = false): ProductDetail
+    {
+        $variantId = DB::table('trader_product_keys')
+            ->where('key', $variantKey)
+            ->where('locale', $locale->get())
+            ->value('variant_id');
+
+        // If no custom key found, we assume the given key is actually the variant ID.
+        if (!$variantId) {
+            $variantId = $variantKey;
+        }
+
+        return $this->findProductDetail(VariantId::fromString($variantId), $allowOffline);
+    }
+
     public function findProductDetail(VariantId $variantId, bool $allowOffline = false): ProductDetail
     {
+        $variantKeysSelect = $this->composeVariantKeysSelect();
+
         // Basic builder query
         $builder = DB::table(static::$variantTable)
             ->join(static::$productTable, static::$variantTable . '.product_id', '=', static::$productTable . '.product_id')
+            ->leftJoin(static::$variantKeysTable, static::$variantTable . '.variant_id', '=', static::$variantKeysTable . '.variant_id')
             ->where(static::$variantTable . '.variant_id', $variantId->get())
             ->select([
                 static::$variantTable . '.*',
                 static::$productTable . '.data AS product_data',
+                DB::raw("GROUP_CONCAT(DISTINCT $variantKeysSelect) AS variant_keys"),
             ])
-            ->addSelect($this->container->get(ProductDetail::class)::stateSelect());
+            ->addSelect($this->container->get(ProductDetail::class)::stateSelect())
+            ->groupBy(static::$variantTable . '.variant_id');
 
         if (!$allowOffline) {
             $builder->whereIn(static::$productTable . '.state', ProductState::onlineStates());
@@ -66,6 +88,8 @@ class MysqlProductDetailRepository implements ProductDetailRepository
 
         return $this->container->get(ProductDetail::class)::fromMappedData(array_merge($state, [
             'includes_vat' => (bool)$state['includes_vat'],
-        ]), $this->getTaxaItems($state['product_id'], $state['variant_id']), $personalisations);
+        ]), $this->getTaxaItems($state['product_id'], $state['variant_id']),
+            $this->extractVariantKeys($state),
+            $personalisations);
     }
 }
