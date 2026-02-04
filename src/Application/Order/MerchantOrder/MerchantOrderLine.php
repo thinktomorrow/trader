@@ -74,5 +74,12 @@ interface MerchantOrderLine
     /** @return MerchantOrderLinePersonalisation[] */
     public function getPersonalisations(): iterable;
 
+    /**
+     * Simple array of the variant taxa related to this line
+     * for display purposes. Format of each item should be
+     * something like ['label' => '...', 'value', ...]`
+     */
+    public function getVariants(): array;
+
     public function getData(?string $key = null, $default = null): mixed;
 }

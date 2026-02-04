@@ -69,6 +69,10 @@ trait RendersVariantPrices
 
     public function onSale(): bool
     {
+        if (! $this->isPurchasableOnline()) {
+            return false;
+        }
+
         return $this->salePrice->getExcludingVat()->lessThan($this->unitPrice->getExcludingVat());
     }
 
