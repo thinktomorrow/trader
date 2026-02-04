@@ -181,8 +181,15 @@ final class VatAllocatorTest extends TestCase
 
     private function line(int $unitExcl, int $qty, string $vat, bool $includesVat = false): Line
     {
-        $unitExcl = $includesVat ? $unitExcl : $unitExcl * ((1 + (int)$vat) / 100);
-        $unitIncl = ! $includesVat ? $unitExcl * ((1 + (int)$vat) / 100) : $unitExcl;
+        $vatRate = ((float)$vat) / 100; // 0.21
+
+        if ($includesVat) {
+            $unitIncl = (int)round($unitExcl);
+            $unitExcl = (int)round($unitIncl / (1 + $vatRate));
+        } else {
+            $unitExcl = (int)round($unitExcl);
+            $unitIncl = (int)round($unitExcl * (1 + $vatRate));
+        }
 
         return $this->orderContext->createLine(
             'order-aaa',

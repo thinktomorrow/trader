@@ -3,7 +3,9 @@ declare(strict_types=1);
 
 namespace Thinktomorrow\Trader\Infrastructure\Test\Repositories;
 
+use Thinktomorrow\Trader\Application\Product\ProductDetail\ProductDetail;
 use Thinktomorrow\Trader\Application\Product\ProductDetail\ProductDetailRepository;
+use Thinktomorrow\Trader\Domain\Common\Locale;
 use Thinktomorrow\Trader\Domain\Model\Product\Exceptions\CouldNotFindVariant;
 use Thinktomorrow\Trader\Domain\Model\Product\Product;
 use Thinktomorrow\Trader\Domain\Model\Product\ProductState;
@@ -16,6 +18,27 @@ use Thinktomorrow\Trader\Infrastructure\Laravel\Models\DefaultVariantTaxonItem;
 
 final class InMemoryProductDetailRepository implements ProductDetailRepository, InMemoryRepository
 {
+    public function findProductDetailByKey(Locale $locale, string $variantKey, bool $allowOffline = false): ProductDetail
+    {
+        $variantId = null;
+
+        foreach (InMemoryVariantRepository::$variants as $variant) {
+            foreach ($variant->getVariantKeys() as $variantKeyObj) {
+                if ($variantKeyObj->getKey()->get() === $variantKey && $variantKeyObj->getLocale()->equals($locale)) {
+                    $variantId = $variant->variantId->get();
+                    break 2;
+                }
+            }
+        }
+
+        // If no custom key found, we assume the given key is actually the variant ID.
+        if (!$variantId) {
+            $variantId = $variantKey;
+        }
+
+        return $this->findProductDetail(VariantId::fromString($variantId), $allowOffline);
+    }
+
     public function findProductDetail(VariantId $variantId, bool $allowOffline = false): DefaultProductDetail
     {
         $variant = InMemoryVariantRepository::$variants[$variantId->get()];
@@ -27,7 +50,7 @@ final class InMemoryProductDetailRepository implements ProductDetailRepository, 
             'stock_data' => json_encode([]),
         ]);
 
-        if (! $allowOffline && ! in_array($product->getState(), ProductState::onlineStates())) {
+        if (!$allowOffline && !in_array($product->getState(), ProductState::onlineStates())) {
             throw new CouldNotFindVariant('No online variant found by id [' . $variantId->get() . ']');
         }
 
