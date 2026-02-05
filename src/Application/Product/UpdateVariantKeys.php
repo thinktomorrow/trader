@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Thinktomorrow\Trader\Application\Product;
@@ -12,14 +13,16 @@ use Thinktomorrow\Trader\Domain\Model\Product\VariantKey\VariantKeyId;
 class UpdateVariantKeys
 {
     private string $productId;
+
     private string $variantId;
+
     private array $variantKeys;
 
     public function __construct(string $productId, string $variantId, array $variantKeys)
     {
         $this->productId = $productId;
         $this->variantId = $variantId;
-        $this->variantKeys = $variantKeys;
+        $this->variantKeys = array_filter($variantKeys, fn ($key) => ! empty($key));
     }
 
     public function getProductId(): ProductId

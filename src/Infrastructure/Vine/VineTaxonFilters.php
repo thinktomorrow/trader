@@ -36,7 +36,7 @@ class VineTaxonFilters implements TaxonFilters
         $taxonTree = $this->taxonTreeRepository->setLocale($this->locale)->getTree();
 
         $rootTaxa = collect($taxonTree->all())
-            ->filter(fn (TaxonNode $node) => $node->getTaxonomyId() === $taxonomyId)
+            ->filter(fn(TaxonNode $node) => $node->getTaxonomyId() === $taxonomyId)
             ->values()->all();
 
         return [[
@@ -53,7 +53,7 @@ class VineTaxonFilters implements TaxonFilters
         [$taxonTree, $productIds] = $this->buildFilterContext($taxonTree, $scopedTaxonIds);
         $taxonomies = $this->taxonomyRepository->getForFilter();
 
-        $result = array_values(array_map(fn (TaxonomyItem $taxonomy) => [
+        $result = array_values(array_map(fn(TaxonomyItem $taxonomy) => [
             'taxonomy' => $taxonomy,
             'taxa' => [],
         ], $taxonomies));
@@ -121,8 +121,8 @@ class VineTaxonFilters implements TaxonFilters
 
             $shaken = TaxonTree::fromIterable([$taxon])
                 ->shake(
-                    fn (TaxonNode $node) => count(array_intersect($node->getGridProductIds(), $productIds)) > 0
-                    && count($node->getGridVariantIds()) > 0
+                    fn(TaxonNode $node) => count(array_intersect($node->getGridProductIds(), $productIds)) > 0
+                        && count($node->getGridVariantIds()) > 0
                 )->all();
 
             return count($shaken) > 0 ? $shaken : [];
@@ -149,8 +149,8 @@ class VineTaxonFilters implements TaxonFilters
     private function buildFilterContext(TaxonTree $taxonTree, array $scopedTaxonIds): array
     {
         // Any taxa that the page is scoped to (the main taxa scope on the page)
-        $scopedTaxa = $taxonTree->findMany(fn (TaxonNode $node) => in_array($node->getId(), $scopedTaxonIds));
-        $scopedTaxonIds = array_map(fn (TaxonNode $node) => $node->getId(), $scopedTaxa->all());
+        $scopedTaxa = $taxonTree->findMany(fn(TaxonNode $node) => in_array($node->getId(), $scopedTaxonIds));
+        $scopedTaxonIds = array_map(fn(TaxonNode $node) => $node->getId(), $scopedTaxa->all());
         $scopedAncestorTaxonIds = [];
 
         foreach ($scopedTaxa as $taxon) {
@@ -169,8 +169,8 @@ class VineTaxonFilters implements TaxonFilters
          * - Remove offline taxa
          */
         $taxonTree = $taxonTree
-            ->shake(fn (TaxonNode $node) => count(array_intersect($node->getGridProductIds(), $productIds)) > 0)
-            ->remove(fn (TaxonNode $node) => ! $node->showOnline());
+            ->shake(fn(TaxonNode $node) => count(array_intersect($node->getGridProductIds(), $productIds)) > 0)
+            ->remove(fn(TaxonNode $node) => !$node->showOnline());
 
         return [
             $taxonTree,
@@ -182,7 +182,7 @@ class VineTaxonFilters implements TaxonFilters
     {
         /** @var TaxonTree $taxonTree */
         $taxonTree = $this->taxonTreeRepository->setLocale($this->locale)->getTree()
-            ->findMany(fn (TaxonNode $node) => in_array($node->getId(), $scopedTaxonIds));
+            ->findMany(fn(TaxonNode $node) => in_array($node->getId(), $scopedTaxonIds));
 
         /**
          * Subfiltering from current request
@@ -192,7 +192,7 @@ class VineTaxonFilters implements TaxonFilters
          */
         if (count($activeTaxonKeys) > 0) {
             $selectedTaxa = $this->taxonTreeRepository->getTree()
-                ->findMany(fn ($node) => in_array($node->getKey(), $activeTaxonKeys) && ! in_array($node->getId(), $scopedTaxonIds));
+                ->findMany(fn($node) => in_array($node->getKey(), $activeTaxonKeys) && !in_array($node->getId(), $scopedTaxonIds));
 
             foreach ($taxonTree->all() as $scopedTaxon) {
                 foreach ($selectedTaxa as $selectedTaxon) {
@@ -214,7 +214,7 @@ class VineTaxonFilters implements TaxonFilters
     public function getFilterIds(array $taxonIds): array
     {
         $nodes = $this->taxonTreeRepository->setLocale($this->locale)->getTree()
-            ->findMany(fn ($node) => in_array($node->getId(), $taxonIds));
+            ->findMany(fn($node) => in_array($node->getId(), $taxonIds));
 
         $expandedIds = [];
 
@@ -232,7 +232,7 @@ class VineTaxonFilters implements TaxonFilters
     public function getFilterIdsFromKeys(array $taxonKeys): array
     {
         $nodes = $this->taxonTreeRepository->setLocale($this->locale)->getTree()
-            ->findMany(fn ($node) => in_array($node->getKey(), $taxonKeys));
+            ->findMany(fn($node) => in_array($node->getKey(), $taxonKeys));
 
         $expandedIds = [];
 
@@ -254,18 +254,21 @@ class VineTaxonFilters implements TaxonFilters
 
     /**
      * Get all product ids belonging to this taxon filter and all its children
+     *
+     * forGrid: when true, fetch all grid related product ids.
+     * This also matches variants in case of variant property taxonomies.
      */
-    public function getProductIds(array $taxonIds, bool $onlineOnly = false): array
+    public function getProductIds(array $taxonIds, bool $forGrid = false): array
     {
-        $nodes = $this->taxonTreeRepository->getTree()->findMany(fn (TaxonNode $node) => in_array($node->getId(), $taxonIds));
+        $nodes = $this->taxonTreeRepository->getTree()->findMany(fn(TaxonNode $node) => in_array($node->getId(), $taxonIds));
 
         $productIds = [];
 
         foreach ($nodes as $node) {
-            $productIds = array_merge($productIds, ($onlineOnly ? $node->getGridProductIds() : $node->getProductIds()));
+            $productIds = array_merge($productIds, ($forGrid ? $node->getGridProductIds() : $node->getProductIds()));
 
-            $node->getChildNodes()->flatten()->each(function ($childNode) use (&$productIds, $onlineOnly) {
-                $productIds = array_merge($productIds, ($onlineOnly ? $childNode->getGridProductIds() : $childNode->getProductIds()));
+            $node->getChildNodes()->flatten()->each(function ($childNode) use (&$productIds, $forGrid) {
+                $productIds = array_merge($productIds, ($forGrid ? $childNode->getGridProductIds() : $childNode->getProductIds()));
             });
         }
 
