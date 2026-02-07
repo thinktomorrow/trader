@@ -8,10 +8,6 @@ use Thinktomorrow\Trader\Domain\Model\Country\CountryId;
 use Thinktomorrow\Trader\Domain\Model\VatRate\Exceptions\CouldNotFindVatRate;
 use Thinktomorrow\Trader\Domain\Model\VatRate\VatRateId;
 use Thinktomorrow\Trader\Domain\Model\VatRate\VatRateState;
-use Thinktomorrow\Trader\Infrastructure\Laravel\Repositories\MysqlVatRateRepository;
-use Thinktomorrow\Trader\Infrastructure\Test\Repositories\InMemoryVatRateRepository;
-use Thinktomorrow\Trader\Infrastructure\Test\TestContainer;
-use Thinktomorrow\Trader\Infrastructure\Test\TestTraderConfig;
 use Thinktomorrow\Trader\Testing\Catalog\CatalogContext;
 use Thinktomorrow\Trader\Testing\Order\OrderContext;
 use Thinktomorrow\Trader\TraderConfig;
@@ -81,37 +77,27 @@ class VatRateRepositoryTest extends TestCase
             $orderContext->createCountry('NL');
             $vatRate = $catalogContext->createVatRate();
             $vatRateNL = $catalogContext->createVatRate('vatrate-bbb', ['country_id' => 'NL']);
-            
+
             $repository = $catalogContext->repos()->vatRateRepository();
 
-            $this->assertEquals($vatRate, $repository->find($vatRate->vatRateId));
-        }
-
-        foreach ($this->repositories() as $i => $repository) {
-            $this->prepareCountries($i);
-
-            $originVatRate = $this->createVatRate(['vat_rate_id' => 'originVatRate-123', 'country_id' => 'NL', 'rate' => '20'], ['rate' => '20']);
-            $repository->save($originVatRate);
-
-            $vatRate = $this->createVatRate([], ['rate' => '20']);
-            $repository->save($vatRate);
-
             $this->assertEquals([$vatRate], iterator_to_array($repository->getVatRatesForCountry(CountryId::fromString('BE'))));
-            $this->assertEquals([$originVatRate], iterator_to_array($repository->getVatRatesForCountry(CountryId::fromString('NL'))));
+            $this->assertEquals([$vatRateNL], iterator_to_array($repository->getVatRatesForCountry(CountryId::fromString('NL'))));
             $this->assertEquals([], iterator_to_array($repository->getVatRatesForCountry(CountryId::fromString('FR'))));
         }
     }
 
     public function test_it_can_find_standard_vat_rate_for_country()
     {
-        foreach ($this->repositories() as $i => $repository) {
-            $this->prepareCountries($i);
+        foreach (OrderContext::drivers() as $orderContext) {
 
-            $vatRate = $this->createVatRateWithoutBaseRates(['country_id' => 'BE', 'rate' => '30', 'is_standard' => true]);
-            $nonStandardVatRate = $this->createVatRateWithoutBaseRates(['country_id' => 'NL', 'rate' => '20', 'is_standard' => false]);
+            $catalogContext = CatalogContext::driver($orderContext->driverName);
 
-            $repository->save($vatRate);
-            $repository->save($nonStandardVatRate);
+            $orderContext->createCountry('BE');
+            $orderContext->createCountry('NL');
+            $vatRate = $catalogContext->createVatRate('vatrate-aaa', ['is_standard' => true]);
+            $catalogContext->createVatRate('vatrate-bbb', ['country_id' => 'NL', 'is_standard' => false]);
+
+            $repository = $catalogContext->repos()->vatRateRepository();
 
             $this->assertEquals($vatRate, $repository->findStandardVatRateForCountry(CountryId::fromString('BE')));
             $this->assertNull($repository->findStandardVatRateForCountry(CountryId::fromString('NL')));
@@ -120,12 +106,14 @@ class VatRateRepositoryTest extends TestCase
 
     public function test_it_cannot_find_offline_standard_vat_rate_for_country()
     {
-        foreach ($this->repositories() as $i => $repository) {
-            $this->prepareCountries($i);
+        foreach (OrderContext::drivers() as $orderContext) {
 
-            $vatRate = $this->createVatRateWithoutBaseRates(['country_id' => 'BE', 'rate' => '30', 'is_standard' => true, 'state' => VatRateState::offline->value]);
+            $catalogContext = CatalogContext::driver($orderContext->driverName);
 
-            $repository->save($vatRate);
+            $orderContext->createCountry('BE');
+            $catalogContext->createVatRate('vatrate-aaa', ['is_standard' => true, 'state' => VatRateState::offline->value]);
+
+            $repository = $catalogContext->repos()->vatRateRepository();
 
             $this->assertNull($repository->findStandardVatRateForCountry(CountryId::fromString('BE')));
         }
@@ -133,29 +121,33 @@ class VatRateRepositoryTest extends TestCase
 
     public function test_it_can_get_primary_vat_rates()
     {
-        foreach ($this->repositories() as $i => $repository) {
-            $this->prepareCountries($i);
+        foreach (OrderContext::drivers() as $orderContext) {
 
-            $vatRate = $this->createVatRateWithoutBaseRates(['country_id' => 'BE', 'rate' => '30', 'is_standard' => true]);
-            $secondVatRate = $this->createVatRateWithoutBaseRates(['country_id' => 'BE', 'rate' => '20', 'is_standard' => false]);
+            $catalogContext = CatalogContext::driver($orderContext->driverName);
 
-            $repository->save($vatRate);
-            $repository->save($secondVatRate);
+            $orderContext->createCountry('BE');
+            $orderContext->createCountry('NL');
+            $vatRate = $catalogContext->createVatRate('vatrate-aaa', ['is_standard' => true]);
+            $vatRate2 = $catalogContext->createVatRate('vatrate-bbb', ['country_id' => 'BE', 'rate' => '30', 'is_standard' => false]);
+
+            $repository = $catalogContext->repos()->vatRateRepository();
 
             $this->assertCount(2, iterator_to_array($repository->getPrimaryVatRates()));
             $this->assertContainsEquals($vatRate, iterator_to_array($repository->getPrimaryVatRates()));
-            $this->assertContainsEquals($secondVatRate, iterator_to_array($repository->getPrimaryVatRates()));
+            $this->assertContainsEquals($vatRate2, iterator_to_array($repository->getPrimaryVatRates()));
         }
     }
 
     public function test_it_cannot_get_offline_primary_vat_rates()
     {
-        foreach ($this->repositories() as $i => $repository) {
-            $this->prepareCountries($i);
+        foreach (OrderContext::drivers() as $orderContext) {
 
-            $vatRate = $this->createVatRateWithoutBaseRates(['country_id' => 'BE', 'rate' => '30', 'is_standard' => true, 'state' => VatRateState::offline->value]);
+            $catalogContext = CatalogContext::driver($orderContext->driverName);
 
-            $repository->save($vatRate);
+            $orderContext->createCountry('BE');
+            $catalogContext->createVatRate('vatrate-aaa', ['is_standard' => true, 'state' => VatRateState::offline->value]);
+
+            $repository = $catalogContext->repos()->vatRateRepository();
 
             $this->assertEquals([], iterator_to_array($repository->getPrimaryVatRates()));
         }
@@ -163,14 +155,16 @@ class VatRateRepositoryTest extends TestCase
 
     public function test_it_can_get_standard_primary_vat_rate()
     {
-        foreach ($this->repositories() as $i => $repository) {
-            $this->prepareCountries($i);
+        foreach (OrderContext::drivers() as $orderContext) {
 
-            $vatRate = $this->createVatRateWithoutBaseRates(['country_id' => 'BE', 'rate' => '30', 'is_standard' => true]);
-            $secondVatRate = $this->createVatRateWithoutBaseRates(['country_id' => 'BE', 'rate' => '20', 'is_standard' => false]);
+            $catalogContext = CatalogContext::driver($orderContext->driverName);
 
-            $repository->save($vatRate);
-            $repository->save($secondVatRate);
+            $orderContext->createCountry('BE');
+            $orderContext->createCountry('NL');
+            $vatRate = $catalogContext->createVatRate('vatrate-aaa', ['is_standard' => true]);
+            $catalogContext->createVatRate('vatrate-bbb', ['country_id' => 'NL', 'is_standard' => false]);
+
+            $repository = $catalogContext->repos()->vatRateRepository();
 
             $this->assertEquals($vatRate->getRate(), $repository->getStandardPrimaryVatRate());
         }
@@ -180,26 +174,17 @@ class VatRateRepositoryTest extends TestCase
     {
         $fallbackRate = app(TraderConfig::class)->getFallBackStandardVatRate();
 
-        foreach ($this->repositories() as $i => $repository) {
-            $this->prepareCountries($i);
+        foreach (OrderContext::drivers() as $orderContext) {
 
-            $vatRate = $this->createVatRateWithoutBaseRates(['country_id' => 'BE', 'rate' => '30', 'is_standard' => true, 'state' => VatRateState::offline->value]);
+            $catalogContext = CatalogContext::driver($orderContext->driverName);
 
-            $repository->save($vatRate);
+            $orderContext->createCountry('BE');
+            $orderContext->createCountry('NL');
+            $catalogContext->createVatRate('vatrate-aaa', ['is_standard' => true, 'state' => VatRateState::offline->value]);
+
+            $repository = $catalogContext->repos()->vatRateRepository();
 
             $this->assertEquals($fallbackRate, $repository->getStandardPrimaryVatRate());
         }
     }
-
-    private static function repositories(): \Generator
-    {
-        yield new InMemoryVatRateRepository(new TestTraderConfig());
-        yield new MysqlVatRateRepository(new TestContainer());
-    }
-
-    //    public static function vatRates(): \Generator
-    //    {
-    //        yield [static::createVatRate([], ['rate' => '20']), static::createVatRate(['vat_rate_id' => 'originVatRate-123', 'country_id' => 'NL', 'rate' => '20'])];
-    //        yield [static::createVatRate(['country_id' => 'BE', 'rate' => '30', 'is_standard' => true], ['rate' => '20']), static::createVatRate(['vat_rate_id' => 'originVatRate-123', 'country_id' => 'NL', 'rate' => '20'])];
-    //    }
 }
