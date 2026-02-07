@@ -26,13 +26,14 @@ final class InMemoryProductDetailRepository implements ProductDetailRepository, 
             foreach ($variant->getVariantKeys() as $variantKeyObj) {
                 if ($variantKeyObj->getKey()->get() === $variantKey && $variantKeyObj->getLocale()->equals($locale)) {
                     $variantId = $variant->variantId->get();
+
                     break 2;
                 }
             }
         }
 
         // If no custom key found, we assume the given key is actually the variant ID.
-        if (!$variantId) {
+        if (! $variantId) {
             $variantId = $variantKey;
         }
 
@@ -50,7 +51,7 @@ final class InMemoryProductDetailRepository implements ProductDetailRepository, 
             'stock_data' => json_encode([]),
         ]);
 
-        if (!$allowOffline && !in_array($product->getState(), ProductState::onlineStates())) {
+        if (! $allowOffline && ! in_array($product->getState(), ProductState::onlineStates())) {
             throw new CouldNotFindVariant('No online variant found by id [' . $variantId->get() . ']');
         }
 
