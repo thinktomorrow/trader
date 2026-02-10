@@ -3,7 +3,6 @@ declare(strict_types=1);
 
 namespace Tests\Infrastructure\Repositories;
 
-use Illuminate\Foundation\Testing\RefreshDatabase;
 use PHPUnit\Framework\Attributes\DataProvider;
 use Tests\Infrastructure\TestCase;
 use Thinktomorrow\Trader\Domain\Model\Product\Product;
@@ -23,28 +22,24 @@ use Thinktomorrow\Trader\Infrastructure\Test\Repositories\InMemoryTaxonomyReposi
 use Thinktomorrow\Trader\Infrastructure\Test\Repositories\InMemoryTaxonRepository;
 use Thinktomorrow\Trader\Infrastructure\Test\Repositories\InMemoryVariantRepository;
 use Thinktomorrow\Trader\Infrastructure\Test\TestContainer;
+use Thinktomorrow\Trader\Testing\Catalog\CatalogContext;
 
 final class VariantRepositoryTest extends TestCase
 {
-    use RefreshDatabase;
-
-    #[DataProvider('variants')]
-    public function test_it_can_save_and_find_an_variant(Product $product, Variant $variant)
+    public function test_it_can_save_and_find_a_variant()
     {
-        foreach ($this->repositories() as $i => $repository) {
+        /** @var CatalogContext $catalog */
+        foreach (CatalogContext::drivers() as $catalog) {
 
             // Create taxon data
-            $taxonomy = Taxonomy::create(TaxonomyId::fromString('ooo'), TaxonomyType::variant_property);
-            $taxon = Taxon::create(TaxonId::fromString('xxx'), TaxonomyId::fromString('ooo'));
-            $this->taxonomyRepositories()[$i]->save($taxonomy);
-            $this->taxonRepositories()[$i]->save($taxon);
+            $taxonomy = $catalog->createTaxonomy('taxonomy-aaa', TaxonomyType::variant_property->value);
+            $taxon = $catalog->createTaxon();
+            $product = $catalog->createProduct();
+            $variant = $product->getVariants()[0];
 
-            $this->productRepositories()[$i]->save($product);
-            $repository->save($variant);
+            $variantStates = $catalog->repos()->variantRepository()->getStatesByProduct($product->productId);
 
-            $variantStates = $repository->getStatesByProduct($variant->productId);
-
-            $this->assertEquals([$variant], array_map(fn ($variantState) => Variant::fromMappedData($variantState[0], ['product_id' => 'xxx'], $variantState[1]), $variantStates));
+            $this->assertEquals([$variant], array_map(fn($variantState) => Variant::fromMappedData($variantState[0], ['product_id' => $product->productId->get()], $variantState[1]), $variantStates));
         }
     }
 

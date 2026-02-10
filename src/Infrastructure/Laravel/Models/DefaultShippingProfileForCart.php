@@ -13,6 +13,7 @@ class DefaultShippingProfileForCart implements ShippingProfileForCart
     private string $shippingProfileId;
     private string $providerId;
     private bool $requiresAddress;
+    protected array $data;
     private iterable $images;
 
     final private function __construct()
@@ -64,5 +65,14 @@ class DefaultShippingProfileForCart implements ShippingProfileForCart
     public function getImages(): iterable
     {
         return $this->images;
+    }
+
+    public function getData(?string $key = null, $default = null): mixed
+    {
+        if (!$key) {
+            return $this->data;
+        }
+
+        return $this->data($key, null, $default);
     }
 }

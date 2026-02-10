@@ -20,26 +20,27 @@ class UpdateShippingProfileOnOrder
         private ContainerInterface        $container,
         private OrderRepository           $orderRepository,
         private ShippingProfileRepository $shippingProfileRepository
-    ) {
+    )
+    {
     }
 
     public function handle(Order $order, ShippingProfileId $shippingProfileId): void
     {
         $shippingProfile = $this->shippingProfileRepository->find($shippingProfileId);
 
-        if (! in_array($shippingProfile->getState(), ShippingProfileState::onlineStates())) {
+        if (!in_array($shippingProfile->getState(), ShippingProfileState::onlineStates())) {
             $this->removeAllShippingsFromOrder($order);
 
             return;
         }
 
         // When shipping country is not given, but profile is country restricted, we bail out.
-        if (! ($shippingCountryId = $order->getShippingAddress()?->getAddress()->countryId) && $shippingProfile->hasAnyCountries()) {
+        if (!($shippingCountryId = $order->getShippingAddress()?->getAddress()->countryId) && $shippingProfile->hasAnyCountries()) {
             $this->removeAllShippingsFromOrder($order);
 
             return;
         } // If shipping country does not match the allowed countries, we bail out.
-        elseif ($shippingCountryId && ! $shippingProfile->hasCountry($shippingCountryId)) {
+        elseif ($shippingCountryId && !$shippingProfile->hasCountry($shippingCountryId)) {
             $this->removeAllShippingsFromOrder($order);
 
             return;
