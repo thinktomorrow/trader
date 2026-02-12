@@ -478,6 +478,7 @@ return new class extends Migration {
 
         // Old options pivots - should be removed in future major
         Schema::dropIfExists(static::PREFIX . 'variant_option_values');
+        Schema::dropIfExists(static::PREFIX . 'product_keys');
         Schema::dropIfExists(static::PREFIX . 'product_option_values');
         Schema::dropIfExists(static::PREFIX . 'product_options');
 
