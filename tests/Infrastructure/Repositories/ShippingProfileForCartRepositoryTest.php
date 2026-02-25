@@ -4,75 +4,35 @@ declare(strict_types=1);
 namespace Tests\Infrastructure\Repositories;
 
 use Tests\Infrastructure\TestCase;
-use Thinktomorrow\Trader\Application\Cart\ShippingProfile\ShippingProfileForCart;
-use Thinktomorrow\Trader\Domain\Model\Country\CountryId;
-use Thinktomorrow\Trader\Infrastructure\Laravel\Models\DefaultShippingProfileForCart;
-use Thinktomorrow\Trader\Infrastructure\Laravel\Repositories\MysqlCountryRepository;
-use Thinktomorrow\Trader\Infrastructure\Laravel\Repositories\MysqlShippingProfileRepository;
-use Thinktomorrow\Trader\Infrastructure\Test\Repositories\InMemoryCountryRepository;
-use Thinktomorrow\Trader\Infrastructure\Test\Repositories\InMemoryShippingProfileRepository;
-use Thinktomorrow\Trader\Infrastructure\Test\TestContainer;
+use Thinktomorrow\Trader\Testing\Order\OrderContext;
 
 class ShippingProfileForCartRepositoryTest extends TestCase
 {
-    private \Thinktomorrow\Trader\Domain\Model\Country\Country $country;
-
-    protected function setUp(): void
+    public function test_it_can_find_shipping_profiles_for_cart()
     {
-        parent::setUp();
+        foreach (OrderContext::drivers() as $orderContext) {
+            $orderContext->createShippingProfile();
 
-        $this->country = $this->createCountry(['country_id' => 'BE']);
-
-        (new TestContainer())->add(ShippingProfileForCart::class, DefaultShippingProfileForCart::class);
-    }
-
-    public function test_it_can_find_profiles_for_cart()
-    {
-        $shippingProfile = $this->createShippingProfile();
-
-        foreach ($this->repositories() as $i => $repository) {
-            $this->countryRepositories()[$i]->save($this->country);
-
-            $this->shippingProfileRepositories()[$i]->save($shippingProfile);
-
+            $repository = $orderContext->repos()->shippingProfileRepository();
             $this->assertCount(1, $repository->findAllShippingProfilesForCart());
         }
     }
 
     public function test_it_can_find_profiles_for_cart_with_matching_countries()
     {
-        $shippingProfile = $this->createShippingProfile();
-        $shippingProfile->addCountry(CountryId::fromString('BE'));
+        foreach (OrderContext::drivers() as $orderContext) {
 
-        foreach ($this->repositories() as $i => $repository) {
-            $this->countryRepositories()[$i]->save($this->country);
+            // Create payment method with country BE
+            $shippingProfile = $orderContext->dontPersist()->createShippingProfile();
+            $country = $orderContext->persist()->createCountry('BE');
 
-            $this->shippingProfileRepositories()[$i]->save($shippingProfile);
+            $repository = $orderContext->repos()->shippingProfileRepository();
+
+            $shippingProfile->addCountry($country->countryId);
+            $repository->save($shippingProfile);
 
             $this->assertCount(1, $repository->findAllShippingProfilesForCart('BE'));
             $this->assertCount(0, $repository->findAllShippingProfilesForCart('NL'));
         }
-    }
-
-    private static function repositories(): \Generator
-    {
-        yield new InMemoryShippingProfileRepository();
-        yield new MysqlShippingProfileRepository(new TestContainer());
-    }
-
-    private function shippingProfileRepositories(): array
-    {
-        return [
-            new InMemoryShippingProfileRepository(),
-            new MysqlShippingProfileRepository(new TestContainer()),
-        ];
-    }
-
-    private function countryRepositories(): array
-    {
-        return [
-            new InMemoryCountryRepository(),
-            new MysqlCountryRepository(),
-        ];
     }
 }
