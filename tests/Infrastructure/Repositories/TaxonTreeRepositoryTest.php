@@ -19,7 +19,7 @@ final class TaxonTreeRepositoryTest extends TestCase
     {
         foreach (CatalogContext::drivers() as $catalog) {
 
-            $this->createTree($catalog);
+            $catalog->createDefaultTree();
 
             $repository = $catalog->repos()->taxonTreeRepository();
 
@@ -33,7 +33,7 @@ final class TaxonTreeRepositoryTest extends TestCase
     {
         foreach (CatalogContext::drivers() as $catalog) {
 
-            $this->createTree($catalog);
+            $catalog->createDefaultTree();
 
             $repository = $catalog->repos()->taxonTreeRepository();
 
@@ -50,7 +50,7 @@ final class TaxonTreeRepositoryTest extends TestCase
     {
         foreach (CatalogContext::drivers() as $catalog) {
 
-            $this->createTree($catalog);
+            $catalog->createDefaultTree();
 
             $repository = $catalog->repos()->taxonTreeRepository();
 
@@ -67,7 +67,7 @@ final class TaxonTreeRepositoryTest extends TestCase
     {
         foreach (CatalogContext::drivers() as $catalog) {
 
-            $this->createTree($catalog);
+            $catalog->createDefaultTree();
 
             $repository = $catalog->repos()->taxonTreeRepository();
 
@@ -80,7 +80,7 @@ final class TaxonTreeRepositoryTest extends TestCase
     {
         foreach (CatalogContext::drivers() as $catalog) {
 
-            $this->createTree($catalog);
+            $catalog->createDefaultTree();
 
             $repository = $catalog->repos()->taxonTreeRepository();
 
@@ -93,7 +93,7 @@ final class TaxonTreeRepositoryTest extends TestCase
     {
         foreach (CatalogContext::drivers() as $catalog) {
 
-            $this->createTree($catalog);
+            $catalog->createDefaultTree();
 
             $repository = $catalog->repos()->taxonTreeRepository();
             $repository->setLocale(Locale::fromString('fr'));
@@ -101,19 +101,5 @@ final class TaxonTreeRepositoryTest extends TestCase
             $this->assertNotNull($repository->findTaxonByKey('taxon-ddd-key-fr'));
             $this->assertNull($repository->findTaxonByKey('taxon-ddd-key-nl'));
         }
-    }
-
-    private function createTree(CatalogContext $catalog): void
-    {
-        $catalog->createTaxonomy('taxonomy-aaa');
-        $taxonA = $catalog->createTaxon('taxon-aaa', 'taxonomy-aaa');
-        $taxonB = $catalog->createTaxon('taxon-bbb', 'taxonomy-aaa', $taxonA->taxonId->get());
-        $taxonC = $catalog->createTaxon('taxon-ccc', 'taxonomy-aaa', $taxonA->taxonId->get());
-        $taxonD = $catalog->createTaxon('taxon-ddd', 'taxonomy-aaa');
-        $taxonE = $catalog->createTaxon('taxon-eee', 'taxonomy-aaa', $taxonD->taxonId->get());
-
-        $catalog->createTaxonomy('taxonomy-bbb');
-        $taxonF = $catalog->createTaxon('taxon-fff', 'taxonomy-bbb');
-        $taxonG = $catalog->createTaxon('taxon-ggg', 'taxonomy-bbb', $taxonF->taxonId->get());
     }
 }

@@ -3,138 +3,95 @@ declare(strict_types=1);
 
 namespace Tests\Infrastructure\Repositories;
 
-use PHPUnit\Framework\Attributes\DataProvider;
 use Tests\Infrastructure\TestCase;
-use Thinktomorrow\Trader\Domain\Common\Locale;
 use Thinktomorrow\Trader\Domain\Model\Taxon\Exceptions\CouldNotFindTaxon;
-use Thinktomorrow\Trader\Domain\Model\Taxon\Taxon;
 use Thinktomorrow\Trader\Domain\Model\Taxon\TaxonId;
-use Thinktomorrow\Trader\Domain\Model\Taxon\TaxonKey;
-use Thinktomorrow\Trader\Domain\Model\Taxon\TaxonKeyId;
-use Thinktomorrow\Trader\Domain\Model\Taxon\TaxonState;
-use Thinktomorrow\Trader\Domain\Model\Taxonomy\TaxonomyId;
-use Thinktomorrow\Trader\Infrastructure\Laravel\Repositories\MysqlTaxonRepository;
-use Thinktomorrow\Trader\Infrastructure\Test\Repositories\InMemoryTaxonRepository;
+use Thinktomorrow\Trader\Testing\Catalog\CatalogContext;
 
 final class TaxonRepositoryTest extends TestCase
 {
-    #[DataProvider('taxons')]
-    public function test_it_can_save_and_find_a_taxon(Taxon $taxon)
+    public function test_it_can_save_and_find_a_taxon()
     {
-        foreach ($this->taxonRepositories() as $taxonRepository) {
-            $taxonRepository->save($taxon);
+        /** @var CatalogContext $catalog */
+        foreach (CatalogContext::drivers() as $catalog) {
+            $repository = $catalog->repos()->taxonRepository();
+
+            $taxon = $catalog->dontPersist()->createTaxon();
+
+            $repository->save($taxon);
             $taxon->releaseEvents();
 
-            $this->assertEquals($taxon, $taxonRepository->find($taxon->taxonId));
+            $this->assertEquals($taxon, $repository->find($taxon->taxonId));
         }
     }
 
-    #[DataProvider('taxons')]
-    public function test_it_can_save_and_find_a_taxon_by_key(Taxon $taxon)
+    public function test_it_can_save_and_find_a_taxon_by_key()
     {
-        foreach ($this->taxonRepositories() as $taxonRepository) {
-            $taxonRepository->save($taxon);
+        /** @var CatalogContext $catalog */
+        foreach (CatalogContext::drivers() as $catalog) {
+            $repository = $catalog->repos()->taxonRepository();
+
+            $taxon = $catalog->dontPersist()->createTaxon();
+
+            $repository->save($taxon);
             $taxon->releaseEvents();
 
-            $freshTaxon = $taxonRepository->find($taxon->taxonId);
+            $freshTaxon = $repository->find($taxon->taxonId);
 
             $this->assertTrue(count($freshTaxon->getTaxonKeys()) > 0);
 
             foreach ($freshTaxon->getTaxonKeys() as $taxonKey) {
-                $this->assertEquals($taxon, $taxonRepository->findByKey($taxonKey->getKey()));
+                $this->assertEquals($taxon, $repository->findByKey($taxonKey->getKey()));
             }
         }
     }
 
-    #[DataProvider('taxons')]
-    public function test_it_can_save_and_find_many(Taxon $taxon)
+    public function test_it_can_save_and_find_many()
     {
-        foreach ($this->taxonRepositories() as $taxonRepository) {
-            $taxonRepository->save($taxon);
+        /** @var CatalogContext $catalog */
+        foreach (CatalogContext::drivers() as $catalog) {
+            $repository = $catalog->repos()->taxonRepository();
+
+            $taxon = $catalog->dontPersist()->createTaxon();
+
+            $repository->save($taxon);
             $taxon->releaseEvents();
 
-            $freshTaxa = $taxonRepository->findMany([$taxon->taxonId->get()]);
+            $freshTaxa = $repository->findMany([$taxon->taxonId->get()]);
 
             $this->assertTrue(count($freshTaxa) === 1);
         }
     }
 
-    #[DataProvider('taxons')]
-    public function test_it_can_delete_a_taxon(Taxon $taxon)
+    public function test_it_can_delete_a_taxon()
     {
         $taxonsNotFound = 0;
 
-        foreach ($this->taxonRepositories() as $taxonRepository) {
-            $taxonRepository->save($taxon);
-            $taxonRepository->delete($taxon->taxonId);
+        /** @var CatalogContext $catalog */
+        foreach (CatalogContext::drivers() as $catalog) {
+            $repository = $catalog->repos()->taxonRepository();
+
+            $taxon = $catalog->createTaxon();
+
+            $repository->delete($taxon->taxonId);
 
             try {
-                $taxonRepository->find($taxon->taxonId);
+                $repository->find($taxon->taxonId);
             } catch (CouldNotFindTaxon $e) {
                 $taxonsNotFound++;
             }
         }
 
-        $this->assertEquals(count(iterator_to_array($this->taxonRepositories())), $taxonsNotFound);
+        $this->assertCount($taxonsNotFound, CatalogContext::drivers());
     }
 
     public function test_it_can_generate_a_next_reference()
     {
-        foreach ($this->taxonRepositories() as $taxonRepository) {
-            $this->assertInstanceOf(TaxonId::class, $taxonRepository->nextReference());
+        /** @var CatalogContext $catalog */
+        foreach (CatalogContext::drivers() as $catalog) {
+            $repository = $catalog->repos()->taxonRepository();
+
+            $this->assertInstanceOf(TaxonId::class, $repository->nextReference());
         }
-    }
-
-    private function taxonRepositories(): \Generator
-    {
-        yield new InMemoryTaxonRepository();
-        yield new MysqlTaxonRepository();
-    }
-
-    public static function taxons(): \Generator
-    {
-        $taxon = Taxon::create(
-            TaxonId::fromString('xxx'),
-            TaxonomyId::fromString('bbb'),
-            TaxonId::fromString('parent'),
-        );
-
-        $taxon->updateTaxonKeys([
-            TaxonKey::create($taxon->taxonId, TaxonKeyId::fromString('taxon-key'), Locale::fromString('nl')),
-        ]);
-
-        $taxon->addData(['foo' => 'bar']);
-
-        yield [$taxon];
-
-        $taxon = Taxon::create(
-            TaxonId::fromString('xxx'),
-            TaxonomyId::fromString('bbb'),
-            TaxonId::fromString('parent'),
-        );
-
-        $taxon->updateTaxonKeys([
-            TaxonKey::create($taxon->taxonId, TaxonKeyId::fromString('taxon-key'), Locale::fromString('nl')),
-            TaxonKey::create($taxon->taxonId, TaxonKeyId::fromString('taxon-key-fr'), Locale::fromString('fr')),
-        ]);
-
-        $taxon->addData(['foo' => 'bar']);
-
-        $taxon->changeState(TaxonState::queued_for_deletion);
-        $taxon->changeOrder(555);
-
-        yield [$taxon];
-
-        // As Root
-        $taxon = Taxon::create(
-            TaxonId::fromString('xxx'),
-            TaxonomyId::fromString('bbb'),
-        );
-
-        $taxon->updateTaxonKeys([
-            TaxonKey::create($taxon->taxonId, TaxonKeyId::fromString('taxon-key'), Locale::fromString('nl')),
-        ]);
-
-        yield [$taxon];
     }
 }
