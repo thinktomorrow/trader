@@ -3,35 +3,35 @@ declare(strict_types=1);
 
 namespace Tests\Infrastructure\Repositories;
 
-use PHPUnit\Framework\Attributes\DataProvider;
 use Tests\Infrastructure\TestCase;
 use Thinktomorrow\Trader\Domain\Model\PaymentMethod\Exceptions\CouldNotFindPaymentMethod;
-use Thinktomorrow\Trader\Domain\Model\PaymentMethod\PaymentMethod;
 use Thinktomorrow\Trader\Domain\Model\PaymentMethod\PaymentMethodId;
-use Thinktomorrow\Trader\Infrastructure\Laravel\Repositories\MysqlPaymentMethodRepository;
-use Thinktomorrow\Trader\Infrastructure\Test\Repositories\InMemoryPaymentMethodRepository;
-use Thinktomorrow\Trader\Infrastructure\Test\TestContainer;
+use Thinktomorrow\Trader\Testing\Order\OrderContext;
 
 class PaymentMethodRepositoryTest extends TestCase
 {
-    #[DataProvider('paymentMethods')]
-    public function test_it_can_save_and_find_a_method(PaymentMethod $paymentMethod)
+    public function test_it_can_save_and_find_a_method()
     {
-        foreach ($this->repositories() as $repository) {
+        foreach (OrderContext::drivers() as $orderContext) {
+            $paymentMethod = $orderContext->dontPersist()->createPaymentMethod();
+
+            $repository = $orderContext->repos()->paymentMethodRepository();
+
             $repository->save($paymentMethod);
-            $paymentMethod->releaseEvents();
 
             $this->assertEquals($paymentMethod, $repository->find($paymentMethod->paymentMethodId));
         }
     }
 
-    #[DataProvider('paymentMethods')]
-    public function test_it_can_delete_a_product(PaymentMethod $paymentMethod)
+    public function test_it_can_delete_a_product()
     {
         $methodsNotFound = 0;
 
-        foreach ($this->repositories() as $repository) {
-            $repository->save($paymentMethod);
+        foreach (OrderContext::drivers() as $orderContext) {
+            $paymentMethod = $orderContext->createPaymentMethod();
+
+            $repository = $orderContext->repos()->paymentMethodRepository();
+
             $repository->delete($paymentMethod->paymentMethodId);
 
             try {
@@ -41,24 +41,16 @@ class PaymentMethodRepositoryTest extends TestCase
             }
         }
 
-        $this->assertEquals(count(iterator_to_array($this->repositories())), $methodsNotFound);
+        $this->assertCount($methodsNotFound, OrderContext::drivers());
     }
 
     public function test_it_can_generate_a_next_reference()
     {
-        foreach ($this->repositories() as $repository) {
+        foreach (OrderContext::drivers() as $orderContext) {
+
+            $repository = $orderContext->repos()->paymentMethodRepository();
+
             $this->assertInstanceOf(PaymentMethodId::class, $repository->nextReference());
         }
-    }
-
-    private static function repositories(): \Generator
-    {
-        yield new InMemoryPaymentMethodRepository();
-        yield new MysqlPaymentMethodRepository(new TestContainer());
-    }
-
-    public static function paymentMethods(): \Generator
-    {
-        yield [static::createPaymentMethod()];
     }
 }
