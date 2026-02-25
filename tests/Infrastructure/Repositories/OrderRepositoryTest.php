@@ -4,122 +4,81 @@ declare(strict_types=1);
 namespace Tests\Infrastructure\Repositories;
 
 use Tests\Infrastructure\TestCase;
-use Thinktomorrow\Trader\Domain\Model\Order\Discount\DiscountableType;
 use Thinktomorrow\Trader\Domain\Model\Order\Exceptions\CouldNotFindOrder;
-use Thinktomorrow\Trader\Domain\Model\Order\Order;
-use Thinktomorrow\Trader\Domain\Model\Order\OrderEvent\OrderEvent;
-use Thinktomorrow\Trader\Domain\Model\Order\OrderEvent\OrderEventId;
 use Thinktomorrow\Trader\Domain\Model\Order\OrderId;
 use Thinktomorrow\Trader\Domain\Model\Order\OrderReference;
 use Thinktomorrow\Trader\Domain\Model\Order\Shipping\ShippingId;
-use Thinktomorrow\Trader\Domain\Model\Order\State\DefaultOrderState;
-use Thinktomorrow\Trader\Infrastructure\Laravel\Repositories\MysqlOrderRepository;
-use Thinktomorrow\Trader\Infrastructure\Test\Repositories\InMemoryOrderRepository;
-use Thinktomorrow\Trader\Infrastructure\Test\TestContainer;
+use Thinktomorrow\Trader\Domain\Model\Order\ShopperId;
+use Thinktomorrow\Trader\Testing\Order\OrderContext;
 
 final class OrderRepositoryTest extends TestCase
 {
     public function test_it_can_save_and_find_an_order()
     {
-        foreach ($this->orders() as $order) {
-            foreach ($this->orderRepositories() as $i => $orderRepository) {
-                $this->prepareWorldForOrder($i);
+        /** @var OrderContext $orderContext */
+        foreach (OrderContext::drivers() as $orderContext) {
+            $order = $orderContext->dontPersist()->createOrder();
 
-                $orderRepository->save($order);
-                $order->releaseEvents();
+            $repository = $orderContext->repos()->orderRepository();
 
-                $this->assertEquals($order, $orderRepository->find($order->orderId));
+            $repository->save($order);
 
-                // Cleanup
-                $orderRepository->delete($order->orderId);
-            }
+            $order->releaseEvents();
+
+            $this->assertEquals($order, $repository->find($order->orderId));
         }
     }
 
     public function test_it_can_delete_an_order()
     {
-        foreach ($this->orders() as $order) {
-            $ordersNotFound = 0;
+        $ordersNotFound = 0;
 
-            foreach ($this->orderRepositories() as $i => $orderRepository) {
-                $this->prepareWorldForOrder($i);
+        /** @var OrderContext $orderContext */
+        foreach (OrderContext::drivers() as $orderContext) {
+            $order = $orderContext->createOrder();
 
-                $orderRepository->save($order);
-                $orderRepository->delete($order->orderId);
+            $repository = $orderContext->repos()->orderRepository();
 
-                try {
-                    $orderRepository->find($order->orderId);
-                } catch (CouldNotFindOrder $e) {
-                    $ordersNotFound++;
-                }
+            $repository->delete($order->orderId);
+
+            try {
+                $repository->find($order->orderId);
+            } catch (CouldNotFindOrder $e) {
+                $ordersNotFound++;
             }
-
-            $this->assertEquals(count(iterator_to_array($this->orderRepositories())), $ordersNotFound);
         }
+
+        $this->assertCount($ordersNotFound, OrderContext::drivers());
     }
 
     public function test_it_can_generate_a_next_reference()
     {
-        foreach ($this->orderRepositories() as $orderRepository) {
-            $this->assertInstanceOf(OrderId::class, $orderRepository->nextReference());
+        /** @var OrderContext $orderContext */
+        foreach (OrderContext::drivers() as $orderContext) {
+            $repository = $orderContext->repos()->orderRepository();
+
+            $this->assertInstanceOf(OrderId::class, $repository->nextReference());
         }
     }
 
     public function test_it_can_generate_a_next_external_reference()
     {
-        foreach ($this->orderRepositories() as $orderRepository) {
-            $this->assertInstanceOf(OrderReference::class, $orderRepository->nextExternalReference());
+        /** @var OrderContext $orderContext */
+        foreach (OrderContext::drivers() as $orderContext) {
+            $repository = $orderContext->repos()->orderRepository();
+
+            $this->assertInstanceOf(OrderReference::class, $repository->nextExternalReference());
         }
     }
 
-    public function test_it_can_generate_a_next_shipping_reference()
+    public function test_it_can_generate_a_next_shipping_and_shopper_reference()
     {
-        foreach ($this->orderRepositories() as $orderRepository) {
-            $this->assertInstanceOf(ShippingId::class, $orderRepository->nextShippingReference());
+        /** @var OrderContext $orderContext */
+        foreach (OrderContext::drivers() as $orderContext) {
+            $repository = $orderContext->repos()->orderRepository();
+
+            $this->assertInstanceOf(ShippingId::class, $repository->nextShippingReference());
+            $this->assertInstanceOf(ShopperId::class, $repository->nextShopperReference());
         }
-    }
-
-    private function orderRepositories(): \Generator
-    {
-        yield new InMemoryOrderRepository();
-        yield (new TestContainer())->get(MysqlOrderRepository::class);
-    }
-
-    public function orders(): \Generator
-    {
-        yield $this->orderContext->createDefaultOrder();
-
-        $orderWithDiscount = $this->orderContext->createDefaultOrder();
-        $orderWithDiscount->addDiscount($this->createOrderDiscount(['discount_id' => 'order-discount-def', 'promo_discount_id' => 'eee'], $orderWithDiscount->getMappedData()));
-
-        yield $orderWithDiscount;
-
-        $orderWithLineDiscount = $this->orderContext->createDefaultOrder();
-        $orderWithLineDiscount->getLines()[0]->addDiscount($this->createOrderDiscount([
-            'discount_id' => 'order-discount-def',
-            'promo_discount_id' => 'eee',
-            'discountable_id' => $orderWithLineDiscount->getLines()[0]->lineId->get(),
-            'discountable_type' => DiscountableType::line->value,
-        ], $orderWithLineDiscount->getMappedData()));
-        yield $orderWithLineDiscount;
-        //
-        $orderWithShippingDiscount = $this->orderContext->createDefaultOrder();
-        $orderWithShippingDiscount->getShippings()[0]->addDiscount($this->createOrderDiscount([
-            'discount_id' => 'order-discount-def',
-            'promo_discount_id' => 'eee',
-            'discountable_id' => $orderWithShippingDiscount->getShippings()[0]->shippingId->get(),
-            'discountable_type' => DiscountableType::shipping->value,
-        ], $orderWithShippingDiscount->getMappedData()));
-        yield $orderWithShippingDiscount;
-
-        yield Order::create(
-            OrderId::fromString('xxx'),
-            OrderReference::fromString('xx-ref'),
-            DefaultOrderState::confirmed
-        );
-
-        $orderWithLogEntries = $this->orderContext->createDefaultOrder();
-        $orderWithLogEntries->addLogEntry(OrderEvent::create(OrderEventId::fromString('def'), 'yyy', new \DateTime('2022-03-01 19:19:00'), ['foo' => 'baz']));
-        yield $orderWithLogEntries;
     }
 }
