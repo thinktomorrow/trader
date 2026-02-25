@@ -3,7 +3,6 @@ declare(strict_types=1);
 
 namespace Tests\Infrastructure\Repositories;
 
-use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\Infrastructure\TestCase;
 use Thinktomorrow\Trader\Domain\Model\Product\ProductTaxa\ProductTaxon;
 use Thinktomorrow\Trader\Domain\Model\Taxon\Taxon;
@@ -25,8 +24,6 @@ use Thinktomorrow\Trader\Infrastructure\Test\TestTraderConfig;
 
 final class TaxonTreeWithProductCountRepositoryTest extends TestCase
 {
-    use RefreshDatabase;
-
     public function test_it_can_get_total_of_products()
     {
         $product = $this->catalogContext->createProduct();

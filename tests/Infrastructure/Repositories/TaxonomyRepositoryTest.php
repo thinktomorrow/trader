@@ -3,7 +3,6 @@ declare(strict_types=1);
 
 namespace Tests\Infrastructure\Repositories;
 
-use Illuminate\Foundation\Testing\RefreshDatabase;
 use PHPUnit\Framework\Attributes\DataProvider;
 use Tests\Infrastructure\TestCase;
 use Thinktomorrow\Trader\Domain\Model\Taxon\Taxon;
@@ -20,8 +19,6 @@ use Thinktomorrow\Trader\Infrastructure\Test\Repositories\InMemoryTaxonRepositor
 
 final class TaxonomyRepositoryTest extends TestCase
 {
-    use RefreshDatabase;
-
     #[DataProvider('taxonomies')]
     public function test_it_can_save_and_find_a_taxonomy(Taxonomy $taxonomy)
     {

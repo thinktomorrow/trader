@@ -3,7 +3,6 @@ declare(strict_types=1);
 
 namespace Tests\Infrastructure\Repositories;
 
-use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\Infrastructure\TestCase;
 use Thinktomorrow\Trader\Application\Product\ProductDetail\ProductDetail;
 use Thinktomorrow\Trader\Domain\Model\Product\Exceptions\CouldNotFindVariant;
@@ -12,8 +11,6 @@ use Thinktomorrow\Trader\Testing\Catalog\CatalogContext;
 
 final class ProductDetailRepositoryTest extends TestCase
 {
-    use RefreshDatabase;
-
     public function test_it_can_find_a_product()
     {
         foreach (CatalogContext::drivers() as $catalog) {
@@ -22,7 +19,7 @@ final class ProductDetailRepositoryTest extends TestCase
 
             foreach ($catalog->products() as $product) {
 
-                if (! $product->hasVariants()) {
+                if (!$product->hasVariants()) {
                     continue;
                 }
 
@@ -45,7 +42,7 @@ final class ProductDetailRepositoryTest extends TestCase
 
             foreach ($catalog->products() as $product) {
 
-                if (! $product->hasVariants()) {
+                if (!$product->hasVariants()) {
                     continue;
                 }
 
@@ -77,7 +74,7 @@ final class ProductDetailRepositoryTest extends TestCase
 
             foreach ($catalog->products() as $product) {
 
-                if (! $product->hasVariants()) {
+                if (!$product->hasVariants()) {
                     continue;
                 }
 

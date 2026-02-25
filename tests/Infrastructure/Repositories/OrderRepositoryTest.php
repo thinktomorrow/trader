@@ -3,7 +3,6 @@ declare(strict_types=1);
 
 namespace Tests\Infrastructure\Repositories;
 
-use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\Infrastructure\TestCase;
 use Thinktomorrow\Trader\Domain\Model\Order\Discount\DiscountableType;
 use Thinktomorrow\Trader\Domain\Model\Order\Exceptions\CouldNotFindOrder;
@@ -20,9 +19,6 @@ use Thinktomorrow\Trader\Infrastructure\Test\TestContainer;
 
 final class OrderRepositoryTest extends TestCase
 {
-    use RefreshDatabase;
-    use PrepareWorld;
-
     public function test_it_can_save_and_find_an_order()
     {
         foreach ($this->orders() as $order) {

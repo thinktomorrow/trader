@@ -3,7 +3,6 @@ declare(strict_types=1);
 
 namespace Tests\Infrastructure\Repositories;
 
-use Illuminate\Foundation\Testing\RefreshDatabase;
 use PHPUnit\Framework\Attributes\DataProvider;
 use Tests\Infrastructure\TestCase;
 use Thinktomorrow\Trader\Application\Promo\OrderPromo\Discounts\FixedAmountOrderDiscount;
@@ -25,8 +24,6 @@ use Thinktomorrow\Trader\Infrastructure\Test\Repositories\InMemoryPromoRepositor
 
 final class PromoRepositoryTest extends TestCase
 {
-    use RefreshDatabase;
-
     #[DataProvider('promos')]
     public function test_it_can_save_and_find_a_promo(Promo $promo)
     {

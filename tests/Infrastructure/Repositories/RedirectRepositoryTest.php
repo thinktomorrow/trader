@@ -3,7 +3,6 @@ declare(strict_types=1);
 
 namespace Tests\Infrastructure\Repositories;
 
-use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\Infrastructure\TestCase;
 use Thinktomorrow\Trader\Application\Taxon\Redirect\Redirect;
 use Thinktomorrow\Trader\Domain\Common\Locale;
@@ -11,8 +10,6 @@ use Thinktomorrow\Trader\Infrastructure\Laravel\Repositories\MysqlTaxonRedirectR
 
 final class RedirectRepositoryTest extends TestCase
 {
-    use RefreshDatabase;
-
     public function test_it_can_create_redirect()
     {
         foreach ($this->repositories() as $repository) {

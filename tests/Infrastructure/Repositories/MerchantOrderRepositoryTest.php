@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Tests\Infrastructure\Repositories;
 
-use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\Infrastructure\TestCase;
 use Thinktomorrow\Trader\Application\Order\MerchantOrder\MerchantOrder;
 use Thinktomorrow\Trader\Domain\Common\Cash\Cash;
@@ -20,9 +19,6 @@ use Thinktomorrow\Trader\Infrastructure\Test\TestContainer;
 
 class MerchantOrderRepositoryTest extends TestCase
 {
-    use PrepareWorld;
-    use RefreshDatabase;
-
     public function test_it_can_find_a_merchantorder()
     {
         $order = $this->orderContext->createDefaultOrder();

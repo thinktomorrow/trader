@@ -3,7 +3,6 @@ declare(strict_types=1);
 
 namespace Tests\Infrastructure\Repositories;
 
-use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use Tests\Infrastructure\TestCase;
@@ -17,9 +16,6 @@ use Thinktomorrow\Trader\Infrastructure\Test\TestTraderConfig;
 
 class OrderGridRepositoryTest extends TestCase
 {
-    use RefreshDatabase;
-    use PrepareWorld;
-
     private \Thinktomorrow\Trader\Domain\Model\Order\Order $order;
 
     protected function setUp(): void

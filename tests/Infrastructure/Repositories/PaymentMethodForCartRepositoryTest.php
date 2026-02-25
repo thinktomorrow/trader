@@ -2,7 +2,6 @@
 
 namespace Tests\Infrastructure\Repositories;
 
-use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\Infrastructure\TestCase;
 use Thinktomorrow\Trader\Application\Cart\PaymentMethod\PaymentMethodForCart;
 use Thinktomorrow\Trader\Domain\Model\Country\CountryId;
@@ -15,8 +14,6 @@ use Thinktomorrow\Trader\Infrastructure\Test\TestContainer;
 
 class PaymentMethodForCartRepositoryTest extends TestCase
 {
-    use RefreshDatabase;
-
     private \Thinktomorrow\Trader\Domain\Model\Country\Country $country;
 
     protected function setUp(): void

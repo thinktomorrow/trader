@@ -2,7 +2,6 @@
 
 namespace Tests\Infrastructure\Repositories;
 
-use Illuminate\Foundation\Testing\RefreshDatabase;
 use PHPUnit\Framework\Attributes\DataProvider;
 use Tests\Infrastructure\TestCase;
 use Thinktomorrow\Trader\Domain\Model\Stock\Exceptions\CouldNotFindStockItem;
@@ -16,8 +15,6 @@ use Thinktomorrow\Trader\Infrastructure\Test\TestContainer;
 
 class StockItemRepositoryTest extends TestCase
 {
-    use RefreshDatabase;
-
     #[DataProvider('items')]
     public function test_it_can_find_and_save_a_stock_item(StockItem $stockItem)
     {

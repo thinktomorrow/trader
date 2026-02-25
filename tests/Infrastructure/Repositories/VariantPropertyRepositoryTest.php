@@ -3,7 +3,6 @@ declare(strict_types=1);
 
 namespace Tests\Infrastructure\Repositories;
 
-use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\Infrastructure\TestCase;
 use Thinktomorrow\Trader\Domain\Model\Product\VariantTaxa\VariantTaxon;
 use Thinktomorrow\Trader\Domain\Model\Taxonomy\TaxonomyType;
@@ -15,8 +14,6 @@ use Thinktomorrow\Trader\Infrastructure\Test\TestContainer;
 
 final class VariantPropertyRepositoryTest extends TestCase
 {
-    use RefreshDatabase;
-
     protected MysqlTaxonRepository $taxonRepository;
     protected MysqlTaxonomyRepository $taxonomyRepository;
     protected MysqlProductRepository $productRepository;
@@ -49,7 +46,7 @@ final class VariantPropertyRepositoryTest extends TestCase
         foreach ($this->repositories() as $repository) {
 
             // Check if combo already exists
-            $taxonIds = array_map(fn ($variantTaxonState) => $variantTaxonState['taxon_id'], $variant->getChildEntities()[VariantTaxon::class]);
+            $taxonIds = array_map(fn($variantTaxonState) => $variantTaxonState['taxon_id'], $variant->getChildEntities()[VariantTaxon::class]);
 
             $this->assertTrue($repository->doesUniqueVariantPropertyCombinationExist($product->productId->get(), $taxonIds));
 
@@ -80,7 +77,7 @@ final class VariantPropertyRepositoryTest extends TestCase
         $variants = $product->getVariants();
         $variantA = $variants[0];
 
-        $taxonIdsA = array_map(fn ($variantTaxonState) => $variantTaxonState['taxon_id'], $variantA->getChildEntities()[VariantTaxon::class]);
+        $taxonIdsA = array_map(fn($variantTaxonState) => $variantTaxonState['taxon_id'], $variantA->getChildEntities()[VariantTaxon::class]);
 
         // Case 1: exists but exclude self => false
         //        $this->assertFalse($repository->doesUniqueVariantPropertyCombinationExist($product->productId->get(), $taxonIdsA, $variantA->variantId->get()));

@@ -3,7 +3,6 @@ declare(strict_types=1);
 
 namespace Tests\Infrastructure\Repositories;
 
-use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\Infrastructure\TestCase;
 use Thinktomorrow\Trader\Application\Cart\ShippingProfile\ShippingProfileForCart;
 use Thinktomorrow\Trader\Domain\Model\Country\CountryId;
@@ -16,8 +15,6 @@ use Thinktomorrow\Trader\Infrastructure\Test\TestContainer;
 
 class ShippingProfileForCartRepositoryTest extends TestCase
 {
-    use RefreshDatabase;
-
     private \Thinktomorrow\Trader\Domain\Model\Country\Country $country;
 
     protected function setUp(): void
