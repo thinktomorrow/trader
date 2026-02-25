@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "6687ad24bbeede5e6e773bcaa4efb297",
+    "content-hash": "82feea6f2fdb9a7d02f8439409c1bfbd",
     "packages": [
         {
             "name": "beberlei/assert",
@@ -10340,16 +10340,10 @@
         {
             "name": "thinktomorrow/trader-testing",
             "version": "dev-main",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/thinktomorrow/trader-testing.git",
-                "reference": "9c64f487560f18949ae52c97c2ac7d0b7f15bf2e"
-            },
             "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/thinktomorrow/trader-testing/zipball/9c64f487560f18949ae52c97c2ac7d0b7f15bf2e",
-                "reference": "9c64f487560f18949ae52c97c2ac7d0b7f15bf2e",
-                "shasum": ""
+                "type": "path",
+                "url": "../trader-testing",
+                "reference": "bbaeb6865bcf59da76fcb42b890fded0c7815a42"
             },
             "require-dev": {
                 "laravel/pint": "1.24",
@@ -10358,20 +10352,22 @@
                 "phpunit/phpunit": "^11",
                 "thinktomorrow/trader": "dev-taxonomy@dev"
             },
-            "default-branch": true,
             "type": "library",
             "autoload": {
                 "psr-4": {
                     "Thinktomorrow\\Trader\\Testing\\": "src/"
                 }
             },
-            "notification-url": "https://packagist.org/downloads/",
-            "description": "testing library for trader projects",
-            "support": {
-                "issues": "https://github.com/thinktomorrow/trader-testing/issues",
-                "source": "https://github.com/thinktomorrow/trader-testing/tree/main"
+            "autoload-dev": {
+                "psr-4": {
+                    "Tests\\": "tests/"
+                },
+                "classmap": []
             },
-            "time": "2026-02-04T09:53:39+00:00"
+            "description": "testing library for trader projects",
+            "transport-options": {
+                "relative": true
+            }
         },
         {
             "name": "webmozart/assert",
