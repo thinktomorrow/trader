@@ -22,7 +22,7 @@ class ShippingProfileForCartRepositoryTest extends TestCase
     {
         foreach (OrderContext::drivers() as $orderContext) {
 
-            // Create payment method with country BE
+            // Create profile with country BE
             $shippingProfile = $orderContext->dontPersist()->createShippingProfile();
             $country = $orderContext->persist()->createCountry('BE');
 

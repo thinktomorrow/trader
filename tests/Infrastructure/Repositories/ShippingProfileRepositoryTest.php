@@ -3,49 +3,36 @@ declare(strict_types=1);
 
 namespace Tests\Infrastructure\Repositories;
 
-use Money\Money;
-use PHPUnit\Framework\Attributes\DataProvider;
 use Tests\Infrastructure\TestCase;
-use Thinktomorrow\Trader\Domain\Model\Country\CountryId;
+use Thinktomorrow\Trader\Application\Country\Country;
 use Thinktomorrow\Trader\Domain\Model\ShippingProfile\Exceptions\CouldNotFindShippingProfile;
-use Thinktomorrow\Trader\Domain\Model\ShippingProfile\ShippingProfile;
 use Thinktomorrow\Trader\Domain\Model\ShippingProfile\ShippingProfileId;
-use Thinktomorrow\Trader\Domain\Model\ShippingProfile\Tariff;
-use Thinktomorrow\Trader\Domain\Model\ShippingProfile\TariffId;
-use Thinktomorrow\Trader\Infrastructure\Laravel\Repositories\MysqlShippingProfileRepository;
-use Thinktomorrow\Trader\Infrastructure\Test\Repositories\InMemoryShippingProfileRepository;
-use Thinktomorrow\Trader\Infrastructure\Test\TestContainer;
+use Thinktomorrow\Trader\Testing\Order\OrderContext;
 
 class ShippingProfileRepositoryTest extends TestCase
 {
-    private \Thinktomorrow\Trader\Domain\Model\Country\Country $country;
-
-    protected function setUp(): void
+    public function test_it_can_save_and_find_a_profile()
     {
-        parent::setUp();
-    }
+        foreach (OrderContext::drivers() as $orderContext) {
+            $shippingProfile = $orderContext->dontPersist()->createShippingProfile();
 
-    #[DataProvider('shippingProfiles')]
-    public function test_it_can_save_and_find_a_profile(ShippingProfile $shippingProfile)
-    {
-        foreach ($this->repositories() as $i => $repository) {
-            $this->prepareCountries($i);
+            $repository = $orderContext->repos()->shippingProfileRepository();
 
             $repository->save($shippingProfile);
-            $shippingProfile->releaseEvents();
 
             $this->assertEquals($shippingProfile, $repository->find($shippingProfile->shippingProfileId));
         }
     }
 
-    #[DataProvider('shippingProfiles')]
-    public function test_it_can_delete_a_profile(ShippingProfile $shippingProfile)
+    public function test_it_can_delete_a_profile()
     {
         $profilesNotFound = 0;
 
-        foreach ($this->repositories() as $i => $repository) {
-            $this->prepareCountries($i);
-            $repository->save($shippingProfile);
+        foreach (OrderContext::drivers() as $orderContext) {
+            $shippingProfile = $orderContext->createShippingProfile();
+
+            $repository = $orderContext->repos()->shippingProfileRepository();
+
             $repository->delete($shippingProfile->shippingProfileId);
 
             try {
@@ -55,46 +42,40 @@ class ShippingProfileRepositoryTest extends TestCase
             }
         }
 
-        $this->assertEquals(count(iterator_to_array($this->repositories())), $profilesNotFound);
+        $this->assertCount($profilesNotFound, OrderContext::drivers());
     }
 
     public function test_it_can_generate_a_next_reference()
     {
-        foreach ($this->repositories() as $repository) {
+        foreach (OrderContext::drivers() as $orderContext) {
+
+            $repository = $orderContext->repos()->shippingProfileRepository();
+
             $this->assertInstanceOf(ShippingProfileId::class, $repository->nextReference());
         }
     }
 
     public function test_it_can_get_available_shipping_countries()
     {
-        foreach ($this->repositories() as $i => $repository) {
-            $this->prepareCountries($i);
+        foreach (OrderContext::drivers() as $orderContext) {
 
-            $profile = $this->createShippingProfile();
-            $profile->addCountry(CountryId::fromString('BE'));
+            $repository = $orderContext->repos()->shippingProfileRepository();
 
-            $repository->save($profile);
+            // Create profile with country BE
+            $shippingProfile = $orderContext->dontPersist()->createShippingProfile();
+            $shippingProfile->addCountry($orderContext->persist()->createCountry('BE')->countryId);
+            $repository->save($shippingProfile);
 
+            // Create profile with country NL
+            $shippingProfile = $orderContext->dontPersist()->createShippingProfile('shipping-profile-bbb');
+            $shippingProfile->addCountry($orderContext->persist()->createCountry('NL')->countryId);
+            $repository->save($shippingProfile);
+
+            $this->assertCount(2, $repository->getAvailableShippingCountries());
             $this->assertEquals([
-                \Thinktomorrow\Trader\Application\Country\Country::fromMappedData($this->createCountry(['country_id' => 'BE'])->getMappedData()),
+                Country::fromMappedData($orderContext->dontPersist()->createCountry('BE')->getMappedData()),
+                Country::fromMappedData($orderContext->dontPersist()->createCountry('NL')->getMappedData()),
             ], $repository->getAvailableShippingCountries());
         }
-    }
-
-    private static function repositories(): \Generator
-    {
-        yield new InMemoryShippingProfileRepository();
-        yield new MysqlShippingProfileRepository(new TestContainer());
-    }
-
-    public static function shippingProfiles(): \Generator
-    {
-        yield [static::createShippingProfile()];
-
-        $profile = static::createShippingProfile();
-        $profile->addCountry(CountryId::fromString('BE'));
-        $profile->addTariff(Tariff::create(TariffId::fromString('xxx'), $profile->shippingProfileId, Money::EUR(10), Money::EUR(20), Money::EUR(30)));
-
-        yield [$profile];
     }
 }
