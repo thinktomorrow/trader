@@ -44,7 +44,7 @@ class MerchantOrderRepositoryTest extends TestCase
             $this->assertInstanceOf(MerchantOrder::class, $merchantOrder);
             $this->assertCount(1, $merchantOrder->getLines());
             $this->assertEquals(
-                Cash::from($order->getTotal()->getIncludingVat())->toLocalizedFormat(Locale::fromString('nl', 'BE')),
+                Cash::from($order->getTotalIncl())->toLocalizedFormat(Locale::fromString('nl', 'BE')),
                 $merchantOrder->getFormattedTotalIncl()
             );
         }

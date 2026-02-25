@@ -13,11 +13,7 @@ use Thinktomorrow\Trader\Domain\Model\Order\Line\Personalisations\LinePersonalis
 use Thinktomorrow\Trader\Domain\Model\Order\State\DefaultOrderState;
 use Thinktomorrow\Trader\Domain\Model\Product\Personalisation\PersonalisationId;
 use Thinktomorrow\Trader\Domain\Model\Product\Personalisation\PersonalisationType;
-use Thinktomorrow\Trader\Infrastructure\Laravel\Repositories\MysqlCartRepository;
-use Thinktomorrow\Trader\Infrastructure\Laravel\Repositories\MysqlOrderRepository;
-use Thinktomorrow\Trader\Infrastructure\Test\Repositories\InMemoryCartRepository;
-use Thinktomorrow\Trader\Infrastructure\Test\Repositories\InMemoryOrderRepository;
-use Thinktomorrow\Trader\Infrastructure\Test\TestContainer;
+use Thinktomorrow\Trader\Testing\Catalog\CatalogContext;
 use Thinktomorrow\Trader\Testing\Order\OrderContext;
 
 final class CartRepositoryTest extends TestCase
@@ -32,7 +28,7 @@ final class CartRepositoryTest extends TestCase
             $this->assertInstanceOf(Cart::class, $cart);
             $this->assertCount(2, $cart->getLines());
             $this->assertEquals(
-                Cash::from($order->getTotal()->getIncludingVat())->toLocalizedFormat(Locale::fromString('nl', 'BE')),
+                Cash::from($order->getTotalIncl())->toLocalizedFormat(Locale::fromString('nl', 'BE')),
                 $cart->getFormattedTotalIncl()
             );
         }
@@ -40,61 +36,64 @@ final class CartRepositoryTest extends TestCase
 
     public function test_it_can_check_if_cart_exists()
     {
-        $order = $this->orderContext->createDefaultOrder();
-        $order->updateState(DefaultOrderState::cart_pending);
+        foreach (OrderContext::drivers() as $orderContext) {
 
-        foreach ($this->orderRepositories() as $i => $orderRepository) {
-            $this->prepareWorldForOrder($i);
+            // Create cart pending order
+            $order = $orderContext->createDefaultOrder();
+            $order->updateState(DefaultOrderState::cart_pending);
+            $orderContext->saveOrder($order);
 
-            $orderRepository->save($order);
+            $repository = $orderContext->repos()->cartRepository();
 
-            $cartRepository = iterator_to_array($this->cartRepositories())[$i];
-
-            $this->assertTrue($cartRepository->existsCart($order->orderId));
+            $this->assertTrue($repository->existsCart($order->orderId));
         }
     }
 
     public function test_it_can_save_line_personalisations()
     {
-        $order = $this->orderContext->createDefaultOrder();
+        /** @var OrderContext $orderContext */
+        foreach (OrderContext::drivers() as $orderContext) {
+            $order = $orderContext->createDefaultOrder();
 
-        $line = $order->getLines()[0];
-        $order->updateLinePersonalisations($line->lineId, [
-            LinePersonalisation::create(
-                $line->lineId,
-                LinePersonalisationId::fromString('xxx'),
-                PersonalisationId::fromString('ooo'),
-                PersonalisationType::fromString('text'),
-                'foobar',
-                ['foo' => 'bar']
-            ),
-        ]);
+            /** @var CatalogContext $catalogContext */
+            $catalogContext = CatalogContext::driver($orderContext->driverName);
+            $product = $catalogContext->createProduct();
+            $personalisation = $catalogContext->makePersonalisation();
+            $catalogContext->addPersonalisationToProduct($product, $personalisation);
+            $catalogContext->saveProduct($product);
 
-        foreach ($this->orderRepositories() as $i => $orderRepository) {
-            $this->prepareWorldForOrder($i);
+            // Add line personalisation to order
+            $line = $order->getLines()[0];
+            $order->updateLinePersonalisations($line->lineId, [
+                LinePersonalisation::create(
+                    $line->lineId,
+                    LinePersonalisationId::fromString('line-personalisation-aaa'),
+                    PersonalisationId::fromString('personalisation-aaa'),
+                    PersonalisationType::fromString('text'),
+                    'foobar',
+                    ['foo' => 'bar']
+                ),
+            ]);
+            $orderContext->saveOrder($order);
 
-            $orderRepository->save($order);
+            $cart = $orderContext->findCart($order->orderId);
 
-            $cartRepository = iterator_to_array($this->cartRepositories())[$i];
-
-            $cartLine = $cartRepository->findCart($order->orderId)->getLines()[0];
-            $this->assertCount(1, $cartLine->getPersonalisations());
+            $this->assertCount(1, $cart->getLines()[0]->getPersonalisations());
         }
     }
 
     public function test_it_checks_if_cart_is_in_customer_hands()
     {
-        $order = $this->orderContext->createDefaultOrder();
-        $order->updateState(DefaultOrderState::confirmed);
+        foreach (OrderContext::drivers() as $orderContext) {
 
-        foreach ($this->orderRepositories() as $i => $orderRepository) {
-            $this->prepareWorldForOrder($i);
+            // Create cart pending order
+            $order = $orderContext->createDefaultOrder();
+            $order->updateState(DefaultOrderState::confirmed);
+            $orderContext->saveOrder($order);
 
-            $orderRepository->save($order);
+            $repository = $orderContext->repos()->cartRepository();
 
-            $cartRepository = iterator_to_array($this->cartRepositories())[$i];
-
-            $this->assertFalse($cartRepository->existsCart($order->orderId));
+            $this->assertFalse($repository->existsCart($order->orderId));
         }
     }
 
@@ -102,35 +101,23 @@ final class CartRepositoryTest extends TestCase
     {
         $calls = 0;
 
-        $order = $this->orderContext->createDefaultOrder();
-        $order->updateState(DefaultOrderState::confirmed);
+        foreach (OrderContext::drivers() as $orderContext) {
 
-        foreach ($this->orderRepositories() as $i => $orderRepository) {
-            $this->prepareWorldForOrder($i);
+            // Create cart pending order
+            $order = $orderContext->createDefaultOrder();
+            $order->updateState(DefaultOrderState::confirmed);
+            $orderContext->saveOrder($order);
 
-            $orderRepository->save($order);
-
-            $cartRepository = iterator_to_array($this->cartRepositories())[$i];
+            $repository = $orderContext->repos()->cartRepository();
 
             try {
-                $cartRepository->findCart($order->orderId);
+                $repository->findCart($order->orderId);
             } catch (\DomainException $e) {
                 $calls++;
             }
         }
 
-        $this->assertEquals(2, $calls);
-    }
+        $this->assertEquals(count(OrderContext::drivers()), $calls);
 
-    private static function orderRepositories(): \Generator
-    {
-        yield new InMemoryOrderRepository;
-        yield (new TestContainer)->get(MysqlOrderRepository::class);
-    }
-
-    private static function cartRepositories(): \Generator
-    {
-        yield new InMemoryCartRepository;
-        yield new MysqlCartRepository(new TestContainer, (new TestContainer)->get(MysqlOrderRepository::class));
     }
 }
