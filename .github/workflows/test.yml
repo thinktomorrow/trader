@@ -1,55 +1,55 @@
 name: run-tests
 
-on: [push]
+on: [ push ]
 
 jobs:
-  test:
+    test:
 
-    runs-on: ubuntu-latest
-    strategy:
-      fail-fast: true
-      matrix:
-        php: [8.2, 8.3, 8.4]
-        laravel: [9.*]
-        dependency-version: [prefer-lowest, prefer-stable]
-        include:
-          - laravel: 9.*
-            testbench: ^7.0
+        runs-on: ubuntu-latest
+        strategy:
+            fail-fast: true
+            matrix:
+                php: [ 8.4, 8.5 ]
+                laravel: [ 11.*, 12.* ]
+                dependency-version: [ prefer-lowest, prefer-stable ]
+                include:
+                    -   laravel: 12.*
+                        testbench: ^10.0
 
-    name: P${{ matrix.php }} - L${{ matrix.laravel }} - ${{ matrix.dependency-version }}
-    services:
-      mysql:
-        image: mysql:5.7
-        env:
-          MYSQL_ALLOW_EMPTY_PASSWORD: yes
-          MYSQL_DATABASE: trader_test
-        ports:
-          - 3306
-        options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=3
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v2
+        name: P${{ matrix.php }} - L${{ matrix.laravel }} - ${{ matrix.dependency-version }}
+        services:
+            mysql:
+                image: mysql:5.7
+                env:
+                    MYSQL_ALLOW_EMPTY_PASSWORD: yes
+                    MYSQL_DATABASE: trader_test
+                ports:
+                    - 3306
+                options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=3
+        steps:
+            -   name: Checkout code
+                uses: actions/checkout@v2
 
-      - name: Setup PHP
-        uses: shivammathur/setup-php@v2
-        with:
-          php-version: ${{ matrix.php }}
-          extensions: dom, curl, libxml, mbstring, zip, pcntl, pdo, sqlite, pdo_sqlite, bcmath, soap, intl, gd, exif, iconv, imagick
-          coverage: none
+            -   name: Setup PHP
+                uses: shivammathur/setup-php@v2
+                with:
+                    php-version: ${{ matrix.php }}
+                    extensions: dom, curl, libxml, mbstring, zip, pcntl, pdo, sqlite, pdo_sqlite, bcmath, soap, intl, gd, exif, iconv, imagick
+                    coverage: none
 
-      - name: Install dependencies
-        run: |
-          composer require "laravel/framework:${{ matrix.laravel }}" "orchestra/testbench:${{ matrix.testbench }}" --no-interaction --no-update
-          composer update --${{ matrix.dependency-version }} --prefer-dist --no-interaction --no-suggest
-      - name: Execute tests
-        run: vendor/bin/phpunit
-        env:
-          DB_CONNECTION: testing
-      - name: Execute tests with mysql
-        run: vendor/bin/phpunit
-        env:
-          DB_CONNECTION: mysql
-          DB_USERNAME: root
-          DB_DATABASE: trader_test
-          DB_HOST: 127.0.0.0
-          DB_PORT: ${{ job.services.mysql.ports[3306] }}
+            -   name: Install dependencies
+                run: |
+                    composer require "laravel/framework:${{ matrix.laravel }}" "orchestra/testbench:${{ matrix.testbench }}" --no-interaction --no-update
+                    composer update --${{ matrix.dependency-version }} --prefer-dist --no-interaction --no-suggest
+            -   name: Execute tests
+                run: vendor/bin/phpunit
+                env:
+                    DB_CONNECTION: testing
+            -   name: Execute tests with mysql
+                run: vendor/bin/phpunit
+                env:
+                    DB_CONNECTION: mysql
+                    DB_USERNAME: root
+                    DB_DATABASE: trader_test
+                    DB_HOST: 127.0.0.0
+                    DB_PORT: ${{ job.services.mysql.ports[3306] }}
