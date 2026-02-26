@@ -10,13 +10,6 @@
     xsi:noNamespaceSchemaLocation="https://schema.phpunit.de/11.5/phpunit.xsd"
     cacheDirectory=".phpunit.cache"
     backupStaticProperties="false">
-    <coverage>
-        <report>
-            <clover outputFile="build/logs/clover.xml"/>
-            <html outputDirectory="build/coverage"/>
-            <text outputFile="build/coverage.txt"/>
-        </report>
-    </coverage>
     <testsuites>
         <testsuite name="unit">
             <directory>tests/Unit</directory>
@@ -28,9 +21,6 @@
             <directory>tests/Infrastructure</directory>
         </testsuite>
     </testsuites>
-    <logging>
-        <junit outputFile="build/report.junit.xml"/>
-    </logging>
     <php>
         <env name="APP_KEY" value="base64:qS0gL9WK3DppyAiXy79dURhU+ecb6k9aryqyOmpHjF8="/>
         <env name="APP_ENV" value="testing"/>
