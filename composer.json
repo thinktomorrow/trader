@@ -28,7 +28,7 @@
     "require-dev": {
         "phpunit/phpunit": "^11.2.7",
         "phpstan/phpstan": "^2.1.17",
-        "illuminate/database": "^12.20",
+        "illuminate/database": "^11.46|^12.20",
         "orchestra/testbench": "^9.16|^10.3",
         "nesbot/carbon": "^3.8",
         "qossmic/deptrac-shim": "^1.0.2",
