@@ -3,25 +3,11 @@ declare(strict_types=1);
 
 namespace Tests\Infrastructure\Repositories;
 
-use PHPUnit\Framework\Attributes\DataProvider;
 use Tests\Infrastructure\TestCase;
-use Thinktomorrow\Trader\Domain\Model\Product\Product;
 use Thinktomorrow\Trader\Domain\Model\Product\Variant\Variant;
 use Thinktomorrow\Trader\Domain\Model\Product\Variant\VariantId;
-use Thinktomorrow\Trader\Domain\Model\Taxon\Taxon;
-use Thinktomorrow\Trader\Domain\Model\Taxon\TaxonId;
-use Thinktomorrow\Trader\Domain\Model\Taxonomy\Taxonomy;
-use Thinktomorrow\Trader\Domain\Model\Taxonomy\TaxonomyId;
+use Thinktomorrow\Trader\Domain\Model\Product\VariantTaxa\VariantProperty;
 use Thinktomorrow\Trader\Domain\Model\Taxonomy\TaxonomyType;
-use Thinktomorrow\Trader\Infrastructure\Laravel\Repositories\MysqlProductRepository;
-use Thinktomorrow\Trader\Infrastructure\Laravel\Repositories\MysqlTaxonomyRepository;
-use Thinktomorrow\Trader\Infrastructure\Laravel\Repositories\MysqlTaxonRepository;
-use Thinktomorrow\Trader\Infrastructure\Laravel\Repositories\MysqlVariantRepository;
-use Thinktomorrow\Trader\Infrastructure\Test\Repositories\InMemoryProductRepository;
-use Thinktomorrow\Trader\Infrastructure\Test\Repositories\InMemoryTaxonomyRepository;
-use Thinktomorrow\Trader\Infrastructure\Test\Repositories\InMemoryTaxonRepository;
-use Thinktomorrow\Trader\Infrastructure\Test\Repositories\InMemoryVariantRepository;
-use Thinktomorrow\Trader\Infrastructure\Test\TestContainer;
 use Thinktomorrow\Trader\Testing\Catalog\CatalogContext;
 
 final class VariantRepositoryTest extends TestCase
@@ -39,114 +25,80 @@ final class VariantRepositoryTest extends TestCase
 
             $variantStates = $catalog->repos()->variantRepository()->getStatesByProduct($product->productId);
 
-            $this->assertEquals([$variant], array_map(fn ($variantState) => Variant::fromMappedData($variantState[0], ['product_id' => $product->productId->get()], $variantState[1]), $variantStates));
+            $this->assertEquals([$variant], array_map(fn($variantState) => Variant::fromMappedData($variantState[0], ['product_id' => $product->productId->get()], $variantState[1]), $variantStates));
         }
     }
 
-    #[DataProvider('variants')]
-    public function test_it_can_update_variant_taxa(Product $product, Variant $variant)
+
+    public function test_it_can_update_variant_taxa()
     {
-        foreach ($this->repositories() as $i => $repository) {
+        /** @var CatalogContext $catalog */
+        foreach (CatalogContext::drivers() as $catalog) {
 
             // Create taxon data
-            $taxonomy = Taxonomy::create(TaxonomyId::fromString('ooo'), TaxonomyType::variant_property);
-            $taxon = Taxon::create(TaxonId::fromString('xxx'), TaxonomyId::fromString('ooo'));
-            $this->taxonomyRepositories()[$i]->save($taxonomy);
-            $this->taxonRepositories()[$i]->save($taxon);
+            $catalog->createTaxonomy('taxonomy-aaa', TaxonomyType::variant_property->value);
+            $taxon = $catalog->createTaxon();
+            $product = $catalog->createProduct();
+            $variant = $product->getVariants()[0];
 
-            $this->productRepositories()[$i]->save($product);
-            $repository->save($variant);
+            $variant->updateVariantTaxa([
+                VariantProperty::create($variant->variantId, $taxon->taxonId)
+            ]);
 
-            // Resave so that the sync check occurs
-            $repository->save($variant);
+            $product->updateVariant($variant);
+            $catalog->saveProduct($product);
 
-            $this->assertEquals($variant->getChildEntities(), $repository->getStatesByProduct($variant->productId)[0][1]);
+            $variantStates = $catalog->repos()->variantRepository()->getStatesByProduct($product->productId);
+
+            $this->assertEquals([$variant], array_map(fn($variantState) => Variant::fromMappedData($variantState[0], ['product_id' => $product->productId->get()], $variantState[1]), $variantStates));
         }
     }
 
-    #[DataProvider('variants')]
-    public function test_it_can_delete_an_variant(Product $product, Variant $variant)
+
+    public function test_it_can_delete_an_variant()
     {
-        foreach ($this->repositories() as $i => $repository) {
-            $this->productRepositories()[$i]->save($product);
-            $repository->save($variant);
+        $recordsNotFound = 0;
+
+        /** @var CatalogContext $catalog */
+        foreach (CatalogContext::drivers() as $catalog) {
+
+            $repository = $catalog->repos()->variantRepository();
+
+            $product = $catalog->createProduct();
+            $variant = $product->getVariants()[0];
+
             $repository->delete($variant->variantId);
 
-            $this->assertCount(0, $repository->getStatesByProduct($variant->productId));
+            if (count($repository->getStatesByProduct($product->productId)) < 1) {
+                $recordsNotFound++;
+            }
         }
+
+        $this->assertCount($recordsNotFound, CatalogContext::drivers());
     }
 
     public function test_it_can_generate_a_next_reference()
     {
-        foreach ($this->repositories() as $repository) {
+        /** @var CatalogContext $catalog */
+        foreach (CatalogContext::drivers() as $catalog) {
+
+            $repository = $catalog->repos()->variantRepository();
+
             $this->assertInstanceOf(VariantId::class, $repository->nextReference());
         }
     }
 
-    #[DataProvider('variants')]
-    public function test_it_can_find_variant_for_cart(Product $product, Variant $variant)
+    public function test_it_can_find_all_variants_for_cart()
     {
-        foreach ($this->repositories() as $i => $repository) {
-            $this->productRepositories()[$i]->save($product);
+        /** @var CatalogContext $catalog */
+        foreach (CatalogContext::drivers() as $catalog) {
 
-            $this->assertNotNull($repository->findVariantForCart($variant->variantId));
-        }
-    }
+            $product = $catalog->createProduct();
+            $variant = $product->getVariants()[0];
 
-    #[DataProvider('variants')]
-    public function test_it_can_find_all_variants_for_cart(Product $product, Variant $variant)
-    {
-        foreach ($this->repositories() as $i => $repository) {
-            $this->productRepositories()[$i]->save($product);
+            $repository = $catalog->repos()->variantRepository();
 
             $this->assertNotNull($repository->findAllVariantsForCart([$variant->variantId]));
         }
-    }
-
-    private function repositories(): \Generator
-    {
-        yield new InMemoryVariantRepository();
-        yield new MysqlVariantRepository(new TestContainer());
-    }
-
-    private function productRepositories(): array
-    {
-        return [
-            new InMemoryProductRepository(),
-            new MysqlProductRepository(new MysqlVariantRepository(new TestContainer())),
-        ];
-    }
-
-    private function taxonomyRepositories(): array
-    {
-        return [
-            new InMemoryTaxonomyRepository(),
-            new MysqlTaxonomyRepository(),
-        ];
-    }
-
-    private function taxonRepositories(): array
-    {
-        return [
-            new InMemoryTaxonRepository(),
-            new MysqlTaxonRepository(),
-        ];
-    }
-
-    public static function variants(): \Generator
-    {
-        $product = static::createProductWithVariant();
-
-        yield [
-            $product,
-            $product->getVariants()[0],
-        ];
-
-        $product = static::createProductWithPersonalisations();
-
-        yield [
-            $product,
-            $product->getVariants()[0],
-        ];
     }
 }

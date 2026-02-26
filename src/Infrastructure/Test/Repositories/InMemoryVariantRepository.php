@@ -11,11 +11,13 @@ use Thinktomorrow\Trader\Domain\Model\Product\ProductId;
 use Thinktomorrow\Trader\Domain\Model\Product\Variant\Variant;
 use Thinktomorrow\Trader\Domain\Model\Product\Variant\VariantId;
 use Thinktomorrow\Trader\Domain\Model\Product\VariantRepository;
+use Thinktomorrow\Trader\Domain\Model\Product\VariantTaxa\VariantTaxon;
 use Thinktomorrow\Trader\Domain\Model\Stock\Exceptions\CouldNotFindStockItem;
 use Thinktomorrow\Trader\Domain\Model\Stock\Exceptions\VariantRecordDoesNotExistWhenSavingStockItem;
 use Thinktomorrow\Trader\Domain\Model\Stock\StockItem;
 use Thinktomorrow\Trader\Domain\Model\Stock\StockItemId;
 use Thinktomorrow\Trader\Domain\Model\Stock\StockItemRepository;
+use Thinktomorrow\Trader\Domain\Model\Taxonomy\TaxonomyType;
 use Thinktomorrow\Trader\Infrastructure\Laravel\Models\DefaultVariantForCart;
 
 final class InMemoryVariantRepository implements VariantRepository, VariantForCartRepository, StockItemRepository, InMemoryRepository
@@ -63,7 +65,25 @@ final class InMemoryVariantRepository implements VariantRepository, VariantForCa
         /** @var Variant $variant */
         foreach (static::$variants as $variant) {
             if ($variant->productId->equals($productId)) {
-                $result[] = [$variant->getMappedData(), $variant->getChildEntities()];
+
+                $childEntities = $variant->getChildEntities();
+
+                foreach ($childEntities as $type => $childEntitiesByType) {
+                    if ($type == VariantTaxon::class) {
+                        foreach ($childEntitiesByType as $index => $childEntity) {
+
+                            // Find taxonomy type for this taxon id
+                            $taxon = InMemoryTaxonRepository::$taxons[$childEntity['taxon_id']] ?? null;
+                            $taxonomy = $taxon ? InMemoryTaxonomyRepository::$taxonomies[$taxon->taxonomyId->get()] : null;
+                            $taxonomyType = $taxonomy ? $taxonomy->getType() : TaxonomyType::variant_property;
+
+                            $childEntities[$type][$index]['taxonomy_type'] = $taxonomyType->value;
+                        }
+                    }
+                }
+
+                // Need to add taxonomy_type so the correct class is set
+                $result[] = [$variant->getMappedData(), $childEntities];
             }
         }
 
