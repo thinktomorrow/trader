@@ -200,7 +200,7 @@ class ProductTaxaTest extends ProductContext
         $this->assertEquals('taxon-aaa-key-nl', $taxon->getKey());
         $this->assertEquals('taxon-aaa-key-nl', $taxon->getKey('nl'));
         $this->assertEquals('taxon-aaa-key-fr', $taxon->getKey('fr'));
-        $this->assertEquals('taxon-aaa-key-nl', $taxon->getKey('de')); // fallback
+        $this->assertNull($taxon->getKey('de'));
 
         $this->assertEquals('taxon-aaa-key-nl', $taxon->getUrl());
         $this->assertEquals('taxon-aaa-key-nl', $taxon->getUrl('nl'));

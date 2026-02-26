@@ -73,7 +73,7 @@ final class PromoTest extends TestCase
             'data' => json_encode([]),
             'is_combinable' => false,
             'is_system_promo' => false,
-            'coupon_code' => 'PROMO123',
+            'coupon_code' => null,
             'start_at' => null,
             'end_at' => null,
         ], $promo->getMappedData());
