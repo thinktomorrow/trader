@@ -13,15 +13,6 @@
             "email": "cavensben@gmail.com"
         }
     ],
-    "repositories": [
-        {
-            "type": "path",
-            "url": "../trader-testing",
-            "options": {
-                "symLink": true
-            }
-        }
-    ],
     "require": {
         "php": ">=8.4",
         "moneyphp/money": "^4.6.0",
@@ -42,7 +33,7 @@
         "nesbot/carbon": "^3.8",
         "qossmic/deptrac-shim": "^1.0.2",
         "infection/infection": "^0.30.3",
-        "thinktomorrow/trader-testing": "dev-main@dev"
+        "thinktomorrow/trader-testing": "dev-main"
     },
     "autoload": {
         "psr-4": {
