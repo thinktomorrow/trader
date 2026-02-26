@@ -33,12 +33,12 @@ final class InMemoryVariantRepository implements VariantRepository, VariantForCa
     {
         static::$variants[$variant->variantId->get()] = $variant;
 
-        static::$variantTaxonLookup[$variant->variantId->get()] = array_map(fn($taxon) => $taxon->taxonId->get(), $variant->getVariantTaxa());
+        static::$variantTaxonLookup[$variant->variantId->get()] = array_map(fn ($taxon) => $taxon->taxonId->get(), $variant->getVariantTaxa());
     }
 
     public static function getGridProductVariantPairsFromLookup(string $taxonId): array
     {
-        $variantIds = array_keys(array_filter(static::$variantTaxonLookup, fn($taxonIds) => in_array($taxonId, $taxonIds)));
+        $variantIds = array_keys(array_filter(static::$variantTaxonLookup, fn ($taxonIds) => in_array($taxonId, $taxonIds)));
 
         $pairs = [];
 
@@ -92,7 +92,7 @@ final class InMemoryVariantRepository implements VariantRepository, VariantForCa
 
     public function delete(VariantId $variantId): void
     {
-        if (!isset(static::$variants[$variantId->get()])) {
+        if (! isset(static::$variants[$variantId->get()])) {
             throw new CouldNotFindVariant('No variant found by id ' . $variantId);
         }
 
@@ -171,7 +171,7 @@ final class InMemoryVariantRepository implements VariantRepository, VariantForCa
     public function saveStockItem(StockItem $stockItem): void
     {
         // StockItem id must exist as variant!
-        if (!isset(static::$variants[$stockItem->stockItemId->get()])) {
+        if (! isset(static::$variants[$stockItem->stockItemId->get()])) {
             throw new VariantRecordDoesNotExistWhenSavingStockItem();
         }
 
