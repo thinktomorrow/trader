@@ -19,7 +19,7 @@ final class ProductDetailRepositoryTest extends TestCase
 
             foreach ($catalog->products() as $product) {
 
-                if (!$product->hasVariants()) {
+                if (! $product->hasVariants()) {
                     continue;
                 }
 
@@ -42,7 +42,7 @@ final class ProductDetailRepositoryTest extends TestCase
 
             foreach ($catalog->products() as $product) {
 
-                if (!$product->hasVariants()) {
+                if (! $product->hasVariants()) {
                     continue;
                 }
 
@@ -74,7 +74,7 @@ final class ProductDetailRepositoryTest extends TestCase
 
             foreach ($catalog->products() as $product) {
 
-                if (!$product->hasVariants()) {
+                if (! $product->hasVariants()) {
                     continue;
                 }
 
