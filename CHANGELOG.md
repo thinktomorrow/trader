@@ -2,14 +2,59 @@
 
 Important changes will be notified in this file
 
-## unreleased
+## 2026-03-17 - 0.9.0
 
-- Removed: usage of variantForCartRepository and use ProductDetailRepository everywhere.
-- Added: taxa data to CartLines and MerchantOrderLines.
-- Added: TraderConfig::areItemDiscountsCalculatedExcludingVat()
-- Added: LineRead::getFormattedDiscountPercentage(): float;
-- Changed: LineRead::getDiscountPercentage(): float; (previous type was int)
-- Changed: translation keys always prefixed with 'trader-' to avoid conflicts with project translation keys.
+### Breaking changes
+
+- Added methods to `TraderConfig`: `areItemDiscountsCalculatedExcludingVat()` and `showVariantsInGridByDefault()`.
+- Changed `CartLine::getDiscountPercentage()` return type from `int` to `float`.
+- Added `CartLine::getFormattedDiscountPercentage(): float`.
+- Added `LineDiscount::setCalculateExcludingVat(bool $calculateExcludingVat): void`.
+- Added `ProductDetailRepository::findProductDetailByKey(Locale $locale, string $variantKey, bool $allowOffline = false): ProductDetail`.
+- Changed `ProductDetail::fromMappedData()` signature to accept taxa, variant keys, and personalisations.
+- Added methods to `ProductDetail`: `getKey()`, `getPersonalisations()`, and `getProductData()`.
+- Changed `GridItem::fromMappedData()` signature to include variant keys.
+- Added `MerchantOrderLine::getVariants(): array`.
+- Added `ShippingProfileForCart::getData(?string $key = null, $default = null): mixed`.
+- Changed `DefaultProductTaxonItem::getKey($locale)` behavior: returns `null` when the requested locale key is missing.
+
+### Added
+
+- Added variant key support in the domain model:
+  - `VariantKey`, `VariantKeyId`, and `HasVariantKeys`
+  - events `VariantKeyCreated` and `VariantKeyUpdated`
+  - command `UpdateVariantKeys`
+  - `ProductApplication::updateVariantKeys()`
+- Added persistence and hydration support for variant keys in MySQL and in-memory repositories.
+- Added product detail lookup by variant key with `findProductDetailByKey()`.
+- Added personalisations and variant keys to product detail mapping.
+- Added config option: `calculate_item_discounts_excluding_vat`.
+- Added config option: `show_variants_in_grid_by_default`.
+- Added taxa metadata to cart lines and merchant order lines for richer rendering.
+
+### Changed
+
+- Replaced cart variant enrichment flow with `ProductDetailRepository` (deprecated `VariantForCartRepository::findVariantForCart()`).
+- Changed discount percentage behavior to preserve decimal precision.
+- Changed VAT/rounding internals to improve total consistency.
+- Changed taxon key sorting behavior to sort by locale.
+- Changed taxon key fallback behavior to avoid implicit fallback for missing locale keys.
+- Changed CI matrix to Laravel 11/12 and PHP 8.4/8.5; tests now run as split Unit/Acceptance/Infrastructure jobs.
+
+### Migration and schema notes
+
+- Added table in base migration: `trader_product_keys`.
+- Updated `trader_taxa_keys` constraints in base migration (`key` length 191, `locale` length 10, unique on locale+taxon).
+- If your project already ran prior migrations, create forward migrations in your app for equivalent schema updates.
+
+### Deprecated
+
+- `VariantForCartRepository::findVariantForCart()` is deprecated; use `ProductDetailRepository::findProductDetail()`.
+
+### Fixed
+
+- Fixed VAT allocation and cash rounding consistency in edge rounding scenarios.
+- Fixed repository and test-driver parity in several product/taxon/stock paths.
 
 ## 2026-02-02 - 0.8.1
 
@@ -206,4 +251,3 @@ Schema::create('trader_product_variants', function (Blueprint $table) {
 ## 2022-11-03 - 0.5.0
 
 First release of the trader package.
-
