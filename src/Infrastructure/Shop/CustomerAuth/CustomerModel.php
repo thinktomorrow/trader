@@ -18,6 +18,9 @@ use Thinktomorrow\Trader\TraderConfig;
 
 /**
  * @property string $customer_id
+ * @property array<string, mixed> $data
+ * @method static \Illuminate\Database\Eloquent\Builder where($column, $operator = null, $value = null, $boolean = 'and')
+ * @method static static findOrFail($id, $columns = ['*'])
  */
 class CustomerModel extends Model implements AuthenticatableContract, CanResetPasswordContract, MustVerifyEmail
 {

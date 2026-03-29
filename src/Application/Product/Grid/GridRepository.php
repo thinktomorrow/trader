@@ -16,7 +16,7 @@ interface GridRepository
 
     public function filterByProductIds(array $product_ids): static;
 
-    public function filterByPrice(string $minimumPriceAmount = null, string $maximumPriceAmount = null): static;
+    public function filterByPrice(?string $minimumPriceAmount = null, ?string $maximumPriceAmount = null): static;
 
     public function sortByLabel(): static;
 

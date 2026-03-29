@@ -72,6 +72,8 @@ final class InMemoryOrderRepository implements OrderRepository, InvoiceRepositor
                 return $order->orderId;
             }
         }
+
+        throw new CouldNotFindOrder('No order found by reference ' . $orderReference->get());
     }
 
     public function nextReference(): OrderId

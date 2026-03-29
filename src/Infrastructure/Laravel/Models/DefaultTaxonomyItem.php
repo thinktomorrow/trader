@@ -6,7 +6,6 @@ namespace Thinktomorrow\Trader\Infrastructure\Laravel\Models;
 use Thinktomorrow\Trader\Application\Common\HasLocale;
 use Thinktomorrow\Trader\Application\Common\RendersData;
 use Thinktomorrow\Trader\Application\Taxonomy\TaxonomyItem;
-use Thinktomorrow\Trader\Domain\Model\Taxon\TaxonState;
 use Thinktomorrow\Trader\Domain\Model\Taxonomy\TaxonomyState;
 use Thinktomorrow\Trader\Domain\Model\Taxonomy\TaxonomyType;
 
@@ -16,7 +15,7 @@ class DefaultTaxonomyItem implements TaxonomyItem
     use RendersData;
 
     public string $taxonomyId;
-    protected TaxonState $taxonState;
+    protected TaxonomyState $state;
     protected TaxonomyType $type;
     protected int $order;
     protected array $data;

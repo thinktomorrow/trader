@@ -33,6 +33,8 @@ abstract class BaseOrderDiscount
         return true;
     }
 
+    abstract public function getDiscountPrice(Order $order, DiscountableItem $discountable): DiscountPrice;
+
     public function apply(Order $order, DiscountableItem $discountable, DiscountId $nextDiscountId): void
     {
         if (! $this->isApplicable($order, $discountable)) {

@@ -53,5 +53,7 @@ class InMemoryCountryRepository implements CountryRepository, BillingCountryRepo
                 return \Thinktomorrow\Trader\Application\Country\Country::fromMappedData($country->getMappedData());
             }
         }
+
+        throw new CouldNotFindCountry('No country found by id ' . $countryId->get());
     }
 }

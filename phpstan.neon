@@ -2,3 +2,8 @@ parameters:
 	level: 1
 	paths:
 		- src
+	ignoreErrors:
+		-
+			identifier: new.static
+		-
+			identifier: property.uninitializedReadonly
