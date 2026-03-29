@@ -2,6 +2,11 @@
 
 Important changes will be notified in this file
 
+## Unreleased
+
+- Added: Extra Snapshot validation before saving order
+- Added: Specific VatSnapshotMismatchException in case vat snapshot of an order is invalid.
+
 ## 2026-03-17 - 0.9.0
 
 ### Breaking changes
@@ -10,7 +15,8 @@ Important changes will be notified in this file
 - Changed `CartLine::getDiscountPercentage()` return type from `int` to `float`.
 - Added `CartLine::getFormattedDiscountPercentage(): float`.
 - Added `LineDiscount::setCalculateExcludingVat(bool $calculateExcludingVat): void`.
-- Added `ProductDetailRepository::findProductDetailByKey(Locale $locale, string $variantKey, bool $allowOffline = false): ProductDetail`.
+- Added
+  `ProductDetailRepository::findProductDetailByKey(Locale $locale, string $variantKey, bool $allowOffline = false): ProductDetail`.
 - Changed `ProductDetail::fromMappedData()` signature to accept taxa, variant keys, and personalisations.
 - Added methods to `ProductDetail`: `getKey()`, `getPersonalisations()`, and `getProductData()`.
 - Changed `GridItem::fromMappedData()` signature to include variant keys.
@@ -21,10 +27,10 @@ Important changes will be notified in this file
 ### Added
 
 - Added variant key support in the domain model:
-  - `VariantKey`, `VariantKeyId`, and `HasVariantKeys`
-  - events `VariantKeyCreated` and `VariantKeyUpdated`
-  - command `UpdateVariantKeys`
-  - `ProductApplication::updateVariantKeys()`
+    - `VariantKey`, `VariantKeyId`, and `HasVariantKeys`
+    - events `VariantKeyCreated` and `VariantKeyUpdated`
+    - command `UpdateVariantKeys`
+    - `ProductApplication::updateVariantKeys()`
 - Added persistence and hydration support for variant keys in MySQL and in-memory repositories.
 - Added product detail lookup by variant key with `findProductDetailByKey()`.
 - Added personalisations and variant keys to product detail mapping.
@@ -34,7 +40,8 @@ Important changes will be notified in this file
 
 ### Changed
 
-- Replaced cart variant enrichment flow with `ProductDetailRepository` (deprecated `VariantForCartRepository::findVariantForCart()`).
+- Replaced cart variant enrichment flow with `ProductDetailRepository` (deprecated
+  `VariantForCartRepository::findVariantForCart()`).
 - Changed discount percentage behavior to preserve decimal precision.
 - Changed VAT/rounding internals to improve total consistency.
 - Changed taxon key sorting behavior to sort by locale.
@@ -44,7 +51,8 @@ Important changes will be notified in this file
 ### Migration and schema notes
 
 - Added table in base migration: `trader_product_keys`.
-- Updated `trader_taxa_keys` constraints in base migration (`key` length 191, `locale` length 10, unique on locale+taxon).
+- Updated `trader_taxa_keys` constraints in base migration (`key` length 191, `locale` length 10, unique on
+  locale+taxon).
 - If your project already ran prior migrations, create forward migrations in your app for equivalent schema updates.
 
 ### Deprecated

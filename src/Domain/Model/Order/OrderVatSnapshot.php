@@ -4,6 +4,7 @@ namespace Thinktomorrow\Trader\Domain\Model\Order;
 
 use Money\Money;
 use Thinktomorrow\Trader\Domain\Common\Vat\VatAllocatedLine;
+use Thinktomorrow\Trader\Domain\Model\Order\Exceptions\VatSnapshotMismatchException;
 
 final class OrderVatSnapshot
 {
@@ -141,7 +142,7 @@ final class OrderVatSnapshot
     public function assertMatchesTotalExcl(Money $totalExcl): void
     {
         if (! $totalExcl->add($this->totalVat)->equals($this->totalIncl)) {
-            throw new \LogicException(
+            throw new VatSnapshotMismatchException(
                 'Stored VAT snapshot total incl [' . $this->totalIncl->getAmount() .
                 '] does not match current order totals excl [' .
                 $totalExcl->getAmount() . '] + vat [' .

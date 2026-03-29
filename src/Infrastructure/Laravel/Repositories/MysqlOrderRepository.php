@@ -7,6 +7,7 @@ use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 use Psr\Container\ContainerInterface;
 use Ramsey\Uuid\Uuid;
+use Thinktomorrow\Trader\Application\Cart\RefreshCart\Adjusters\AdjustOrderVatSnapshot;
 use Thinktomorrow\Trader\Application\Order\Invoice\CreateInvoiceReferenceByYearAndMonth;
 use Thinktomorrow\Trader\Domain\Common\Address\AddressType;
 use Thinktomorrow\Trader\Domain\Model\Order\Address\BillingAddress;
@@ -16,6 +17,7 @@ use Thinktomorrow\Trader\Domain\Model\Order\Discount\DiscountableType;
 use Thinktomorrow\Trader\Domain\Model\Order\Discount\DiscountId;
 use Thinktomorrow\Trader\Domain\Model\Order\Exceptions\CouldNotFindOrder;
 use Thinktomorrow\Trader\Domain\Model\Order\Exceptions\OrderAlreadyInMerchantHands;
+use Thinktomorrow\Trader\Domain\Model\Order\Exceptions\VatSnapshotMismatchException;
 use Thinktomorrow\Trader\Domain\Model\Order\Invoice\InvoiceReference;
 use Thinktomorrow\Trader\Domain\Model\Order\Invoice\InvoiceRepository;
 use Thinktomorrow\Trader\Domain\Model\Order\Line\Line;
@@ -62,7 +64,7 @@ class MysqlOrderRepository implements OrderRepository, InvoiceRepository
 
     public function save(Order $order): void
     {
-        $state = $order->getMappedData();
+        $state = $this->getMappedDataForSave($order);
 
         if (! $this->exists($order->orderId)) {
             DB::table(static::$orderTable)->insert(array_merge($state, [
@@ -83,6 +85,17 @@ class MysqlOrderRepository implements OrderRepository, InvoiceRepository
         $this->upsertAddresses($order);
         $this->upsertShopper($order);
         $this->upsertEvents($order);
+    }
+
+    private function getMappedDataForSave(Order $order): array
+    {
+        try {
+            return $order->getMappedData();
+        } catch (VatSnapshotMismatchException) {
+            $this->container->get(AdjustOrderVatSnapshot::class)->adjust($order);
+
+            return $order->getMappedData();
+        }
     }
 
     private function upsertLines(Order $order): void
