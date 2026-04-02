@@ -42,7 +42,9 @@ final class Line implements ChildAggregate, DiscountableItem
 
     private Quantity $quantity;
 
-    private function __construct() {}
+    private function __construct()
+    {
+    }
 
     public static function create(OrderId $orderId, LineId $lineId, PurchasableReference $purchasableReference, ItemPrice $unitPrice, Quantity $quantity, array $data): static
     {
