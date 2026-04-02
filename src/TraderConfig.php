@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Thinktomorrow\Trader;
@@ -38,8 +39,6 @@ interface TraderConfig
 
     /**
      * Show product prices including or excluding vat in the shop.
-     *
-     * @return bool
      */
     public function includeVatInPrices(): bool;
 
@@ -50,6 +49,11 @@ interface TraderConfig
      * are always calculated on the prices excluding vat.
      */
     public function areItemDiscountsCalculatedExcludingVat(): bool;
+
+    /**
+     * Strategy used to split VAT amounts when rounding (unit_based|line_based).
+     */
+    public function getVatRoundingStrategy(): string;
 
     /**
      * If this is true, the shop allows vat exemption for international business shoppers.

@@ -28,6 +28,7 @@ use Thinktomorrow\Trader\Application\VatNumber\VatNumberValidation;
 use Thinktomorrow\Trader\Application\VatRate\VatExemptionApplication;
 use Thinktomorrow\Trader\Domain\Common\Event\EventDispatcher;
 use Thinktomorrow\Trader\Domain\Common\Price\DefaultItemPrice;
+use Thinktomorrow\Trader\Domain\Common\Vat\VatRoundingStrategy;
 use Thinktomorrow\Trader\Domain\Model\Customer\CustomerRepository;
 use Thinktomorrow\Trader\Domain\Model\Order\Address\BillingAddress;
 use Thinktomorrow\Trader\Domain\Model\Order\Address\ShippingAddress;
@@ -46,22 +47,20 @@ use Thinktomorrow\Trader\TraderConfig;
 final class CartApplication
 {
     public function __construct(
-        private TraderConfig                 $config,
-        private ContainerInterface           $container,
-        private ProductDetailRepository      $productDetailRepository,
-        private AdjustLine                   $adjustLine,
-        private OrderRepository              $orderRepository,
-        private OrderStateMachine            $orderStateMachine,
-        private RefreshCartAction            $refreshCartAction,
+        private TraderConfig $config,
+        private ContainerInterface $container,
+        private ProductDetailRepository $productDetailRepository,
+        private AdjustLine $adjustLine,
+        private OrderRepository $orderRepository,
+        private OrderStateMachine $orderStateMachine,
+        private RefreshCartAction $refreshCartAction,
         private UpdateShippingProfileOnOrder $updateShippingProfileOnOrder,
-        private UpdatePaymentMethodOnOrder   $updatePaymentMethodOnOrder,
-        private CustomerRepository           $customerRepository,
-        private EventDispatcher              $eventDispatcher,
-        private VatNumberApplication         $vatNumberApplication,
-        private VatExemptionApplication      $vatExemptionApplication,
-    ) {
-
-    }
+        private UpdatePaymentMethodOnOrder $updatePaymentMethodOnOrder,
+        private CustomerRepository $customerRepository,
+        private EventDispatcher $eventDispatcher,
+        private VatNumberApplication $vatNumberApplication,
+        private VatExemptionApplication $vatExemptionApplication,
+    ) {}
 
     public function refresh(RefreshCart $refreshCart): void
     {
@@ -129,6 +128,7 @@ final class CartApplication
                 'unit_price_incl' => $product->getUnitPrice()->getIncludingVat()->getAmount(),
                 'sale_price_excl' => $product->getSalePrice()->getExcludingVat()->getAmount(),
                 'sale_price_incl' => $product->getSalePrice()->getIncludingVat()->getAmount(),
+                'vat_rounding_strategy' => VatRoundingStrategy::fromString($this->config->getVatRoundingStrategy())->value,
             ])
         );
 
@@ -152,7 +152,7 @@ final class CartApplication
             }
 
             if (! $originalPersonalisation) {
-                throw new \InvalidArgumentException('No personalisation found for variant [' . $addLine->getVariantId()->get() . '] by personalisation id [' . $personalisation_id . '].');
+                throw new \InvalidArgumentException('No personalisation found for variant ['.$addLine->getVariantId()->get().'] by personalisation id ['.$personalisation_id.'].');
             }
 
             $linePersonalisations[] = LinePersonalisation::create(
@@ -173,7 +173,6 @@ final class CartApplication
         $this->orderRepository->save($order);
 
         $this->eventDispatcher->dispatchAll($order->releaseEvents());
-
 
         return $orderId;
     }
@@ -248,7 +247,6 @@ final class CartApplication
 
         $this->orderRepository->save($order);
 
-
         $this->eventDispatcher->dispatchAll($order->releaseEvents());
     }
 
@@ -264,7 +262,6 @@ final class CartApplication
         ));
 
         $this->orderRepository->save($order);
-
 
         $this->eventDispatcher->dispatchAll($order->releaseEvents());
     }
@@ -293,7 +290,6 @@ final class CartApplication
         $this->container->get(AdjustOrderVatSnapshot::class)->adjust($order);
 
         $this->orderRepository->save($order);
-
 
         $this->eventDispatcher->dispatchAll($order->releaseEvents());
     }
@@ -417,7 +413,6 @@ final class CartApplication
         // Proceed in checkout should be done based on filled data no?
 
         $this->orderRepository->save($order);
-
 
         $this->eventDispatcher->dispatchAll($order->releaseEvents());
     }

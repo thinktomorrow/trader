@@ -71,6 +71,14 @@ return [
     'calculate_item_discounts_excluding_vat' => false,
 
     /**
+     * Defines how VAT is rounded when splitting totals between excluding and VAT amounts.
+     *
+     * - unit_based: derive excluding amount per unit and multiply by quantity.
+     * - line_based: derive excluding amount from the full line including amount.
+     */
+    'vat_rounding_strategy' => 'unit_based',
+
+    /**
      * If this is true, the shop allows vat exemption for international business shoppers.
      * This means that if a shopper is a business and has a valid vat number, they are
      * eligible for vat exemption if their country is different from the primary vat country.

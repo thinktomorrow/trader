@@ -5,6 +5,7 @@ Important changes will be notified in this file
 ## Unreleased
 
 - Fixed: static analysis errors level 1
+- Added: Config option for unit-based (default) or line-based vat rounding strategy
 - Added: Extra Snapshot validation before saving order
 - Added: Specific VatSnapshotMismatchException in case vat snapshot of an order is invalid.
 

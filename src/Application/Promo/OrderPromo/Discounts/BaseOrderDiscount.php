@@ -1,11 +1,14 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Thinktomorrow\Trader\Application\Promo\OrderPromo\Discounts;
 
 use Assert\Assertion;
 use Thinktomorrow\Trader\Application\Promo\OrderPromo\OrderCondition;
+use Thinktomorrow\Trader\Domain\Common\Price\DefaultDiscountPrice;
 use Thinktomorrow\Trader\Domain\Common\Price\DiscountPrice;
+use Thinktomorrow\Trader\Domain\Common\Price\ItemDiscountPrice;
 use Thinktomorrow\Trader\Domain\Model\Order\Discount\Discount;
 use Thinktomorrow\Trader\Domain\Model\Order\Discount\DiscountableItem;
 use Thinktomorrow\Trader\Domain\Model\Order\Discount\DiscountId;
@@ -16,7 +19,9 @@ use Thinktomorrow\Trader\Domain\Model\Promo\PromoId;
 abstract class BaseOrderDiscount
 {
     protected readonly PromoId $promoId;
+
     protected readonly PromoDiscountId $promoDiscountId;
+
     protected array $promoData;
 
     /** @var OrderCondition[] */
@@ -33,7 +38,7 @@ abstract class BaseOrderDiscount
         return true;
     }
 
-    abstract public function getDiscountPrice(Order $order, DiscountableItem $discountable): DiscountPrice;
+    abstract public function getDiscountPrice(Order $order, DiscountableItem $discountable): DiscountPrice|ItemDiscountPrice;
 
     public function apply(Order $order, DiscountableItem $discountable, DiscountId $nextDiscountId): void
     {
@@ -59,7 +64,7 @@ abstract class BaseOrderDiscount
     {
         Assertion::allIsInstanceOf($conditions, OrderCondition::class);
 
-        $discount = new static();
+        $discount = new static;
         $discount->promoId = PromoId::fromString($aggregateState['promo_id']);
         $discount->promoDiscountId = PromoDiscountId::fromString($state['discount_id']);
         $discount->promoData = [
@@ -73,6 +78,12 @@ abstract class BaseOrderDiscount
 
     public function getCombinedDiscountPrice(Order $order): DiscountPrice
     {
-        return $this->getDiscountPrice($order, $order);
+        $discountPrice = $this->getDiscountPrice($order, $order);
+
+        if ($discountPrice instanceof ItemDiscountPrice) {
+            return DefaultDiscountPrice::fromExcludingVat($discountPrice->getExcludingVat());
+        }
+
+        return $discountPrice;
     }
 }

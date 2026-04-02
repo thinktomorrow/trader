@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Thinktomorrow\Trader\Infrastructure\Test;
@@ -62,6 +63,11 @@ class TestTraderConfig implements TraderConfig
     public function areItemDiscountsCalculatedExcludingVat(): bool
     {
         return false;
+    }
+
+    public function getVatRoundingStrategy(): string
+    {
+        return $this->overwrites['vat_rounding_strategy'] ?? 'unit_based';
     }
 
     public function isVatExemptionAllowed(): bool

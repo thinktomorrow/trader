@@ -14,6 +14,7 @@ use Thinktomorrow\Trader\Domain\Common\Price\ItemDiscountPrice;
 use Thinktomorrow\Trader\Domain\Common\Price\ItemPrice;
 use Thinktomorrow\Trader\Domain\Common\Price\WithAuthoritativeIncl;
 use Thinktomorrow\Trader\Domain\Common\Vat\VatPercentage;
+use Thinktomorrow\Trader\Domain\Common\Vat\VatRoundingStrategy;
 use Thinktomorrow\Trader\Domain\Model\Order\Discount\Discount;
 use Thinktomorrow\Trader\Domain\Model\Order\Discount\DiscountableId;
 use Thinktomorrow\Trader\Domain\Model\Order\Discount\DiscountableItem;
@@ -41,9 +42,7 @@ final class Line implements ChildAggregate, DiscountableItem
 
     private Quantity $quantity;
 
-    private function __construct()
-    {
-    }
+    private function __construct() {}
 
     public static function create(OrderId $orderId, LineId $lineId, PurchasableReference $purchasableReference, ItemPrice $unitPrice, Quantity $quantity, array $data): static
     {
@@ -78,12 +77,12 @@ final class Line implements ChildAggregate, DiscountableItem
 
     public function getTotal(): ItemPrice
     {
-        return $this->getDiscountedUnitPrice()->multiply($this->quantity->asInt());
+        return $this->multiplyByVatRoundingStrategy($this->getDiscountedUnitPrice());
     }
 
     public function getSubtotal(): ItemPrice
     {
-        return $this->unitPrice->multiply($this->quantity->asInt());
+        return $this->multiplyByVatRoundingStrategy($this->unitPrice);
     }
 
     public function getDiscountPrice(): DiscountPrice|ItemDiscountPrice
@@ -165,7 +164,7 @@ final class Line implements ChildAggregate, DiscountableItem
         if (isset($state['purchasable_reference'])) {
             $line->purchasableReference = $state['purchasable_reference'] ? PurchasableReference::fromString($state['purchasable_reference']) : null;
         } elseif (isset($state['variant_id'])) {
-            $line->purchasableReference = $state['variant_id'] ? PurchasableReference::fromString('variant@' . $state['variant_id']) : null;
+            $line->purchasableReference = $state['variant_id'] ? PurchasableReference::fromString('variant@'.$state['variant_id']) : null;
         } else {
             // Reference does not exist (anymore)
             $line->purchasableReference = null;
@@ -195,5 +194,29 @@ final class Line implements ChildAggregate, DiscountableItem
     public function getDiscountableType(): DiscountableType
     {
         return DiscountableType::line;
+    }
+
+    private function multiplyByVatRoundingStrategy(ItemPrice $itemPrice): ItemPrice
+    {
+        $quantity = $this->quantity->asInt();
+
+        if (! $this->isLineBasedVatRoundingStrategy()) {
+            return $itemPrice->multiply($quantity);
+        }
+
+        if (! $itemPrice->isIncludingVatAuthoritative()) {
+            return $itemPrice->multiply($quantity);
+        }
+
+        return DefaultItemPrice::fromMoney(
+            $itemPrice->getIncludingVat()->multiply($quantity),
+            $itemPrice->getVatPercentage(),
+            true,
+        );
+    }
+
+    private function isLineBasedVatRoundingStrategy(): bool
+    {
+        return VatRoundingStrategy::fromString((string) $this->getData('vat_rounding_strategy', VatRoundingStrategy::unit_based->value)) === VatRoundingStrategy::line_based;
     }
 }

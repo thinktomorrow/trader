@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Thinktomorrow\Trader\Infrastructure\Laravel\config;
@@ -72,6 +73,10 @@ class TraderConfig implements \Thinktomorrow\Trader\TraderConfig
         return config('trader.calculate_item_discounts_excluding_vat');
     }
 
+    public function getVatRoundingStrategy(): string
+    {
+        return config('trader.vat_rounding_strategy', 'unit_based');
+    }
 
     public function isVatExemptionAllowed(): bool
     {
