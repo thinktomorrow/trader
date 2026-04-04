@@ -16,7 +16,7 @@ use Thinktomorrow\Trader\Domain\Model\Order\OrderId;
 
 final class LineVatRoundingStrategyTest extends TestCase
 {
-    public function test_it_uses_unit_based_rounding_by_default(): void
+    public function test_it_uses_line_based_rounding_by_default(): void
     {
         $line = Line::create(
             OrderId::fromString('order-aaa'),
@@ -28,11 +28,11 @@ final class LineVatRoundingStrategyTest extends TestCase
         );
 
         $this->assertEquals(Money::EUR(597), $line->getTotal()->getIncludingVat());
-        $this->assertEquals(Money::EUR(492), $line->getTotal()->getExcludingVat());
-        $this->assertEquals(Money::EUR(105), $line->getTotal()->getVatTotal());
+        $this->assertEquals(Money::EUR(493), $line->getTotal()->getExcludingVat());
+        $this->assertEquals(Money::EUR(104), $line->getTotal()->getVatTotal());
     }
 
-    public function test_it_uses_line_based_rounding_when_configured_on_line_data(): void
+    public function test_it_uses_unit_based_rounding_when_configured_on_line_data(): void
     {
         $line = Line::create(
             OrderId::fromString('order-aaa'),
@@ -40,11 +40,11 @@ final class LineVatRoundingStrategyTest extends TestCase
             PurchasableReference::fromString('variant@variant-aaa'),
             DefaultItemPrice::fromMoney(Money::EUR(199), VatPercentage::fromString('21'), true),
             Quantity::fromInt(3),
-            ['vat_rounding_strategy' => 'line_based'],
+            ['vat_rounding_strategy' => 'unit_based'],
         );
 
         $this->assertEquals(Money::EUR(597), $line->getTotal()->getIncludingVat());
-        $this->assertEquals(Money::EUR(493), $line->getTotal()->getExcludingVat());
-        $this->assertEquals(Money::EUR(104), $line->getTotal()->getVatTotal());
+        $this->assertEquals(Money::EUR(492), $line->getTotal()->getExcludingVat());
+        $this->assertEquals(Money::EUR(105), $line->getTotal()->getVatTotal());
     }
 }

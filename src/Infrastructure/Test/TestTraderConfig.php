@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Thinktomorrow\Trader\Infrastructure\Test;
 
 use Thinktomorrow\Trader\Domain\Common\Locale;
+use Thinktomorrow\Trader\Domain\Common\Vat\VatRoundingStrategy;
 use Thinktomorrow\Trader\TraderConfig;
 
 class TestTraderConfig implements TraderConfig
@@ -67,7 +68,7 @@ class TestTraderConfig implements TraderConfig
 
     public function getVatRoundingStrategy(): string
     {
-        return $this->overwrites['vat_rounding_strategy'] ?? 'unit_based';
+        return $this->overwrites['vat_rounding_strategy'] ?? VatRoundingStrategy::getDefault()->value;
     }
 
     public function isVatExemptionAllowed(): bool

@@ -200,7 +200,7 @@ final class Line implements ChildAggregate, DiscountableItem
     {
         $quantity = $this->quantity->asInt();
 
-        if (! $this->isLineBasedVatRoundingStrategy()) {
+        if (! VatRoundingStrategy::fromStringOrDefault($this->getData('vat_rounding_strategy'))->isLineBased()) {
             return $itemPrice->multiply($quantity);
         }
 
@@ -213,10 +213,5 @@ final class Line implements ChildAggregate, DiscountableItem
             $itemPrice->getVatPercentage(),
             true,
         );
-    }
-
-    private function isLineBasedVatRoundingStrategy(): bool
-    {
-        return VatRoundingStrategy::fromString((string) $this->getData('vat_rounding_strategy', VatRoundingStrategy::unit_based->value)) === VatRoundingStrategy::line_based;
     }
 }

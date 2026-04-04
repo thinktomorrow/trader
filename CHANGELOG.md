@@ -5,9 +5,12 @@ Important changes will be notified in this file
 ## Unreleased
 
 - Fixed: static analysis errors level 1
-- Added: Config option for unit-based (default) or line-based vat rounding strategy
+- Added: `VatRoundingStrategy::getDefault()` and `VatRoundingStrategy::fromStringOrDefault()` to centralize fallback
+  behavior.
 - Added: Extra Snapshot validation before saving order
 - Added: Specific VatSnapshotMismatchException in case vat snapshot of an order is invalid.
+- Changed: Default VAT rounding strategy is now line-based.
+- Changed: Fallback VAT rounding behavior now consistently follows the centralized default strategy.
 
 ## 2026-03-17 - 0.9.0
 
@@ -177,7 +180,7 @@ the checkout and order.
 - Added: state column to payment methods table. And removed unused 'active' columns. For existing projects, you can use
   the following migrations:
 
-```php 
+```php
 Schema::table('trader_shipping_profiles', function (Blueprint $table) {
     $table->dropColumn('active');
 });

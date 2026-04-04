@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Thinktomorrow\Trader\Infrastructure\Laravel\config;
 
 use Thinktomorrow\Trader\Domain\Common\Locale;
+use Thinktomorrow\Trader\Domain\Common\Vat\VatRoundingStrategy;
 
 class TraderConfig implements \Thinktomorrow\Trader\TraderConfig
 {
@@ -75,7 +76,7 @@ class TraderConfig implements \Thinktomorrow\Trader\TraderConfig
 
     public function getVatRoundingStrategy(): string
     {
-        return config('trader.vat_rounding_strategy', 'unit_based');
+        return config('trader.vat_rounding_strategy', VatRoundingStrategy::getDefault()->value);
     }
 
     public function isVatExemptionAllowed(): bool

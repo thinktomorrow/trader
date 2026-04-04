@@ -128,7 +128,7 @@ final class CartApplication
                 'unit_price_incl' => $product->getUnitPrice()->getIncludingVat()->getAmount(),
                 'sale_price_excl' => $product->getSalePrice()->getExcludingVat()->getAmount(),
                 'sale_price_incl' => $product->getSalePrice()->getIncludingVat()->getAmount(),
-                'vat_rounding_strategy' => VatRoundingStrategy::fromString($this->config->getVatRoundingStrategy())->value,
+                'vat_rounding_strategy' => VatRoundingStrategy::fromStringOrDefault($this->config->getVatRoundingStrategy())->value,
             ])
         );
 
