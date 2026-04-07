@@ -60,7 +60,8 @@ final class CartApplication
         private EventDispatcher $eventDispatcher,
         private VatNumberApplication $vatNumberApplication,
         private VatExemptionApplication $vatExemptionApplication,
-    ) {}
+    ) {
+    }
 
     public function refresh(RefreshCart $refreshCart): void
     {
