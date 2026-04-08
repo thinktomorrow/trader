@@ -9,6 +9,7 @@ Important changes will be notified in this file
   behavior.
 - Added: Extra Snapshot validation before saving order
 - Added: Specific VatSnapshotMismatchException in case vat snapshot of an order is invalid.
+- Added: TaxonomyItem::getData() method
 - Changed: Default VAT rounding strategy is now line-based.
 - Changed: Fallback VAT rounding behavior now consistently follows the centralized default strategy.
 

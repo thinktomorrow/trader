@@ -14,4 +14,6 @@ interface TaxonomyItem
     public function showOnline(): bool;
 
     public function getLabel(?string $locale = null): string;
+
+    public function getData(?string $key = null, $default = null): mixed;
 }

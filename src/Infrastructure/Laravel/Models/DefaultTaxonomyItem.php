@@ -59,4 +59,13 @@ class DefaultTaxonomyItem implements TaxonomyItem
     {
         return in_array($this->state, TaxonomyState::onlineStates());
     }
+
+    public function getData(?string $key = null, $default = null): mixed
+    {
+        if (is_null($key)) {
+            return $this->data;
+        }
+
+        return $this->data($key, null, $default);
+    }
 }
