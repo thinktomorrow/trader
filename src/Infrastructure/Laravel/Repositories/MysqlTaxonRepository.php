@@ -112,7 +112,6 @@ class MysqlTaxonRepository implements TaxonRepository
             ])
             ->whereIn(static::$taxonTable . '.taxon_id', $taxonIds)
             ->groupBy(static::$taxonTable . '.taxon_id')
-            ->orderByRaw('FIELD(' . static::$taxonTable . '.taxon_id, ' . implode(',', array_map('intval', $taxonIds)) . ')')
             ->get();
 
         return $taxonStates

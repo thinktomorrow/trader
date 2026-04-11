@@ -85,6 +85,34 @@ final class TaxonRepositoryTest extends TestCase
         $this->assertCount($taxonsNotFound, CatalogContext::drivers());
     }
 
+    public function test_it_preserves_input_order_when_finding_many_taxa(): void
+    {
+        /** @var CatalogContext $catalog */
+        foreach (CatalogContext::drivers() as $catalog) {
+            $repository = $catalog->repos()->taxonRepository();
+
+            $suffix = uniqid();
+            $taxonomy = $catalog->createTaxonomy('taxonomy-'.$suffix);
+
+            $taxonA = $catalog->createTaxon('taxon-a-'.$suffix, $taxonomy->taxonomyId->get());
+            $taxonB = $catalog->createTaxon('taxon-b-'.$suffix, $taxonomy->taxonomyId->get());
+            $taxonC = $catalog->createTaxon('taxon-c-'.$suffix, $taxonomy->taxonomyId->get());
+
+            $inputOrder = [
+                $taxonC->taxonId->get(),
+                $taxonA->taxonId->get(),
+                $taxonB->taxonId->get(),
+            ];
+
+            $freshTaxa = $repository->findMany($inputOrder);
+
+            $this->assertSame(
+                $inputOrder,
+                array_map(fn ($taxon) => $taxon->taxonId->get(), $freshTaxa)
+            );
+        }
+    }
+
     public function test_it_can_generate_a_next_reference()
     {
         /** @var CatalogContext $catalog */
