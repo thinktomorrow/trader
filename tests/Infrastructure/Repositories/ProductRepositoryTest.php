@@ -1,11 +1,14 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Tests\Infrastructure\Repositories;
 
+use Illuminate\Support\Facades\DB;
 use Tests\Infrastructure\TestCase;
 use Thinktomorrow\Trader\Domain\Model\Product\Exceptions\CouldNotFindProduct;
 use Thinktomorrow\Trader\Domain\Model\Product\ProductId;
+use Thinktomorrow\Trader\Domain\Model\Taxonomy\TaxonomyType;
 use Thinktomorrow\Trader\Testing\Catalog\CatalogContext;
 
 final class ProductRepositoryTest extends TestCase
@@ -59,6 +62,31 @@ final class ProductRepositoryTest extends TestCase
     {
         foreach (CatalogContext::drivers() as $catalog) {
             $this->assertInstanceOf(ProductId::class, $catalog->repos()->productRepository()->nextReference());
+        }
+    }
+
+    public function test_it_keeps_product_taxa_with_null_data_when_loading(): void
+    {
+        foreach (CatalogContext::drivers() as $catalog) {
+            $suffix = uniqid();
+
+            $taxonomy = $catalog->createTaxonomy('taxonomy-'.$suffix, TaxonomyType::property->value);
+            $taxon = $catalog->createTaxon('taxon-'.$suffix, $taxonomy->taxonomyId->get());
+
+            $product = $catalog->linkProductToTaxon(
+                $catalog->createProduct('product-'.$suffix, 'variant-'.$suffix),
+                $taxon,
+            );
+
+            DB::table('trader_taxa_products')
+                ->where('product_id', $product->productId->get())
+                ->where('taxon_id', $taxon->taxonId->get())
+                ->update(['data' => null]);
+
+            $found = $catalog->repos()->productRepository()->find($product->productId);
+            $foundTaxonIds = array_map(fn ($productTaxon) => $productTaxon->taxonId->get(), $found->getProductTaxa());
+
+            $this->assertContains($taxon->taxonId->get(), $foundTaxonIds);
         }
     }
 }

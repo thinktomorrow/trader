@@ -1,8 +1,10 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Tests\Infrastructure\Repositories;
 
+use Illuminate\Support\Facades\DB;
 use Tests\Infrastructure\TestCase;
 use Thinktomorrow\Trader\Domain\Model\Product\Variant\Variant;
 use Thinktomorrow\Trader\Domain\Model\Product\Variant\VariantId;
@@ -29,7 +31,6 @@ final class VariantRepositoryTest extends TestCase
         }
     }
 
-
     public function test_it_can_update_variant_taxa()
     {
         /** @var CatalogContext $catalog */
@@ -53,7 +54,6 @@ final class VariantRepositoryTest extends TestCase
             $this->assertEquals([$variant], array_map(fn ($variantState) => Variant::fromMappedData($variantState[0], ['product_id' => $product->productId->get()], $variantState[1]), $variantStates));
         }
     }
-
 
     public function test_it_can_delete_an_variant()
     {
@@ -99,6 +99,32 @@ final class VariantRepositoryTest extends TestCase
             $repository = $catalog->repos()->variantRepository();
 
             $this->assertNotNull($repository->findAllVariantsForCart([$variant->variantId]));
+        }
+    }
+
+    public function test_it_keeps_variant_taxa_with_null_data_when_loading_states(): void
+    {
+        /** @var CatalogContext $catalog */
+        foreach (CatalogContext::drivers() as $catalog) {
+            $suffix = uniqid();
+
+            $taxonomy = $catalog->createTaxonomy('taxonomy-'.$suffix, TaxonomyType::variant_property->value);
+            $taxon = $catalog->createTaxon('taxon-'.$suffix, $taxonomy->taxonomyId->get());
+            $product = $catalog->createProduct('product-'.$suffix, 'variant-'.$suffix);
+            $variant = $product->getVariants()[0];
+
+            $catalog->linkVariantToTaxon($product->productId->get(), $variant->variantId->get(), $taxon->taxonId->get());
+
+            DB::table('trader_taxa_variants')
+                ->where('variant_id', $variant->variantId->get())
+                ->where('taxon_id', $taxon->taxonId->get())
+                ->update(['data' => null]);
+
+            $variantStates = $catalog->repos()->variantRepository()->getStatesByProduct($product->productId);
+            $foundVariant = Variant::fromMappedData($variantStates[0][0], ['product_id' => $product->productId->get()], $variantStates[0][1]);
+            $foundTaxonIds = array_map(fn ($variantTaxon) => $variantTaxon->taxonId->get(), $foundVariant->getVariantTaxa());
+
+            $this->assertContains($taxon->taxonId->get(), $foundTaxonIds);
         }
     }
 }

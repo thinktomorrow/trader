@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Thinktomorrow\Trader\Infrastructure\Laravel\Repositories;
@@ -19,8 +20,11 @@ class MysqlProductRepository implements ProductRepository
     private VariantRepository $variantRepository;
 
     private static string $productTable = 'trader_products';
+
     private static string $variantTable = 'trader_product_variants';
+
     private static string $productTaxonLookupTable = 'trader_taxa_products';
+
     private static string $personalisationTable = 'trader_product_personalisations';
 
     public function __construct(VariantRepository $variantRepository)
@@ -110,33 +114,33 @@ class MysqlProductRepository implements ProductRepository
 
         $productState = DB::table(static::$productTable)
             ->select([
-                static::$productTable . '.*',
+                static::$productTable.'.*',
                 DB::raw("GROUP_CONCAT(DISTINCT $taxaSelect SEPARATOR '|||') AS taxa"),
             ])
-            ->where(static::$productTable . '.product_id', $productId->get())
-            ->leftJoin(static::$productTaxonLookupTable, static::$productTable . '.product_id', '=', static::$productTaxonLookupTable . '.product_id')
-            ->leftJoin('trader_taxa', static::$productTaxonLookupTable . '.taxon_id', '=', 'trader_taxa.taxon_id')
+            ->where(static::$productTable.'.product_id', $productId->get())
+            ->leftJoin(static::$productTaxonLookupTable, static::$productTable.'.product_id', '=', static::$productTaxonLookupTable.'.product_id')
+            ->leftJoin('trader_taxa', static::$productTaxonLookupTable.'.taxon_id', '=', 'trader_taxa.taxon_id')
             ->leftJoin('trader_taxonomies', 'trader_taxa.taxonomy_id', '=', 'trader_taxonomies.taxonomy_id')
-            ->groupBy(static::$productTable . '.product_id')
+            ->groupBy(static::$productTable.'.product_id')
             ->first();
 
         // Handle a bug in laravel where raw group concat statement would return a record with falsy null values
-        if ($productState && null === $productState->product_id) {
+        if ($productState && $productState->product_id === null) {
             $productState = null;
         }
 
         if (! $productState) {
-            throw new CouldNotFindProduct('No product found by id [' . $productId->get() . ']');
+            throw new CouldNotFindProduct('No product found by id ['.$productId->get().']');
         }
 
-        $productState = (array)$productState;
+        $productState = (array) $productState;
         $variantStates = $this->variantRepository->getStatesByProduct($productId);
         $personalisationStates = DB::table(static::$personalisationTable)
-            ->where(static::$personalisationTable . '.product_id', $productId->get())
-            ->orderBy(static::$personalisationTable . '.order_column')
+            ->where(static::$personalisationTable.'.product_id', $productId->get())
+            ->orderBy(static::$personalisationTable.'.order_column')
             ->orderBy('order_column')
             ->get()
-            ->map(fn ($item) => (array)$item)
+            ->map(fn ($item) => (array) $item)
             ->toArray();
 
         $productTaxa = $this->getProductTaxonStatesByProduct($productState);
@@ -179,13 +183,13 @@ class MysqlProductRepository implements ProductRepository
 
     public function nextReference(): ProductId
     {
-        return ProductId::fromString((string)Uuid::uuid4());
+        return ProductId::fromString((string) Uuid::uuid4());
     }
 
     private function composeTaxaSelect(): string
     {
         if (DB::getDriverName() === 'sqlite') {
-            return "trader_taxonomies.taxonomy_id || '::::' || trader_taxonomies.type || '::::' || trader_taxa.taxon_id || '::::' || trader_taxa_products.state || '::::' || trader_taxa_products.data";
+            return "trader_taxonomies.taxonomy_id || '::::' || trader_taxonomies.type || '::::' || trader_taxa.taxon_id || '::::' || trader_taxa_products.state || '::::' || ifnull(trader_taxa_products.data, '[]')";
         }
 
         return "CONCAT(
@@ -193,7 +197,7 @@ class MysqlProductRepository implements ProductRepository
             trader_taxonomies.type, '::::',
             trader_taxa.taxon_id, '::::',
             trader_taxa_products.state, '::::',
-            trader_taxa_products.data
+            COALESCE(trader_taxa_products.data, '[]')
         )";
     }
 }

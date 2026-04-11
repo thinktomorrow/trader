@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Thinktomorrow\Trader\Infrastructure\Laravel\Repositories;
@@ -22,20 +23,29 @@ use Thinktomorrow\Trader\Domain\Model\Stock\StockItem;
 use Thinktomorrow\Trader\Domain\Model\Stock\StockItemId;
 use Thinktomorrow\Trader\Domain\Model\Stock\StockItemRepository;
 
-class MysqlVariantRepository implements VariantRepository, VariantForCartRepository, StockItemRepository
+class MysqlVariantRepository implements StockItemRepository, VariantForCartRepository, VariantRepository
 {
     use WithTaxaSelection;
     use WithVariantKeysSelection;
 
     private static string $productTable = 'trader_products';
+
     private static string $variantTable = 'trader_product_variants';
+
     private static $variantKeysTable = 'trader_product_keys';
+
     private static string $taxonProductLookupTable = 'trader_taxa_products';
+
     private static string $taxonVariantLookupTable = 'trader_taxa_variants';
+
     private static string $taxonomyTable = 'trader_taxonomies';
+
     private static string $taxonTable = 'trader_taxa';
+
     private static $taxonKeysTable = 'trader_taxa_keys';
+
     private static string $variantTaxaLookupTable = 'trader_taxa_variants';
+
     private static $productPersonalisationsTable = 'trader_product_personalisations';
 
     private ContainerInterface $container;
@@ -107,7 +117,7 @@ class MysqlVariantRepository implements VariantRepository, VariantForCartReposit
     private function cleanupOldVariantKeys(Variant $variant): void
     {
         $validPairs = collect($variant->getVariantKeys())
-            ->map(fn ($key) => $key->getKey()->get() . '||||' . $key->getLocale()->get())
+            ->map(fn ($key) => $key->getKey()->get().'||||'.$key->getLocale()->get())
             ->toArray();
 
         $existing = DB::table(static::$variantKeysTable)
@@ -116,7 +126,7 @@ class MysqlVariantRepository implements VariantRepository, VariantForCartReposit
 
         // Cleanup any variant keys that are not in the valid set anymore
         $existing->filter(
-            fn ($row) => ! in_array($row->key . '||||' . $row->locale, $validPairs)
+            fn ($row) => ! in_array($row->key.'||||'.$row->locale, $validPairs)
         )->each(function ($row) use ($variant) {
             DB::table(static::$variantKeysTable)
                 ->where('variant_id', $variant->variantId->get())
@@ -133,21 +143,21 @@ class MysqlVariantRepository implements VariantRepository, VariantForCartReposit
 
         $variantStates = DB::table(static::$variantTable)
             ->select([
-                static::$variantTable . '.*',
+                static::$variantTable.'.*',
                 DB::raw("GROUP_CONCAT(DISTINCT $taxaSelect SEPARATOR '|||') AS taxa"),
                 DB::raw("GROUP_CONCAT(DISTINCT $variantKeysSelect) AS variant_keys"),
             ])
-            ->where(static::$variantTable . '.product_id', $productId->get())
-            ->leftJoin(static::$variantTaxaLookupTable, static::$variantTable . '.variant_id', '=', static::$variantTaxaLookupTable . '.variant_id')
-            ->leftJoin('trader_taxa', static::$variantTaxaLookupTable . '.taxon_id', '=', 'trader_taxa.taxon_id')
+            ->where(static::$variantTable.'.product_id', $productId->get())
+            ->leftJoin(static::$variantTaxaLookupTable, static::$variantTable.'.variant_id', '=', static::$variantTaxaLookupTable.'.variant_id')
+            ->leftJoin('trader_taxa', static::$variantTaxaLookupTable.'.taxon_id', '=', 'trader_taxa.taxon_id')
             ->leftJoin('trader_taxonomies', 'trader_taxa.taxonomy_id', '=', 'trader_taxonomies.taxonomy_id')
-            ->leftJoin(static::$variantKeysTable, static::$variantTable . '.variant_id', '=', static::$variantKeysTable . '.variant_id')
-            ->groupBy(static::$variantTable . '.variant_id')
-            ->orderBy(static::$variantTable . '.order_column')
+            ->leftJoin(static::$variantKeysTable, static::$variantTable.'.variant_id', '=', static::$variantKeysTable.'.variant_id')
+            ->groupBy(static::$variantTable.'.variant_id')
+            ->orderBy(static::$variantTable.'.order_column')
             ->get()
-            ->map(fn ($item) => (array)$item)
+            ->map(fn ($item) => (array) $item)
             ->map(fn ($item) => array_merge($item, [
-                'includes_vat' => (bool)$item['includes_vat'],
+                'includes_vat' => (bool) $item['includes_vat'],
             ]))
             ->map(function ($item) {
                 $taxaPairs = [];
@@ -165,7 +175,7 @@ class MysqlVariantRepository implements VariantRepository, VariantForCartReposit
                     }
                 }
 
-                return [$item, [VariantTaxon::class => $taxaPairs, VariantKey::class => $this->extractVariantKeys((array)$item)]];
+                return [$item, [VariantTaxon::class => $taxaPairs, VariantKey::class => $this->extractVariantKeys((array) $item)]];
             })
             ->toArray();
 
@@ -185,7 +195,7 @@ class MysqlVariantRepository implements VariantRepository, VariantForCartReposit
 
     public function nextReference(): VariantId
     {
-        return VariantId::fromString((string)Uuid::uuid4());
+        return VariantId::fromString((string) Uuid::uuid4());
     }
 
     /**
@@ -195,37 +205,37 @@ class MysqlVariantRepository implements VariantRepository, VariantForCartReposit
     {
         // Basic builder query
         $state = DB::table(static::$variantTable)
-            ->join(static::$productTable, static::$variantTable . '.product_id', '=', static::$productTable . '.product_id')
-            ->whereIn(static::$productTable . '.state', ProductState::onlineStates())
-            ->where(static::$variantTable . '.variant_id', $variantId->get())
+            ->join(static::$productTable, static::$variantTable.'.product_id', '=', static::$productTable.'.product_id')
+            ->whereIn(static::$productTable.'.state', ProductState::onlineStates())
+            ->where(static::$variantTable.'.variant_id', $variantId->get())
             ->select([
-                static::$variantTable . '.*',
-                static::$productTable . '.data AS product_data',
+                static::$variantTable.'.*',
+                static::$productTable.'.data AS product_data',
             ])
             ->first();
 
         if (! $state) {
-            throw new \RuntimeException('No online/available variant found by id [' . $variantId->get() . ']');
+            throw new \RuntimeException('No online/available variant found by id ['.$variantId->get().']');
         }
 
-        $state = (array)$state;
+        $state = (array) $state;
 
         $variantTaxa = DB::table(static::$variantTaxaLookupTable)
-            ->join('trader_taxa', static::$variantTaxaLookupTable . '.taxon_id', '=', 'trader_taxa.taxon_id')
+            ->join('trader_taxa', static::$variantTaxaLookupTable.'.taxon_id', '=', 'trader_taxa.taxon_id')
             ->join('trader_taxonomies', 'trader_taxa.taxonomy_id', '=', 'trader_taxonomies.taxonomy_id')
-            ->where(static::$variantTaxaLookupTable . '.variant_id', $variantId->get())
+            ->where(static::$variantTaxaLookupTable.'.variant_id', $variantId->get())
             ->select([
                 'trader_taxonomies.taxonomy_id',
                 'trader_taxonomies.type as taxonomy_type',
                 'trader_taxa.taxon_id',
                 'trader_taxa.data',
                 'trader_taxonomies.data AS taxonomy_data',
-                static::$variantTaxaLookupTable . '.state',
-                static::$variantTaxaLookupTable . '.data AS taxa_variant_data',
+                static::$variantTaxaLookupTable.'.state',
+                static::$variantTaxaLookupTable.'.data AS taxa_variant_data',
             ])
-            ->orderBy(static::$variantTaxaLookupTable . '.order_column')
+            ->orderBy(static::$variantTaxaLookupTable.'.order_column')
             ->get()
-            ->map(fn ($item) => (array)$item);
+            ->map(fn ($item) => (array) $item);
 
         $state['taxa'] = [];
 
@@ -242,9 +252,9 @@ class MysqlVariantRepository implements VariantRepository, VariantForCartReposit
         }
 
         $personalisationStates = DB::table(static::$productPersonalisationsTable)
-            ->where(static::$productPersonalisationsTable . '.product_id', $state['product_id'])
+            ->where(static::$productPersonalisationsTable.'.product_id', $state['product_id'])
             ->get()
-            ->map(fn ($item) => (array)$item);
+            ->map(fn ($item) => (array) $item);
 
         $personalisations = $personalisationStates->map(fn ($personalisationState) => Personalisation::fromMappedData($personalisationState, $state))->all();
 
@@ -254,29 +264,29 @@ class MysqlVariantRepository implements VariantRepository, VariantForCartReposit
     public function findAllVariantsForCart(array $variantIds): array
     {
         $states = DB::table(static::$variantTable)
-            ->join(static::$productTable, static::$variantTable . '.product_id', '=', static::$productTable . '.product_id')
-            ->whereIn(static::$productTable . '.state', ProductState::onlineStates())
-            ->whereIn(static::$variantTable . '.variant_id', array_map(fn ($variantId) => $variantId instanceof VariantId ? $variantId->get() : $variantId, $variantIds))
+            ->join(static::$productTable, static::$variantTable.'.product_id', '=', static::$productTable.'.product_id')
+            ->whereIn(static::$productTable.'.state', ProductState::onlineStates())
+            ->whereIn(static::$variantTable.'.variant_id', array_map(fn ($variantId) => $variantId instanceof VariantId ? $variantId->get() : $variantId, $variantIds))
             ->select([
-                static::$variantTable . '.*',
-                static::$productTable . '.data AS product_data',
+                static::$variantTable.'.*',
+                static::$productTable.'.data AS product_data',
             ])
             ->get();
 
         $allPersonalisationStates = DB::table(static::$productPersonalisationsTable)
-            ->where(static::$productPersonalisationsTable . '.product_id', $states->pluck('product_id')->unique()->toArray())
+            ->where(static::$productPersonalisationsTable.'.product_id', $states->pluck('product_id')->unique()->toArray())
             ->get()
-            ->map(fn ($item) => (array)$item);
+            ->map(fn ($item) => (array) $item);
 
         return $states
-            ->map(fn ($state) => (array)$state)
+            ->map(fn ($state) => (array) $state)
             ->map(fn ($state) => $this->composeVariantForCart($state, $allPersonalisationStates->filter(fn ($personalisationState) => $personalisationState['product_id'] == $state['product_id'])->map(fn ($personalisationState) => Personalisation::fromMappedData($personalisationState, $state))->all()))->toArray();
     }
 
     private function composeVariantForCart(array $state, array $personalisations): VariantForCart
     {
         return $this->container->get(VariantForCart::class)::fromMappedData(array_merge($state, [
-            'includes_vat' => (bool)$state['includes_vat'],
+            'includes_vat' => (bool) $state['includes_vat'],
         ]), $personalisations);
     }
 
@@ -284,17 +294,17 @@ class MysqlVariantRepository implements VariantRepository, VariantForCartReposit
     {
         // Basic builder query
         $state = DB::table(static::$variantTable)
-            ->where(static::$variantTable . '.variant_id', $stockItemId->get())
+            ->where(static::$variantTable.'.variant_id', $stockItemId->get())
             ->select([
-                static::$variantTable . '.*',
+                static::$variantTable.'.*',
             ])
             ->first();
 
         if (! $state) {
-            throw new CouldNotFindStockItem('No stockitem found by id [' . $stockItemId->get() . ']');
+            throw new CouldNotFindStockItem('No stockitem found by id ['.$stockItemId->get().']');
         }
 
-        $state = (array)$state;
+        $state = (array) $state;
 
         return StockItem::fromMappedData(array_merge($state, [
             'stockitem_id' => $state['variant_id'],
@@ -307,7 +317,7 @@ class MysqlVariantRepository implements VariantRepository, VariantForCartReposit
 
         // StockItemId corresponds to the variant id. This is a given requirement.
         if (! $this->exists(VariantId::fromString($stockItem->stockItemId->get()))) {
-            throw new VariantRecordDoesNotExistWhenSavingStockItem('No variant record found by id ' . $stockItem->stockItemId->get());
+            throw new VariantRecordDoesNotExistWhenSavingStockItem('No variant record found by id '.$stockItem->stockItemId->get());
         }
 
         unset($state['stockitem_id']);
@@ -318,7 +328,7 @@ class MysqlVariantRepository implements VariantRepository, VariantForCartReposit
     private function composeTaxaSelect(): string
     {
         if (DB::getDriverName() === 'sqlite') {
-            return "trader_taxonomies.taxonomy_id || '::::' || trader_taxonomies.type || '::::' || trader_taxa.taxon_id || '::::' || trader_taxa_variants.state || '::::' || trader_taxa_variants.data";
+            return "trader_taxonomies.taxonomy_id || '::::' || trader_taxonomies.type || '::::' || trader_taxa.taxon_id || '::::' || trader_taxa_variants.state || '::::' || ifnull(trader_taxa_variants.data, '[]')";
         }
 
         return "CONCAT(
@@ -326,7 +336,7 @@ class MysqlVariantRepository implements VariantRepository, VariantForCartReposit
             trader_taxonomies.type, '::::',
             trader_taxa.taxon_id, '::::',
             trader_taxa_variants.state, '::::',
-            trader_taxa_variants.data
+            COALESCE(trader_taxa_variants.data, '[]')
         )";
     }
 }
