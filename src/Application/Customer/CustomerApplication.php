@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Thinktomorrow\Trader\Application\Customer;
@@ -14,6 +15,7 @@ use Thinktomorrow\Trader\Domain\Model\Customer\Events\CustomerDeleted;
 class CustomerApplication
 {
     private CustomerRepository $customerRepository;
+
     private EventDispatcher $eventDispatcher;
 
     public function __construct(CustomerRepository $customerRepository, EventDispatcher $eventDispatcher)
@@ -25,7 +27,7 @@ class CustomerApplication
     public function registerCustomer(RegisterCustomer $command): CustomerId
     {
         if ($this->customerRepository->existsByEmail($command->getEmail())) {
-            throw new \InvalidArgumentException('Registration failed. A customer with email ' . $command->getEmail()->get() . ' already exists.');
+            throw new \InvalidArgumentException('Registration failed. A customer with email '.$command->getEmail()->get().' already exists.');
         }
 
         $customer = Customer::create(
@@ -58,13 +60,13 @@ class CustomerApplication
     public function updateEmail(UpdateEmail $command): void
     {
         if ($this->customerRepository->existsByEmail($command->getNewEmail(), $command->getCustomerId())) {
-            throw new \InvalidArgumentException('Email update failed. A customer with email ' . $command->getNewEmail()->get() . ' already exists.');
+            throw new \InvalidArgumentException('Email update failed. A customer with email '.$command->getNewEmail()->get().' already exists.');
         }
 
         $customer = $this->customerRepository->find($command->getCustomerId());
 
         if (! $customer->getEmail()->equals($command->getOldEmail())) {
-            throw new \InvalidArgumentException('Email update constraint: Email [' . $command->getOldEmail()->get() . '] does not belong to customer with id [' . $customer->customerId->get() . '].');
+            throw new \InvalidArgumentException('Email update constraint: Email ['.$command->getOldEmail()->get().'] does not belong to customer with id ['.$customer->customerId->get().'].');
         }
 
         $customer->updateEmail($command->getNewEmail());
@@ -88,14 +90,16 @@ class CustomerApplication
     public function updateBillingAddress(UpdateBillingAddress $command): void
     {
         $customer = $this->customerRepository->find($command->getCustomerId());
+        $existingData = $customer->getBillingAddress()?->getData() ?? [];
 
-        $customer->updateBillingAddress(
-            BillingAddress::create(
-                $customer->customerId,
-                $command->getAddress(),
-                []
-            )
+        $billingAddress = BillingAddress::create(
+            $customer->customerId,
+            $command->getAddress(),
+            $existingData
         );
+        $billingAddress->addData($command->getData());
+
+        $customer->updateBillingAddress($billingAddress);
 
         $this->customerRepository->save($customer);
 
@@ -105,14 +109,16 @@ class CustomerApplication
     public function updateShippingAddress(UpdateShippingAddress $command): void
     {
         $customer = $this->customerRepository->find($command->getCustomerId());
+        $existingData = $customer->getShippingAddress()?->getData() ?? [];
 
-        $customer->updateShippingAddress(
-            ShippingAddress::create(
-                $customer->customerId,
-                $command->getAddress(),
-                []
-            )
+        $shippingAddress = ShippingAddress::create(
+            $customer->customerId,
+            $command->getAddress(),
+            $existingData
         );
+        $shippingAddress->addData($command->getData());
+
+        $customer->updateShippingAddress($shippingAddress);
 
         $this->customerRepository->save($customer);
 

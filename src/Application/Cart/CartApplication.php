@@ -60,8 +60,7 @@ final class CartApplication
         private EventDispatcher $eventDispatcher,
         private VatNumberApplication $vatNumberApplication,
         private VatExemptionApplication $vatExemptionApplication,
-    ) {
-    }
+    ) {}
 
     public function refresh(RefreshCart $refreshCart): void
     {
@@ -238,13 +237,17 @@ final class CartApplication
     public function updateShippingAddress(UpdateShippingAddress $updateShippingAddress): void
     {
         $order = $this->orderRepository->findForCart($updateShippingAddress->getOrderId());
+        $existingData = $order->getShippingAddress()?->getData() ?? [];
 
         // Get existing address_id, if not we create one here
-        $order->updateShippingAddress(ShippingAddress::create(
+        $shippingAddress = ShippingAddress::create(
             $order->orderId,
             $updateShippingAddress->getAddress(),
-            []
-        ));
+            $existingData
+        );
+        $shippingAddress->addData($updateShippingAddress->getData());
+
+        $order->updateShippingAddress($shippingAddress);
 
         $this->orderRepository->save($order);
 
@@ -254,13 +257,17 @@ final class CartApplication
     public function updateBillingAddress(UpdateBillingAddress $updateBillingAddress): void
     {
         $order = $this->orderRepository->findForCart($updateBillingAddress->getOrderId());
+        $existingData = $order->getBillingAddress()?->getData() ?? [];
 
         // Get existing address_id, if not we create one here
-        $order->updateBillingAddress(BillingAddress::create(
+        $billingAddress = BillingAddress::create(
             $order->orderId,
             $updateBillingAddress->getAddress(),
-            []
-        ));
+            $existingData
+        );
+        $billingAddress->addData($updateBillingAddress->getData());
+
+        $order->updateBillingAddress($billingAddress);
 
         $this->orderRepository->save($order);
 
@@ -423,7 +430,7 @@ final class CartApplication
         $order->updateBillingAddress(BillingAddress::create(
             $order->orderId,
             $billingAddress->getAddress(),
-            []
+            $billingAddress->getData()
         ));
 
     }
@@ -433,7 +440,7 @@ final class CartApplication
         $order->updateShippingAddress(ShippingAddress::create(
             $order->orderId,
             $shippingAddress->getAddress(),
-            []
+            $shippingAddress->getData()
         ));
 
     }

@@ -7,6 +7,7 @@ Important changes will be notified in this file
 - Fixed: prevent taxa rows with `NULL` pivot data from being dropped during repository hydration in
   `MysqlProductRepository` and `MysqlVariantRepository` by using null-safe concatenation in taxa select statements.
 - Fixed: taxon findMany ordering for UUID ids
+- Fixed: Issue where UpdateShippingAddress and UpdateBillingAddress removed existing data.
 - Fixed: static analysis errors level 1
 - Added: `VatRoundingStrategy::getDefault()` and `VatRoundingStrategy::fromStringOrDefault()` to centralize fallback
   behavior.

@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Tests\Acceptance\Cart;
@@ -107,6 +108,34 @@ class CartTest extends CartContext
         $this->assertEquals($address, array_values($this->getOrder()->getBillingAddress()->getAddress()->toArray()));
     }
 
+    public function test_it_keeps_existing_billing_address_data_and_applies_command_data()
+    {
+        $orderId = $this->getOrder()->orderId->get();
+
+        $this->orderContext->apps()->cartApplication()->updateBillingAddress(new UpdateBillingAddress(
+            $orderId,
+            'NL',
+            'example 12',
+            'bus 2',
+            '1000',
+            'Amsterdam',
+            ['source' => 'checkout', 'odoo_partner_address_id' => 10]
+        ));
+
+        $this->orderContext->apps()->cartApplication()->updateBillingAddress(new UpdateBillingAddress(
+            $orderId,
+            'NL',
+            'example 13',
+            'bus 2',
+            '1000',
+            'Amsterdam',
+            ['odoo_partner_address_id' => 20]
+        ));
+
+        $this->assertSame('checkout', $this->getOrder()->getBillingAddress()->getData('source'));
+        $this->assertSame(20, $this->getOrder()->getBillingAddress()->getData('odoo_partner_address_id'));
+    }
+
     public function test_it_can_verify_vat_number(): void
     {
         $this->givenThereIsAProductWhichCostsEur('lightsaber', 5);
@@ -114,7 +143,7 @@ class CartTest extends CartContext
         $this->whenIAddBillingAddress('BE', 'example 13', 'bus 2', '1200', 'Brussel');
         $this->whenIEnterShopperDetails('ben@tt.be');
 
-        (new TestContainer())->get(VatNumberValidator::class)->setExpectedResult(new VatNumberValidation('BE', '0123456789', VatNumberValidationState::invalid, []));
+        (new TestContainer)->get(VatNumberValidator::class)->setExpectedResult(new VatNumberValidation('BE', '0123456789', VatNumberValidationState::invalid, []));
 
         $this->orderContext->apps()->cartApplication()->verifyVatNumber(new VerifyCartVatNumber(
             $this->getOrder()->orderId->get(),

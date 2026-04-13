@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Tests\Acceptance\Order\Merchant;
@@ -28,7 +29,7 @@ class UpdateAddressTest extends CartContext
 
         $order = $this->orderContext->findOrder($order->orderId);
 
-        $this->assertEquals(new Address(CountryId::fromString('NL'), 'line-1 updated', 'line-2', 'postal-code', 'city', ), $order->getShippingAddress()->getAddress());
+        $this->assertEquals(new Address(CountryId::fromString('NL'), 'line-1 updated', 'line-2', 'postal-code', 'city'), $order->getShippingAddress()->getAddress());
 
         $lastEvent = last($this->orderContext->apps()->getEventDispatcher()->releaseDispatchedEvents());
 
@@ -56,7 +57,7 @@ class UpdateAddressTest extends CartContext
 
         $order = $this->orderContext->findOrder($order->orderId);
 
-        $this->assertEquals(new Address(CountryId::fromString('NL'), 'line-1 updated', 'line-2', 'postal-code', 'city', ), $order->getBillingAddress()->getAddress());
+        $this->assertEquals(new Address(CountryId::fromString('NL'), 'line-1 updated', 'line-2', 'postal-code', 'city'), $order->getBillingAddress()->getAddress());
 
         $lastEvent = last($this->orderContext->apps()->getEventDispatcher()->releaseDispatchedEvents());
 
@@ -88,5 +89,27 @@ class UpdateAddressTest extends CartContext
         $events = $this->orderContext->apps()->getEventDispatcher()->releaseDispatchedEvents();
 
         $this->assertCount(0, $this->orderContext->apps()->getEventDispatcher()->releaseDispatchedEvents());
+    }
+
+    public function test_merchant_update_keeps_existing_address_data_and_applies_command_data()
+    {
+        $order = $this->orderContext->createDefaultOrder();
+        $order->getBillingAddress()->addData(['odoo_partner_address_id' => 111, 'source' => 'checkout']);
+        $this->orderContext->repos()->orderRepository()->save($order);
+
+        $this->orderContext->apps()->merchantOrderApplication()->updateBillingAddress(new UpdateBillingAddress(
+            $order->orderId->get(),
+            'NL',
+            'line-1 updated',
+            'line-2',
+            'postal-code',
+            'city',
+            ['odoo_partner_address_id' => 222]
+        ), []);
+
+        $order = $this->orderContext->findOrder($order->orderId);
+
+        $this->assertSame('checkout', $order->getBillingAddress()->getData('source'));
+        $this->assertSame(222, $order->getBillingAddress()->getData('odoo_partner_address_id'));
     }
 }

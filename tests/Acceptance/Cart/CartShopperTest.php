@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Tests\Acceptance\Cart;
@@ -52,7 +53,7 @@ class CartShopperTest extends CartContext
     public function test_it_uses_customer_billing_address()
     {
         $customer = $this->givenACustomerExists('foo@example.com');
-        $address = (new Address(CountryId::fromString('BE'), 'street 123', 'bus 456', '2200', 'Herentals', ));
+        $address = (new Address(CountryId::fromString('BE'), 'street 123', 'bus 456', '2200', 'Herentals'));
 
         $this->orderContext->apps()->customerApplication()->updateBillingAddress(new UpdateBillingAddress(
             $customer->customerId->get(),
@@ -76,7 +77,7 @@ class CartShopperTest extends CartContext
     public function test_it_uses_customer_shipping_address()
     {
         $customer = $this->givenACustomerExists('foo@example.com');
-        $address = (new Address(CountryId::fromString('BE'), 'street 123', 'bus 456', '2200', 'Herentals', ));
+        $address = (new Address(CountryId::fromString('BE'), 'street 123', 'bus 456', '2200', 'Herentals'));
 
         $this->orderContext->apps()->customerApplication()->updateShippingAddress(new UpdateShippingAddress(
             $customer->customerId->get(),
@@ -100,14 +101,14 @@ class CartShopperTest extends CartContext
     public function test_it_should_not_use_customer_billing_address_when_cart_address_is_already_filled_in()
     {
         $customer = $this->givenACustomerExists('foo@example.com');
-        $address = (new Address(CountryId::fromString('BE'), 'street 123', 'bus 456', '2200', 'Herentals', ));
+        $address = (new Address(CountryId::fromString('BE'), 'street 123', 'bus 456', '2200', 'Herentals'));
 
         $this->orderContext->apps()->customerApplication()->updateBillingAddress(new UpdateBillingAddress(
             $customer->customerId->get(),
             ...array_values($address->toArray())
         ));
 
-        $cartAddress = (new Address(CountryId::fromString('NL'), 'example 345', 'bus 7', '2230', 'Bouwel', ));
+        $cartAddress = (new Address(CountryId::fromString('NL'), 'example 345', 'bus 7', '2230', 'Bouwel'));
         $this->orderContext->apps()->cartApplication()->updateBillingAddress(new \Thinktomorrow\Trader\Application\Cart\UpdateBillingAddress(
             $this->getOrder()->orderId->get(),
             ...array_values($cartAddress->toArray())
@@ -130,14 +131,14 @@ class CartShopperTest extends CartContext
     public function test_it_should_not_use_customer_shipping_address_when_cart_address_is_already_filled_in()
     {
         $customer = $this->givenACustomerExists('foo@example.com');
-        $address = (new Address(CountryId::fromString('BE'), 'street 123', 'bus 456', '2200', 'Herentals', ));
+        $address = (new Address(CountryId::fromString('BE'), 'street 123', 'bus 456', '2200', 'Herentals'));
 
         $this->orderContext->apps()->customerApplication()->updateShippingAddress(new UpdateShippingAddress(
             $customer->customerId->get(),
             ...array_values($address->toArray())
         ));
 
-        $cartAddress = (new Address(CountryId::fromString('NL'), 'example 345', 'bus 7', '2230', 'Bouwel', ));
+        $cartAddress = (new Address(CountryId::fromString('NL'), 'example 345', 'bus 7', '2230', 'Bouwel'));
         $this->orderContext->apps()->cartApplication()->updateShippingAddress(new \Thinktomorrow\Trader\Application\Cart\UpdateShippingAddress(
             $this->getOrder()->orderId->get(),
             ...array_values($cartAddress->toArray())
@@ -155,5 +156,43 @@ class CartShopperTest extends CartContext
             $cart->getShippingAddress()->getPostalCode(),
             $cart->getShippingAddress()->getCity(),
         ]);
+    }
+
+    public function test_it_copies_customer_billing_address_data_to_cart_when_choosing_customer()
+    {
+        $customer = $this->givenACustomerExists('foo@example.com');
+
+        $this->orderContext->apps()->customerApplication()->updateBillingAddress(new UpdateBillingAddress(
+            $customer->customerId->get(),
+            'BE',
+            'street 123',
+            'bus 456',
+            '2200',
+            'Herentals',
+            ['odoo_partner_address_id' => 12345]
+        ));
+
+        $this->whenIChooseCustomer('foo@example.com');
+
+        $this->assertSame(12345, $this->getOrder()->getBillingAddress()->getData('odoo_partner_address_id'));
+    }
+
+    public function test_it_copies_customer_shipping_address_data_to_cart_when_choosing_customer()
+    {
+        $customer = $this->givenACustomerExists('foo@example.com');
+
+        $this->orderContext->apps()->customerApplication()->updateShippingAddress(new UpdateShippingAddress(
+            $customer->customerId->get(),
+            'BE',
+            'street 123',
+            'bus 456',
+            '2200',
+            'Herentals',
+            ['odoo_partner_address_id' => 54321]
+        ));
+
+        $this->whenIChooseCustomer('foo@example.com');
+
+        $this->assertSame(54321, $this->getOrder()->getShippingAddress()->getData('odoo_partner_address_id'));
     }
 }

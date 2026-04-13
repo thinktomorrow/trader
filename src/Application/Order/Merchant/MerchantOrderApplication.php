@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Thinktomorrow\Trader\Application\Order\Merchant;
@@ -20,7 +21,9 @@ use Thinktomorrow\Trader\Domain\Model\Order\Shopper;
 class MerchantOrderApplication
 {
     private OrderRepository $orderRepository;
+
     private EventDispatcher $eventDispatcher;
+
     private VatNumberApplication $vatNumberApplication;
 
     public function __construct(OrderRepository $orderRepository, EventDispatcher $eventDispatcher, VatNumberApplication $vatNumberApplication)
@@ -37,7 +40,7 @@ class MerchantOrderApplication
         $order->addLogEntry(OrderEvent::create(
             $this->orderRepository->nextLogEntryReference(),
             $command->getEvent(),
-            new \DateTime(),
+            new \DateTime,
             $command->getData(),
         ));
 
@@ -89,7 +92,7 @@ class MerchantOrderApplication
         $billingAddressCountryId = $order->getBillingAddress()?->getAddress()->countryId;
 
         if (! $billingAddressCountryId) {
-            throw new \Exception('No billing address found for order ' . $order->orderId);
+            throw new \Exception('No billing address found for order '.$order->orderId);
         }
 
         try {
@@ -126,11 +129,14 @@ class MerchantOrderApplication
         }
 
         // Get existing address_id, if not we create one here
-        $order->updateShippingAddress(ShippingAddress::create(
+        $updatedShippingAddress = ShippingAddress::create(
             $order->orderId,
             $command->getAddress(),
-            []
-        ));
+            $shippingAddress?->getData() ?? []
+        );
+        $updatedShippingAddress->addData($command->getData());
+
+        $order->updateShippingAddress($updatedShippingAddress);
 
         $this->orderRepository->save($order);
 
@@ -149,11 +155,14 @@ class MerchantOrderApplication
         }
 
         // Get existing address_id, if not we create one here
-        $order->updateBillingAddress(BillingAddress::create(
+        $updatedBillingAddress = BillingAddress::create(
             $order->orderId,
             $command->getAddress(),
-            []
-        ));
+            $billingAddress?->getData() ?? []
+        );
+        $updatedBillingAddress->addData($command->getData());
+
+        $order->updateBillingAddress($updatedBillingAddress);
 
         $this->orderRepository->save($order);
 
