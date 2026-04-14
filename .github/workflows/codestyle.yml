@@ -1,23 +1,35 @@
-name: Check & fix styling
+name: Fix Code Style
 
-on: [ push ]
+on: [push]
 
 jobs:
-  php-cs-fixer:
-    runs-on: ubuntu-latest
+    lint:
+        runs-on: ubuntu-latest
+        strategy:
+            fail-fast: true
+            matrix:
+                php: [8.5]
 
-    steps:
-      -   name: Checkout code
-          uses: actions/checkout@v2
-          with:
-            ref: ${{ github.head_ref }}
+        steps:
+            - name: Checkout code
+              uses: actions/checkout@v5
+              with:
+                  ref: ${{ github.head_ref }}
 
-      -   name: Run PHP CS Fixer
-          uses: docker://oskarstark/php-cs-fixer-ga
-          with:
-            args: --config=.php-cs-fixer.dist.php --allow-risky=yes
+            - name: Setup PHP
+              uses: shivammathur/setup-php@v2
+              with:
+                  php-version: ${{ matrix.php }}
+                  extensions: json, dom, curl, libxml, mbstring
+                  coverage: none
 
-      -   name: Commit changes
-          uses: stefanzweifel/git-auto-commit-action@v4
-          with:
-            commit_message: Fix styling
+            - name: Install Pint
+              run: composer require laravel/pint:1.24
+
+            - name: Run Pint
+              run: vendor/bin/pint
+
+            - name: Commit linted files
+              uses: stefanzweifel/git-auto-commit-action@v7
+              with:
+                  commit_message: Pint formatting
