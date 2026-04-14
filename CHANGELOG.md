@@ -15,6 +15,7 @@ Important changes will be notified in this file
 - Added: Specific VatSnapshotMismatchException in case vat snapshot of an order is invalid.
 - Added: TaxonomyItem::getData() method
 - Added: Laravel boost guideline
+- Added: laravel/pint as codestyle + ran pint
 - Changed: Default VAT rounding strategy is now line-based.
 - Changed: Fallback VAT rounding behavior now consistently follows the centralized default strategy.
 
