@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Thinktomorrow\Trader\Infrastructure\Laravel\Repositories;
@@ -23,11 +24,11 @@ class MysqlCustomerLoginRepository implements CustomerLoginRepository
     public function find(CustomerId $customerId): CustomerLogin
     {
         $customerState = DB::table(static::$customerTable)
-            ->where(static::$customerTable . '.customer_id', $customerId->get())
+            ->where(static::$customerTable.'.customer_id', $customerId->get())
             ->first();
 
         if (! $customerState) {
-            throw new CouldNotFindCustomer('No customer found by id [' . $customerId->get() . ']');
+            throw new CouldNotFindCustomer('No customer found by id ['.$customerId->get().']');
         }
 
         return CustomerLogin::fromMappedData((array) $customerState, []);

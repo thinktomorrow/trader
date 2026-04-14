@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Thinktomorrow\Trader\Application\Promo\CUD;
@@ -15,8 +16,11 @@ use Thinktomorrow\Trader\TraderConfig;
 class PromoApplication
 {
     private TraderConfig $traderConfig;
+
     private EventDispatcher $eventDispatcher;
+
     private PromoRepository $promoRepository;
+
     private DiscountFactory $discountFactory;
 
     public function __construct(TraderConfig $traderConfig, EventDispatcher $eventDispatcher, PromoRepository $promoRepository, DiscountFactory $discountFactory)
@@ -26,7 +30,6 @@ class PromoApplication
         $this->promoRepository = $promoRepository;
         $this->discountFactory = $discountFactory;
     }
-
 
     public function createPromo(CreatePromo $command): PromoId
     {

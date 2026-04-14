@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Thinktomorrow\Trader\Infrastructure\Laravel\Models\OrderRead;
@@ -12,19 +13,22 @@ abstract class OrderReadShopper
     use RendersData;
 
     protected string $shopper_id;
+
     protected ?string $customer_id;
+
     protected string $email;
+
     protected bool $is_business;
+
     protected Locale $shopperLocale;
+
     protected array $data;
 
-    final public function __construct()
-    {
-    }
+    final public function __construct() {}
 
     public static function fromMappedData(array $state, array $orderState): static
     {
-        $shopper = new static();
+        $shopper = new static;
 
         $shopper->shopper_id = $state['shopper_id'];
         $shopper->customer_id = $state['customer_id'];
@@ -83,7 +87,7 @@ abstract class OrderReadShopper
 
     public function isVatNumberValid(): bool
     {
-        return ! ! $this->dataAsPrimitive('vat_number_valid');
+        return (bool) $this->dataAsPrimitive('vat_number_valid');
     }
 
     public function getVatNumberState(): VatNumberValidationState

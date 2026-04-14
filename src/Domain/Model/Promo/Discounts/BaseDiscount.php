@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Thinktomorrow\Trader\Domain\Model\Promo\Discounts;
@@ -14,6 +15,7 @@ abstract class BaseDiscount
     use HasData;
 
     public readonly PromoId $promoId;
+
     public readonly DiscountId $discountId;
 
     /** @var Condition[] */
@@ -52,7 +54,7 @@ abstract class BaseDiscount
     {
         Assertion::allIsInstanceOf($childEntities[Condition::class], Condition::class);
 
-        $object = new static();
+        $object = new static;
 
         $object->promoId = PromoId::fromString($aggregateState['promo_id']);
         $object->discountId = DiscountId::fromString($state['discount_id']);

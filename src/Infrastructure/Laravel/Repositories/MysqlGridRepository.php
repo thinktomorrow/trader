@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Thinktomorrow\Trader\Infrastructure\Laravel\Repositories;
@@ -28,21 +29,33 @@ class MysqlGridRepository implements GridRepository
     use WithVariantKeysSelection;
 
     private ContainerInterface $container;
+
     private TraderConfig $traderConfig;
+
     private FlattenedTaxonIds $flattenedTaxonIds;
 
     protected Builder $builder;
+
     private Locale $locale;
+
     private int $perPage = 20;
+
     private ?int $limit = null;
 
     private static string $productTable = 'trader_products';
+
     private static string $variantTable = 'trader_product_variants';
+
     private static $variantKeysTable = 'trader_product_keys';
+
     private static string $taxonTable = 'trader_taxa';
+
     private static string $taxonomyTable = 'trader_taxonomies';
+
     private static string $taxonPivotTable = 'trader_taxa_products';
+
     private static string $taxonVariantPivotTable = 'trader_taxa_variants';
+
     private static $taxonKeysTable = 'trader_taxa_keys';
 
     public function __construct(ContainerInterface $container, TraderConfig $traderConfig, FlattenedTaxonIds $flattenedTaxonIds)
@@ -54,21 +67,21 @@ class MysqlGridRepository implements GridRepository
 
         // Basic builder query
         $this->builder = DB::table(static::$variantTable)
-            ->join(static::$productTable, static::$variantTable . '.product_id', '=', static::$productTable . '.product_id')
-            ->where(static::$variantTable . '.show_in_grid', 1)
-            ->whereIn(static::$productTable . '.state', array_map(fn ($state) => $state->value, ProductState::onlineStates()))
-            ->whereIn(static::$variantTable . '.state', array_map(fn ($state) => $state->value, VariantState::availableStates()))
-            ->leftJoin(static::$taxonPivotTable, static::$variantTable . '.product_id', '=', static::$taxonPivotTable . '.product_id')
-            ->leftJoin(static::$taxonVariantPivotTable, static::$variantTable . '.variant_id', '=', static::$taxonVariantPivotTable . '.variant_id')
-            ->groupBy(static::$variantTable . '.variant_id', static::$productTable . '.product_id')
+            ->join(static::$productTable, static::$variantTable.'.product_id', '=', static::$productTable.'.product_id')
+            ->where(static::$variantTable.'.show_in_grid', 1)
+            ->whereIn(static::$productTable.'.state', array_map(fn ($state) => $state->value, ProductState::onlineStates()))
+            ->whereIn(static::$variantTable.'.state', array_map(fn ($state) => $state->value, VariantState::availableStates()))
+            ->leftJoin(static::$taxonPivotTable, static::$variantTable.'.product_id', '=', static::$taxonPivotTable.'.product_id')
+            ->leftJoin(static::$taxonVariantPivotTable, static::$variantTable.'.variant_id', '=', static::$taxonVariantPivotTable.'.variant_id')
+            ->groupBy(static::$variantTable.'.variant_id', static::$productTable.'.product_id')
 //            ->groupBy(static::$variantTable . '.variant_id', 'product_data', 'product_order_column', 'variant_order_column')
             ->select([
-                static::$variantTable . '.*',
-                static::$productTable . '.data AS product_data',
-                static::$variantTable . '.order_column AS variant_order_column',
-                static::$productTable . '.order_column AS product_order_column',
-                DB::raw('GROUP_CONCAT(' . static::$taxonPivotTable . '.taxon_id) AS product_taxon_ids'),
-                DB::raw('GROUP_CONCAT(' . static::$taxonVariantPivotTable . '.taxon_id) AS variant_taxon_ids'),
+                static::$variantTable.'.*',
+                static::$productTable.'.data AS product_data',
+                static::$variantTable.'.order_column AS variant_order_column',
+                static::$productTable.'.order_column AS product_order_column',
+                DB::raw('GROUP_CONCAT('.static::$taxonPivotTable.'.taxon_id) AS product_taxon_ids'),
+                DB::raw('GROUP_CONCAT('.static::$taxonVariantPivotTable.'.taxon_id) AS variant_taxon_ids'),
             ]);
     }
 
@@ -106,8 +119,8 @@ class MysqlGridRepository implements GridRepository
                 $outer->whereExists(function ($query) use ($ids) {
                     $query->select(DB::raw(1))
                         ->from(static::$taxonPivotTable)
-                        ->whereColumn(static::$taxonPivotTable . '.product_id', static::$productTable . '.product_id')
-                        ->whereIn(static::$taxonPivotTable . '.taxon_id', array_unique($ids));
+                        ->whereColumn(static::$taxonPivotTable.'.product_id', static::$productTable.'.product_id')
+                        ->whereIn(static::$taxonPivotTable.'.taxon_id', array_unique($ids));
                 });
             }
         });
@@ -120,7 +133,7 @@ class MysqlGridRepository implements GridRepository
         $taxonIdsGroupedByTaxonomy = $already_grouped ? $taxon_ids : $this->flattenedTaxonIds->getGroupedByTaxonomyByIds($taxon_ids);
 
         foreach ($taxonIdsGroupedByTaxonomy as $ids) {
-            $this->builder->whereIn(static::$taxonVariantPivotTable . '.taxon_id', array_unique($ids));
+            $this->builder->whereIn(static::$taxonVariantPivotTable.'.taxon_id', array_unique($ids));
         }
 
         return $this;
@@ -128,7 +141,7 @@ class MysqlGridRepository implements GridRepository
 
     public function filterByProductIds(array $product_ids): static
     {
-        $this->builder->whereIn(static::$productTable . '.product_id', $product_ids);
+        $this->builder->whereIn(static::$productTable.'.product_id', $product_ids);
 
         return $this;
     }
@@ -146,7 +159,7 @@ class MysqlGridRepository implements GridRepository
                     ? Cash::from($minimumPriceAmount)->subtractTaxPercentage($fallbackVatPercentage)->getAmount()
                     : $minimumPriceAmount);
 
-            $this->builder->where(static::$variantTable . '.sale_price', '>=', $minimumPriceAmount);
+            $this->builder->where(static::$variantTable.'.sale_price', '>=', $minimumPriceAmount);
         }
 
         if (! is_null($maximumPriceAmount)) {
@@ -157,7 +170,7 @@ class MysqlGridRepository implements GridRepository
                     ? Cash::from($maximumPriceAmount)->subtractTaxPercentage($fallbackVatPercentage)->getAmount()
                     : $maximumPriceAmount);
 
-            $this->builder->where(static::$variantTable . '.sale_price', '<=', $maximumPriceAmount);
+            $this->builder->where(static::$variantTable.'.sale_price', '<=', $maximumPriceAmount);
         }
 
         return $this;
@@ -175,12 +188,12 @@ class MysqlGridRepository implements GridRepository
 
     protected function addSortByLabel($order = 'ASC'): static
     {
-        $productTitleExpr = 'LOWER(json_unquote(json_extract(' . static::$productTable . '.data, "$.title.' . $this->locale->get() . '")))';
-        $variantTitleExpr = 'LOWER(json_unquote(json_extract(' . static::$variantTable . '.data, "$.title.' . $this->locale->get() . '")))';
+        $productTitleExpr = 'LOWER(json_unquote(json_extract('.static::$productTable.'.data, "$.title.'.$this->locale->get().'")))';
+        $variantTitleExpr = 'LOWER(json_unquote(json_extract('.static::$variantTable.'.data, "$.title.'.$this->locale->get().'")))';
 
         $this->builder->addSelect(
-            DB::raw($productTitleExpr . ' AS product_title'),
-            DB::raw($variantTitleExpr . ' AS variant_title'),
+            DB::raw($productTitleExpr.' AS product_title'),
+            DB::raw($variantTitleExpr.' AS variant_title'),
             DB::raw("COALESCE(
                 NULLIF($variantTitleExpr, 'null'),
                 $productTitleExpr
@@ -240,11 +253,11 @@ class MysqlGridRepository implements GridRepository
         $this->addDefaultSorting($builder);
 
         $result = $builder->select([
-            static::$productTable . '.product_id',
-            static::$variantTable . '.variant_id',
-            static::$productTable . '.data AS product_data',
-            static::$productTable . '.order_column AS product_order_column',
-            static::$variantTable . '.order_column AS variant_order_column',
+            static::$productTable.'.product_id',
+            static::$variantTable.'.variant_id',
+            static::$productTable.'.data AS product_data',
+            static::$productTable.'.order_column AS product_order_column',
+            static::$variantTable.'.order_column AS variant_order_column',
 
         ])
             ->get()
@@ -284,17 +297,17 @@ class MysqlGridRepository implements GridRepository
                     // Create taxon items for corresponding product and variant taxa
                     $productTaxonItems = $productTaxa
                         ->filter(fn ($taxonState) => $taxonState->product_id == $state['product_id'])
-                        ->map(fn ($taxonState) => $this->container->get(ProductTaxonItem::class)::fromMappedData((array)$taxonState, $this->extractTaxonKeys((array)$taxonState)));
+                        ->map(fn ($taxonState) => $this->container->get(ProductTaxonItem::class)::fromMappedData((array) $taxonState, $this->extractTaxonKeys((array) $taxonState)));
 
                     $variantTaxonItems = $variantTaxa
                         ->filter(fn ($taxonState) => $taxonState->variant_id == $state['variant_id'])
-                        ->map(fn ($taxonState) => $this->container->get(VariantTaxonItem::class)::fromMappedData(array_merge((array)$taxonState, ['product_id' => $state['product_id']]), $this->extractTaxonKeys((array)$taxonState)));
+                        ->map(fn ($taxonState) => $this->container->get(VariantTaxonItem::class)::fromMappedData(array_merge((array) $taxonState, ['product_id' => $state['product_id']]), $this->extractTaxonKeys((array) $taxonState)));
 
                     $variantKeysForVariant = array_filter($variantKeys, fn ($vk) => $vk['variant_id'] === $state['variant_id']);
 
                     return $this->container->get(GridItem::class)::fromMappedData(
                         array_merge($state, [
-                            'includes_vat' => (bool)$state['includes_vat'],
+                            'includes_vat' => (bool) $state['includes_vat'],
                         ]),
                         [...$productTaxonItems, ...$variantTaxonItems],
                         [...$variantKeysForVariant]
@@ -309,8 +322,8 @@ class MysqlGridRepository implements GridRepository
         // Default ordering if no ordering has been applied yet.
         if (! $builder->orders || count($builder->orders) < 1) {
             $builder
-                ->orderBy(static::$productTable . '.order_column', 'ASC')
-                ->orderBy(static::$variantTable . '.order_column', 'ASC');
+                ->orderBy(static::$productTable.'.order_column', 'ASC')
+                ->orderBy(static::$variantTable.'.order_column', 'ASC');
         }
     }
 
@@ -333,78 +346,78 @@ class MysqlGridRepository implements GridRepository
         $variantTaxonIds = array_values(array_filter(array_unique($variantTaxonIds)));
 
         $productTaxaStates = DB::table(static::$taxonPivotTable)
-            ->join(static::$taxonTable, static::$taxonPivotTable . '.taxon_id', '=', static::$taxonTable . '.taxon_id')
-            ->join(static::$taxonomyTable, static::$taxonTable . '.taxonomy_id', '=', static::$taxonomyTable . '.taxonomy_id')
-            ->leftJoin(static::$taxonKeysTable, static::$taxonTable . '.taxon_id', '=', static::$taxonKeysTable . '.taxon_id')
+            ->join(static::$taxonTable, static::$taxonPivotTable.'.taxon_id', '=', static::$taxonTable.'.taxon_id')
+            ->join(static::$taxonomyTable, static::$taxonTable.'.taxonomy_id', '=', static::$taxonomyTable.'.taxonomy_id')
+            ->leftJoin(static::$taxonKeysTable, static::$taxonTable.'.taxon_id', '=', static::$taxonKeysTable.'.taxon_id')
             ->select([
-                static::$taxonPivotTable . '.product_id AS product_id',
-                static::$taxonPivotTable . '.taxon_id AS taxon_id',
-                static::$taxonPivotTable . '.state AS state',
-                static::$taxonPivotTable . '.data AS data',
-                static::$taxonPivotTable . '.order_column AS order_column',
-                static::$taxonTable . '.data AS taxon_data',
-                static::$taxonTable . '.state AS taxon_state',
-                static::$taxonomyTable . '.taxonomy_id AS taxonomy_id',
-                static::$taxonomyTable . '.data AS taxonomy_data',
-                static::$taxonomyTable . '.state AS taxonomy_state',
-                static::$taxonomyTable . '.type AS taxonomy_type',
-                static::$taxonomyTable . '.shows_in_grid AS shows_in_grid',
+                static::$taxonPivotTable.'.product_id AS product_id',
+                static::$taxonPivotTable.'.taxon_id AS taxon_id',
+                static::$taxonPivotTable.'.state AS state',
+                static::$taxonPivotTable.'.data AS data',
+                static::$taxonPivotTable.'.order_column AS order_column',
+                static::$taxonTable.'.data AS taxon_data',
+                static::$taxonTable.'.state AS taxon_state',
+                static::$taxonomyTable.'.taxonomy_id AS taxonomy_id',
+                static::$taxonomyTable.'.data AS taxonomy_data',
+                static::$taxonomyTable.'.state AS taxonomy_state',
+                static::$taxonomyTable.'.type AS taxonomy_type',
+                static::$taxonomyTable.'.shows_in_grid AS shows_in_grid',
                 DB::raw("GROUP_CONCAT(DISTINCT {$this->composeTaxonKeysSelect()}) AS taxon_keys"),
             ])
-            ->whereIn(static::$taxonPivotTable . '.product_id', $productIds)
-            ->whereIn(static::$taxonPivotTable . '.taxon_id', $productTaxonIds)
-            ->whereIn(static::$taxonTable . '.state', array_map(fn (TaxonState $state) => $state->value, TaxonState::onlineStates()))
+            ->whereIn(static::$taxonPivotTable.'.product_id', $productIds)
+            ->whereIn(static::$taxonPivotTable.'.taxon_id', $productTaxonIds)
+            ->whereIn(static::$taxonTable.'.state', array_map(fn (TaxonState $state) => $state->value, TaxonState::onlineStates()))
             ->groupBy(
-                static::$taxonPivotTable . '.product_id',
-                static::$taxonPivotTable . '.taxon_id',
-                static::$taxonPivotTable . '.state',
-                static::$taxonPivotTable . '.data',
-                static::$taxonPivotTable . '.order_column',
-                static::$taxonTable . '.data',
-                static::$taxonTable . '.state',
-                static::$taxonomyTable . '.taxonomy_id',
-                static::$taxonomyTable . '.data',
-                static::$taxonomyTable . '.state',
-                static::$taxonomyTable . '.type',
-                static::$taxonomyTable . '.shows_in_grid',
+                static::$taxonPivotTable.'.product_id',
+                static::$taxonPivotTable.'.taxon_id',
+                static::$taxonPivotTable.'.state',
+                static::$taxonPivotTable.'.data',
+                static::$taxonPivotTable.'.order_column',
+                static::$taxonTable.'.data',
+                static::$taxonTable.'.state',
+                static::$taxonomyTable.'.taxonomy_id',
+                static::$taxonomyTable.'.data',
+                static::$taxonomyTable.'.state',
+                static::$taxonomyTable.'.type',
+                static::$taxonomyTable.'.shows_in_grid',
             )
             ->get();
 
         $variantTaxaStates = DB::table(static::$taxonVariantPivotTable)
-            ->join(static::$taxonTable, static::$taxonVariantPivotTable . '.taxon_id', '=', static::$taxonTable . '.taxon_id')
-            ->join(static::$taxonomyTable, static::$taxonTable . '.taxonomy_id', '=', static::$taxonomyTable . '.taxonomy_id')
-            ->leftJoin(static::$taxonKeysTable, static::$taxonTable . '.taxon_id', '=', static::$taxonKeysTable . '.taxon_id')
+            ->join(static::$taxonTable, static::$taxonVariantPivotTable.'.taxon_id', '=', static::$taxonTable.'.taxon_id')
+            ->join(static::$taxonomyTable, static::$taxonTable.'.taxonomy_id', '=', static::$taxonomyTable.'.taxonomy_id')
+            ->leftJoin(static::$taxonKeysTable, static::$taxonTable.'.taxon_id', '=', static::$taxonKeysTable.'.taxon_id')
             ->select([
-                static::$taxonVariantPivotTable . '.variant_id AS variant_id',
-                static::$taxonVariantPivotTable . '.taxon_id AS taxon_id',
-                static::$taxonVariantPivotTable . '.state AS state',
-                static::$taxonVariantPivotTable . '.data AS data',
-                static::$taxonVariantPivotTable . '.order_column AS order_column',
-                static::$taxonTable . '.data AS taxon_data',
-                static::$taxonTable . '.state AS taxon_state',
-                static::$taxonomyTable . '.taxonomy_id AS taxonomy_id',
-                static::$taxonomyTable . '.data AS taxonomy_data',
-                static::$taxonomyTable . '.state AS taxonomy_state',
-                static::$taxonomyTable . '.type AS taxonomy_type',
-                static::$taxonomyTable . '.shows_in_grid AS shows_in_grid',
+                static::$taxonVariantPivotTable.'.variant_id AS variant_id',
+                static::$taxonVariantPivotTable.'.taxon_id AS taxon_id',
+                static::$taxonVariantPivotTable.'.state AS state',
+                static::$taxonVariantPivotTable.'.data AS data',
+                static::$taxonVariantPivotTable.'.order_column AS order_column',
+                static::$taxonTable.'.data AS taxon_data',
+                static::$taxonTable.'.state AS taxon_state',
+                static::$taxonomyTable.'.taxonomy_id AS taxonomy_id',
+                static::$taxonomyTable.'.data AS taxonomy_data',
+                static::$taxonomyTable.'.state AS taxonomy_state',
+                static::$taxonomyTable.'.type AS taxonomy_type',
+                static::$taxonomyTable.'.shows_in_grid AS shows_in_grid',
                 DB::raw("GROUP_CONCAT({$this->composeTaxonKeysSelect()}) AS taxon_keys"),
             ])
-            ->whereIn(static::$taxonVariantPivotTable . '.variant_id', $variantIds)
-            ->whereIn(static::$taxonVariantPivotTable . '.taxon_id', $variantTaxonIds)
-            ->whereIn(static::$taxonTable . '.state', array_map(fn (TaxonState $state) => $state->value, TaxonState::onlineStates()))
+            ->whereIn(static::$taxonVariantPivotTable.'.variant_id', $variantIds)
+            ->whereIn(static::$taxonVariantPivotTable.'.taxon_id', $variantTaxonIds)
+            ->whereIn(static::$taxonTable.'.state', array_map(fn (TaxonState $state) => $state->value, TaxonState::onlineStates()))
             ->groupBy([
-                static::$taxonVariantPivotTable . '.variant_id',
-                static::$taxonVariantPivotTable . '.taxon_id',
-                static::$taxonVariantPivotTable . '.state',
-                static::$taxonVariantPivotTable . '.data',
-                static::$taxonVariantPivotTable . '.order_column',
-                static::$taxonTable . '.data',
-                static::$taxonTable . '.state',
-                static::$taxonomyTable . '.taxonomy_id',
-                static::$taxonomyTable . '.data',
-                static::$taxonomyTable . '.state',
-                static::$taxonomyTable . '.type',
-                static::$taxonomyTable . '.shows_in_grid',
+                static::$taxonVariantPivotTable.'.variant_id',
+                static::$taxonVariantPivotTable.'.taxon_id',
+                static::$taxonVariantPivotTable.'.state',
+                static::$taxonVariantPivotTable.'.data',
+                static::$taxonVariantPivotTable.'.order_column',
+                static::$taxonTable.'.data',
+                static::$taxonTable.'.state',
+                static::$taxonomyTable.'.taxonomy_id',
+                static::$taxonomyTable.'.data',
+                static::$taxonomyTable.'.state',
+                static::$taxonomyTable.'.type',
+                static::$taxonomyTable.'.shows_in_grid',
             ])
             ->get();
 
@@ -419,19 +432,15 @@ class MysqlGridRepository implements GridRepository
             ->whereIn('variant_id', $variantIds)
             ->get();
 
-        return $variantKeyStates->map(fn ($item) => (array)$item)->all();
+        return $variantKeyStates->map(fn ($item) => (array) $item)->all();
     }
 
     /**
      * Group Concat grammar for mysql
-     *
-     * @param string $column
-     * @param string $separator
-     * @return \Illuminate\Database\Query\Expression
      */
     protected function grammarGroupConcat(string $column, string $separator = ','): Expression
     {
-        return DB::raw('GROUP_CONCAT(' . $column . ' SEPARATOR "' . $separator . '")');
+        return DB::raw('GROUP_CONCAT('.$column.' SEPARATOR "'.$separator.'")');
     }
 
     protected function whereJsonLike($value)
@@ -448,8 +457,8 @@ class MysqlGridRepository implements GridRepository
             foreach ([static::$productTable, static::$variantTable] as $table) {
                 foreach ($keys[$table] as $key) {
                     $builder->orWhereRaw(
-                        'LOWER(JSON_UNQUOTE(JSON_EXTRACT(`' . $table . '`.`data`, "$.' . $key . '.' . $locale . '"))) LIKE ?',
-                        ['%' . $value . '%']
+                        'LOWER(JSON_UNQUOTE(JSON_EXTRACT(`'.$table.'`.`data`, "$.'.$key.'.'.$locale.'"))) LIKE ?',
+                        ['%'.$value.'%']
                     );
                 }
             }

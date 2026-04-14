@@ -8,10 +8,9 @@ use Thinktomorrow\Trader\Domain\Model\Order\State\OrderState;
 class OrderMarkedPaidByMerchant
 {
     public function __construct(
-        public readonly OrderId    $orderId,
+        public readonly OrderId $orderId,
         public readonly OrderState $oldState,
         public readonly OrderState $newState,
-        public readonly array      $data,
-    ) {
-    }
+        public readonly array $data,
+    ) {}
 }

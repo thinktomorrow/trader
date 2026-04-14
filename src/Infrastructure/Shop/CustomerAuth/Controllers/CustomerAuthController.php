@@ -5,8 +5,10 @@ declare(strict_types=1);
 namespace Thinktomorrow\Trader\Infrastructure\Shop\CustomerAuth\Controllers;
 
 use Illuminate\Foundation\Validation\ValidatesRequests;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
+use Illuminate\Routing\Redirector;
 use Illuminate\Support\Facades\Auth;
 use Thinktomorrow\Trader\Domain\Model\Customer\CustomerId;
 use Thinktomorrow\Trader\Domain\Model\Customer\Events\CustomerHasLoggedIn;
@@ -54,7 +56,7 @@ class CustomerAuthController extends Controller
      * Log the admin out of the application.
      *
      *
-     * @return \Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector
+     * @return RedirectResponse|Redirector
      */
     public function logout(Request $request)
     {

@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Thinktomorrow\Trader\Domain\Model\VatRate;
@@ -9,13 +10,16 @@ use Thinktomorrow\Trader\Domain\Common\Vat\VatPercentage;
 final class BaseRate implements ChildEntity
 {
     public readonly BaseRateId $baseRateId;
+
     public readonly VatRateId $originVatRateId;
+
     public readonly VatRateId $targetVatRateId;
+
     public readonly VatPercentage $rate;
 
     public static function create(BaseRateId $baseRateId, VatRateId $originVatRateId, VatRateId $targetVatRateId, VatPercentage $rate): static
     {
-        $object = new static();
+        $object = new self;
         $object->baseRateId = $baseRateId;
         $object->originVatRateId = $originVatRateId;
         $object->targetVatRateId = $targetVatRateId;
@@ -35,7 +39,7 @@ final class BaseRate implements ChildEntity
 
     public static function fromMappedData(array $state, array $aggregateState): static
     {
-        $object = new static();
+        $object = new static;
         $object->baseRateId = BaseRateId::fromString($state['base_rate_id']);
         $object->originVatRateId = VatRateId::fromString($state['origin_vat_rate_id']);
         $object->targetVatRateId = VatRateId::fromString($aggregateState['vat_rate_id']);

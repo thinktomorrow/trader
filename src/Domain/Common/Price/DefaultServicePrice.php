@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Thinktomorrow\Trader\Domain\Common\Price;
@@ -7,7 +8,7 @@ use Money\Money;
 use Thinktomorrow\Trader\Domain\Common\Price\Exceptions\PriceCannotBeNegative;
 
 /**
- * @inheritdoc
+ * {@inheritdoc}
  */
 class DefaultServicePrice implements ServicePrice
 {
@@ -17,7 +18,7 @@ class DefaultServicePrice implements ServicePrice
     {
         if ($excludingVat->isNegative()) {
             throw new PriceCannotBeNegative(
-                'Excluding VAT money amount cannot be negative: ' . $excludingVat->getAmount() . ' is given.'
+                'Excluding VAT money amount cannot be negative: '.$excludingVat->getAmount().' is given.'
             );
         }
 
@@ -40,7 +41,7 @@ class DefaultServicePrice implements ServicePrice
 
         if ($newExcluding->isNegative()) {
             throw new PriceCannotBeNegative(
-                'Applying the discount would result in a negative excluding VAT amount: ' .
+                'Applying the discount would result in a negative excluding VAT amount: '.
                 $newExcluding->getAmount()
             );
         }

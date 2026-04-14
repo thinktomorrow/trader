@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Tests\Infrastructure;
@@ -12,15 +13,16 @@ use Thinktomorrow\Trader\Testing\Order\OrderContext;
 
 abstract class TestCase extends \Orchestra\Testbench\TestCase
 {
-    use TestHelpers;
     use RefreshDatabase;
+    use TestHelpers;
 
     protected CatalogContext $catalogContext;
+
     protected OrderContext $orderContext;
 
     protected function getEnvironmentSetUp($app)
     {
-        # Setup default database to use sqlite :memory:
+        // Setup default database to use sqlite :memory:
         //        $app['config']->set('database.default', 'mysql');
         //        $app['config']->set('database.connections.mysql', [
         //            'driver' => 'mysql',

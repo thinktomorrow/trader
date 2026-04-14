@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Thinktomorrow\Trader\Application\Cart\RefreshCart;
@@ -26,7 +27,7 @@ class RefreshCartAction
     private function assertCartState(Order $order): void
     {
         if (! $order->inCustomerHands()) {
-            throw new CannotRefreshCart('Refresh cart is not allowed. Order has state ' . $order->getOrderState()->value .' and is no longer in customer hands.');
+            throw new CannotRefreshCart('Refresh cart is not allowed. Order has state '.$order->getOrderState()->value.' and is no longer in customer hands.');
         }
     }
 }

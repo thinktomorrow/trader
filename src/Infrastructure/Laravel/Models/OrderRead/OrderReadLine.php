@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Thinktomorrow\Trader\Infrastructure\Laravel\Models\OrderRead;
@@ -12,36 +13,42 @@ abstract class OrderReadLine
 {
     use RendersData;
     use RendersMoney;
-    use WithLineTotals;
     use WithFormattedLineTotals;
+    use WithLineTotals;
 
     protected string $line_id;
+
     protected ?PurchasableReference $purchasableReference;
+
     protected ?string $variant_id;
+
     protected ?string $product_id;
+
     protected array $purchasableData;
 
     protected int $quantity;
+
     protected iterable $discounts;
+
     protected array $data;
 
     protected VatPercentage $vatRate;
+
     protected iterable $images;
+
     protected iterable $personalisations;
 
-    final public function __construct()
-    {
-    }
+    final public function __construct() {}
 
     public static function fromMappedData(array $state, array $orderState, iterable $discounts, iterable $personalisations): static
     {
-        $line = new static();
+        $line = new static;
 
         // variant_id is deprecated, but kept for backward compatibility and current carts
         if (isset($state['purchasable_reference'])) {
             $line->purchasableReference = $state['purchasable_reference'] ? PurchasableReference::fromString($state['purchasable_reference']) : null;
         } elseif (isset($state['variant_id'])) {
-            $line->purchasableReference = $state['variant_id'] ? PurchasableReference::fromString('variant@' . $state['variant_id']) : null;
+            $line->purchasableReference = $state['variant_id'] ? PurchasableReference::fromString('variant@'.$state['variant_id']) : null;
         } else {
             // Reference does not exist (anymore)
             $line->purchasableReference = null;

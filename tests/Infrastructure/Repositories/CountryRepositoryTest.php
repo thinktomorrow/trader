@@ -1,9 +1,11 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Tests\Infrastructure\Repositories;
 
 use Tests\Infrastructure\TestCase;
+use Thinktomorrow\Trader\Application\Country\Country;
 use Thinktomorrow\Trader\Domain\Model\Country\CountryId;
 use Thinktomorrow\Trader\Domain\Model\Country\Exceptions\CouldNotFindCountry;
 use Thinktomorrow\Trader\Testing\Order\OrderContext;
@@ -32,7 +34,6 @@ class CountryRepositoryTest extends TestCase
 
             $country = $orderContext->createCountry('BE');
 
-
             $repository->delete($country->countryId);
 
             try {
@@ -55,8 +56,8 @@ class CountryRepositoryTest extends TestCase
             $country2 = $orderContext->createCountry('NL');
 
             $this->assertEquals([
-                \Thinktomorrow\Trader\Application\Country\Country::fromMappedData($country->getMappedData()),
-                \Thinktomorrow\Trader\Application\Country\Country::fromMappedData($country2->getMappedData()),
+                Country::fromMappedData($country->getMappedData()),
+                Country::fromMappedData($country2->getMappedData()),
             ], $repository->getAvailableBillingCountries());
         }
     }
@@ -70,7 +71,7 @@ class CountryRepositoryTest extends TestCase
             $country = $orderContext->createCountry('BE');
 
             $this->assertEquals(
-                \Thinktomorrow\Trader\Application\Country\Country::fromMappedData($country->getMappedData()),
+                Country::fromMappedData($country->getMappedData()),
                 $repository->findBillingCountry(CountryId::fromString('BE'))
             );
         }

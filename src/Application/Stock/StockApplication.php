@@ -9,7 +9,9 @@ use Thinktomorrow\Trader\TraderConfig;
 class StockApplication
 {
     private TraderConfig $traderConfig;
+
     private EventDispatcher $eventDispatcher;
+
     private StockItemRepository $stockItemRepository;
 
     public function __construct(TraderConfig $traderConfig, EventDispatcher $eventDispatcher, StockItemRepository $stockItemRepository)

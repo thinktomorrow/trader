@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Thinktomorrow\Trader\Infrastructure\Laravel\Services;
@@ -9,10 +10,13 @@ use Illuminate\Http\Request;
 trait InteractsWithCookies
 {
     protected ?string $value;
+
     private CookieJar $cookieJar;
+
     private Request $request;
 
     abstract protected function getCookieKey(): string;
+
     abstract protected function getLifetime(): int;
 
     public function __construct(Request $request, CookieJar $cookieJar)
@@ -29,7 +33,7 @@ trait InteractsWithCookies
 
     public function exists(): bool
     {
-        return ! ! $this->value;
+        return (bool) $this->value;
     }
 
     private function getCookieValue()
@@ -72,9 +76,6 @@ trait InteractsWithCookies
 
     /**
      * Simple low-level check to see if value looks serialized or not.
-     *
-     * @param $value
-     * @return bool
      */
     private function looksLikeNoSerializedValue($value): bool
     {
@@ -82,7 +83,7 @@ trait InteractsWithCookies
             return true;
         }
 
-        return (false === strpos($value, ';'));
+        return strpos($value, ';') === false;
     }
 
     private function encodeCookieValue($value)
@@ -103,6 +104,6 @@ trait InteractsWithCookies
 
     private function isJson($string)
     {
-        return (is_string($string) && is_array(json_decode($string, true)));
+        return is_string($string) && is_array(json_decode($string, true));
     }
 }

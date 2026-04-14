@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Thinktomorrow\Trader\Application\Cart;
@@ -9,6 +10,7 @@ use Thinktomorrow\Trader\Domain\Model\Order\OrderId;
 final class ChooseShippingCountry
 {
     private string $orderId;
+
     private string $countryId;
 
     public function __construct(string $orderId, string $countryId)

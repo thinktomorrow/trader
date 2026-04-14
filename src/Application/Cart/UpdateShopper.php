@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Thinktomorrow\Trader\Application\Cart;
@@ -10,10 +11,15 @@ use Thinktomorrow\Trader\Domain\Model\Order\OrderId;
 class UpdateShopper
 {
     private string $orderId;
+
     private string $email;
+
     private bool $isBusiness;
+
     private ?string $vatNumber;
+
     private string $locale;
+
     private array $data;
 
     public function __construct(string $orderId, string $email, bool $isBusiness, ?string $vatNumber, string $locale, array $data)

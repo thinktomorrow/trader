@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Thinktomorrow\Trader\Application\Order\Merchant;
@@ -9,7 +10,9 @@ use Thinktomorrow\Trader\Domain\Model\Order\Shipping\ShippingId;
 class UpdateShippingData
 {
     private string $orderId;
+
     private string $shippingId;
+
     private array $data;
 
     public function __construct(string $orderId, string $shippingId, array $data)

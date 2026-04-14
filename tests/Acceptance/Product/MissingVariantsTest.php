@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Tests\Acceptance\Product;
@@ -37,7 +38,6 @@ class MissingVariantsTest extends ProductContext
         $this->catalogContext->linkProductToTaxon($product->productId->get(), $taxon->taxonId->get());
         $this->catalogContext->linkProductToTaxon($product->productId->get(), $taxon2->taxonId->get());
         $this->catalogContext->linkProductToTaxon($product->productId->get(), $taxon3->taxonId->get());
-
 
         $missingCombos = $this->missingOptionCombinations->get($product);
 

@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Tests\Unit\Model\Customer;
@@ -61,7 +62,7 @@ class CustomerTest extends TestCase
             'line_2' => 'bus 2',
             'postal_code' => '1000',
             'city' => 'Amsterdam',
-            'data' => "[]",
+            'data' => '[]',
         ];
 
         $customer->updateShippingAddress($shippingAddress = ShippingAddress::fromMappedData($addressPayload, $customer->getMappedData()));
@@ -81,7 +82,7 @@ class CustomerTest extends TestCase
             'line_2' => 'bus 999',
             'postal_code' => '3000',
             'city' => 'Paris',
-            'data' => "[]",
+            'data' => '[]',
         ];
 
         $customer->updateBillingAddress($billingAddress = BillingAddress::fromMappedData($addressPayload, $customer->getMappedData()));
@@ -133,7 +134,7 @@ class CustomerTest extends TestCase
                 'line_2' => 'bus 2',
                 'postal_code' => '1000',
                 'city' => 'Amsterdam',
-                'data' => "[]",
+                'data' => '[]',
             ],
             ShippingAddress::class => [
                 'address_id' => 'def',
@@ -142,7 +143,7 @@ class CustomerTest extends TestCase
                 'line_2' => 'bus 999',
                 'postal_code' => '3000',
                 'city' => 'Paris',
-                'data' => "[]",
+                'data' => '[]',
             ],
         ]);
     }

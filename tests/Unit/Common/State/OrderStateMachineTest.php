@@ -5,6 +5,7 @@ namespace Tests\Unit\Common\State;
 use Tests\TestHelpers;
 use Tests\Unit\TestCase;
 use Thinktomorrow\Trader\Domain\Common\State\StateException;
+use Thinktomorrow\Trader\Domain\Model\Order\Order;
 use Thinktomorrow\Trader\Domain\Model\Order\State\DefaultOrderState;
 use Thinktomorrow\Trader\Domain\Model\Order\State\OrderStateMachine;
 
@@ -12,10 +13,11 @@ class OrderStateMachineTest extends TestCase
 {
     use TestHelpers;
 
-    private \Thinktomorrow\Trader\Domain\Model\Order\Order $order;
+    private Order $order;
+
     private OrderStateMachine $machine;
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         parent::setUp();
 

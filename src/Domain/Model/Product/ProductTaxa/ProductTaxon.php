@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Thinktomorrow\Trader\Domain\Model\Product\ProductTaxa;
@@ -14,16 +15,16 @@ class ProductTaxon implements ChildEntity
     use HasData;
 
     public readonly ProductId $productId;
+
     public readonly TaxonId $taxonId;
+
     private TaxonState $state;
 
-    private function __construct()
-    {
-    }
+    private function __construct() {}
 
     public static function create(ProductId $productId, TaxonId $taxonId): static
     {
-        $object = new static();
+        $object = new static;
 
         $object->productId = $productId;
         $object->taxonId = $taxonId;
@@ -34,7 +35,7 @@ class ProductTaxon implements ChildEntity
 
     public function toVariantProperty(): VariantProperty
     {
-        $variantProperty = new VariantProperty();
+        $variantProperty = new VariantProperty;
 
         $variantProperty->productId = $this->productId;
         $variantProperty->taxonId = $this->taxonId;
@@ -66,7 +67,7 @@ class ProductTaxon implements ChildEntity
 
     public static function fromMappedData(array $state, array $aggregateState, array $childEntities = []): static
     {
-        $object = new static();
+        $object = new static;
 
         $object->productId = ProductId::fromString($aggregateState['product_id']);
         $object->taxonId = TaxonId::fromString($state['taxon_id']);

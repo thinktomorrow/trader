@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Thinktomorrow\Trader\Application\Order\Invoice;
@@ -20,15 +21,15 @@ class CreateInvoiceReferenceByYearAndMonth
         $lastInvoiceReference = $this->invoiceRepository->lastInvoiceReference();
 
         if (! $lastInvoiceReference) {
-            return InvoiceReference::fromString(date('ym'). str_pad((string) 1, 4, "0", STR_PAD_LEFT));
+            return InvoiceReference::fromString(date('ym').str_pad((string) 1, 4, '0', STR_PAD_LEFT));
         }
 
         $parsed = ParsedInvoiceReferenceByYearAndMonth::fromInvoiceReference($lastInvoiceReference);
 
         if ($parsed->year != date('y') || $parsed->month != date('m')) {
-            return InvoiceReference::fromString(date('ym'). str_pad((string) 1, 4, "0", STR_PAD_LEFT));
+            return InvoiceReference::fromString(date('ym').str_pad((string) 1, 4, '0', STR_PAD_LEFT));
         }
 
-        return InvoiceReference::fromString(date('ym'). str_pad((string) ($parsed->getNumberAsInt() + 1), 4, "0", STR_PAD_LEFT));
+        return InvoiceReference::fromString(date('ym').str_pad((string) ($parsed->getNumberAsInt() + 1), 4, '0', STR_PAD_LEFT));
     }
 }

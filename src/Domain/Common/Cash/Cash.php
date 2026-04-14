@@ -15,6 +15,7 @@ use Thinktomorrow\Trader\Domain\Common\Locale;
 class Cash
 {
     private static ?MoneyFormatter $formatter = null;
+
     private Money $money;
 
     private function __construct(Money $money)
@@ -34,10 +35,6 @@ class Cash
     /**
      * Convenience method to allow maintaining dynamic currency.
      * Keep in mind that this remains consistent across your application.
-     *
-     * @param string|int $amount
-     * @param string|null $currencyCode
-     * @return Money
      */
     public static function make(string|int $amount, ?string $currencyCode = null): Money
     {
@@ -55,12 +52,6 @@ class Cash
 
     /**
      * Get full string representation of amount in desired locale.
-     *
-     * @param int $decimals
-     * @param string $dec_point
-     * @param string $thousands_sep
-     *
-     * @return string
      */
     public function toFormat(int $decimals = 2, string $dec_point = ',', string $thousands_sep = '.'): string
     {
@@ -97,7 +88,7 @@ class Cash
             $percentage = $percentage->get();
         }
 
-        $multiplier = (string)($percentage / 100);
+        $multiplier = (string) ($percentage / 100);
 
         $money = $this->money->multiply($multiplier);
 
@@ -126,19 +117,18 @@ class Cash
 
     private function precisionRound(float $number): int
     {
-        return (int)round($number, 0, PHP_ROUND_HALF_UP);
+        return (int) round($number, 0, PHP_ROUND_HALF_UP);
 
-        return (int)round((float)bcadd((string)$number, '0', 2), 0, PHP_ROUND_HALF_UP);
+        return (int) round((float) bcadd((string) $number, '0', 2), 0, PHP_ROUND_HALF_UP);
 
-        return (int)round(round($number * 10) / 10);
+        return (int) round(round($number * 10) / 10);
     }
 
     /**
      * Subtract a percentage of the amount
      *
-     * @param int $percentage
-     * @param int $roundMethod
-     * @return Money
+     * @param  int  $percentage
+     * @param  int  $roundMethod
      */
     public function subtractPercentage($percentage, \RoundingMode $roundMethod = \RoundingMode::HalfAwayFromZero): Money
     {
@@ -153,15 +143,13 @@ class Cash
      * Subtract a tax percentage from a gross amount
      * e.g. when gross is 100 and taxrate is 20%, we will have 100 / 1.2 = 80
      *
-     * @param $percentage
-     * @param int $roundMethod
-     * @param bool $returnAsMoney
-     * @param null $round
-     * @return Money
+     * @param  int  $roundMethod
+     * @param  bool  $returnAsMoney
+     * @param  null  $round
      */
     public function subtractTaxPercentage(Percentage $percentage, $roundMethod = Money::ROUND_HALF_UP, $returnAsMoney = true, $round = null): Money
     {
-        $tax_percentage = (string)($percentage->toFloat() + 1);
+        $tax_percentage = (string) ($percentage->toFloat() + 1);
 
         return $this->money->divide($tax_percentage, $roundMethod, $returnAsMoney, $round);
     }
@@ -174,13 +162,10 @@ class Cash
 
     /**
      * Format according to locale preferences (default is fetched from Config)
-     *
-     * @param Locale $locale
-     * @return string
      */
     public function toLocalizedFormat(Locale $locale): string
     {
-        return $this->getSymbol() . ' ' . $this->getFormatter($locale)->format($this->money);
+        return $this->getSymbol().' '.$this->getFormatter($locale)->format($this->money);
     }
 
     private static function getDefaultCurrencyCode(): string
@@ -191,7 +176,7 @@ class Cash
     private function getFormatter(Locale $locale): MoneyFormatter
     {
         if (! static::$formatter) {
-            $currencies = new ISOCurrencies();
+            $currencies = new ISOCurrencies;
 
             $numberFormatter = new NumberFormatter($locale->toIso15897(), NumberFormatter::DECIMAL);
             $numberFormatter->setAttribute(NumberFormatter::FRACTION_DIGITS, 2);

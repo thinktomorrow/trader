@@ -17,13 +17,13 @@ class PurchasableReference
     public static function fromString(string $reference): self
     {
         if (strpos($reference, '@') == false) {
-            throw new \InvalidArgumentException('Invalid reference composition. A Purchasable reference should consist of schema <class>@<id>. [' . $reference . '] was passed instead.');
+            throw new \InvalidArgumentException('Invalid reference composition. A Purchasable reference should consist of schema <class>@<id>. ['.$reference.'] was passed instead.');
         }
 
         [$type, $id] = explode('@', $reference);
 
         if ($id === '') {
-            throw new \InvalidArgumentException('Missing id on purchasable reference. [' . $reference . '] was passed.');
+            throw new \InvalidArgumentException('Missing id on purchasable reference. ['.$reference.'] was passed.');
         }
 
         return new self($type, $id);

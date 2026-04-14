@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Thinktomorrow\Trader\Application\Cart\RefreshCart\Adjusters;
@@ -14,6 +15,7 @@ use Thinktomorrow\Trader\Domain\Model\Product\Variant\VariantState;
 class AdjustLines implements Adjuster
 {
     private VariantForCartRepository $variantForCartRepository;
+
     private AdjustLine $adjustLine;
 
     public function __construct(VariantForCartRepository $variantForCartRepository, AdjustLine $adjustLine)

@@ -1,8 +1,10 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Thinktomorrow\Trader\Application\Promo\Coupon;
 
+use Psr\Container\ContainerInterface;
 use Thinktomorrow\Trader\Application\Cart\RefreshCart\Adjusters\AdjustOrderVatSnapshot;
 use Thinktomorrow\Trader\Application\Promo\ApplyPromoToOrder;
 use Thinktomorrow\Trader\Application\Promo\OrderPromo\OrderPromoRepository;
@@ -12,13 +14,12 @@ use Thinktomorrow\Trader\Domain\Model\Order\OrderRepository;
 final class CouponPromoApplication
 {
     public function __construct(
-        private OrderRepository                   $orderRepository,
-        private EventDispatcher                   $eventDispatcher,
-        private OrderPromoRepository              $orderPromoRepository,
-        private ApplyPromoToOrder                 $applyPromoToOrder,
-        private \Psr\Container\ContainerInterface $container,
-    ) {
-    }
+        private OrderRepository $orderRepository,
+        private EventDispatcher $eventDispatcher,
+        private OrderPromoRepository $orderPromoRepository,
+        private ApplyPromoToOrder $applyPromoToOrder,
+        private ContainerInterface $container,
+    ) {}
 
     public function enterCoupon(EnterCoupon $enterCoupon): void
     {

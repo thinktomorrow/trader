@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Thinktomorrow\Trader\Domain\Common\Price;
@@ -9,11 +10,12 @@ use Thinktomorrow\Trader\Domain\Common\Price\Exceptions\PriceCannotBeNegative;
 use Thinktomorrow\Trader\Domain\Common\Vat\VatPercentage;
 
 /**
- * @inheritdoc
+ * {@inheritdoc}
  */
 class DefaultItemPrice implements ItemPrice
 {
     private Money $excludingVat;
+
     private VatPercentage $vatPercentage;
 
     /**
@@ -26,7 +28,7 @@ class DefaultItemPrice implements ItemPrice
     {
         if ($excludingVat->isNegative()) {
             throw new PriceCannotBeNegative(
-                'Excluding VAT money amount cannot be negative: ' . $excludingVat->getAmount() . ' is given.'
+                'Excluding VAT money amount cannot be negative: '.$excludingVat->getAmount().' is given.'
             );
         }
 
@@ -91,9 +93,9 @@ class DefaultItemPrice implements ItemPrice
     {
         if (! $this->vatPercentage->equals($price->getVatPercentage())) {
             throw new \InvalidArgumentException(
-                'Cannot add ItemPrice with different VAT percentage (' .
-                $price->getVatPercentage()->get() . '% given, ' .
-                $this->vatPercentage->get() . '% expected).'
+                'Cannot add ItemPrice with different VAT percentage ('.
+                $price->getVatPercentage()->get().'% given, '.
+                $this->vatPercentage->get().'% expected).'
             );
         }
 
@@ -112,9 +114,9 @@ class DefaultItemPrice implements ItemPrice
     {
         if (! $this->vatPercentage->equals($price->getVatPercentage())) {
             throw new \InvalidArgumentException(
-                'Cannot subtract ItemPrice with different VAT percentage (' .
-                $price->getVatPercentage()->get() . '% given, ' .
-                $this->vatPercentage->get() . '% expected).'
+                'Cannot subtract ItemPrice with different VAT percentage ('.
+                $price->getVatPercentage()->get().'% given, '.
+                $this->vatPercentage->get().'% expected).'
             );
         }
 
@@ -122,7 +124,7 @@ class DefaultItemPrice implements ItemPrice
 
         if ($newExcluding->isNegative()) {
             throw new PriceCannotBeNegative(
-                'Subtracting the price would result in a negative excluding VAT amount: ' .
+                'Subtracting the price would result in a negative excluding VAT amount: '.
                 $newExcluding->getAmount()
             );
         }
@@ -159,9 +161,9 @@ class DefaultItemPrice implements ItemPrice
             // Assert vat percentages match
             if (! $this->vatPercentage->equals($discount->getVatPercentage())) {
                 throw new \InvalidArgumentException(
-                    'Cannot apply ItemDiscountPrice with different VAT percentage (' .
-                    $discount->getVatPercentage()->get() . '% given, ' .
-                    $this->vatPercentage->get() . '% expected).'
+                    'Cannot apply ItemDiscountPrice with different VAT percentage ('.
+                    $discount->getVatPercentage()->get().'% given, '.
+                    $this->vatPercentage->get().'% expected).'
                 );
             }
 
@@ -171,7 +173,7 @@ class DefaultItemPrice implements ItemPrice
 
             if ($newIncluding->isNegative()) {
                 throw new PriceCannotBeNegative(
-                    'Applying the discount would result in a negative including VAT amount: ' .
+                    'Applying the discount would result in a negative including VAT amount: '.
                     $newIncluding->getAmount()
                 );
             }
@@ -190,7 +192,7 @@ class DefaultItemPrice implements ItemPrice
 
         if ($newExcluding->isNegative()) {
             throw new PriceCannotBeNegative(
-                'Applying the discount would result in a negative excluding VAT amount: ' .
+                'Applying the discount would result in a negative excluding VAT amount: '.
                 $newExcluding->getAmount()
             );
         }

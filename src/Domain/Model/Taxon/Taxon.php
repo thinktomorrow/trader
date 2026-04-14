@@ -52,7 +52,7 @@ class Taxon implements Aggregate
     public function changeParent(TaxonId $parentTaxonId): void
     {
         if ($this->taxonId->equals($parentTaxonId)) {
-            throw new InvalidParentTaxonId('Cannot set taxon as parent of itself. [' . $parentTaxonId->get() . ']');
+            throw new InvalidParentTaxonId('Cannot set taxon as parent of itself. ['.$parentTaxonId->get().']');
         }
 
         $this->parentTaxonId = $parentTaxonId;
@@ -108,7 +108,7 @@ class Taxon implements Aggregate
         $taxon->taxonId = TaxonId::fromString($state['taxon_id']);
         $taxon->taxonomyId = TaxonomyId::fromString($state['taxonomy_id']);
         $taxon->taxonState = TaxonState::from($state['state']);
-        $taxon->order = (int)($state['order'] ?? 0);
+        $taxon->order = (int) ($state['order'] ?? 0);
         $taxon->data = json_decode($state['data'], true);
         $taxon->parentTaxonId = $state['parent_id'] ? TaxonId::fromString($state['parent_id']) : null;
 

@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Thinktomorrow\Trader\Infrastructure\Test\Repositories;
@@ -16,7 +17,7 @@ use Thinktomorrow\Trader\Infrastructure\Laravel\Models\DefaultProductDetail;
 use Thinktomorrow\Trader\Infrastructure\Laravel\Models\DefaultProductTaxonItem;
 use Thinktomorrow\Trader\Infrastructure\Laravel\Models\DefaultVariantTaxonItem;
 
-final class InMemoryProductDetailRepository implements ProductDetailRepository, InMemoryRepository
+final class InMemoryProductDetailRepository implements InMemoryRepository, ProductDetailRepository
 {
     public function findProductDetailByKey(Locale $locale, string $variantKey, bool $allowOffline = false): ProductDetail
     {
@@ -52,14 +53,14 @@ final class InMemoryProductDetailRepository implements ProductDetailRepository, 
         ]);
 
         if (! $allowOffline && ! in_array($product->getState(), ProductState::onlineStates())) {
-            throw new CouldNotFindVariant('No online variant found by id [' . $variantId->get() . ']');
+            throw new CouldNotFindVariant('No online variant found by id ['.$variantId->get().']');
         }
 
         // Convert each taxon to the read model
         $taxa = [];
 
-        $taxonomyRepo = new InMemoryTaxonomyRepository();
-        $taxonRepo = new InMemoryTaxonRepository();
+        $taxonomyRepo = new InMemoryTaxonomyRepository;
+        $taxonRepo = new InMemoryTaxonRepository;
 
         foreach ($product->getProductTaxa() as $i => $productTaxon) {
             $taxon = $taxonRepo->find($productTaxon->taxonId);

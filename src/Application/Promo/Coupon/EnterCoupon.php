@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Thinktomorrow\Trader\Application\Promo\Coupon;
@@ -8,6 +9,7 @@ use Thinktomorrow\Trader\Domain\Model\Order\OrderId;
 final class EnterCoupon
 {
     private string $orderId;
+
     private string $couponCode;
 
     public function __construct(string $orderId, string $couponCode)

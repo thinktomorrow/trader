@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Thinktomorrow\Trader\Domain\Common\Price;
@@ -15,7 +16,7 @@ class DefaultDiscountPrice implements DiscountPrice
     private function __construct(Money $excludingVat)
     {
         if ($excludingVat->isNegative()) {
-            throw new PriceCannotBeNegative('Excluding VAT money amount cannot be negative: ' . $excludingVat->getAmount() . ' is given.');
+            throw new PriceCannotBeNegative('Excluding VAT money amount cannot be negative: '.$excludingVat->getAmount().' is given.');
         }
 
         $this->excludingVat = $excludingVat;

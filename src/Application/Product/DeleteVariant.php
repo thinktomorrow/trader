@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Thinktomorrow\Trader\Application\Product;
@@ -9,6 +10,7 @@ use Thinktomorrow\Trader\Domain\Model\Product\Variant\VariantId;
 class DeleteVariant
 {
     private string $productId;
+
     private string $variantId;
 
     public function __construct(string $productId, string $variantId)

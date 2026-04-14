@@ -17,10 +17,7 @@ class FindVatRateForOrder
 
     private bool $allowVatExemption = true;
 
-    public function __construct(private TraderConfig $config, private VatExemptionApplication $checkVatExemptionForOrder, private VatRateRepository $vatRateRepository)
-    {
-
-    }
+    public function __construct(private TraderConfig $config, private VatExemptionApplication $checkVatExemptionForOrder, private VatRateRepository $vatRateRepository) {}
 
     public function allowVatExemption(bool $allowVatExemption = true): static
     {

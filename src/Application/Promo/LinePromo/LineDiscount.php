@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Thinktomorrow\Trader\Application\Promo\LinePromo;
@@ -29,9 +30,6 @@ interface LineDiscount extends Mappable
      * The total discount on the order. This is not used in the price calculation, but rather
      * for sorting the available order promos to determine which one has the highest
      * discount impact. This way the visitor receives the best available discount.
-     *
-     * @param Order $order
-     * @return DiscountPrice
      */
     public function getCombinedDiscountPrice(Order $order): DiscountPrice;
 }

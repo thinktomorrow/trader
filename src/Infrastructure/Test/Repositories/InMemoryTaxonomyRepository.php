@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Thinktomorrow\Trader\Infrastructure\Test\Repositories;
@@ -12,7 +13,7 @@ use Thinktomorrow\Trader\Domain\Model\Taxonomy\TaxonomyRepository;
 use Thinktomorrow\Trader\Domain\Model\Taxonomy\TaxonomyState;
 use Thinktomorrow\Trader\Infrastructure\Laravel\Models\DefaultTaxonomyItem;
 
-final class InMemoryTaxonomyRepository implements TaxonomyRepository, InMemoryRepository
+final class InMemoryTaxonomyRepository implements InMemoryRepository, TaxonomyRepository
 {
     /** @var Taxonomy[] */
     public static array $taxonomies = [];
@@ -30,7 +31,7 @@ final class InMemoryTaxonomyRepository implements TaxonomyRepository, InMemoryRe
     public function find(TaxonomyId $taxonomyId): Taxonomy
     {
         if (! isset(self::$taxonomies[$taxonomyId->get()])) {
-            throw new CouldNotFindTaxonomy('No taxonomy found by id ' . $taxonomyId);
+            throw new CouldNotFindTaxonomy('No taxonomy found by id '.$taxonomyId);
         }
 
         return self::$taxonomies[$taxonomyId->get()];
@@ -78,7 +79,7 @@ final class InMemoryTaxonomyRepository implements TaxonomyRepository, InMemoryRe
     public function delete(TaxonomyId $taxonomyId): void
     {
         if (! isset(self::$taxonomies[$taxonomyId->get()])) {
-            throw new CouldNotFindTaxonomy('No taxonomy found by id ' . $taxonomyId);
+            throw new CouldNotFindTaxonomy('No taxonomy found by id '.$taxonomyId);
         }
 
         unset(self::$taxonomies[$taxonomyId->get()]);
@@ -96,7 +97,7 @@ final class InMemoryTaxonomyRepository implements TaxonomyRepository, InMemoryRe
 
     public function setProductIds(TaxonomyId $taxonomyId, array $productIds): void
     {
-        static::$productIds[$taxonomyId->get()] = $productIds;
+        self::$productIds[$taxonomyId->get()] = $productIds;
     }
 
     private function existsByKey(TaxonomyKeyId $taxonKeyId, TaxonomyId $allowedTaxonomyId): bool
@@ -113,6 +114,6 @@ final class InMemoryTaxonomyRepository implements TaxonomyRepository, InMemoryRe
     public static function clear()
     {
         self::$taxonomies = [];
-        static::$productIds = [];
+        self::$productIds = [];
     }
 }

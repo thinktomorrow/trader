@@ -7,6 +7,7 @@ use Thinktomorrow\Trader\Domain\Model\Stock\StockItemId;
 class AddStock
 {
     private string $stockItemId;
+
     private int $amount;
 
     public function __construct(string $stockItemId, int $amount)

@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Thinktomorrow\Trader\Domain\Model\Product\VariantTaxa;
@@ -14,16 +15,16 @@ class VariantTaxon implements ChildEntity
     use HasData;
 
     public readonly VariantId $variantId;
+
     public readonly TaxonId $taxonId;
+
     private TaxonState $state;
 
-    private function __construct()
-    {
-    }
+    private function __construct() {}
 
     public static function create(VariantId $variantId, TaxonId $taxonId): static
     {
-        $object = new static();
+        $object = new static;
 
         $object->variantId = $variantId;
         $object->taxonId = $taxonId;
@@ -34,7 +35,7 @@ class VariantTaxon implements ChildEntity
 
     public function toVariantProperty(): VariantProperty
     {
-        $variantProperty = new VariantProperty();
+        $variantProperty = new VariantProperty;
 
         $variantProperty->variantId = $this->variantId;
         $variantProperty->taxonId = $this->taxonId;
@@ -66,7 +67,7 @@ class VariantTaxon implements ChildEntity
 
     public static function fromMappedData(array $state, array $aggregateState, array $childEntities = []): static
     {
-        $object = new static();
+        $object = new static;
 
         $object->variantId = VariantId::fromString($aggregateState['variant_id']);
         $object->taxonId = TaxonId::fromString($state['taxon_id']);

@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Thinktomorrow\Trader\Application\Taxon;
@@ -11,6 +12,7 @@ use Thinktomorrow\Trader\Domain\Model\Taxon\TaxonKeyId;
 class UpdateTaxonKeys
 {
     private string $taxonId;
+
     private array $taxonKeys;
 
     public function __construct(string $taxonId, array $taxonKeys)

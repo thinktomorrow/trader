@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Thinktomorrow\Trader\Application\Product\VariantProperties;
@@ -22,7 +23,9 @@ class VariantPropertiesForSelect
     use HasLocale;
 
     private ProductRepository $productRepository;
+
     private TaxonRepository $taxonRepository;
+
     private TaxonomyRepository $taxonomyRepository;
 
     public function __construct(ProductRepository $productRepository, TaxonRepository $taxonRepository, TaxonomyRepository $taxonomyRepository)
@@ -55,12 +58,12 @@ class VariantPropertiesForSelect
             foreach ($taxaByTaxonomy as $taxon) {
                 $_result[] = [
                     'value' => $taxon->taxonId->get(),
-                    'label' => $taxon->getData('title.' . $this->getLocale()->getLanguage()),
+                    'label' => $taxon->getData('title.'.$this->getLocale()->getLanguage()),
                 ];
             }
 
             $result[$taxonomyId] = [
-                'label' => $taxonomy->getData('title.' . $this->getLocale()->getLanguage()),
+                'label' => $taxonomy->getData('title.'.$this->getLocale()->getLanguage()),
                 'options' => $_result,
             ];
         }

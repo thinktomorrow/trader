@@ -38,12 +38,12 @@ class ProductApplication
     private TaxonomyRepository $taxonomyRepository;
 
     public function __construct(
-        TraderConfig        $traderConfig,
-        EventDispatcher     $eventDispatcher,
-        ProductRepository   $productRepository,
-        VariantRepository   $variantRepository,
+        TraderConfig $traderConfig,
+        EventDispatcher $eventDispatcher,
+        ProductRepository $productRepository,
+        VariantRepository $variantRepository,
         TaxonTreeRepository $taxonTreeRepository,
-        TaxonomyRepository  $taxonomyRepository,
+        TaxonomyRepository $taxonomyRepository,
     ) {
         $this->traderConfig = $traderConfig;
         $this->eventDispatcher = $eventDispatcher;

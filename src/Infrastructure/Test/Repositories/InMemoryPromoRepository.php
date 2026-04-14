@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Thinktomorrow\Trader\Infrastructure\Test\Repositories;
@@ -17,15 +18,17 @@ use Thinktomorrow\Trader\Domain\Model\Promo\PromoId;
 use Thinktomorrow\Trader\Domain\Model\Promo\PromoRepository;
 use Thinktomorrow\Trader\Domain\Model\Promo\PromoState;
 
-final class InMemoryPromoRepository implements PromoRepository, OrderPromoRepository, InMemoryRepository
+final class InMemoryPromoRepository implements InMemoryRepository, OrderPromoRepository, PromoRepository
 {
     /** @var Promo[] */
     public static array $promos = [];
 
     private string $nextReference = 'ppp-123';
+
     private string $nextDiscountReference = 'ddd-123';
 
     private DiscountFactory $discountFactory;
+
     private OrderDiscountFactory $orderDiscountFactory;
 
     public function __construct(DiscountFactory $discountFactory, OrderDiscountFactory $orderDiscountFactory)
@@ -36,25 +39,25 @@ final class InMemoryPromoRepository implements PromoRepository, OrderPromoReposi
 
     public function save(Promo $promo): void
     {
-        static::$promos[$promo->promoId->get()] = $promo;
+        self::$promos[$promo->promoId->get()] = $promo;
     }
 
     public function find(PromoId $promoId): Promo
     {
-        if (! isset(static::$promos[$promoId->get()])) {
-            throw new CouldNotFindPromo('No promo found by id ' . $promoId);
+        if (! isset(self::$promos[$promoId->get()])) {
+            throw new CouldNotFindPromo('No promo found by id '.$promoId);
         }
 
-        return static::$promos[$promoId->get()];
+        return self::$promos[$promoId->get()];
     }
 
     public function delete(PromoId $promoId): void
     {
-        if (! isset(static::$promos[$promoId->get()])) {
-            throw new CouldNotFindPromo('No promo found by id ' . $promoId);
+        if (! isset(self::$promos[$promoId->get()])) {
+            throw new CouldNotFindPromo('No promo found by id '.$promoId);
         }
 
-        unset(static::$promos[$promoId->get()]);
+        unset(self::$promos[$promoId->get()]);
     }
 
     public function nextReference(): PromoId
@@ -75,7 +78,7 @@ final class InMemoryPromoRepository implements PromoRepository, OrderPromoReposi
 
     public static function clear()
     {
-        static::$promos = [];
+        self::$promos = [];
     }
 
     public function getAvailableSystemPromos(): array
@@ -111,7 +114,7 @@ final class InMemoryPromoRepository implements PromoRepository, OrderPromoReposi
         foreach ($this->filterActivePromos() as $promo) {
             if ($promo->hasCouponCode() && $promo->getCouponCode() == $couponCode) {
                 return $this->createApplicablePromoFromPromo($promo);
-            };
+            }
         }
 
         return null;
@@ -121,7 +124,7 @@ final class InMemoryPromoRepository implements PromoRepository, OrderPromoReposi
     {
         $result = [];
 
-        foreach (static::$promos as $promo) {
+        foreach (self::$promos as $promo) {
             if (! in_array($promo->getState(), PromoState::onlineStates())) {
                 continue;
             }

@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Thinktomorrow\Trader\Infrastructure\Test\Repositories;
@@ -6,6 +7,7 @@ namespace Thinktomorrow\Trader\Infrastructure\Test\Repositories;
 use Thinktomorrow\Trader\Application\Cart\VariantForCart\VariantForCart;
 use Thinktomorrow\Trader\Application\Cart\VariantForCart\VariantForCartRepository;
 use Thinktomorrow\Trader\Domain\Model\Product\Exceptions\CouldNotFindVariant;
+use Thinktomorrow\Trader\Domain\Model\Product\Personalisation\Personalisation;
 use Thinktomorrow\Trader\Domain\Model\Product\Product;
 use Thinktomorrow\Trader\Domain\Model\Product\ProductId;
 use Thinktomorrow\Trader\Domain\Model\Product\Variant\Variant;
@@ -20,25 +22,27 @@ use Thinktomorrow\Trader\Domain\Model\Stock\StockItemRepository;
 use Thinktomorrow\Trader\Domain\Model\Taxonomy\TaxonomyType;
 use Thinktomorrow\Trader\Infrastructure\Laravel\Models\DefaultVariantForCart;
 
-final class InMemoryVariantRepository implements VariantRepository, VariantForCartRepository, StockItemRepository, InMemoryRepository
+final class InMemoryVariantRepository implements InMemoryRepository, StockItemRepository, VariantForCartRepository, VariantRepository
 {
     /** @var Variant[] */
     public static array $variants = [];
+
     public static array $stockItems = [];
+
     private static string $nextReference = 'xxx-123';
 
     public static array $variantTaxonLookup = [];
 
     public function save(Variant $variant): void
     {
-        static::$variants[$variant->variantId->get()] = $variant;
+        self::$variants[$variant->variantId->get()] = $variant;
 
-        static::$variantTaxonLookup[$variant->variantId->get()] = array_map(fn ($taxon) => $taxon->taxonId->get(), $variant->getVariantTaxa());
+        self::$variantTaxonLookup[$variant->variantId->get()] = array_map(fn ($taxon) => $taxon->taxonId->get(), $variant->getVariantTaxa());
     }
 
     public static function getGridProductVariantPairsFromLookup(string $taxonId): array
     {
-        $variantIds = array_keys(array_filter(static::$variantTaxonLookup, fn ($taxonIds) => in_array($taxonId, $taxonIds)));
+        $variantIds = array_keys(array_filter(self::$variantTaxonLookup, fn ($taxonIds) => in_array($taxonId, $taxonIds)));
 
         $pairs = [];
 
@@ -56,14 +60,14 @@ final class InMemoryVariantRepository implements VariantRepository, VariantForCa
 
     /**
      * @return array with two entries: [0 => state data, 1 => child entities].
-     * Used internally by product repository to fetch all variants.
+     *               Used internally by product repository to fetch all variants.
      */
     public function getStatesByProduct(ProductId $productId): array
     {
         $result = [];
 
         /** @var Variant $variant */
-        foreach (static::$variants as $variant) {
+        foreach (self::$variants as $variant) {
             if ($variant->productId->equals($productId)) {
 
                 $childEntities = $variant->getChildEntities();
@@ -92,45 +96,45 @@ final class InMemoryVariantRepository implements VariantRepository, VariantForCa
 
     public function delete(VariantId $variantId): void
     {
-        if (! isset(static::$variants[$variantId->get()])) {
-            throw new CouldNotFindVariant('No variant found by id ' . $variantId);
+        if (! isset(self::$variants[$variantId->get()])) {
+            throw new CouldNotFindVariant('No variant found by id '.$variantId);
         }
 
-        unset(static::$variants[$variantId->get()]);
+        unset(self::$variants[$variantId->get()]);
     }
 
     public function nextReference(): VariantId
     {
-        return VariantId::fromString(static::$nextReference);
+        return VariantId::fromString(self::$nextReference);
     }
 
     // For testing purposes only
     public static function setNextReference(string $nextReference): void
     {
-        static::$nextReference = $nextReference;
+        self::$nextReference = $nextReference;
     }
 
     public static function clear()
     {
-        static::$variants = [];
+        self::$variants = [];
     }
 
     public function findVariantForCart(VariantId $variantId): VariantForCart
     {
-        foreach (static::$variants as $variant) {
+        foreach (self::$variants as $variant) {
             if ($variant->variantId->equals($variantId)) {
                 return DefaultVariantForCart::fromMappedData(array_merge($variant->getMappedData(), ['product_data' => json_encode(InMemoryProductRepository::$products[$variant->productId->get()]->getData())]), $personalisations = $this->getPersonalisationsForVariant($variant));
             }
         }
 
-        throw new CouldNotFindVariant('No variant found by id ' . $variantId->get());
+        throw new CouldNotFindVariant('No variant found by id '.$variantId->get());
     }
 
     public function findAllVariantsForCart(array $variantIds): array
     {
         $result = [];
 
-        foreach (static::$variants as $variant) {
+        foreach (self::$variants as $variant) {
             if (in_array($variant->variantId, $variantIds)) {
                 $result[] = DefaultVariantForCart::fromMappedData(array_merge($variant->getMappedData(), ['product_data' => json_encode(InMemoryProductRepository::$products[$variant->productId->get()]->getData())]), $this->getPersonalisationsForVariant($variant));
             }
@@ -140,8 +144,7 @@ final class InMemoryVariantRepository implements VariantRepository, VariantForCa
     }
 
     /**
-     * @param Variant $variant
-     * @return array|\Thinktomorrow\Trader\Domain\Model\Product\Personalisation\Personalisation[]
+     * @return array|Personalisation[]
      */
     private function getPersonalisationsForVariant(Variant $variant): array
     {
@@ -159,22 +162,22 @@ final class InMemoryVariantRepository implements VariantRepository, VariantForCa
 
     public function findStockItem(StockItemId $stockItemId): StockItem
     {
-        foreach (static::$stockItems as $stockItem) {
+        foreach (self::$stockItems as $stockItem) {
             if ($stockItem->stockItemId->equals($stockItemId)) {
                 return $stockItem;
             }
         }
 
-        throw new CouldNotFindStockItem('No stockitem found by id ' . $stockItemId->get());
+        throw new CouldNotFindStockItem('No stockitem found by id '.$stockItemId->get());
     }
 
     public function saveStockItem(StockItem $stockItem): void
     {
         // StockItem id must exist as variant!
-        if (! isset(static::$variants[$stockItem->stockItemId->get()])) {
-            throw new VariantRecordDoesNotExistWhenSavingStockItem();
+        if (! isset(self::$variants[$stockItem->stockItemId->get()])) {
+            throw new VariantRecordDoesNotExistWhenSavingStockItem;
         }
 
-        static::$stockItems[] = $stockItem;
+        self::$stockItems[] = $stockItem;
     }
 }

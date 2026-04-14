@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Thinktomorrow\Trader\Domain\Model\Product\VariantKey;
@@ -10,16 +11,16 @@ use Thinktomorrow\Trader\Domain\Model\Product\Variant\VariantId;
 class VariantKey implements ChildEntity
 {
     public readonly VariantId $variantId;
+
     public VariantKeyId $variantKeyId;
+
     private Locale $locale;
 
-    private function __construct()
-    {
-    }
+    private function __construct() {}
 
     public static function create(VariantId $variantId, VariantKeyId $key, Locale $locale): static
     {
-        $variantKey = new static();
+        $variantKey = new static;
 
         $variantKey->variantId = $variantId;
         $variantKey->variantKeyId = $key;
@@ -30,7 +31,7 @@ class VariantKey implements ChildEntity
 
     public static function temp(VariantKeyId $key, Locale $locale): static
     {
-        $variantKey = new static();
+        $variantKey = new static;
 
         $variantKey->variantKeyId = $key;
         $variantKey->locale = $locale;
@@ -68,7 +69,7 @@ class VariantKey implements ChildEntity
 
     public static function fromMappedData(array $state, array $aggregateState): static
     {
-        $variantKey = new static();
+        $variantKey = new static;
 
         $variantKey->variantId = VariantId::fromString($aggregateState['variant_id']);
         $variantKey->variantKeyId = VariantKeyId::fromString($state['key']);

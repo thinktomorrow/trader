@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Thinktomorrow\Trader\Application\Promo\CUD;
@@ -6,6 +7,7 @@ namespace Thinktomorrow\Trader\Application\Promo\CUD;
 class UpdateCondition
 {
     private string $key;
+
     private array $data;
 
     public function __construct(string $key, array $data)

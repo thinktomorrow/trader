@@ -64,13 +64,13 @@ final class InMemoryTaxonRedirectRepository implements TaxonRedirectRepository
             }
         } else {
             // insert
-            $id = (string)$this->autoIncrement++;
+            $id = (string) $this->autoIncrement++;
             $newRedirect = new Redirect(
                 $redirect->getLocale(),
                 $from,
                 $to,
                 $id,
-                new \DateTime()
+                new \DateTime
             );
             $this->items[] = $newRedirect;
         }
@@ -92,5 +92,4 @@ final class InMemoryTaxonRedirectRepository implements TaxonRedirectRepository
     {
         return trim($slug, '/ ');
     }
-
 }

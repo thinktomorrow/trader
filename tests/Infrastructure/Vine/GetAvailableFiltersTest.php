@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Tests\Infrastructure\Vine;
@@ -307,5 +308,4 @@ final class GetAvailableFiltersTest extends TestCase
             $this->assertEquals([$product->productId->get()], $ids);
         }
     }
-
 }

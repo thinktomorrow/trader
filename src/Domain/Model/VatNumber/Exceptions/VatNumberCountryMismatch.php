@@ -2,7 +2,4 @@
 
 namespace Thinktomorrow\Trader\Domain\Model\VatNumber\Exceptions;
 
-class VatNumberCountryMismatch extends \InvalidArgumentException
-{
-
-}
+class VatNumberCountryMismatch extends \InvalidArgumentException {}

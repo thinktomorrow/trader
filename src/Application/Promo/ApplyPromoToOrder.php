@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Thinktomorrow\Trader\Application\Promo;
@@ -11,15 +12,10 @@ use Thinktomorrow\Trader\TraderConfig;
 
 class ApplyPromoToOrder
 {
-    public function __construct(private OrderRepository $orderRepository, private TraderConfig $config)
-    {
-    }
+    public function __construct(private OrderRepository $orderRepository, private TraderConfig $config) {}
 
     /**
-     * @param Order $order
-     * @param OrderDiscount[] $discounts
-     * @param string|null $coupon_code
-     * @return void
+     * @param  OrderDiscount[]  $discounts
      */
     public function apply(Order $order, array $discounts, ?string $coupon_code = null): void
     {
@@ -62,7 +58,6 @@ class ApplyPromoToOrder
                 }
             }
 
-
         }
 
         if ($coupon_code && $hasBeenApplied) {
@@ -74,7 +69,7 @@ class ApplyPromoToOrder
     {
         foreach ($discounts as $discount) {
             if (! $discount instanceof OrderDiscount && ! $discount instanceof LineDiscount) {
-                throw new \InvalidArgumentException('Invalid discount type [' . $discount::class . '] provided in child entities for OrderPromo.');
+                throw new \InvalidArgumentException('Invalid discount type ['.$discount::class.'] provided in child entities for OrderPromo.');
             }
         }
     }

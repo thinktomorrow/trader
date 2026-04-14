@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Thinktomorrow\Trader\Infrastructure\Laravel\Repositories;
@@ -15,10 +16,12 @@ use Thinktomorrow\Trader\Domain\Model\PaymentMethod\PaymentMethodId;
 use Thinktomorrow\Trader\Domain\Model\PaymentMethod\PaymentMethodRepository;
 use Thinktomorrow\Trader\Domain\Model\PaymentMethod\PaymentMethodState;
 
-class MysqlPaymentMethodRepository implements PaymentMethodRepository, PaymentMethodForCartRepository
+class MysqlPaymentMethodRepository implements PaymentMethodForCartRepository, PaymentMethodRepository
 {
     private static $paymentMethodTable = 'trader_payment_methods';
+
     private static $paymentMethodCountryTable = 'trader_payment_method_countries';
+
     private static $countryTable = 'trader_countries';
 
     private ContainerInterface $container;
@@ -62,23 +65,23 @@ class MysqlPaymentMethodRepository implements PaymentMethodRepository, PaymentMe
     public function find(PaymentMethodId $paymentMethodId): PaymentMethod
     {
         $paymentMethodState = DB::table(static::$paymentMethodTable)
-            ->where(static::$paymentMethodTable . '.payment_method_id', $paymentMethodId->get())
+            ->where(static::$paymentMethodTable.'.payment_method_id', $paymentMethodId->get())
             ->first();
 
         if (! $paymentMethodState) {
-            throw new CouldNotFindPaymentMethod('No payment method found by id [' . $paymentMethodId->get() . ']');
+            throw new CouldNotFindPaymentMethod('No payment method found by id ['.$paymentMethodId->get().']');
         }
 
         $countryStates = DB::table(static::$paymentMethodCountryTable)
-            ->join(static::$countryTable, static::$paymentMethodCountryTable . '.country_id', '=', static::$countryTable . '.country_id')
-            ->where(static::$paymentMethodCountryTable . '.payment_method_id', $paymentMethodId->get())
-            ->where(static::$countryTable . '.active', '1')
-            ->select(static::$countryTable . '.country_id')
+            ->join(static::$countryTable, static::$paymentMethodCountryTable.'.country_id', '=', static::$countryTable.'.country_id')
+            ->where(static::$paymentMethodCountryTable.'.payment_method_id', $paymentMethodId->get())
+            ->where(static::$countryTable.'.active', '1')
+            ->select(static::$countryTable.'.country_id')
             ->get()
-            ->map(fn ($item) => (array)$item)
+            ->map(fn ($item) => (array) $item)
             ->toArray();
 
-        return PaymentMethod::fromMappedData((array)$paymentMethodState, [
+        return PaymentMethod::fromMappedData((array) $paymentMethodState, [
             CountryId::class => $countryStates,
         ]);
     }
@@ -90,7 +93,7 @@ class MysqlPaymentMethodRepository implements PaymentMethodRepository, PaymentMe
 
     public function nextReference(): PaymentMethodId
     {
-        return PaymentMethodId::fromString((string)Uuid::uuid4());
+        return PaymentMethodId::fromString((string) Uuid::uuid4());
     }
 
     public function findAllPaymentMethodsForCart(?string $countryId = null): array
@@ -103,13 +106,13 @@ class MysqlPaymentMethodRepository implements PaymentMethodRepository, PaymentMe
             $builder->where(function ($query) use ($countryId) {
                 $query
                     // payment method has matching country
-                    ->whereIn(static::$paymentMethodTable . '.payment_method_id', function ($sub) use ($countryId) {
+                    ->whereIn(static::$paymentMethodTable.'.payment_method_id', function ($sub) use ($countryId) {
                         $sub->select('payment_method_id')
                             ->from(static::$paymentMethodCountryTable)
                             ->where('country_id', $countryId);
                     })
                     // payment method has no countries assigned at all - so allowed everywhere
-                    ->orWhereNotIn(static::$paymentMethodTable . '.payment_method_id', function ($sub) {
+                    ->orWhereNotIn(static::$paymentMethodTable.'.payment_method_id', function ($sub) {
                         $sub->select('payment_method_id')->from(static::$paymentMethodCountryTable);
                     });
             });
@@ -117,7 +120,7 @@ class MysqlPaymentMethodRepository implements PaymentMethodRepository, PaymentMe
 
         return $builder
             ->get()
-            ->map(fn ($paymentMethodState) => $this->container->get(PaymentMethodForCart::class)::fromMappedData((array)$paymentMethodState))
+            ->map(fn ($paymentMethodState) => $this->container->get(PaymentMethodForCart::class)::fromMappedData((array) $paymentMethodState))
             ->toArray();
     }
 }

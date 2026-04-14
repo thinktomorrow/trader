@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Thinktomorrow\Trader\Domain\Model\Product\Variant;
@@ -11,32 +12,37 @@ use Thinktomorrow\Trader\Domain\Model\Product\ProductId;
 use Thinktomorrow\Trader\Domain\Model\Product\VariantKey\HasVariantKeys;
 use Thinktomorrow\Trader\Domain\Model\Product\VariantKey\VariantKey;
 use Thinktomorrow\Trader\Domain\Model\Product\VariantTaxa\HasVariantTaxa;
+use Thinktomorrow\Trader\Domain\Model\Product\VariantTaxa\VariantProperty;
 use Thinktomorrow\Trader\Domain\Model\Product\VariantTaxa\VariantTaxon;
 use Thinktomorrow\Trader\Domain\Model\Taxonomy\TaxonomyType;
 
 final class Variant implements ChildAggregate
 {
     use HasData;
-    use RecordsEventsForAggregate;
-    use HasVariantTaxa;
     use HasVariantKeys;
+    use HasVariantTaxa;
+    use RecordsEventsForAggregate;
 
     public readonly ProductId $productId;
+
     public readonly VariantId $variantId;
+
     private VariantState $state;
+
     private VariantUnitPrice $unitPrice;
+
     private VariantSalePrice $salePrice; // bedrag, btw perc, bool includes_tax?
 
     /** @var Personalisation[] */
     private array $personalisations = [];
 
     private string $sku;
+
     private ?string $ean = null;
+
     private bool $show_in_grid = false;
 
-    private function __construct()
-    {
-    }
+    private function __construct() {}
 
     public function getSalePrice(): VariantSalePrice
     {
@@ -50,7 +56,7 @@ final class Variant implements ChildAggregate
 
     public static function create(ProductId $productId, VariantId $variantId, VariantUnitPrice $unitPrice, VariantSalePrice $salePrice, string $sku): static
     {
-        $variant = new static();
+        $variant = new self;
         $variant->state = VariantState::available;
         $variant->productId = $productId;
         $variant->variantId = $variantId;
@@ -133,7 +139,7 @@ final class Variant implements ChildAggregate
 
     public static function fromMappedData(array $state, array $aggregateState, array $childEntities = []): static
     {
-        $variant = new static();
+        $variant = new static;
 
         $variant->productId = ProductId::fromString($aggregateState['product_id']);
         $variant->variantId = VariantId::fromString($state['variant_id']);
@@ -142,13 +148,13 @@ final class Variant implements ChildAggregate
         $variant->salePrice = VariantSalePrice::fromScalars($state['sale_price'], $state['tax_rate'], $state['includes_vat']);
         $variant->sku = $state['sku'];
         $variant->ean = $state['ean'] ?? null;
-        $variant->show_in_grid = $state['show_in_grid'] ? (bool)$state['show_in_grid'] : false;
+        $variant->show_in_grid = $state['show_in_grid'] ? (bool) $state['show_in_grid'] : false;
         $variant->data = json_decode($state['data'], true);
 
         if (array_key_exists(VariantTaxon::class, $childEntities)) {
             foreach ($childEntities[VariantTaxon::class] as $childState) {
                 $variant->variantTaxa[] = (isset($childState['taxonomy_type']) && $childState['taxonomy_type'] == TaxonomyType::variant_property->value)
-                    ? \Thinktomorrow\Trader\Domain\Model\Product\VariantTaxa\VariantProperty::fromMappedData($childState, $state)
+                    ? VariantProperty::fromMappedData($childState, $state)
                     : VariantTaxon::fromMappedData($childState, $state);
             }
         }

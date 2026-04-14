@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Thinktomorrow\Trader\Application\Cart\PaymentMethod;
@@ -15,8 +16,11 @@ use Thinktomorrow\Trader\Domain\Model\PaymentMethod\PaymentMethodRepository;
 class UpdatePaymentMethodOnOrder
 {
     private ContainerInterface $container;
+
     private OrderRepository $orderRepository;
+
     private PaymentMethodRepository $paymentMethodRepository;
+
     private VerifyPaymentMethodForCart $verifyPaymentMethodForCart;
 
     public function __construct(ContainerInterface $container, OrderRepository $orderRepository, VerifyPaymentMethodForCart $verifyPaymentMethodForCart, PaymentMethodRepository $paymentMethodRepository)

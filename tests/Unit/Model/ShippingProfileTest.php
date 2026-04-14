@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Tests\Unit\Model;
@@ -29,7 +30,7 @@ class ShippingProfileTest extends TestCase
             'provider_id' => $shippingProviderId->get(),
             'state' => ShippingProfileState::online->value,
             'requires_address' => false,
-            'data' => "[]",
+            'data' => '[]',
         ], $shippingProfile->getMappedData());
 
         $this->assertEquals([

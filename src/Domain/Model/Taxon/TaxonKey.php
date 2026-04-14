@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Thinktomorrow\Trader\Domain\Model\Taxon;
@@ -9,16 +10,16 @@ use Thinktomorrow\Trader\Domain\Common\Locale;
 class TaxonKey implements ChildEntity
 {
     public readonly TaxonId $taxonId;
+
     public TaxonKeyId $taxonKeyId;
+
     private Locale $locale;
 
-    private function __construct()
-    {
-    }
+    private function __construct() {}
 
     public static function create(TaxonId $taxonId, TaxonKeyId $key, Locale $locale): static
     {
-        $taxonKey = new static();
+        $taxonKey = new static;
 
         $taxonKey->taxonId = $taxonId;
         $taxonKey->taxonKeyId = $key;
@@ -29,7 +30,7 @@ class TaxonKey implements ChildEntity
 
     public static function temp(TaxonKeyId $key, Locale $locale): static
     {
-        $taxonKey = new static();
+        $taxonKey = new static;
 
         $taxonKey->taxonKeyId = $key;
         $taxonKey->locale = $locale;
@@ -67,7 +68,7 @@ class TaxonKey implements ChildEntity
 
     public static function fromMappedData(array $state, array $aggregateState): static
     {
-        $taxonKey = new static();
+        $taxonKey = new static;
 
         $taxonKey->taxonId = TaxonId::fromString($aggregateState['taxon_id']);
         $taxonKey->taxonKeyId = TaxonKeyId::fromString($state['key']);

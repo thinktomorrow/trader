@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Tests\Acceptance\Customer;
@@ -17,19 +18,21 @@ use Thinktomorrow\Trader\Infrastructure\Test\Repositories\InMemoryCustomerReposi
 abstract class CustomerContext extends TestCase
 {
     protected CustomerRepository $customerRepository;
+
     protected CustomerApplication $customerApplication;
+
     protected CustomerReadRepository $customerReadRepository;
 
     protected function setUp(): void
     {
         parent::setUp();
 
-        $this->customerRepository = $this->customerReadRepository = new InMemoryCustomerRepository();
+        $this->customerRepository = $this->customerReadRepository = new InMemoryCustomerRepository;
         $this->customerRepository->autoGenerateNextReference();
 
         $this->customerApplication = new CustomerApplication(
             $this->customerRepository,
-            new EventDispatcherSpy(),
+            new EventDispatcherSpy,
         );
     }
 

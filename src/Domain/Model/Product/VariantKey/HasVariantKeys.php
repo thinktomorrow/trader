@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Thinktomorrow\Trader\Domain\Model\Product\VariantKey;
@@ -40,9 +41,6 @@ trait HasVariantKeys
     /**
      * Add the keys if for the given locale no key is present yet,
      * else we update since we have one key per locale
-     *
-     * @param VariantKey $variantKey
-     * @return void
      */
     private function addOrUpdateVariantKey(VariantKey $variantKey): void
     {

@@ -2,7 +2,4 @@
 
 namespace Thinktomorrow\Trader\Domain\Model\VatNumber\Exceptions;
 
-class InvalidVatNumber extends \InvalidArgumentException
-{
-
-}
+class InvalidVatNumber extends \InvalidArgumentException {}

@@ -17,8 +17,8 @@ class CustomerEmailVerificationTest extends TestCase
     {
         parent::setUp();
 
-        $this->app['view']->addLocation(__DIR__ . '/views');
-        $this->app['view']->addNamespace('trader', __DIR__ . '/views/shop');
+        $this->app['view']->addLocation(__DIR__.'/views');
+        $this->app['view']->addNamespace('trader', __DIR__.'/views/shop');
 
         config()->set('trader.webmaster_email', 'example@trader');
         config()->set('trader.webmaster_name', 'Trader Webmaster');
@@ -99,7 +99,7 @@ class CustomerEmailVerificationTest extends TestCase
 
     private function createUnverifiedCustomer(): CustomerModel
     {
-        $model = new CustomerModel();
+        $model = new CustomerModel;
         $model->customer_id = 'cust_unverified';
         $model->email = 'unverified@thinktomorrow.be';
         $model->password = bcrypt('password123');
@@ -117,7 +117,7 @@ class CustomerEmailVerificationTest extends TestCase
 
     private function createVerifiedCustomer(): CustomerModel
     {
-        $model = new CustomerModel();
+        $model = new CustomerModel;
         $model->customer_id = 'cust_verified';
         $model->email = 'verified@thinktomorrow.be';
         $model->password = bcrypt('password123');

@@ -18,9 +18,8 @@ class ProRateAllocator
      * - som(allocaties) === $totalToAllocate
      * - geen verloren centen / remainders
      *
-     * @param array<string, ItemPrice> $itemTotalsPerRate bv. ['21' => ItemPrice(1210), '9' => ItemPrice(1090)]
-     * @param Money $totalToAllocate bv. Money(1000)
-     *
+     * @param  array<string, ItemPrice>  $itemTotalsPerRate  bv. ['21' => ItemPrice(1210), '9' => ItemPrice(1090)]
+     * @param  Money  $totalToAllocate  bv. Money(1000)
      * @return array<string, Money>
      */
     public function allocate(array $itemTotalsPerRate, Money $totalToAllocate): array
@@ -59,26 +58,26 @@ class ProRateAllocator
         }
 
         $currency = $totalToAllocate->getCurrency();
-        $totalMinor = (int)$totalToAllocate->getAmount(); // centen
+        $totalMinor = (int) $totalToAllocate->getAmount(); // centen
         $alloc = [];
         $allocatedSum = new Money('0', $currency);
 
         // 1) voorlopige allocaties (floor per ratio)
         foreach ($itemTotalsPerRate as $rate => $itemPricePerRate) {
             $ratio = bcdiv(
-                (string)$itemPricePerRate->getExcludingVat()->getAmount(),
-                (string)$sum->getAmount(),
+                (string) $itemPricePerRate->getExcludingVat()->getAmount(),
+                (string) $sum->getAmount(),
                 12 // genoeg precisie voor ratio
             );
 
-            $minor = $this->truncateTowardZero($totalMinor * (float)$ratio);
+            $minor = $this->truncateTowardZero($totalMinor * (float) $ratio);
 
-            $alloc[$rate] = new Money((string)$minor, $currency);
+            $alloc[$rate] = new Money((string) $minor, $currency);
             $allocatedSum = $allocatedSum->add($alloc[$rate]);
         }
 
         // 2) remainder in minor units (mag niet blijven liggen)
-        $remainder = $totalMinor - (int)$allocatedSum->getAmount();
+        $remainder = $totalMinor - (int) $allocatedSum->getAmount();
 
         if ($remainder === 0) {
             return $alloc; // perfect gesplitst
@@ -92,21 +91,19 @@ class ProRateAllocator
 
             $adjustment = $remainder > 0 ? 1 : -1;
 
-            $alloc[$rate] = $money->add(new Money((string)$adjustment, $currency));
+            $alloc[$rate] = $money->add(new Money((string) $adjustment, $currency));
 
             $remainder -= $adjustment;
         }
 
         if ($remainder !== 0) {
-            throw new \LogicException('ProRateAllocator remainder leak detected: ' . $remainder);
+            throw new \LogicException('ProRateAllocator remainder leak detected: '.$remainder);
         }
 
         return $alloc;
     }
 
     /**
-     * @param Money $totalToAllocate
-     * @param array $itemTotals
      * @return Money[]
      */
     private function mapToZero(Money $totalToAllocate, array $itemTotals): array
@@ -136,18 +133,18 @@ class ProRateAllocator
      */
     private function truncateTowardZero(float $value): int
     {
-        return $value >= 0 ? (int)floor($value) : (int)ceil($value);
+        return $value >= 0 ? (int) floor($value) : (int) ceil($value);
     }
 
     private function assertItemTotalsAreKeyedWithRates(array $itemTotalsPerRate): void
     {
         foreach ($itemTotalsPerRate as $rate => $itemTotal) {
             if (! is_string($rate) && ! is_int($rate)) {
-                throw new \InvalidArgumentException('itemTotalsPerRate must be an array keyed by VAT rates. Got key ' . gettype($rate));
+                throw new \InvalidArgumentException('itemTotalsPerRate must be an array keyed by VAT rates. Got key '.gettype($rate));
             }
 
-            if ($itemTotal->getVatPercentage()->get() !== (string)$rate) {
-                throw new \InvalidArgumentException('itemTotalsPerRate key must match ItemPrice VAT rate. Got key ' . $rate . ' but ItemPrice has VAT rate ' . $itemTotal->getVatPercentage()->get());
+            if ($itemTotal->getVatPercentage()->get() !== (string) $rate) {
+                throw new \InvalidArgumentException('itemTotalsPerRate key must match ItemPrice VAT rate. Got key '.$rate.' but ItemPrice has VAT rate '.$itemTotal->getVatPercentage()->get());
             }
         }
     }
@@ -156,7 +153,7 @@ class ProRateAllocator
     {
         foreach ($itemTotalsPerRate as $itemTotal) {
             if (! $itemTotal instanceof ItemPrice) {
-                throw new \InvalidArgumentException('itemTotalsPerRate must be an array of ItemPrice instances. Got ' . $itemTotal::class);
+                throw new \InvalidArgumentException('itemTotalsPerRate must be an array of ItemPrice instances. Got '.$itemTotal::class);
             }
         }
     }

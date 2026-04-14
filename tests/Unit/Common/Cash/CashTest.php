@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Tests\Unit\Common\Cash;
@@ -46,7 +47,7 @@ class CashTest extends TestCase
     public function test_it_can_get_percentage_of_money_values()
     {
         $cash = Cash::from(Money::EUR(51));
-        $this->assertEquals(Percentage::fromString("51.00"), $cash->asPercentage(Money::EUR(100)));
+        $this->assertEquals(Percentage::fromString('51.00'), $cash->asPercentage(Money::EUR(100)));
     }
 
     public function test_it_can_get_percentage_with_specificity_of_2_decimals()
@@ -54,7 +55,7 @@ class CashTest extends TestCase
         $cash = Cash::from(Money::EUR(55));
 
         // Specificity of 2 decimals by default
-        $this->assertEquals(Percentage::fromString("45.83"), $cash->asPercentage(Money::EUR(120), 2));
+        $this->assertEquals(Percentage::fromString('45.83'), $cash->asPercentage(Money::EUR(120), 2));
         $this->assertEquals(Percentage::fromString('45.83'), $cash->asPercentage(Money::EUR(120), 2));
 
         // Percentage can be rounded off

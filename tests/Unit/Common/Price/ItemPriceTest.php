@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Tests\Unit\Common\Price;
@@ -154,7 +155,7 @@ class ItemPriceTest extends TestCase
 
         // Expected values calculated externally
         $excl = 2521 * $qty;
-        $incl = (int)round($excl * 1.21);
+        $incl = (int) round($excl * 1.21);
         $vat = $incl - $excl;
 
         $this->assertEquals(Money::EUR($excl), $object->getExcludingVat());

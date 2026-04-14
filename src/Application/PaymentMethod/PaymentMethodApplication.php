@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Thinktomorrow\Trader\Application\PaymentMethod;
@@ -12,6 +13,7 @@ use Thinktomorrow\Trader\Domain\Model\PaymentMethod\PaymentMethodRepository;
 class PaymentMethodApplication
 {
     private EventDispatcher $eventDispatcher;
+
     private PaymentMethodRepository $paymentMethodRepository;
 
     public function __construct(EventDispatcher $eventDispatcher, PaymentMethodRepository $paymentMethodRepository)
@@ -19,7 +21,6 @@ class PaymentMethodApplication
         $this->eventDispatcher = $eventDispatcher;
         $this->paymentMethodRepository = $paymentMethodRepository;
     }
-
 
     public function createPaymentMethod(CreatePaymentMethod $command): PaymentMethodId
     {

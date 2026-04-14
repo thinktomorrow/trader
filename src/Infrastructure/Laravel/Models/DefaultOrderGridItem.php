@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Thinktomorrow\Trader\Infrastructure\Laravel\Models;
@@ -11,29 +12,36 @@ use Thinktomorrow\Trader\Infrastructure\Laravel\Models\OrderRead\WithImmutableOr
 
 class DefaultOrderGridItem implements OrderGridItem
 {
-    use RendersMoney;
     use HasLocale;
-    use WithImmutableOrderTotals;
+    use RendersMoney;
     use WithFormattedOrderTotals;
+    use WithImmutableOrderTotals;
 
     protected string $order_id;
+
     protected string $order_reference;
+
     protected ?string $invoice_reference;
+
     protected string $state;
+
     protected ?\DateTime $updated_at;
+
     protected ?\DateTime $confirmed_at;
+
     protected ?\DateTime $paid_at;
+
     protected ?\DateTime $delivered_at;
+
     protected ?string $customer_id;
+
     protected array $shopperData;
 
-    final private function __construct()
-    {
-    }
+    final private function __construct() {}
 
     public static function fromMappedData(array $state, array $shopperState): static
     {
-        $gridItem = new static();
+        $gridItem = new static;
 
         $gridItem->order_id = $state['order_id'];
         $gridItem->order_reference = $state['order_ref'];
@@ -109,7 +117,7 @@ class DefaultOrderGridItem implements OrderGridItem
 
     public function getUrl(): string
     {
-        return '/admin/orders/' . $this->order_id;
+        return '/admin/orders/'.$this->order_id;
     }
 
     public function getShopperTitle(): string
@@ -119,7 +127,7 @@ class DefaultOrderGridItem implements OrderGridItem
 
     public function isBusiness(): bool
     {
-        return ! ! $this->shopperData['is_business'];
+        return (bool) $this->shopperData['is_business'];
     }
 
     public function hasCustomer(): bool
@@ -133,6 +141,6 @@ class DefaultOrderGridItem implements OrderGridItem
             return null;
         }
 
-        return '/admin/customers/' . $this->customer_id;
+        return '/admin/customers/'.$this->customer_id;
     }
 }

@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Thinktomorrow\Trader\Domain\Model\VatRate;
@@ -12,10 +13,11 @@ use Thinktomorrow\Trader\Domain\Model\VatRate\Events\BaseRateDeleted;
 
 final class VatRate implements Aggregate
 {
-    use RecordsEvents;
     use HasData;
+    use RecordsEvents;
 
     public readonly VatRateId $vatRateId;
+
     public readonly CountryId $countryId;
 
     private VatPercentage $rate;
@@ -29,13 +31,14 @@ final class VatRate implements Aggregate
 
     /**
      * Mapping of any the primary country rates to this rate
+     *
      * @var BaseRate[]
      */
     private array $baseRates = [];
 
     public static function create(VatRateId $vatRateId, CountryId $countryId, VatPercentage $rate, bool $isStandard): static
     {
-        $object = new static();
+        $object = new self;
         $object->vatRateId = $vatRateId;
         $object->countryId = $countryId;
         $object->rate = $rate;
@@ -104,7 +107,7 @@ final class VatRate implements Aggregate
             }
         }
 
-        throw new \InvalidArgumentException('No base rate found by id ' . $baseRateId->get());
+        throw new \InvalidArgumentException('No base rate found by id '.$baseRateId->get());
     }
 
     public function addBaseRate(BaseRate $baseRate): void
@@ -143,7 +146,7 @@ final class VatRate implements Aggregate
 
     public static function fromMappedData(array $state, array $childEntities = []): static
     {
-        $object = new static();
+        $object = new static;
         $object->vatRateId = VatRateId::fromString($state['vat_rate_id']);
         $object->countryId = CountryId::fromString($state['country_id']);
         $object->rate = VatPercentage::fromString($state['rate']);

@@ -18,13 +18,14 @@ use Thinktomorrow\Trader\TraderConfig;
 class CheckVatExemptionForOrderTest extends VatRateContext
 {
     private TraderConfig $config;
+
     private VatExemptionApplication $checker;
 
     protected function setUp(): void
     {
         parent::setUp();
 
-        $this->config = new TestTraderConfig();
+        $this->config = new TestTraderConfig;
         $this->checker = new VatExemptionApplication($this->config);
     }
 

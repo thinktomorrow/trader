@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Thinktomorrow\Trader\Domain\Model\Order\Line\Personalisations;
@@ -15,14 +16,18 @@ final class LinePersonalisation implements ChildEntity
     use HasData;
 
     public readonly LineId $lineId;
+
     public readonly LinePersonalisationId $linePersonalisationId;
+
     public readonly ?OriginalPersonalisationId $originalPersonalisationId;
+
     private PersonalisationType $personalisationType;
+
     private $value;
 
     public static function create(LineId $lineId, LinePersonalisationId $linePersonalisationId, ?OriginalPersonalisationId $originalPersonalisationId, PersonalisationType $personalisationType, $value, array $data): static
     {
-        $personalisation = new static();
+        $personalisation = new self;
 
         $personalisation->lineId = $lineId;
         $personalisation->linePersonalisationId = $linePersonalisationId;
@@ -48,7 +53,7 @@ final class LinePersonalisation implements ChildEntity
 
     public static function fromMappedData(array $state, array $aggregateState): static
     {
-        $personalisation = new static();
+        $personalisation = new static;
 
         $personalisation->lineId = LineId::fromString($aggregateState['line_id']);
         $personalisation->linePersonalisationId = LinePersonalisationId::fromString($state['line_personalisation_id']);

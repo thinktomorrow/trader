@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Thinktomorrow\Trader\Domain\Common\Cash;
@@ -8,9 +9,6 @@ class IntegerConverter
     /**
      * Convert float or decimal to integer value
      * e.g. used to inject into our Money object
-     *
-     * @param string $float
-     * @return int
      */
     public static function convertDecimalToInteger(string $float, string $decimal_separator = ',', string $thousand_separator = '.'): int
     {
@@ -26,10 +24,6 @@ class IntegerConverter
     /**
      * Convert an integer to its decimal counterpart.
      * Used to display amounts in user interfaces.
-     *
-     * @param int $amount
-     * @param int $decimals
-     * @return string
      */
     public static function convertIntegerToDecimal(int $amount, int $decimals = 2, string $decimal_separator = ',', string $thousand_separator = '.'): string
     {

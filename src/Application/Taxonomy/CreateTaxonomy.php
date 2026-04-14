@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Thinktomorrow\Trader\Application\Taxonomy;
@@ -8,9 +9,13 @@ use Thinktomorrow\Trader\Domain\Model\Taxonomy\TaxonomyType;
 final class CreateTaxonomy
 {
     private string $taxonomyType;
+
     private bool $showsAsGridFilter;
+
     private bool $showsOnListing;
+
     private bool $allowsMultipleValues;
+
     private array $data;
 
     public function __construct(string $taxonomyType, bool $showsAsGridFilter, bool $showsOnListing, bool $allowsMultipleValues, array $data)

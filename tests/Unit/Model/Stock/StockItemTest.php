@@ -46,7 +46,7 @@ class StockItemTest extends TestCase
         $item->updateStockLevel(10);
 
         $this->assertEquals([
-           new StockAdded($item->stockItemId, 5, 10),
+            new StockAdded($item->stockItemId, 5, 10),
         ], $item->releaseEvents());
     }
 

@@ -7,7 +7,9 @@ use Money\Money;
 trait WithServiceTotals
 {
     protected Money $costPriceExcl;
+
     protected Money $discountPriceExcl;
+
     protected Money $totalPriceExcl;
 
     protected function initializeServiceTotalsFromState(array $state): void

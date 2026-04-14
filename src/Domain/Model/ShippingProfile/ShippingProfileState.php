@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Thinktomorrow\Trader\Domain\Model\ShippingProfile;
@@ -12,7 +13,7 @@ enum ShippingProfileState: string
     public static function onlineStates(): array
     {
         return [
-            static::online,
+            self::online,
         ];
     }
 }

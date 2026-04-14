@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Tests\Acceptance\Cart;
@@ -50,7 +51,6 @@ class CartReadTest extends CartContext
     {
         $this->markTestSkipped('todo: with payment / shipping / discount values');
     }
-
 
     public function test_in_order_to_confirm_my_product_choice_as_a_visitor__i_need_to_be_able_to_see_each_line_of_my_cart()
     {

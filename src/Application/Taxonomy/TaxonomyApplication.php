@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Thinktomorrow\Trader\Application\Taxonomy;
@@ -13,7 +14,9 @@ use Thinktomorrow\Trader\TraderConfig;
 final class TaxonomyApplication
 {
     private TraderConfig $traderConfig;
+
     private EventDispatcher $eventDispatcher;
+
     private TaxonomyRepository $taxonomyRepository;
 
     public function __construct(TraderConfig $traderConfig, EventDispatcher $eventDispatcher, TaxonomyRepository $taxonomyRepository)

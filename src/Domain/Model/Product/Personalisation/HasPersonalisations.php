@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Thinktomorrow\Trader\Domain\Model\Product\Personalisation;
@@ -19,10 +20,10 @@ trait HasPersonalisations
     public function getNextPersonalisationId(): PersonalisationId
     {
         $i = mt_rand(1, 999);
-        $nextPersonalisationId = PersonalisationId::fromString(substr($i . '_' . $this->productId->get(), 0, 36));
+        $nextPersonalisationId = PersonalisationId::fromString(substr($i.'_'.$this->productId->get(), 0, 36));
 
         while ($this->hasPersonalisation($nextPersonalisationId)) {
-            $nextPersonalisationId = PersonalisationId::fromString(substr(++$i . '_' . $this->productId->get(), 0, 36));
+            $nextPersonalisationId = PersonalisationId::fromString(substr(++$i.'_'.$this->productId->get(), 0, 36));
         }
 
         return $nextPersonalisationId;

@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Tests\Unit\Model\Order;
@@ -50,7 +51,7 @@ class OrderTotalsTest extends TestCase
         $order = $this->orderContext->createDefaultOrder();
         $this->orderContext->addDiscountToOrder($order, $this->orderContext->createOrderDiscount());
 
-        (new TestContainer())->get(AdjustOrderVatSnapshot::class)->adjust($order);
+        (new TestContainer)->get(AdjustOrderVatSnapshot::class)->adjust($order);
 
         $this->assertEquals(Money::EUR('200'), $order->getSubtotalIncl());
         $this->assertEquals(Money::EUR('61'), $order->getShippingCostIncl());

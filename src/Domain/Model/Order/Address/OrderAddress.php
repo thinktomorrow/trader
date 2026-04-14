@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Thinktomorrow\Trader\Domain\Model\Order\Address;
@@ -13,15 +14,14 @@ abstract class OrderAddress
     use HasData;
 
     public readonly OrderId $orderId;
+
     protected Address $address;
 
-    private function __construct()
-    {
-    }
+    private function __construct() {}
 
     public static function create(OrderId $orderId, Address $address, array $data): static
     {
-        $orderAddress = new static();
+        $orderAddress = new static;
 
         $orderAddress->orderId = $orderId;
         $orderAddress->address = $address;
@@ -32,7 +32,7 @@ abstract class OrderAddress
 
     public static function fromMappedData(array $state, array $aggregateState): static
     {
-        $address = new static();
+        $address = new static;
 
         $address->orderId = OrderId::fromString($aggregateState['order_id']);
         $address->address = new Address(

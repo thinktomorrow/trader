@@ -15,7 +15,7 @@ trait HasShippings
 
     public function addShipping(Shipping $shipping): void
     {
-        if (null !== $this->findShippingIndex($shipping->shippingId)) {
+        if ($this->findShippingIndex($shipping->shippingId) !== null) {
             throw new ShippingAlreadyOnOrder(
                 'Cannot add shipping because order ['.$this->orderId->get().'] already has shipping ['.$shipping->shippingId->get().']'
             );

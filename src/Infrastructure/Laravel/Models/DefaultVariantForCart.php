@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Thinktomorrow\Trader\Infrastructure\Laravel\Models;
@@ -16,22 +17,28 @@ class DefaultVariantForCart implements VariantForCart
     use RendersData;
 
     private VariantId $variantId;
+
     private ProductId $productId;
+
     private VariantState $state;
+
     private VariantUnitPrice $variantUnitPrice;
+
     private VariantSalePrice $variantSalePrice;
+
     private array $taxa; // Extra info on which variant taxa this variant has applied.
+
     private array $personalisations;
+
     private array $data;
+
     private array $productData;
 
-    final private function __construct()
-    {
-    }
+    final private function __construct() {}
 
     public static function fromMappedData(array $state, array $personalisations): static
     {
-        $object = new static();
+        $object = new static;
 
         $object->variantId = VariantId::fromString($state['variant_id']);
         $object->productId = ProductId::fromString($state['product_id']);
@@ -79,7 +86,7 @@ class DefaultVariantForCart implements VariantForCart
 
         $productTitle = $this->data('title', $locale, '', $this->productData);
 
-        return ($productTitle ? $productTitle . ' ' : '') . $this->dataAsPrimitive('option_title', $locale, '');
+        return ($productTitle ? $productTitle.' ' : '').$this->dataAsPrimitive('option_title', $locale, '');
     }
 
     public function getPersonalisations(): array

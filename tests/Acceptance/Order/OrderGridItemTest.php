@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Tests\Acceptance\Order;
@@ -21,7 +22,7 @@ class OrderGridItemTest extends TestCase
         $order = $this->orderContext->createDefaultDiscountedOrder();
 
         // Refresh Vat snapshot
-        (new TestContainer())->get(AdjustOrderVatSnapshot::class)->adjust($order);
+        (new TestContainer)->get(AdjustOrderVatSnapshot::class)->adjust($order);
         $this->orderContext->saveOrder($order);
         $order = $this->orderContext->findOrder($order->orderId);
 
@@ -54,7 +55,7 @@ class OrderGridItemTest extends TestCase
         $order = $this->orderContext->createDefaultDiscountedOrder();
 
         // Refresh Vat snapshot
-        (new TestContainer())->get(AdjustOrderVatSnapshot::class)->adjust($order);
+        (new TestContainer)->get(AdjustOrderVatSnapshot::class)->adjust($order);
         $this->orderContext->saveOrder($order);
         $order = $this->orderContext->findOrder($order->orderId);
 

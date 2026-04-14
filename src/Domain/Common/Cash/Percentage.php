@@ -24,7 +24,7 @@ class Percentage
 
     public static function zero(): self
     {
-        return new static("0");
+        return new static('0');
     }
 
     public function get(): string
@@ -34,12 +34,12 @@ class Percentage
 
     public function toDecimal(): string
     {
-        return bcdiv($this->value, "100", 4);
+        return bcdiv($this->value, '100', 4);
     }
 
     public function toFloat(): float
     {
-        return (float)$this->toDecimal();
+        return (float) $this->toDecimal();
     }
 
     public function doesItExceeds100(): bool
@@ -49,7 +49,7 @@ class Percentage
 
     public function equals($other): bool
     {
-        return (get_class($other) === get_class($this) && $other->value === $this->value);
+        return get_class($other) === get_class($this) && $other->value === $this->value;
     }
 
     public function __toString(): string

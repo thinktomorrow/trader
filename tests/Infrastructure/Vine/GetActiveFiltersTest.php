@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Tests\Infrastructure\Vine;
@@ -193,5 +194,4 @@ final class GetActiveFiltersTest extends TestCase
             $this->assertEquals('taxon-1', $activeFilters->first()->getId());
         }
     }
-
 }

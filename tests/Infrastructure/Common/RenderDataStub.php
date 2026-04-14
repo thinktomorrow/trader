@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Tests\Infrastructure\Common;
@@ -16,7 +17,7 @@ class RenderDataStub
         $this->data = $data;
     }
 
-    public function get(string $key, string $language = null, string $default = null)
+    public function get(string $key, ?string $language = null, ?string $default = null)
     {
         return $this->data($key, $language, $default);
     }

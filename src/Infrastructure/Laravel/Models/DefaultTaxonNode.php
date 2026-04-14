@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Thinktomorrow\Trader\Infrastructure\Laravel\Models;
@@ -16,18 +17,26 @@ class DefaultTaxonNode extends DefaultNode implements TaxonNode
     use RendersData;
 
     public readonly string $id;
+
     public readonly string $taxonomyId;
 
     /** @var TaxonKey[] */
     protected array $keys;
 
     protected TaxonState $taxonState;
+
     public readonly int $order; // Make publicly available for sorting via vine
+
     protected array $data;
+
     protected array $product_ids;
+
     protected array $grid_product_ids;
+
     protected array $grid_variant_ids;
+
     protected ?string $parentId;
+
     protected iterable $images;
 
     private function __construct(string $id, string $taxonomyId, TaxonState $taxonState, int $order, array $data, array $product_ids, array $grid_product_ids, array $grid_variant_ids, array $keys, ?string $parentId = null)
@@ -230,10 +239,10 @@ class DefaultTaxonNode extends DefaultNode implements TaxonNode
         if (! $this->isRootNode()) {
             $label = array_reduce(array_reverse($this->getBreadCrumbs()), function ($carry, $taxon) use ($withoutRoot, $locale) {
                 if ($taxon->isRootNode()) {
-                    return $withoutRoot ? $carry : $taxon->getLabel($locale) . ': ' . $carry;
+                    return $withoutRoot ? $carry : $taxon->getLabel($locale).': '.$carry;
                 }
 
-                return $taxon->getLabel($locale) . ' > ' . $carry;
+                return $taxon->getLabel($locale).' > '.$carry;
             }, $this->getLabel($locale));
         }
 

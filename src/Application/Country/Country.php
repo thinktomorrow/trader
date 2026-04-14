@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Thinktomorrow\Trader\Application\Country;
@@ -12,9 +13,7 @@ class Country
 
     public readonly CountryId $countryId;
 
-    final private function __construct()
-    {
-    }
+    final private function __construct() {}
 
     public function getLabel(): string
     {
@@ -23,7 +22,7 @@ class Country
 
     public static function fromMappedData(array $state): static
     {
-        $country = new static();
+        $country = new static;
 
         $country->countryId = CountryId::fromString($state['country_id']);
         $country->data = json_decode($state['data'], true);

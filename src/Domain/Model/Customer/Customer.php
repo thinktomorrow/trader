@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Thinktomorrow\Trader\Domain\Model\Customer;
@@ -13,23 +14,26 @@ use Thinktomorrow\Trader\Domain\Model\Customer\Address\ShippingAddress;
 
 class Customer implements Aggregate
 {
-    use RecordsEvents;
     use HasData;
+    use RecordsEvents;
 
     public readonly CustomerId $customerId;
+
     private Email $email;
+
     private bool $isBusiness;
+
     private Locale $locale;
+
     private ?BillingAddress $billingAddress = null;
+
     private ?ShippingAddress $shippingAddress = null;
 
-    private function __construct()
-    {
-    }
+    private function __construct() {}
 
     public static function create(CustomerId $customerId, Email $email, bool $isBusiness, Locale $locale)
     {
-        $customer = new static();
+        $customer = new static;
         $customer->customerId = $customerId;
         $customer->email = $email;
         $customer->isBusiness = $isBusiness;
@@ -109,16 +113,15 @@ class Customer implements Aggregate
 
     public static function fromMappedData(array $state, array $childEntities = []): static
     {
-        $customer = new static();
+        $customer = new static;
         $customer->customerId = $state['customer_id'] ? CustomerId::fromString($state['customer_id']) : null;
         $customer->email = Email::fromString($state['email']);
-        $customer->isBusiness = ! ! $state['is_business'];
+        $customer->isBusiness = (bool) $state['is_business'];
         $customer->locale = Locale::fromString($state['locale']);
         $customer->data = json_decode($state['data'], true);
 
         $customer->shippingAddress = $childEntities[ShippingAddress::class] ? ShippingAddress::fromMappedData($childEntities[ShippingAddress::class], $state) : null;
         $customer->billingAddress = $childEntities[BillingAddress::class] ? BillingAddress::fromMappedData($childEntities[BillingAddress::class], $state) : null;
-
 
         return $customer;
     }

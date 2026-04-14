@@ -12,6 +12,7 @@ use Thinktomorrow\Trader\Domain\Model\Product\Variant\VariantId;
 class AdjustVatRates implements Adjuster
 {
     private VariantForCartRepository $variantForCartRepository;
+
     private FindVatRateForOrder $findVatRateForOrder;
 
     public function __construct(VariantForCartRepository $variantForCartRepository, FindVatRateForOrder $findVatRateForOrder)

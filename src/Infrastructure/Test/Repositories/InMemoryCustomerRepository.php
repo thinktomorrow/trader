@@ -1,9 +1,11 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Thinktomorrow\Trader\Infrastructure\Test\Repositories;
 
 use Thinktomorrow\Trader\Application\Customer\Read\CustomerBillingAddress;
+use Thinktomorrow\Trader\Application\Customer\Read\CustomerRead;
 use Thinktomorrow\Trader\Application\Customer\Read\CustomerReadRepository;
 use Thinktomorrow\Trader\Application\Customer\Read\CustomerShippingAddress;
 use Thinktomorrow\Trader\Domain\Common\Email;
@@ -15,42 +17,43 @@ use Thinktomorrow\Trader\Infrastructure\Laravel\Models\CustomerRead\DefaultCusto
 use Thinktomorrow\Trader\Infrastructure\Laravel\Models\CustomerRead\DefaultCustomerRead;
 use Thinktomorrow\Trader\Infrastructure\Laravel\Models\CustomerRead\DefaultCustomerShippingAddress;
 
-final class InMemoryCustomerRepository implements CustomerRepository, CustomerReadRepository, InMemoryRepository
+final class InMemoryCustomerRepository implements CustomerReadRepository, CustomerRepository, InMemoryRepository
 {
     /** @var Customer[] */
     public static array $customers = [];
 
     private bool $autoGenerateNextReference = false;
+
     private string $nextReference = 'ccc-123';
 
     public function save(Customer $customer): void
     {
-        static::$customers[$customer->customerId->get()] = $customer;
+        self::$customers[$customer->customerId->get()] = $customer;
     }
 
     public function find(CustomerId $customerId): Customer
     {
-        if (! isset(static::$customers[$customerId->get()])) {
-            throw new CouldNotFindCustomer('No customer found by id ' . $customerId);
+        if (! isset(self::$customers[$customerId->get()])) {
+            throw new CouldNotFindCustomer('No customer found by id '.$customerId);
         }
 
-        return static::$customers[$customerId->get()];
+        return self::$customers[$customerId->get()];
     }
 
     public function findByEmail(Email $email): Customer
     {
-        foreach (static::$customers as $customer) {
+        foreach (self::$customers as $customer) {
             if ($customer->getEmail()->equals($email)) {
                 return $customer;
             }
         }
 
-        throw new CouldNotFindCustomer('No customer found by email ' . $email->get());
+        throw new CouldNotFindCustomer('No customer found by email '.$email->get());
     }
 
     public function existsByEmail(Email $email, ?CustomerId $ignoredCustomerId = null): bool
     {
-        foreach (static::$customers as $customer) {
+        foreach (self::$customers as $customer) {
             if ($customer->getEmail()->equals($email)) {
                 if ($ignoredCustomerId && $customer->customerId->equals($ignoredCustomerId)) {
                     trap('sisi');
@@ -67,17 +70,17 @@ final class InMemoryCustomerRepository implements CustomerRepository, CustomerRe
 
     public function delete(CustomerId $customerId): void
     {
-        if (! isset(static::$customers[$customerId->get()])) {
-            throw new CouldNotFindCustomer('No customer found by id ' . $customerId);
+        if (! isset(self::$customers[$customerId->get()])) {
+            throw new CouldNotFindCustomer('No customer found by id '.$customerId);
         }
 
-        unset(static::$customers[$customerId->get()]);
+        unset(self::$customers[$customerId->get()]);
     }
 
     public function nextReference(): CustomerId
     {
         if ($this->autoGenerateNextReference) {
-            return CustomerId::fromString('customer-id-' . mt_rand(111, 999));
+            return CustomerId::fromString('customer-id-'.mt_rand(111, 999));
         }
 
         return CustomerId::fromString($this->nextReference);
@@ -96,10 +99,10 @@ final class InMemoryCustomerRepository implements CustomerRepository, CustomerRe
 
     public static function clear()
     {
-        static::$customers = [];
+        self::$customers = [];
     }
 
-    public function findCustomer(CustomerId $customerId): \Thinktomorrow\Trader\Application\Customer\Read\CustomerRead
+    public function findCustomer(CustomerId $customerId): CustomerRead
     {
         $customer = $this->find($customerId);
 

@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Thinktomorrow\Trader\Application\Cart;
@@ -9,6 +10,7 @@ use Thinktomorrow\Trader\Domain\Model\Order\OrderId;
 final class ChooseCustomer
 {
     private string $orderId;
+
     private string $customerId;
 
     public function __construct(string $orderId, string $customerId)

@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Thinktomorrow\Trader\Domain\Model\Order\Payment;
@@ -12,22 +13,22 @@ use Thinktomorrow\Trader\Domain\Model\Order\Events\PaymentStates\PaymentRefunded
 
 enum DefaultPaymentState: string implements PaymentState
 {
-    case none = "none"; // The order is still in customer hands (incomplete) and a payment is not initialized yet.
+    case none = 'none'; // The order is still in customer hands (incomplete) and a payment is not initialized yet.
 
-    case initialized = "initialized"; // a payment link has been generated, but the customer hasn't yet completed payment.
-    case paid = "paid"; // the customer has completed payment and settlement is guaranteed. proceed with shipment.
+    case initialized = 'initialized'; // a payment link has been generated, but the customer hasn't yet completed payment.
+    case paid = 'paid'; // the customer has completed payment and settlement is guaranteed. proceed with shipment.
     case paid_by_merchant = 'paid_by_merchant'; // set to paid by merchant
-    case canceled = "canceled"; // the merchant or the customer has canceled the transaction.
-    case expired = "expired"; // the payment has expired, e.g. your customer has abandoned the payment.
-    case failed = "failed"; // the payment has failed and cannot be completed. this could be that the issuer or acquirer has declined the transaction.
-    case refunded = "refunded"; // the merchant has refunded the payment to the customer via the payment provider.
-    case refunded_by_merchant = "refunded_by_merchant"; // the merchant has manually refunded the payment to the customer
-    case charged_back = "charged_back"; // the customer has done a chargeback via the issuer or acquirer.
-    case unknown = "unknown"; // unknown status
+    case canceled = 'canceled'; // the merchant or the customer has canceled the transaction.
+    case expired = 'expired'; // the payment has expired, e.g. your customer has abandoned the payment.
+    case failed = 'failed'; // the payment has failed and cannot be completed. this could be that the issuer or acquirer has declined the transaction.
+    case refunded = 'refunded'; // the merchant has refunded the payment to the customer via the payment provider.
+    case refunded_by_merchant = 'refunded_by_merchant'; // the merchant has manually refunded the payment to the customer
+    case charged_back = 'charged_back'; // the customer has done a chargeback via the issuer or acquirer.
+    case unknown = 'unknown'; // unknown status
 
     public static function fromString(string $state): self
     {
-        return static::from($state);
+        return self::from($state);
     }
 
     public function getValueAsString(): string
@@ -37,17 +38,17 @@ enum DefaultPaymentState: string implements PaymentState
 
     public function equals($other): bool
     {
-        return (get_class($this) === get_class($other) && $this->getValueAsString() === $other->getValueAsString());
+        return get_class($this) === get_class($other) && $this->getValueAsString() === $other->getValueAsString();
     }
 
     public static function getDefaultState(): self
     {
-        return static::none;
+        return self::none;
     }
 
     public static function getStates(): array
     {
-        return static::cases();
+        return self::cases();
     }
 
     public static function getTransitions(): array

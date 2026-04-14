@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Tests\Acceptance\Taxonomy;
@@ -12,7 +13,9 @@ use Thinktomorrow\Trader\Infrastructure\Test\TestTraderConfig;
 abstract class TaxonomyContext extends TestCase
 {
     protected TaxonomyApplication $taxonomyApplication;
+
     protected EventDispatcherSpy $eventDispatcher;
+
     protected InMemoryTaxonomyRepository $taxonomyRepository;
 
     protected function setUp(): void
@@ -20,13 +23,13 @@ abstract class TaxonomyContext extends TestCase
         parent::setUp();
 
         $this->taxonomyApplication = new TaxonomyApplication(
-            new TestTraderConfig(),
-            $this->eventDispatcher = new EventDispatcherSpy(),
-            $this->taxonomyRepository = new InMemoryTaxonomyRepository(),
+            new TestTraderConfig,
+            $this->eventDispatcher = new EventDispatcherSpy,
+            $this->taxonomyRepository = new InMemoryTaxonomyRepository,
         );
     }
 
-    public function tearDown(): void
+    protected function tearDown(): void
     {
         $this->taxonomyRepository->clear();
     }

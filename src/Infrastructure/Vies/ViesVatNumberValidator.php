@@ -10,9 +10,7 @@ use Thinktomorrow\Trader\Domain\Model\VatNumber\VatNumberValidationState;
 
 class ViesVatNumberValidator implements VatNumberValidator
 {
-    public function __construct(private ViesClient $client)
-    {
-    }
+    public function __construct(private ViesClient $client) {}
 
     /**
      * Common SoapFaults (taken from https://github.com/DragonBe/vies/blob/master/src/Vies/Vies.php) include:
@@ -37,14 +35,14 @@ class ViesVatNumberValidator implements VatNumberValidator
         } catch (SoapFault $e) {
 
             // Faulty input
-            if ($e->getMessage() == "INVALID_INPUT") {
+            if ($e->getMessage() == 'INVALID_INPUT') {
                 return new VatNumberValidation($vatNumber->getCountryCode(), $vatNumber->getNumber(), VatNumberValidationState::invalid, [
                     'error' => 'Invalid VAT number',
                 ]);
             }
 
             return new VatNumberValidation($vatNumber->getCountryCode(), $vatNumber->getNumber(), VatNumberValidationState::service_error, [
-                'error' => 'VIES service is currently unavailable. Reason: [' . $e->getMessage() . ']',
+                'error' => 'VIES service is currently unavailable. Reason: ['.$e->getMessage().']',
             ]);
         }
     }

@@ -126,7 +126,7 @@ class InMemoryMerchantOrderRepository implements InMemoryRepository, MerchantOrd
             }
         }
 
-        throw new CouldNotFindOrder('No order found by reference ' . $orderReference->get());
+        throw new CouldNotFindOrder('No order found by reference '.$orderReference->get());
     }
 
     public function existsCart(OrderId $orderId): bool

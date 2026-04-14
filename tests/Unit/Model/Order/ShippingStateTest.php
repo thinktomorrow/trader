@@ -1,18 +1,23 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Tests\Unit\Model\Order;
 
 use Tests\Unit\TestCase;
+use Thinktomorrow\Trader\Domain\Model\Order\Order;
 use Thinktomorrow\Trader\Domain\Model\Order\Shipping\DefaultShippingState;
+use Thinktomorrow\Trader\Domain\Model\Order\Shipping\Shipping;
 use Thinktomorrow\Trader\Domain\Model\Order\Shipping\ShippingStateMachine;
 use Thinktomorrow\Trader\Infrastructure\Laravel\Models\MerchantOrder\DefaultMerchantOrderShipping;
 
 class ShippingStateTest extends TestCase
 {
     private ShippingStateMachine $machine;
-    private \Thinktomorrow\Trader\Domain\Model\Order\Order $order;
-    private \Thinktomorrow\Trader\Domain\Model\Order\Shipping\Shipping $shipping;
+
+    private Order $order;
+
+    private Shipping $shipping;
 
     protected function setUp(): void
     {

@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Thinktomorrow\Trader\Application\Promo\OrderPromo\Conditions;
@@ -30,7 +31,7 @@ final class MinimumLinesQuantityOrderCondition implements OrderCondition
     {
         $data = json_decode($state['data'], true);
 
-        $condition = new static();
+        $condition = new self;
         $condition->minimum_quantity = $data['minimum_quantity'];
 
         return $condition;

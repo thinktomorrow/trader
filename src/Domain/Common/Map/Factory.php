@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Thinktomorrow\Trader\Domain\Common\Map;
@@ -18,7 +19,7 @@ class Factory
     public function findMappable(string $key): string
     {
         if (! isset($this->mapping[$key])) {
-            throw new \RuntimeException('No mappable class found by key ' . $key);
+            throw new \RuntimeException('No mappable class found by key '.$key);
         }
 
         return $this->mapping[$key];

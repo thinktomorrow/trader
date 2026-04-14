@@ -14,6 +14,7 @@ use Thinktomorrow\Trader\Infrastructure\Vies\ViesVatNumberValidator;
 class ViesVatNumberValidatorTest extends TestCase
 {
     private ViesVatNumberValidator $validator;
+
     private $viesClientMock;
 
     protected function setUp(): void
@@ -31,7 +32,7 @@ class ViesVatNumberValidatorTest extends TestCase
 
         $this->viesClientMock
             ->method('check')
-            ->willReturn((object)['valid' => true]);
+            ->willReturn((object) ['valid' => true]);
 
         $result = $this->validator->validate($vatNumber);
 
@@ -45,7 +46,7 @@ class ViesVatNumberValidatorTest extends TestCase
 
         $this->viesClientMock
             ->method('check')
-            ->willReturn((object)['valid' => false]);
+            ->willReturn((object) ['valid' => false]);
 
         $result = $this->validator->validate($vatNumber);
 

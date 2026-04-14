@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Thinktomorrow\Trader\Infrastructure\Laravel\Models\MerchantOrder;
@@ -26,8 +27,8 @@ class DefaultMerchantOrderLine extends OrderReadLine implements MerchantOrderLin
             }
 
             $result[] = [
-                'label' => data_get($taxon, 'data.taxonomy_data.title.' . app()->getLocale()) ?? null,
-                'value' => data_get($taxon, 'data.taxon_data.title.' . app()->getLocale()) ?? null,
+                'label' => data_get($taxon, 'data.taxonomy_data.title.'.app()->getLocale()) ?? null,
+                'value' => data_get($taxon, 'data.taxon_data.title.'.app()->getLocale()) ?? null,
             ];
         }
 

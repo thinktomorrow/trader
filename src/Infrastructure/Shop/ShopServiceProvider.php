@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Thinktomorrow\Trader\Infrastructure\Shop;
@@ -13,14 +14,12 @@ use Thinktomorrow\Trader\Infrastructure\Shop\CustomerAuth\Middleware\CustomerVer
 
 class ShopServiceProvider extends ServiceProvider
 {
-    public function register()
-    {
-    }
+    public function register() {}
 
     public function boot()
     {
         // Default setup for customer auth routes: this should be set up per project.
-        $this->loadRoutesFrom(__DIR__ . '/CustomerAuth/routes.php');
+        $this->loadRoutesFrom(__DIR__.'/CustomerAuth/routes.php');
 
         $this->bootCustomerGuard();
     }
@@ -33,17 +32,17 @@ class ShopServiceProvider extends ServiceProvider
         $this->app->make(Router::class)->aliasMiddleware('customer-verified', CustomerVerified::class);
         $this->app->make(Router::class)->aliasMiddleware('customer-signed', CustomerValidateSignature::class);
 
-        $this->app['config']["auth.providers.customer"] = [
+        $this->app['config']['auth.providers.customer'] = [
             'driver' => 'eloquent',
             'model' => CustomerModel::class,
         ];
 
-        $this->app['config']["auth.guards.customer"] = [
+        $this->app['config']['auth.guards.customer'] = [
             'driver' => 'session',
             'provider' => 'customer',
         ];
 
-        $this->app['config']["auth.passwords.customer"] = [
+        $this->app['config']['auth.passwords.customer'] = [
             'provider' => 'customer',
             'table' => 'trader_customer_password_resets',
             'expire' => 60,

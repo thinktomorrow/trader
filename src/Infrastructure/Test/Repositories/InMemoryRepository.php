@@ -2,7 +2,4 @@
 
 namespace Thinktomorrow\Trader\Infrastructure\Test\Repositories;
 
-interface InMemoryRepository
-{
-
-}
+interface InMemoryRepository {}

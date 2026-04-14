@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Tests\Infrastructure\Auth;
@@ -9,10 +10,11 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Notification;
-use function route;
 use Tests\Infrastructure\TestCase;
 use Thinktomorrow\Trader\Domain\Model\Customer\Events\CustomerHasLoggedIn;
 use Thinktomorrow\Trader\Infrastructure\Shop\CustomerAuth\CustomerModel;
+
+use function route;
 
 class CustomerRegisterTest extends TestCase
 {
@@ -25,8 +27,8 @@ class CustomerRegisterTest extends TestCase
         Mail::fake();
         Notification::fake();
 
-        $this->app['view']->addLocation(__DIR__ . '/views');
-        $this->app['view']->addNamespace('trader', __DIR__ . '/views/shop');
+        $this->app['view']->addLocation(__DIR__.'/views');
+        $this->app['view']->addNamespace('trader', __DIR__.'/views/shop');
     }
 
     public function test_it_shows_register_form()
@@ -139,7 +141,7 @@ class CustomerRegisterTest extends TestCase
 
     private function createDummyCustomer(): CustomerModel
     {
-        $model = new CustomerModel();
+        $model = new CustomerModel;
         $model->customer_id = 'cust_12345';
         $model->email = 'ben@thinktomorrow.be';
         $model->password = bcrypt('22222222');

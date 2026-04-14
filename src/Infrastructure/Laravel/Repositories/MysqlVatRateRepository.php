@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Thinktomorrow\Trader\Infrastructure\Laravel\Repositories;
@@ -20,6 +21,7 @@ use Thinktomorrow\Trader\Infrastructure\Laravel\config\TraderConfig;
 class MysqlVatRateRepository implements VatRateRepository
 {
     private static $vatRateTable = 'trader_vat_rates';
+
     private static $baseRateTable = 'trader_vat_base_rates';
 
     private ContainerInterface $container;
@@ -60,11 +62,11 @@ class MysqlVatRateRepository implements VatRateRepository
     public function find(VatRateId $vatRateId): VatRate
     {
         $vatRateState = DB::table(static::$vatRateTable)
-            ->where(static::$vatRateTable . '.vat_rate_id', $vatRateId->get())
+            ->where(static::$vatRateTable.'.vat_rate_id', $vatRateId->get())
             ->first();
 
         if (! $vatRateState) {
-            throw new CouldNotFindVatRate('No vatRate found by id [' . $vatRateId->get() . ']');
+            throw new CouldNotFindVatRate('No vatRate found by id ['.$vatRateId->get().']');
         }
 
         return $this->makeWithChildEntities($vatRateId->get(), $vatRateState);
@@ -77,28 +79,28 @@ class MysqlVatRateRepository implements VatRateRepository
 
     public function nextReference(): VatRateId
     {
-        return VatRateId::fromString((string)Uuid::uuid4());
+        return VatRateId::fromString((string) Uuid::uuid4());
     }
 
     public function nextBaseRateReference(): BaseRateId
     {
-        return BaseRateId::fromString((string)Uuid::uuid4());
+        return BaseRateId::fromString((string) Uuid::uuid4());
     }
 
     private function makeWithChildEntities(string $vatRateId, $vatRateState): VatRate
     {
-        $vatRateState = (array)$vatRateState;
-        $vatRateState['is_standard'] = (bool)$vatRateState['is_standard'];
+        $vatRateState = (array) $vatRateState;
+        $vatRateState['is_standard'] = (bool) $vatRateState['is_standard'];
 
         $baseRateStates = DB::table(static::$baseRateTable)
-            ->join(static::$vatRateTable, static::$baseRateTable . '.origin_vat_rate_id', '=', static::$vatRateTable . '.vat_rate_id')
-            ->where(static::$baseRateTable . '.target_vat_rate_id', $vatRateId)
-            ->select([static::$baseRateTable . '.*', static::$vatRateTable . '.rate'])
+            ->join(static::$vatRateTable, static::$baseRateTable.'.origin_vat_rate_id', '=', static::$vatRateTable.'.vat_rate_id')
+            ->where(static::$baseRateTable.'.target_vat_rate_id', $vatRateId)
+            ->select([static::$baseRateTable.'.*', static::$vatRateTable.'.rate'])
             ->get()
-            ->map(fn ($item) => (array)$item)
+            ->map(fn ($item) => (array) $item)
             ->toArray();
 
-        return VatRate::fromMappedData((array)$vatRateState, [
+        return VatRate::fromMappedData((array) $vatRateState, [
             BaseRate::class => $baseRateStates,
         ]);
     }

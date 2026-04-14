@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Thinktomorrow\Trader\Application\Taxon\Queries;
@@ -16,9 +17,6 @@ interface TaxonFilters
 
     /**
      * Get all root taxa as available filters for the given taxonomy
-     *
-     * @param string $taxonomyId
-     * @return array
      */
     public function getAvailableFiltersByRoots(string $taxonomyId): array;
 

@@ -20,7 +20,7 @@ class InMemoryCustomerLoginRepository implements CustomerLoginRepository
     public function find(CustomerId $customerId): CustomerLogin
     {
         if (! isset(self::$items[$customerId->get()])) {
-            throw new CouldNotFindCustomer('No customer found by id [' . $customerId->get() . ']');
+            throw new CouldNotFindCustomer('No customer found by id ['.$customerId->get().']');
         }
 
         return self::$items[$customerId->get()];

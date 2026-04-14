@@ -9,9 +9,7 @@ use Thinktomorrow\Trader\Domain\Model\Order\OrderVatSnapshot;
 
 class AdjustOrderVatSnapshot implements Adjuster
 {
-    public function __construct(private VatAllocator $vatAllocator)
-    {
-    }
+    public function __construct(private VatAllocator $vatAllocator) {}
 
     public function adjust(Order $order): void
     {

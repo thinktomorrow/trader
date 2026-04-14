@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Thinktomorrow\Trader\Application\Product\Grid;
@@ -23,6 +24,7 @@ interface GridItem
 
     /**
      * All related VariantTaxon and ProductTaxon objects.
+     *
      * @return array<VariantTaxonItem|ProductTaxonItem>
      */
     public function getTaxa(): array;

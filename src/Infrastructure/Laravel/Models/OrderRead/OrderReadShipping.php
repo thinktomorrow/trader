@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Thinktomorrow\Trader\Infrastructure\Laravel\Models\OrderRead;
@@ -11,25 +12,27 @@ abstract class OrderReadShipping
 {
     use RendersData;
     use RendersMoney;
-    use WithServiceTotals;
     use WithFormattedServiceTotals;
+    use WithServiceTotals;
 
     protected string $shipping_id;
+
     protected ?string $shipping_profile_id;
+
     protected ShippingState $state;
+
     protected iterable $discounts;
+
     protected array $data;
 
-    final public function __construct()
-    {
-    }
+    final public function __construct() {}
 
     public static function fromMappedData(array $state, array $orderState, iterable $discounts): static
     {
-        $shipping = new static();
+        $shipping = new static;
 
         if (! $state['shipping_state'] instanceof ShippingState) {
-            throw new \InvalidArgumentException('Shipping state is expected to be instance of ShippingState. Instead ' . gettype($state['shipping_state']) . ' is passed.');
+            throw new \InvalidArgumentException('Shipping state is expected to be instance of ShippingState. Instead '.gettype($state['shipping_state']).' is passed.');
         }
 
         $shipping->shipping_id = $state['shipping_id'];

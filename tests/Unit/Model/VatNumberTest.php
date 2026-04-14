@@ -26,7 +26,7 @@ class VatNumberTest extends TestCase
 
         $this->assertEquals('NL', $vatNumber->getCountryCode());
         $this->assertEquals('123456789B01', $vatNumber->getNumber());
-        $this->assertEquals('NL123456789B01', (string)$vatNumber);
+        $this->assertEquals('NL123456789B01', (string) $vatNumber);
     }
 
     public function test_it_throws_an_exception_for_invalid_country_code()
@@ -57,7 +57,7 @@ class VatNumberTest extends TestCase
     {
         $vatNumber = VatNumber::make(CountryId::fromString('DE'), 'DE 123-456.789,00');
 
-        $this->assertEquals('DE12345678900', (string)$vatNumber);
+        $this->assertEquals('DE12345678900', (string) $vatNumber);
     }
 
     public function test_it_compares_two_vat_numbers_correctly()
@@ -74,7 +74,7 @@ class VatNumberTest extends TestCase
     {
         $vatNumber = VatNumber::make(CountryId::fromString('ES'), 'ESX12345678');
 
-        $this->assertEquals('ESX12345678', (string)$vatNumber);
+        $this->assertEquals('ESX12345678', (string) $vatNumber);
     }
 
     public function test_it_correctly_finds_an_included_country_code()

@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Thinktomorrow\Trader\Infrastructure\Test\Repositories;
@@ -13,9 +14,10 @@ use Thinktomorrow\Trader\Domain\Common\Locale;
 use Thinktomorrow\Trader\Domain\Model\Taxon\TaxonId;
 use Thinktomorrow\Trader\TraderConfig;
 
-final class InMemoryTaxonTreeRepository implements TaxonTreeRepository, CategoryRepository, InMemoryRepository
+final class InMemoryTaxonTreeRepository implements CategoryRepository, InMemoryRepository, TaxonTreeRepository
 {
     private ContainerInterface $container;
+
     private Locale $locale;
 
     public function __construct(ContainerInterface $container, TraderConfig $traderConfig)
@@ -64,7 +66,7 @@ final class InMemoryTaxonTreeRepository implements TaxonTreeRepository, Category
         $taxonNode = $this->getTree()->find(fn (TaxonNode $taxonNode) => $taxonNode->getId() == $taxonId);
 
         if (! $taxonNode) {
-            throw new \RuntimeException('No taxon record found by id ' . $taxonId);
+            throw new \RuntimeException('No taxon record found by id '.$taxonId);
         }
 
         return $taxonNode;

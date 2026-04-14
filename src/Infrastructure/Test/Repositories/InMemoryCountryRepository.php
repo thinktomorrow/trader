@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Thinktomorrow\Trader\Infrastructure\Test\Repositories;
@@ -9,7 +10,7 @@ use Thinktomorrow\Trader\Domain\Model\Country\CountryId;
 use Thinktomorrow\Trader\Domain\Model\Country\CountryRepository;
 use Thinktomorrow\Trader\Domain\Model\Country\Exceptions\CouldNotFindCountry;
 
-class InMemoryCountryRepository implements CountryRepository, BillingCountryRepository, InMemoryRepository
+class InMemoryCountryRepository implements BillingCountryRepository, CountryRepository, InMemoryRepository
 {
     public static array $countries = [];
 
@@ -21,7 +22,7 @@ class InMemoryCountryRepository implements CountryRepository, BillingCountryRepo
     public function find(CountryId $countryId): Country
     {
         if (! isset(static::$countries[$countryId->get()])) {
-            throw new CouldNotFindCountry('No country found by id ' . $countryId->get());
+            throw new CouldNotFindCountry('No country found by id '.$countryId->get());
         }
 
         return static::$countries[$countryId->get()];
@@ -30,7 +31,7 @@ class InMemoryCountryRepository implements CountryRepository, BillingCountryRepo
     public function delete(CountryId $countryId): void
     {
         if (! isset(static::$countries[$countryId->get()])) {
-            throw new CouldNotFindCountry('No available country found by id ' . $countryId->get());
+            throw new CouldNotFindCountry('No available country found by id '.$countryId->get());
         }
 
         unset(static::$countries[$countryId->get()]);
@@ -54,6 +55,6 @@ class InMemoryCountryRepository implements CountryRepository, BillingCountryRepo
             }
         }
 
-        throw new CouldNotFindCountry('No country found by id ' . $countryId->get());
+        throw new CouldNotFindCountry('No country found by id '.$countryId->get());
     }
 }

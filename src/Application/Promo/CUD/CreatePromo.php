@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Thinktomorrow\Trader\Application\Promo\CUD;
@@ -6,9 +7,13 @@ namespace Thinktomorrow\Trader\Application\Promo\CUD;
 class CreatePromo
 {
     protected ?string $couponCode;
+
     protected ?string $startAt;
+
     protected ?string $endAt;
+
     protected bool $isCombinable;
+
     protected array $data;
 
     public function __construct(?string $couponCode, ?string $startAt, ?string $endAt, bool $isCombinable, array $data)

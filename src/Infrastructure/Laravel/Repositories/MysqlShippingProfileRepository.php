@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Thinktomorrow\Trader\Infrastructure\Laravel\Repositories;
@@ -8,6 +9,7 @@ use Psr\Container\ContainerInterface;
 use Ramsey\Uuid\Uuid;
 use Thinktomorrow\Trader\Application\Cart\ShippingProfile\ShippingProfileForCart;
 use Thinktomorrow\Trader\Application\Cart\ShippingProfile\ShippingProfileForCartRepository;
+use Thinktomorrow\Trader\Application\Country\Country;
 use Thinktomorrow\Trader\Application\Country\ShippingCountryRepository;
 use Thinktomorrow\Trader\Domain\Model\Country\CountryId;
 use Thinktomorrow\Trader\Domain\Model\ShippingProfile\Exceptions\CouldNotFindShippingProfile;
@@ -18,11 +20,14 @@ use Thinktomorrow\Trader\Domain\Model\ShippingProfile\ShippingProfileState;
 use Thinktomorrow\Trader\Domain\Model\ShippingProfile\Tariff;
 use Thinktomorrow\Trader\Domain\Model\ShippingProfile\TariffId;
 
-class MysqlShippingProfileRepository implements ShippingProfileRepository, ShippingProfileForCartRepository, ShippingCountryRepository
+class MysqlShippingProfileRepository implements ShippingCountryRepository, ShippingProfileForCartRepository, ShippingProfileRepository
 {
     private static $shippingProfileTable = 'trader_shipping_profiles';
+
     private static $shippingProfileTariffTable = 'trader_shipping_profile_tariffs';
+
     private static $shippingProfileCountryTable = 'trader_shipping_profile_countries';
+
     private static $countryTable = 'trader_countries';
 
     private ContainerInterface $container;
@@ -77,31 +82,29 @@ class MysqlShippingProfileRepository implements ShippingProfileRepository, Shipp
     public function find(ShippingProfileId $shippingProfileId): ShippingProfile
     {
         $shippingProfileState = DB::table(static::$shippingProfileTable)
-            ->where(static::$shippingProfileTable . '.shipping_profile_id', $shippingProfileId->get())
+            ->where(static::$shippingProfileTable.'.shipping_profile_id', $shippingProfileId->get())
             ->first();
 
         if (! $shippingProfileState) {
-            throw new CouldNotFindShippingProfile('No shipping profile found by id [' . $shippingProfileId->get() . ']');
+            throw new CouldNotFindShippingProfile('No shipping profile found by id ['.$shippingProfileId->get().']');
         }
 
         $tariffStates = DB::table(static::$shippingProfileTariffTable)
-            ->where(static::$shippingProfileTariffTable . '.shipping_profile_id', $shippingProfileId->get())
+            ->where(static::$shippingProfileTariffTable.'.shipping_profile_id', $shippingProfileId->get())
             ->get()
-            ->map(fn ($item) => (array)$item)
+            ->map(fn ($item) => (array) $item)
             ->toArray();
 
         $countryStates = DB::table(static::$shippingProfileCountryTable)
             ->join(static::$countryTable, static::$shippingProfileCountryTable.'.country_id', '=', static::$countryTable.'.country_id')
-            ->where(static::$shippingProfileCountryTable . '.shipping_profile_id', $shippingProfileId->get())
-            ->where(static::$countryTable . '.active', '1')
+            ->where(static::$shippingProfileCountryTable.'.shipping_profile_id', $shippingProfileId->get())
+            ->where(static::$countryTable.'.active', '1')
             ->select(static::$countryTable.'.country_id')
             ->get()
-            ->map(fn ($item) => (array)$item)
+            ->map(fn ($item) => (array) $item)
             ->toArray();
 
-
-
-        return ShippingProfile::fromMappedData(array_merge((array)$shippingProfileState, [
+        return ShippingProfile::fromMappedData(array_merge((array) $shippingProfileState, [
             'requires_address' => (bool) $shippingProfileState->requires_address,
         ]), [
             Tariff::class => $tariffStates,
@@ -116,27 +119,27 @@ class MysqlShippingProfileRepository implements ShippingProfileRepository, Shipp
 
     public function nextReference(): ShippingProfileId
     {
-        return ShippingProfileId::fromString((string)Uuid::uuid4());
+        return ShippingProfileId::fromString((string) Uuid::uuid4());
     }
 
     public function nextTariffReference(): TariffId
     {
-        return TariffId::fromString((string)Uuid::uuid4());
+        return TariffId::fromString((string) Uuid::uuid4());
     }
 
     public function getAvailableShippingCountries(): iterable
     {
         $countryStates = DB::table(static::$countryTable)
             ->join(static::$shippingProfileCountryTable, static::$countryTable.'.country_id', '=', static::$shippingProfileCountryTable.'.country_id')
-            ->where(static::$countryTable . '.active', '1')
+            ->where(static::$countryTable.'.active', '1')
             ->groupBy(static::$countryTable.'.country_id')
             ->select(static::$countryTable.'.*')
             ->orderBy(static::$countryTable.'.order_column')
             ->get()
-            ->map(fn ($item) => (array)$item)
+            ->map(fn ($item) => (array) $item)
             ->toArray();
 
-        return array_map(fn ($countryState) => \Thinktomorrow\Trader\Application\Country\Country::fromMappedData($countryState), $countryStates);
+        return array_map(fn ($countryState) => Country::fromMappedData($countryState), $countryStates);
     }
 
     public function findAllShippingProfilesForCart(?string $countryId = null): array
@@ -147,13 +150,13 @@ class MysqlShippingProfileRepository implements ShippingProfileRepository, Shipp
 
         if ($countryId) {
             $builder->leftJoin(static::$shippingProfileCountryTable, static::$shippingProfileTable.'.shipping_profile_id', '=', static::$shippingProfileCountryTable.'.shipping_profile_id')
-                ->where(static::$shippingProfileCountryTable . '.country_id', $countryId)
+                ->where(static::$shippingProfileCountryTable.'.country_id', $countryId)
                 ->select(static::$shippingProfileTable.'.*');
         }
 
         return $builder
             ->get()
-            ->map(fn ($shippingProfileState) => $this->container->get(ShippingProfileForCart::class)::fromMappedData(array_merge((array)$shippingProfileState, [
+            ->map(fn ($shippingProfileState) => $this->container->get(ShippingProfileForCart::class)::fromMappedData(array_merge((array) $shippingProfileState, [
                 'requires_address' => (bool) $shippingProfileState->requires_address,
             ])))
             ->toArray();

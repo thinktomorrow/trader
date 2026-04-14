@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Thinktomorrow\Trader\Infrastructure\Test\Repositories;
@@ -11,7 +12,7 @@ use Thinktomorrow\Trader\Domain\Model\Product\ProductTaxa\ProductTaxon;
 use Thinktomorrow\Trader\Domain\Model\Product\Variant\Variant;
 use Thinktomorrow\Trader\Domain\Model\Taxonomy\TaxonomyType;
 
-final class InMemoryProductRepository implements ProductRepository, InMemoryRepository
+final class InMemoryProductRepository implements InMemoryRepository, ProductRepository
 {
     public static array $products = [];
 
@@ -23,23 +24,23 @@ final class InMemoryProductRepository implements ProductRepository, InMemoryRepo
     {
         $this->extractVariantProperties($product);
 
-        static::$products[$product->productId->get()] = $product;
+        self::$products[$product->productId->get()] = $product;
 
         foreach ($product->getVariants() as $variant) {
-            (new InMemoryVariantRepository())->save($variant);
+            (new InMemoryVariantRepository)->save($variant);
         }
 
-        static::$productTaxonLookup[$product->productId->get()] = array_map(fn (ProductTaxon $productTaxon) => $productTaxon->taxonId->get(), $product->getProductTaxa());
+        self::$productTaxonLookup[$product->productId->get()] = array_map(fn (ProductTaxon $productTaxon) => $productTaxon->taxonId->get(), $product->getProductTaxa());
     }
 
     public static function getProductsFromLookup(string $taxonId): array
     {
-        return array_keys(array_filter(static::$productTaxonLookup, fn ($taxonIds) => in_array($taxonId, $taxonIds)));
+        return array_keys(array_filter(self::$productTaxonLookup, fn ($taxonIds) => in_array($taxonId, $taxonIds)));
     }
 
     public static function getGridProductVariantPairsFromLookup(string $taxonId): array
     {
-        $productIds = array_keys(array_filter(static::$productTaxonLookup, fn ($taxonIds) => in_array($taxonId, $taxonIds)));
+        $productIds = array_keys(array_filter(self::$productTaxonLookup, fn ($taxonIds) => in_array($taxonId, $taxonIds)));
 
         $pairs = [];
 
@@ -57,20 +58,20 @@ final class InMemoryProductRepository implements ProductRepository, InMemoryRepo
 
     public function find(ProductId $productId): Product
     {
-        if (! isset(static::$products[$productId->get()])) {
-            throw new CouldNotFindProduct('No product found by id ' . $productId);
+        if (! isset(self::$products[$productId->get()])) {
+            throw new CouldNotFindProduct('No product found by id '.$productId);
         }
 
-        return static::$products[$productId->get()];
+        return self::$products[$productId->get()];
     }
 
     public function delete(ProductId $productId): void
     {
-        if (! isset(static::$products[$productId->get()])) {
-            throw new CouldNotFindProduct('No product found by id ' . $productId);
+        if (! isset(self::$products[$productId->get()])) {
+            throw new CouldNotFindProduct('No product found by id '.$productId);
         }
 
-        unset(static::$products[$productId->get()]);
+        unset(self::$products[$productId->get()]);
     }
 
     public function nextReference(): ProductId
@@ -86,7 +87,7 @@ final class InMemoryProductRepository implements ProductRepository, InMemoryRepo
 
     public static function clear()
     {
-        static::$products = [];
+        self::$products = [];
     }
 
     //    public function findVariantForCart(VariantId $variantId): VariantForCart
@@ -103,11 +104,11 @@ final class InMemoryProductRepository implements ProductRepository, InMemoryRepo
     //    }
     public function getProductTaxonStatesByProduct(string $productId): array
     {
-        if (! isset(static::$products[$productId])) {
-            throw new CouldNotFindProduct('No product found by id ' . $productId);
+        if (! isset(self::$products[$productId])) {
+            throw new CouldNotFindProduct('No product found by id '.$productId);
         }
 
-        return static::$products[$productId]->getChildEntities()[ProductTaxon::class] ?? [];
+        return self::$products[$productId]->getChildEntities()[ProductTaxon::class] ?? [];
     }
 
     public function getProductTaxaByTaxonIds(string $productId, array $taxonIds): array

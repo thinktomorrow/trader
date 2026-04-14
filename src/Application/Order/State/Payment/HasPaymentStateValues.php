@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Thinktomorrow\Trader\Application\Order\State\Payment;
@@ -9,7 +10,9 @@ use Thinktomorrow\Trader\Domain\Model\Order\Payment\PaymentId;
 trait HasPaymentStateValues
 {
     private string $orderId;
+
     private string $paymentId;
+
     private array $data;
 
     public function __construct(string $orderId, string $paymentId, array $data = [])

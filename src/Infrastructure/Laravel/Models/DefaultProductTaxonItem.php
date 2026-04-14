@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Thinktomorrow\Trader\Infrastructure\Laravel\Models;
@@ -19,14 +20,20 @@ class DefaultProductTaxonItem implements ProductTaxonItem
     protected string $productId;
 
     protected readonly string $taxonId;
+
     protected readonly string $taxonomyId;
+
     protected readonly TaxonomyType $taxonomyType;
+
     protected readonly bool $showsInGrid;
+
     protected TaxonState $taxonState;
 
     /** @var array|TaxonKey[] */
     protected array $keys;
+
     protected iterable $images = [];
+
     protected array $data;
 
     public function __construct(string $productId, string $taxonId, string $taxonomyId, TaxonomyType $taxonomyType, bool $showsInGrid, TaxonState $taxonState, array $taxonKeys, array $data)
@@ -49,7 +56,7 @@ class DefaultProductTaxonItem implements ProductTaxonItem
             $state['taxon_id'],
             $state['taxonomy_id'],
             TaxonomyType::from($state['taxonomy_type']),
-            (bool)$state['shows_in_grid'],
+            (bool) $state['shows_in_grid'],
             self::determineStateFlag($state),
             $keys,
             array_merge(

@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Thinktomorrow\Trader\Application\Cart\Line;
@@ -10,9 +11,13 @@ use Thinktomorrow\Trader\Domain\Model\Product\Variant\VariantId;
 final class AddLine
 {
     private string $orderId;
+
     private string $variantId;
+
     private int $quantity;
+
     private array $personalisations;
+
     private array $data;
 
     public function __construct(string $orderId, string $variantId, int $quantity, array $personalisations, array $data)

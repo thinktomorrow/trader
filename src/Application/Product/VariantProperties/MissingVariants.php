@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Thinktomorrow\Trader\Application\Product\VariantProperties;
@@ -15,6 +16,7 @@ use Thinktomorrow\Trader\Domain\Model\Taxonomy\TaxonomyRepository;
 class MissingVariants
 {
     private TaxonRepository $taxonRepository;
+
     private TaxonomyRepository $taxonomyRepository;
 
     public function __construct(TaxonomyRepository $taxonomyRepository, TaxonRepository $taxonRepository)
@@ -75,7 +77,7 @@ class MissingVariants
                 $value = $taxon->getData($taxonLabelKey);
 
                 if ($label && $value) {
-                    $missingCombinations[$i][$j] = $label . ': ' . $value;
+                    $missingCombinations[$i][$j] = $label.': '.$value;
                 } elseif ($value) {
                     $missingCombinations[$i][$j] = $value;
                 } else {
@@ -87,10 +89,6 @@ class MissingVariants
         return $missingCombinations;
     }
 
-    /**
-     * @param Collection $groupedByTaxonomy
-     * @return Collection
-     */
     private function createMatrix(Collection $groupedByTaxonomy): Collection
     {
         $firstTaxonomyId = $groupedByTaxonomy->keys()->first();
@@ -108,11 +106,7 @@ class MissingVariants
         return $matrix;
     }
 
-    /**
-     * @param \Illuminate\Support\Collection $matrix
-     * @return \Illuminate\Support\Collection
-     */
-    private function join(\Illuminate\Support\Collection $matrix, array $values): \Illuminate\Support\Collection
+    private function join(Collection $matrix, array $values): Collection
     {
         $matrix = $matrix->crossJoin($values);
 

@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Tests\Acceptance\Order\Merchant;
@@ -27,7 +28,7 @@ class VerifyVatNumberTest extends CartContext
         $this->orderContext->addBillingAddressToOrder($order, $billingAddress);
         $this->orderContext->addShopperToOrder($order, $shopper);
 
-        (new TestContainer())->get(VatNumberValidator::class)->setExpectedResult(new VatNumberValidation('BE', '0123456789', VatNumberValidationState::invalid, []));
+        (new TestContainer)->get(VatNumberValidator::class)->setExpectedResult(new VatNumberValidation('BE', '0123456789', VatNumberValidationState::invalid, []));
 
         $this->orderContext->apps()->merchantOrderApplication()->verifyVatNumber(new VerifyVatNumber(
             $order->orderId->get(),

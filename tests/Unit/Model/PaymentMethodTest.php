@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Tests\Unit\Model;
@@ -26,7 +27,7 @@ class PaymentMethodTest extends TestCase
             'provider_id' => $paymentMethodProviderId->get(),
             'state' => PaymentMethodState::online->value,
             'rate' => '10',
-            'data' => "[]",
+            'data' => '[]',
         ], $paymentMethod->getMappedData());
     }
 

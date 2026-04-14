@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Thinktomorrow\Trader\Infrastructure\Test\Repositories;
@@ -19,30 +20,35 @@ use Thinktomorrow\Trader\Domain\Model\Order\Payment\PaymentId;
 use Thinktomorrow\Trader\Domain\Model\Order\Shipping\ShippingId;
 use Thinktomorrow\Trader\Domain\Model\Order\ShopperId;
 
-final class InMemoryOrderRepository implements OrderRepository, InvoiceRepository, InMemoryRepository
+final class InMemoryOrderRepository implements InMemoryRepository, InvoiceRepository, OrderRepository
 {
     /** @var Order[] */
     public static array $orders = [];
 
     private string $nextReference = 'xxx-123';
+
     private string $nextShippingReference = 'shipping-123';
+
     private string $nextPaymentReference = 'payment-123';
+
     private string $nextShopperReference = 'shopper-123';
+
     private string $nextDiscountReference = 'discount-123';
+
     private string $nextLineReference = 'line';
 
     public function save(Order $order): void
     {
-        static::$orders[$order->orderId->get()] = $order;
+        self::$orders[$order->orderId->get()] = $order;
     }
 
     public function find(OrderId $orderId): Order
     {
-        if (! isset(static::$orders[$orderId->get()])) {
-            throw new CouldNotFindOrder('No order found by id ' . $orderId);
+        if (! isset(self::$orders[$orderId->get()])) {
+            throw new CouldNotFindOrder('No order found by id '.$orderId);
         }
 
-        return static::$orders[$orderId->get()];
+        return self::$orders[$orderId->get()];
     }
 
     public function findForCart(OrderId $orderId): Order
@@ -50,7 +56,7 @@ final class InMemoryOrderRepository implements OrderRepository, InvoiceRepositor
         $order = $this->find($orderId);
 
         if (! $order->inCustomerHands()) {
-            throw new OrderAlreadyInMerchantHands('Cannot fetch order for cart. Order is no longer in customer hands and has already the following state: ' . $order->getOrderState()->value);
+            throw new OrderAlreadyInMerchantHands('Cannot fetch order for cart. Order is no longer in customer hands and has already the following state: '.$order->getOrderState()->value);
         }
 
         return $order;
@@ -58,22 +64,22 @@ final class InMemoryOrderRepository implements OrderRepository, InvoiceRepositor
 
     public function delete(OrderId $orderId): void
     {
-        if (! isset(static::$orders[$orderId->get()])) {
-            throw new CouldNotFindOrder('No order found by id ' . $orderId);
+        if (! isset(self::$orders[$orderId->get()])) {
+            throw new CouldNotFindOrder('No order found by id '.$orderId);
         }
 
-        unset(static::$orders[$orderId->get()]);
+        unset(self::$orders[$orderId->get()]);
     }
 
     public function findIdByReference(OrderReference $orderReference): OrderId
     {
-        foreach (static::$orders as $order) {
+        foreach (self::$orders as $order) {
             if ($order->orderReference->equals($orderReference)) {
                 return $order->orderId;
             }
         }
 
-        throw new CouldNotFindOrder('No order found by reference ' . $orderReference->get());
+        throw new CouldNotFindOrder('No order found by reference '.$orderReference->get());
     }
 
     public function nextReference(): OrderId
@@ -84,18 +90,18 @@ final class InMemoryOrderRepository implements OrderRepository, InvoiceRepositor
     public function nextExternalReference(): OrderReference
     {
         return OrderReference::fromString(
-            date('ymdHis') . str_pad((string)mt_rand(1, 999), 3, "0")
+            date('ymdHis').str_pad((string) mt_rand(1, 999), 3, '0')
         );
     }
 
     public function nextInvoiceReference(): InvoiceReference
     {
-        return InvoiceReference::fromString('invoice- ' . $this->nextReference);
+        return InvoiceReference::fromString('invoice- '.$this->nextReference);
     }
 
     public function lastInvoiceReference(): ?InvoiceReference
     {
-        foreach (static::$orders as $order) {
+        foreach (self::$orders as $order) {
             return $order->getInvoiceReference();
         }
 
@@ -119,12 +125,12 @@ final class InMemoryOrderRepository implements OrderRepository, InvoiceRepositor
 
     public function nextDiscountReference(): DiscountId
     {
-        return DiscountId::fromString($this->nextDiscountReference . '-' . mt_rand(1, 999));
+        return DiscountId::fromString($this->nextDiscountReference.'-'.mt_rand(1, 999));
     }
 
     public function nextLineReference(): LineId
     {
-        return LineId::fromString($this->nextLineReference . '-' . mt_rand(1, 999));
+        return LineId::fromString($this->nextLineReference.'-'.mt_rand(1, 999));
     }
 
     public function setNextLineReference(string $nextLineReference): void
@@ -134,12 +140,12 @@ final class InMemoryOrderRepository implements OrderRepository, InvoiceRepositor
 
     public function nextLinePersonalisationReference(): LinePersonalisationId
     {
-        return LinePersonalisationId::fromString('' . mt_rand(1, 999));
+        return LinePersonalisationId::fromString(''.mt_rand(1, 999));
     }
 
     public function nextLogEntryReference(): OrderEventId
     {
-        return OrderEventId::fromString('entry_id_' . mt_rand(1, 999));
+        return OrderEventId::fromString('entry_id_'.mt_rand(1, 999));
     }
 
     // For testing purposes only
@@ -170,6 +176,6 @@ final class InMemoryOrderRepository implements OrderRepository, InvoiceRepositor
 
     public static function clear()
     {
-        static::$orders = [];
+        self::$orders = [];
     }
 }

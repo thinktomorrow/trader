@@ -26,13 +26,8 @@ use Thinktomorrow\Trader\Domain\Model\Order\Order;
  */
 final class VatAllocator
 {
-    public function __construct(private ProRateAllocator $proRateAllocator)
-    {
-    }
+    public function __construct(private ProRateAllocator $proRateAllocator) {}
 
-    /**
-     * @return VatAllocatedTotalPrices
-     */
     public function allocate(Order $order, Money $shipping, Money $payment, Money $discount): VatAllocatedTotalPrices
     {
         // Item bases per VAT
@@ -122,9 +117,7 @@ final class VatAllocator
      * The customer-facing including-VAT total can be set as authoritative.
      * Any rounding difference is then absorbed by the VAT amount.
      *
-     * @param array $amountsExclPerRate
-     * @param Money|null $authoritativeIncl
-     * @return VatAllocatedTotalPrice
+     * @param  Money|null  $authoritativeIncl
      */
     private function buildAllocatedServiceTotal(array $amountsExclPerRate): VatAllocatedTotalPrice
     {

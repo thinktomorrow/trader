@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Thinktomorrow\Trader\Domain\Model\Product;
@@ -19,25 +20,23 @@ use Thinktomorrow\Trader\Domain\Model\Taxonomy\TaxonomyType;
 
 class Product implements Aggregate
 {
-    use RecordsEvents;
-    use HasPersonalisations;
-    use HasVariants;
-    use HasProductTaxa;
     use HasData {
         addData as defaultAddData;
     }
+    use HasPersonalisations;
+    use HasProductTaxa;
+    use HasVariants;
+    use RecordsEvents;
 
     private ProductState $state;
 
     public readonly ProductId $productId;
 
-    private function __construct()
-    {
-    }
+    private function __construct() {}
 
     public static function create(ProductId $productId): static
     {
-        $product = new static();
+        $product = new static;
         $product->productId = $productId;
         $product->state = ProductState::offline;
 
@@ -89,7 +88,7 @@ class Product implements Aggregate
 
     public static function fromMappedData(array $state, array $childEntities = []): static
     {
-        $product = new static();
+        $product = new static;
         $product->productId = ProductId::fromString($state['product_id']);
         $product->state = ProductState::from($state['state']);
 

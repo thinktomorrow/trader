@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Thinktomorrow\Trader\Infrastructure\Laravel\Repositories;
@@ -19,13 +20,21 @@ class MysqlProductDetailRepository implements ProductDetailRepository
     use WithVariantKeysSelection;
 
     private static string $productTable = 'trader_products';
+
     private static string $variantTable = 'trader_product_variants';
+
     private static $variantKeysTable = 'trader_product_keys';
+
     private static string $taxonProductLookupTable = 'trader_taxa_products';
+
     private static string $taxonVariantLookupTable = 'trader_taxa_variants';
+
     private static string $taxonomyTable = 'trader_taxonomies';
+
     private static string $taxonTable = 'trader_taxa';
+
     private static $taxonKeysTable = 'trader_taxa_keys';
+
     private static $productPersonalisationsTable = 'trader_product_personalisations';
 
     private ContainerInterface $container;
@@ -56,40 +65,40 @@ class MysqlProductDetailRepository implements ProductDetailRepository
 
         // Basic builder query
         $builder = DB::table(static::$variantTable)
-            ->join(static::$productTable, static::$variantTable . '.product_id', '=', static::$productTable . '.product_id')
-            ->leftJoin(static::$variantKeysTable, static::$variantTable . '.variant_id', '=', static::$variantKeysTable . '.variant_id')
-            ->where(static::$variantTable . '.variant_id', $variantId->get())
+            ->join(static::$productTable, static::$variantTable.'.product_id', '=', static::$productTable.'.product_id')
+            ->leftJoin(static::$variantKeysTable, static::$variantTable.'.variant_id', '=', static::$variantKeysTable.'.variant_id')
+            ->where(static::$variantTable.'.variant_id', $variantId->get())
             ->select([
-                static::$variantTable . '.*',
-                static::$productTable . '.data AS product_data',
+                static::$variantTable.'.*',
+                static::$productTable.'.data AS product_data',
                 DB::raw("GROUP_CONCAT(DISTINCT $variantKeysSelect) AS variant_keys"),
             ])
             ->addSelect($this->container->get(ProductDetail::class)::stateSelect())
-            ->groupBy(static::$variantTable . '.variant_id');
+            ->groupBy(static::$variantTable.'.variant_id');
 
         if (! $allowOffline) {
-            $builder->whereIn(static::$productTable . '.state', ProductState::onlineStates());
+            $builder->whereIn(static::$productTable.'.state', ProductState::onlineStates());
         }
 
         $state = $builder->first();
 
         if (! $state) {
-            throw new CouldNotFindVariant('No online variant found by id [' . $variantId->get() . ']');
+            throw new CouldNotFindVariant('No online variant found by id ['.$variantId->get().']');
         }
 
-        $state = (array)$state;
+        $state = (array) $state;
 
         $personalisationStates = DB::table(static::$productPersonalisationsTable)
-            ->where(static::$productPersonalisationsTable . '.product_id', $state['product_id'])
+            ->where(static::$productPersonalisationsTable.'.product_id', $state['product_id'])
             ->get()
-            ->map(fn ($item) => (array)$item);
+            ->map(fn ($item) => (array) $item);
 
         $personalisations = $personalisationStates->map(fn ($personalisationState) => Personalisation::fromMappedData($personalisationState, $state))->all();
 
         return $this->container->get(ProductDetail::class)::fromMappedData(
             array_merge($state, [
-            'includes_vat' => (bool)$state['includes_vat'],
-        ]),
+                'includes_vat' => (bool) $state['includes_vat'],
+            ]),
             $this->getTaxaItems($state['product_id'], $state['variant_id']),
             $this->extractVariantKeys($state),
             $personalisations

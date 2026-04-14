@@ -12,9 +12,13 @@ final class OrderVatSnapshot
     private array $vatLines;
 
     private Money $shippingIncl;
+
     private Money $paymentIncl;
+
     private Money $discountIncl;
+
     private Money $totalVat;
+
     private Money $totalIncl;
 
     private function __construct(
@@ -48,7 +52,7 @@ final class OrderVatSnapshot
     /**
      * Factory used by application layer (VatAllocator)
      *
-     * @param VatAllocatedLine[] $vatLines
+     * @param  VatAllocatedLine[]  $vatLines
      */
     public static function fromVatAllocation(
         array $vatLines,
@@ -63,8 +67,8 @@ final class OrderVatSnapshot
         // Invariant 1: total_excl + total_vat === total_incl
         if (! $totalExcl->add($totalVat)->equals($totalIncl)) {
             throw new \LogicException(
-                'OrderVatSnapshot invariant violated: total_excl + total_vat must equal total_incl: [' .
-                $totalExcl->getAmount() . '] + [' . $totalVat->getAmount() . '] != [' . $totalIncl->getAmount() . ']'
+                'OrderVatSnapshot invariant violated: total_excl + total_vat must equal total_incl: ['.
+                $totalExcl->getAmount().'] + ['.$totalVat->getAmount().'] != ['.$totalIncl->getAmount().']'
             );
         }
 
@@ -81,8 +85,8 @@ final class OrderVatSnapshot
 
         if (! $vatSum->equals($totalVat)) {
             throw new \LogicException(
-                'OrderVatSnapshot invariant violated: sum of vat lines [' .
-                $vatSum->getAmount() . '] does not equal total vat [' . $totalVat->getAmount() . '].'
+                'OrderVatSnapshot invariant violated: sum of vat lines ['.
+                $vatSum->getAmount().'] does not equal total vat ['.$totalVat->getAmount().'].'
             );
         }
 
@@ -143,10 +147,10 @@ final class OrderVatSnapshot
     {
         if (! $totalExcl->add($this->totalVat)->equals($this->totalIncl)) {
             throw new VatSnapshotMismatchException(
-                'Stored VAT snapshot total incl [' . $this->totalIncl->getAmount() .
-                '] does not match current order totals excl [' .
-                $totalExcl->getAmount() . '] + vat [' .
-                $this->totalVat->getAmount() . '].'
+                'Stored VAT snapshot total incl ['.$this->totalIncl->getAmount().
+                '] does not match current order totals excl ['.
+                $totalExcl->getAmount().'] + vat ['.
+                $this->totalVat->getAmount().'].'
             );
         }
     }

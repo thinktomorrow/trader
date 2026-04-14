@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Thinktomorrow\Trader\Infrastructure\Laravel\Models\CustomerRead;
@@ -14,19 +15,22 @@ class DefaultCustomerRead implements CustomerRead
     use RendersData;
 
     private string $customerId;
+
     private ?CustomerShippingAddress $shippingAddress;
+
     private ?CustomerBillingAddress $billingAddress;
+
     private string $email;
+
     private bool $is_business;
+
     private array $data;
 
-    final private function __construct()
-    {
-    }
+    final private function __construct() {}
 
     public static function fromMappedData(array $state, array $childObjects): static
     {
-        $customer = new static();
+        $customer = new static;
 
         $customer->customerId = $state['customer_id'];
 

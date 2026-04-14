@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Tests\Infrastructure\Repositories;
@@ -84,7 +85,6 @@ class GridRepositoryTest extends TestCase
         $this->assertCount(0, $gridItem->getGridVariantProperties());
         $this->assertCount(0, $gridItem->getGridCollections());
         $this->assertCount(0, $gridItem->getGridTags());
-
 
     }
 

@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Thinktomorrow\Trader\Infrastructure\Laravel\Models\OrderRead;
@@ -11,19 +12,22 @@ abstract class Address
     use RendersData;
 
     protected ?CountryId $countryId;
+
     protected ?string $line1;
+
     protected ?string $line2;
+
     protected ?string $postalCode;
+
     protected ?string $city;
+
     protected array $data;
 
-    final public function __construct()
-    {
-    }
+    final public function __construct() {}
 
     public static function fromMappedData(array $state, array $orderState): static
     {
-        $address = new static();
+        $address = new static;
 
         $address->countryId = $state['country_id'] ? CountryId::fromString($state['country_id']) : null;
         $address->line1 = $state['line_1'];

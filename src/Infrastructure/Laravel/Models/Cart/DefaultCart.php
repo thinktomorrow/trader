@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Thinktomorrow\Trader\Infrastructure\Laravel\Models\Cart;
@@ -19,26 +20,32 @@ class DefaultCart implements Cart
 {
     use RendersData;
     use RendersMoney;
-    use WithImmutableOrderTotals;
     use WithFormattedOrderTotals;
+    use WithImmutableOrderTotals;
 
     protected string $orderId;
+
     protected iterable $lines;
+
     protected ?CartShippingAddress $shippingAddress;
+
     protected ?CartBillingAddress $billingAddress;
+
     protected ?CartShipping $shipping;
+
     protected ?CartPayment $payment;
+
     protected ?CartShopper $shopper;
+
     protected array $discounts;
+
     protected array $data;
 
-    final private function __construct()
-    {
-    }
+    final private function __construct() {}
 
     public static function fromMappedData(array $state, array $childObjects, array $discounts): static
     {
-        $cart = new static();
+        $cart = new static;
 
         $cart->orderId = $state['order_id'];
 
@@ -90,7 +97,7 @@ class DefaultCart implements Cart
 
     public function getQuantity(): int
     {
-        return array_reduce((array)$this->getLines(), fn ($carry, $line) => $carry + $line->getQuantity(), 0);
+        return array_reduce((array) $this->getLines(), fn ($carry, $line) => $carry + $line->getQuantity(), 0);
     }
 
     public function isVatExempt(): bool

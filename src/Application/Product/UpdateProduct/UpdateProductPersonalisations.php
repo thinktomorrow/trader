@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Thinktomorrow\Trader\Application\Product\UpdateProduct;
@@ -8,6 +9,7 @@ use Thinktomorrow\Trader\Domain\Model\Product\ProductId;
 class UpdateProductPersonalisations
 {
     private string $productId;
+
     private array $personalisations;
 
     public function __construct(string $productId, array $personalisations)

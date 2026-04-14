@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Thinktomorrow\Trader\Domain\Model\Order;
@@ -16,9 +17,13 @@ class Shopper implements ChildEntity, HasVatNumber
     use HasData;
 
     public readonly ShopperId $shopperId;
+
     private Email $email;
+
     private ?CustomerId $customerId = null;
+
     private bool $isBusiness;
+
     private Locale $locale;
 
     /**
@@ -27,13 +32,11 @@ class Shopper implements ChildEntity, HasVatNumber
      */
     private bool $registerAfterCheckout = false;
 
-    private function __construct()
-    {
-    }
+    private function __construct() {}
 
     public static function create(ShopperId $shopperId, Email $email, bool $isBusiness, Locale $locale): static
     {
-        $shopper = new static();
+        $shopper = new static;
         $shopper->shopperId = $shopperId;
         $shopper->email = $email;
         $shopper->isBusiness = $isBusiness;
@@ -94,7 +97,7 @@ class Shopper implements ChildEntity, HasVatNumber
 
     public function isVatNumberValid(): bool
     {
-        return ! ! $this->getData('vat_number_valid');
+        return (bool) $this->getData('vat_number_valid');
     }
 
     public function getVatNumberState(): VatNumberValidationState
@@ -140,7 +143,7 @@ class Shopper implements ChildEntity, HasVatNumber
 
     public static function fromMappedData(array $state, array $aggregateState): static
     {
-        $shopper = new static();
+        $shopper = new static;
         $shopper->shopperId = ShopperId::fromString($state['shopper_id']);
         $shopper->email = Email::fromString($state['email']);
         $shopper->isBusiness = $state['is_business'];

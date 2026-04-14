@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Thinktomorrow\Trader\Infrastructure\Laravel\Models\OrderRead;
@@ -10,19 +11,22 @@ abstract class OrderReadLinePersonalisation
     use RendersData;
 
     protected string $line_id;
+
     protected string $line_personalisation_id;
+
     protected ?string $personalisation_id;
+
     protected string $personalisation_type;
+
     protected $value;
+
     protected array $data;
 
-    final public function __construct()
-    {
-    }
+    final public function __construct() {}
 
     public static function fromMappedData(array $state, array $lineState): static
     {
-        $personalisation = new static();
+        $personalisation = new static;
 
         $personalisation->line_id = $lineState['line_id'];
         $personalisation->line_personalisation_id = $state['line_personalisation_id'];

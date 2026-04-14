@@ -20,8 +20,8 @@ class CustomerRegisterController extends Controller
     use ValidatesRequests;
 
     public function __construct(
-        private CustomerApplication     $customerApplication,
-        private CustomerRepository      $customerRepository,
+        private CustomerApplication $customerApplication,
+        private CustomerRepository $customerRepository,
         private CustomerLoginRepository $customerLoginRepository,
     ) {
         $this->middleware('customer-guest');
@@ -51,7 +51,7 @@ class CustomerRegisterController extends Controller
             // Maak nieuwe klant aan
             $customerId = $this->customerApplication->registerCustomer(new RegisterCustomer(
                 $request->email,
-                (bool)$request->is_business,
+                (bool) $request->is_business,
                 app()->getLocale(),
                 [
                     'firstname' => $request->firstname,

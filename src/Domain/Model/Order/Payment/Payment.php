@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Thinktomorrow\Trader\Domain\Model\Order\Payment;
@@ -23,18 +24,20 @@ class Payment implements ChildAggregate, DiscountableItem
     use HasDiscounts;
 
     public readonly OrderId $orderId;
+
     public readonly PaymentId $paymentId;
+
     private ?PaymentMethodId $paymentMethodId;
+
     private PaymentState $paymentState;
+
     private ServicePrice $paymentCost;
 
-    private function __construct()
-    {
-    }
+    private function __construct() {}
 
     public static function create(OrderId $orderId, PaymentId $paymentId, PaymentMethodId $paymentMethodId, PaymentState $paymentState, ServicePrice $paymentCost): static
     {
-        $payment = new static();
+        $payment = new static;
 
         $payment->orderId = $orderId;
         $payment->paymentId = $paymentId;
@@ -110,10 +113,10 @@ class Payment implements ChildAggregate, DiscountableItem
 
     public static function fromMappedData(array $state, array $aggregateState, array $childEntities = []): static
     {
-        $payment = new static();
+        $payment = new static;
 
         if (! $state['payment_state'] instanceof PaymentState) {
-            throw new \InvalidArgumentException('Payment state is expected to be instance of PaymentState. Instead ' . gettype($state['payment_state']) . ' is passed.');
+            throw new \InvalidArgumentException('Payment state is expected to be instance of PaymentState. Instead '.gettype($state['payment_state']).' is passed.');
         }
 
         $payment->orderId = OrderId::fromString($aggregateState['order_id']);

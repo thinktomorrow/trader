@@ -6,7 +6,7 @@ use SoapClient;
 
 class ViesClient
 {
-    private string $wsdl = "http://ec.europa.eu/taxation_customs/vies/checkVatService.wsdl";
+    private string $wsdl = 'http://ec.europa.eu/taxation_customs/vies/checkVatService.wsdl';
 
     private SoapClient $client;
 

@@ -17,7 +17,7 @@ final class VatAllocatorTest extends TestCase
     {
         parent::setUp();
 
-        $this->allocator = new VatAllocator(new ProRateAllocator());
+        $this->allocator = new VatAllocator(new ProRateAllocator);
     }
 
     public function test_it_allocates_items_only_single_vat_rate(): void
@@ -181,14 +181,14 @@ final class VatAllocatorTest extends TestCase
 
     private function line(int $unitExcl, int $qty, string $vat, bool $includesVat = false): Line
     {
-        $vatRate = ((float)$vat) / 100; // 0.21
+        $vatRate = ((float) $vat) / 100; // 0.21
 
         if ($includesVat) {
-            $unitIncl = (int)round($unitExcl);
-            $unitExcl = (int)round($unitIncl / (1 + $vatRate));
+            $unitIncl = (int) round($unitExcl);
+            $unitExcl = (int) round($unitIncl / (1 + $vatRate));
         } else {
-            $unitExcl = (int)round($unitExcl);
-            $unitIncl = (int)round($unitExcl * (1 + $vatRate));
+            $unitExcl = (int) round($unitExcl);
+            $unitIncl = (int) round($unitExcl * (1 + $vatRate));
         }
 
         return $this->orderContext->createLine(

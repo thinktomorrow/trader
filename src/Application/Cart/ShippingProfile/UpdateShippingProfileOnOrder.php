@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Thinktomorrow\Trader\Application\Cart\ShippingProfile;
@@ -17,11 +18,10 @@ use Thinktomorrow\Trader\Domain\Model\ShippingProfile\ShippingProfileState;
 class UpdateShippingProfileOnOrder
 {
     public function __construct(
-        private ContainerInterface        $container,
-        private OrderRepository           $orderRepository,
+        private ContainerInterface $container,
+        private OrderRepository $orderRepository,
         private ShippingProfileRepository $shippingProfileRepository
-    ) {
-    }
+    ) {}
 
     public function handle(Order $order, ShippingProfileId $shippingProfileId): void
     {

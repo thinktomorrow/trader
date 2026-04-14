@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Thinktomorrow\Trader\Application\Promo\CUD;
@@ -8,8 +9,11 @@ use Thinktomorrow\Trader\Domain\Model\Promo\DiscountId;
 class UpdateDiscount
 {
     private ?string $discountId;
+
     private string $key;
+
     private array $data;
+
     private array $conditions;
 
     public function __construct(?string $discountId, string $key, array $conditions, array $data)

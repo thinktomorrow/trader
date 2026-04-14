@@ -7,10 +7,7 @@ use Thinktomorrow\Trader\TraderConfig;
 
 class VatExemptionApplication
 {
-    public function __construct(private TraderConfig $config)
-    {
-
-    }
+    public function __construct(private TraderConfig $config) {}
 
     /**
      * If the shopper is business with valid VAT and billing country is different

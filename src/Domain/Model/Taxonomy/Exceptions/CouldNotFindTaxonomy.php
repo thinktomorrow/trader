@@ -1,8 +1,7 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Thinktomorrow\Trader\Domain\Model\Taxonomy\Exceptions;
 
-class CouldNotFindTaxonomy extends \RuntimeException
-{
-}
+class CouldNotFindTaxonomy extends \RuntimeException {}

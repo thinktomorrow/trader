@@ -1,18 +1,23 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Tests\Unit\Model\Order;
 
 use Tests\Unit\TestCase;
+use Thinktomorrow\Trader\Domain\Model\Order\Order;
 use Thinktomorrow\Trader\Domain\Model\Order\Payment\DefaultPaymentState;
+use Thinktomorrow\Trader\Domain\Model\Order\Payment\Payment;
 use Thinktomorrow\Trader\Domain\Model\Order\Payment\PaymentStateMachine;
 use Thinktomorrow\Trader\Infrastructure\Laravel\Models\MerchantOrder\DefaultMerchantOrderPayment;
 
 class PaymentStateTest extends TestCase
 {
     private PaymentStateMachine $machine;
-    private \Thinktomorrow\Trader\Domain\Model\Order\Order $order;
-    private \Thinktomorrow\Trader\Domain\Model\Order\Payment\Payment $payment;
+
+    private Order $order;
+
+    private Payment $payment;
 
     protected function setUp(): void
     {

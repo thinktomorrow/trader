@@ -7,11 +7,17 @@ use Money\Money;
 trait WithLineTotals
 {
     protected Money $unitPriceExcl;
+
     protected Money $unitPriceIncl;
+
     protected Money $discountPriceExcl;
+
     protected Money $discountPriceIncl;
+
     protected Money $totalPriceExcl;
+
     protected Money $totalVat;
+
     protected Money $totalPriceIncl;
 
     protected function initializeLineTotalsFromState(array $state): void

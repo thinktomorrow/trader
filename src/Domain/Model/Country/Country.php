@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Thinktomorrow\Trader\Domain\Model\Country;
@@ -14,13 +15,11 @@ class Country implements Entity
 
     public readonly CountryId $countryId;
 
-    private function __construct()
-    {
-    }
+    private function __construct() {}
 
     public static function create(CountryId $countryId, array $data): static
     {
-        $country = new static();
+        $country = new static;
         $country->countryId = $countryId;
         $country->data = $data;
 
@@ -37,7 +36,7 @@ class Country implements Entity
 
     public static function fromMappedData(array $state): static
     {
-        $country = new static();
+        $country = new static;
         $country->countryId = CountryId::fromString($state['country_id']);
         $country->data = json_decode($state['data'], true);
 

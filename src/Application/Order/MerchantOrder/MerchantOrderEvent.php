@@ -14,7 +14,7 @@ interface MerchantOrderEvent
 
     /**
      * Retrieve a value from the data.
-     * @param string $key
+     *
      * @return mixed
      */
     public function getData(string $key, ?string $language = null, $default = null);

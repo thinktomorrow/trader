@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Thinktomorrow\Trader\Infrastructure\Laravel\Models;
@@ -15,9 +16,13 @@ class DefaultTaxonomyItem implements TaxonomyItem
     use RendersData;
 
     public string $taxonomyId;
+
     protected TaxonomyState $state;
+
     protected TaxonomyType $type;
+
     protected int $order;
+
     protected array $data;
 
     private function __construct(string $taxonomyId, TaxonomyState $state, TaxonomyType $type, int $order, array $data)

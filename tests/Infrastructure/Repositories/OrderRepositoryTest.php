@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Tests\Infrastructure\Repositories;
@@ -88,7 +89,7 @@ final class OrderRepositoryTest extends TestCase
     public function test_it_repairs_stale_vat_snapshot_when_abandoning_order(): void
     {
         foreach ([OrderContext::mysql(), OrderContext::laravel()] as $orderContext) {
-            $order = $orderContext->createDefaultOrder('vatfix-' . $orderContext->driverName);
+            $order = $orderContext->createDefaultOrder('vatfix-'.$orderContext->driverName);
 
             DB::table('trader_orders')
                 ->where('order_id', $order->orderId->get())

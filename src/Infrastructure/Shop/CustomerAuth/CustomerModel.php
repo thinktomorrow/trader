@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Thinktomorrow\Trader\Infrastructure\Shop\CustomerAuth;
@@ -19,6 +20,7 @@ use Thinktomorrow\Trader\TraderConfig;
 /**
  * @property string $customer_id
  * @property array<string, mixed> $data
+ *
  * @method static \Illuminate\Database\Eloquent\Builder where($column, $operator = null, $value = null, $boolean = 'and')
  * @method static static findOrFail($id, $columns = ['*'])
  */
@@ -26,8 +28,8 @@ class CustomerModel extends Model implements AuthenticatableContract, CanResetPa
 {
     use Authenticatable;
     use CanResetPassword;
-    use Notifiable;
     use \Illuminate\Auth\MustVerifyEmail;
+    use Notifiable;
 
     public $table = 'trader_customers';
 
@@ -44,7 +46,9 @@ class CustomerModel extends Model implements AuthenticatableContract, CanResetPa
 
     // Using uuid as primary key
     public $primaryKey = 'customer_id';
+
     public $keyType = 'string';
+
     public $incrementing = false;
 
     public function sendPasswordResetNotification($token)
@@ -85,7 +89,7 @@ class CustomerModel extends Model implements AuthenticatableContract, CanResetPa
 
     public function getFullName(): string
     {
-        return trim($this->getFirstName() . ' ' . $this->getLastName());
+        return trim($this->getFirstName().' '.$this->getLastName());
     }
 
     public function getData(string $key, $default = null)

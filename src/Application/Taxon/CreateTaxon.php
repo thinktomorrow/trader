@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Thinktomorrow\Trader\Application\Taxon;
@@ -11,9 +12,13 @@ use Thinktomorrow\Trader\Domain\Model\Taxonomy\TaxonomyId;
 final class CreateTaxon
 {
     private string $taxonomyId;
+
     private string $taxonKeyId;
+
     private string $taxonKeyLocale;
+
     private array $data;
+
     private ?string $parent_taxon_id;
 
     public function __construct(string $taxonomyId, string $taxonKeyId, string $taxonKeyLocale, array $data, ?string $parent_taxon_id = null)

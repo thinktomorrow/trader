@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Thinktomorrow\Trader\Domain\Model\Order\Discount;
@@ -22,16 +23,20 @@ final class Discount implements ChildEntity
     use HasData;
 
     public readonly OrderId $orderId;
+
     public readonly DiscountId $discountId;
+
     public readonly DiscountableType $discountableType;
+
     public readonly DiscountableId $discountableId;
+
     public readonly ?PromoId $promoId;
+
     public readonly ?PromoDiscountId $promoDiscountId;
+
     private readonly DiscountPrice|ItemDiscountPrice $discountPrice;
 
-    private function __construct()
-    {
-    }
+    private function __construct() {}
 
     /**
      * The discount amount (excluding VAT).
@@ -69,7 +74,7 @@ final class Discount implements ChildEntity
 
     public static function create(OrderId $orderId, DiscountId $discountId, DiscountableType $discountableType, DiscountableId $discountableId, PromoId $promoId, PromoDiscountId $promoDiscountId, DiscountPrice|ItemDiscountPrice $discountPrice, array $data): static
     {
-        $discount = new static();
+        $discount = new self;
 
         $discount->orderId = $orderId;
         $discount->discountId = $discountId;
@@ -85,7 +90,7 @@ final class Discount implements ChildEntity
 
     public static function fromMappedData(array $state, array $aggregateState): static
     {
-        $discount = new static();
+        $discount = new static;
 
         $discount->orderId = OrderId::fromString($aggregateState['order_id']);
         $discount->discountId = DiscountId::fromString($state['discount_id']);

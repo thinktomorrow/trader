@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Thinktomorrow\Trader\Domain\Model\Taxon\Events;
@@ -14,6 +15,5 @@ class TaxonKeyUpdated
         public readonly Locale $locale,
         public readonly TaxonKeyId $formerTaxonKeyId,
         public readonly TaxonKeyId $newTaxonKeyId,
-    ) {
-    }
+    ) {}
 }

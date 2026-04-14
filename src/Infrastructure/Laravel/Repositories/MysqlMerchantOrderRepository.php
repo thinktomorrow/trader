@@ -58,10 +58,10 @@ class MysqlMerchantOrderRepository implements MerchantOrderRepository
         // MerchantOrder can need some extra data that is not available in the order
         // model instance, therefore we call the state of the order record again
         $orderState = DB::table(static::$orderTable)
-            ->where(static::$orderTable . '.order_id', $order->orderId->get())
+            ->where(static::$orderTable.'.order_id', $order->orderId->get())
             ->first();
 
-        $orderState = array_merge((array)$orderState, [
+        $orderState = array_merge((array) $orderState, [
             'order_state' => $order->getOrderState(),
         ]);
 

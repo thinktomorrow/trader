@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Tests\Acceptance;
@@ -13,6 +14,7 @@ use Thinktomorrow\Trader\Testing\Order\OrderContext;
 class TestCase extends \PHPUnit\Framework\TestCase
 {
     protected CatalogContext $catalogContext;
+
     protected OrderContext $orderContext;
 
     protected function setUp(): void
@@ -26,7 +28,7 @@ class TestCase extends \PHPUnit\Framework\TestCase
 
             $value = Arr::get(
                 $data,
-                $key . '.' . $language,
+                $key.'.'.$language,
                 Arr::get($data, $key, $default)
             );
 
@@ -38,7 +40,7 @@ class TestCase extends \PHPUnit\Framework\TestCase
 
         $this->catalogContext = CatalogContext::inMemory();
         $this->orderContext = OrderContext::inMemory();
-        
+
         $this->orderContext->createSalePriceSystemPromo();
     }
 

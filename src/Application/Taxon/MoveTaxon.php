@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Thinktomorrow\Trader\Application\Taxon;
@@ -8,6 +9,7 @@ use Thinktomorrow\Trader\Domain\Model\Taxon\TaxonId;
 final class MoveTaxon
 {
     private string $taxon_id;
+
     private ?string $parent_taxon_id;
 
     public function __construct(string $taxon_id, ?string $parent_taxon_id = null)

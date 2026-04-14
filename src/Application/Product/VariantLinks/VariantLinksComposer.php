@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Thinktomorrow\Trader\Application\Product\VariantLinks;
@@ -17,6 +18,7 @@ use Thinktomorrow\Trader\Domain\Model\Product\Variant\VariantId;
 class VariantLinksComposer
 {
     private ProductRepository $productRepository;
+
     private ContainerInterface $container;
 
     public function __construct(ProductRepository $productRepository, ContainerInterface $container)
@@ -114,7 +116,7 @@ class VariantLinksComposer
         return $result;
     }
 
-    private function findVariantByProperties(Product $product, array $variantProperties): ?\Thinktomorrow\Trader\Domain\Model\Product\Variant\Variant
+    private function findVariantByProperties(Product $product, array $variantProperties): ?Variant
     {
         $taxonIds = array_map(fn (ProductTaxonItem|VariantTaxonItem $prop) => $prop->getTaxonId(), $variantProperties);
 

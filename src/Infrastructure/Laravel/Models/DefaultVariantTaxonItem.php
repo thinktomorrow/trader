@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Thinktomorrow\Trader\Infrastructure\Laravel\Models;
@@ -26,7 +27,7 @@ class DefaultVariantTaxonItem extends DefaultProductTaxonItem implements Variant
             $state['taxon_id'],
             $state['taxonomy_id'],
             TaxonomyType::from($state['taxonomy_type']),
-            (bool)$state['shows_in_grid'],
+            (bool) $state['shows_in_grid'],
             TaxonState::from($state['state']),
             $keys,
             array_merge(

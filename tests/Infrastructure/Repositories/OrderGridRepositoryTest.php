@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Tests\Infrastructure\Repositories;
@@ -6,11 +7,12 @@ namespace Tests\Infrastructure\Repositories;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use Tests\Infrastructure\TestCase;
+use Thinktomorrow\Trader\Domain\Model\Order\Order;
 use Thinktomorrow\Trader\Domain\Model\Order\State\DefaultOrderState;
 
 class OrderGridRepositoryTest extends TestCase
 {
-    private \Thinktomorrow\Trader\Domain\Model\Order\Order $order;
+    private Order $order;
 
     protected function setUp(): void
     {

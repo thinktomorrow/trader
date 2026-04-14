@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Thinktomorrow\Trader\Infrastructure\Laravel\Repositories;
@@ -10,7 +11,7 @@ use Thinktomorrow\Trader\Domain\Model\Country\CountryId;
 use Thinktomorrow\Trader\Domain\Model\Country\CountryRepository;
 use Thinktomorrow\Trader\Domain\Model\Country\Exceptions\CouldNotFindCountry;
 
-class MysqlCountryRepository implements CountryRepository, BillingCountryRepository
+class MysqlCountryRepository implements BillingCountryRepository, CountryRepository
 {
     private static $countryTable = 'trader_countries';
 
@@ -33,14 +34,14 @@ class MysqlCountryRepository implements CountryRepository, BillingCountryReposit
     public function find(CountryId $countryId): Country
     {
         $countryState = DB::table(static::$countryTable)
-            ->where(static::$countryTable . '.country_id', $countryId->get())
+            ->where(static::$countryTable.'.country_id', $countryId->get())
             ->first();
 
         if (! $countryState) {
-            throw new CouldNotFindCountry('No country found by id [' . $countryId->get() . ']');
+            throw new CouldNotFindCountry('No country found by id ['.$countryId->get().']');
         }
 
-        return Country::fromMappedData((array)$countryState);
+        return Country::fromMappedData((array) $countryState);
     }
 
     public function delete(CountryId $countryId): void
@@ -54,7 +55,7 @@ class MysqlCountryRepository implements CountryRepository, BillingCountryReposit
             ->where('active', '1')
             ->orderBy('order_column')
             ->get()
-            ->map(fn ($item) => (array)$item)
+            ->map(fn ($item) => (array) $item)
             ->toArray();
 
         return array_map(fn ($countryState) => \Thinktomorrow\Trader\Application\Country\Country::fromMappedData($countryState), $countryStates);
@@ -66,6 +67,6 @@ class MysqlCountryRepository implements CountryRepository, BillingCountryReposit
             ->where('country_id', $countryId->get())
             ->first();
 
-        return \Thinktomorrow\Trader\Application\Country\Country::fromMappedData((array)$countryState);
+        return \Thinktomorrow\Trader\Application\Country\Country::fromMappedData((array) $countryState);
     }
 }

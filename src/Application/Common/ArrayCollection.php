@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Thinktomorrow\Trader\Application\Common;
@@ -8,7 +9,7 @@ use Countable;
 use IteratorAggregate;
 use Traversable;
 
-abstract class ArrayCollection implements Countable, IteratorAggregate, ArrayAccess
+abstract class ArrayCollection implements ArrayAccess, Countable, IteratorAggregate
 {
     protected array $items;
 

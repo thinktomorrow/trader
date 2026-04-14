@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Tests\Acceptance\Order\States;
@@ -23,10 +24,10 @@ abstract class StateContext extends TestCase
         $order = $this->orderContext->createOrder('order-aaa', $currentState->getValueAsString());
 
         if ($useCartApplication) {
-            $transitionClass = 'Thinktomorrow\\Trader\\Application\\Cart\\' . ucfirst($transitionMethod);
+            $transitionClass = 'Thinktomorrow\\Trader\\Application\\Cart\\'.ucfirst($transitionMethod);
             $this->orderContext->apps()->cartApplication()->$transitionMethod(new $transitionClass($order->orderId->get()));
         } else {
-            $transitionClass = 'Thinktomorrow\\Trader\\Application\\Order\\State\\Order\\' . ucfirst($transitionMethod);
+            $transitionClass = 'Thinktomorrow\\Trader\\Application\\Order\\State\\Order\\'.ucfirst($transitionMethod);
             $this->orderContext->apps()->orderStateApplication()->$transitionMethod(new $transitionClass($order->orderId->get()));
         }
 
@@ -52,8 +53,7 @@ abstract class StateContext extends TestCase
 
         $this->orderContext->addPaymentToOrder($order, $payment);
 
-
-        $transitionClass = 'Thinktomorrow\\Trader\\Application\\Order\\State\\Payment\\' . ucfirst($transitionMethod);
+        $transitionClass = 'Thinktomorrow\\Trader\\Application\\Order\\State\\Payment\\'.ucfirst($transitionMethod);
         $this->orderContext->apps()->orderStateApplication()->$transitionMethod(new $transitionClass($order->orderId->get(), $payment->paymentId->get()));
 
         $order = $this->orderContext->findOrder($order->orderId);
@@ -77,7 +77,7 @@ abstract class StateContext extends TestCase
 
         $this->orderContext->addShippingToOrder($order, $shipping);
 
-        $transitionClass = 'Thinktomorrow\\Trader\\Application\\Order\\State\\Shipping\\' . ucfirst($transitionMethod);
+        $transitionClass = 'Thinktomorrow\\Trader\\Application\\Order\\State\\Shipping\\'.ucfirst($transitionMethod);
         $this->orderContext->apps()->orderStateApplication()->$transitionMethod(new $transitionClass($order->orderId->get(), $shipping->shippingId->get()));
 
         $order = $this->orderContext->findOrder($order->orderId);

@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Thinktomorrow\Trader\Application\Customer;
@@ -9,7 +10,9 @@ use Thinktomorrow\Trader\Domain\Model\Customer\CustomerId;
 class UpdateEmail
 {
     private string $customerId;
+
     private string $oldEmail;
+
     private string $newEmail;
 
     public function __construct(string $customerId, string $oldEmail, string $newEmail)

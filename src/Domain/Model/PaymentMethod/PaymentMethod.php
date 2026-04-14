@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Thinktomorrow\Trader\Domain\Model\PaymentMethod;
@@ -13,22 +14,23 @@ use Thinktomorrow\Trader\Domain\Model\Country\HasCountryIds;
 
 class PaymentMethod implements Aggregate
 {
-    use HasData;
     use HasCountryIds;
+    use HasData;
     use RecordsEvents;
 
     public readonly PaymentMethodId $paymentMethodId;
+
     private PaymentMethodProviderId $paymentMethodProviderId;
+
     private PaymentMethodState $state;
+
     private Money $rate;
 
-    private function __construct()
-    {
-    }
+    private function __construct() {}
 
     public static function create(PaymentMethodId $paymentMethodId, PaymentMethodProviderId $paymentMethodProviderId, Money $rate): static
     {
-        $method = new static();
+        $method = new static;
 
         $method->paymentMethodId = $paymentMethodId;
         $method->paymentMethodProviderId = $paymentMethodProviderId;
@@ -81,7 +83,7 @@ class PaymentMethod implements Aggregate
 
     public static function fromMappedData(array $state, array $childEntities = []): static
     {
-        $method = new static();
+        $method = new static;
 
         $method->paymentMethodId = PaymentMethodId::fromString($state['payment_method_id']);
         $method->paymentMethodProviderId = PaymentMethodProviderId::fromString($state['provider_id']);

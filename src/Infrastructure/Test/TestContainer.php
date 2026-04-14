@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Thinktomorrow\Trader\Infrastructure\Test;
@@ -11,7 +12,7 @@ final class TestContainer implements ContainerInterface
 
     public function add(string $id, $entry)
     {
-        static::$entries[$id] = $entry;
+        self::$entries[$id] = $entry;
     }
 
     public function get(string $id)
@@ -20,16 +21,16 @@ final class TestContainer implements ContainerInterface
             return new $id;
         }
 
-        return static::$entries[$id];
+        return self::$entries[$id];
     }
 
     public function has(string $id): bool
     {
-        return isset(static::$entries[$id]);
+        return isset(self::$entries[$id]);
     }
 
     public static function make(string $id)
     {
-        return (new static)->get($id);
+        return (new self)->get($id);
     }
 }

@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Thinktomorrow\Trader\Application\Cart\RefreshCart\Adjusters;
@@ -12,6 +13,7 @@ use Thinktomorrow\Trader\Domain\Model\Order\Order;
 class AdjustDiscounts implements Adjuster
 {
     private OrderPromoRepository $orderPromoRepository;
+
     private ApplyPromoToOrder $applyPromoToOrder;
 
     public function __construct(OrderPromoRepository $orderPromoRepository, ApplyPromoToOrder $applyPromoToOrder)
@@ -40,8 +42,6 @@ class AdjustDiscounts implements Adjuster
      * The combinable flag does not apply between groups.
      * This allows for system promo's to be always combined with marketing promos.
      *
-     * @param Order $order
-     * @param array $promos
      * @return void
      */
     private function processPromos(Order $order, array $promos)
@@ -134,24 +134,23 @@ class AdjustDiscounts implements Adjuster
         foreach ($order->getShippings() as $shipping) {
             foreach ($shipping->getDiscounts() as $discount) {
                 $promoIds[] = $discount->promoId;
-            };
+            }
         }
 
         foreach ($order->getLines() as $line) {
             foreach ($line->getDiscounts() as $discount) {
                 $promoIds[] = $discount->promoId;
-            };
+            }
         }
 
         foreach ($order->getDiscounts() as $discount) {
             $promoIds[] = $discount->promoId;
-        };
+        }
 
         return array_unique($promoIds);
     }
 
     /**
-     * @param Order $order
      * @return OrderPromo[]
      */
     public function getMarketingPromos(Order $order): array

@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Tests\Unit\Model\Product;
@@ -84,6 +85,6 @@ class ProductPersonalisationTest extends TestCase
 
         $this->expectException(\InvalidArgumentException::class);
 
-        $product->updatePersonalisations([new \stdClass()]);
+        $product->updatePersonalisations([new \stdClass]);
     }
 }

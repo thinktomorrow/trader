@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Tests\Acceptance\Cart;
@@ -12,7 +13,6 @@ use Thinktomorrow\Trader\Domain\Model\Product\Variant\VariantUnitPrice;
 
 class RefreshCartTest extends CartContext
 {
-
     protected function setUp(): void
     {
         parent::setUp();

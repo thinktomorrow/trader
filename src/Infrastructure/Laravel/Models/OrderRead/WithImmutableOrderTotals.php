@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Thinktomorrow\Trader\Infrastructure\Laravel\Models\OrderRead;
@@ -13,15 +14,25 @@ trait WithImmutableOrderTotals
     private array $vatLines = [];
 
     protected Money $subtotalExcl;
+
     protected Money $subtotalIncl;
+
     protected Money $shippingExcl;
+
     protected Money $shippingIncl;
+
     protected Money $paymentExcl;
+
     protected Money $paymentIncl;
+
     protected Money $discountExcl;
+
     protected Money $discountIncl;
+
     protected Money $totalExcl;
+
     protected Money $totalVat;
+
     protected Money $totalIncl;
 
     protected function initializeOrderTotalsFromState(array $state): void

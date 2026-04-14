@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Tests\Unit\Common\Cash;
@@ -26,7 +27,7 @@ class PercentageTest extends TestCase
 
     public function test_it_can_be_set_with_string_percentage()
     {
-        $percentage = Percentage::fromString("1.23");
+        $percentage = Percentage::fromString('1.23');
 
         $this->assertEquals(1.23, $percentage->get());
         $this->assertEquals(0.0123, $percentage->toDecimal());

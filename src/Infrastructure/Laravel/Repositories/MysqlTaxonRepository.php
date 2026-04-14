@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Thinktomorrow\Trader\Infrastructure\Laravel\Repositories;
@@ -18,6 +19,7 @@ class MysqlTaxonRepository implements TaxonRepository
     use WithTaxonKeysSelection;
 
     private static $taxonTable = 'trader_taxa';
+
     private static $taxonKeysTable = 'trader_taxa_keys';
 
     public function save(Taxon $taxon): void
@@ -49,7 +51,7 @@ class MysqlTaxonRepository implements TaxonRepository
     private function cleanupOldKeys(Taxon $taxon): void
     {
         $validPairs = collect($taxon->getTaxonKeys())
-            ->map(fn ($tk) => $tk->getKey()->get() . '|' . $tk->getLocale()->get())
+            ->map(fn ($tk) => $tk->getKey()->get().'|'.$tk->getLocale()->get())
             ->toArray();
 
         $existing = DB::table(static::$taxonKeysTable)
@@ -58,7 +60,7 @@ class MysqlTaxonRepository implements TaxonRepository
 
         // Cleanup any taxon keys that are not in the valid set anymore
         $existing->filter(
-            fn ($row) => ! in_array($row->key . '|' . $row->locale, $validPairs)
+            fn ($row) => ! in_array($row->key.'|'.$row->locale, $validPairs)
         )->each(function ($row) use ($taxon) {
             DB::table(static::$taxonKeysTable)
                 ->where('taxon_id', $taxon->taxonId->get())
@@ -78,22 +80,22 @@ class MysqlTaxonRepository implements TaxonRepository
         $taxonKeysSelect = $this->composeTaxonKeysSelect();
 
         $taxonState = DB::table(static::$taxonTable)
-            ->leftJoin(static::$taxonKeysTable, static::$taxonTable . '.taxon_id', '=', static::$taxonKeysTable . '.taxon_id')
+            ->leftJoin(static::$taxonKeysTable, static::$taxonTable.'.taxon_id', '=', static::$taxonKeysTable.'.taxon_id')
             ->select([
-                static::$taxonTable . '.*',
+                static::$taxonTable.'.*',
                 DB::raw("GROUP_CONCAT(DISTINCT $taxonKeysSelect) AS taxon_keys"),
             ])
-            ->where(static::$taxonTable . '.taxon_id', $taxonId->get())
-            ->groupBy(static::$taxonTable . '.taxon_id')
+            ->where(static::$taxonTable.'.taxon_id', $taxonId->get())
+            ->groupBy(static::$taxonTable.'.taxon_id')
             ->first();
 
-        $taxonKeyStates = $this->extractTaxonKeys((array)$taxonState);
+        $taxonKeyStates = $this->extractTaxonKeys((array) $taxonState);
 
         if (! $taxonState) {
-            throw new CouldNotFindTaxon('No taxon found by id [' . $taxonId->get() . ']');
+            throw new CouldNotFindTaxon('No taxon found by id ['.$taxonId->get().']');
         }
 
-        return Taxon::fromMappedData((array)$taxonState, [TaxonKey::class => $taxonKeyStates]);
+        return Taxon::fromMappedData((array) $taxonState, [TaxonKey::class => $taxonKeyStates]);
     }
 
     public function findMany(array $taxonIds): array
@@ -105,18 +107,18 @@ class MysqlTaxonRepository implements TaxonRepository
         $taxonKeysSelect = $this->composeTaxonKeysSelect();
 
         $taxonStates = DB::table(static::$taxonTable)
-            ->leftJoin(static::$taxonKeysTable, static::$taxonTable . '.taxon_id', '=', static::$taxonKeysTable . '.taxon_id')
+            ->leftJoin(static::$taxonKeysTable, static::$taxonTable.'.taxon_id', '=', static::$taxonKeysTable.'.taxon_id')
             ->select([
-                static::$taxonTable . '.*',
+                static::$taxonTable.'.*',
                 DB::raw("GROUP_CONCAT(DISTINCT $taxonKeysSelect) AS taxon_keys"),
             ])
-            ->whereIn(static::$taxonTable . '.taxon_id', $taxonIds)
-            ->groupBy(static::$taxonTable . '.taxon_id')
+            ->whereIn(static::$taxonTable.'.taxon_id', $taxonIds)
+            ->groupBy(static::$taxonTable.'.taxon_id')
             ->get();
 
         return $taxonStates
             ->sortBy(fn ($record) => array_search($record->taxon_id, $taxonIds))
-            ->map(fn ($record) => Taxon::fromMappedData((array)$record, [TaxonKey::class => $this->extractTaxonKeys((array)$record)]))
+            ->map(fn ($record) => Taxon::fromMappedData((array) $record, [TaxonKey::class => $this->extractTaxonKeys((array) $record)]))
             ->values()
             ->all();
     }
@@ -126,34 +128,34 @@ class MysqlTaxonRepository implements TaxonRepository
         $taxonKeysSelect = $this->composeTaxonKeysSelect();
 
         $taxonState = DB::table(static::$taxonTable)
-            ->join(static::$taxonKeysTable, static::$taxonTable . '.taxon_id', '=', static::$taxonKeysTable . '.taxon_id')
+            ->join(static::$taxonKeysTable, static::$taxonTable.'.taxon_id', '=', static::$taxonKeysTable.'.taxon_id')
             ->select([
-                static::$taxonTable . '.*',
+                static::$taxonTable.'.*',
                 DB::raw("GROUP_CONCAT(DISTINCT $taxonKeysSelect) AS taxon_keys"),
             ])
-            ->where(static::$taxonTable . '.taxon_id', function ($query) use ($taxonKeyId) {
-                $query->select(static::$taxonKeysTable . '.taxon_id')
+            ->where(static::$taxonTable.'.taxon_id', function ($query) use ($taxonKeyId) {
+                $query->select(static::$taxonKeysTable.'.taxon_id')
                     ->from(static::$taxonKeysTable)
-                    ->where(static::$taxonKeysTable . '.key', $taxonKeyId->get())
+                    ->where(static::$taxonKeysTable.'.key', $taxonKeyId->get())
                     ->limit(1);
             })
-            ->groupBy(static::$taxonTable . '.taxon_id')
+            ->groupBy(static::$taxonTable.'.taxon_id')
             ->first();
 
         if (! $taxonState) {
-            throw new CouldNotFindTaxon('No taxon found by key [' . $taxonKeyId->get() . ']');
+            throw new CouldNotFindTaxon('No taxon found by key ['.$taxonKeyId->get().']');
         }
 
-        $taxonKeyStates = $this->extractTaxonKeys((array)$taxonState);
+        $taxonKeyStates = $this->extractTaxonKeys((array) $taxonState);
 
-        return Taxon::fromMappedData((array)$taxonState, [TaxonKey::class => $taxonKeyStates]);
+        return Taxon::fromMappedData((array) $taxonState, [TaxonKey::class => $taxonKeyStates]);
     }
 
     public function getByParentId(TaxonId $taxonId): array
     {
         $taxonIds = DB::table(static::$taxonTable)
-            ->where(static::$taxonTable . '.parent_id', $taxonId->get())
-            ->select(static::$taxonTable . '.taxon_id')
+            ->where(static::$taxonTable.'.parent_id', $taxonId->get())
+            ->select(static::$taxonTable.'.taxon_id')
             ->pluck('taxon_id')
             ->all();
 
@@ -167,7 +169,7 @@ class MysqlTaxonRepository implements TaxonRepository
 
     public function nextReference(): TaxonId
     {
-        return TaxonId::fromString((string)Uuid::uuid4());
+        return TaxonId::fromString((string) Uuid::uuid4());
     }
 
     public function uniqueKeyReference(TaxonKeyId $taxonKeyId, TaxonId $allowedTaxonId): TaxonKeyId
@@ -175,7 +177,7 @@ class MysqlTaxonRepository implements TaxonRepository
         $key = $taxonKeyId;
 
         while ($this->existsByKey($key, $allowedTaxonId)) {
-            $key = TaxonKeyId::fromString($taxonKeyId->get() . '_' . Str::random(3));
+            $key = TaxonKeyId::fromString($taxonKeyId->get().'_'.Str::random(3));
         }
 
         return $key;
@@ -184,7 +186,7 @@ class MysqlTaxonRepository implements TaxonRepository
     private function existsByKey(TaxonKeyId $taxonKeyId, TaxonId $allowedTaxonId): bool
     {
         return DB::table(static::$taxonKeysTable)
-            ->where(static::$taxonKeysTable . '.key', $taxonKeyId->get())
+            ->where(static::$taxonKeysTable.'.key', $taxonKeyId->get())
             ->where('taxon_id', '<>', $allowedTaxonId->get())
             ->exists();
     }

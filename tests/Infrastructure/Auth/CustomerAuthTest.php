@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Tests\Infrastructure\Auth;
@@ -19,8 +20,8 @@ class CustomerAuthTest extends TestCase
     {
         parent::setUp();
 
-        $this->app['view']->addLocation(__DIR__ . '/views');
-        $this->app['view']->addNamespace('trader', __DIR__ . '/views/shop');
+        $this->app['view']->addLocation(__DIR__.'/views');
+        $this->app['view']->addNamespace('trader', __DIR__.'/views/shop');
     }
 
     public function test_non_authenticated_are_kept_out()
@@ -28,7 +29,6 @@ class CustomerAuthTest extends TestCase
         $response = $this->get(route('customer.index'));
         $response->assertRedirect(route('customer.login'));
     }
-
 
     public function test_it_redirects_if_unauthenticated_customer()
     {

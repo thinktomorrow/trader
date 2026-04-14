@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Thinktomorrow\Trader\Domain\Model\ShippingProfile;
@@ -13,13 +14,16 @@ use Thinktomorrow\Trader\Domain\Model\ShippingProfile\Events\TariffDeleted;
 
 final class ShippingProfile implements Aggregate
 {
-    use RecordsEvents;
     use HasCountryIds;
     use HasData;
+    use RecordsEvents;
 
     public readonly ShippingProfileId $shippingProfileId;
+
     private ShippingProviderId $shippingProviderId;
+
     private ShippingProfileState $state;
+
     private bool $requiresAddress;
 
     /** @var Tariff[] */
@@ -27,7 +31,7 @@ final class ShippingProfile implements Aggregate
 
     public static function create(ShippingProfileId $shippingProfileId, ShippingProviderId $shippingProviderId, bool $requiresAddress): static
     {
-        $shippingProfile = new static();
+        $shippingProfile = new self;
         $shippingProfile->shippingProfileId = $shippingProfileId;
         $shippingProfile->shippingProviderId = $shippingProviderId;
         $shippingProfile->state = ShippingProfileState::online;
@@ -90,7 +94,7 @@ final class ShippingProfile implements Aggregate
             }
         }
 
-        throw new \InvalidArgumentException('No Tariff found by id ' . $tariffId->get());
+        throw new \InvalidArgumentException('No Tariff found by id '.$tariffId->get());
     }
 
     public function addTariff(Tariff $tariff): void
@@ -129,7 +133,7 @@ final class ShippingProfile implements Aggregate
 
     public static function fromMappedData(array $state, array $childEntities = []): static
     {
-        $shippingProfile = new static();
+        $shippingProfile = new static;
         $shippingProfile->shippingProfileId = ShippingProfileId::fromString($state['shipping_profile_id']);
         $shippingProfile->shippingProviderId = ShippingProviderId::fromString($state['provider_id']);
         $shippingProfile->state = ShippingProfileState::from($state['state']);

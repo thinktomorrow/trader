@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Thinktomorrow\Trader\Domain\Model\Product\Variant;
@@ -12,7 +13,7 @@ enum VariantState: string
     public static function availableStates(): array
     {
         return [
-            static::available,
+            self::available,
         ];
     }
 }

@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Thinktomorrow\Trader\Infrastructure\Laravel\Repositories;
@@ -20,12 +21,12 @@ class MysqlVariantPropertyRepository implements VariantPropertyRepository
         $n = count($taxonIds);
         $inPlaceholders = implode(',', array_fill(0, $n, '?'));
 
-        $sql = "
+        $sql = '
             SELECT v.variant_id AS variant_id
             FROM trader_product_variants v
             JOIN trader_taxa_variants t ON t.variant_id = v.variant_id
             WHERE v.product_id = ?
-            " . ($excludeVariantId ? "AND v.variant_id <> ?\n" : "") . "
+            '.($excludeVariantId ? "AND v.variant_id <> ?\n" : '')."
             GROUP BY v.variant_id
             HAVING
                 -- variant heeft precies n taxa (dus geen extra's)
@@ -53,9 +54,6 @@ class MysqlVariantPropertyRepository implements VariantPropertyRepository
     //    }
 
     /**
-     * @param string $productId
-     * @param string|null $excludeVariantId
-     * @param array $taxonIds
      * @return array|string[]
      */
     public function composeBindings(string $productId, ?string $excludeVariantId, array $taxonIds): array

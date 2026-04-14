@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Thinktomorrow\Trader\Infrastructure\Shop\CustomerAuth\Middleware;
@@ -17,7 +18,6 @@ class CustomerVerified
         }
 
         $customer = Auth::guard('customer')->user();
-
 
         if ($customer instanceof MustVerifyEmail && ! $customer->hasVerifiedEmail()) {
             return $request->expectsJson()

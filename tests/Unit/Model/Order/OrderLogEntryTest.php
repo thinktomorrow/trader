@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Tests\Unit\Model\Order;
@@ -11,7 +12,7 @@ class OrderLogEntryTest extends TestCase
 {
     public function test_it_can_create_entry()
     {
-        $entry = OrderEvent::create($orderEventId = OrderEventId::fromString('abc'), 'xxx', $createdAt = new \DateTime(), ['foo' => 'bar']);
+        $entry = OrderEvent::create($orderEventId = OrderEventId::fromString('abc'), 'xxx', $createdAt = new \DateTime, ['foo' => 'bar']);
 
         $this->assertEquals($orderEventId, $entry->orderEventId);
         $this->assertEquals('xxx', $entry->getEvent());

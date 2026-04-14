@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Thinktomorrow\Trader\Infrastructure\Laravel\Models;
@@ -19,14 +20,18 @@ use Thinktomorrow\Trader\Domain\Model\Taxonomy\TaxonomyType;
 
 class DefaultGridItem implements GridItem
 {
-    use RendersVariantPrices;
-    use RendersData;
     use HasLocale;
+    use RendersData;
+    use RendersVariantPrices;
 
     protected VariantId $variantId;
+
     protected ProductId $productId;
+
     protected VariantState $state;
+
     protected array $data;
+
     protected iterable $images;
 
     /** @var array<ProductTaxonItem|VariantTaxonItem> */
@@ -35,13 +40,11 @@ class DefaultGridItem implements GridItem
     /** @var array<VariantKey> */
     protected array $variantKeys;
 
-    final private function __construct()
-    {
-    }
+    final private function __construct() {}
 
     public static function fromMappedData(array $state, array $taxa, array $variantKeys): static
     {
-        $item = new static();
+        $item = new static;
 
         $item->variantId = VariantId::fromString($state['variant_id']);
         $item->productId = ProductId::fromString($state['product_id']);
@@ -87,7 +90,7 @@ class DefaultGridItem implements GridItem
 
     public function getUrl(): string
     {
-        return '/' . $this->getVariantId();
+        return '/'.$this->getVariantId();
     }
 
     public function setImages(iterable $images): void

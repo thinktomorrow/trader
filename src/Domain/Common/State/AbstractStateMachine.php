@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Thinktomorrow\Trader\Domain\Common\State;
@@ -6,6 +7,7 @@ namespace Thinktomorrow\Trader\Domain\Common\State;
 abstract class AbstractStateMachine
 {
     protected array $states;
+
     protected array $transitions;
 
     public function __construct(array $states, array $transitions)
@@ -17,6 +19,7 @@ abstract class AbstractStateMachine
     }
 
     abstract protected function getState($model): State;
+
     abstract protected function updateState($model, State $state, array $data): void;
 
     public function can($model, $transition): bool
@@ -71,7 +74,6 @@ abstract class AbstractStateMachine
     /**
      * Verify the new state is valid.
      *
-     * @param $state
      *
      * @return bool
      */

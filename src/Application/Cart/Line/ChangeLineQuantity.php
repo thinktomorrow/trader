@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Thinktomorrow\Trader\Application\Cart\Line;
@@ -10,7 +11,9 @@ use Thinktomorrow\Trader\Domain\Model\Order\OrderId;
 final class ChangeLineQuantity
 {
     private string $orderId;
+
     private string $lineId;
+
     private int $quantity;
 
     public function __construct(string $orderId, string $lineId, int $quantity)

@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Thinktomorrow\Trader\Infrastructure\Laravel\Repositories;
@@ -23,7 +24,7 @@ class MysqlTaxonRedirectRepository implements TaxonRedirectRepository
             return null;
         }
 
-        return new Redirect($locale, $result->from, $result->to, (string)$result->id, \DateTime::createFromFormat('Y-m-d H:i:s', $result->created_at));
+        return new Redirect($locale, $result->from, $result->to, (string) $result->id, \DateTime::createFromFormat('Y-m-d H:i:s', $result->created_at));
     }
 
     public function getAllTo(Locale $locale, string $to): array
@@ -32,7 +33,7 @@ class MysqlTaxonRedirectRepository implements TaxonRedirectRepository
             ->where('locale', $locale->get())
             ->where('to', static::sanitizeSlug($to))
             ->get()
-            ->map(fn ($result) => new Redirect($locale, $result->from, $result->to, (string)$result->id, \DateTime::createFromFormat('Y-m-d H:i:s', $result->created_at)))
+            ->map(fn ($result) => new Redirect($locale, $result->from, $result->to, (string) $result->id, \DateTime::createFromFormat('Y-m-d H:i:s', $result->created_at)))
             ->toArray();
     }
 
@@ -71,7 +72,7 @@ class MysqlTaxonRedirectRepository implements TaxonRedirectRepository
                 'locale' => $redirect->getLocale()->get(),
                 'from' => static::sanitizeSlug($redirect->getFrom()),
                 'to' => static::sanitizeSlug($redirect->getTo()),
-                'created_at' => new \DateTime(),
+                'created_at' => new \DateTime,
             ]);
         }
     }

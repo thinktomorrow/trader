@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Thinktomorrow\Trader\Infrastructure\Laravel\Repositories;
@@ -19,11 +20,12 @@ use Thinktomorrow\Trader\Domain\Model\Customer\CustomerId;
 use Thinktomorrow\Trader\Domain\Model\Customer\CustomerRepository;
 use Thinktomorrow\Trader\Domain\Model\Customer\Exceptions\CouldNotFindCustomer;
 
-class MysqlCustomerRepository implements CustomerRepository, CustomerReadRepository
+class MysqlCustomerRepository implements CustomerReadRepository, CustomerRepository
 {
     private ContainerInterface $container;
 
     private static $customerTable = 'trader_customers';
+
     private static $customerAddressTable = 'trader_customer_addresses';
 
     public function __construct(ContainerInterface $container)
@@ -81,11 +83,11 @@ class MysqlCustomerRepository implements CustomerRepository, CustomerReadReposit
     public function find(CustomerId $customerId): Customer
     {
         $customerState = DB::table(static::$customerTable)
-            ->where(static::$customerTable . '.customer_id', $customerId->get())
+            ->where(static::$customerTable.'.customer_id', $customerId->get())
             ->first();
 
         if (! $customerState) {
-            throw new CouldNotFindCustomer('No customer found by id [' . $customerId->get() . ']');
+            throw new CouldNotFindCustomer('No customer found by id ['.$customerId->get().']');
         }
 
         return $this->composeCustomer($customerId->get(), $customerState);
@@ -94,11 +96,11 @@ class MysqlCustomerRepository implements CustomerRepository, CustomerReadReposit
     public function findByEmail(Email $email): Customer
     {
         $customerState = DB::table(static::$customerTable)
-            ->where(static::$customerTable . '.email', $email->get())
+            ->where(static::$customerTable.'.email', $email->get())
             ->first();
 
         if (! $customerState) {
-            throw new CouldNotFindCustomer('No customer found by email [' . $email->get() . ']');
+            throw new CouldNotFindCustomer('No customer found by email ['.$email->get().']');
         }
 
         return $this->composeCustomer($customerState->customer_id, $customerState);
@@ -107,15 +109,15 @@ class MysqlCustomerRepository implements CustomerRepository, CustomerReadReposit
     private function composeCustomer(string $customerId, object $customerState)
     {
         $addressStates = DB::table(static::$customerAddressTable)
-            ->where(static::$customerAddressTable . '.customer_id', $customerId)
+            ->where(static::$customerAddressTable.'.customer_id', $customerId)
             ->get();
 
         $shippingAddressState = $addressStates->first(fn ($address) => $address->type == AddressType::shipping->value);
         $billingAddressState = $addressStates->first(fn ($address) => $address->type == AddressType::billing->value);
 
         return Customer::fromMappedData((array) $customerState, [
-            ShippingAddress::class => $shippingAddressState ? (array)$shippingAddressState : null,
-            BillingAddress::class => $billingAddressState ? (array)$billingAddressState : null,
+            ShippingAddress::class => $shippingAddressState ? (array) $shippingAddressState : null,
+            BillingAddress::class => $billingAddressState ? (array) $billingAddressState : null,
         ]);
     }
 
@@ -140,7 +142,7 @@ class MysqlCustomerRepository implements CustomerRepository, CustomerReadReposit
         return CustomerId::fromString((string) Uuid::uuid4());
     }
 
-    public function findCustomer(CustomerId $customerId): \Thinktomorrow\Trader\Application\Customer\Read\CustomerRead
+    public function findCustomer(CustomerId $customerId): CustomerRead
     {
         $customer = $this->find($customerId);
 

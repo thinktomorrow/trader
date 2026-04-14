@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Thinktomorrow\Trader\Application\Order\State;
@@ -43,9 +44,13 @@ use Thinktomorrow\Trader\Domain\Model\Order\State\OrderStateMachine;
 final class OrderStateApplication
 {
     private OrderRepository $orderRepository;
+
     private OrderStateMachine $orderStateMachine;
+
     private EventDispatcher $eventDispatcher;
+
     private PaymentStateMachine $paymentStateMachine;
+
     private ShippingStateMachine $shippingStateMachine;
 
     public function __construct(OrderRepository $orderRepository, OrderStateMachine $orderStateMachine, PaymentStateMachine $paymentStateMachine, ShippingStateMachine $shippingStateMachine, EventDispatcher $eventDispatcher)

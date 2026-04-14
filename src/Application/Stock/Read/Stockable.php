@@ -9,8 +9,6 @@ interface Stockable
     /**
      * Allow to be purchased even when order exceeds
      * the stock levels or when stock is depleted.
-     *
-     * @return bool
      */
     public function ignoresOutOfStock(): bool;
 

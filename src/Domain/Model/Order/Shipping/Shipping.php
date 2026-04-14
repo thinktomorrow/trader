@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Thinktomorrow\Trader\Domain\Model\Order\Shipping;
@@ -23,18 +24,20 @@ final class Shipping implements ChildAggregate, DiscountableItem
     use HasDiscounts;
 
     public readonly OrderId $orderId;
+
     public readonly ShippingId $shippingId;
+
     private ?ShippingProfileId $shippingProfileId;
+
     private ShippingState $shippingState;
+
     private ServicePrice $shippingCost;
 
-    private function __construct()
-    {
-    }
+    private function __construct() {}
 
     public static function create(OrderId $orderId, ShippingId $shippingId, ShippingProfileId $shippingProfileId, ShippingState $shippingState, ServicePrice $shippingCost): static
     {
-        $shipping = new static();
+        $shipping = new self;
 
         $shipping->orderId = $orderId;
         $shipping->shippingId = $shippingId;
@@ -106,10 +109,10 @@ final class Shipping implements ChildAggregate, DiscountableItem
 
     public static function fromMappedData(array $state, array $aggregateState, array $childEntities = []): static
     {
-        $shipping = new static();
+        $shipping = new static;
 
         if (! $state['shipping_state'] instanceof ShippingState) {
-            throw new \InvalidArgumentException('Shipping state is expected to be instance of ShippingState. Instead ' . gettype($state['shipping_state']) . ' is passed.');
+            throw new \InvalidArgumentException('Shipping state is expected to be instance of ShippingState. Instead '.gettype($state['shipping_state']).' is passed.');
         }
 
         $shipping->orderId = OrderId::fromString($aggregateState['order_id']);

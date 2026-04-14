@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Thinktomorrow\Trader\Infrastructure\Laravel\Models\OrderRead;
@@ -11,25 +12,27 @@ abstract class OrderReadPayment
 {
     use RendersData;
     use RendersMoney;
-    use WithServiceTotals;
     use WithFormattedServiceTotals;
+    use WithServiceTotals;
 
     protected string $payment_id;
+
     protected ?string $payment_method_id;
+
     protected PaymentState $state;
+
     protected iterable $discounts;
+
     protected array $data;
 
-    final public function __construct()
-    {
-    }
+    final public function __construct() {}
 
     public static function fromMappedData(array $state, array $orderState, iterable $discounts): static
     {
-        $payment = new static();
+        $payment = new static;
 
         if (! $state['payment_state'] instanceof PaymentState) {
-            throw new \InvalidArgumentException('Payment state is expected to be instance of PaymentState. Instead ' . gettype($state['payment_state']) . ' is passed.');
+            throw new \InvalidArgumentException('Payment state is expected to be instance of PaymentState. Instead '.gettype($state['payment_state']).' is passed.');
         }
 
         $payment->payment_id = $state['payment_id'];

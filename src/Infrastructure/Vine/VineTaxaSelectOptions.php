@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Thinktomorrow\Trader\Infrastructure\Vine;
@@ -17,6 +18,7 @@ class VineTaxaSelectOptions implements TaxaSelectOptions
     private TaxonTreeRepository $taxonTreeRepository;
 
     private array $excludeTaxonIds = [];
+
     private TaxonomyRepository $taxonomyRepository;
 
     public function __construct(TaxonomyRepository $taxonomyRepository, TaxonTreeRepository $taxonTreeRepository)
@@ -52,7 +54,7 @@ class VineTaxaSelectOptions implements TaxaSelectOptions
 
     public function excludeTaxa(array|string $excludeTaxonIds): static
     {
-        $this->excludeTaxonIds = (array)$excludeTaxonIds;
+        $this->excludeTaxonIds = (array) $excludeTaxonIds;
 
         return $this;
     }

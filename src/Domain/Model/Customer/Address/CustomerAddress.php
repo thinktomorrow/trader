@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Thinktomorrow\Trader\Domain\Model\Customer\Address;
@@ -13,15 +14,14 @@ abstract class CustomerAddress
     use HasData;
 
     public readonly CustomerId $customerId;
+
     protected Address $address;
 
-    private function __construct()
-    {
-    }
+    private function __construct() {}
 
     public static function create(CustomerId $customerId, Address $address, array $data): static
     {
-        $customerAddress = new static();
+        $customerAddress = new static;
 
         $customerAddress->customerId = $customerId;
         $customerAddress->address = $address;
@@ -32,7 +32,7 @@ abstract class CustomerAddress
 
     public static function fromMappedData(array $state, array $aggregateState): static
     {
-        $address = new static();
+        $address = new static;
 
         $address->customerId = CustomerId::fromString($aggregateState['customer_id']);
         $address->address = new Address(CountryId::fromString($state['country_id']), $state['line_1'], $state['line_2'], $state['postal_code'], $state['city']);

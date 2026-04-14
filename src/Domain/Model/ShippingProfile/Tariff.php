@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Thinktomorrow\Trader\Domain\Model\ShippingProfile;
@@ -10,18 +11,20 @@ use Thinktomorrow\Trader\Domain\Common\Entity\ChildEntity;
 final class Tariff implements ChildEntity
 {
     public readonly TariffId $tariffId;
+
     public readonly ShippingProfileId $shippingProfileId;
+
     private Money $rate;
+
     private Money $from;
+
     private ?Money $to;
 
-    private function __construct()
-    {
-    }
+    private function __construct() {}
 
     public static function create(TariffId $tariffId, ShippingProfileId $shippingProfileId, Money $rate, Money $from, ?Money $to): static
     {
-        $object = new static();
+        $object = new self;
 
         $object->tariffId = $tariffId;
         $object->shippingProfileId = $shippingProfileId;
@@ -62,7 +65,7 @@ final class Tariff implements ChildEntity
 
     public static function fromMappedData(array $state, array $aggregateState): static
     {
-        $tariff = new static();
+        $tariff = new static;
 
         $tariff->tariffId = TariffId::fromString($state['tariff_id']);
         $tariff->shippingProfileId = ShippingProfileId::fromString($aggregateState['shipping_profile_id']);

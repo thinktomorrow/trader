@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Thinktomorrow\Trader\Domain\Model\Order;
@@ -44,31 +45,34 @@ use Thinktomorrow\Trader\Domain\Model\Order\State\OrderState;
 
 final class Order implements Aggregate, DiscountableItem
 {
+    use HasData;
+    use HasDiscounts;
+    use HasLines;
+    use HasOrderEvents;
+    use HasPayments;
+    use HasShippings;
     use RecordsEvents;
     use WithOrderTotals;
-    use HasLines;
-    use HasShippings;
-    use HasPayments;
-    use HasDiscounts;
-    use HasOrderEvents;
-    use HasData;
 
     public readonly OrderId $orderId;
+
     private OrderState $orderState;
+
     public readonly OrderReference $orderReference;
+
     private ?InvoiceReference $invoiceReference = null;
 
     private ?ShippingAddress $shippingAddress = null;
+
     private ?BillingAddress $billingAddress = null;
+
     private ?Shopper $shopper = null;
 
-    private function __construct()
-    {
-    }
+    private function __construct() {}
 
     public static function create(OrderId $orderId, OrderReference $orderReference, OrderState $orderState)
     {
-        $order = new static();
+        $order = new self;
 
         $order->orderId = $orderId;
         $order->orderReference = $orderReference;
@@ -300,10 +304,10 @@ final class Order implements Aggregate, DiscountableItem
 
     public static function fromMappedData(array $state, array $childEntities = []): static
     {
-        $order = new static();
+        $order = new self;
 
         if (! $state['order_state'] instanceof OrderState) {
-            throw new \InvalidArgumentException('Order state is expected to be instance of OrderState. Instead ' . gettype($state['order_state']) . ' is passed.');
+            throw new \InvalidArgumentException('Order state is expected to be instance of OrderState. Instead '.gettype($state['order_state']).' is passed.');
         }
 
         $order->orderId = OrderId::fromString($state['order_id']);
@@ -335,10 +339,10 @@ final class Order implements Aggregate, DiscountableItem
      */
     public static function fromMappedDataWithoutVatValidation(array $state, array $childEntities = []): static
     {
-        $order = new static();
+        $order = new static;
 
         if (! $state['order_state'] instanceof OrderState) {
-            throw new \InvalidArgumentException('Order state is expected to be instance of OrderState. Instead ' . gettype($state['order_state']) . ' is passed.');
+            throw new \InvalidArgumentException('Order state is expected to be instance of OrderState. Instead '.gettype($state['order_state']).' is passed.');
         }
 
         $order->orderId = OrderId::fromString($state['order_id']);

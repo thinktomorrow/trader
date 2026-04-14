@@ -10,8 +10,7 @@ final class VatAllocatedTotalPrices
         private VatAllocatedTotalPrice $payment,
         private VatAllocatedTotalPrice $discounts,
         private VatAllocatedTotalPrice $total,
-    ) {
-    }
+    ) {}
 
     public function items(): VatAllocatedTotalPrice
     {

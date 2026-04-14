@@ -11,9 +11,7 @@ class DummyVatNumberValidator implements VatNumberValidator
 {
     private ?VatNumberValidation $expectedResult = null;
 
-    public function __construct()
-    {
-    }
+    public function __construct() {}
 
     public function validate(VatNumber $vatNumber): VatNumberValidation
     {

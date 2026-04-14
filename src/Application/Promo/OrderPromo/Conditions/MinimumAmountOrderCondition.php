@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Thinktomorrow\Trader\Application\Promo\OrderPromo\Conditions;
@@ -32,7 +33,7 @@ class MinimumAmountOrderCondition implements OrderCondition
     {
         $data = json_decode($state['data'], true);
 
-        $condition = new static();
+        $condition = new static;
         $condition->amount = Cash::make($data['amount']);
 
         return $condition;

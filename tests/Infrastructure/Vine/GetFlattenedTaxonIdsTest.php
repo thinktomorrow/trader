@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Tests\Infrastructure\Vine;
@@ -180,5 +181,4 @@ final class GetFlattenedTaxonIdsTest extends TestCase
             $this->assertEquals(['taxon-2', 'taxon-1'], $taxonIds[$taxonomy->taxonomyId->get()]);
         }
     }
-
 }

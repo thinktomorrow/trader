@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Thinktomorrow\Trader\Infrastructure\Laravel\Models;
@@ -16,9 +17,13 @@ class DefaultVariantLink implements VariantLink
     use RendersData;
 
     protected bool $isActive = false;
+
     protected ?Variant $variant;
+
     protected string $groupId;
+
     protected iterable $images = [];
+
     protected array $data;
 
     private function __construct(string $groupId, ?Variant $variant, array $data)
@@ -69,7 +74,7 @@ class DefaultVariantLink implements VariantLink
             return null;
         }
 
-        return '/' . $this->variant->variantId->get();
+        return '/'.$this->variant->variantId->get();
     }
 
     public function isVariantAvailable(): bool

@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Thinktomorrow\Trader\Domain\Model\Order\OrderEvent;
@@ -11,12 +12,14 @@ final class OrderEvent implements ChildEntity
     use HasData;
 
     public readonly OrderEventId $orderEventId;
+
     private string $event;
+
     private \DateTime $createdAt;
 
     public static function create(OrderEventId $orderEventId, string $event, \DateTime $createdAt, array $data)
     {
-        $entry = new static();
+        $entry = new self;
         $entry->orderEventId = $orderEventId;
         $entry->event = $event;
         $entry->createdAt = $createdAt;
@@ -47,7 +50,7 @@ final class OrderEvent implements ChildEntity
 
     public static function fromMappedData(array $state, array $aggregateState): static
     {
-        $entry = new static();
+        $entry = new self;
 
         $entry->orderEventId = OrderEventId::fromString($state['entry_id']);
         $entry->event = $state['event'];

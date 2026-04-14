@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Thinktomorrow\Trader\Infrastructure\Laravel\Models\OrderRead;
@@ -18,16 +19,23 @@ abstract class OrderRead
 {
     use RendersData;
     use RendersMoney;
-    use WithImmutableOrderTotals;
     use WithFormattedOrderTotals;
+    use WithImmutableOrderTotals;
 
     protected string $orderId;
+
     protected string $orderReference;
+
     protected ?string $invoiceReference;
+
     protected OrderState $state;
+
     protected iterable $lines;
+
     protected ?MerchantOrderShippingAddress $shippingAddress;
+
     protected ?MerchantOrderBillingAddress $billingAddress;
+
     /** @var MerchantOrderShipping[] */
     protected array $shippings;
 
@@ -35,22 +43,22 @@ abstract class OrderRead
     protected array $payments;
 
     protected ?MerchantOrderShopper $shopper;
+
     protected array $discounts;
 
     /** @var MerchantOrderEvent[] */
     protected array $orderEvents;
+
     protected array $data;
 
-    final public function __construct()
-    {
-    }
+    final public function __construct() {}
 
     public static function fromMappedData(array $state, array $childObjects, array $discounts): static
     {
-        $order = new static();
+        $order = new static;
 
         if (! $state['order_state'] instanceof OrderState) {
-            throw new \InvalidArgumentException('Order state is expected to be instance of OrderState. Instead ' . gettype($state['order_state']) . ' is passed.');
+            throw new \InvalidArgumentException('Order state is expected to be instance of OrderState. Instead '.gettype($state['order_state']).' is passed.');
         }
 
         $order->orderId = $state['order_id'];
@@ -106,7 +114,7 @@ abstract class OrderRead
 
     public function getQuantity(): int
     {
-        return array_reduce((array)$this->getLines(), fn ($carry, $line) => $carry + $line->getQuantity(), 0);
+        return array_reduce((array) $this->getLines(), fn ($carry, $line) => $carry + $line->getQuantity(), 0);
     }
 
     public function isVatExempt(): bool

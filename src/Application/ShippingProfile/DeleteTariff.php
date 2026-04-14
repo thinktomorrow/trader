@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Thinktomorrow\Trader\Application\ShippingProfile;
@@ -9,6 +10,7 @@ use Thinktomorrow\Trader\Domain\Model\ShippingProfile\TariffId;
 class DeleteTariff
 {
     private string $shippingProfileId;
+
     private string $tariffId;
 
     public function __construct(string $shippingProfileId, string $tariffId)

@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Thinktomorrow\Trader\Application\Customer;
@@ -9,6 +10,7 @@ use Thinktomorrow\Trader\Domain\Model\Customer\CustomerId;
 class UpdateLocale
 {
     private string $customerId;
+
     private string $iso15897Locale;
 
     public function __construct(string $customerId, string $iso15897Locale)

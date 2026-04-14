@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Thinktomorrow\Trader\Domain\Model\CustomerLogin;
@@ -14,12 +15,14 @@ class CustomerLogin implements Aggregate
     use RecordsEvents;
 
     public readonly CustomerId $customerId;
+
     private Email $email;
+
     private string $password;
 
     public static function create(CustomerId $customerId, Email $email, string $password): static
     {
-        $customerLogin = new static();
+        $customerLogin = new static;
         $customerLogin->customerId = $customerId;
         $customerLogin->email = $email;
         $customerLogin->password = $password;
@@ -54,7 +57,7 @@ class CustomerLogin implements Aggregate
 
     public static function fromMappedData(array $state, array $childEntities = []): static
     {
-        $customerLogin = new static();
+        $customerLogin = new static;
         $customerLogin->customerId = CustomerId::fromString($state['customer_id']);
         $customerLogin->email = Email::fromString($state['email']);
         $customerLogin->password = $state['password'];

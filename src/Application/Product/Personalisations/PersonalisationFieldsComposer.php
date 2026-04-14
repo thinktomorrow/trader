@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Thinktomorrow\Trader\Application\Product\Personalisations;
@@ -11,6 +12,7 @@ use Thinktomorrow\Trader\Domain\Model\Product\ProductRepository;
 class PersonalisationFieldsComposer
 {
     private ProductRepository $productRepository;
+
     private ContainerInterface $container;
 
     public function __construct(ProductRepository $productRepository, ContainerInterface $container)

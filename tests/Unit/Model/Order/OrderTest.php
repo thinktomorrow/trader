@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Tests\Unit\Model\Order;
@@ -38,7 +39,7 @@ class OrderTest extends TestCase
             DefaultOrderState::cart_pending
         );
 
-        (new TestContainer())->get(AdjustOrderVatSnapshot::class)->adjust($order);
+        (new TestContainer)->get(AdjustOrderVatSnapshot::class)->adjust($order);
 
         $this->assertEquals([
             'order_id' => 'xxx',
@@ -106,7 +107,7 @@ class OrderTest extends TestCase
     {
         $order = $this->orderContext->createDefaultOrder();
 
-        /** @var \Thinktomorrow\Trader\Domain\Model\Order\Shipping\Shipping $shipping */
+        /** @var Shipping $shipping */
         $shipping = $order->getShippings()[0];
         $shipping->updateCost($cost = DefaultServicePrice::fromExcludingVat(Money::EUR('23')));
 
@@ -197,7 +198,7 @@ class OrderTest extends TestCase
     {
         $order = $this->orderContext->createDefaultOrder();
 
-        $order->addLogEntry($logEntry = OrderEvent::create(OrderEventId::fromString('abc'), 'xxx', new \DateTime(), []));
+        $order->addLogEntry($logEntry = OrderEvent::create(OrderEventId::fromString('abc'), 'xxx', new \DateTime, []));
 
         $this->assertCount(1, $order->getOrderEvents());
         $this->assertEquals($logEntry->getMappedData(), $order->getChildEntities()[OrderEvent::class][0]);

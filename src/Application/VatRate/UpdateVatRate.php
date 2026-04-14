@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Thinktomorrow\Trader\Application\VatRate;
@@ -9,7 +10,9 @@ use Thinktomorrow\Trader\Domain\Model\VatRate\VatRateId;
 class UpdateVatRate
 {
     private string $vatRateId;
+
     private string $rate;
+
     private array $data;
 
     public function __construct(string $vatRateId, string $rate, array $data)

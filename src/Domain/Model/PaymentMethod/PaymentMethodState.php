@@ -11,7 +11,7 @@ enum PaymentMethodState: string
     public static function onlineStates(): array
     {
         return [
-            static::online,
+            self::online,
         ];
     }
 }

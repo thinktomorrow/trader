@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Thinktomorrow\Trader\Application\Product;
@@ -10,9 +11,13 @@ use Thinktomorrow\Trader\Domain\Model\Product\Variant\VariantUnitPrice;
 class CreateVariant
 {
     private string $productId;
+
     private string $unitPrice;
+
     private string $taxRate;
+
     private string $sku;
+
     private array $data;
 
     public function __construct(string $productId, string $unitPrice, string $taxRate, string $sku, array $data)

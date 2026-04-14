@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Thinktomorrow\Trader\Application\ShippingProfile;
@@ -14,6 +15,7 @@ use Thinktomorrow\Trader\Domain\Model\ShippingProfile\TariffId;
 class ShippingProfileApplication
 {
     private EventDispatcher $eventDispatcher;
+
     private ShippingProfileRepository $shippingProfileRepository;
 
     public function __construct(EventDispatcher $eventDispatcher, ShippingProfileRepository $shippingProfileRepository)
@@ -21,7 +23,6 @@ class ShippingProfileApplication
         $this->eventDispatcher = $eventDispatcher;
         $this->shippingProfileRepository = $shippingProfileRepository;
     }
-
 
     public function createShippingProfile(CreateShippingProfile $command): ShippingProfileId
     {

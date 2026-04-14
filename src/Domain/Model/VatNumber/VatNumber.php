@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Thinktomorrow\Trader\Domain\Model\VatNumber;
 
@@ -47,12 +49,12 @@ class VatNumber
 
     public function equals($other): bool
     {
-        return ($other instanceof self && $other->countryCode === $this->countryCode && $other->number === $this->number);
+        return $other instanceof self && $other->countryCode === $this->countryCode && $other->number === $this->number;
     }
 
     public function get(): string
     {
-        return $this->countryCode . $this->number;
+        return $this->countryCode.$this->number;
     }
 
     public function __toString(): string
@@ -63,7 +65,7 @@ class VatNumber
     private function validate(string $countryCode, string $number)
     {
         if (strlen($countryCode) !== 2 || ! ctype_alpha($countryCode)) {
-            throw new InvalidVatNumber('Invalid country code [' . $countryCode . ']');
+            throw new InvalidVatNumber('Invalid country code ['.$countryCode.']');
         }
 
         /**
@@ -71,11 +73,11 @@ class VatNumber
          * but at least of eight characters + iso country code (2 chars)
          */
         if (! $number || strlen($number) < 8) {
-            throw new InvalidVatNumber('Invalid vat number [' . $number . ']');
+            throw new InvalidVatNumber('Invalid vat number ['.$number.']');
         }
 
         if (($includedCountryCode = self::findIncludedCountryCode($number)) && $includedCountryCode !== $countryCode) {
-            throw new VatNumberCountryMismatch('Invalid vat number [' . $number . ']. Included country code [' . $includedCountryCode . '] does not match given country code [' . $countryCode . ']');
+            throw new VatNumberCountryMismatch('Invalid vat number ['.$number.']. Included country code ['.$includedCountryCode.'] does not match given country code ['.$countryCode.']');
         }
     }
 
@@ -92,7 +94,7 @@ class VatNumber
 
     private static function cleanup($number): string
     {
-        return str_replace([' ', '.', '-', ',', ', '], '', (string)$number);
+        return str_replace([' ', '.', '-', ',', ', '], '', (string) $number);
     }
 
     private static function findIncludedCountryCode(string $number): ?string

@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Thinktomorrow\Trader\Infrastructure\Laravel\Models\MerchantOrder;
@@ -11,17 +12,18 @@ class DefaultMerchantOrderEvent implements MerchantOrderEvent
     use RendersData;
 
     protected string $entry_id;
+
     protected string $event;
+
     protected \DateTime $createdAt;
+
     protected array $data;
 
-    final public function __construct()
-    {
-    }
+    final public function __construct() {}
 
     public static function fromMappedData(array $state, array $orderState): static
     {
-        $entry = new static();
+        $entry = new static;
 
         $entry->entry_id = $state['entry_id'];
         $entry->event = $state['event'];

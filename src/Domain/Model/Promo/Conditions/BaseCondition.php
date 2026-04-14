@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Thinktomorrow\Trader\Domain\Model\Promo\Conditions;
@@ -19,7 +20,7 @@ abstract class BaseCondition
 
     public static function fromMappedData(array $state, array $aggregateState): static
     {
-        $object = new static();
+        $object = new static;
 
         $object->data = json_decode($state['data'], true);
 

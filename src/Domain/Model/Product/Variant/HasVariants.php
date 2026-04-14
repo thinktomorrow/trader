@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Thinktomorrow\Trader\Domain\Model\Product\Variant;
@@ -29,11 +30,11 @@ trait HasVariants
 
     public function createVariant(Variant $variant): void
     {
-        Assertion::true($variant->productId->equals($this->productId), 'Variant has a different product id [' . $variant->productId->get() . '] that the product it is being added to [' . $this->productId->get() . '].');
+        Assertion::true($variant->productId->equals($this->productId), 'Variant has a different product id ['.$variant->productId->get().'] that the product it is being added to ['.$this->productId->get().'].');
 
-        if (null !== $this->findVariantIndex($variant->variantId)) {
+        if ($this->findVariantIndex($variant->variantId) !== null) {
             throw new VariantAlreadyExistsOnProduct(
-                'Cannot add variant because product [' . $this->productId->get() . '] already has variant [' . $variant->variantId->get() . ']'
+                'Cannot add variant because product ['.$this->productId->get().'] already has variant ['.$variant->variantId->get().']'
             );
         }
 
@@ -51,9 +52,9 @@ trait HasVariants
     {
         $index = $this->findVariantIndex($variantId);
 
-        if (null === $index) {
+        if ($index === null) {
             throw new CouldNotFindVariantOnProduct(
-                'Cannot find variant [' . $variantId->get() . '] on product [' . $this->productId->get() . ']'
+                'Cannot find variant ['.$variantId->get().'] on product ['.$this->productId->get().']'
             );
         }
 
@@ -62,10 +63,10 @@ trait HasVariants
 
     public function updateVariant(Variant $variant): void
     {
-        Assertion::true($variant->productId->equals($this->productId), 'Variant has a different product id [' . $variant->productId->get() . '] that the product it is being added to [' . $this->productId->get() . '].');
+        Assertion::true($variant->productId->equals($this->productId), 'Variant has a different product id ['.$variant->productId->get().'] that the product it is being added to ['.$this->productId->get().'].');
 
         if (null === $variantIndex = $this->findVariantIndex($variant->variantId)) {
-            throw new CouldNotFindVariantOnProduct('No variant by id ' . $variant->variantId->get() . ' found on product ' . $this->productId->get());
+            throw new CouldNotFindVariantOnProduct('No variant by id '.$variant->variantId->get().' found on product '.$this->productId->get());
         }
 
         $this->variants[$variantIndex] = $variant;

@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Thinktomorrow\Trader\Application\Product;
@@ -12,10 +13,15 @@ use Thinktomorrow\Trader\Domain\Model\Taxon\TaxonId;
 class CreateProduct
 {
     private array $taxonIds;
+
     private string $unitPrice;
+
     private string $taxRate;
+
     private string $sku;
+
     private array $data;
+
     private array $variantData;
 
     public function __construct(array $taxonIds, string $unitPrice, string $taxRate, string $sku, array $data, array $variantData)

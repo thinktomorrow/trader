@@ -15,7 +15,7 @@ final class ProRateAllocatorTest extends TestCase
 
     protected function setUp(): void
     {
-        $this->allocator = new ProRateAllocator();
+        $this->allocator = new ProRateAllocator;
     }
 
     public function test_it_allocates_pro_rata_and_preserves_total(): void
@@ -118,7 +118,7 @@ final class ProRateAllocatorTest extends TestCase
     #[DataProvider('remainderCases')]
     public function test_remainder_distribution_edge_cases(
         array $items,
-        int   $toAllocate,
+        int $toAllocate,
         array $expected
     ): void {
         // Map items to DefaultItemPrices

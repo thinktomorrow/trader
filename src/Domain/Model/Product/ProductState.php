@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Thinktomorrow\Trader\Domain\Model\Product;
@@ -13,7 +14,7 @@ enum ProductState: string
     public static function onlineStates(): array
     {
         return [
-            static::online,
+            self::online,
         ];
     }
 }

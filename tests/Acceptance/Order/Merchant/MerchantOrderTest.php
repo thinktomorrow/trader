@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Tests\Acceptance\Order\Merchant;
@@ -23,7 +24,7 @@ class MerchantOrderTest extends CartContext
     {
         $order = $this->orderContext->createDefaultDiscountedOrder();
 
-        (new TestContainer())->get(AdjustOrderVatSnapshot::class)->adjust($order);
+        (new TestContainer)->get(AdjustOrderVatSnapshot::class)->adjust($order);
         $this->orderContext->saveOrder($order);
 
         $order = $this->orderContext->findMerchantOrder($order->orderId->get());
@@ -49,7 +50,7 @@ class MerchantOrderTest extends CartContext
     {
         $order = $this->orderContext->createDefaultDiscountedOrder();
 
-        (new TestContainer())->get(AdjustOrderVatSnapshot::class)->adjust($order);
+        (new TestContainer)->get(AdjustOrderVatSnapshot::class)->adjust($order);
         $this->orderContext->saveOrder($order);
 
         $order = $this->orderContext->findMerchantOrder($order->orderId->get());
@@ -187,7 +188,7 @@ class MerchantOrderTest extends CartContext
 
         // Vat Snapshot needs to be adjusted to pick up customer info
         $order = $this->orderContext->findOrder(OrderId::fromString('xxx'));
-        (new TestContainer())->get(AdjustOrderVatSnapshot::class)->adjust($order);
+        (new TestContainer)->get(AdjustOrderVatSnapshot::class)->adjust($order);
         $this->orderContext->saveOrder($order);
 
         $order = $this->orderContext->findMerchantOrder(OrderId::fromString('xxx'));
@@ -206,7 +207,7 @@ class MerchantOrderTest extends CartContext
 
         // Vat Snapshot needs to be adjusted to pick up customer info
         $order = $this->orderContext->findOrder(OrderId::fromString('xxx'));
-        (new TestContainer())->get(AdjustOrderVatSnapshot::class)->adjust($order);
+        (new TestContainer)->get(AdjustOrderVatSnapshot::class)->adjust($order);
         $this->orderContext->saveOrder($order);
 
         $order = $this->orderContext->findMerchantOrder(OrderId::fromString('xxx'));

@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Thinktomorrow\Trader\Application\VatRate;
@@ -14,6 +15,7 @@ use Thinktomorrow\Trader\Domain\Model\VatRate\VatRateRepository;
 class VatRateApplication
 {
     private EventDispatcher $eventDispatcher;
+
     private VatRateRepository $vatRateRepository;
 
     public function __construct(EventDispatcher $eventDispatcher, VatRateRepository $vatRateRepository)

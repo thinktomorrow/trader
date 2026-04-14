@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Tests\Infrastructure\Repositories;
@@ -88,6 +89,6 @@ final class RedirectRepositoryTest extends TestCase
 
     private static function repositories(): \Generator
     {
-        yield new MysqlTaxonRedirectRepository();
+        yield new MysqlTaxonRedirectRepository;
     }
 }

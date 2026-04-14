@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Thinktomorrow\Trader\Application\Order\Invoice;
@@ -9,10 +10,10 @@ class ParsedInvoiceReferenceByYear
 {
     public function __construct(public readonly string $year, public readonly string $number)
     {
-        $number = (int)$number;
+        $number = (int) $number;
 
         if ($number < 0) {
-            throw new \InvalidArgumentException('Invalid invoice number for invoice reference ' . $this->year . $this->number . '. Invoice number should be a positive integer.');
+            throw new \InvalidArgumentException('Invalid invoice number for invoice reference '.$this->year.$this->number.'. Invoice number should be a positive integer.');
         }
     }
 

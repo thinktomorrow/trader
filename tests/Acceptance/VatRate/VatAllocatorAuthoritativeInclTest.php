@@ -39,7 +39,7 @@ final class VatAllocatorAuthoritativeInclTest extends TestCase
         $order = $this->orderContext->createEmptyOrder();
         $this->orderContext->addLineToOrder($order, $line);
 
-        $allocator = new VatAllocator(new ProRateAllocator());
+        $allocator = new VatAllocator(new ProRateAllocator);
 
         $result = $allocator->allocate(
             $order,

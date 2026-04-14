@@ -15,7 +15,9 @@ use Money\Money;
 final class VatAllocatedLine
 {
     private Money $taxableBase;
+
     private Money $vatAmount;
+
     private VatPercentage $vatPercentage;
 
     public function __construct(Money $taxableBase, Money $vatAmount, VatPercentage $vatPercentage)
@@ -48,11 +50,11 @@ final class VatAllocatedLine
     public function add(VatAllocatedLine $other): static
     {
         if (! $this->vatPercentage->equals($other->vatPercentage)) {
-            throw new \InvalidArgumentException('Cannot add VatAllocatedLine with different VAT percentages. ' .
-                'Given: ' . $other->vatPercentage->get() . '%, expected: ' . $this->vatPercentage->get() . '%.');
+            throw new \InvalidArgumentException('Cannot add VatAllocatedLine with different VAT percentages. '.
+                'Given: '.$other->vatPercentage->get().'%, expected: '.$this->vatPercentage->get().'%.');
         }
 
-        return new static(
+        return new self(
             $this->taxableBase->add($other->taxableBase),
             $this->vatAmount->add($other->vatAmount),
             $this->vatPercentage
@@ -62,8 +64,8 @@ final class VatAllocatedLine
     public function subtract(VatAllocatedLine $other): static
     {
         if (! $this->vatPercentage->equals($other->vatPercentage)) {
-            throw new \InvalidArgumentException('Cannot subtract VatAllocatedLine with different VAT percentages. ' .
-                'Given: ' . $other->vatPercentage->get() . '%, expected: ' . $this->vatPercentage->get() . '%.');
+            throw new \InvalidArgumentException('Cannot subtract VatAllocatedLine with different VAT percentages. '.
+                'Given: '.$other->vatPercentage->get().'%, expected: '.$this->vatPercentage->get().'%.');
         }
 
         return new static(

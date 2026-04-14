@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Thinktomorrow\Trader\Domain\Common;
@@ -17,10 +18,9 @@ final class Locale
         $this->locale = strtolower(str_replace('_', '-', $locale));
     }
 
-
     public static function fromString(string $locale): self
     {
-        return new static($locale);
+        return new self($locale);
     }
 
     public function get(): string
@@ -30,7 +30,7 @@ final class Locale
 
     public function getLanguage(): string
     {
-        [$language,] = $this->splitInLanguageAndRegion();
+        [$language] = $this->splitInLanguageAndRegion();
 
         return $language;
     }
@@ -48,18 +48,16 @@ final class Locale
      * - uppercased ISO 3166-1 country/region codes
      *
      * https://en.wikipedia.org/wiki/ISO/IEC_15897
-     * @return string
      */
     public function toIso15897(): string
     {
         [$language, $region] = $this->splitInLanguageAndRegion();
 
-        return $language . '_' . strtoupper($region);
+        return $language.'_'.strtoupper($region);
     }
 
     /**
      * The language (in ISO 639-1 format) and optionally a region (in ISO 3166-1 Alpha 2 format)
-     * @return string
      */
     public function toIso639(): string
     {
@@ -69,7 +67,7 @@ final class Locale
             return $language;
         }
 
-        return $language . '-' . strtoupper($region);
+        return $language.'-'.strtoupper($region);
     }
 
     public function __toString(): string
@@ -80,7 +78,7 @@ final class Locale
     public function equals($other): bool
     {
         return get_class($other) === get_class($this)
-            && (string)$this === (string)$other;
+            && (string) $this === (string) $other;
     }
 
     private function splitInLanguageAndRegion(): array

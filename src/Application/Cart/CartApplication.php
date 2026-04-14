@@ -19,6 +19,7 @@ use Thinktomorrow\Trader\Application\Cart\RefreshCart\Adjusters\AdjustVatRates;
 use Thinktomorrow\Trader\Application\Cart\RefreshCart\RefreshCart;
 use Thinktomorrow\Trader\Application\Cart\RefreshCart\RefreshCartAction;
 use Thinktomorrow\Trader\Application\Cart\ShippingProfile\UpdateShippingProfileOnOrder;
+use Thinktomorrow\Trader\Application\Product\ProductDetail\ProductDetail;
 use Thinktomorrow\Trader\Application\Product\ProductDetail\ProductDetailRepository;
 use Thinktomorrow\Trader\Application\Product\Taxa\ProductTaxonItem;
 use Thinktomorrow\Trader\Application\Product\Taxa\VariantTaxonItem;
@@ -60,8 +61,7 @@ final class CartApplication
         private EventDispatcher $eventDispatcher,
         private VatNumberApplication $vatNumberApplication,
         private VatExemptionApplication $vatExemptionApplication,
-    ) {
-    }
+    ) {}
 
     public function refresh(RefreshCart $refreshCart): void
     {
@@ -502,7 +502,7 @@ final class CartApplication
         $this->eventDispatcher->dispatchAll($order->releaseEvents());
     }
 
-    private function extractTaxaData(\Thinktomorrow\Trader\Application\Product\ProductDetail\ProductDetail $product, ?string $locale): array
+    private function extractTaxaData(ProductDetail $product, ?string $locale): array
     {
         $taxaData = [];
 

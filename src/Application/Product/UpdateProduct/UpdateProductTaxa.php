@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Thinktomorrow\Trader\Application\Product\UpdateProduct;
@@ -11,7 +12,9 @@ use Thinktomorrow\Trader\Domain\Model\Taxonomy\TaxonomyId;
 class UpdateProductTaxa
 {
     private string $productId;
+
     private array $taxonIds;
+
     private array $scopedTaxonomyIds;
 
     public function __construct(string $productId, array $taxonIds, array $scopedTaxonomyIds = [])

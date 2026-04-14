@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Thinktomorrow\Trader\Domain\Model\Promo;
@@ -15,8 +16,11 @@ class Promo implements Aggregate
     use RecordsEvents;
 
     public readonly PromoId $promoId;
+
     private PromoState $state;
+
     private ?string $coupon_code;
+
     private bool $isCombinable;
 
     /**
@@ -26,6 +30,7 @@ class Promo implements Aggregate
     private bool $isSystemPromo = false;
 
     private ?\DateTime $startAt;
+
     private ?\DateTime $endAt;
 
     /** @var Discount[] */
@@ -33,7 +38,7 @@ class Promo implements Aggregate
 
     public static function create(PromoId $promoId, ?string $coupon_code, ?\DateTime $startAt, ?\DateTime $endAt, bool $isCombinable): static
     {
-        $promo = new static();
+        $promo = new static;
         $promo->promoId = $promoId;
         $promo->state = PromoState::online;
         $promo->isCombinable = $isCombinable;
@@ -67,7 +72,7 @@ class Promo implements Aggregate
      */
     public function hasCouponCode(): bool
     {
-        return ! ! $this->coupon_code;
+        return (bool) $this->coupon_code;
     }
 
     public function getCouponCode(): ?string
@@ -142,7 +147,7 @@ class Promo implements Aggregate
     {
         Assertion::allIsInstanceOf($childEntities[Discount::class], Discount::class);
 
-        $promo = new static();
+        $promo = new static;
 
         $promo->promoId = PromoId::fromString($state['promo_id']);
         $promo->state = PromoState::from($state['state']);
@@ -157,7 +162,6 @@ class Promo implements Aggregate
         //        $promo->discounts = array_key_exists(Discount::class, $childEntities)
         //            ? array_map(fn ($discountState) => Discount::fromMappedData($discountState, $state, [Condition::class => $discountState[Condition::class]]), $childEntities[Discount::class])
         //            : [];
-
 
         return $promo;
     }

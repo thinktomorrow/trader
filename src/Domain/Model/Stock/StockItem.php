@@ -11,11 +11,13 @@ use Thinktomorrow\Trader\Domain\Model\Stock\Events\StockReduced;
 
 class StockItem implements Aggregate
 {
-    use RecordsEvents;
     use HasData;
+    use RecordsEvents;
 
     public readonly StockItemId $stockItemId;
+
     private int $stockLevel;
+
     private bool $ignoreOutOfStock;
 
     public function updateStockLevel(int $level): void
@@ -77,7 +79,7 @@ class StockItem implements Aggregate
 
     public static function fromMappedData(array $state, array $childEntities = []): static
     {
-        $stockItem = new self();
+        $stockItem = new self;
 
         $stockItem->stockItemId = StockItemId::fromString($state['stockitem_id']);
         $stockItem->stockLevel = (int) $state['stock_level'];

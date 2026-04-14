@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Tests\Unit\Model\Order;
@@ -34,18 +35,18 @@ use Thinktomorrow\Trader\Domain\Model\Order\Events\ShippingStates\ShipmentMarked
 use Thinktomorrow\Trader\Domain\Model\Order\Events\ShippingStates\ShipmentPacked;
 use Thinktomorrow\Trader\Domain\Model\Order\Events\ShippingStates\ShipmentReturned;
 use Thinktomorrow\Trader\Domain\Model\Order\Events\ShippingStateUpdated;
+use Thinktomorrow\Trader\Domain\Model\Order\Order;
 use Thinktomorrow\Trader\Domain\Model\Order\Payment\DefaultPaymentState;
 use Thinktomorrow\Trader\Domain\Model\Order\Shipping\DefaultShippingState;
 use Thinktomorrow\Trader\Domain\Model\Order\State\DefaultOrderState;
 
 class OrderStateTest extends TestCase
 {
-    private \Thinktomorrow\Trader\Domain\Model\Order\Order $order;
+    private Order $order;
 
     protected function setUp(): void
     {
         parent::setUp();
-
 
         $this->order = $this->orderContext->createDefaultOrder();
     }

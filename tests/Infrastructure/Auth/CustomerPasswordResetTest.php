@@ -1,18 +1,20 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Infrastructure\Auth;
 
-use function bcrypt;
 use Carbon\Carbon;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Notification;
-use function route;
 use Tests\Infrastructure\TestCase;
 use Thinktomorrow\Trader\Infrastructure\Shop\CustomerAuth\CustomerModel;
 use Thinktomorrow\Trader\Infrastructure\Shop\CustomerAuth\Notifications\ResetCustomerPasswordNotification;
+
+use function bcrypt;
+use function route;
 
 class CustomerPasswordResetTest extends TestCase
 {
@@ -68,20 +70,19 @@ class CustomerPasswordResetTest extends TestCase
 
         // Create reset token manually so we can check the token
         DB::insert('INSERT INTO trader_customer_password_resets (email, token, created_at) VALUES(?, ?, ?)', [
-            "ben@thinktomorrow.be",
-            bcrypt("71594f253f7543eca5d884b37c637b0611b6a40809250c2e5ba2fbc9db74916c"),
+            'ben@thinktomorrow.be',
+            bcrypt('71594f253f7543eca5d884b37c637b0611b6a40809250c2e5ba2fbc9db74916c'),
             Carbon::now(),
         ]);
 
         $response = $this->post(route('customer.password.reset.store'), [
-            'token' => "71594f253f7543eca5d884b37c637b0611b6a40809250c2e5ba2fbc9db74916c",
-            'email' => "ben@thinktomorrow.be",
-            'password' => "new-password",
-            'password_confirmation' => "new-password",
+            'token' => '71594f253f7543eca5d884b37c637b0611b6a40809250c2e5ba2fbc9db74916c',
+            'email' => 'ben@thinktomorrow.be',
+            'password' => 'new-password',
+            'password_confirmation' => 'new-password',
         ]);
 
         $response->assertRedirect(route('customer.index'));
-
 
         Auth::guard('customer')->logout();
 

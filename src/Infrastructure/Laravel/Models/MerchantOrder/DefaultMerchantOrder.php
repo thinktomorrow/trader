@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Thinktomorrow\Trader\Infrastructure\Laravel\Models\MerchantOrder;
@@ -14,7 +15,9 @@ use Thinktomorrow\Trader\Infrastructure\Laravel\Models\OrderRead\OrderRead;
 class DefaultMerchantOrder extends OrderRead implements MerchantOrder
 {
     protected ?\DateTime $confirmed_at;
+
     protected ?\DateTime $paid_at;
+
     protected ?\DateTime $delivered_at;
 
     public static function fromMappedData(array $state, array $childObjects, array $discounts): static

@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Thinktomorrow\Trader\Application\VatNumber;
@@ -10,12 +11,11 @@ use Thinktomorrow\Trader\Domain\Model\VatNumber\VatNumberValidationState;
 class VatNumberValidation
 {
     public function __construct(
-        public readonly string                   $countryCode,
-        public readonly string                   $vatNumber,
+        public readonly string $countryCode,
+        public readonly string $vatNumber,
         public readonly VatNumberValidationState $state,
-        public readonly array                    $data
-    ) {
-    }
+        public readonly array $data
+    ) {}
 
     public static function fromException(string $countryCode, string $vatNumber, \Exception $exception): self
     {

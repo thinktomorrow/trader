@@ -13,16 +13,13 @@ trait TestHelpers
 {
     protected function disableExceptionHandling(): void
     {
-        $this->app->instance(ExceptionHandler::class, new class implements ExceptionHandler {
-            public function __construct()
-            {
-            }
+        $this->app->instance(ExceptionHandler::class, new class implements ExceptionHandler
+        {
+            public function __construct() {}
 
-            public function report(\Throwable $e)
-            {
-            }
+            public function report(Throwable $e) {}
 
-            public function render($request, \Throwable $e)
+            public function render($request, Throwable $e)
             {
                 throw $e;
             }
@@ -588,13 +585,12 @@ trait TestHelpers
     //        ], $mappedData), []);
     //    }
 
-
     protected function assertArrayEqualsWithWildcard(array $expected, array $actual, $message = null): void
     {
-        $message = $message ?: 'actual array: ' . print_r($actual, true) . ' does not match expected: ' . print_r($expected, true);
+        $message = $message ?: 'actual array: '.print_r($actual, true).' does not match expected: '.print_r($expected, true);
 
-        $this->assertEquals(count($expected), count($actual), 'Count doesn\'t match: ' . $message);
-        $this->assertEquals(array_keys($expected), array_keys($actual), 'Keys do not match: ' . $message);
+        $this->assertEquals(count($expected), count($actual), 'Count doesn\'t match: '.$message);
+        $this->assertEquals(array_keys($expected), array_keys($actual), 'Keys do not match: '.$message);
 
         foreach ($expected as $expectedKey => $expectedValue) {
             if (is_array($expectedValue) && ! is_array($actual[$expectedKey])) {

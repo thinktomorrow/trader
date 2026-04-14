@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Thinktomorrow\Trader\Infrastructure\Laravel\Models\OrderRead;
@@ -20,17 +21,18 @@ abstract class OrderReadDiscount
     use RendersMoney;
 
     protected DiscountPrice|ItemDiscountPrice $discountPrice;
+
     protected Percentage $percentage;
+
     protected string $discount_id;
+
     protected array $data;
 
-    final public function __construct()
-    {
-    }
+    final public function __construct() {}
 
     public static function fromMappedData(array $state, array $orderState): static
     {
-        $discount = new static();
+        $discount = new static;
 
         $discount->discount_id = $state['discount_id'];
         $discount->percentage = $state['percentage'];

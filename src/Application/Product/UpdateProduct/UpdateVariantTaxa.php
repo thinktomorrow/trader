@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Thinktomorrow\Trader\Application\Product\UpdateProduct;
@@ -11,7 +12,9 @@ use Thinktomorrow\Trader\Domain\Model\Taxon\TaxonId;
 class UpdateVariantTaxa
 {
     private string $productId;
+
     private string $variantId;
+
     private array $taxonIds;
 
     public function __construct(string $productId, string $variantId, array $taxonIds)

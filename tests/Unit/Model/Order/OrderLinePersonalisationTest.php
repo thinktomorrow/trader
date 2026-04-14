@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Tests\Unit\Model\Order;
@@ -7,12 +8,13 @@ use Tests\Unit\TestCase;
 use Thinktomorrow\Trader\Domain\Model\Order\Line\LineId;
 use Thinktomorrow\Trader\Domain\Model\Order\Line\Personalisations\LinePersonalisation;
 use Thinktomorrow\Trader\Domain\Model\Order\Line\Personalisations\LinePersonalisationId;
+use Thinktomorrow\Trader\Domain\Model\Order\Order;
 use Thinktomorrow\Trader\Domain\Model\Product\Personalisation\PersonalisationId;
 use Thinktomorrow\Trader\Domain\Model\Product\Personalisation\PersonalisationType;
 
 final class OrderLinePersonalisationTest extends TestCase
 {
-    private \Thinktomorrow\Trader\Domain\Model\Order\Order $order;
+    private Order $order;
 
     protected function setUp(): void
     {

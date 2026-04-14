@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Thinktomorrow\Trader\Application\Order\Merchant;
@@ -8,6 +9,7 @@ use Thinktomorrow\Trader\Domain\Model\Order\OrderId;
 class VerifyVatNumber
 {
     private string $orderId;
+
     private string $vatNumber;
 
     public function __construct(string $orderId, string $vatNumber)

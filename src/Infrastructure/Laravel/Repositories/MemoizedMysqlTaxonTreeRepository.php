@@ -42,7 +42,7 @@ class MemoizedMysqlTaxonTreeRepository implements CategoryRepository, TaxonTreeR
         $taxonNode = $this->getTree()->find(fn (TaxonNode $taxonNode) => $taxonNode->getId() == $taxonId);
 
         if (! $taxonNode) {
-            throw new CouldNotFindTaxon('No taxon record found by id ' . $taxonId);
+            throw new CouldNotFindTaxon('No taxon record found by id '.$taxonId);
         }
 
         return $taxonNode;
@@ -75,7 +75,7 @@ class MemoizedMysqlTaxonTreeRepository implements CategoryRepository, TaxonTreeR
 
     public function getTreeByTaxonomy(string $taxonomyId): TaxonTree
     {
-        $memoizeKey = $this->locale->get() . '_' . $taxonomyId;
+        $memoizeKey = $this->locale->get().'_'.$taxonomyId;
 
         if (isset(static::$trees[$memoizeKey])) {
             return static::$trees[$memoizeKey];
@@ -88,7 +88,7 @@ class MemoizedMysqlTaxonTreeRepository implements CategoryRepository, TaxonTreeR
 
     public function getTreeByTaxonomies(array $taxonomyIds): TaxonTree
     {
-        $memoizeKey = $this->locale->get() . '_' . implode('_', $taxonomyIds);
+        $memoizeKey = $this->locale->get().'_'.implode('_', $taxonomyIds);
 
         if (isset(static::$trees[$memoizeKey])) {
             return static::$trees[$memoizeKey];

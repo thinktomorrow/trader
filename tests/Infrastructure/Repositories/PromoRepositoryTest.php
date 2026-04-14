@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Tests\Infrastructure\Repositories;
@@ -12,7 +13,6 @@ use Thinktomorrow\Trader\Testing\Order\OrderContext;
 
 final class PromoRepositoryTest extends TestCase
 {
-
     public function test_it_can_save_and_find_a_promo()
     {
         foreach (OrderContext::drivers() as $orderContext) {
@@ -25,7 +25,6 @@ final class PromoRepositoryTest extends TestCase
             $this->assertEquals($promo, $repository->find($promo->promoId));
         }
     }
-
 
     public function test_it_can_delete_a_promo()
     {

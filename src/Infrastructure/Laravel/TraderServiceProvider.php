@@ -32,6 +32,8 @@ use Thinktomorrow\Trader\Application\Customer\Read\CustomerBillingAddress;
 use Thinktomorrow\Trader\Application\Customer\Read\CustomerRead;
 use Thinktomorrow\Trader\Application\Customer\Read\CustomerReadRepository;
 use Thinktomorrow\Trader\Application\Customer\Read\CustomerShippingAddress;
+use Thinktomorrow\Trader\Application\Order\Grid\OrderGridItem;
+use Thinktomorrow\Trader\Application\Order\Grid\OrderGridRepository;
 use Thinktomorrow\Trader\Application\Order\MerchantOrder\MerchantOrder;
 use Thinktomorrow\Trader\Application\Order\MerchantOrder\MerchantOrderBillingAddress;
 use Thinktomorrow\Trader\Application\Order\MerchantOrder\MerchantOrderDiscount;
@@ -167,8 +169,8 @@ class TraderServiceProvider extends ServiceProvider
     public function register()
     {
         // Trader
-        $this->app->bind(TraderConfig::class, \Thinktomorrow\Trader\Infrastructure\Laravel\config\TraderConfig::class);
-        $this->app->bind(EventDispatcher::class, \Thinktomorrow\Trader\Infrastructure\Laravel\Services\EventDispatcher::class);
+        $this->app->bind(TraderConfig::class, config\TraderConfig::class);
+        $this->app->bind(EventDispatcher::class, Services\EventDispatcher::class);
 
         // Catalog Repositories
         $this->app->bind(GridRepository::class, MysqlGridRepository::class);
@@ -201,7 +203,7 @@ class TraderServiceProvider extends ServiceProvider
         $this->app->bind(VatRateRepository::class, MysqlVatRateRepository::class);
         $this->app->bind(PaymentMethodRepository::class, MysqlPaymentMethodRepository::class);
         $this->app->bind(MerchantOrderRepository::class, MysqlMerchantOrderRepository::class);
-        $this->app->bind(\Thinktomorrow\Trader\Application\Order\Grid\OrderGridRepository::class, MysqlOrderGridRepository::class);
+        $this->app->bind(OrderGridRepository::class, MysqlOrderGridRepository::class);
         $this->app->bind(VatNumberValidator::class, function () {
             return new ViesVatNumberValidator(ViesClient::createDefault());
         });
@@ -224,7 +226,7 @@ class TraderServiceProvider extends ServiceProvider
         $this->app->bind(VariantForCart::class, fn () => DefaultVariantForCart::class);
 
         // Order models
-        $this->app->bind(\Thinktomorrow\Trader\Application\Order\Grid\OrderGridItem::class, fn () => DefaultOrderGridItem::class);
+        $this->app->bind(OrderGridItem::class, fn () => DefaultOrderGridItem::class);
         $this->app->bind(Cart::class, fn () => DefaultCart::class);
         $this->app->bind(CartLine::class, fn () => DefaultCartLine::class);
         $this->app->bind(CartLinePersonalisation::class, fn () => DefaultCartLinePersonalisation::class);
@@ -266,11 +268,11 @@ class TraderServiceProvider extends ServiceProvider
     public function boot()
     {
         // Config
-        $this->publishes([__DIR__ . '/config/config.php' => config_path('trader.php')]);
-        $this->mergeConfigFrom(__DIR__ . '/config/config.php', 'trader');
+        $this->publishes([__DIR__.'/config/config.php' => config_path('trader.php')]);
+        $this->mergeConfigFrom(__DIR__.'/config/config.php', 'trader');
 
         // Migrations
-        $this->loadMigrationsFrom(__DIR__ . '/database/migrations');
+        $this->loadMigrationsFrom(__DIR__.'/database/migrations');
 
         // Default locale - this will be overwritten by the middleware so the current locale is used. Here we just ensure a fallback locale is available
         DefaultLocale::set($this->app->make(TraderConfig::class)->getDefaultLocale());
@@ -293,10 +295,10 @@ class TraderServiceProvider extends ServiceProvider
 
             $value = Arr::get(
                 $data,
-                $key . '.' . $language,
+                $key.'.'.$language,
                 Arr::get(
                     $data,
-                    $key . '.' . $defaultLanguage,
+                    $key.'.'.$defaultLanguage,
                     Arr::get($data, $key, $default)
                 )
             );

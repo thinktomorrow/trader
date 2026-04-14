@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Tests\Infrastructure\Repositories;
@@ -15,15 +16,17 @@ use Thinktomorrow\Trader\Infrastructure\Test\TestContainer;
 final class VariantPropertyRepositoryTest extends TestCase
 {
     protected MysqlTaxonRepository $taxonRepository;
+
     protected MysqlTaxonomyRepository $taxonomyRepository;
+
     protected MysqlProductRepository $productRepository;
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         parent::setUp();
 
-        $this->taxonRepository = new MysqlTaxonRepository();
-        $this->taxonomyRepository = new MysqlTaxonomyRepository(new TestContainer());
+        $this->taxonRepository = new MysqlTaxonRepository;
+        $this->taxonomyRepository = new MysqlTaxonomyRepository(new TestContainer);
     }
 
     public function test_it_can_check_if_variant_property_combination_exists()
@@ -73,7 +76,7 @@ final class VariantPropertyRepositoryTest extends TestCase
         $this->catalogContext->linkVariantToTaxon($product->productId->get(), $variantId->get(), $taxon3->taxonId->get());
 
         $product = $this->catalogContext->findProduct($product->productId);
-        $repository = new MysqlVariantPropertyRepository();
+        $repository = new MysqlVariantPropertyRepository;
         $variants = $product->getVariants();
         $variantA = $variants[0];
 
@@ -138,6 +141,6 @@ final class VariantPropertyRepositoryTest extends TestCase
 
     private static function repositories(): \Generator
     {
-        yield new MysqlVariantPropertyRepository();
+        yield new MysqlVariantPropertyRepository;
     }
 }

@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Thinktomorrow\Trader\Domain\Common;
@@ -28,6 +29,6 @@ class Email
 
     public function equals($other): bool
     {
-        return (get_class($other) === get_class($this) && $other->email === $this->email);
+        return get_class($other) === get_class($this) && $other->email === $this->email;
     }
 }

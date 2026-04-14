@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Thinktomorrow\Trader\Domain\Model\Taxon;
@@ -39,9 +40,6 @@ trait HasTaxonKeys
     /**
      * Add the keys if for the given locale no key is present yet,
      * else we update since we have one key per locale
-     *
-     * @param TaxonKey $taxonKey
-     * @return void
      */
     private function addOrUpdateTaxonKey(TaxonKey $taxonKey): void
     {

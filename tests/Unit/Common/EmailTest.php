@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Tests\Unit\Common;
@@ -28,6 +29,6 @@ class EmailTest extends TestCase
 
         $this->assertTrue($email->equals(Email::fromString('ben@example.com')));
         $this->assertFalse($email->equals(Email::fromString('john@example.com')));
-        $this->assertFalse($email->equals(new \stdClass()));
+        $this->assertFalse($email->equals(new \stdClass));
     }
 }

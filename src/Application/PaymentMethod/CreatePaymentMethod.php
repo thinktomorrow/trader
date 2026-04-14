@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Thinktomorrow\Trader\Application\PaymentMethod;
@@ -11,8 +12,11 @@ use Thinktomorrow\Trader\Domain\Model\PaymentMethod\PaymentMethodProviderId;
 class CreatePaymentMethod
 {
     private string $providerId;
+
     private string $rate;
+
     private array $data;
+
     private array $countryIds;
 
     public function __construct(string $providerId, string $rate, array $countryIds, array $data)

@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Thinktomorrow\Trader\Application\Order\Merchant;
@@ -10,9 +11,13 @@ use Thinktomorrow\Trader\Domain\Model\Order\OrderId;
 class UpdateShopper
 {
     private string $orderId;
+
     private string $email;
+
     private bool $is_business;
+
     private string $locale;
+
     private array $data;
 
     public function __construct(string $orderId, string $email, bool $is_business, string $locale, array $data)

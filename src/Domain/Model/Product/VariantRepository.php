@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Thinktomorrow\Trader\Domain\Model\Product;
@@ -12,7 +13,7 @@ interface VariantRepository
 
     /**
      * @return array with two entries: [0 => state data, 1 => child entities].
-     * Used internally by product repository to fetch all variants.
+     *               Used internally by product repository to fetch all variants.
      */
     public function getStatesByProduct(ProductId $productId): array;
 

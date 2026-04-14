@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Thinktomorrow\Trader\Domain\Model\Order\Line;
@@ -18,7 +19,7 @@ final class Quantity
 
     public static function fromInt(int $quantity): self
     {
-        return new static($quantity);
+        return new self($quantity);
     }
 
     public function asInt(): int

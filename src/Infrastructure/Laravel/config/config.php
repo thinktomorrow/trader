@@ -1,5 +1,7 @@
 <?php
 
+use Thinktomorrow\Trader\Domain\Common\Vat\VatRoundingStrategy;
+
 return [
     /**
      * Prepends a marker to any exposable references such as cart references, invoice numbers or payment references.
@@ -76,7 +78,7 @@ return [
      * - unit_based: derive excluding amount per unit and multiply by quantity.
      * - line_based: derive excluding amount from the full line including amount.
      */
-    'vat_rounding_strategy' => \Thinktomorrow\Trader\Domain\Common\Vat\VatRoundingStrategy::getDefault()->value,
+    'vat_rounding_strategy' => VatRoundingStrategy::getDefault()->value,
 
     /**
      * If this is true, the shop allows vat exemption for international business shoppers.

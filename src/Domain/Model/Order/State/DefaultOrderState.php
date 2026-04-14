@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Thinktomorrow\Trader\Domain\Model\Order\State;
@@ -22,7 +23,7 @@ use Thinktomorrow\Trader\Domain\Model\Order\Events\OrderStates\OrderPartiallyPai
 use Thinktomorrow\Trader\Domain\Model\Order\Events\OrderStates\OrderQuoted;
 use Thinktomorrow\Trader\Domain\Model\Order\Events\OrderStates\QuotedOrderConfirmed;
 
-enum DefaultOrderState:string implements OrderState
+enum DefaultOrderState: string implements OrderState
 {
     /**
      * ------------------------------------------------
@@ -85,12 +86,12 @@ enum DefaultOrderState:string implements OrderState
 
     public static function fromString(string $state): self
     {
-        return static::from($state);
+        return self::from($state);
     }
 
     public function inCustomerHands(): bool
     {
-        return in_array($this, static::customerStates());
+        return in_array($this, self::customerStates());
     }
 
     public static function customerStates(): array
@@ -110,17 +111,17 @@ enum DefaultOrderState:string implements OrderState
 
     public function equals($other): bool
     {
-        return (get_class($this) === get_class($other) && $this->getValueAsString() === $other->getValueAsString());
+        return get_class($this) === get_class($other) && $this->getValueAsString() === $other->getValueAsString();
     }
 
     public static function getDefaultState(): self
     {
-        return static::cart_pending;
+        return self::cart_pending;
     }
 
     public static function getStates(): array
     {
-        return static::cases();
+        return self::cases();
     }
 
     public static function getTransitions(): array

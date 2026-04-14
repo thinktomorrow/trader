@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Thinktomorrow\Trader\Application\Order\Merchant;
@@ -8,7 +9,9 @@ use Thinktomorrow\Trader\Domain\Model\Order\OrderId;
 class AddLogEntry
 {
     private string $orderId;
+
     private string $event;
+
     private array $data;
 
     public function __construct(string $orderId, string $event, array $data)

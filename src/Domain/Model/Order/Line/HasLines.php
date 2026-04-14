@@ -34,7 +34,7 @@ trait HasLines
     public function findLine(LineId $lineId): Line
     {
         if (null === ($lineIndexToBeUpdated = $this->findLineIndex($lineId))) {
-            throw new \DomainException('No line found by id ' . $lineId->get() . ' on order ' . $this->orderId->get());
+            throw new \DomainException('No line found by id '.$lineId->get().' on order '.$this->orderId->get());
         }
 
         return $this->lines[$lineIndexToBeUpdated];
@@ -43,7 +43,7 @@ trait HasLines
     //    public function addOrUpdateLine(LineId $lineId, VariantId $productId, LinePrice $linePrice, Quantity $quantity, array $data): void
     public function addOrUpdateLine(Line $line): void
     {
-        if (null !== $this->findLineIndex($line->lineId)) {
+        if ($this->findLineIndex($line->lineId) !== null) {
             $this->updateLine($line);
 
             return;

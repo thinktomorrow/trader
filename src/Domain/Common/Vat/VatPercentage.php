@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Thinktomorrow\Trader\Domain\Common\Vat;
 
@@ -30,7 +32,7 @@ class VatPercentage
 
     public function equals($other): bool
     {
-        return (get_class($other) === get_class($this) && $other->percentage->equals($this->percentage));
+        return get_class($other) === get_class($this) && $other->percentage->equals($this->percentage);
     }
 
     public function get(): string

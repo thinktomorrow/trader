@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Tests\Unit\Model\Order;
@@ -94,7 +95,7 @@ class OrderAddressTest extends TestCase
             'line_2' => '',
             'postal_code' => '2200',
             'city' => 'Herentals',
-            'data' => "[]",
+            'data' => '[]',
             'type' => AddressType::shipping->value,
         ], $order->getShippingAddress()->getMappedData());
     }
@@ -110,7 +111,7 @@ class OrderAddressTest extends TestCase
             'line_2' => '',
             'postal_code' => '1000',
             'city' => 'Amsterdam',
-            'data' => "[]",
+            'data' => '[]',
             'type' => AddressType::billing->value,
         ], $order->getBillingAddress()->getMappedData());
     }

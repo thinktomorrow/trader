@@ -13,9 +13,7 @@ use Thinktomorrow\Trader\Domain\Model\Product\Variant\VariantUnitPrice;
 interface ProductDetail extends Stockable
 {
     /**
-     * @param array $state
-     * @param array<VariantTaxonItem|ProductTaxonItem> $taxa
-     * @return static
+     * @param  array<VariantTaxonItem|ProductTaxonItem>  $taxa
      */
     public static function fromMappedData(array $state, array $taxa, array $variantKeys, array $personalisations): static;
 
@@ -25,6 +23,7 @@ interface ProductDetail extends Stockable
 
     /**
      * All related VariantTaxon and ProductTaxon objects.
+     *
      * @return array<VariantTaxonItem|ProductTaxonItem>
      */
     public function getTaxa(): array;
@@ -39,6 +38,7 @@ interface ProductDetail extends Stockable
 
     /**
      * All available variant properties of the product
+     *
      * @return array<ProductTaxonItem>
      */
     public function getProductVariantProperties(): array;
@@ -96,8 +96,6 @@ interface ProductDetail extends Stockable
      * This is used by the query builder to determine which values to return. This
      * is only for custom data to return e.g. on the product table that is not
      * included by default in the ProductDetail query result. Period. End.
-     *
-     * @return array
      */
     public static function stateSelect(): array;
 

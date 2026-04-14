@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Acceptance\Product;
@@ -40,7 +41,7 @@ class UpdateVariantKeysTest extends TestCase
 
         $updatedProduct = $this->catalogContext->repos()->productRepository()->find($product->productId);
         $updatedVariant = $updatedProduct->findVariant($variant->variantId);
-        
+
         $this->assertCount(2, $updatedVariant->getVariantKeys());
         $this->assertEquals('new-key-xxx', $updatedVariant->getVariantKeys()[0]->getKey());
         $this->assertEquals('new-key-xxx', $updatedVariant->getVariantKeys()[1]->getKey());

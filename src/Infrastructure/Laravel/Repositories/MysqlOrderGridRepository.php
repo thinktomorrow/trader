@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Thinktomorrow\Trader\Infrastructure\Laravel\Repositories;
@@ -16,13 +17,17 @@ use Thinktomorrow\Trader\TraderConfig;
 final class MysqlOrderGridRepository implements OrderGridRepository
 {
     private ContainerInterface $container;
+
     private TraderConfig $traderConfig;
 
     private int $perPage = 20;
+
     private Locale $locale;
+
     protected Builder $builder;
 
     private static string $orderTable = 'trader_orders';
+
     private static string $shopperTable = 'trader_order_shoppers';
 
     public function __construct(ContainerInterface $container, TraderConfig $traderConfig)
@@ -32,27 +37,27 @@ final class MysqlOrderGridRepository implements OrderGridRepository
         $this->locale = $traderConfig->getDefaultLocale();
 
         // Basic builder query
-        $this->builder = DB::table(static::$orderTable)
-            ->leftJoin(static::$shopperTable, static::$orderTable . '.order_id', '=', static::$shopperTable . '.order_id')
+        $this->builder = DB::table(self::$orderTable)
+            ->leftJoin(self::$shopperTable, self::$orderTable.'.order_id', '=', self::$shopperTable.'.order_id')
             ->select([
-                static::$orderTable . '.*',
-                static::$shopperTable . '.email AS shopper_email',
-                static::$shopperTable . '.is_business AS is_business',
-                static::$shopperTable . '.data AS shopper_data',
-                static::$shopperTable . '.customer_id AS shopper_customer_id',
+                self::$orderTable.'.*',
+                self::$shopperTable.'.email AS shopper_email',
+                self::$shopperTable.'.is_business AS is_business',
+                self::$shopperTable.'.data AS shopper_data',
+                self::$shopperTable.'.customer_id AS shopper_customer_id',
             ]);
     }
 
     public function filterByOrderReference(string $orderReference): static
     {
-        $this->builder->where('order_ref', 'LIKE', '%' . $orderReference . '%');
+        $this->builder->where('order_ref', 'LIKE', '%'.$orderReference.'%');
 
         return $this;
     }
 
     public function filterByShopperEmail(string $shopperEmail): static
     {
-        $this->builder->where(static::$shopperTable . '.email', 'LIKE', '%' . $shopperEmail . '%');
+        $this->builder->where(static::$shopperTable.'.email', 'LIKE', '%'.$shopperEmail.'%');
 
         return $this;
     }
@@ -60,8 +65,8 @@ final class MysqlOrderGridRepository implements OrderGridRepository
     public function filterByShopperTerm(string $shopperTerm): static
     {
         $this->builder->where(function ($query) use ($shopperTerm) {
-            $query->where(static::$shopperTable . '.email', 'LIKE', '%' . $shopperTerm . '%')
-                ->orWhereRaw("JSON_SEARCH(LOWER(`trader_order_shoppers`.`data`), 'all', ?) IS NOT NULL", ["%" . strtolower($shopperTerm) . "%"]);
+            $query->where(static::$shopperTable.'.email', 'LIKE', '%'.$shopperTerm.'%')
+                ->orWhereRaw("JSON_SEARCH(LOWER(`trader_order_shoppers`.`data`), 'all', ?) IS NOT NULL", ['%'.strtolower($shopperTerm).'%']);
         });
 
         return $this;
@@ -69,14 +74,14 @@ final class MysqlOrderGridRepository implements OrderGridRepository
 
     public function filterByCustomerId(string $customerId): static
     {
-        $this->builder->where(static::$shopperTable . '.customer_id', $customerId);
+        $this->builder->where(static::$shopperTable.'.customer_id', $customerId);
 
         return $this;
     }
 
     public function filterByStates(array $states): static
     {
-        $this->builder->whereIn(static::$orderTable . '.order_state', $states);
+        $this->builder->whereIn(static::$orderTable.'.order_state', $states);
 
         return $this;
     }
@@ -94,11 +99,11 @@ final class MysqlOrderGridRepository implements OrderGridRepository
     private function filterByDate(string $column, ?string $startAt = null, ?string $endAt = null): static
     {
         if (! is_null($startAt)) {
-            $this->builder->where(static::$orderTable . '.' . $column, '>=', Carbon::parse($startAt)->toDateTimeString());
+            $this->builder->where(static::$orderTable.'.'.$column, '>=', Carbon::parse($startAt)->toDateTimeString());
         }
 
         if (! is_null($endAt)) {
-            $this->builder->where(static::$orderTable . '.' . $column, '<=', Carbon::parse($endAt)->toDateTimeString());
+            $this->builder->where(static::$orderTable.'.'.$column, '<=', Carbon::parse($endAt)->toDateTimeString());
         }
 
         return $this;
@@ -195,11 +200,11 @@ final class MysqlOrderGridRepository implements OrderGridRepository
             $this->sortByDefault();
         }
 
-        return $this->builder->select(static::$orderTable . '.order_id')->get()->pluck('order_id')->toArray();
+        return $this->builder->select(static::$orderTable.'.order_id')->get()->pluck('order_id')->toArray();
     }
 
     private function sortByDefault(): void
     {
-        $this->builder->orderBy(static::$orderTable . '.created_at', 'DESC');
+        $this->builder->orderBy(static::$orderTable.'.created_at', 'DESC');
     }
 }

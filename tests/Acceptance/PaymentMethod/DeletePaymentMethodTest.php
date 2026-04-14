@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Tests\Acceptance\PaymentMethod;
@@ -18,7 +19,7 @@ class DeletePaymentMethodTest extends TestCase
     {
         $paymentMethodId = $this->orderContext->apps()->paymentMethodApplication()->createPaymentMethod(new CreatePaymentMethod(
             'pay-after-invoice',
-            "10",
+            '10',
             ['BE', 'NL'],
             ['foo' => 'bar']
         ));

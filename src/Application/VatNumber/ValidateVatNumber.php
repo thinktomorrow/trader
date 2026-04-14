@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Thinktomorrow\Trader\Application\VatNumber;
@@ -8,6 +9,7 @@ use Thinktomorrow\Trader\Domain\Model\Country\CountryId;
 class ValidateVatNumber
 {
     private string $countryId;
+
     private string $vatNumber;
 
     public function __construct(string $countryId, string $vatNumber)

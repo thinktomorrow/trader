@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Thinktomorrow\Trader\Application\ShippingProfile;
@@ -11,9 +12,13 @@ use Thinktomorrow\Trader\Domain\Model\ShippingProfile\TariffId;
 class UpdateTariff
 {
     private string $tariffId;
+
     private string $shippingProfileId;
+
     private string $rate;
+
     private string $from;
+
     private ?string $to;
 
     public function __construct(string $tariffId, string $shippingProfileId, string $rate, string $from, ?string $to)

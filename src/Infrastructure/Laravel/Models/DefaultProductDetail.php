@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Thinktomorrow\Trader\Infrastructure\Laravel\Models;
@@ -21,31 +22,37 @@ use Thinktomorrow\Trader\Domain\Model\Taxonomy\TaxonomyType;
 
 class DefaultProductDetail implements ProductDetail
 {
-    use RendersVariantPrices;
-    use RendersData;
     use HasLocale;
+    use RendersData;
+    use RendersVariantPrices;
     use StockableDefault;
 
     protected VariantId $variantId;
+
     protected ProductId $productId;
+
     protected VariantState $state;
+
     protected array $taxa;
+
     protected array $personalisations;
+
     protected string $sku;
+
     protected ?string $ean;
+
     protected array $data;
+
     protected iterable $images;
 
     /** @var VariantKey[] */
     protected array $keys;
 
-    final private function __construct()
-    {
-    }
+    final private function __construct() {}
 
     public static function fromMappedData(array $state, array $taxa, array $variantKeys, array $personalisations): static
     {
-        $item = new static();
+        $item = new static;
 
         $item->variantId = VariantId::fromString($state['variant_id']);
         $item->productId = ProductId::fromString($state['product_id']);
@@ -61,7 +68,7 @@ class DefaultProductDetail implements ProductDetail
         );
 
         $item->stock_level = $state['stock_level'];
-        $item->ignore_out_of_stock = (bool)$state['ignore_out_of_stock'];
+        $item->ignore_out_of_stock = (bool) $state['ignore_out_of_stock'];
 
         foreach ($taxa as $taxon) {
             if (! ($taxon instanceof ProductTaxonItem)) {
@@ -108,7 +115,7 @@ class DefaultProductDetail implements ProductDetail
             return $variantOptionTitle;
         }
 
-        return $productTitle . ' ' . $variantOptionTitle;
+        return $productTitle.' '.$variantOptionTitle;
     }
 
     public function getIntro(?string $locale = null): string
@@ -188,6 +195,7 @@ class DefaultProductDetail implements ProductDetail
 
     /**
      * All available variant properties of the product
+     *
      * @return array<ProductTaxonItem>
      */
     public function getProductVariantProperties(): array
@@ -240,7 +248,7 @@ class DefaultProductDetail implements ProductDetail
 
     public function getUrl(?string $locale = null): string
     {
-        return '/' . $this->getVariantId() . '/' . $this->getKey($locale) ?? '';
+        return '/'.$this->getVariantId().'/'.$this->getKey($locale) ?? '';
     }
 
     public function getPersonalisations(): array
@@ -255,6 +263,6 @@ class DefaultProductDetail implements ProductDetail
 
     public function getProductData(?string $key = null, $default = null): mixed
     {
-        return $this->data('product_data.' . $key, null, $default);
+        return $this->data('product_data.'.$key, null, $default);
     }
 }

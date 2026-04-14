@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Tests\Acceptance\Cart;
@@ -52,7 +53,7 @@ abstract class CartContext extends TestCase
         parent::setUp();
     }
 
-    public function tearDown(): void
+    protected function tearDown(): void
     {
         parent::tearDown();
     }
@@ -62,7 +63,7 @@ abstract class CartContext extends TestCase
         $productId = ProductId::fromString($productTitle)->get();
 
         $this->catalogContext->createProduct($productId, null);
-        $this->catalogContext->createVariant($productId, $productId . '-variant-aaa', [
+        $this->catalogContext->createVariant($productId, $productId.'-variant-aaa', [
             'unit_price' => $price * 100,
             'sale_price' => $price * 100,
         ]);
@@ -189,7 +190,7 @@ abstract class CartContext extends TestCase
         $this->orderContext->apps()->cartApplication()->addLine(new AddLine(
             $order->orderId->get(),
             VariantId::fromString($productVariantId)->get(),
-            Quantity::fromInt((int)$quantity)->asInt(),
+            Quantity::fromInt((int) $quantity)->asInt(),
             $personalisations,
             $data
         ));
@@ -203,7 +204,7 @@ abstract class CartContext extends TestCase
         }
 
         if (! $checkFlag) {
-            throw new \Exception('Cartitem presence check failed. No line found by ' . $productVariantId);
+            throw new \Exception('Cartitem presence check failed. No line found by '.$productVariantId);
         }
     }
 
@@ -215,7 +216,7 @@ abstract class CartContext extends TestCase
         $this->orderContext->apps()->cartApplication()->addLine(new AddLine(
             $orderId->get(),
             VariantId::fromString($productVariantId)->get(),
-            Quantity::fromInt((int)$quantity)->asInt(),
+            Quantity::fromInt((int) $quantity)->asInt(),
             $personalisations,
             $data
         ));
@@ -229,7 +230,7 @@ abstract class CartContext extends TestCase
         }
 
         if (! $checkFlag) {
-            throw new \Exception('Cartitem presence check failed. No line found by ' . $productVariantId);
+            throw new \Exception('Cartitem presence check failed. No line found by '.$productVariantId);
         }
     }
 
@@ -249,7 +250,7 @@ abstract class CartContext extends TestCase
         $this->orderContext->apps()->cartApplication()->changeLineQuantity(new ChangeLineQuantity(
             $order->orderId->get(),
             $lineId->get(),
-            Quantity::fromInt((int)$quantity)->asInt(),
+            Quantity::fromInt((int) $quantity)->asInt(),
         ));
     }
 
@@ -303,9 +304,9 @@ abstract class CartContext extends TestCase
         $order = $this->orderContext->findOrder(OrderId::fromString($orderId));
         $lines = $this->orderContext->findOrder($order->orderId)->getLines();
 
-        Assert::assertCount((int)$times, $lines);
+        Assert::assertCount((int) $times, $lines);
         if (count($lines) > 0) {
-            Assert::assertEquals((int)$quantity, $lines[0]->getQuantity()->asInt());
+            Assert::assertEquals((int) $quantity, $lines[0]->getQuantity()->asInt());
         }
     }
 
@@ -385,7 +386,7 @@ abstract class CartContext extends TestCase
         }
 
         if (! $line) {
-            throw new \Exception('No line found by ' . $productVariantId);
+            throw new \Exception('No line found by '.$productVariantId);
         }
 
         $this->assertArrayHasKey($dataKey, $line->getData());

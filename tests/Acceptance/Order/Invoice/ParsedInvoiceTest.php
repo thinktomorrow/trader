@@ -13,8 +13,8 @@ class ParsedInvoiceTest extends TestCase
         $ref = InvoiceReference::fromString(23000003);
         $parsed = ParsedInvoiceReferenceByYear::fromInvoiceReference($ref);
 
-        $this->assertEquals("23", $parsed->year);
-        $this->assertEquals("000003", $parsed->number);
+        $this->assertEquals('23', $parsed->year);
+        $this->assertEquals('000003', $parsed->number);
         $this->assertEquals(3, $parsed->getNumberAsInt());
 
         //        $parsed

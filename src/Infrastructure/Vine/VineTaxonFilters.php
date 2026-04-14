@@ -18,6 +18,7 @@ use Thinktomorrow\Trader\TraderConfig;
 class VineTaxonFilters implements TaxonFilters
 {
     private TaxonTreeRepository $taxonTreeRepository;
+
     private TaxonomyRepository $taxonomyRepository;
 
     private Locale $locale;

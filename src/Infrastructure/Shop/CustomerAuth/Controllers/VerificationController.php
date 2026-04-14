@@ -3,6 +3,7 @@
 namespace Thinktomorrow\Trader\Infrastructure\Shop\CustomerAuth\Controllers;
 
 use Illuminate\Auth\Access\AuthorizationException;
+use Illuminate\Auth\Events\Verified;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
@@ -47,7 +48,7 @@ class VerificationController extends Controller
     {
         $customer = CustomerModel::findOrFail($request->route('id'));
 
-        if (! hash_equals((string)$request->route('hash'), sha1($customer->getEmailForVerification()))) {
+        if (! hash_equals((string) $request->route('hash'), sha1($customer->getEmailForVerification()))) {
             throw new AuthorizationException;
         }
         if ($customer->hasVerifiedEmail()) {
@@ -59,7 +60,7 @@ class VerificationController extends Controller
 
         $customer->markEmailAsVerified();
 
-        event(new \Illuminate\Auth\Events\Verified($customer));
+        event(new Verified($customer));
 
         return redirect()->route('customer.login')
             ->with('status', trans('trader-auth.verify.success_verified'))

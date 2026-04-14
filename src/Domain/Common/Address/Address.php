@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Thinktomorrow\Trader\Domain\Common\Address;
@@ -13,8 +14,7 @@ class Address
         public readonly ?string $line2,
         public readonly ?string $postalCode,
         public readonly ?string $city
-    ) {
-    }
+    ) {}
 
     public function replaceCountry(CountryId $countryId): static
     {

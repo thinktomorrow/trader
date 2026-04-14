@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Thinktomorrow\Trader\Application\Cart;
@@ -9,6 +10,7 @@ use Thinktomorrow\Trader\Domain\Model\PaymentMethod\PaymentMethodId;
 final class ChoosePaymentMethod
 {
     private string $orderId;
+
     private string $paymentMethodId;
 
     public function __construct(string $orderId, string $paymentMethodId)

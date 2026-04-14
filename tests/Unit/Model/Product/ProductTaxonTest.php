@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Tests\Unit\Model\Product;
@@ -55,6 +56,6 @@ class ProductTaxonTest extends TestCase
 
         $this->expectException(\InvalidArgumentException::class);
 
-        $product->updateProductTaxa([new \stdClass()]);
+        $product->updateProductTaxa([new \stdClass]);
     }
 }

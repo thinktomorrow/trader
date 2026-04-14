@@ -27,13 +27,12 @@ class FindMainCategoryTaxon
     public function get(): TaxonTree
     {
         if (! $categoryTaxonomyId = $this->traderConfig->getMainCategoryTaxonomyId()) {
-            return new TaxonTree();
+            return new TaxonTree;
         }
 
         return $this->taxonTreeRepository->setLocale($this->getLocale())->getTreeByTaxonomy($categoryTaxonomyId);
     }
 
-    /** @return null|TaxonNode */
     public function findFirstByTaxonIds(array $taxonIds): ?TaxonNode
     {
         $taxonTree = $this->get();

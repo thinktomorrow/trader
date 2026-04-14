@@ -24,14 +24,16 @@ final class VatAllocatedTotalPrice
     private array $vatLines;
 
     private Money $totalExcluding;
+
     private Money $totalVat;
+
     private Money $totalIncluding;
 
     /**
-     * @param VatAllocatedLine[] $vatLines List of VAT lines, one per VAT percentage.
-     * @param Money $totalExcluding Total excluding VAT (= sum of all taxable bases)
-     * @param Money $totalVat Total VAT amount (= sum of all VAT amounts)
-     * @param Money $totalIncluding Total including VAT (= totalExcluding + totalVat)
+     * @param  VatAllocatedLine[]  $vatLines  List of VAT lines, one per VAT percentage.
+     * @param  Money  $totalExcluding  Total excluding VAT (= sum of all taxable bases)
+     * @param  Money  $totalVat  Total VAT amount (= sum of all VAT amounts)
+     * @param  Money  $totalIncluding  Total including VAT (= totalExcluding + totalVat)
      */
     public function __construct(array $vatLines, Money $totalExcluding, Money $totalVat, Money $totalIncluding)
     {

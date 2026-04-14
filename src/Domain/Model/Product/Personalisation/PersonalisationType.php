@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Thinktomorrow\Trader\Domain\Model\Product\Personalisation;
@@ -6,6 +7,7 @@ namespace Thinktomorrow\Trader\Domain\Model\Product\Personalisation;
 class PersonalisationType
 {
     const TEXT = 'text';
+
     const IMAGE = 'image';
 
     private string $type;
@@ -33,6 +35,6 @@ class PersonalisationType
     public function equals($other): bool
     {
         return get_class($other) === get_class($this)
-            && (string)$this === (string)$other;
+            && (string) $this === (string) $other;
     }
 }

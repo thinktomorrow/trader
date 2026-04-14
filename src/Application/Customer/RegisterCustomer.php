@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Thinktomorrow\Trader\Application\Customer;
@@ -9,8 +10,11 @@ use Thinktomorrow\Trader\Domain\Common\Locale;
 class RegisterCustomer
 {
     private string $email;
+
     private bool $isBusiness;
+
     private string $iso15897Locale;
+
     private array $data;
 
     public function __construct(string $email, bool $isBusiness, string $iso15897Locale, array $data)

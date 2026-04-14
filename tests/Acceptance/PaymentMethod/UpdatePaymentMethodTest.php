@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Tests\Acceptance\PaymentMethod;
@@ -16,7 +17,7 @@ class UpdatePaymentMethodTest extends TestCase
     {
         $paymentMethodId = $this->orderContext->apps()->paymentMethodApplication()->createPaymentMethod(new CreatePaymentMethod(
             'mollie',
-            "10",
+            '10',
             ['BE', 'NL'],
             ['foo' => 'bar']
         ));
@@ -24,7 +25,7 @@ class UpdatePaymentMethodTest extends TestCase
         $this->orderContext->apps()->paymentMethodApplication()->updatePaymentMethod(new UpdatePaymentMethod(
             $paymentMethodId->get(),
             'stripe',
-            "20",
+            '20',
             ['BE'],
             ['foo' => 'baz']
         ));

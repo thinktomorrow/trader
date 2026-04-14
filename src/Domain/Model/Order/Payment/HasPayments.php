@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Thinktomorrow\Trader\Domain\Model\Order\Payment;
@@ -16,7 +17,7 @@ trait HasPayments
 
     public function addPayment(Payment $payment): void
     {
-        if (null !== $this->findPaymentIndex($payment->paymentId)) {
+        if ($this->findPaymentIndex($payment->paymentId) !== null) {
             throw new PaymentAlreadyOnOrder(
                 'Cannot add payment because order ['.$this->orderId->get().'] already has payment ['.$payment->paymentId->get().']'
             );

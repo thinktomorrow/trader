@@ -13,13 +13,19 @@ class Taxonomy implements Aggregate
     use RecordsEvents;
 
     public readonly TaxonomyId $taxonomyId;
+
     private TaxonomyType $type;
+
     private TaxonomyState $state;
 
     private bool $showsAsGridFilter;
+
     private bool $showsInGrid;
+
     private bool $allowsMultipleValues;
+
     private bool $allowsNestableValues;
+
     private int $order;
 
     private function __construct(TaxonomyId $taxonomyId, TaxonomyType $type, TaxonomyState $state)
@@ -147,11 +153,11 @@ class Taxonomy implements Aggregate
             TaxonomyState::from($state['state'])
         );
 
-        $object->showsAsGridFilter = (bool)$state['shows_as_grid_filter'];
-        $object->showsInGrid = (bool)$state['shows_in_grid'];
-        $object->allowsMultipleValues = (bool)$state['allows_multiple_values'];
-        $object->allowsNestableValues = (bool)$state['allows_nestable_values'];
-        $object->order = (int)$state['order'];
+        $object->showsAsGridFilter = (bool) $state['shows_as_grid_filter'];
+        $object->showsInGrid = (bool) $state['shows_in_grid'];
+        $object->allowsMultipleValues = (bool) $state['allows_multiple_values'];
+        $object->allowsNestableValues = (bool) $state['allows_nestable_values'];
+        $object->order = (int) $state['order'];
         $object->data = $state['data'] ? json_decode($state['data'], true) : [];
 
         return $object;
