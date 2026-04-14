@@ -4,6 +4,8 @@ Important changes will be notified in this file
 
 ## Unreleased
 
+## 2026-04-14 - 0.9.1
+
 - Fixed: prevent taxa rows with `NULL` pivot data from being dropped during repository hydration in
   `MysqlProductRepository` and `MysqlVariantRepository` by using null-safe concatenation in taxa select statements.
 - Fixed: taxon findMany ordering for UUID ids
