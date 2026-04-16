@@ -4,6 +4,8 @@ Important changes will be notified in this file
 
 ## Unreleased
 
+- Fixed: pivot order of product/variant taxa
+
 ## 2026-04-14 - 0.9.1
 
 - Fixed: prevent taxa rows with `NULL` pivot data from being dropped during repository hydration in

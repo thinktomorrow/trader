@@ -46,6 +46,7 @@ trait WithTaxaSelection
                 static::$taxonomyTable.'.type',
                 static::$taxonomyTable.'.shows_in_grid',
             ])
+            ->orderBy(static::$taxonProductLookupTable.'.order_column', 'ASC')
             ->get();
 
         $variantTaxaStates = DB::table(static::$taxonVariantLookupTable)
@@ -82,6 +83,7 @@ trait WithTaxaSelection
                 static::$taxonomyTable.'.type',
                 static::$taxonomyTable.'.shows_in_grid',
             ])
+            ->orderBy(static::$taxonVariantLookupTable.'.order_column', 'ASC')
             ->get();
 
         return [
