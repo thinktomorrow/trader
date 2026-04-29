@@ -11,6 +11,7 @@ use Thinktomorrow\Trader\Domain\Model\Customer\Address\BillingAddress;
 use Thinktomorrow\Trader\Domain\Model\Customer\Address\ShippingAddress;
 use Thinktomorrow\Trader\Domain\Model\Customer\Customer;
 use Thinktomorrow\Trader\Domain\Model\Customer\CustomerId;
+use Thinktomorrow\Trader\Domain\Model\Customer\Events\CustomerCreated;
 
 class CustomerTest extends TestCase
 {
@@ -35,6 +36,13 @@ class CustomerTest extends TestCase
             BillingAddress::class => null,
             ShippingAddress::class => null,
         ], $customer->getChildEntities());
+
+        $events = $customer->releaseEvents();
+
+        $this->assertCount(1, $events);
+        $this->assertInstanceOf(CustomerCreated::class, $events[0]);
+        $this->assertEquals($customerId, $events[0]->customerId);
+        $this->assertEquals($customerEmail, $events[0]->email);
     }
 
     public function test_it_can_be_build_from_raw_data()

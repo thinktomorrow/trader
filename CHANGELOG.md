@@ -4,6 +4,10 @@ Important changes will be notified in this file
 
 ## Unreleased
 
+## 2026-04-29 - 0.9.3
+
+- Add CustomerCreated event
+
 ## 2026-04-16 - 0.9.2
 
 - Fixed: pivot order of product/variant taxa

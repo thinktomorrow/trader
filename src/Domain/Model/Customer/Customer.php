@@ -11,6 +11,7 @@ use Thinktomorrow\Trader\Domain\Common\Event\RecordsEvents;
 use Thinktomorrow\Trader\Domain\Common\Locale;
 use Thinktomorrow\Trader\Domain\Model\Customer\Address\BillingAddress;
 use Thinktomorrow\Trader\Domain\Model\Customer\Address\ShippingAddress;
+use Thinktomorrow\Trader\Domain\Model\Customer\Events\CustomerCreated;
 
 class Customer implements Aggregate
 {
@@ -38,6 +39,7 @@ class Customer implements Aggregate
         $customer->email = $email;
         $customer->isBusiness = $isBusiness;
         $customer->locale = $locale;
+        $customer->recordEvent(new CustomerCreated($customerId, $email));
 
         return $customer;
     }

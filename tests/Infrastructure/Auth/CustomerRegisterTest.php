@@ -11,6 +11,7 @@ use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Notification;
 use Tests\Infrastructure\TestCase;
+use Thinktomorrow\Trader\Domain\Model\Customer\Events\CustomerCreated;
 use Thinktomorrow\Trader\Domain\Model\Customer\Events\CustomerHasLoggedIn;
 use Thinktomorrow\Trader\Infrastructure\Shop\CustomerAuth\CustomerModel;
 
@@ -65,6 +66,9 @@ class CustomerRegisterTest extends TestCase
         $this->assertFalse(Auth::guard('customer')->check());
 
         $response->assertRedirect(route('customer.login'));
+        Event::assertDispatched(CustomerCreated::class, function (CustomerCreated $event): bool {
+            return $event->email->get() === 'ben@thinktomorrow.be';
+        });
         Event::assertNotDispatched(CustomerHasLoggedIn::class);
     }
 
