@@ -4,6 +4,8 @@ Important changes will be notified in this file
 
 ## Unreleased
 
+- Fixed: DefaultVariantTaxonItem failed when data was NULL
+
 ## 2026-04-29 - 0.9.3
 
 - Add CustomerCreated event

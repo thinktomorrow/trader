@@ -31,9 +31,9 @@ class DefaultVariantTaxonItem extends DefaultProductTaxonItem implements Variant
             TaxonState::from($state['state']),
             $keys,
             array_merge(
-                ['taxonomy_data' => json_decode($state['taxonomy_data'], true)],
-                ['taxon_data' => json_decode($state['taxon_data'], true)],
-                json_decode($state['data'], true),
+                ['taxonomy_data' => ($state['taxonomy_data'] ? json_decode($state['taxonomy_data'], true) : [])],
+                ['taxon_data' => ($state['taxon_data'] ? json_decode($state['taxon_data'], true) : [])],
+                ($state['data'] ? json_decode($state['data'], true) : []),
             ),
         );
     }
