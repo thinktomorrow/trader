@@ -5,6 +5,10 @@ Important changes will be notified in this file
 ## Unreleased
 
 - Fixed: DefaultVariantTaxonItem failed when data was NULL
+- Added: `GridRepository::filterByVariantIds(array $variant_ids): static;` to filter on variant ids instead of product
+  ids
+- Added: `GridRepository::filterByExplicitVariantIds(array $variant_ids): static;`to filter on variant ids but also
+  allowing non grid variants to be returned
 
 ## 2026-04-29 - 0.9.3
 

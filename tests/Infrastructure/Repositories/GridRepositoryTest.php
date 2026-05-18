@@ -162,6 +162,26 @@ class GridRepositoryTest extends TestCase
         $this->assertCount(2, $gridItems);
     }
 
+    public function test_it_can_filter_by_exact_variant_ids()
+    {
+        CatalogContext::mysql()->createVariant('product-aaa', 'variant-aaa-secondary');
+
+        $gridItems = CatalogContext::mysql()->repos()->gridRepository()->filterByVariantIds(['variant-aaa-secondary'])->getResults();
+
+        $this->assertCount(1, $gridItems);
+        $this->assertEquals('variant-aaa-secondary', $gridItems->first()->getVariantId());
+    }
+
+    public function test_it_can_fetch_explicit_variant_ids_even_when_hidden_from_grid()
+    {
+        CatalogContext::mysql()->createVariant('product-aaa', 'variant-hidden', ['show_in_grid' => false]);
+
+        $gridItems = CatalogContext::mysql()->repos()->gridRepository()->filterByExplicitVariantIds(['variant-hidden'])->getResults();
+
+        $this->assertCount(1, $gridItems);
+        $this->assertEquals('variant-hidden', $gridItems->first()->getVariantId());
+    }
+
     public function test_it_can_sort_by_sale_price()
     {
         $gridItems = CatalogContext::mysql()->repos()->gridRepository()->sortByPrice()->getResults();

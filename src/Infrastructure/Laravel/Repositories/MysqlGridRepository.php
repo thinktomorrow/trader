@@ -58,6 +58,8 @@ class MysqlGridRepository implements GridRepository
 
     private static $taxonKeysTable = 'trader_taxa_keys';
 
+    private bool $onlyGridItems = true;
+
     public function __construct(ContainerInterface $container, TraderConfig $traderConfig, FlattenedTaxonIds $flattenedTaxonIds)
     {
         $this->container = $container;
@@ -65,10 +67,13 @@ class MysqlGridRepository implements GridRepository
         $this->traderConfig = $traderConfig;
         $this->locale = $traderConfig->getDefaultLocale();
 
-        // Basic builder query
-        $this->builder = DB::table(static::$variantTable)
+        $this->builder = $this->baseBuilder();
+    }
+
+    protected function baseBuilder(): Builder
+    {
+        $builder = DB::table(static::$variantTable)
             ->join(static::$productTable, static::$variantTable.'.product_id', '=', static::$productTable.'.product_id')
-            ->where(static::$variantTable.'.show_in_grid', 1)
             ->whereIn(static::$productTable.'.state', array_map(fn ($state) => $state->value, ProductState::onlineStates()))
             ->whereIn(static::$variantTable.'.state', array_map(fn ($state) => $state->value, VariantState::availableStates()))
             ->leftJoin(static::$taxonPivotTable, static::$variantTable.'.product_id', '=', static::$taxonPivotTable.'.product_id')
@@ -83,6 +88,8 @@ class MysqlGridRepository implements GridRepository
                 DB::raw('GROUP_CONCAT('.static::$taxonPivotTable.'.taxon_id) AS product_taxon_ids'),
                 DB::raw('GROUP_CONCAT('.static::$taxonVariantPivotTable.'.taxon_id) AS variant_taxon_ids'),
             ]);
+
+        return $builder;
     }
 
     public function filterByTerm(string $term): static
@@ -142,6 +149,22 @@ class MysqlGridRepository implements GridRepository
     public function filterByProductIds(array $product_ids): static
     {
         $this->builder->whereIn(static::$productTable.'.product_id', $product_ids);
+
+        return $this;
+    }
+
+    public function filterByVariantIds(array $variant_ids): static
+    {
+        $this->builder->whereIn(static::$variantTable.'.variant_id', $variant_ids);
+
+        return $this;
+    }
+
+    public function filterByExplicitVariantIds(array $variant_ids): static
+    {
+        $this->onlyGridItems = false;
+
+        $this->builder->whereIn(static::$variantTable.'.variant_id', $variant_ids);
 
         return $this;
     }
@@ -250,6 +273,10 @@ class MysqlGridRepository implements GridRepository
     {
         $builder = $this->builder->clone();
 
+        if ($this->onlyGridItems) {
+            $builder->where(static::$variantTable.'.show_in_grid', 1);
+        }
+
         $this->addDefaultSorting($builder);
 
         $result = $builder->select([
@@ -277,6 +304,10 @@ class MysqlGridRepository implements GridRepository
      */
     public function getResults(?int $total = null): LengthAwarePaginator
     {
+        if ($this->onlyGridItems) {
+            $this->builder->where(static::$variantTable.'.show_in_grid', 1);
+        }
+
         $this->addDefaultSorting($this->builder);
 
         if (isset($this->limit) && $this->limit < $this->perPage) {
