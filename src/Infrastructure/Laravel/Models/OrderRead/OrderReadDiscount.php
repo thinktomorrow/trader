@@ -99,6 +99,11 @@ abstract class OrderReadDiscount
         return $this->data('title');
     }
 
+    public function getLabel(): ?string
+    {
+        return $this->data('label');
+    }
+
     public function getDescription(): ?string
     {
         return $this->data('description');

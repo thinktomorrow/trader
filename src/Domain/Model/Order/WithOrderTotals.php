@@ -115,7 +115,7 @@ trait WithOrderTotals
         $total = Money::EUR(0);
 
         foreach ($this->getShippings() as $shipping) {
-            $total = $total->add($shipping->getShippingCost()->getExcludingVat());
+            $total = $total->add($shipping->getShippingCostTotal()->getExcludingVat());
         }
 
         return $total;
@@ -126,7 +126,7 @@ trait WithOrderTotals
         $total = Money::EUR(0);
 
         foreach ($this->getPayments() as $payment) {
-            $total = $total->add($payment->getPaymentCost()->getExcludingVat());
+            $total = $total->add($payment->getPaymentCostTotal()->getExcludingVat());
         }
 
         return $total;

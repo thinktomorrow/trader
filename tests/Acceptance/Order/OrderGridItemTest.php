@@ -74,6 +74,26 @@ class OrderGridItemTest extends TestCase
         $this->assertEquals('€ 3,05', $order->getFormattedTotalIncl());
     }
 
+    public function test_it_reflects_net_service_totals_in_grid_item(): void
+    {
+        $order = $this->orderContext->createDefaultOrder();
+        $order->getShippings()[0]->addDiscount($this->orderContext->createShippingDiscount());
+        $order->getPayments()[0]->addDiscount($this->orderContext->createPaymentDiscount());
+
+        (new TestContainer)->get(AdjustOrderVatSnapshot::class)->adjust($order);
+        $this->orderContext->saveOrder($order);
+        $order = $this->orderContext->findOrder($order->orderId);
+
+        $gridItem = DefaultOrderGridItem::fromMappedData($order->getMappedData(), []);
+
+        $this->assertEquals(Money::EUR('35'), $gridItem->getShippingCostExcl());
+        $this->assertEquals(Money::EUR('42'), $gridItem->getShippingCostIncl());
+        $this->assertEquals(Money::EUR('35'), $gridItem->getPaymentCostExcl());
+        $this->assertEquals(Money::EUR('42'), $gridItem->getPaymentCostIncl());
+        $this->assertEquals(Money::EUR('236'), $gridItem->getTotalExcl());
+        $this->assertEquals(Money::EUR('285'), $gridItem->getTotalIncl());
+    }
+
     public function test_it_can_get_important_timestamps()
     {
         $order = $this->orderContext->createDefaultOrder();

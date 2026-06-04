@@ -21,6 +21,8 @@ interface MerchantOrderDiscount
 
     public function getTitle(): ?string;
 
+    public function getLabel(): ?string;
+
     public function getDescription(): ?string;
 
     public function getData(string $key, $default = null): mixed;

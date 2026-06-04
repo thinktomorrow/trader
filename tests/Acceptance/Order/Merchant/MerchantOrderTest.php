@@ -68,6 +68,27 @@ class MerchantOrderTest extends CartContext
         $this->assertEquals('€ 3,05', $order->getFormattedTotalIncl());
     }
 
+    public function test_it_includes_service_discounts_in_net_totals(): void
+    {
+        $order = $this->orderContext->createDefaultOrder();
+        $order->getShippings()[0]->addDiscount($this->orderContext->createShippingDiscount());
+        $order->getPayments()[0]->addDiscount($this->orderContext->createPaymentDiscount());
+
+        (new TestContainer)->get(AdjustOrderVatSnapshot::class)->adjust($order);
+        $this->orderContext->saveOrder($order);
+
+        $order = $this->orderContext->findMerchantOrder($order->orderId->get());
+
+        $this->assertEquals(Money::EUR('35'), $order->getShippingCostExcl());
+        $this->assertEquals(Money::EUR('42'), $order->getShippingCostIncl());
+        $this->assertEquals(Money::EUR('35'), $order->getPaymentCostExcl());
+        $this->assertEquals(Money::EUR('42'), $order->getPaymentCostIncl());
+        $this->assertEquals(Money::EUR('0'), $order->getDiscountTotalExcl());
+        $this->assertEquals(Money::EUR('236'), $order->getTotalExcl());
+        $this->assertEquals(Money::EUR('285'), $order->getTotalIncl());
+        $this->assertCount(2, $order->getAllDiscounts());
+    }
+
     public function test_as_a_merchant_i_need_to_be_able_to_see_each_line_of_the_order()
     {
         $order = $this->orderContext->createDefaultDiscountedOrder();

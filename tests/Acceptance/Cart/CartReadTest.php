@@ -5,8 +5,10 @@ declare(strict_types=1);
 namespace Tests\Acceptance\Cart;
 
 use Money\Money;
+use Thinktomorrow\Trader\Application\Cart\RefreshCart\Adjusters\AdjustOrderVatSnapshot;
 use Thinktomorrow\Trader\Domain\Model\Order\OrderId;
 use Thinktomorrow\Trader\Domain\Model\Product\Personalisation\PersonalisationType;
+use Thinktomorrow\Trader\Infrastructure\Test\TestContainer;
 
 class CartReadTest extends CartContext
 {
@@ -50,6 +52,27 @@ class CartReadTest extends CartContext
     public function test_it_can_get_totals()
     {
         $this->markTestSkipped('todo: with payment / shipping / discount values');
+    }
+
+    public function test_it_can_read_net_service_totals_and_all_discounts(): void
+    {
+        $order = $this->orderContext->createDefaultOrder();
+        $order->getShippings()[0]->addDiscount($this->orderContext->createShippingDiscount());
+        $order->getPayments()[0]->addDiscount($this->orderContext->createPaymentDiscount());
+
+        (new TestContainer)->get(AdjustOrderVatSnapshot::class)->adjust($order);
+        $this->orderContext->saveOrder($order);
+
+        $cart = $this->orderContext->repos()->cartRepository()->findCart($order->orderId);
+
+        $this->assertEquals(Money::EUR(35), $cart->getShippingCostExcl());
+        $this->assertEquals(Money::EUR(42), $cart->getShippingCostIncl());
+        $this->assertEquals(Money::EUR(35), $cart->getPaymentCostExcl());
+        $this->assertEquals(Money::EUR(42), $cart->getPaymentCostIncl());
+        $this->assertEquals(Money::EUR(236), $cart->getTotalExcl());
+        $this->assertEquals(Money::EUR(285), $cart->getTotalIncl());
+        $this->assertCount(0, $cart->getDiscounts());
+        $this->assertCount(2, $cart->getAllDiscounts());
     }
 
     public function test_in_order_to_confirm_my_product_choice_as_a_visitor__i_need_to_be_able_to_see_each_line_of_my_cart()

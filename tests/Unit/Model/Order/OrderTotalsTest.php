@@ -70,4 +70,56 @@ class OrderTotalsTest extends TestCase
         $this->assertEquals(Money::EUR(54), $vatLine->getVatAmount());
         $this->assertEquals(VatPercentage::fromString('21'), $vatLine->getVatPercentage());
     }
+
+    public function test_it_subtracts_shipping_discounts_from_shipping_and_order_totals(): void
+    {
+        $order = $this->orderContext->createDefaultOrder();
+        $order->getShippings()[0]->addDiscount($this->orderContext->createShippingDiscount());
+
+        $this->assertEquals(Money::EUR('35'), $order->getShippingCostExcl());
+        $this->assertEquals(Money::EUR('251'), $order->getTotalExcl());
+
+        (new TestContainer)->get(AdjustOrderVatSnapshot::class)->adjust($order);
+
+        $this->assertEquals(Money::EUR('42'), $order->getShippingCostIncl());
+        $this->assertEquals(Money::EUR('61'), $order->getPaymentCostIncl());
+        $this->assertEquals(Money::EUR('0'), $order->getDiscountTotalIncl());
+        $this->assertEquals(Money::EUR('304'), $order->getTotalIncl());
+    }
+
+    public function test_it_subtracts_payment_discounts_from_payment_and_order_totals(): void
+    {
+        $order = $this->orderContext->createDefaultOrder();
+        $order->getPayments()[0]->addDiscount($this->orderContext->createPaymentDiscount());
+
+        $this->assertEquals(Money::EUR('35'), $order->getPaymentCostExcl());
+        $this->assertEquals(Money::EUR('251'), $order->getTotalExcl());
+
+        (new TestContainer)->get(AdjustOrderVatSnapshot::class)->adjust($order);
+
+        $this->assertEquals(Money::EUR('61'), $order->getShippingCostIncl());
+        $this->assertEquals(Money::EUR('42'), $order->getPaymentCostIncl());
+        $this->assertEquals(Money::EUR('0'), $order->getDiscountTotalIncl());
+        $this->assertEquals(Money::EUR('304'), $order->getTotalIncl());
+    }
+
+    public function test_it_combines_service_and_order_discounts_without_double_counting(): void
+    {
+        $order = $this->orderContext->createDefaultOrder();
+        $order->getShippings()[0]->addDiscount($this->orderContext->createShippingDiscount());
+        $order->getPayments()[0]->addDiscount($this->orderContext->createPaymentDiscount());
+        $this->orderContext->addDiscountToOrder($order, $this->orderContext->createOrderDiscount());
+
+        $this->assertEquals(Money::EUR('35'), $order->getShippingCostExcl());
+        $this->assertEquals(Money::EUR('35'), $order->getPaymentCostExcl());
+        $this->assertEquals(Money::EUR('15'), $order->getDiscountTotalExcl());
+        $this->assertEquals(Money::EUR('221'), $order->getTotalExcl());
+
+        (new TestContainer)->get(AdjustOrderVatSnapshot::class)->adjust($order);
+
+        $this->assertEquals(Money::EUR('42'), $order->getShippingCostIncl());
+        $this->assertEquals(Money::EUR('42'), $order->getPaymentCostIncl());
+        $this->assertEquals(Money::EUR('18'), $order->getDiscountTotalIncl());
+        $this->assertEquals(Money::EUR('267'), $order->getTotalIncl());
+    }
 }

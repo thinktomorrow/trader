@@ -4,6 +4,11 @@ Important changes will be notified in this file
 
 ## Unreleased
 
+## 2026-06-04 - 0.9.5
+
+- Fixed: shipping and payment cost totals now use `getShippingCostTotal()` / `getPaymentCostTotal()` in `WithOrderTotals` so service-level discounts are correctly reflected in order totals.
+- Added: `getLabel(): ?string` method to `MerchantOrderDiscount` interface and `OrderReadDiscount`.
+
 ## 2026-05-18 - 0.9.4
 
 - Fixed: DefaultVariantTaxonItem failed when data was NULL

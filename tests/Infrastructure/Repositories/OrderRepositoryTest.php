@@ -110,4 +110,41 @@ final class OrderRepositoryTest extends TestCase
             $this->assertTrue($savedOrder->hasUpToDateVatSnapshot());
         }
     }
+
+    public function test_it_persists_net_service_totals_after_shipping_and_payment_discounts(): void
+    {
+        foreach ([OrderContext::mysql(), OrderContext::laravel()] as $orderContext) {
+            $orderContext->createPromo('service-promo', [], [
+                $orderContext->createPromoDiscount('service-promo', 'service-promo-discount'),
+            ]);
+
+            $orderId = $orderContext->driverName === 'mysql' ? 'srvdisc-mysql' : 'srvdisc-laravel';
+            $order = $orderContext->createDefaultOrder($orderId);
+
+            $order->getShippings()[0]->addDiscount(
+                $orderContext->createShippingDiscount($order->orderId->get(), $order->getShippings()[0]->shippingId->get(), 'shipdisc', [
+                    'promo_id' => 'service-promo',
+                    'promo_discount_id' => 'service-promo-discount',
+                ])
+            );
+
+            $order->getPayments()[0]->addDiscount(
+                $orderContext->createPaymentDiscount($order->orderId->get(), $order->getPayments()[0]->paymentId->get(), 'paydisc', [
+                    'promo_id' => 'service-promo',
+                    'promo_discount_id' => 'service-promo-discount',
+                ])
+            );
+
+            $orderContext->saveOrder($order);
+
+            $savedOrder = $orderContext->findOrder($order->orderId);
+
+            $this->assertEquals(35, (int) $savedOrder->getShippingCostExcl()->getAmount());
+            $this->assertEquals(35, (int) $savedOrder->getPaymentCostExcl()->getAmount());
+            $this->assertEquals(236, (int) $savedOrder->getTotalExcl()->getAmount());
+            $this->assertCount(1, $savedOrder->getShippings()[0]->getDiscounts());
+            $this->assertCount(1, $savedOrder->getPayments()[0]->getDiscounts());
+            $this->assertTrue($savedOrder->hasUpToDateVatSnapshot());
+        }
+    }
 }
