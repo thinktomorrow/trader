@@ -4,9 +4,12 @@ Important changes will be notified in this file
 
 ## Unreleased
 
+- Added: CustomerAlreadyExists exception to be thrown when creating a customer with an existing email address.
+
 ## 2026-06-04 - 0.9.5
 
-- Fixed: shipping and payment cost totals now use `getShippingCostTotal()` / `getPaymentCostTotal()` in `WithOrderTotals` so service-level discounts are correctly reflected in order totals.
+- Fixed: shipping and payment cost totals now use `getShippingCostTotal()` / `getPaymentCostTotal()` in
+  `WithOrderTotals` so service-level discounts are correctly reflected in order totals.
 - Added: `getLabel(): ?string` method to `MerchantOrderDiscount` interface and `OrderReadDiscount`.
 
 ## 2026-05-18 - 0.9.4
@@ -36,7 +39,7 @@ Important changes will be notified in this file
   behavior.
 - Added: Extra Snapshot validation before saving order
 - Added: Specific VatSnapshotMismatchException in case vat snapshot of an order is invalid.
-- Added: TaxonomyItem::getData() method
+- Added: TaxonomyItem::getData () method
 - Added: Laravel boost guideline
 - Added: laravel/pint as codestyle + ran pint
 - Changed: Default VAT rounding strategy is now line-based.
@@ -110,8 +113,8 @@ Important changes will be notified in this file
 
 ### Introducing Taxonomy & Taxon setup
 
-A Taxon now belongs to a Taxonomy. This allows for more flexible and structured categorization of products.
-Available taxonomy types are:
+A Taxon now belongs to a Taxonomy. This allows for more flexible and structured categorization of products. Available
+taxonomy types are:
 
 - property: product properties like brand, vendor, gtin, ...
 - variant property: color, size, ...
@@ -129,9 +132,9 @@ Available taxonomy types are:
 - Removed: `TaxonIdOptionsComposer::getRoots()`, `TaxonIdOptionsComposer::includeRoots()` and
   `TaxonIdOptionsComposer::include()`.
 
-- Added: Product::getProductTaxa() and updateProductTaxa(). Also Product::getVariantProperties() as subset of the
+- Added: Product::getProductTaxa () and updateProductTaxa (). Also Product::getVariantProperties () as subset of the
   product taxa to allow for specific behavior around the variant properties.
-- Added: Variant::getVariantTaxa() and updateVariantTaxa(), Variant::getVariantProperties() as subset of the variant
+- Added: Variant::getVariantTaxa () and updateVariantTaxa (), Variant::getVariantProperties () as subset of the variant
   taxa.
 
 ## 2025-06-02 - 0.7.3
@@ -140,7 +143,7 @@ Available taxonomy types are:
 
 ## 2025-03-31 - 0.7.2
 
-- Added: `OrderGridItem::isBusiness()' method to check if the order is a business order.
+- Added: `OrderGridItem::isBusiness ()' method to check if the order is a business order.
 
 ## 2025-03-31 - 0.7.1
 
@@ -184,7 +187,7 @@ the checkout and order.
 
 ## 2024-01-22 - 0.6.3
 
-- Fixed: TaxonFilterTreeComposer::getAvailableFilters() filtering improved: For type type of category taxa, only
+- Fixed: TaxonFilterTreeComposer::getAvailableFilters () filtering improved: For type type of category taxa, only
   children of the given main taxon are returned.
 
 ## 2024-01-16 - 0.6.2
@@ -243,7 +246,7 @@ Schema::create('trader_product_variants', function (Blueprint $table) {
 
 ```
 
-- Added: TaxonFilterTreeComposer::getOnlineProductIds(string $taxonId); to collect product ids of online products.
+- Added: TaxonFilterTreeComposer::getOnlineProductIds (string $taxonId); to collect product ids of online products.
 - Fixed: Discount calculation when price calculations is set to 'include_vat_in_prices'
 - Changed: TaxonFilterTreeComposer::getActiveFilters now returns filters that have online products
 - Changed: LineAdded property productId renamed to variantId. This was actually already the value of the variant id.
@@ -278,7 +281,7 @@ Schema::create('trader_product_variants', function (Blueprint $table) {
 ## 2022-11-08 - 0.5.3
 
 - Fixed: do not record order update events when state hasn't changed.
-- Added: ProductDetail::getUnitPriceAsPrice() and ProductDetail::getSalePriceAsPrice() to retrieve the original Price
+- Added: ProductDetail::getUnitPriceAsPrice () and ProductDetail::getSalePriceAsPrice () to retrieve the original Price
   objects.
 
 ## 2022-11-07 - 0.5.2
@@ -287,8 +290,8 @@ Schema::create('trader_product_variants', function (Blueprint $table) {
 
 ## 2022-11-07 - 0.5.1
 
-- Added: dataAsPrimitive() helper method to render data and ensure that a primitive is given, else the default is
-  returned. The default data() method can also return object or array, which can cause - in case of missing
+- Added: dataAsPrimitive () helper method to render data and ensure that a primitive is given, else the default is
+  returned. The default data () method can also return object or array, which can cause - in case of missing
   translations - unexcepted array returns.
 
 ## 2022-11-03 - 0.5.0

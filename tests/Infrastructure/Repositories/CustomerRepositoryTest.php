@@ -16,6 +16,7 @@ use Thinktomorrow\Trader\Domain\Model\Customer\Address\ShippingAddress;
 use Thinktomorrow\Trader\Domain\Model\Customer\Customer;
 use Thinktomorrow\Trader\Domain\Model\Customer\CustomerId;
 use Thinktomorrow\Trader\Domain\Model\Customer\Exceptions\CouldNotFindCustomer;
+use Thinktomorrow\Trader\Domain\Model\Customer\Exceptions\CustomerAlreadyExists;
 use Thinktomorrow\Trader\Testing\Order\OrderContext;
 
 final class CustomerRepositoryTest extends TestCase
@@ -86,6 +87,27 @@ final class CustomerRepositoryTest extends TestCase
 
             $this->assertInstanceOf(CustomerId::class, $repository->nextReference());
         }
+    }
+
+    public function test_it_throws_customer_already_exists_when_email_is_taken_on_save(): void
+    {
+        $repository = OrderContext::mysql()->repos()->customerRepository();
+
+        $repository->save(Customer::create(
+            CustomerId::fromString('xxx-existing'),
+            Email::fromString('ben@thinktomorrow.be'),
+            false,
+            Locale::fromString('nl_BE')
+        ));
+
+        $this->expectException(CustomerAlreadyExists::class);
+
+        $repository->save(Customer::create(
+            CustomerId::fromString('xxx-new'),
+            Email::fromString('ben@thinktomorrow.be'),
+            false,
+            Locale::fromString('nl_BE')
+        ));
     }
 
     #[DataProvider('customers')]

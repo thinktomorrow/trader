@@ -11,8 +11,12 @@ use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Notification;
 use Tests\Infrastructure\TestCase;
+use Thinktomorrow\Trader\Application\Customer\CustomerApplication;
+use Thinktomorrow\Trader\Application\Customer\RegisterCustomer;
+use Thinktomorrow\Trader\Domain\Model\Customer\CustomerId;
 use Thinktomorrow\Trader\Domain\Model\Customer\Events\CustomerCreated;
 use Thinktomorrow\Trader\Domain\Model\Customer\Events\CustomerHasLoggedIn;
+use Thinktomorrow\Trader\Domain\Model\Customer\Exceptions\CustomerAlreadyExists;
 use Thinktomorrow\Trader\Infrastructure\Shop\CustomerAuth\CustomerModel;
 
 use function route;
@@ -96,6 +100,43 @@ class CustomerRegisterTest extends TestCase
 
         $response->assertRedirect(route('customer.login'));
         $response->assertSessionHas('status');
+        $response->assertSessionHasNoErrors();
+
+        $this->assertDatabaseCount('trader_customers', 1);
+    }
+
+    public function test_it_handles_customer_created_by_concurrent_registration()
+    {
+        $this->app->bind(CustomerApplication::class, function () {
+            return new class extends CustomerApplication
+            {
+                public function __construct() {}
+
+                public function registerCustomer(RegisterCustomer $command): CustomerId
+                {
+                    DB::table('trader_customers')->insert([
+                        'customer_id' => 'cust_12345',
+                        'email' => $command->getEmail()->get(),
+                        'is_business' => false,
+                        'locale' => 'en',
+                        'data' => json_encode([]),
+                    ]);
+
+                    throw CustomerAlreadyExists::forEmail($command->getEmail());
+                }
+            };
+        });
+
+        $response = $this->post(route('customer.register.store'), [
+            'firstname' => 'Ben',
+            'lastname' => 'Doe',
+            'email' => 'ben@thinktomorrow.be',
+            'password' => 'secret123',
+            'password_confirmation' => 'secret123',
+        ]);
+
+        $response->assertRedirect(route('customer.login'));
+        $response->assertSessionHas('status', 'trader-auth.register.status.verification_notice');
         $response->assertSessionHasNoErrors();
 
         $this->assertDatabaseCount('trader_customers', 1);

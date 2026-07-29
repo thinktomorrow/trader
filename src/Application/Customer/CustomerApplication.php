@@ -11,6 +11,7 @@ use Thinktomorrow\Trader\Domain\Model\Customer\Customer;
 use Thinktomorrow\Trader\Domain\Model\Customer\CustomerId;
 use Thinktomorrow\Trader\Domain\Model\Customer\CustomerRepository;
 use Thinktomorrow\Trader\Domain\Model\Customer\Events\CustomerDeleted;
+use Thinktomorrow\Trader\Domain\Model\Customer\Exceptions\CustomerAlreadyExists;
 
 class CustomerApplication
 {
@@ -27,7 +28,7 @@ class CustomerApplication
     public function registerCustomer(RegisterCustomer $command): CustomerId
     {
         if ($this->customerRepository->existsByEmail($command->getEmail())) {
-            throw new \InvalidArgumentException('Registration failed. A customer with email '.$command->getEmail()->get().' already exists.');
+            throw CustomerAlreadyExists::forEmail($command->getEmail());
         }
 
         $customer = Customer::create(

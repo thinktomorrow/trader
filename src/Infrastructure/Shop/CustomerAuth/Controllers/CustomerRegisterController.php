@@ -11,6 +11,7 @@ use Thinktomorrow\Trader\Application\Customer\CustomerApplication;
 use Thinktomorrow\Trader\Application\Customer\RegisterCustomer;
 use Thinktomorrow\Trader\Domain\Common\Email;
 use Thinktomorrow\Trader\Domain\Model\Customer\CustomerRepository;
+use Thinktomorrow\Trader\Domain\Model\Customer\Exceptions\CustomerAlreadyExists;
 use Thinktomorrow\Trader\Domain\Model\CustomerLogin\CustomerLogin;
 use Thinktomorrow\Trader\Domain\Model\CustomerLogin\CustomerLoginRepository;
 use Thinktomorrow\Trader\Infrastructure\Shop\CustomerAuth\CustomerModel;
@@ -47,40 +48,39 @@ class CustomerRegisterController extends Controller
 
         $existingCustomer = CustomerModel::where('email', $request->email)->first();
 
+        if ($existingCustomer) {
+            $this->sendVerificationNotificationWhenNeeded($existingCustomer);
+        }
+
         if (! $existingCustomer) {
-            // Maak nieuwe klant aan
-            $customerId = $this->customerApplication->registerCustomer(new RegisterCustomer(
-                $request->email,
-                (bool) $request->is_business,
-                app()->getLocale(),
-                [
-                    'firstname' => $request->firstname,
-                    'lastname' => $request->lastname,
-                    'company' => $request->company ?? null,
-                    'vat_number' => $request->vat_number ?? null,
-                    'phone' => $request->phone ?? null,
-                ]
-            ));
+            try {
+                $customerId = $this->customerApplication->registerCustomer(new RegisterCustomer(
+                    $request->email,
+                    (bool) $request->is_business,
+                    app()->getLocale(),
+                    [
+                        'firstname' => $request->firstname,
+                        'lastname' => $request->lastname,
+                        'company' => $request->company ?? null,
+                        'vat_number' => $request->vat_number ?? null,
+                        'phone' => $request->phone ?? null,
+                    ]
+                ));
 
-            // Maak login aan voor klant
-            $this->customerLoginRepository->save(CustomerLogin::create(
-                $customerId,
-                Email::fromString($request->email),
-                bcrypt($request->password)
-            ));
+                $this->customerLoginRepository->save(CustomerLogin::create(
+                    $customerId,
+                    Email::fromString($request->email),
+                    bcrypt($request->password)
+                ));
 
-            // Verzend verificatiemail
-            $customer = CustomerModel::findOrFail($customerId->get());
+                $customer = CustomerModel::findOrFail($customerId->get());
 
-            $customer->sendEmailVerificationNotification();
-
-        } else {
-            // Indien klant al bestaat maar nog niet geverifieerd, stuur opnieuw mail
-            if (! $existingCustomer->hasVerifiedEmail()) {
-                $existingCustomer->sendEmailVerificationNotification();
+                $customer->sendEmailVerificationNotification();
+            } catch (CustomerAlreadyExists) {
+                $this->sendVerificationNotificationWhenNeeded(
+                    CustomerModel::where('email', $request->email)->firstOrFail()
+                );
             }
-
-            // Indien klant al verified, doen we niets — we geven gewoon dezelfde feedback
         }
 
         if (! $redirect) {
@@ -89,6 +89,13 @@ class CustomerRegisterController extends Controller
 
         return redirect()
             ->to($redirect)
-            ->with('status', __('trader-auth.verify.pending_verification'));
+            ->with('status', __('trader-auth.register.status.verification_notice'));
+    }
+
+    private function sendVerificationNotificationWhenNeeded(CustomerModel $customer): void
+    {
+        if (! $customer->hasVerifiedEmail()) {
+            $customer->sendEmailVerificationNotification();
+        }
     }
 }

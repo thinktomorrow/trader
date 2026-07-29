@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Thinktomorrow\Trader\Infrastructure\Laravel\Repositories;
 
+use Illuminate\Database\UniqueConstraintViolationException;
 use Illuminate\Support\Facades\DB;
 use Psr\Container\ContainerInterface;
 use Ramsey\Uuid\Uuid;
@@ -19,6 +20,7 @@ use Thinktomorrow\Trader\Domain\Model\Customer\Customer;
 use Thinktomorrow\Trader\Domain\Model\Customer\CustomerId;
 use Thinktomorrow\Trader\Domain\Model\Customer\CustomerRepository;
 use Thinktomorrow\Trader\Domain\Model\Customer\Exceptions\CouldNotFindCustomer;
+use Thinktomorrow\Trader\Domain\Model\Customer\Exceptions\CustomerAlreadyExists;
 
 class MysqlCustomerRepository implements CustomerReadRepository, CustomerRepository
 {
@@ -37,10 +39,18 @@ class MysqlCustomerRepository implements CustomerReadRepository, CustomerReposit
     {
         $state = $customer->getMappedData();
 
-        if (! $this->exists($customer->customerId)) {
-            DB::table(static::$customerTable)->insert($state);
-        } else {
-            DB::table(static::$customerTable)->where('customer_id', $customer->customerId->get())->update($state);
+        try {
+            if (! $this->exists($customer->customerId)) {
+                DB::table(static::$customerTable)->insert($state);
+            } else {
+                DB::table(static::$customerTable)->where('customer_id', $customer->customerId->get())->update($state);
+            }
+        } catch (UniqueConstraintViolationException $e) {
+            if ($this->existsByEmail($customer->getEmail())) {
+                throw CustomerAlreadyExists::forEmail($customer->getEmail());
+            }
+
+            throw $e;
         }
 
         $this->upsertAddresses($customer);

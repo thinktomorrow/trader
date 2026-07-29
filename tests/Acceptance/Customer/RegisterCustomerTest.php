@@ -7,6 +7,7 @@ namespace Tests\Acceptance\Customer;
 use Thinktomorrow\Trader\Application\Customer\RegisterCustomer;
 use Thinktomorrow\Trader\Domain\Common\Email;
 use Thinktomorrow\Trader\Domain\Common\Locale;
+use Thinktomorrow\Trader\Domain\Model\Customer\Exceptions\CustomerAlreadyExists;
 
 class RegisterCustomerTest extends CustomerContext
 {
@@ -34,7 +35,7 @@ class RegisterCustomerTest extends CustomerContext
     {
         $this->givenACustomerExists('ben@tt.be');
 
-        $this->expectException(\InvalidArgumentException::class);
+        $this->expectException(CustomerAlreadyExists::class);
         $this->customerApplication->registerCustomer(new RegisterCustomer('ben@tt.be', false, 'nl_BE', []));
     }
 }
