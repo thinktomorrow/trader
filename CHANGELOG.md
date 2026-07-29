@@ -4,7 +4,10 @@ Important changes will be notified in this file
 
 ## Unreleased
 
+## 2026-07-29 - 0.9.6
+
 - Added: CustomerAlreadyExists exception to be thrown when creating a customer with an existing email address.
+- Added: trader-auth.status.verification_notice text used to notify when a customer needs to verify their email address.
 
 ## 2026-06-04 - 0.9.5
 
