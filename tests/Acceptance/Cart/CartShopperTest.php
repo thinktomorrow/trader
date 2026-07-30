@@ -26,6 +26,21 @@ class CartShopperTest extends CartContext
         $this->assertFalse($cart->getShopper()->isCustomer());
     }
 
+    public function test_guest_shopper_with_existing_customer_email_is_not_linked_to_customer()
+    {
+        $this->givenACustomerExists('foo@example.com');
+
+        $this->whenIEnterShopperDetails('foo@example.com');
+
+        $cart = $this->orderContext->repos()->cartRepository()->findCart(OrderId::fromString('xxx'));
+
+        $this->assertInstanceOf(CartShopper::class, $cart->getShopper());
+        $this->assertEquals('foo@example.com', $cart->getShopper()->getEmail());
+        $this->assertNull($cart->getShopper()->getCustomerId());
+        $this->assertTrue($cart->getShopper()->isGuest());
+        $this->assertFalse($cart->getShopper()->isCustomer());
+    }
+
     public function test_it_can_see_customer_shopper()
     {
         $this->givenACustomerExists('foo@example.com');
