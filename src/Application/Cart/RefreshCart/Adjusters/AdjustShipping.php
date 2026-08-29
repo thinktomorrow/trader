@@ -26,6 +26,6 @@ final class AdjustShipping implements Adjuster
 
         $shippingProfileId = $order->getShippings()[0]->getShippingProfileId();
 
-        $this->updateShippingProfileOnOrder->handle($order, $shippingProfileId);
+        $this->updateShippingProfileOnOrder->refresh($order, $shippingProfileId);
     }
 }

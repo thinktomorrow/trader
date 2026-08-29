@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Thinktomorrow\Trader\Infrastructure\Vine;
 
 use Thinktomorrow\Trader\Application\Product\Grid\FlattenedTaxonIds;
+use Thinktomorrow\Trader\Application\Taxon\Queries\TaxonHierarchy;
 use Thinktomorrow\Trader\Application\Taxon\Tree\TaxonNode;
 use Thinktomorrow\Trader\Application\Taxon\Tree\TaxonTreeRepository;
 
@@ -17,9 +18,12 @@ class VineFlattenedTaxonIds implements FlattenedTaxonIds
 {
     private TaxonTreeRepository $taxonTreeRepository;
 
-    public function __construct(TaxonTreeRepository $taxonTreeRepository)
+    private TaxonHierarchy $taxonHierarchy;
+
+    public function __construct(TaxonTreeRepository $taxonTreeRepository, ?TaxonHierarchy $taxonHierarchy = null)
     {
         $this->taxonTreeRepository = $taxonTreeRepository;
+        $this->taxonHierarchy = $taxonHierarchy ?? new VineTaxonHierarchy($taxonTreeRepository);
     }
 
     /**
@@ -59,6 +63,7 @@ class VineFlattenedTaxonIds implements FlattenedTaxonIds
         $taxonIds = [];
 
         foreach ($taxonKeys as $key) {
+            /** @var ?TaxonNode $node */
             $node = ($passedAsKeys)
                 ? $this->taxonTreeRepository->getTree()->find(fn (TaxonNode $node) => $node->getKey() == $key)
                 : $this->taxonTreeRepository->getTree()->find(fn (TaxonNode $node) => $node->getNodeId() == $key);
@@ -73,7 +78,10 @@ class VineFlattenedTaxonIds implements FlattenedTaxonIds
                 $taxonIds[$taxonomyId] = [];
             }
 
-            $taxonIds[$taxonomyId] = array_merge($taxonIds[$taxonomyId], $node->pluckChildNodes('id', null, true));
+            $taxonIds[$taxonomyId] = array_merge(
+                $taxonIds[$taxonomyId],
+                array_map(fn (TaxonNode $taxon): string => $taxon->getId(), $this->taxonHierarchy->descendants($node, true))
+            );
         }
 
         foreach ($taxonIds as $taxonomyId => $ids) {

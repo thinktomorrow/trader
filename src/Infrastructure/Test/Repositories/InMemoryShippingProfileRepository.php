@@ -92,9 +92,18 @@ final class InMemoryShippingProfileRepository implements InMemoryRepository, Shi
         $activeProfiles = [];
 
         foreach (self::$shippingProfiles as $shippingProfile) {
-            if ($shippingProfile->getState() == ShippingProfileState::online && (! $countryId || $shippingProfile->hasCountry(CountryId::fromString($countryId)))) {
-                $activeProfiles[] = $shippingProfile;
+            if (! in_array($shippingProfile->getState(), ShippingProfileState::onlineStates(), true)) {
+                continue;
             }
+
+            $isCountryEligible = ! $shippingProfile->hasAnyCountries()
+                || ($countryId !== null && $shippingProfile->hasCountry(CountryId::fromString($countryId)));
+
+            if (! $isCountryEligible) {
+                continue;
+            }
+
+            $activeProfiles[] = $shippingProfile;
         }
 
         return array_map(fn ($shippingProfile) => DefaultShippingProfileForCart::fromMappedData($shippingProfile->getMappedData()), $activeProfiles);

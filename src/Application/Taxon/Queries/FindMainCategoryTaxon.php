@@ -18,10 +18,13 @@ class FindMainCategoryTaxon
 
     private TraderConfig $traderConfig;
 
-    public function __construct(TraderConfig $traderConfig, TaxonTreeRepository $taxonTreeRepository)
+    private ?TaxonHierarchy $taxonHierarchy;
+
+    public function __construct(TraderConfig $traderConfig, TaxonTreeRepository $taxonTreeRepository, ?TaxonHierarchy $taxonHierarchy = null)
     {
         $this->traderConfig = $traderConfig;
         $this->taxonTreeRepository = $taxonTreeRepository;
+        $this->taxonHierarchy = $taxonHierarchy;
     }
 
     public function get(): TaxonTree
@@ -39,7 +42,12 @@ class FindMainCategoryTaxon
 
         foreach ($taxonTree->all() as $categoryRootTaxon) {
 
-            $matchingTaxonIds = [$categoryRootTaxon->getNodeId(), ...$categoryRootTaxon->pluckChildNodes('id')];
+            $matchingTaxonIds = $this->taxonHierarchy
+                ? array_map(
+                    fn (TaxonNode $taxon): string => $taxon->getId(),
+                    $this->taxonHierarchy->descendants($categoryRootTaxon, true)
+                )
+                : [$categoryRootTaxon->getNodeId(), ...$categoryRootTaxon->pluckChildNodes('id')];
 
             foreach ($taxonIds as $taxonId) {
                 if (in_array($taxonId, $matchingTaxonIds)) {

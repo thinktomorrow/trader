@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Thinktomorrow\Trader\Infrastructure\Vine;
 
 use Thinktomorrow\Trader\Application\Taxon\Queries\TaxonFilters;
+use Thinktomorrow\Trader\Application\Taxon\Queries\TaxonHierarchy;
 use Thinktomorrow\Trader\Application\Taxon\Tree\TaxonNode;
 use Thinktomorrow\Trader\Application\Taxon\Tree\TaxonTree;
 use Thinktomorrow\Trader\Application\Taxon\Tree\TaxonTreeRepository;
@@ -23,10 +24,13 @@ class VineTaxonFilters implements TaxonFilters
 
     private Locale $locale;
 
-    public function __construct(TraderConfig $traderConfig, TaxonTreeRepository $taxonTreeRepository, TaxonomyRepository $taxonomyRepository)
+    private TaxonHierarchy $taxonHierarchy;
+
+    public function __construct(TraderConfig $traderConfig, TaxonTreeRepository $taxonTreeRepository, TaxonomyRepository $taxonomyRepository, ?TaxonHierarchy $taxonHierarchy = null)
     {
         $this->taxonTreeRepository = $taxonTreeRepository;
         $this->taxonomyRepository = $taxonomyRepository;
+        $this->taxonHierarchy = $taxonHierarchy ?? new VineTaxonHierarchy($taxonTreeRepository);
 
         $this->locale = $traderConfig->getDefaultLocale();
     }
@@ -77,37 +81,6 @@ class VineTaxonFilters implements TaxonFilters
                     )
                 );
 
-                //                // For the taxonomy type variant_property, we want to shake on the online variants instead of products
-                //                if ($item['taxonomy']->getTaxonomyType() == TaxonomyType::variant_property->value) {
-                //                    $shakenTaxa = TaxonTree::fromIterable([$taxon])->shake(function (TaxonNode $node) use ($productIds) {
-                //                        return count(array_intersect($node->getGridProductIds(), $productIds)) > 0 && count($node->getGridVariantIds()) > 0;
-                //                    })->all();
-                //
-                //                    if (count($shakenTaxa) > 0) {
-                //                        $result[$i]['taxa'] = array_merge($result[$i]['taxa'], $shakenTaxa);
-                //                    }
-                //                } // If the taxon is the scoped taxon itself, we want to show its children as filter options
-                //                elseif (in_array($taxon->getId(), $scopedTaxonIds)) {
-                //
-                //                    // This would only show the children of the scoped taxon as filter options - not the scoped taxon itself
-                //                    foreach ($taxon->getChildNodes() as $childNode) {
-                //                        $result[$i]['taxa'][] = $childNode;
-                //                    }
-                //                }
-                //
-                //                // If the taxon is an ancestor of any of the scoped taxa, we don't show it
-                //                // but rather show the children of the scoped taxa instead
-                //                elseif (count(array_intersect($taxon->pluckChildNodes('id'), $scopedTaxonIds)) > 0) {
-                //
-                //                    // Get all children that are scoped and add them as filter options instead of the ancestor
-                //                    $matchingScopedTaxa = $taxon->findChildNodes('id', $scopedTaxonIds);
-                //
-                //                    foreach ($matchingScopedTaxa as $matchingTaxon) {
-                //                        $result[$i]['taxa'][] = $matchingTaxon;
-                //                    }
-                //                } else {
-                //                    $result[$i]['taxa'][] = $taxon;
-                //                }
             }
         }
 
@@ -138,7 +111,7 @@ class VineTaxonFilters implements TaxonFilters
         // 3. Taxon is ancestor of scoped → show matching scoped children
         // If the taxon is an ancestor of the scoped taxa, we don't show it
         // but rather show the children of the scoped taxa instead
-        if (count(array_intersect($taxon->pluckChildNodes('id'), $scopedTaxonIds)) > 0) {
+        if (count(array_intersect($this->taxonIds($this->taxonHierarchy->descendants($taxon)), $scopedTaxonIds)) > 0) {
             return $taxon->findChildNodes('id', $scopedTaxonIds)->all();
         }
 
@@ -152,12 +125,6 @@ class VineTaxonFilters implements TaxonFilters
         // Any taxa that the page is scoped to (the main taxa scope on the page)
         $scopedTaxa = $taxonTree->findMany(fn (TaxonNode $node) => in_array($node->getId(), $scopedTaxonIds));
         $scopedTaxonIds = array_map(fn (TaxonNode $node) => $node->getId(), $scopedTaxa->all());
-        $scopedAncestorTaxonIds = [];
-
-        foreach ($scopedTaxa as $taxon) {
-            $scopedAncestorTaxonIds = array_merge($scopedAncestorTaxonIds, $taxon->pluckAncestorNodes('id'));
-        }
-
         // All the products belonging to the scoped taxa that serve as the base reference for the filter
         $productIds = $this->getGridProductIds($scopedTaxonIds);
 
@@ -197,7 +164,7 @@ class VineTaxonFilters implements TaxonFilters
 
             foreach ($taxonTree->all() as $scopedTaxon) {
                 foreach ($selectedTaxa as $selectedTaxon) {
-                    if (in_array($scopedTaxon->getNodeId(), $selectedTaxon->pluckAncestorNodes('id'))) {
+                    if ($this->taxonHierarchy->isAncestorOf($scopedTaxon, $selectedTaxon)) {
                         $taxonTree = $taxonTree->removeNode($scopedTaxon);
                     }
                 }
@@ -220,7 +187,7 @@ class VineTaxonFilters implements TaxonFilters
         $expandedIds = [];
 
         foreach ($nodes as $node) {
-            $expandedIds = array_merge($expandedIds, $node->pluckChildNodes('id'));
+            $expandedIds = array_merge($expandedIds, $this->taxonIds($this->taxonHierarchy->descendants($node)));
             $expandedIds[] = $node->getId();
         }
 
@@ -238,7 +205,7 @@ class VineTaxonFilters implements TaxonFilters
         $expandedIds = [];
 
         foreach ($nodes as $node) {
-            $expandedIds = array_merge($expandedIds, $node->pluckChildNodes('id'));
+            $expandedIds = array_merge($expandedIds, $this->taxonIds($this->taxonHierarchy->descendants($node)));
             $expandedIds[] = $node->getId();
         }
 
@@ -266,11 +233,9 @@ class VineTaxonFilters implements TaxonFilters
         $productIds = [];
 
         foreach ($nodes as $node) {
-            $productIds = array_merge($productIds, ($forGrid ? $node->getGridProductIds() : $node->getProductIds()));
-
-            $node->getChildNodes()->flatten()->each(function ($childNode) use (&$productIds, $forGrid) {
-                $productIds = array_merge($productIds, ($forGrid ? $childNode->getGridProductIds() : $childNode->getProductIds()));
-            });
+            foreach ($this->taxonHierarchy->descendants($node, true) as $descendant) {
+                $productIds = array_merge($productIds, ($forGrid ? $descendant->getGridProductIds() : $descendant->getProductIds()));
+            }
         }
 
         return array_values(array_unique($productIds));
@@ -281,5 +246,14 @@ class VineTaxonFilters implements TaxonFilters
         $this->locale = $locale;
 
         return $this;
+    }
+
+    /**
+     * @param  list<TaxonNode>  $taxa
+     * @return list<string>
+     */
+    private function taxonIds(array $taxa): array
+    {
+        return array_map(fn (TaxonNode $taxon): string => $taxon->getId(), $taxa);
     }
 }

@@ -9,6 +9,7 @@ use Thinktomorrow\Trader\Application\Taxon\Queries\FindMainCategoryTaxon;
 use Thinktomorrow\Trader\Infrastructure\Test\Repositories\InMemoryTaxonTreeRepository;
 use Thinktomorrow\Trader\Infrastructure\Test\TestContainer;
 use Thinktomorrow\Trader\Infrastructure\Test\TestTraderConfig;
+use Thinktomorrow\Trader\Infrastructure\Vine\VineTaxonHierarchy;
 
 class FindMainCategoryTaxaTest extends TestCase
 {
@@ -23,9 +24,11 @@ class FindMainCategoryTaxaTest extends TestCase
 
     public function test_it_can_find_the_main_category_taxa()
     {
+        $taxonTreeRepository = new InMemoryTaxonTreeRepository(new TestContainer, new TestTraderConfig);
         $finder = new FindMainCategoryTaxon(
             new TestTraderConfig(['category_taxonomy_id' => 'taxonomy-aaa']),
-            new InMemoryTaxonTreeRepository(new TestContainer, new TestTraderConfig)
+            $taxonTreeRepository,
+            new VineTaxonHierarchy($taxonTreeRepository),
         );
 
         $this->assertEquals('taxon-aaa', $finder->findFirstByTaxonIds(['taxon-aaa'])->getId());

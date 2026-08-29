@@ -142,16 +142,65 @@ class MysqlShippingProfileRepository implements ShippingCountryRepository, Shipp
         return array_map(fn ($countryState) => Country::fromMappedData($countryState), $countryStates);
     }
 
+    /**
+     * Profiles without active country links are unrestricted. Restricted profiles are only
+     * available for a matching active country; EXISTS keeps both cases unambiguous.
+     */
     public function findAllShippingProfilesForCart(?string $countryId = null): array
     {
         $builder = DB::table(static::$shippingProfileTable)
-            ->whereIn('state', ShippingProfileState::onlineStates())
-            ->orderBy('order_column', 'ASC');
+            ->whereIn(static::$shippingProfileTable.'.state', ShippingProfileState::onlineStates())
+            ->orderBy(static::$shippingProfileTable.'.order_column', 'ASC');
 
         if ($countryId) {
-            $builder->leftJoin(static::$shippingProfileCountryTable, static::$shippingProfileTable.'.shipping_profile_id', '=', static::$shippingProfileCountryTable.'.shipping_profile_id')
-                ->where(static::$shippingProfileCountryTable.'.country_id', $countryId)
-                ->select(static::$shippingProfileTable.'.*');
+            $builder->where(function ($query) use ($countryId) {
+                $query->whereNotExists(function ($query) {
+                    $query->selectRaw('1')
+                        ->from(static::$shippingProfileCountryTable)
+                        ->join(
+                            static::$countryTable,
+                            static::$shippingProfileCountryTable.'.country_id',
+                            '=',
+                            static::$countryTable.'.country_id'
+                        )
+                        ->whereColumn(
+                            static::$shippingProfileCountryTable.'.shipping_profile_id',
+                            static::$shippingProfileTable.'.shipping_profile_id'
+                        )
+                        ->where(static::$countryTable.'.active', '1');
+                })->orWhereExists(function ($query) use ($countryId) {
+                    $query->selectRaw('1')
+                        ->from(static::$shippingProfileCountryTable)
+                        ->join(
+                            static::$countryTable,
+                            static::$shippingProfileCountryTable.'.country_id',
+                            '=',
+                            static::$countryTable.'.country_id'
+                        )
+                        ->whereColumn(
+                            static::$shippingProfileCountryTable.'.shipping_profile_id',
+                            static::$shippingProfileTable.'.shipping_profile_id'
+                        )
+                        ->where(static::$shippingProfileCountryTable.'.country_id', $countryId)
+                        ->where(static::$countryTable.'.active', '1');
+                });
+            });
+        } else {
+            $builder->whereNotExists(function ($query) {
+                $query->selectRaw('1')
+                    ->from(static::$shippingProfileCountryTable)
+                    ->join(
+                        static::$countryTable,
+                        static::$shippingProfileCountryTable.'.country_id',
+                        '=',
+                        static::$countryTable.'.country_id'
+                    )
+                    ->whereColumn(
+                        static::$shippingProfileCountryTable.'.shipping_profile_id',
+                        static::$shippingProfileTable.'.shipping_profile_id'
+                    )
+                    ->where(static::$countryTable.'.active', '1');
+            });
         }
 
         return $builder

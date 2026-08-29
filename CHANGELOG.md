@@ -4,6 +4,16 @@ Important changes will be notified in this file
 
 ## Unreleased
 
+## 2026-08-29 - 0.9.7
+
+- Added: generic `TaxonHierarchy` queries for descendants, ancestors and nested taxon membership.
+- Changed: existing taxon filter, flattened taxon and main category queries now share the hierarchy implementation.
+- Added: composable shipping profile eligibility rules and order-aware available shipping profile query.
+- Note: applications replacing the shipping eligibility binding must retain the package's online and country rules.
+- Changed: explicitly selecting an unavailable shipping profile now throws `ShippingProfileIsNotAvailable` before mutating the order.
+- Changed: cart refresh silently removes a selected shipping profile that is no longer available.
+- Fixed: unrestricted shipping profiles remain available when a shipping country is selected, while restricted profiles require a matching country.
+
 ## 2026-07-29 - 0.9.6
 
 - Added: CustomerAlreadyExists exception to be thrown when creating a customer with an existing email address.

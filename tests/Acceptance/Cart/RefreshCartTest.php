@@ -10,6 +10,8 @@ use Thinktomorrow\Trader\Domain\Model\Order\State\DefaultOrderState;
 use Thinktomorrow\Trader\Domain\Model\Product\ProductId;
 use Thinktomorrow\Trader\Domain\Model\Product\Variant\VariantState;
 use Thinktomorrow\Trader\Domain\Model\Product\Variant\VariantUnitPrice;
+use Thinktomorrow\Trader\Domain\Model\ShippingProfile\ShippingProfileId;
+use Thinktomorrow\Trader\Domain\Model\ShippingProfile\ShippingProfileState;
 
 class RefreshCartTest extends CartContext
 {
@@ -86,6 +88,35 @@ class RefreshCartTest extends CartContext
         $cart = $this->orderContext->repos()->cartRepository()->findCart(OrderId::fromString('xxx'));
         $this->assertEquals('€ 0', $cart->getFormattedTotalIncl());
         $this->assertEquals(0, $cart->getSize());
+    }
+
+    public function test_refresh_removes_shipping_profile_that_became_unavailable(): void
+    {
+        $this->givenShippingCostsForAPurchaseOfEur(2, 0, 10, [], 'shipping');
+        $this->whenIChooseShipping('shipping');
+        $shippingProfile = $this->orderContext->repos()->shippingProfileRepository()->find(ShippingProfileId::fromString('shipping'));
+        $shippingProfile->updateState(ShippingProfileState::offline);
+        $this->orderContext->repos()->shippingProfileRepository()->save($shippingProfile);
+
+        $this->refreshCart();
+
+        $cart = $this->orderContext->repos()->cartRepository()->findCart(OrderId::fromString('xxx'));
+        $this->assertNull($cart->getShipping());
+    }
+
+    public function test_refresh_removes_shipping_profile_that_no_longer_supports_country(): void
+    {
+        $this->orderContext->createCountry('BE');
+        $this->orderContext->createCountry('NL');
+        $this->givenShippingCostsForAPurchaseOfEur(2, 0, 10, ['BE'], 'shipping');
+        $this->givenOrderHasAShippingCountry('BE');
+        $this->whenIChooseShipping('shipping');
+        $this->givenOrderHasAShippingCountry('NL');
+
+        $this->refreshCart();
+
+        $cart = $this->orderContext->repos()->cartRepository()->findCart(OrderId::fromString('xxx'));
+        $this->assertNull($cart->getShipping());
     }
 
     //    public function test_it_can_refresh_discounts()

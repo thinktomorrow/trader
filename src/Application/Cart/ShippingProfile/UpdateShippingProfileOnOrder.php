@@ -5,15 +5,19 @@ declare(strict_types=1);
 namespace Thinktomorrow\Trader\Application\Cart\ShippingProfile;
 
 use Psr\Container\ContainerInterface;
+use Thinktomorrow\Trader\Application\Cart\ShippingProfile\Eligibility\ProfileMustBeOnline;
+use Thinktomorrow\Trader\Application\Cart\ShippingProfile\Eligibility\ProfileMustSupportShippingCountry;
+use Thinktomorrow\Trader\Application\Cart\ShippingProfile\Eligibility\ShippingProfileEligibility;
 use Thinktomorrow\Trader\Domain\Common\Cash\Cash;
 use Thinktomorrow\Trader\Domain\Model\Order\Order;
 use Thinktomorrow\Trader\Domain\Model\Order\OrderRepository;
 use Thinktomorrow\Trader\Domain\Model\Order\Shipping\Shipping;
 use Thinktomorrow\Trader\Domain\Model\Order\Shipping\ShippingCost;
 use Thinktomorrow\Trader\Domain\Model\Order\Shipping\ShippingState;
+use Thinktomorrow\Trader\Domain\Model\ShippingProfile\Exceptions\CouldNotFindShippingProfile;
+use Thinktomorrow\Trader\Domain\Model\ShippingProfile\ShippingProfile;
 use Thinktomorrow\Trader\Domain\Model\ShippingProfile\ShippingProfileId;
 use Thinktomorrow\Trader\Domain\Model\ShippingProfile\ShippingProfileRepository;
-use Thinktomorrow\Trader\Domain\Model\ShippingProfile\ShippingProfileState;
 
 class UpdateShippingProfileOnOrder
 {
@@ -27,24 +31,31 @@ class UpdateShippingProfileOnOrder
     {
         $shippingProfile = $this->shippingProfileRepository->find($shippingProfileId);
 
-        if (! in_array($shippingProfile->getState(), ShippingProfileState::onlineStates())) {
+        $this->shippingProfileEligibility()->assertEligible($order, $shippingProfile);
+        $this->applyShippingProfile($order, $shippingProfile);
+    }
+
+    public function refresh(Order $order, ShippingProfileId $shippingProfileId): void
+    {
+        try {
+            $shippingProfile = $this->shippingProfileRepository->find($shippingProfileId);
+        } catch (CouldNotFindShippingProfile) {
             $this->removeAllShippingsFromOrder($order);
 
             return;
         }
 
-        // When shipping country is not given, but profile is country restricted, we bail out.
-        if (! ($shippingCountryId = $order->getShippingAddress()?->getAddress()->countryId) && $shippingProfile->hasAnyCountries()) {
-            $this->removeAllShippingsFromOrder($order);
-
-            return;
-        } // If shipping country does not match the allowed countries, we bail out.
-        elseif ($shippingCountryId && ! $shippingProfile->hasCountry($shippingCountryId)) {
+        if (! $this->shippingProfileEligibility()->isEligible($order, $shippingProfile)) {
             $this->removeAllShippingsFromOrder($order);
 
             return;
         }
 
+        $this->applyShippingProfile($order, $shippingProfile);
+    }
+
+    private function applyShippingProfile(Order $order, ShippingProfile $shippingProfile): void
+    {
         // Apply matching tariff - if no tariff is found, no rate will be applied
         $tariff = $shippingProfile->findTariffByPrice($order->getSubtotalExcl());
 
@@ -75,10 +86,22 @@ class UpdateShippingProfileOnOrder
         }
     }
 
-    private function removeAllShippingsFromOrder(Order $order)
+    private function removeAllShippingsFromOrder(Order $order): void
     {
         foreach ($order->getShippings() as $shipping) {
             $order->deleteShipping($shipping->shippingId);
         }
+    }
+
+    private function shippingProfileEligibility(): ShippingProfileEligibility
+    {
+        if ($this->container->has(ShippingProfileEligibility::class)) {
+            return $this->container->get(ShippingProfileEligibility::class);
+        }
+
+        return new ShippingProfileEligibility(
+            new ProfileMustBeOnline,
+            new ProfileMustSupportShippingCountry,
+        );
     }
 }

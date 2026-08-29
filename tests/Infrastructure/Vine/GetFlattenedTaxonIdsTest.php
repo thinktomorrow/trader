@@ -72,6 +72,20 @@ final class GetFlattenedTaxonIdsTest extends TestCase
         }
     }
 
+    public function test_it_expands_grandchildren(): void
+    {
+        foreach (CatalogContext::drivers() as $catalog) {
+            $taxonomy = $catalog->createTaxonomy();
+            $catalog->createTaxon('root', $taxonomy->taxonomyId->get());
+            $catalog->createTaxon('child', $taxonomy->taxonomyId->get(), 'root');
+            $catalog->createTaxon('grandchild', $taxonomy->taxonomyId->get(), 'child');
+
+            $taxonIds = $catalog->repos()->flattenedTaxonIds()->getGroupedByTaxonomyByIds(['root']);
+
+            $this->assertSame(['root', 'child', 'grandchild'], $taxonIds[$taxonomy->taxonomyId->get()]);
+        }
+    }
+
     public function test_it_returns_unique_values()
     {
         foreach (CatalogContext::drivers() as $catalog) {

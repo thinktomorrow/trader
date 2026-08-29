@@ -20,6 +20,9 @@ use Thinktomorrow\Trader\Application\Cart\Read\CartShipping;
 use Thinktomorrow\Trader\Application\Cart\Read\CartShippingAddress;
 use Thinktomorrow\Trader\Application\Cart\Read\CartShopper;
 use Thinktomorrow\Trader\Application\Cart\RefreshCart\Adjusters\AdjustLine;
+use Thinktomorrow\Trader\Application\Cart\ShippingProfile\Eligibility\ProfileMustBeOnline;
+use Thinktomorrow\Trader\Application\Cart\ShippingProfile\Eligibility\ProfileMustSupportShippingCountry;
+use Thinktomorrow\Trader\Application\Cart\ShippingProfile\Eligibility\ShippingProfileEligibility;
 use Thinktomorrow\Trader\Application\Cart\ShippingProfile\ShippingProfileForCart;
 use Thinktomorrow\Trader\Application\Cart\ShippingProfile\ShippingProfileForCartRepository;
 use Thinktomorrow\Trader\Application\Cart\VariantForCart\VariantForCart;
@@ -66,6 +69,7 @@ use Thinktomorrow\Trader\Application\Promo\OrderPromo\OrderPromoRepository;
 use Thinktomorrow\Trader\Application\Taxon\Queries\CategoryRepository;
 use Thinktomorrow\Trader\Application\Taxon\Queries\TaxaSelectOptions;
 use Thinktomorrow\Trader\Application\Taxon\Queries\TaxonFilters;
+use Thinktomorrow\Trader\Application\Taxon\Queries\TaxonHierarchy;
 use Thinktomorrow\Trader\Application\Taxon\Redirect\TaxonRedirectRepository;
 use Thinktomorrow\Trader\Application\Taxon\Tree\TaxonNode;
 use Thinktomorrow\Trader\Application\Taxon\Tree\TaxonTreeRepository;
@@ -162,6 +166,7 @@ use Thinktomorrow\Trader\Infrastructure\Vies\ViesVatNumberValidator;
 use Thinktomorrow\Trader\Infrastructure\Vine\VineFlattenedTaxonIds;
 use Thinktomorrow\Trader\Infrastructure\Vine\VineTaxaSelectOptions;
 use Thinktomorrow\Trader\Infrastructure\Vine\VineTaxonFilters;
+use Thinktomorrow\Trader\Infrastructure\Vine\VineTaxonHierarchy;
 use Thinktomorrow\Trader\TraderConfig;
 
 class TraderServiceProvider extends ServiceProvider
@@ -186,6 +191,7 @@ class TraderServiceProvider extends ServiceProvider
         $this->app->bind(CategoryRepository::class, MysqlTaxonTreeRepository::class);
         $this->app->bind(TaxaSelectOptions::class, VineTaxaSelectOptions::class);
         $this->app->bind(TaxonFilters::class, VineTaxonFilters::class);
+        $this->app->singleton(TaxonHierarchy::class, VineTaxonHierarchy::class);
         $this->app->bind(FlattenedTaxonIds::class, VineFlattenedTaxonIds::class);
         $this->app->bind(TaxonRedirectRepository::class, MysqlTaxonRedirectRepository::class);
 
@@ -195,6 +201,13 @@ class TraderServiceProvider extends ServiceProvider
         $this->app->bind(CountryRepository::class, MysqlCountryRepository::class);
         $this->app->bind(CartRepository::class, MysqlCartRepository::class);
         $this->app->bind(ShippingProfileForCartRepository::class, MysqlShippingProfileRepository::class);
+        $this->app->singleton(
+            ShippingProfileEligibility::class,
+            fn ($app) => new ShippingProfileEligibility(
+                $app->make(ProfileMustBeOnline::class),
+                $app->make(ProfileMustSupportShippingCountry::class),
+            )
+        );
         $this->app->bind(PaymentMethodForCartRepository::class, MysqlPaymentMethodRepository::class);
         $this->app->bind(PromoRepository::class, MysqlPromoRepository::class);
         $this->app->bind(OrderPromoRepository::class, MysqlPromoRepository::class);
