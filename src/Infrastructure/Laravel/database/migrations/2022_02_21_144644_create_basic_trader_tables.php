@@ -392,8 +392,8 @@ return new class extends Migration
             $table->char('discountable_id', 36);
             $table->char('promo_id', 36)->nullable()->index(); // Refers to original promo
             $table->char('promo_discount_id', 36)->nullable()->index(); // Refers to original promo discount
-            $table->integer('total_excl')->unsignedBigInteger();
-            $table->integer('total_incl')->unsignedBigInteger()->nullable();
+            $table->integer('total_excl');
+            $table->integer('total_incl')->nullable();
             $table->string('vat_rate')->nullable();
             $table->json('data')->nullable();
 

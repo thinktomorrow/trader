@@ -8,7 +8,7 @@ use Thinktomorrow\Trader\Domain\Common\Locale;
 
 class DefaultLocale
 {
-    private static Locale $defaultLocale;
+    protected static Locale $defaultLocale;
 
     public static function get(): Locale
     {

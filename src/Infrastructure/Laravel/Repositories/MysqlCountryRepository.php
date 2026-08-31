@@ -13,7 +13,7 @@ use Thinktomorrow\Trader\Domain\Model\Country\Exceptions\CouldNotFindCountry;
 
 class MysqlCountryRepository implements BillingCountryRepository, CountryRepository
 {
-    private static $countryTable = 'trader_countries';
+    protected static $countryTable = 'trader_countries';
 
     public function save(Country $country): void
     {

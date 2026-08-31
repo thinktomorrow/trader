@@ -45,7 +45,7 @@ final class MysqlCartRepository implements CartRepository
         $order = $this->orderRepository->find($orderId);
 
         if (! $order->inCustomerHands()) {
-            throw new OrderAlreadyInMerchantHands('Cannot fetch cart. Order is no longer in customer hands and has already the following state: '.$order->getOrderState()->value);
+            throw new OrderAlreadyInMerchantHands('Cannot fetch cart. Order is no longer in customer hands and has already the following state: '.$order->getOrderState()->getValueAsString());
         }
 
         // Since we rely on the vat order snapshot for prices, we need to provide a vat snapshot state to the cart read models.
@@ -129,7 +129,7 @@ final class MysqlCartRepository implements CartRepository
     {
         return DB::table(self::$orderTable)
             ->where('order_id', $orderId->get())
-            ->whereIn('order_state', array_map(fn (OrderState $state) => $state->value, $this->container->get(OrderState::class)::customerStates()))
+            ->whereIn('order_state', array_map(fn (OrderState $state) => $state->getValueAsString(), $this->container->get(OrderState::class)::customerStates()))
             ->exists();
     }
 }

@@ -18,7 +18,7 @@ abstract class BaseDiscount
 
     public readonly DiscountId $discountId;
 
-    /** @var Condition[] */
+    /** @var list<Condition> */
     protected array $conditions;
 
     public function updateConditions(array $conditions): void

@@ -56,7 +56,7 @@ final class InMemoryOrderRepository implements InMemoryRepository, InvoiceReposi
         $order = $this->find($orderId);
 
         if (! $order->inCustomerHands()) {
-            throw new OrderAlreadyInMerchantHands('Cannot fetch order for cart. Order is no longer in customer hands and has already the following state: '.$order->getOrderState()->value);
+            throw new OrderAlreadyInMerchantHands('Cannot fetch order for cart. Order is no longer in customer hands and has already the following state: '.$order->getOrderState()->getValueAsString());
         }
 
         return $order;

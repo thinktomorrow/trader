@@ -116,8 +116,6 @@ final class VatAllocator
      * In e-commerce, VAT rounding is resolved at the final aggregation level.
      * The customer-facing including-VAT total can be set as authoritative.
      * Any rounding difference is then absorbed by the VAT amount.
-     *
-     * @param  Money|null  $authoritativeIncl
      */
     private function buildAllocatedServiceTotal(array $amountsExclPerRate): VatAllocatedTotalPrice
     {

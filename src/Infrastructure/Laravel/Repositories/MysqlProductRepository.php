@@ -19,13 +19,13 @@ class MysqlProductRepository implements ProductRepository
 {
     private VariantRepository $variantRepository;
 
-    private static string $productTable = 'trader_products';
+    protected static string $productTable = 'trader_products';
 
-    private static string $variantTable = 'trader_product_variants';
+    protected static string $variantTable = 'trader_product_variants';
 
-    private static string $productTaxonLookupTable = 'trader_taxa_products';
+    protected static string $productTaxonLookupTable = 'trader_taxa_products';
 
-    private static string $personalisationTable = 'trader_product_personalisations';
+    protected static string $personalisationTable = 'trader_product_personalisations';
 
     public function __construct(VariantRepository $variantRepository)
     {

@@ -9,7 +9,6 @@ use Thinktomorrow\Trader\Application\Promo\LinePromo\LineDiscount;
 use Thinktomorrow\Trader\Application\Promo\OrderPromo\Discounts\BaseOrderDiscount;
 use Thinktomorrow\Trader\Domain\Common\Price\DefaultItemDiscountPrice;
 use Thinktomorrow\Trader\Domain\Common\Price\ItemDiscountPrice;
-use Thinktomorrow\Trader\Domain\Common\Price\ItemPrice;
 use Thinktomorrow\Trader\Domain\Model\Order\Discount\DiscountableItem;
 use Thinktomorrow\Trader\Domain\Model\Order\Line\Line;
 use Thinktomorrow\Trader\Domain\Model\Order\Order;
@@ -52,7 +51,10 @@ class SalePriceLineDiscount extends BaseOrderDiscount implements LineDiscount
 
     public function getDiscountPrice(Order $order, DiscountableItem $discountable): ItemDiscountPrice
     {
-        /** @var ItemPrice $unitPrice */
+        if (! $discountable instanceof Line) {
+            throw new \InvalidArgumentException('A sale price discount can only be calculated for an order line.');
+        }
+
         $unitPrice = $discountable->getUnitPrice();
 
         if (! $this->calculateExcludingVat && $unitPrice->isIncludingVatAuthoritative()) {

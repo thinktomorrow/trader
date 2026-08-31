@@ -4,6 +4,7 @@ namespace Thinktomorrow\Trader\Infrastructure\Shop\CustomerAuth\Controllers;
 
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Auth\Events\Verified;
+use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
@@ -39,7 +40,7 @@ class VerificationController extends Controller
 
     public function show(Request $request)
     {
-        return Auth::guard('customer')->user()->hasVerifiedEmail()
+        return $this->authenticatedCustomer()->hasVerifiedEmail()
             ? redirect($this->redirectPath())
             : view('trader::customer.auth.verify');
     }
@@ -69,7 +70,7 @@ class VerificationController extends Controller
 
     public function resend(Request $request)
     {
-        $customer = Auth::guard('customer')->user();
+        $customer = $this->authenticatedCustomer();
 
         if ($customer->hasVerifiedEmail()) {
             return $request->wantsJson()
@@ -82,5 +83,16 @@ class VerificationController extends Controller
         return $request->wantsJson()
             ? new JsonResponse([], 202)
             : back()->with('resent', true);
+    }
+
+    private function authenticatedCustomer(): MustVerifyEmail
+    {
+        $customer = Auth::guard('customer')->user();
+
+        if (! $customer instanceof MustVerifyEmail) {
+            throw new \LogicException('The authenticated customer must support email verification.');
+        }
+
+        return $customer;
     }
 }

@@ -20,6 +20,10 @@ final class PaymentStateMachine extends AbstractStateMachine
             // Get class of state so we can create the state
             $firstState = reset($this->states);
 
+            if (! $firstState instanceof PaymentState) {
+                throw new \LogicException('Cannot resolve a payment state without configured states.');
+            }
+
             return get_class($firstState)::fromString($model->getPaymentState());
         }
 

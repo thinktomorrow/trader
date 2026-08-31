@@ -21,6 +21,14 @@ class CashTest extends TestCase
         $this->assertEquals('USD', $money->getCurrency()->getCode());
     }
 
+    public function test_default_currency_can_be_overridden_by_an_extension(): void
+    {
+        $money = CashWithUsdDefault::make(120);
+
+        $this->assertEquals('USD', $money->getCurrency()->getCode());
+        $this->assertInstanceOf(CashWithUsdDefault::class, CashWithUsdDefault::from($money));
+    }
+
     public function test_it_can_represent_localised_money()
     {
         $cash = Cash::from(Money::EUR(120));
@@ -71,6 +79,7 @@ class CashTest extends TestCase
         $this->assertEquals(500, $percentaged->getAmount());
 
         $this->assertEquals(Money::EUR(50), Cash::from(Money::EUR(500))->percentage('10.0'));
+        $this->assertEquals(Money::EUR(50), Cash::from(Money::EUR(500))->percentage(Percentage::fromString('10.0')));
     }
 
     public function test_percentage_can_be_rounded()
@@ -109,5 +118,26 @@ class CashTest extends TestCase
 
         $money = new Money(1200, new Currency('EUR'));
         $this->assertEquals(960, Cash::from($money)->subtractTaxPercentage(Percentage::fromString('25.0'))->getAmount());
+    }
+
+    public function test_tax_percentage_retains_wrapper_arguments_and_returns_money(): void
+    {
+        $result = Cash::from(Money::EUR(120))->subtractTaxPercentage(
+            Percentage::fromString('20'),
+            Money::ROUND_HALF_UP,
+            false,
+            2,
+        );
+
+        $this->assertInstanceOf(Money::class, $result);
+        $this->assertEquals('100', $result->getAmount());
+    }
+}
+
+class CashWithUsdDefault extends Cash
+{
+    protected static function getDefaultCurrencyCode(): string
+    {
+        return 'USD';
     }
 }

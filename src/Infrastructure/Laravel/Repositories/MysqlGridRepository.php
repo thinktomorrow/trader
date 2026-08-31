@@ -5,9 +5,9 @@ declare(strict_types=1);
 namespace Thinktomorrow\Trader\Infrastructure\Laravel\Repositories;
 
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
-use Illuminate\Contracts\Pagination\Paginator;
 use Illuminate\Database\Query\Builder;
 use Illuminate\Database\Query\Expression;
+use Illuminate\Pagination\LengthAwarePaginator as LaravelLengthAwarePaginator;
 use Illuminate\Support\Facades\DB;
 use Psr\Container\ContainerInterface;
 use Thinktomorrow\Trader\Application\Product\Grid\FlattenedTaxonIds;
@@ -42,21 +42,21 @@ class MysqlGridRepository implements GridRepository
 
     private ?int $limit = null;
 
-    private static string $productTable = 'trader_products';
+    protected static string $productTable = 'trader_products';
 
-    private static string $variantTable = 'trader_product_variants';
+    protected static string $variantTable = 'trader_product_variants';
 
-    private static $variantKeysTable = 'trader_product_keys';
+    protected static $variantKeysTable = 'trader_product_keys';
 
-    private static string $taxonTable = 'trader_taxa';
+    protected static string $taxonTable = 'trader_taxa';
 
-    private static string $taxonomyTable = 'trader_taxonomies';
+    protected static string $taxonomyTable = 'trader_taxonomies';
 
-    private static string $taxonPivotTable = 'trader_taxa_products';
+    protected static string $taxonPivotTable = 'trader_taxa_products';
 
-    private static string $taxonVariantPivotTable = 'trader_taxa_variants';
+    protected static string $taxonVariantPivotTable = 'trader_taxa_variants';
 
-    private static $taxonKeysTable = 'trader_taxa_keys';
+    protected static $taxonKeysTable = 'trader_taxa_keys';
 
     private bool $onlyGridItems = true;
 
@@ -268,7 +268,7 @@ class MysqlGridRepository implements GridRepository
         return $this;
     }
 
-    /** @return array[product_id,variant_id] */
+    /** @return list<array{product_id: mixed, variant_id: mixed}> */
     public function getResultingIds(): array
     {
         $builder = $this->builder->clone();
@@ -300,7 +300,7 @@ class MysqlGridRepository implements GridRepository
      * In case you already know the total count of results,
      * you can pass it here to optimize the pagination.
      *
-     * @return LengthAwarePaginator<GridItem>
+     * @return LengthAwarePaginator<int, GridItem>
      */
     public function getResults(?int $total = null): LengthAwarePaginator
     {
@@ -344,7 +344,13 @@ class MysqlGridRepository implements GridRepository
                         [...$variantKeysForVariant]
                     );
                 })
-                ->each(fn (GridItem $gridItem) => $gridItem->setLocale($this->locale))
+                ->each(function (GridItem $gridItem): void {
+                    if (! is_callable([$gridItem, 'setLocale'])) {
+                        throw new \LogicException('Grid item implementations must expose a setLocale method.');
+                    }
+
+                    $gridItem->setLocale($this->locale);
+                })
         );
     }
 
@@ -358,7 +364,8 @@ class MysqlGridRepository implements GridRepository
         }
     }
 
-    protected function getTaxaInBulk(Paginator $results): array
+    /** @param LaravelLengthAwarePaginator<int, object> $results */
+    protected function getTaxaInBulk(LaravelLengthAwarePaginator $results): array
     {
         $productIds = $results->getCollection()->pluck('product_id')->all();
         $variantIds = $results->getCollection()->pluck('variant_id')->all();
@@ -455,7 +462,8 @@ class MysqlGridRepository implements GridRepository
         return [$productTaxaStates, $variantTaxaStates];
     }
 
-    protected function getVariantKeysInBulk(Paginator $results): array
+    /** @param LaravelLengthAwarePaginator<int, object> $results */
+    protected function getVariantKeysInBulk(LaravelLengthAwarePaginator $results): array
     {
         $variantIds = $results->getCollection()->pluck('variant_id')->all();
 

@@ -12,7 +12,7 @@ use Thinktomorrow\Trader\Domain\Model\CustomerLogin\CustomerLoginRepository;
 
 class MysqlCustomerLoginRepository implements CustomerLoginRepository
 {
-    private static $customerTable = 'trader_customers';
+    protected static $customerTable = 'trader_customers';
 
     public function save(CustomerLogin $customerLogin): void
     {

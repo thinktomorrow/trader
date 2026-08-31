@@ -13,7 +13,6 @@ use Thinktomorrow\Trader\Application\Promo\OrderPromo\OrderDiscount;
 use Thinktomorrow\Trader\Application\Promo\OrderPromo\OrderDiscountFactory;
 use Thinktomorrow\Trader\Application\Promo\OrderPromo\OrderPromo;
 use Thinktomorrow\Trader\Application\Promo\OrderPromo\OrderPromoRepository;
-use Thinktomorrow\Trader\Domain\Common\Map\Factory;
 use Thinktomorrow\Trader\Domain\Model\Promo\Condition;
 use Thinktomorrow\Trader\Domain\Model\Promo\Discount;
 use Thinktomorrow\Trader\Domain\Model\Promo\DiscountFactory;
@@ -196,7 +195,7 @@ final class MysqlPromoRepository implements OrderPromoRepository, PromoRepositor
             ->get();
     }
 
-    private function makeDiscounts(Collection $discountResults, array $promoState, Factory $factory): array
+    private function makeDiscounts(Collection $discountResults, array $promoState, DiscountFactory|OrderDiscountFactory $factory): array
     {
         return $discountResults
             ->where('promo_id', $promoState['promo_id'])

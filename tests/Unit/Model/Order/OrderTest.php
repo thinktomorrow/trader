@@ -66,6 +66,29 @@ class OrderTest extends TestCase
         ], $order->releaseEvents());
     }
 
+    public function test_it_can_hydrate_an_order_without_child_state_arrays(): void
+    {
+        $order = Order::create(
+            OrderId::fromString('xxx'),
+            OrderReference::fromString('xx-ref'),
+            DefaultOrderState::cart_pending,
+        );
+        (new TestContainer)->get(AdjustOrderVatSnapshot::class)->adjust($order);
+
+        $state = array_merge($order->getMappedData(), [
+            'order_state' => DefaultOrderState::cart_pending,
+        ]);
+
+        $hydratedOrder = Order::fromMappedData($state);
+
+        $this->assertSame([], $hydratedOrder->getLines());
+        $this->assertSame([], $hydratedOrder->getShippings());
+        $this->assertSame([], $hydratedOrder->getPayments());
+        $this->assertNull($hydratedOrder->getShippingAddress());
+        $this->assertNull($hydratedOrder->getBillingAddress());
+        $this->assertNull($hydratedOrder->getShopper());
+    }
+
     public function test_it_can_update_shopper()
     {
         $order = $this->orderContext->createDefaultOrder();

@@ -8,7 +8,6 @@ use Thinktomorrow\Trader\Application\Taxonomy\TaxonomyItem;
 use Thinktomorrow\Trader\Domain\Model\Taxonomy\Exceptions\CouldNotFindTaxonomy;
 use Thinktomorrow\Trader\Domain\Model\Taxonomy\Taxonomy;
 use Thinktomorrow\Trader\Domain\Model\Taxonomy\TaxonomyId;
-use Thinktomorrow\Trader\Domain\Model\Taxonomy\TaxonomyKeyId;
 use Thinktomorrow\Trader\Domain\Model\Taxonomy\TaxonomyRepository;
 use Thinktomorrow\Trader\Domain\Model\Taxonomy\TaxonomyState;
 use Thinktomorrow\Trader\Infrastructure\Laravel\Models\DefaultTaxonomyItem;
@@ -98,17 +97,6 @@ final class InMemoryTaxonomyRepository implements InMemoryRepository, TaxonomyRe
     public function setProductIds(TaxonomyId $taxonomyId, array $productIds): void
     {
         self::$productIds[$taxonomyId->get()] = $productIds;
-    }
-
-    private function existsByKey(TaxonomyKeyId $taxonKeyId, TaxonomyId $allowedTaxonomyId): bool
-    {
-        foreach (self::$taxonomies as $taxonomy) {
-            if (! $taxonomy->taxonomyId->equals($allowedTaxonomyId) && $taxonomy->hasTaxonomyKeyId($taxonKeyId)) {
-                return true;
-            }
-        }
-
-        return false;
     }
 
     public static function clear()

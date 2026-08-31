@@ -62,8 +62,8 @@ return new class extends Migration
         });
 
         Schema::table('trader_order_discounts', function (Blueprint $table) {
-            $table->integer('total_excl')->unsignedBigInteger();
-            $table->integer('total_incl')->unsignedBigInteger()->nullable();
+            $table->integer('total_excl');
+            $table->integer('total_incl')->nullable();
             $table->string('vat_rate')->nullable();
         });
     }

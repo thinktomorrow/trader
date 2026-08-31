@@ -11,7 +11,7 @@ use Thinktomorrow\Trader\Domain\Common\Locale;
 
 class MysqlTaxonRedirectRepository implements TaxonRedirectRepository
 {
-    private static string $redirectTable = 'trader_taxa_redirects';
+    protected static string $redirectTable = 'trader_taxa_redirects';
 
     public function find(Locale $locale, string $from): ?Redirect
     {
@@ -86,7 +86,7 @@ class MysqlTaxonRedirectRepository implements TaxonRedirectRepository
         DB::table(static::$redirectTable)->where('id', $redirect->getId())->delete();
     }
 
-    private static function sanitizeSlug(string $slug): string
+    protected static function sanitizeSlug(string $slug): string
     {
         return trim($slug, '/ ');
     }

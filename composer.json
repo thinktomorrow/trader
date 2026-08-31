@@ -53,7 +53,7 @@
     },
     "scripts": {
         "test": "phpunit",
-        "phpstan": "php -d memory_limit=500MB ./vendor/bin/phpstan analyse src --level=1"
+        "phpstan": "php -d memory_limit=1G ./vendor/bin/phpstan analyse src --level=2"
     },
     "extra": {
         "laravel": {

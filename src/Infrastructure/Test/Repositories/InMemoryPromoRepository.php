@@ -151,12 +151,18 @@ final class InMemoryPromoRepository implements InMemoryRepository, OrderPromoRep
         return OrderPromo::fromMappedData(
             $promo->getMappedData(),
             [
-                OrderDiscount::class => array_map(fn (Discount $discount) => $this->orderDiscountFactory->make(
-                    $discount::getMapKey(),
-                    $discount->getMappedData(),
-                    $promo->getMappedData(),
-                    array_map(fn (Condition $condition) => $condition->getMappedData(), $discount->getConditions())
-                ), $promo->getDiscounts()),
+                OrderDiscount::class => array_map(function (Discount $discount) use ($promo) {
+                    if (! is_callable([$discount, 'getConditions'])) {
+                        throw new \LogicException('An order promo discount must expose its conditions.');
+                    }
+
+                    return $this->orderDiscountFactory->make(
+                        $discount::getMapKey(),
+                        $discount->getMappedData(),
+                        $promo->getMappedData(),
+                        array_map(fn (Condition $condition) => $condition->getMappedData(), $discount->getConditions())
+                    );
+                }, $promo->getDiscounts()),
             ]
         );
     }

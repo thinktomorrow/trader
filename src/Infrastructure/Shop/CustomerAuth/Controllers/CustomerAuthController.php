@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Thinktomorrow\Trader\Infrastructure\Shop\CustomerAuth\Controllers;
 
+use Illuminate\Contracts\Auth\StatefulGuard;
 use Illuminate\Foundation\Validation\ValidatesRequests;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -35,9 +36,21 @@ class CustomerAuthController extends Controller
             'password' => 'required|min:6',
         ]);
 
-        if (Auth::guard('customer')->attempt(['email' => $request->email, 'password' => $request->password], $request->remember)) {
+        $guard = Auth::guard('customer');
+
+        if (! $guard instanceof StatefulGuard) {
+            throw new \LogicException('The customer auth guard must be stateful.');
+        }
+
+        if ($guard->attempt(['email' => $request->input('email'), 'password' => $request->input('password')], $request->boolean('remember'))) {
+            $customer = $guard->user();
+
+            if (! is_callable([$customer, 'getCustomerId'])) {
+                throw new \LogicException('The authenticated customer must expose its customer ID.');
+            }
+
             event(new CustomerHasLoggedIn(
-                CustomerId::fromString(Auth::guard('customer')->user()->getCustomerId())
+                CustomerId::fromString($customer->getCustomerId())
             ));
 
             if ($redirectAfterLogin) {
@@ -60,9 +73,21 @@ class CustomerAuthController extends Controller
      */
     public function logout(Request $request)
     {
-        $customerId = CustomerId::fromString(Auth::guard('customer')->user()->getCustomerId());
+        $guard = Auth::guard('customer');
 
-        Auth::guard('customer')->logout();
+        if (! $guard instanceof StatefulGuard) {
+            throw new \LogicException('The customer auth guard must be stateful.');
+        }
+
+        $customer = $guard->user();
+
+        if (! is_callable([$customer, 'getCustomerId'])) {
+            throw new \LogicException('The authenticated customer must expose its customer ID.');
+        }
+
+        $customerId = CustomerId::fromString($customer->getCustomerId());
+
+        $guard->logout();
 
         event(new CustomerHasLoggedOut($customerId));
 

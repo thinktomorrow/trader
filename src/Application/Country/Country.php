@@ -13,6 +13,8 @@ class Country
 
     public readonly CountryId $countryId;
 
+    private array $data = [];
+
     final private function __construct() {}
 
     public function getLabel(): string

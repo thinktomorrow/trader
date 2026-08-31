@@ -20,9 +20,9 @@ use Thinktomorrow\Trader\Infrastructure\Laravel\config\TraderConfig;
 
 class MysqlVatRateRepository implements VatRateRepository
 {
-    private static $vatRateTable = 'trader_vat_rates';
+    protected static $vatRateTable = 'trader_vat_rates';
 
-    private static $baseRateTable = 'trader_vat_base_rates';
+    protected static $baseRateTable = 'trader_vat_base_rates';
 
     private ContainerInterface $container;
 

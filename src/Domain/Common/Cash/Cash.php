@@ -14,11 +14,11 @@ use Thinktomorrow\Trader\Domain\Common\Locale;
 
 class Cash
 {
-    private static ?MoneyFormatter $formatter = null;
+    protected static ?MoneyFormatter $formatter = null;
 
     private Money $money;
 
-    private function __construct(Money $money)
+    protected function __construct(Money $money)
     {
         $this->money = $money;
     }
@@ -80,17 +80,13 @@ class Cash
     }
 
     /**
-     * @return Money|int
+     * @return Money|string
      */
     public function percentage(Percentage|string $percentage, \RoundingMode $roundMethod = \RoundingMode::HalfAwayFromZero, bool $returnAsMoney = true, int $round = 0)
     {
-        if ($percentage instanceof Percentage) {
-            $percentage = $percentage->get();
-        }
+        $percentage = $percentage instanceof Percentage ? $percentage : Percentage::fromString($percentage);
 
-        $multiplier = (string) ($percentage / 100);
-
-        $money = $this->money->multiply($multiplier);
+        $money = $this->money->multiply($this->percentageDecimal($percentage));
 
         return $returnAsMoney ? $money : $money->getAmount();
     }
@@ -100,11 +96,8 @@ class Cash
      */
     public function addPercentage(Percentage|string $percentage, \RoundingMode $roundMethod = \RoundingMode::HalfAwayFromZero): Money
     {
-        if ($percentage instanceof Percentage) {
-            $percentage = $percentage->get();
-        }
-
-        $factor = 1 + ($percentage / 100);
+        $percentage = $percentage instanceof Percentage ? $percentage : Percentage::fromString($percentage);
+        $factor = (float) bcadd('1', $this->percentageDecimal($percentage), 14);
 
         // Multiply with 2 decimals precision
         $raw = $this->precisionRound($this->money->getAmount() * $factor);
@@ -127,8 +120,7 @@ class Cash
     /**
      * Subtract a percentage of the amount
      *
-     * @param  int  $percentage
-     * @param  int  $roundMethod
+     * @param  Percentage|string  $percentage
      */
     public function subtractPercentage($percentage, \RoundingMode $roundMethod = \RoundingMode::HalfAwayFromZero): Money
     {
@@ -142,16 +134,17 @@ class Cash
     /**
      * Subtract a tax percentage from a gross amount
      * e.g. when gross is 100 and taxrate is 20%, we will have 100 / 1.2 = 80
-     *
-     * @param  int  $roundMethod
-     * @param  bool  $returnAsMoney
-     * @param  null  $round
      */
     public function subtractTaxPercentage(Percentage $percentage, $roundMethod = Money::ROUND_HALF_UP, $returnAsMoney = true, $round = null): Money
     {
-        $tax_percentage = (string) ($percentage->toFloat() + 1);
+        $tax_percentage = bcadd('1', $this->percentageDecimal($percentage), 14);
 
-        return $this->money->divide($tax_percentage, $roundMethod, $returnAsMoney, $round);
+        return $this->money->divide($tax_percentage, $roundMethod);
+    }
+
+    private function percentageDecimal(Percentage $percentage): string
+    {
+        return bcdiv($percentage->get(), '100', 14);
     }
 
     //        // TODO Rate exchanger...
@@ -168,7 +161,7 @@ class Cash
         return $this->getSymbol().' '.$this->getFormatter($locale)->format($this->money);
     }
 
-    private static function getDefaultCurrencyCode(): string
+    protected static function getDefaultCurrencyCode(): string
     {
         return 'EUR';
     }

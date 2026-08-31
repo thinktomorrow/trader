@@ -33,7 +33,7 @@ class MysqlMerchantOrderRepository implements MerchantOrderRepository
 
     private OrderRepository $orderRepository;
 
-    private static $orderTable = 'trader_orders';
+    protected static $orderTable = 'trader_orders';
 
     public function __construct(ContainerInterface $container, OrderRepository $orderRepository)
     {

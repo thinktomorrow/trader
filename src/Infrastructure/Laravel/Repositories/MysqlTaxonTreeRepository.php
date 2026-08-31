@@ -26,9 +26,9 @@ class MysqlTaxonTreeRepository implements CategoryRepository, TaxonTreeRepositor
 
     private Locale $locale;
 
-    private static $taxonTable = 'trader_taxa';
+    protected static $taxonTable = 'trader_taxa';
 
-    private static $taxonKeysTable = 'trader_taxa_keys';
+    protected static $taxonKeysTable = 'trader_taxa_keys';
 
     private ContainerInterface $container;
 

@@ -4,8 +4,13 @@ namespace Tests\Unit\Common\State;
 
 use Tests\TestHelpers;
 use Tests\Unit\TestCase;
+use Thinktomorrow\Trader\Application\Order\MerchantOrder\MerchantOrder;
+use Thinktomorrow\Trader\Application\Order\MerchantOrder\MerchantOrderPayment;
+use Thinktomorrow\Trader\Application\Order\MerchantOrder\MerchantOrderShipping;
 use Thinktomorrow\Trader\Domain\Common\State\StateException;
 use Thinktomorrow\Trader\Domain\Model\Order\Order;
+use Thinktomorrow\Trader\Domain\Model\Order\Payment\PaymentStateMachine;
+use Thinktomorrow\Trader\Domain\Model\Order\Shipping\ShippingStateMachine;
 use Thinktomorrow\Trader\Domain\Model\Order\State\DefaultOrderState;
 use Thinktomorrow\Trader\Domain\Model\Order\State\OrderStateMachine;
 
@@ -83,5 +88,31 @@ class OrderStateMachineTest extends TestCase
                 'from' => [DefaultOrderState::cart_pending],
             ],
         ]);
+    }
+
+    public function test_order_state_resolution_requires_at_least_one_configured_state(): void
+    {
+        $this->expectException(\LogicException::class);
+
+        $this->invokeGetState(new OrderStateMachine([], []), $this->createMock(MerchantOrder::class));
+    }
+
+    public function test_payment_state_resolution_requires_at_least_one_configured_state(): void
+    {
+        $this->expectException(\LogicException::class);
+
+        $this->invokeGetState(new PaymentStateMachine([], []), $this->createMock(MerchantOrderPayment::class));
+    }
+
+    public function test_shipping_state_resolution_requires_at_least_one_configured_state(): void
+    {
+        $this->expectException(\LogicException::class);
+
+        $this->invokeGetState(new ShippingStateMachine([], []), $this->createMock(MerchantOrderShipping::class));
+    }
+
+    private function invokeGetState(object $stateMachine, object $model): void
+    {
+        (new \ReflectionMethod($stateMachine, 'getState'))->invoke($stateMachine, $model);
     }
 }

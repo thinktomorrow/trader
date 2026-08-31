@@ -16,7 +16,7 @@ use Thinktomorrow\Trader\Domain\Model\Taxonomy\TaxonomyState;
 
 class MysqlTaxonomyRepository implements TaxonomyRepository
 {
-    private static $taxonomyTable = 'trader_taxonomies';
+    protected static $taxonomyTable = 'trader_taxonomies';
 
     private ContainerInterface $container;
 

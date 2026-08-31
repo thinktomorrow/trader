@@ -18,6 +18,10 @@ class OrderStateMachine extends AbstractStateMachine
             // Get class of state so we can create the state
             $firstState = reset($this->states);
 
+            if (! $firstState instanceof OrderState) {
+                throw new \LogicException('Cannot resolve an order state without configured states.');
+            }
+
             return get_class($firstState)::fromString($model->getState());
         }
 

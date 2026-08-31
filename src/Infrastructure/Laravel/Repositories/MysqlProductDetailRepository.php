@@ -19,23 +19,23 @@ class MysqlProductDetailRepository implements ProductDetailRepository
     use WithTaxaSelection;
     use WithVariantKeysSelection;
 
-    private static string $productTable = 'trader_products';
+    protected static string $productTable = 'trader_products';
 
-    private static string $variantTable = 'trader_product_variants';
+    protected static string $variantTable = 'trader_product_variants';
 
-    private static $variantKeysTable = 'trader_product_keys';
+    protected static $variantKeysTable = 'trader_product_keys';
 
-    private static string $taxonProductLookupTable = 'trader_taxa_products';
+    protected static string $taxonProductLookupTable = 'trader_taxa_products';
 
-    private static string $taxonVariantLookupTable = 'trader_taxa_variants';
+    protected static string $taxonVariantLookupTable = 'trader_taxa_variants';
 
-    private static string $taxonomyTable = 'trader_taxonomies';
+    protected static string $taxonomyTable = 'trader_taxonomies';
 
-    private static string $taxonTable = 'trader_taxa';
+    protected static string $taxonTable = 'trader_taxa';
 
-    private static $taxonKeysTable = 'trader_taxa_keys';
+    protected static $taxonKeysTable = 'trader_taxa_keys';
 
-    private static $productPersonalisationsTable = 'trader_product_personalisations';
+    protected static $productPersonalisationsTable = 'trader_product_personalisations';
 
     private ContainerInterface $container;
 

@@ -44,23 +44,23 @@ use Thinktomorrow\Trader\TraderConfig;
 
 class MysqlOrderRepository implements InvoiceRepository, OrderRepository
 {
-    private static $orderTable = 'trader_orders';
+    protected static string $orderTable = 'trader_orders';
 
-    private static $orderLinesTable = 'trader_order_lines';
+    protected static string $orderLinesTable = 'trader_order_lines';
 
-    private static $orderLinePersonalisationsTable = 'trader_order_line_personalisations';
+    protected static string $orderLinePersonalisationsTable = 'trader_order_line_personalisations';
 
-    private static $orderDiscountsTable = 'trader_order_discounts';
+    protected static string $orderDiscountsTable = 'trader_order_discounts';
 
-    private static $orderShippingTable = 'trader_order_shipping';
+    protected static string $orderShippingTable = 'trader_order_shipping';
 
-    private static $orderPaymentTable = 'trader_order_payment';
+    protected static string $orderPaymentTable = 'trader_order_payment';
 
-    private static $orderAddressTable = 'trader_order_addresses';
+    protected static string $orderAddressTable = 'trader_order_addresses';
 
-    private static $orderShopperTable = 'trader_order_shoppers';
+    protected static string $orderShopperTable = 'trader_order_shoppers';
 
-    private static $orderEventsTable = 'trader_order_events';
+    protected static string $orderEventsTable = 'trader_order_events';
 
     private ContainerInterface $container;
 
@@ -418,7 +418,7 @@ class MysqlOrderRepository implements InvoiceRepository, OrderRepository
         $order = $this->find($orderId);
 
         if (! $order->inCustomerHands()) {
-            throw new OrderAlreadyInMerchantHands('Cannot fetch order for cart. Order is no longer in customer hands and has already the following state: '.$order->getOrderState()->value);
+            throw new OrderAlreadyInMerchantHands('Cannot fetch order for cart. Order is no longer in customer hands and has already the following state: '.$order->getOrderState()->getValueAsString());
         }
 
         return $order;

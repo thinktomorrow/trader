@@ -18,11 +18,11 @@ use Thinktomorrow\Trader\Domain\Model\PaymentMethod\PaymentMethodState;
 
 class MysqlPaymentMethodRepository implements PaymentMethodForCartRepository, PaymentMethodRepository
 {
-    private static $paymentMethodTable = 'trader_payment_methods';
+    protected static $paymentMethodTable = 'trader_payment_methods';
 
-    private static $paymentMethodCountryTable = 'trader_payment_method_countries';
+    protected static $paymentMethodCountryTable = 'trader_payment_method_countries';
 
-    private static $countryTable = 'trader_countries';
+    protected static $countryTable = 'trader_countries';
 
     private ContainerInterface $container;
 

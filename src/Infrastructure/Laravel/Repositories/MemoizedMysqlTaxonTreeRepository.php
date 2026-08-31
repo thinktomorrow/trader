@@ -17,7 +17,7 @@ class MemoizedMysqlTaxonTreeRepository implements CategoryRepository, TaxonTreeR
     private MysqlTaxonTreeRepository $taxonTreeRepository;
 
     /** @var TaxonTree[] - tree per locale */
-    private static array $trees = [];
+    protected static array $trees = [];
 
     private Locale $locale;
 

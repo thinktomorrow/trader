@@ -95,7 +95,8 @@ class VineTaxonFilters implements TaxonFilters
 
             $shaken = TaxonTree::fromIterable([$taxon])
                 ->shake(
-                    fn (TaxonNode $node) => count(array_intersect($node->getGridProductIds(), $productIds)) > 0
+                    fn (TaxonNode $node) => is_callable([$node, 'getGridVariantIds'])
+                        && count(array_intersect($node->getGridProductIds(), $productIds)) > 0
                         && count($node->getGridVariantIds()) > 0
                 )->all();
 
@@ -119,7 +120,7 @@ class VineTaxonFilters implements TaxonFilters
         return [$taxon];
     }
 
-    /** @return [TaxonTree, productIds] */
+    /** @return array{TaxonTree, list<string>} */
     private function buildFilterContext(TaxonTree $taxonTree, array $scopedTaxonIds): array
     {
         // Any taxa that the page is scoped to (the main taxa scope on the page)

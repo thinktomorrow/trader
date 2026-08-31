@@ -148,8 +148,10 @@ final class Order implements Aggregate, DiscountableItem
     {
         $map = $newState::getEventMapping();
 
-        if (isset($map[$newState->value])) {
-            $this->recordEvent(new $map[$newState->value]($this->orderId, $oldState, $newState, $data));
+        $stateValue = $newState->getValueAsString();
+
+        if (isset($map[$stateValue])) {
+            $this->recordEvent(new $map[$stateValue]($this->orderId, $oldState, $newState, $data));
         }
     }
 
@@ -172,8 +174,10 @@ final class Order implements Aggregate, DiscountableItem
     {
         $map = $newState::getEventMapping();
 
-        if (isset($map[$newState->value])) {
-            $this->recordEvent(new $map[$newState->value]($this->orderId, $paymentId, $oldState, $newState, $data));
+        $stateValue = $newState->getValueAsString();
+
+        if (isset($map[$stateValue])) {
+            $this->recordEvent(new $map[$stateValue]($this->orderId, $paymentId, $oldState, $newState, $data));
         }
     }
 
@@ -196,8 +200,10 @@ final class Order implements Aggregate, DiscountableItem
     {
         $map = $newState::getEventMapping();
 
-        if (isset($map[$newState->value])) {
-            $this->recordEvent(new $map[$newState->value]($this->orderId, $shippingId, $oldState, $newState, $data));
+        $stateValue = $newState->getValueAsString();
+
+        if (isset($map[$stateValue])) {
+            $this->recordEvent(new $map[$stateValue]($this->orderId, $shippingId, $oldState, $newState, $data));
         }
     }
 
@@ -306,6 +312,8 @@ final class Order implements Aggregate, DiscountableItem
     {
         $order = new self;
 
+        $childEntities += self::emptyChildEntities();
+
         if (! $state['order_state'] instanceof OrderState) {
             throw new \InvalidArgumentException('Order state is expected to be instance of OrderState. Instead '.gettype($state['order_state']).' is passed.');
         }
@@ -340,6 +348,8 @@ final class Order implements Aggregate, DiscountableItem
     public static function fromMappedDataWithoutVatValidation(array $state, array $childEntities = []): static
     {
         $order = new static;
+
+        $childEntities += self::emptyChildEntities();
 
         if (! $state['order_state'] instanceof OrderState) {
             throw new \InvalidArgumentException('Order state is expected to be instance of OrderState. Instead '.gettype($state['order_state']).' is passed.');
@@ -379,6 +389,20 @@ final class Order implements Aggregate, DiscountableItem
         );
 
         return $order;
+    }
+
+    private static function emptyChildEntities(): array
+    {
+        return [
+            Discount::class => [],
+            Line::class => [],
+            Shipping::class => [],
+            Payment::class => [],
+            ShippingAddress::class => null,
+            BillingAddress::class => null,
+            Shopper::class => null,
+            OrderEvent::class => [],
+        ];
     }
 
     public function getDiscountableId(): DiscountableId

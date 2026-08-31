@@ -6,7 +6,7 @@ namespace Thinktomorrow\Trader\Application\Common;
 
 class DataRenderer
 {
-    private static \Closure $dataResolver;
+    protected static \Closure $dataResolver;
 
     public static function setDataResolver(\Closure $dataResolver)
     {

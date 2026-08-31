@@ -46,7 +46,7 @@ class CustomerRegisterController extends Controller
             'company.required_if' => __('trader-auth.register.validation.company_required'),
         ]);
 
-        $existingCustomer = CustomerModel::where('email', $request->email)->first();
+        $existingCustomer = CustomerModel::where('email', $request->input('email'))->first();
 
         if ($existingCustomer) {
             $this->sendVerificationNotificationWhenNeeded($existingCustomer);
@@ -55,22 +55,22 @@ class CustomerRegisterController extends Controller
         if (! $existingCustomer) {
             try {
                 $customerId = $this->customerApplication->registerCustomer(new RegisterCustomer(
-                    $request->email,
-                    (bool) $request->is_business,
+                    $request->input('email'),
+                    $request->boolean('is_business'),
                     app()->getLocale(),
                     [
-                        'firstname' => $request->firstname,
-                        'lastname' => $request->lastname,
-                        'company' => $request->company ?? null,
-                        'vat_number' => $request->vat_number ?? null,
-                        'phone' => $request->phone ?? null,
+                        'firstname' => $request->input('firstname'),
+                        'lastname' => $request->input('lastname'),
+                        'company' => $request->input('company'),
+                        'vat_number' => $request->input('vat_number'),
+                        'phone' => $request->input('phone'),
                     ]
                 ));
 
                 $this->customerLoginRepository->save(CustomerLogin::create(
                     $customerId,
-                    Email::fromString($request->email),
-                    bcrypt($request->password)
+                    Email::fromString($request->input('email')),
+                    bcrypt($request->input('password'))
                 ));
 
                 $customer = CustomerModel::findOrFail($customerId->get());
@@ -78,7 +78,7 @@ class CustomerRegisterController extends Controller
                 $customer->sendEmailVerificationNotification();
             } catch (CustomerAlreadyExists) {
                 $this->sendVerificationNotificationWhenNeeded(
-                    CustomerModel::where('email', $request->email)->firstOrFail()
+                    CustomerModel::where('email', $request->input('email'))->firstOrFail()
                 );
             }
         }

@@ -65,7 +65,7 @@ class ApplyPromoToOrder
         }
     }
 
-    private static function validateDiscounts($discounts): void
+    protected static function validateDiscounts($discounts): void
     {
         foreach ($discounts as $discount) {
             if (! $discount instanceof OrderDiscount && ! $discount instanceof LineDiscount) {

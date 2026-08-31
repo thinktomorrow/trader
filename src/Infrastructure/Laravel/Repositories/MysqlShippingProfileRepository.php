@@ -22,13 +22,13 @@ use Thinktomorrow\Trader\Domain\Model\ShippingProfile\TariffId;
 
 class MysqlShippingProfileRepository implements ShippingCountryRepository, ShippingProfileForCartRepository, ShippingProfileRepository
 {
-    private static $shippingProfileTable = 'trader_shipping_profiles';
+    protected static $shippingProfileTable = 'trader_shipping_profiles';
 
-    private static $shippingProfileTariffTable = 'trader_shipping_profile_tariffs';
+    protected static $shippingProfileTariffTable = 'trader_shipping_profile_tariffs';
 
-    private static $shippingProfileCountryTable = 'trader_shipping_profile_countries';
+    protected static $shippingProfileCountryTable = 'trader_shipping_profile_countries';
 
-    private static $countryTable = 'trader_countries';
+    protected static $countryTable = 'trader_countries';
 
     private ContainerInterface $container;
 

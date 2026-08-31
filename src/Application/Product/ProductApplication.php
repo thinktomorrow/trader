@@ -94,8 +94,8 @@ class ProductApplication
         $product->createVariant($variant = Variant::create(
             $product->productId,
             $this->variantRepository->nextReference(),
-            $createVariant->getUnitPrice($this->traderConfig->doesPriceInputIncludesVat(), $this->traderConfig->getDefaultCurrency()),
-            $createVariant->getSalePrice($this->traderConfig->doesPriceInputIncludesVat(), $this->traderConfig->getDefaultCurrency()),
+            $createVariant->getUnitPrice($this->traderConfig->doesPriceInputIncludesVat()),
+            $createVariant->getSalePrice($this->traderConfig->doesPriceInputIncludesVat()),
             $createVariant->getSku(),
         ));
 

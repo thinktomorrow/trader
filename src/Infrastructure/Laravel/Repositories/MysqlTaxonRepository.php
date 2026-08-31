@@ -18,9 +18,9 @@ class MysqlTaxonRepository implements TaxonRepository
 {
     use WithTaxonKeysSelection;
 
-    private static $taxonTable = 'trader_taxa';
+    protected static $taxonTable = 'trader_taxa';
 
-    private static $taxonKeysTable = 'trader_taxa_keys';
+    protected static $taxonKeysTable = 'trader_taxa_keys';
 
     public function save(Taxon $taxon): void
     {

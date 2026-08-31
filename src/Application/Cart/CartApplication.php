@@ -506,7 +506,7 @@ final class CartApplication
     {
         $taxaData = [];
 
-        /** @var ProductTaxonItem|VariantTaxonItem $taxa */
+        /** @var ProductTaxonItem|VariantTaxonItem $taxon */
         foreach ($product->getTaxa() as $taxon) {
             $taxaData[] = [
                 'class_type' => $taxon instanceof VariantTaxonItem ? VariantTaxonItem::class : ProductTaxonItem::class,

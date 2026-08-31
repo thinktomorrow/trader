@@ -26,9 +26,9 @@ class MysqlCustomerRepository implements CustomerReadRepository, CustomerReposit
 {
     private ContainerInterface $container;
 
-    private static $customerTable = 'trader_customers';
+    protected static $customerTable = 'trader_customers';
 
-    private static $customerAddressTable = 'trader_customer_addresses';
+    protected static $customerAddressTable = 'trader_customer_addresses';
 
     public function __construct(ContainerInterface $container)
     {

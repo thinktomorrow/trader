@@ -16,7 +16,7 @@ class CustomerResetPasswordController extends Controller
 
     public function showResetForm(Request $request, $token = null)
     {
-        return view('trader::customer.auth.password.reset-form')->with(['token' => $token, 'email' => $request->email]);
+        return view('trader::customer.auth.password.reset-form')->with(['token' => $token, 'email' => $request->input('email')]);
     }
 
     protected function guard()

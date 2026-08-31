@@ -41,7 +41,7 @@ final class InMemoryCartRepository implements CartRepository, InMemoryRepository
         $order = InMemoryOrderRepository::$orders[$orderId->get()];
 
         if (! $order->inCustomerHands()) {
-            throw new OrderAlreadyInMerchantHands('Cannot fetch cart. Order is no longer in customer hands and has already the following state: '.$order->getOrderState()->value);
+            throw new OrderAlreadyInMerchantHands('Cannot fetch cart. Order is no longer in customer hands and has already the following state: '.$order->getOrderState()->getValueAsString());
         }
 
         // Since we rely on the vat order snapshot for prices, we need to provide a vat snapshot state to the cart read models.
