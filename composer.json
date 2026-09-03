@@ -23,8 +23,7 @@
         "psr/container": "^2.0.2",
         "laravel/ui": "^4.2",
         "thinktomorrow/vine": "^0.5.2",
-        "ramsey/uuid": "^4.9.0",
-        "laravel/pint": "1.24"
+        "ramsey/uuid": "^4.9.0"
     },
     "require-dev": {
         "phpunit/phpunit": "^11.2.7",
@@ -34,6 +33,7 @@
         "nesbot/carbon": "^3.8",
         "qossmic/deptrac-shim": "^1.0.2",
         "infection/infection": "^0.30.3",
+        "laravel/pint": "^1.24",
         "thinktomorrow/trader-testing": "dev-main"
     },
     "autoload": {

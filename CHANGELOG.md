@@ -6,6 +6,7 @@ Important changes will be notified in this file
 
 ## 2026-08-29 - 0.9.7
 
+- Fixed: Laravel Pint is now a flexible development dependency and no longer constrains consuming applications.
 - Added: generic `TaxonHierarchy` queries for descendants, ancestors and nested taxon membership.
 - Changed: existing taxon filter, flattened taxon and main category queries now share the hierarchy implementation.
 - Added: composable shipping profile eligibility rules and order-aware available shipping profile query.
