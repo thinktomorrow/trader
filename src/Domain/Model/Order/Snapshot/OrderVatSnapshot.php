@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Thinktomorrow\Trader\Domain\Model\Order;
+namespace Thinktomorrow\Trader\Domain\Model\Order\Snapshot;
 
 use Money\Money;
 use Thinktomorrow\Trader\Domain\Common\Vat\VatAllocatedLine;

@@ -5,7 +5,7 @@ namespace Thinktomorrow\Trader\Application\Cart\RefreshCart\Adjusters;
 use Thinktomorrow\Trader\Application\Cart\RefreshCart\Adjuster;
 use Thinktomorrow\Trader\Application\VatRate\Allocator\VatAllocator;
 use Thinktomorrow\Trader\Domain\Model\Order\Order;
-use Thinktomorrow\Trader\Domain\Model\Order\OrderVatSnapshot;
+use Thinktomorrow\Trader\Domain\Model\Order\Snapshot\OrderVatSnapshot;
 
 class AdjustOrderVatSnapshot implements Adjuster
 {

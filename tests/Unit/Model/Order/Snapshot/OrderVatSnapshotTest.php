@@ -2,13 +2,13 @@
 
 declare(strict_types=1);
 
-namespace Tests\Unit\Model\Order;
+namespace Tests\Unit\Model\Order\Snapshot;
 
 use Money\Money;
 use PHPUnit\Framework\TestCase;
 use Thinktomorrow\Trader\Domain\Common\Vat\VatAllocatedLine;
 use Thinktomorrow\Trader\Domain\Common\Vat\VatPercentage;
-use Thinktomorrow\Trader\Domain\Model\Order\OrderVatSnapshot;
+use Thinktomorrow\Trader\Domain\Model\Order\Snapshot\OrderVatSnapshot;
 
 final class OrderVatSnapshotTest extends TestCase
 {

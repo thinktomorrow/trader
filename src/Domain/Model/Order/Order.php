@@ -41,6 +41,9 @@ use Thinktomorrow\Trader\Domain\Model\Order\Shipping\HasShippings;
 use Thinktomorrow\Trader\Domain\Model\Order\Shipping\Shipping;
 use Thinktomorrow\Trader\Domain\Model\Order\Shipping\ShippingId;
 use Thinktomorrow\Trader\Domain\Model\Order\Shipping\ShippingState;
+use Thinktomorrow\Trader\Domain\Model\Order\Snapshot\OrderVatSnapshot;
+use Thinktomorrow\Trader\Domain\Model\Order\Snapshot\WithOrderVatSnapshot;
+use Thinktomorrow\Trader\Domain\Model\Order\Snapshot\WithPricingFingerprint;
 use Thinktomorrow\Trader\Domain\Model\Order\State\OrderState;
 
 final class Order implements Aggregate, DiscountableItem
@@ -53,6 +56,8 @@ final class Order implements Aggregate, DiscountableItem
     use HasShippings;
     use RecordsEvents;
     use WithOrderTotals;
+    use WithOrderVatSnapshot;
+    use WithPricingFingerprint;
 
     public readonly OrderId $orderId;
 
