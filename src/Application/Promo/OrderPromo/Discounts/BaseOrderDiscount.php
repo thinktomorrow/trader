@@ -6,6 +6,7 @@ namespace Thinktomorrow\Trader\Application\Promo\OrderPromo\Discounts;
 
 use Assert\Assertion;
 use Thinktomorrow\Trader\Application\Promo\OrderPromo\OrderCondition;
+use Thinktomorrow\Trader\Application\VatRate\Allocator\VatAllocator;
 use Thinktomorrow\Trader\Domain\Common\Price\DefaultDiscountPrice;
 use Thinktomorrow\Trader\Domain\Common\Price\DiscountPrice;
 use Thinktomorrow\Trader\Domain\Common\Price\ItemDiscountPrice;
@@ -26,6 +27,8 @@ abstract class BaseOrderDiscount
 
     /** @var OrderCondition[] */
     protected array $conditions;
+
+    protected VatAllocator $vatAllocator;
 
     protected function isApplicable(Order $order, DiscountableItem $discountable): bool
     {
@@ -60,7 +63,7 @@ abstract class BaseOrderDiscount
         $discountable->addDiscount($discount);
     }
 
-    public static function fromMappedData(array $state, array $aggregateState, array $conditions): static
+    public static function fromMappedData(array $state, array $aggregateState, array $conditions, VatAllocator $vatAllocator): static
     {
         Assertion::allIsInstanceOf($conditions, OrderCondition::class);
 
@@ -72,6 +75,7 @@ abstract class BaseOrderDiscount
             ...json_decode($aggregateState['data'], true),
         ];
         $discount->conditions = $conditions;
+        $discount->vatAllocator = $vatAllocator;
 
         return $discount;
     }

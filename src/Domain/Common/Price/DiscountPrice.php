@@ -6,11 +6,13 @@ namespace Thinktomorrow\Trader\Domain\Common\Price;
 
 use Money\Money;
 
-interface DiscountPrice extends Price
+interface DiscountPrice extends HasAuthoritativeAmount, Price
 {
     public static function fromExcludingVat(Money $amount): static;
 
-    public static function zero(): static;
+    public static function fromIncludingVat(Money $includingVat, Money $resolvedExcludingVat): static;
+
+    public static function zero(TaxMode $taxMode = TaxMode::Exclusive): static;
 
     public function add(DiscountPrice $discountPrice): static;
 }

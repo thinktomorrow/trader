@@ -27,6 +27,7 @@ class PaymentMethodTest extends TestCase
             'provider_id' => $paymentMethodProviderId->get(),
             'state' => PaymentMethodState::online->value,
             'rate' => '10',
+            'tax_mode' => 'exclusive',
             'data' => '[]',
         ], $paymentMethod->getMappedData());
     }

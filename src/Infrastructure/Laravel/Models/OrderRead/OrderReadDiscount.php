@@ -12,6 +12,7 @@ use Thinktomorrow\Trader\Domain\Common\Price\DefaultDiscountPrice;
 use Thinktomorrow\Trader\Domain\Common\Price\DefaultItemDiscountPrice;
 use Thinktomorrow\Trader\Domain\Common\Price\DiscountPrice;
 use Thinktomorrow\Trader\Domain\Common\Price\ItemDiscountPrice;
+use Thinktomorrow\Trader\Domain\Common\Price\TaxMode;
 use Thinktomorrow\Trader\Domain\Common\Vat\VatPercentage;
 use Thinktomorrow\Trader\Domain\Model\Order\Discount\DiscountableType;
 
@@ -41,9 +42,11 @@ abstract class OrderReadDiscount
         if ($state['discountable_type'] == DiscountableType::line->value) {
 
             if (isset($state['total_incl']) && $state['total_incl'] !== null) {
-                $discount->discountPrice = DefaultItemDiscountPrice::fromIncludingVat(
+                $discount->discountPrice = DefaultItemDiscountPrice::fromResolvedAmounts(
+                    Money::EUR($state['total_excl']),
                     Money::EUR($state['total_incl']),
-                    VatPercentage::fromString($state['vat_rate'])
+                    VatPercentage::fromString($state['vat_rate']),
+                    TaxMode::from($state['tax_mode'] ?? TaxMode::Inclusive->value),
                 );
             } else {
                 $discount->discountPrice = DefaultItemDiscountPrice::fromExcludingVat(
@@ -53,7 +56,9 @@ abstract class OrderReadDiscount
             }
 
         } else {
-            $discount->discountPrice = DefaultDiscountPrice::fromExcludingVat(Money::EUR($state['total_excl']));
+            $discount->discountPrice = ($state['tax_mode'] ?? TaxMode::Exclusive->value) === TaxMode::Inclusive->value
+                ? DefaultDiscountPrice::fromIncludingVat(Money::EUR($state['total_incl']), Money::EUR($state['total_excl']))
+                : DefaultDiscountPrice::fromExcludingVat(Money::EUR($state['total_excl']));
         }
 
         return $discount;

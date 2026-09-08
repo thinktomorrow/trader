@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Thinktomorrow\Trader\Infrastructure\Laravel\config;
 
 use Thinktomorrow\Trader\Domain\Common\Locale;
-use Thinktomorrow\Trader\Domain\Common\Vat\VatRoundingStrategy;
+use Thinktomorrow\Trader\Domain\Common\Price\TaxMode;
 
 class TraderConfig implements \Thinktomorrow\Trader\TraderConfig
 {
@@ -64,19 +64,21 @@ class TraderConfig implements \Thinktomorrow\Trader\TraderConfig
         return config('trader.does_price_input_includes_vat');
     }
 
+    public function doesTariffInputIncludeVat(): bool
+    {
+        return config('trader.does_tariff_input_includes_vat', false);
+    }
+
     public function includeVatInPrices(): bool
     {
         return config('trader.include_vat_in_prices');
     }
 
-    public function areItemDiscountsCalculatedExcludingVat(): bool
+    public function getItemDiscountTaxMode(): TaxMode
     {
-        return config('trader.calculate_item_discounts_excluding_vat');
-    }
-
-    public function getVatRoundingStrategy(): string
-    {
-        return config('trader.vat_rounding_strategy', VatRoundingStrategy::getDefault()->value);
+        return config('trader.calculate_item_discounts_excluding_vat')
+            ? TaxMode::Exclusive
+            : TaxMode::Inclusive;
     }
 
     public function isVatExemptionAllowed(): bool

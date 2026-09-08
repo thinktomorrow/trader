@@ -2,7 +2,9 @@
 
 namespace Tests\Acceptance\Cart;
 
+use Money\Money;
 use Thinktomorrow\Trader\Domain\Common\Cash\Cash;
+use Thinktomorrow\Trader\Domain\Common\Price\TaxMode;
 use Thinktomorrow\Trader\Domain\Model\Country\CountryId;
 use Thinktomorrow\Trader\Domain\Model\PaymentMethod\Exceptions\CouldNotFindPaymentMethod;
 use Thinktomorrow\Trader\Domain\Model\PaymentMethod\PaymentMethod;
@@ -20,6 +22,28 @@ class ChoosePaymentMethodTest extends CartContext
         // Assert all is present
         $cart = $this->orderContext->repos()->cartRepository()->findCart($this->getOrder()->orderId);
         $this->assertNotNull($cart->getPayment());
+    }
+
+    public function test_including_vat_payment_rate_remains_authoritative(): void
+    {
+        $this->givenThereIsAProductWhichCostsEur('lightsaber', 5);
+        $this->whenIAddTheVariantToTheCart('lightsaber-variant-aaa', 1);
+        $order = $this->getOrder();
+        $paymentMethod = PaymentMethod::create(
+            PaymentMethodId::fromString('gross-payment'),
+            PaymentMethodProviderId::fromString('mollie'),
+            Money::EUR(700),
+            TaxMode::Inclusive,
+        );
+        $this->orderContext->repos()->paymentMethodRepository()->save($paymentMethod);
+
+        $this->whenIChoosePayment('gross-payment');
+
+        $savedOrder = $this->orderContext->findOrder($order->orderId);
+
+        $this->assertEquals(Money::EUR(583), $savedOrder->getPaymentCostExcl());
+        $this->assertEquals(Money::EUR(700), $savedOrder->getPaymentCostIncl());
+        $this->assertSame(TaxMode::Inclusive, $savedOrder->getPayments()[0]->getPaymentCost()->getTaxMode());
     }
 
     public function test_it_cannot_choose_payment_method_when_none_is_online()

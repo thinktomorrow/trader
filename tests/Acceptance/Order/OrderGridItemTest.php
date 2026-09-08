@@ -46,8 +46,8 @@ class OrderGridItemTest extends TestCase
         $this->assertEquals(Money::EUR('15'), $order->getDiscountTotalExcl());
         $this->assertEquals(Money::EUR('18'), $order->getDiscountTotalIncl());
         $this->assertEquals(Money::EUR('251'), $order->getTotalExcl());
-        $this->assertEquals(Money::EUR('54'), $order->getTotalVat());
-        $this->assertEquals(Money::EUR('305'), $order->getTotalIncl());
+        $this->assertEquals(Money::EUR('53'), $order->getTotalVat());
+        $this->assertEquals(Money::EUR('304'), $order->getTotalIncl());
     }
 
     public function test_it_can_return_formatted_prices()
@@ -70,8 +70,8 @@ class OrderGridItemTest extends TestCase
         $this->assertEquals('€ 0,15', $order->getFormattedDiscountTotalExcl());
         $this->assertEquals('€ 0,18', $order->getFormattedDiscountTotalIncl());
         $this->assertEquals('€ 2,51', $order->getFormattedTotalExcl());
-        $this->assertEquals('€ 0,54', $order->getFormattedTotalVat());
-        $this->assertEquals('€ 3,05', $order->getFormattedTotalIncl());
+        $this->assertEquals('€ 0,53', $order->getFormattedTotalVat());
+        $this->assertEquals('€ 3,04', $order->getFormattedTotalIncl());
     }
 
     public function test_it_reflects_net_service_totals_in_grid_item(): void
@@ -87,11 +87,11 @@ class OrderGridItemTest extends TestCase
         $gridItem = DefaultOrderGridItem::fromMappedData($order->getMappedData(), []);
 
         $this->assertEquals(Money::EUR('35'), $gridItem->getShippingCostExcl());
-        $this->assertEquals(Money::EUR('42'), $gridItem->getShippingCostIncl());
+        $this->assertEquals(Money::EUR('43'), $gridItem->getShippingCostIncl());
         $this->assertEquals(Money::EUR('35'), $gridItem->getPaymentCostExcl());
-        $this->assertEquals(Money::EUR('42'), $gridItem->getPaymentCostIncl());
+        $this->assertEquals(Money::EUR('43'), $gridItem->getPaymentCostIncl());
         $this->assertEquals(Money::EUR('236'), $gridItem->getTotalExcl());
-        $this->assertEquals(Money::EUR('285'), $gridItem->getTotalIncl());
+        $this->assertEquals(Money::EUR('286'), $gridItem->getTotalIncl());
     }
 
     public function test_it_can_get_important_timestamps()

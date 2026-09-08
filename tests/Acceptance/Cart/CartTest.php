@@ -203,7 +203,7 @@ class CartTest extends CartContext
         $this->givenPaymentMethod(10);
         $this->whenIChooseShipping('bpost_home');
 
-        $this->whenIAddShippingAddress('NL', 'example 12', 'bus 2', '1000', 'Amsterdam');
+        $this->whenIAddShippingAddress('BE', 'example 12', 'bus 2', '1000', 'Brussel');
         $this->whenIAddBillingAddress('BE', 'example 13', 'bus 2', '1200', 'Brussel');
         $this->whenIChoosePayment('visa');
         $this->whenIEnterShopperDetails('ben@tt.be');

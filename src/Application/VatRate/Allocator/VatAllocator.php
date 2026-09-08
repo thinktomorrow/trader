@@ -4,10 +4,15 @@ namespace Thinktomorrow\Trader\Application\VatRate\Allocator;
 
 use Money\Money;
 use Thinktomorrow\Trader\Domain\Common\Cash\Cash;
+use Thinktomorrow\Trader\Domain\Common\Price\DefaultItemPrice;
+use Thinktomorrow\Trader\Domain\Common\Price\HasAuthoritativeAmount;
+use Thinktomorrow\Trader\Domain\Common\Price\ItemPrice;
+use Thinktomorrow\Trader\Domain\Common\Price\Price;
+use Thinktomorrow\Trader\Domain\Common\Price\TaxMode;
+use Thinktomorrow\Trader\Domain\Common\Price\VatApplicableAmount;
 use Thinktomorrow\Trader\Domain\Common\Vat\VatAllocatedLine;
 use Thinktomorrow\Trader\Domain\Common\Vat\VatAllocatedTotalPrice;
 use Thinktomorrow\Trader\Domain\Common\Vat\VatAllocatedTotalPrices;
-use Thinktomorrow\Trader\Domain\Common\Vat\VatPercentage;
 use Thinktomorrow\Trader\Domain\Model\Order\Order;
 
 /**
@@ -26,55 +31,29 @@ use Thinktomorrow\Trader\Domain\Model\Order\Order;
  */
 final class VatAllocator
 {
-    public function __construct(private ProRateAllocator $proRateAllocator) {}
+    private VatApplicableAmountAllocator $vatApplicableAmountAllocator;
 
-    public function allocate(Order $order, Money $shipping, Money $payment, Money $discount): VatAllocatedTotalPrices
+    public function __construct(VatApplicableAmountAllocator|ProRateAllocator $allocator)
+    {
+        $this->vatApplicableAmountAllocator = $allocator instanceof VatApplicableAmountAllocator
+            ? $allocator
+            : new VatApplicableAmountAllocator($allocator);
+    }
+
+    /**
+     * Allocate already aggregated shipping, payment and discount amounts over the order's VAT mix.
+     * Plain Money inputs are treated as excluding-VAT authoritative for backwards compatibility.
+     */
+    public function allocate(Order $order, Money|VatApplicableAmount $shipping, Money|VatApplicableAmount $payment, Money|VatApplicableAmount $discount): VatAllocatedTotalPrices
     {
         // Item bases per VAT
-        $itemTotals = $this->collectItemTotalsPerVat($order);
+        $itemBasesPerVatRate = $this->collectItemBasesPerVatRate($order);
 
-        if ($this->sumExcl($itemTotals)->isZero()) {
-            $zeroItems = new VatAllocatedTotalPrice([], Cash::zero(), Cash::zero(), Cash::zero());
+        $itemsTotal = $this->buildAllocatedItemTotal($order);
+        $shippingTotal = $this->vatApplicableAmountAllocator->allocate($itemBasesPerVatRate, $this->normalizeAmount($shipping));
+        $paymentTotal = $this->vatApplicableAmountAllocator->allocate($itemBasesPerVatRate, $this->normalizeAmount($payment));
+        $discountTotal = $this->vatApplicableAmountAllocator->allocate($itemBasesPerVatRate, $this->normalizeAmount($discount));
 
-            // Service-only: treat as 0% VAT (incl == excl, vat == 0)
-            $shippingTotal = new VatAllocatedTotalPrice([], $shipping, Cash::zero(), $shipping);
-            $paymentTotal = new VatAllocatedTotalPrice([], $payment, Cash::zero(), $payment);
-            $discountTotal = new VatAllocatedTotalPrice([], $discount, Cash::zero(), $discount);
-
-            $totalExcl = $shipping->add($payment)->subtract($discount);
-            $total = new VatAllocatedTotalPrice([], $totalExcl, Cash::zero(), $totalExcl);
-
-            return new VatAllocatedTotalPrices(
-                items: $zeroItems,
-                shipping: $shippingTotal,
-                payment: $paymentTotal,
-                discounts: $discountTotal,
-                total: $total,
-            );
-        }
-
-        // Allocate excl amounts - Distribute service costs and order-level discounts across VAT groups (pro-rata)
-        $shippingAlloc = $this->proRateAllocator->allocate(
-            $itemTotals,
-            $shipping
-        );
-
-        $paymentAlloc = $this->proRateAllocator->allocate(
-            $itemTotals,
-            $payment
-        );
-
-        $discountAlloc = $this->proRateAllocator->allocate(
-            $itemTotals,
-            $discount
-        );
-
-        $itemsTotal = $this->buildAllocatedItemTotal($itemTotals);
-        $shippingTotal = $this->buildAllocatedServiceTotal($shippingAlloc);
-        $paymentTotal = $this->buildAllocatedServiceTotal($paymentAlloc);
-        $discountTotal = $this->buildAllocatedServiceTotal($discountAlloc);
-
-        // 4) Build all allocated totals
         return new VatAllocatedTotalPrices(
             items: $itemsTotal,
             shipping: $shippingTotal,
@@ -84,20 +63,98 @@ final class VatAllocator
         );
     }
 
-    private function buildAllocatedItemTotal(array $itemTotalsPerRate): VatAllocatedTotalPrice
+    /**
+     * Allocate every persisted service and discount separately before combining their VAT lines.
+     * This preserves per-component authority and rounding that would be lost by allocating one
+     * pre-summed shipping, payment or discount amount.
+     */
+    public function allocateOrder(Order $order): VatAllocatedTotalPrices
     {
+        $itemBasesPerVatRate = $this->collectItemBasesPerVatRate($order);
+        $itemsTotal = $this->buildAllocatedItemTotal($order);
+        $shippingCosts = [];
+        $shippingDiscounts = [];
+        $paymentCosts = [];
+        $paymentDiscounts = [];
+        $orderDiscountParts = [];
+
+        foreach ($order->getShippings() as $shipping) {
+            $shippingCosts[] = $this->allocateAuthoritativePrice($itemBasesPerVatRate, $shipping->getShippingCost());
+            $shippingDiscounts[] = $this->allocateAuthoritativePrice($itemBasesPerVatRate, $shipping->getDiscountPrice());
+        }
+
+        foreach ($order->getPayments() as $payment) {
+            $paymentCosts[] = $this->allocateAuthoritativePrice($itemBasesPerVatRate, $payment->getPaymentCost());
+            $paymentDiscounts[] = $this->allocateAuthoritativePrice($itemBasesPerVatRate, $payment->getDiscountPrice());
+        }
+
+        foreach ($order->getDiscounts() as $discount) {
+            $orderDiscountParts[] = $this->allocateAuthoritativePrice($itemBasesPerVatRate, $discount->getDiscountPrice());
+        }
+
+        $shippingTotal = $this->combineAllocatedTotals($shippingCosts, $shippingDiscounts);
+        $paymentTotal = $this->combineAllocatedTotals($paymentCosts, $paymentDiscounts);
+        $discountTotal = $this->combineAllocatedTotals($orderDiscountParts);
+
+        return new VatAllocatedTotalPrices(
+            items: $itemsTotal,
+            shipping: $shippingTotal,
+            payment: $paymentTotal,
+            discounts: $discountTotal,
+            total: $this->buildAllocatedTotal($itemsTotal, $shippingTotal, $paymentTotal, $discountTotal),
+        );
+    }
+
+    /**
+     * Resolve the taxable base of an amount against the current net item distribution.
+     * Inclusive amounts cannot be reversed using one VAT percentage because an order may contain
+     * multiple rates; exclusive amounts already provide their authoritative taxable base.
+     */
+    public function resolveVatApplicableAmountExcludingVat(Order $order, VatApplicableAmount $amount): Money
+    {
+        if ($amount->getTaxMode() === TaxMode::Exclusive) {
+            return $amount->getAmount();
+        }
+
+        return $this->vatApplicableAmountAllocator->deriveExcludingVatFromIncludingVat(
+            $this->collectItemBasesPerVatRate($order),
+            $amount->getAmount(),
+        );
+    }
+
+    /**
+     * Preserve each line's own VAT and rounding, then group those definitive values by VAT rate.
+     * Recalculating VAT from a grouped taxable base could produce a different rounded result.
+     */
+    private function buildAllocatedItemTotal(Order $order): VatAllocatedTotalPrice
+    {
+        /** @var array<string, VatAllocatedLine> $vatLinesPerRate */
+        $vatLinesPerRate = [];
+
+        foreach ($order->getLines() as $line) {
+            $price = $line->getTotal();
+            $rate = $price->getVatPercentage()->get();
+            $vatLine = new VatAllocatedLine(
+                $price->getExcludingVat(),
+                $price->getVatTotal(),
+                $price->getVatPercentage(),
+            );
+
+            $vatLinesPerRate[$rate] = isset($vatLinesPerRate[$rate])
+                ? $vatLinesPerRate[$rate]->add($vatLine)
+                : $vatLine;
+        }
+
+        uksort($vatLinesPerRate, fn (string|int $left, string|int $right): int => bccomp((string) $right, (string) $left, 6));
+
         $vatLines = [];
         $totalExcl = Cash::zero();
         $totalIncl = Cash::zero();
 
-        foreach ($itemTotalsPerRate as $rate => $totalPrice) {
-            $totalExcl = $totalExcl->add($totalPrice->getExcludingVat());
-            $totalIncl = $totalIncl->add($totalPrice->getIncludingVat());
-
-            $vatPercentage = VatPercentage::fromString($rate);
-            $vat = $totalPrice->getIncludingVat()->subtract($totalPrice->getExcludingVat());
-
-            $vatLines[] = new VatAllocatedLine($totalPrice->getExcludingVat(), $vat, $vatPercentage);
+        foreach ($vatLinesPerRate as $vatLine) {
+            $totalExcl = $totalExcl->add($vatLine->getTaxableBase());
+            $totalIncl = $totalIncl->add($vatLine->getTotalIncludingVat());
+            $vatLines[] = $vatLine;
         }
 
         $totalVat = $totalIncl->subtract($totalExcl);
@@ -111,42 +168,8 @@ final class VatAllocator
     }
 
     /**
-     * Build the VatAllocatedTotalPrice from bases per VAT rate.
-     *
-     * In e-commerce, VAT rounding is resolved at the final aggregation level.
-     * The customer-facing including-VAT total can be set as authoritative.
-     * Any rounding difference is then absorbed by the VAT amount.
+     * Add item and service VAT lines and subtract discount VAT lines into one legal order total.
      */
-    private function buildAllocatedServiceTotal(array $amountsExclPerRate): VatAllocatedTotalPrice
-    {
-        $vatLines = [];
-        $totalExcl = Cash::zero();
-        $totalVat = Cash::zero();
-
-        foreach ($amountsExclPerRate as $rate => $base) {
-
-            $vatPercentage = VatPercentage::fromString($rate);
-
-            $vat = Cash::from($base)
-                ->addPercentage($vatPercentage->toPercentage())
-                ->subtract($base);
-
-            $vatLines[] = new VatAllocatedLine($base, $vat, $vatPercentage);
-
-            $totalExcl = $totalExcl->add($base);
-            $totalVat = $totalVat->add($vat);
-        }
-
-        $totalIncl = $totalExcl->add($totalVat);
-
-        return new VatAllocatedTotalPrice(
-            $vatLines,
-            $totalExcl,
-            $totalVat,
-            $totalIncl
-        );
-    }
-
     private function buildAllocatedTotal(VatAllocatedTotalPrice $itemTotal, VatAllocatedTotalPrice $shippingTotal, VatAllocatedTotalPrice $paymentTotal, VatAllocatedTotalPrice $orderDiscountTotal): VatAllocatedTotalPrice
     {
         $totalExcl = Cash::zero()
@@ -189,6 +212,9 @@ final class VatAllocator
             }
         }
 
+        // Stable descending rates keep snapshots and downstream exports independent of insertion order.
+        uksort($vatLines, fn (string|int $left, string|int $right): int => bccomp((string) $right, (string) $left, 6));
+
         return new VatAllocatedTotalPrice(
             $vatLines,
             $totalExcl,
@@ -197,43 +223,105 @@ final class VatAllocator
         );
     }
 
-    private function collectItemTotalsPerVat(Order $order): array
+    /**
+     * Collect net line totals after line discounts. These bases determine how services and global
+     * order discounts are distributed over the order's VAT rates.
+     *
+     * @return array<string, ItemPrice>
+     */
+    private function collectItemBasesPerVatRate(Order $order): array
     {
         $results = [];
 
         foreach ($order->getLines() as $line) {
-            $itemPrice = $line->getTotal(); // ItemPrice (item-level)
-            $vatRate = $line->getTotal()->getVatPercentage()->get();
+            $itemPrice = $line->getTotal();
+            $vatRate = $itemPrice->getVatPercentage()->get();
 
             if (! isset($results[$vatRate])) {
-                $results[$vatRate] = $itemPrice;
+                $results[$vatRate] = DefaultItemPrice::fromExcludingVat(
+                    $itemPrice->getExcludingVat(),
+                    $itemPrice->getVatPercentage(),
+                );
             } else {
-                $results[$vatRate] = $results[$vatRate]->add($itemPrice);
+                $results[$vatRate] = DefaultItemPrice::fromExcludingVat(
+                    $results[$vatRate]->getExcludingVat()->add($itemPrice->getExcludingVat()),
+                    $itemPrice->getVatPercentage(),
+                );
             }
         }
+
+        uksort($results, fn (string|int $left, string|int $right): int => bccomp((string) $right, (string) $left, 6));
 
         return $results;
     }
 
-    private function sumExcl(array $itemPrices): Money
+    private function normalizeAmount(Money|VatApplicableAmount $amount): VatApplicableAmount
     {
-        $sum = Cash::zero();
-
-        foreach ($itemPrices as $price) {
-            $sum = $sum->add($price->getExcludingVat());
-        }
-
-        return $sum;
+        return $amount instanceof VatApplicableAmount ? $amount : VatApplicableAmount::excludingVat($amount);
     }
 
-    private function sumIncl(array $itemPrices): Money
+    /**
+     * Allocate a component from its stored authoritative amount and resolved excluding-VAT base.
+     * The excluding base must not be derived again, otherwise persisted component rounding can shift.
+     *
+     * @param  array<string, ItemPrice>  $itemBasesPerVatRate
+     */
+    private function allocateAuthoritativePrice(array $itemBasesPerVatRate, HasAuthoritativeAmount&Price $price): VatAllocatedTotalPrice
     {
-        $sum = Cash::zero();
+        return $this->vatApplicableAmountAllocator->allocateResolved(
+            $itemBasesPerVatRate,
+            VatApplicableAmount::fromMoney($price->getAuthoritativeAmount(), $price->getTaxMode()),
+            $price->getExcludingVat(),
+        );
+    }
 
-        foreach ($itemPrices as $price) {
-            $sum = $sum->add($price->getIncludingVat());
+    /**
+     * Combine already allocated components per VAT rate. Positive totals are costs; negative totals
+     * are discounts and are subtracted from both the taxable base and VAT amount.
+     *
+     * @param  VatAllocatedTotalPrice[]  $positiveTotals
+     * @param  VatAllocatedTotalPrice[]  $negativeTotals
+     */
+    private function combineAllocatedTotals(array $positiveTotals, array $negativeTotals = []): VatAllocatedTotalPrice
+    {
+        /** @var array<string, VatAllocatedLine> $lines */
+        $lines = [];
+        $totalExcludingVat = Cash::zero();
+        $totalVat = Cash::zero();
+
+        foreach ($positiveTotals as $total) {
+            $totalExcludingVat = $totalExcludingVat->add($total->getTotalExcludingVat());
+            $totalVat = $totalVat->add($total->getTotalVat());
+
+            foreach ($total->getVatLines() as $line) {
+                $rate = $line->getVatPercentage()->get();
+                $lines[$rate] = isset($lines[$rate]) ? $lines[$rate]->add($line) : $line;
+            }
         }
 
-        return $sum;
+        foreach ($negativeTotals as $total) {
+            $totalExcludingVat = $totalExcludingVat->subtract($total->getTotalExcludingVat());
+            $totalVat = $totalVat->subtract($total->getTotalVat());
+
+            foreach ($total->getVatLines() as $line) {
+                $rate = $line->getVatPercentage()->get();
+                $lines[$rate] = isset($lines[$rate])
+                    ? $lines[$rate]->subtract($line)
+                    : new VatAllocatedLine(
+                        Cash::zero()->subtract($line->getTaxableBase()),
+                        Cash::zero()->subtract($line->getVatAmount()),
+                        $line->getVatPercentage(),
+                    );
+            }
+        }
+
+        uksort($lines, fn (string|int $left, string|int $right): int => bccomp((string) $right, (string) $left, 6));
+
+        return new VatAllocatedTotalPrice(
+            array_values($lines),
+            $totalExcludingVat,
+            $totalVat,
+            $totalExcludingVat->add($totalVat),
+        );
     }
 }

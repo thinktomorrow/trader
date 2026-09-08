@@ -37,8 +37,12 @@ class PaymentTest extends TestCase
             'payment_method_id' => $paymentMethodId->get(),
             'payment_state' => $state->value,
             'cost_excl' => $cost->getExcludingVat()->getAmount(),
-            'discount_excl' => 0,
+            'discount_excl' => '0',
             'total_excl' => $cost->getExcludingVat()->getAmount(),
+            'cost_incl' => null,
+            'discount_incl' => null,
+            'total_incl' => null,
+            'cost_tax_mode' => 'exclusive',
             'data' => json_encode(['payment_method_id' => $paymentMethodId->get()]),
         ], $payment->getMappedData());
     }
@@ -56,6 +60,10 @@ class PaymentTest extends TestCase
             'cost_excl' => '50',
             'discount_excl' => '0',
             'total_excl' => '50',
+            'cost_incl' => null,
+            'discount_incl' => null,
+            'total_incl' => null,
+            'cost_tax_mode' => 'exclusive',
             'data' => json_encode([
                 'title' => ['nl' => 'payment-aaa title nl', 'fr' => 'payment-aaa title fr'],
                 'payment_method_id' => 'payment-method-aaa',

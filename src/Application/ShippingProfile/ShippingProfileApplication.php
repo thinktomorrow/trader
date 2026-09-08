@@ -5,12 +5,14 @@ declare(strict_types=1);
 namespace Thinktomorrow\Trader\Application\ShippingProfile;
 
 use Thinktomorrow\Trader\Domain\Common\Event\EventDispatcher;
+use Thinktomorrow\Trader\Domain\Common\Price\TaxMode;
 use Thinktomorrow\Trader\Domain\Model\ShippingProfile\Events\ShippingProfileDeleted;
 use Thinktomorrow\Trader\Domain\Model\ShippingProfile\ShippingProfile;
 use Thinktomorrow\Trader\Domain\Model\ShippingProfile\ShippingProfileId;
 use Thinktomorrow\Trader\Domain\Model\ShippingProfile\ShippingProfileRepository;
 use Thinktomorrow\Trader\Domain\Model\ShippingProfile\Tariff;
 use Thinktomorrow\Trader\Domain\Model\ShippingProfile\TariffId;
+use Thinktomorrow\Trader\TraderConfig;
 
 class ShippingProfileApplication
 {
@@ -18,7 +20,7 @@ class ShippingProfileApplication
 
     private ShippingProfileRepository $shippingProfileRepository;
 
-    public function __construct(EventDispatcher $eventDispatcher, ShippingProfileRepository $shippingProfileRepository)
+    public function __construct(EventDispatcher $eventDispatcher, ShippingProfileRepository $shippingProfileRepository, private ?TraderConfig $traderConfig = null)
     {
         $this->eventDispatcher = $eventDispatcher;
         $this->shippingProfileRepository = $shippingProfileRepository;
@@ -72,7 +74,8 @@ class ShippingProfileApplication
                 $shippingProfile->shippingProfileId,
                 $command->getRate(),
                 $command->getFrom(),
-                $command->getTo()
+                $command->getTo(),
+                $this->tariffTaxMode($command->getTaxMode()),
             )
         );
 
@@ -92,12 +95,24 @@ class ShippingProfileApplication
         $tariff->update(
             $command->getRate(),
             $command->getFrom(),
-            $command->getTo()
+            $command->getTo(),
+            $command->getTaxMode() ?? $tariff->getTaxMode(),
         );
 
         $this->shippingProfileRepository->save($shippingProfile);
 
         $this->eventDispatcher->dispatchAll($shippingProfile->releaseEvents());
+    }
+
+    private function tariffTaxMode(?TaxMode $taxMode): TaxMode
+    {
+        if ($taxMode) {
+            return $taxMode;
+        }
+
+        return $this->traderConfig?->doesTariffInputIncludeVat() === true
+            ? TaxMode::Inclusive
+            : TaxMode::Exclusive;
     }
 
     public function deleteTariff(DeleteTariff $command): void

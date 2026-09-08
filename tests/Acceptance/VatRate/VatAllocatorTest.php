@@ -6,6 +6,9 @@ use Money\Money;
 use Tests\Acceptance\TestCase;
 use Thinktomorrow\Trader\Application\VatRate\Allocator\ProRateAllocator;
 use Thinktomorrow\Trader\Application\VatRate\Allocator\VatAllocator;
+use Thinktomorrow\Trader\Application\VatRate\Allocator\VatApplicableAmountAllocator;
+use Thinktomorrow\Trader\Domain\Common\Price\TaxMode;
+use Thinktomorrow\Trader\Domain\Common\Price\VatApplicableAmount;
 use Thinktomorrow\Trader\Domain\Model\Order\Line\Line;
 use Thinktomorrow\Trader\Domain\Model\Order\Order;
 
@@ -17,7 +20,7 @@ final class VatAllocatorTest extends TestCase
     {
         parent::setUp();
 
-        $this->allocator = new VatAllocator(new ProRateAllocator);
+        $this->allocator = new VatAllocator(new VatApplicableAmountAllocator(new ProRateAllocator));
     }
 
     public function test_it_allocates_items_only_single_vat_rate(): void
@@ -168,6 +171,97 @@ final class VatAllocatorTest extends TestCase
         $this->assertEquals(14362, $total->getTotalIncludingVat()->getAmount()); // Rounded from 14361,49
     }
 
+    public function test_empty_order_allocates_service_amount_at_zero_percent(): void
+    {
+        $result = $this->allocator->allocate(
+            $this->orderWithLines([]),
+            VatApplicableAmount::includingVat(Money::EUR(700)),
+            Money::EUR(0),
+            Money::EUR(0),
+        );
+
+        $this->assertCount(0, $result->items()->getVatLines());
+        $this->assertEquals(Money::EUR(700), $result->shipping()->getTotalExcludingVat());
+        $this->assertEquals(Money::EUR(0), $result->shipping()->getTotalVat());
+        $this->assertEquals(Money::EUR(700), $result->shipping()->getTotalIncludingVat());
+        $this->assertEquals(Money::EUR(700), $result->shipping()->findByRate('0')->getTaxableBase());
+    }
+
+    public function test_free_items_keep_their_vat_lines_and_determine_the_service_vat_rate(): void
+    {
+        $order = $this->orderWithLines([
+            $this->line(0, 1, '6'),
+            $this->line(0, 1, '21'),
+        ]);
+
+        $result = $this->allocator->allocate(
+            $order,
+            VatApplicableAmount::includingVat(Money::EUR(121)),
+            Money::EUR(0),
+            Money::EUR(0),
+        );
+
+        $this->assertCount(2, $result->items()->getVatLines());
+        $this->assertEquals(Money::EUR(100), $result->shipping()->findByRate('21')->getTaxableBase());
+        $this->assertEquals(Money::EUR(21), $result->shipping()->findByRate('21')->getVatAmount());
+        $this->assertEquals(Money::EUR(0), $result->shipping()->findByRate('6')->getTaxableBase());
+    }
+
+    public function test_allocate_order_preserves_per_component_rounding(): void
+    {
+        $order = $this->orderWithLines([$this->line(100, 1, '21')]);
+
+        foreach (['first', 'second'] as $shippingId) {
+            $order->addShipping($this->orderContext->createShipping('order-aaa', $shippingId, [
+                'cost_excl' => 2,
+                'cost_incl' => 3,
+                'cost_tax_mode' => TaxMode::Inclusive->value,
+            ]));
+        }
+
+        $allocatedOrder = $this->allocator->allocateOrder($order)->shipping();
+        $allocatedAggregate = $this->allocator->allocate(
+            $order,
+            VatApplicableAmount::includingVat(Money::EUR(6)),
+            Money::EUR(0),
+            Money::EUR(0),
+        )->shipping();
+
+        $this->assertEquals(Money::EUR(4), $allocatedOrder->getTotalExcludingVat());
+        $this->assertEquals(Money::EUR(2), $allocatedOrder->getTotalVat());
+        $this->assertEquals(Money::EUR(6), $allocatedOrder->getTotalIncludingVat());
+        $this->assertEquals(Money::EUR(5), $allocatedAggregate->getTotalExcludingVat());
+        $this->assertEquals(Money::EUR(1), $allocatedAggregate->getTotalVat());
+    }
+
+    public function test_allocate_order_combines_mixed_rates_and_authoritative_components(): void
+    {
+        $order = $this->mixedAuthorityOrder([
+            $this->line(1000, 1, '21'),
+            $this->line(1000, 1, '6'),
+        ]);
+        $reversedOrder = $this->mixedAuthorityOrder([
+            $this->line(1000, 1, '6'),
+            $this->line(1000, 1, '21'),
+        ]);
+
+        $result = $this->allocator->allocateOrder($order);
+        $reversedResult = $this->allocator->allocateOrder($reversedOrder);
+
+        $this->assertEquals(Money::EUR(100), $result->shipping()->getTotalIncludingVat());
+        $this->assertEquals(Money::EUR(227), $result->payment()->getTotalIncludingVat());
+        $this->assertEquals(Money::EUR(57), $result->discounts()->getTotalIncludingVat());
+        $this->assertEquals(Money::EUR(2540), $result->total()->getTotalIncludingVat());
+        $this->assertEquals(
+            $result->total()->getTotalExcludingVat()->add($result->total()->getTotalVat()),
+            $result->total()->getTotalIncludingVat(),
+        );
+        $this->assertCount(2, $result->total()->getVatLines());
+        $this->assertEquals($result->total()->getTotalExcludingVat(), $reversedResult->total()->getTotalExcludingVat());
+        $this->assertEquals($result->total()->getTotalVat(), $reversedResult->total()->getTotalVat());
+        $this->assertEquals($result->total()->getTotalIncludingVat(), $reversedResult->total()->getTotalIncludingVat());
+    }
+
     private function orderWithLines(array $lines): Order
     {
         $order = $this->orderContext->createEmptyOrder();
@@ -175,6 +269,41 @@ final class VatAllocatorTest extends TestCase
         foreach ($lines as $line) {
             $this->orderContext->addLineToOrder($order, $line);
         }
+
+        return $order;
+    }
+
+    private function mixedAuthorityOrder(array $lines): Order
+    {
+        $order = $this->orderWithLines($lines);
+        $shippingExcl = $this->allocator->resolveVatApplicableAmountExcludingVat($order, VatApplicableAmount::includingVat(Money::EUR(121)));
+        $shippingDiscountExcl = $this->allocator->resolveVatApplicableAmountExcludingVat($order, VatApplicableAmount::includingVat(Money::EUR(21)));
+        $paymentExcl = $this->allocator->resolveVatApplicableAmountExcludingVat($order, VatApplicableAmount::includingVat(Money::EUR(227)));
+        $orderDiscountExcl = $this->allocator->resolveVatApplicableAmountExcludingVat($order, VatApplicableAmount::includingVat(Money::EUR(57)));
+
+        $shipping = $this->orderContext->createShipping('order-aaa', 'shipping-mixed', [
+            'cost_excl' => $shippingExcl->getAmount(),
+            'cost_incl' => '121',
+            'cost_tax_mode' => TaxMode::Inclusive->value,
+        ]);
+        $shipping->addDiscount($this->orderContext->createShippingDiscount('order-aaa', $shipping->shippingId->get(), 'shipping-discount', [
+            'total_excl' => $shippingDiscountExcl->getAmount(),
+            'total_incl' => '21',
+            'tax_mode' => TaxMode::Inclusive->value,
+        ]));
+        $order->addShipping($shipping);
+
+        $order->addPayment($this->orderContext->createPayment('order-aaa', 'payment-mixed', [
+            'cost_excl' => $paymentExcl->getAmount(),
+            'cost_incl' => '227',
+            'cost_tax_mode' => TaxMode::Inclusive->value,
+        ]));
+
+        $this->orderContext->addDiscountToOrder($order, $this->orderContext->createOrderDiscount('order-aaa', 'order-discount', [
+            'total_excl' => $orderDiscountExcl->getAmount(),
+            'total_incl' => '57',
+            'tax_mode' => TaxMode::Inclusive->value,
+        ]));
 
         return $order;
     }

@@ -4,16 +4,18 @@ declare(strict_types=1);
 
 namespace Thinktomorrow\Trader\Application\Promo\LinePromo;
 
+use Thinktomorrow\Trader\Application\VatRate\Allocator\VatAllocator;
 use Thinktomorrow\Trader\Domain\Common\Map\Mappable;
 use Thinktomorrow\Trader\Domain\Common\Price\DiscountPrice;
 use Thinktomorrow\Trader\Domain\Common\Price\ItemDiscountPrice;
+use Thinktomorrow\Trader\Domain\Common\Price\TaxMode;
 use Thinktomorrow\Trader\Domain\Model\Order\Discount\DiscountableItem;
 use Thinktomorrow\Trader\Domain\Model\Order\Discount\DiscountId;
 use Thinktomorrow\Trader\Domain\Model\Order\Order;
 
 interface LineDiscount extends Mappable
 {
-    public static function fromMappedData(array $state, array $aggregateState, array $conditions): static;
+    public static function fromMappedData(array $state, array $aggregateState, array $conditions, VatAllocator $vatAllocator): static;
 
     public function isApplicable(Order $order, DiscountableItem $discountable): bool;
 
@@ -21,10 +23,7 @@ interface LineDiscount extends Mappable
 
     public function getDiscountPrice(Order $order, DiscountableItem $discountable): ItemDiscountPrice;
 
-    /**
-     * Should the discount be calculated on prices excluding VAT?
-     */
-    public function setCalculateExcludingVat(bool $calculateExcludingVat): void;
+    public function setCalculationTaxMode(TaxMode $taxMode): void;
 
     /**
      * The total discount on the order. This is not used in the price calculation, but rather

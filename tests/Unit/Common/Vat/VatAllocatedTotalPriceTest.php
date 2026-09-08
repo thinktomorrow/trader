@@ -6,6 +6,7 @@ namespace Tests\Unit\Common\Vat;
 
 use Money\Money;
 use PHPUnit\Framework\TestCase;
+use Thinktomorrow\Trader\Domain\Common\Vat\Exceptions\InvalidVatAllocatedTotal;
 use Thinktomorrow\Trader\Domain\Common\Vat\VatAllocatedLine;
 use Thinktomorrow\Trader\Domain\Common\Vat\VatAllocatedTotalPrice;
 use Thinktomorrow\Trader\Domain\Common\Vat\VatPercentage;
@@ -15,7 +16,7 @@ final class VatAllocatedTotalPriceTest extends TestCase
     public function test_it_exposes_totals(): void
     {
         $total = new VatAllocatedTotalPrice(
-            [],
+            [new VatAllocatedLine(Money::EUR(15000), Money::EUR(2550), VatPercentage::fromString('17'))],
             Money::EUR(15000),
             Money::EUR(2550),
             Money::EUR(17550)
@@ -119,6 +120,44 @@ final class VatAllocatedTotalPriceTest extends TestCase
         $this->assertEquals(
             $total->getTotalIncludingVat(),
             $total->getTotalExcludingVat()->add($total->getTotalVat())
+        );
+    }
+
+    public function test_it_rejects_totals_that_do_not_match_vat_lines(): void
+    {
+        $this->expectException(InvalidVatAllocatedTotal::class);
+
+        new VatAllocatedTotalPrice(
+            [new VatAllocatedLine(Money::EUR(100), Money::EUR(21), VatPercentage::fromString('21'))],
+            Money::EUR(100),
+            Money::EUR(20),
+            Money::EUR(120),
+        );
+    }
+
+    public function test_it_rejects_an_inconsistent_total_equation(): void
+    {
+        $this->expectException(InvalidVatAllocatedTotal::class);
+        $this->expectExceptionMessage('excluding VAT + VAT');
+
+        new VatAllocatedTotalPrice(
+            [new VatAllocatedLine(Money::EUR(100), Money::EUR(21), VatPercentage::fromString('21'))],
+            Money::EUR(100),
+            Money::EUR(21),
+            Money::EUR(120),
+        );
+    }
+
+    public function test_it_rejects_taxable_bases_that_do_not_match_total_excluding_vat(): void
+    {
+        $this->expectException(InvalidVatAllocatedTotal::class);
+        $this->expectExceptionMessage('taxable bases');
+
+        new VatAllocatedTotalPrice(
+            [new VatAllocatedLine(Money::EUR(99), Money::EUR(21), VatPercentage::fromString('21'))],
+            Money::EUR(100),
+            Money::EUR(21),
+            Money::EUR(121),
         );
     }
 }

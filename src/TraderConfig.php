@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Thinktomorrow\Trader;
 
 use Thinktomorrow\Trader\Domain\Common\Locale;
+use Thinktomorrow\Trader\Domain\Common\Price\TaxMode;
 
 interface TraderConfig
 {
@@ -37,23 +38,14 @@ interface TraderConfig
      */
     public function doesPriceInputIncludesVat(): bool;
 
+    public function doesTariffInputIncludeVat(): bool;
+
     /**
      * Show product prices including or excluding vat in the shop.
      */
     public function includeVatInPrices(): bool;
 
-    /**
-     * Calculate item discounts on the prices including or excluding vat.
-     * This setting is mostly relevant for b2b shops where discounts are
-     * often calculated on the prices excluding vat. Order discounts
-     * are always calculated on the prices excluding vat.
-     */
-    public function areItemDiscountsCalculatedExcludingVat(): bool;
-
-    /**
-     * Strategy used to split VAT amounts when rounding (unit_based|line_based).
-     */
-    public function getVatRoundingStrategy(): string;
+    public function getItemDiscountTaxMode(): TaxMode;
 
     /**
      * If this is true, the shop allows vat exemption for international business shoppers.

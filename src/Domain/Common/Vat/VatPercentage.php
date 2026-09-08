@@ -17,6 +17,10 @@ class VatPercentage
 
     public static function fromString(string $rate): self
     {
+        if (! preg_match('/^\d+(?:\.\d{1,6})?$/', $rate)) {
+            throw new \InvalidArgumentException('VAT percentage must be a non-negative decimal with at most six decimal places.');
+        }
+
         return new static(Percentage::fromString($rate));
     }
 

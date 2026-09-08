@@ -8,6 +8,7 @@ use Money\Money;
 use Tests\Acceptance\TestCase;
 use Thinktomorrow\Trader\Application\PaymentMethod\CreatePaymentMethod;
 use Thinktomorrow\Trader\Application\PaymentMethod\UpdatePaymentMethod;
+use Thinktomorrow\Trader\Domain\Common\Price\TaxMode;
 use Thinktomorrow\Trader\Domain\Model\Country\CountryId;
 use Thinktomorrow\Trader\Domain\Model\PaymentMethod\PaymentMethodProviderId;
 
@@ -27,16 +28,41 @@ class UpdatePaymentMethodTest extends TestCase
             'stripe',
             '20',
             ['BE'],
-            ['foo' => 'baz']
+            ['foo' => 'baz'],
+            'inclusive',
         ));
 
         $updatedPaymentMethod = $this->orderContext->repos()->paymentMethodRepository()->find($paymentMethodId);
 
         $this->assertEquals(PaymentMethodProviderId::fromString('stripe'), $updatedPaymentMethod->getProvider());
         $this->assertEquals(Money::EUR(20), $updatedPaymentMethod->getRate());
+        $this->assertSame(TaxMode::Inclusive, $updatedPaymentMethod->getTaxMode());
         $this->assertEquals([
             CountryId::fromString('BE'),
         ], $updatedPaymentMethod->getCountryIds());
         $this->assertEquals(['foo' => 'baz'], $updatedPaymentMethod->getData());
+    }
+
+    public function test_omitted_tax_mode_preserves_existing_authority(): void
+    {
+        $paymentMethodId = $this->orderContext->apps()->paymentMethodApplication()->createPaymentMethod(new CreatePaymentMethod(
+            'mollie',
+            '10',
+            [],
+            [],
+            TaxMode::Inclusive->value,
+        ));
+
+        $this->orderContext->apps()->paymentMethodApplication()->updatePaymentMethod(new UpdatePaymentMethod(
+            $paymentMethodId->get(),
+            'stripe',
+            '20',
+            [],
+            [],
+        ));
+
+        $updatedPaymentMethod = $this->orderContext->repos()->paymentMethodRepository()->find($paymentMethodId);
+
+        $this->assertSame(TaxMode::Inclusive, $updatedPaymentMethod->getTaxMode());
     }
 }

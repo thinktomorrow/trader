@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Thinktomorrow\Trader\Application\Promo\OrderPromo\Discounts;
 
 use Thinktomorrow\Trader\Application\Promo\OrderPromo\OrderDiscount;
+use Thinktomorrow\Trader\Application\VatRate\Allocator\VatAllocator;
 use Thinktomorrow\Trader\Domain\Common\Cash\Cash;
 use Thinktomorrow\Trader\Domain\Common\Cash\Percentage;
 use Thinktomorrow\Trader\Domain\Common\Price\DefaultDiscountPrice;
@@ -43,9 +44,9 @@ class PercentageOffOrderDiscount extends BaseOrderDiscount implements OrderDisco
         return DefaultDiscountPrice::fromExcludingVat($discountMoney);
     }
 
-    public static function fromMappedData(array $state, array $aggregateState, array $conditions): static
+    public static function fromMappedData(array $state, array $aggregateState, array $conditions, VatAllocator $vatAllocator): static
     {
-        $discount = parent::fromMappedData($state, $aggregateState, $conditions);
+        $discount = parent::fromMappedData($state, $aggregateState, $conditions, $vatAllocator);
 
         $data = json_decode($state['data'], true);
         $discount->percentage = Percentage::fromString($data['percentage']);

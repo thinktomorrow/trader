@@ -7,6 +7,7 @@ namespace Tests\Acceptance\PaymentMethod;
 use Money\Money;
 use Tests\Acceptance\TestCase;
 use Thinktomorrow\Trader\Application\PaymentMethod\CreatePaymentMethod;
+use Thinktomorrow\Trader\Domain\Common\Price\TaxMode;
 use Thinktomorrow\Trader\Domain\Model\Country\CountryId;
 use Thinktomorrow\Trader\Domain\Model\PaymentMethod\PaymentMethodId;
 use Thinktomorrow\Trader\Domain\Model\PaymentMethod\PaymentMethodProviderId;
@@ -28,6 +29,7 @@ class CreatePaymentMethodTest extends TestCase
         $this->assertEquals($paymentMethodId, $paymentMethod->paymentMethodId);
         $this->assertEquals(PaymentMethodProviderId::fromString('mollie'), $paymentMethod->getProvider());
         $this->assertEquals(Money::EUR(10), $paymentMethod->getRate());
+        $this->assertSame(TaxMode::Exclusive, $paymentMethod->getTaxMode());
         $this->assertEquals([
             CountryId::fromString('BE'),
             CountryId::fromString('NL'),

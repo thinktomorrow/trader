@@ -8,6 +8,7 @@ use Thinktomorrow\Trader\Application\Cart\RefreshCart\Adjuster;
 use Thinktomorrow\Trader\Application\Promo\ApplyPromoToOrder;
 use Thinktomorrow\Trader\Application\Promo\OrderPromo\OrderPromo;
 use Thinktomorrow\Trader\Application\Promo\OrderPromo\OrderPromoRepository;
+use Thinktomorrow\Trader\Application\Promo\PromoApplicationScope;
 use Thinktomorrow\Trader\Domain\Model\Order\Order;
 
 class AdjustDiscounts implements Adjuster
@@ -24,7 +25,13 @@ class AdjustDiscounts implements Adjuster
 
     public function adjust(Order $order): void
     {
-        // Dang
+        $promos = $this->resetDiscountsAndSelectPromos($order);
+        $this->applySelectedPromos($order, $promos, PromoApplicationScope::All);
+    }
+
+    /** @return OrderPromo[] */
+    public function resetDiscountsAndSelectPromos(Order $order): array
+    {
         $this->deleteAllDiscounts($order);
 
         // System promos
@@ -33,8 +40,10 @@ class AdjustDiscounts implements Adjuster
         // Coupon / Marketing promos
         $promos = $this->getMarketingPromos($order);
 
-        $this->processPromos($order, $systemPromos);
-        $this->processPromos($order, $promos);
+        return [
+            ...$this->selectPromos($systemPromos),
+            ...$this->selectPromos($promos),
+        ];
     }
 
     /**
@@ -42,44 +51,38 @@ class AdjustDiscounts implements Adjuster
      * The combinable flag does not apply between groups.
      * This allows for system promo's to be always combined with marketing promos.
      *
-     * @return void
+     * @param  OrderPromo[]  $promos
+     * @return OrderPromo[]
      */
-    private function processPromos(Order $order, array $promos)
+    private function selectPromos(array $promos): array
     {
-        $processedPromoIds = [];
-
-        // Keep track of the promos that are considered combinable with other combinable promos
-        $processedCombinablePromoIds = [];
+        $selectedPromos = [];
 
         foreach ($promos as $promo) {
-
-            // First promo in the group always applies
-            if (count($processedPromoIds) === 0) {
-                $this->applyPromo($order, $promo, $processedPromoIds, $processedCombinablePromoIds);
+            if ($selectedPromos === []) {
+                $selectedPromos[] = $promo;
 
                 continue;
             }
 
-            // Check if all existing promos are combinable
-            $allExistingAreCombinable = count($processedPromoIds) === count($processedCombinablePromoIds);
+            $allExistingAreCombinable = count(array_filter($selectedPromos, fn (OrderPromo $selectedPromo) => $selectedPromo->isCombinable())) === count($selectedPromos);
 
             if (! $allExistingAreCombinable || ! $promo->isCombinable()) {
                 continue;
             }
 
-            $this->applyPromo($order, $promo, $processedPromoIds, $processedCombinablePromoIds);
+            $selectedPromos[] = $promo;
         }
+
+        return $selectedPromos;
     }
 
-    private function applyPromo(Order $order, OrderPromo $promo, array &$processedPromoIds, array &$processedCombinablePromoIds): void
+    /** @param OrderPromo[] $promos */
+    public function applySelectedPromos(Order $order, array $promos, PromoApplicationScope $scope): void
     {
-        $processedPromoIds[] = $promo->promoId;
-
-        if ($promo->isCombinable()) {
-            $processedCombinablePromoIds[] = $promo->promoId;
+        foreach ($promos as $promo) {
+            $this->applyPromoToOrder->apply($order, $promo->getDiscounts(), $promo->getCouponCode(), $scope);
         }
-
-        $this->applyPromoToOrder->apply($order, $promo->getDiscounts(), $promo->getCouponCode());
     }
 
     private function deleteAllDiscounts(Order $order)
@@ -88,66 +91,15 @@ class AdjustDiscounts implements Adjuster
             $shipping->deleteDiscounts();
         }
 
+        foreach ($order->getPayments() as $payment) {
+            $payment->deleteDiscounts();
+        }
+
         foreach ($order->getLines() as $line) {
             $line->deleteDiscounts();
         }
 
         $order->deleteDiscounts();
-    }
-
-    private function areExistingPromosCombinable(Order $order, array $combinablePromoIds)
-    {
-        foreach ($this->getExistingPromoIds($order) as $existingPromoId) {
-            if (! in_array($existingPromoId, $combinablePromoIds)) {
-                return false;
-            }
-        }
-
-        return true;
-    }
-
-    private function hasPromo(Order $order): bool
-    {
-        foreach ($order->getShippings() as $shipping) {
-            if (count($shipping->getDiscounts()) > 0) {
-                return true;
-            }
-        }
-
-        foreach ($order->getLines() as $line) {
-            if (count($line->getDiscounts()) > 0) {
-                return true;
-            }
-        }
-
-        if (count($order->getDiscounts()) > 0) {
-            return true;
-        }
-
-        return false;
-    }
-
-    private function getExistingPromoIds(Order $order)
-    {
-        $promoIds = [];
-
-        foreach ($order->getShippings() as $shipping) {
-            foreach ($shipping->getDiscounts() as $discount) {
-                $promoIds[] = $discount->promoId;
-            }
-        }
-
-        foreach ($order->getLines() as $line) {
-            foreach ($line->getDiscounts() as $discount) {
-                $promoIds[] = $discount->promoId;
-            }
-        }
-
-        foreach ($order->getDiscounts() as $discount) {
-            $promoIds[] = $discount->promoId;
-        }
-
-        return array_unique($promoIds);
     }
 
     /**

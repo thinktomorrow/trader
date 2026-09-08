@@ -6,6 +6,7 @@ namespace Thinktomorrow\Trader\Application\PaymentMethod;
 
 use Money\Money;
 use Thinktomorrow\Trader\Domain\Common\Cash\Cash;
+use Thinktomorrow\Trader\Domain\Common\Price\TaxMode;
 use Thinktomorrow\Trader\Domain\Model\Country\CountryId;
 use Thinktomorrow\Trader\Domain\Model\PaymentMethod\PaymentMethodProviderId;
 
@@ -19,12 +20,17 @@ class CreatePaymentMethod
 
     private array $countryIds;
 
-    public function __construct(string $providerId, string $rate, array $countryIds, array $data)
+    public function __construct(string $providerId, string $rate, array $countryIds, array $data, private string $taxMode = 'exclusive')
     {
         $this->providerId = $providerId;
         $this->rate = $rate;
         $this->data = $data;
         $this->countryIds = $countryIds;
+    }
+
+    public function getTaxMode(): TaxMode
+    {
+        return TaxMode::from($this->taxMode);
     }
 
     public function getProviderId(): PaymentMethodProviderId

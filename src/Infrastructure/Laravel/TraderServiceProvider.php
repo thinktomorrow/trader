@@ -75,6 +75,8 @@ use Thinktomorrow\Trader\Application\Taxon\Tree\TaxonNode;
 use Thinktomorrow\Trader\Application\Taxon\Tree\TaxonTreeRepository;
 use Thinktomorrow\Trader\Application\Taxonomy\TaxonomyItem;
 use Thinktomorrow\Trader\Application\VatNumber\VatNumberValidator;
+use Thinktomorrow\Trader\Application\VatRate\Allocator\VatAllocator;
+use Thinktomorrow\Trader\Application\VatRate\Allocator\VatApplicableAmountAllocator;
 use Thinktomorrow\Trader\Domain\Common\Event\EventDispatcher;
 use Thinktomorrow\Trader\Domain\Model\Country\CountryRepository;
 use Thinktomorrow\Trader\Domain\Model\Customer\CustomerRepository;
@@ -253,9 +255,9 @@ class TraderServiceProvider extends ServiceProvider
         $this->app->bind(PaymentMethodForCart::class, fn () => DefaultPaymentMethodForCart::class);
         $this->app->bind(VerifyPaymentMethodForCart::class, DefaultVerifyPaymentMethodForCart::class);
         $this->app->bind(AdjustLine::class, DefaultAdjustLine::class);
-        //        $this->app->bind(AdjustOrderVatSnapshot::class, function () {
-        //            return new AdjustOrderVatSnapshot(new VatAllocator(new ProRateAllocator()));
-        //        });
+        $this->app->bind(VatAllocator::class, fn ($app) => new VatAllocator(
+            $app->make(VatApplicableAmountAllocator::class),
+        ));
 
         // MerchantOrder models
         $this->app->bind(MerchantOrder::class, fn () => DefaultMerchantOrder::class);
@@ -356,7 +358,8 @@ class TraderServiceProvider extends ServiceProvider
                     PercentageOffOrderDiscount::class,
                     FixedAmountOrderDiscount::class,
                 ],
-                $app->get(OrderConditionFactory::class)
+                $app->get(OrderConditionFactory::class),
+                $app->get(VatAllocator::class),
             );
         });
     }

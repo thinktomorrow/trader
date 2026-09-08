@@ -42,8 +42,8 @@ class MerchantOrderTest extends CartContext
         $this->assertEquals(Money::EUR('15'), $order->getDiscountTotalExcl());
         $this->assertEquals(Money::EUR('18'), $order->getDiscountTotalIncl());
         $this->assertEquals(Money::EUR('251'), $order->getTotalExcl());
-        $this->assertEquals(Money::EUR('54'), $order->getTotalVat());
-        $this->assertEquals(Money::EUR('305'), $order->getTotalIncl());
+        $this->assertEquals(Money::EUR('53'), $order->getTotalVat());
+        $this->assertEquals(Money::EUR('304'), $order->getTotalIncl());
     }
 
     public function test_it_can_get_formatted_totals()
@@ -64,8 +64,8 @@ class MerchantOrderTest extends CartContext
         $this->assertEquals('€ 0,15', $order->getFormattedDiscountTotalExcl());
         $this->assertEquals('€ 0,18', $order->getFormattedDiscountTotalIncl());
         $this->assertEquals('€ 2,51', $order->getFormattedTotalExcl());
-        $this->assertEquals('€ 0,54', $order->getFormattedTotalVat());
-        $this->assertEquals('€ 3,05', $order->getFormattedTotalIncl());
+        $this->assertEquals('€ 0,53', $order->getFormattedTotalVat());
+        $this->assertEquals('€ 3,04', $order->getFormattedTotalIncl());
     }
 
     public function test_it_includes_service_discounts_in_net_totals(): void
@@ -80,12 +80,12 @@ class MerchantOrderTest extends CartContext
         $order = $this->orderContext->findMerchantOrder($order->orderId->get());
 
         $this->assertEquals(Money::EUR('35'), $order->getShippingCostExcl());
-        $this->assertEquals(Money::EUR('42'), $order->getShippingCostIncl());
+        $this->assertEquals(Money::EUR('43'), $order->getShippingCostIncl());
         $this->assertEquals(Money::EUR('35'), $order->getPaymentCostExcl());
-        $this->assertEquals(Money::EUR('42'), $order->getPaymentCostIncl());
+        $this->assertEquals(Money::EUR('43'), $order->getPaymentCostIncl());
         $this->assertEquals(Money::EUR('0'), $order->getDiscountTotalExcl());
         $this->assertEquals(Money::EUR('236'), $order->getTotalExcl());
-        $this->assertEquals(Money::EUR('285'), $order->getTotalIncl());
+        $this->assertEquals(Money::EUR('286'), $order->getTotalIncl());
         $this->assertCount(2, $order->getAllDiscounts());
     }
 

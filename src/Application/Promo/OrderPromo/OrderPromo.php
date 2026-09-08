@@ -48,7 +48,11 @@ class OrderPromo
 
     public function getCombinedDiscountPrice(Order $order): DiscountPrice
     {
-        return array_reduce($this->discounts, fn ($carry, OrderDiscount $discount) => $discount->getCombinedDiscountPrice($order), DefaultDiscountPrice::zero());
+        return array_reduce(
+            $this->discounts,
+            fn (DiscountPrice $carry, OrderDiscount $discount) => $carry->add($discount->getCombinedDiscountPrice($order)),
+            DefaultDiscountPrice::zero(),
+        );
     }
 
     public static function fromMappedData(array $state, array $childEntities = []): static

@@ -2,10 +2,14 @@
 
 namespace Tests\Acceptance\Cart;
 
+use Money\Money;
+use Thinktomorrow\Trader\Application\Cart\RefreshCart\Adjusters\AdjustOrderVatSnapshot;
 use Thinktomorrow\Trader\Application\Cart\ShippingProfile\Eligibility\ProfileMustBeOnline;
 use Thinktomorrow\Trader\Application\Cart\ShippingProfile\Eligibility\ProfileMustSupportShippingCountry;
 use Thinktomorrow\Trader\Application\Cart\ShippingProfile\Eligibility\ShippingProfileEligibility;
 use Thinktomorrow\Trader\Application\Cart\ShippingProfile\Eligibility\ShippingProfileEligibilityRule;
+use Thinktomorrow\Trader\Domain\Common\Cash\Cash;
+use Thinktomorrow\Trader\Domain\Common\Price\TaxMode;
 use Thinktomorrow\Trader\Domain\Model\Country\CountryId;
 use Thinktomorrow\Trader\Domain\Model\Order\Order;
 use Thinktomorrow\Trader\Domain\Model\ShippingProfile\Exceptions\CouldNotFindShippingProfile;
@@ -14,6 +18,7 @@ use Thinktomorrow\Trader\Domain\Model\ShippingProfile\ShippingProfile;
 use Thinktomorrow\Trader\Domain\Model\ShippingProfile\ShippingProfileId;
 use Thinktomorrow\Trader\Domain\Model\ShippingProfile\ShippingProfileState;
 use Thinktomorrow\Trader\Domain\Model\ShippingProfile\ShippingProviderId;
+use Thinktomorrow\Trader\Domain\Model\ShippingProfile\Tariff;
 use Thinktomorrow\Trader\Infrastructure\Test\TestContainer;
 
 class ChooseShippingProfileTest extends CartContext
@@ -26,6 +31,32 @@ class ChooseShippingProfileTest extends CartContext
         // Assert all is present
         $cart = $this->orderContext->repos()->cartRepository()->findCart($this->getOrder()->orderId);
         $this->assertNotNull($cart->getShipping());
+    }
+
+    public function test_including_vat_tariff_remains_authoritative(): void
+    {
+        $this->givenThereIsAProductWhichCostsEur('lightsaber', 5);
+        $this->whenIAddTheVariantToTheCart('lightsaber-variant-aaa', 1);
+        $order = $this->getOrder();
+        $profile = ShippingProfile::create(ShippingProfileId::fromString('gross-shipping'), ShippingProviderId::fromString('postnl'), false);
+        $profile->addTariff(Tariff::create(
+            $this->orderContext->repos()->shippingProfileRepository()->nextTariffReference(),
+            $profile->shippingProfileId,
+            Money::EUR(700),
+            Cash::zero(),
+            null,
+            TaxMode::Inclusive,
+        ));
+        $this->orderContext->repos()->shippingProfileRepository()->save($profile);
+
+        $this->whenIChooseShipping('gross-shipping');
+
+        $savedOrder = $this->orderContext->findOrder($order->orderId);
+        (new TestContainer)->get(AdjustOrderVatSnapshot::class)->adjust($savedOrder);
+
+        $this->assertEquals(Money::EUR(583), $savedOrder->getShippingCostExcl());
+        $this->assertEquals(Money::EUR(700), $savedOrder->getShippingCostIncl());
+        $this->assertSame(TaxMode::Inclusive, $savedOrder->getShippings()[0]->getShippingCost()->getTaxMode());
     }
 
     public function test_it_cannot_choose_profile_when_none_is_online()

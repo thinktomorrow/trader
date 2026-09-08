@@ -1,7 +1,5 @@
 <?php
 
-use Thinktomorrow\Trader\Domain\Common\Vat\VatRoundingStrategy;
-
 return [
     /**
      * Prepends a marker to any exposable references such as cart references, invoice numbers or payment references.
@@ -46,8 +44,8 @@ return [
     'does_price_input_includes_vat' => true,
 
     /**
-     * Do the tariffs set in the admin include vat or not?
-     * This is mainly for the shipping tariffs.
+     * Default tax mode for newly created shipping tariffs when no explicit mode is provided.
+     * Existing tariffs retain their persisted tax mode.
      */
     'does_tariff_input_includes_vat' => true,
 
@@ -71,14 +69,6 @@ return [
      * are always calculated on the prices excluding vat.
      */
     'calculate_item_discounts_excluding_vat' => false,
-
-    /**
-     * Defines how VAT is rounded when splitting totals between excluding and VAT amounts.
-     *
-     * - unit_based: derive excluding amount per unit and multiply by quantity.
-     * - line_based: derive excluding amount from the full line including amount.
-     */
-    'vat_rounding_strategy' => VatRoundingStrategy::getDefault()->value,
 
     /**
      * If this is true, the shop allows vat exemption for international business shoppers.

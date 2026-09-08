@@ -7,6 +7,7 @@ namespace Tests\Unit\Model;
 use Money\Money;
 use PHPUnit\Framework\TestCase;
 use Thinktomorrow\Trader\Domain\Common\Cash\Cash;
+use Thinktomorrow\Trader\Domain\Common\Price\TaxMode;
 use Thinktomorrow\Trader\Domain\Model\Country\CountryId;
 use Thinktomorrow\Trader\Domain\Model\ShippingProfile\ShippingProfile;
 use Thinktomorrow\Trader\Domain\Model\ShippingProfile\ShippingProfileId;
@@ -55,6 +56,7 @@ class ShippingProfileTest extends TestCase
             'rate' => '500',
             'from' => '0',
             'to' => '1000',
+            'tax_mode' => 'exclusive',
         ], $shippingProfile->getChildEntities()[Tariff::class][0]);
 
         $this->assertCount(2, $shippingProfile->getChildEntities()[CountryId::class]);
@@ -144,6 +146,29 @@ class ShippingProfileTest extends TestCase
         $this->assertTrue($tariff->withinRange(Cash::make(100001)));
     }
 
+    public function test_it_matches_tariff_range_against_its_tax_mode(): void
+    {
+        $profile = ShippingProfile::create(
+            ShippingProfileId::fromString('shipping'),
+            ShippingProviderId::fromString('postnl'),
+            false,
+        );
+        $profile->addTariff(Tariff::create(
+            TariffId::fromString('inclusive'),
+            $profile->shippingProfileId,
+            Money::EUR(10000),
+            Money::EUR(850000),
+            null,
+            TaxMode::Inclusive,
+        ));
+
+        $this->assertNull($profile->findTariffByPrices(Money::EUR(850000), Money::EUR(849999)));
+        $this->assertSame(
+            'inclusive',
+            $profile->findTariffByPrices(Money::EUR(702479), Money::EUR(850000))->tariffId->get(),
+        );
+    }
+
     private function createdShippingProfile(): ShippingProfile
     {
         return ShippingProfile::fromMappedData([
@@ -159,12 +184,14 @@ class ShippingProfileTest extends TestCase
                     'rate' => '500',
                     'from' => '0',
                     'to' => '1000',
+                    'tax_mode' => 'exclusive',
                 ],
                 [
                     'tariff_id' => 'yyy',
                     'rate' => '0',
                     'from' => '1001',
                     'to' => '2000',
+                    'tax_mode' => 'exclusive',
                 ],
             ],
             CountryId::class => [

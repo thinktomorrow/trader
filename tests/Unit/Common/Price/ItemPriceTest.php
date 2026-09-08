@@ -10,6 +10,7 @@ use PHPUnit\Framework\TestCase;
 use Thinktomorrow\Trader\Domain\Common\Price\DefaultItemDiscountPrice;
 use Thinktomorrow\Trader\Domain\Common\Price\DefaultItemPrice;
 use Thinktomorrow\Trader\Domain\Common\Price\Exceptions\PriceCannotBeNegative;
+use Thinktomorrow\Trader\Domain\Common\Price\TaxMode;
 use Thinktomorrow\Trader\Domain\Common\Vat\VatPercentage;
 
 class ItemPriceTest extends TestCase
@@ -63,6 +64,7 @@ class ItemPriceTest extends TestCase
 
         $this->assertEquals(Money::EUR(100), $object->getExcludingVat());
         $this->assertEquals(Money::EUR(106), $object->getIncludingVat());
+        $this->assertFalse($object->isIncludingVatAuthoritative());
 
         // From price including vat
         $object = DefaultItemPrice::fromMoney(
@@ -73,8 +75,9 @@ class ItemPriceTest extends TestCase
 
         $object = $object->changeVatPercentage(VatPercentage::fromString('6'));
 
-        $this->assertEquals(Money::EUR(100), $object->getExcludingVat());
-        $this->assertEquals(Money::EUR(106), $object->getIncludingVat());
+        $this->assertEquals(Money::EUR(113), $object->getExcludingVat());
+        $this->assertEquals(Money::EUR(120), $object->getIncludingVat());
+        $this->assertTrue($object->isIncludingVatAuthoritative());
     }
 
     public function test_it_can_get_vat_total()
@@ -122,9 +125,8 @@ class ItemPriceTest extends TestCase
 
         $object = $object->changeVatPercentage(VatPercentage::fromString('6'));
 
-        // 121 incl - 21% = 100 excl
-        // 100 + 6% = 106 incl
-        $this->assertEquals(Money::EUR(106), $object->getIncludingVat());
+        $this->assertEquals(Money::EUR(114), $object->getExcludingVat());
+        $this->assertEquals(Money::EUR(121), $object->getIncludingVat());
     }
 
     public function test_apply_discount_cannot_make_values_negative()
@@ -170,5 +172,36 @@ class ItemPriceTest extends TestCase
             [11], [13], [17], [19], [23], [29], [31],
             [37], [41], [43], [47], [53],
         ];
+    }
+
+    public function test_including_vat_arithmetic_preserves_gross_authority(): void
+    {
+        $price = DefaultItemPrice::fromMoney(Money::EUR(121), VatPercentage::fromString('21'), true);
+        $other = DefaultItemPrice::fromMoney(Money::EUR(242), VatPercentage::fromString('21'), true);
+
+        $sum = $price->add($other);
+        $difference = $other->subtract($price);
+
+        $this->assertEquals(Money::EUR(363), $sum->getIncludingVat());
+        $this->assertSame(TaxMode::Inclusive, $sum->getTaxMode());
+        $this->assertEquals(Money::EUR(121), $difference->getIncludingVat());
+        $this->assertSame(TaxMode::Inclusive, $difference->getTaxMode());
+    }
+
+    public function test_mixed_authority_arithmetic_falls_back_to_net_authority(): void
+    {
+        $result = DefaultItemPrice::fromMoney(Money::EUR(121), VatPercentage::fromString('21'), true)
+            ->add(DefaultItemPrice::fromExcludingVat(Money::EUR(100), VatPercentage::fromString('21')));
+
+        $this->assertSame(TaxMode::Exclusive, $result->getTaxMode());
+        $this->assertEquals(Money::EUR(200), $result->getExcludingVat());
+    }
+
+    public function test_arithmetic_rejects_different_vat_rates(): void
+    {
+        $this->expectException(\InvalidArgumentException::class);
+
+        DefaultItemPrice::fromExcludingVat(Money::EUR(100), VatPercentage::fromString('21'))
+            ->add(DefaultItemPrice::fromExcludingVat(Money::EUR(100), VatPercentage::fromString('6')));
     }
 }

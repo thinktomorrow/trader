@@ -6,6 +6,8 @@ namespace Tests\Infrastructure\Repositories;
 
 use Tests\Infrastructure\TestCase;
 use Thinktomorrow\Trader\Application\Promo\OrderPromo\OrderPromo;
+use Thinktomorrow\Trader\Domain\Common\Price\TaxMode;
+use Thinktomorrow\Trader\Domain\Model\Promo\Discounts\FixedAmountDiscount;
 use Thinktomorrow\Trader\Domain\Model\Promo\Exceptions\CouldNotFindPromo;
 use Thinktomorrow\Trader\Domain\Model\Promo\PromoId;
 use Thinktomorrow\Trader\Domain\Model\Promo\PromoState;
@@ -23,6 +25,27 @@ final class PromoRepositoryTest extends TestCase
             $repository->save($promo);
 
             $this->assertEquals($promo, $repository->find($promo->promoId));
+        }
+    }
+
+    public function test_it_preserves_fixed_discount_tax_mode(): void
+    {
+        foreach (OrderContext::drivers() as $orderContext) {
+            $repository = $orderContext->repos()->promoRepository();
+            $promo = $orderContext->dontPersist()->createPromo('inclusive-promo', [], [
+                $orderContext->createPromoDiscount('inclusive-promo', 'inclusive-discount', 'fixed_amount', [
+                    'data' => json_encode([
+                        'amount' => '700',
+                        'tax_mode' => TaxMode::Inclusive->value,
+                    ]),
+                ]),
+            ]);
+
+            $repository->save($promo);
+            $savedDiscount = $repository->find($promo->promoId)->getDiscounts()[0];
+
+            $this->assertInstanceOf(FixedAmountDiscount::class, $savedDiscount);
+            $this->assertSame(TaxMode::Inclusive, $savedDiscount->getTaxMode());
         }
     }
 

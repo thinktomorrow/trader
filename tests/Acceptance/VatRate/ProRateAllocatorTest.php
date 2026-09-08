@@ -51,7 +51,7 @@ final class ProRateAllocatorTest extends TestCase
         $this->allocator->allocate($items, $toAllocate);
     }
 
-    public function test_it_distributes_remainder_in_input_order(): void
+    public function test_it_uses_vat_rate_as_stable_tie_breaker(): void
     {
         $items = [
             '21' => DefaultItemPrice::fromExcludingVat(Money::EUR(1), VatPercentage::fromString('21')),
@@ -66,6 +66,69 @@ final class ProRateAllocatorTest extends TestCase
         $this->assertEquals(Money::EUR(0), $result['6']);
     }
 
+    public function test_largest_fractional_remainder_is_independent_of_input_order(): void
+    {
+        $firstOrder = [
+            '21' => DefaultItemPrice::fromExcludingVat(Money::EUR(1), VatPercentage::fromString('21')),
+            '12' => DefaultItemPrice::fromExcludingVat(Money::EUR(2), VatPercentage::fromString('12')),
+            '6' => DefaultItemPrice::fromExcludingVat(Money::EUR(3), VatPercentage::fromString('6')),
+        ];
+        $secondOrder = [
+            '6' => $firstOrder['6'],
+            '21' => $firstOrder['21'],
+            '12' => $firstOrder['12'],
+        ];
+
+        $firstResult = $this->allocator->allocate($firstOrder, Money::EUR(2));
+        $secondResult = $this->allocator->allocate($secondOrder, Money::EUR(2));
+
+        foreach (['21', '12', '6'] as $rate) {
+            $this->assertEquals($firstResult[$rate], $secondResult[$rate]);
+        }
+
+        $this->assertEquals(Money::EUR(0), $firstResult['21']);
+        $this->assertEquals(Money::EUR(1), $firstResult['12']);
+        $this->assertEquals(Money::EUR(1), $firstResult['6']);
+    }
+
+    #[DataProvider('tiedRemainderCases')]
+    public function test_tied_remainders_are_stable_for_positive_and_negative_totals(int $total, array $expected): void
+    {
+        $items = [
+            '6' => DefaultItemPrice::fromExcludingVat(Money::EUR(1), VatPercentage::fromString('6')),
+            '21' => DefaultItemPrice::fromExcludingVat(Money::EUR(1), VatPercentage::fromString('21')),
+            '12' => DefaultItemPrice::fromExcludingVat(Money::EUR(1), VatPercentage::fromString('12')),
+        ];
+
+        $result = $this->allocator->allocate($items, Money::EUR($total));
+
+        foreach ($expected as $rate => $amount) {
+            $this->assertEquals(Money::EUR($amount), $result[$rate]);
+        }
+    }
+
+    public static function tiedRemainderCases(): array
+    {
+        return [
+            'positive' => [2, ['21' => 1, '12' => 1, '6' => 0]],
+            'negative' => [-2, ['21' => -1, '12' => -1, '6' => 0]],
+        ];
+    }
+
+    public function test_it_allocates_exactly_beyond_float_integer_precision(): void
+    {
+        $items = [
+            '21' => DefaultItemPrice::fromExcludingVat(Money::EUR(2), VatPercentage::fromString('21')),
+            '6' => DefaultItemPrice::fromExcludingVat(Money::EUR(1), VatPercentage::fromString('6')),
+        ];
+
+        $result = $this->allocator->allocate($items, Money::EUR('9007199254740993'));
+
+        $this->assertEquals(Money::EUR('6004799503160662'), $result['21']);
+        $this->assertEquals(Money::EUR('3002399751580331'), $result['6']);
+        $this->assertEquals(Money::EUR('9007199254740993'), $result['21']->add($result['6']));
+    }
+
     public function test_zero_allocation_returns_zero_for_all_groups(): void
     {
         $items = [
@@ -77,6 +140,39 @@ final class ProRateAllocatorTest extends TestCase
 
         $this->assertEquals(Money::EUR(0), $result['21']);
         $this->assertEquals(Money::EUR(0), $result['6']);
+    }
+
+    public function test_zero_bases_use_a_stable_vat_rate_independent_of_input_order(): void
+    {
+        $first = [
+            '6' => DefaultItemPrice::fromExcludingVat(Money::EUR(0), VatPercentage::fromString('6')),
+            '21' => DefaultItemPrice::fromExcludingVat(Money::EUR(0), VatPercentage::fromString('21')),
+        ];
+        $second = array_reverse($first, true);
+
+        $firstResult = $this->allocator->allocate($first, Money::EUR(10));
+        $secondResult = $this->allocator->allocate($second, Money::EUR(10));
+
+        foreach (['21', '6'] as $rate) {
+            $this->assertEquals($firstResult[$rate], $secondResult[$rate]);
+        }
+
+        $this->assertEquals(Money::EUR(10), $firstResult['21']);
+    }
+
+    public function test_non_zero_amount_requires_vat_groups(): void
+    {
+        $this->expectException(\InvalidArgumentException::class);
+
+        $this->allocator->allocate([], Money::EUR(1));
+    }
+
+    public function test_it_rejects_non_item_price_values_with_a_domain_error(): void
+    {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('Got string');
+
+        $this->allocator->allocate(['21' => 'invalid'], Money::EUR(100));
     }
 
     public function test_allocation_when_item_totals_are_zero(): void
@@ -199,14 +295,14 @@ final class ProRateAllocatorTest extends TestCase
             'Small remainder spill positive' => [
                 ['21' => 1, '6' => 1, '12' => 1],
                 5,
-                ['21' => 2, '6' => 2, '12' => 1],
+                ['21' => 2, '6' => 1, '12' => 2],
             ],
 
             // --- Small remainder spill negative ---
             'Small remainder spill negative' => [
                 ['21' => 1, '6' => 1, '12' => 1],
                 -5,
-                ['21' => -2, '6' => -2, '12' => -1],
+                ['21' => -2, '6' => -1, '12' => -2],
             ],
 
             // --- Large remainder spill ---
@@ -244,11 +340,11 @@ final class ProRateAllocatorTest extends TestCase
                 ['21' => 10, '6' => 0],
             ],
 
-            // --- Order stability check ---
-            'order stability matters' => [
+            // --- Tie-breaker is independent of input order ---
+            'VAT rate tie-breaker' => [
                 ['6' => 1, '21' => 1],
                 1,
-                ['6' => 1, '21' => 0],
+                ['6' => 0, '21' => 1],
             ],
         ];
     }

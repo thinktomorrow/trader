@@ -13,6 +13,7 @@ use Thinktomorrow\Trader\Domain\Common\Price\DefaultDiscountPrice;
 use Thinktomorrow\Trader\Domain\Common\Price\DefaultItemDiscountPrice;
 use Thinktomorrow\Trader\Domain\Common\Price\DiscountPrice;
 use Thinktomorrow\Trader\Domain\Common\Price\ItemDiscountPrice;
+use Thinktomorrow\Trader\Domain\Common\Price\TaxMode;
 use Thinktomorrow\Trader\Domain\Common\Vat\VatPercentage;
 use Thinktomorrow\Trader\Domain\Model\Order\OrderId;
 use Thinktomorrow\Trader\Domain\Model\Promo\DiscountId as PromoDiscountId;
@@ -66,7 +67,10 @@ final class Discount implements ChildEntity
             'promo_id' => $this->promoId?->get(),
             'promo_discount_id' => $this->promoDiscountId?->get(),
             'total_excl' => $this->discountPrice->getExcludingVat()->getAmount(),
-            'total_incl' => $this->discountPrice instanceof ItemDiscountPrice && $this->discountPrice->isIncludingVatAuthoritative() ? $this->discountPrice->getIncludingVat()->getAmount() : null,
+            'total_incl' => $this->discountPrice instanceof ItemDiscountPrice
+                ? $this->discountPrice->getIncludingVat()->getAmount()
+                : ($this->discountPrice->getTaxMode() === TaxMode::Inclusive ? $this->discountPrice->getAuthoritativeAmount()->getAmount() : null),
+            'tax_mode' => $this->discountPrice->getTaxMode()->value,
             'vat_rate' => $this->discountPrice instanceof ItemDiscountPrice ? $this->discountPrice->getVatPercentage()->get() : null,
             'data' => json_encode($data),
         ];
@@ -107,9 +111,11 @@ final class Discount implements ChildEntity
             }
 
             if (isset($state['total_incl']) && $state['total_incl'] !== null) {
-                $discount->discountPrice = DefaultItemDiscountPrice::fromIncludingVat(
+                $discount->discountPrice = DefaultItemDiscountPrice::fromResolvedAmounts(
+                    Money::EUR($state['total_excl']),
                     Money::EUR($state['total_incl']),
-                    VatPercentage::fromString($state['vat_rate'])
+                    VatPercentage::fromString($state['vat_rate']),
+                    TaxMode::from($state['tax_mode'] ?? TaxMode::Inclusive->value),
                 );
             } else {
                 $discount->discountPrice = DefaultItemDiscountPrice::fromExcludingVat(
@@ -119,7 +125,9 @@ final class Discount implements ChildEntity
             }
 
         } else {
-            $discount->discountPrice = DefaultDiscountPrice::fromExcludingVat(Money::EUR($state['total_excl']));
+            $discount->discountPrice = ($state['tax_mode'] ?? TaxMode::Exclusive->value) === TaxMode::Inclusive->value
+                ? DefaultDiscountPrice::fromIncludingVat(Money::EUR($state['total_incl']), Money::EUR($state['total_excl']))
+                : DefaultDiscountPrice::fromExcludingVat(Money::EUR($state['total_excl']));
         }
 
         return $discount;

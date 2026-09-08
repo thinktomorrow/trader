@@ -47,6 +47,7 @@ class OrderLineTest extends TestCase
         $order = $this->orderContext->createDefaultOrder();
         $line = $this->orderContext->createLine($order->orderId->get(), 'line-aaa', [
             'unit_price_excl' => 200,
+            'unit_price_incl' => 242,
         ]);
 
         $order->addOrUpdateLine($line);

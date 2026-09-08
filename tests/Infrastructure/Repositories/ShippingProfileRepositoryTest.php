@@ -4,10 +4,13 @@ declare(strict_types=1);
 
 namespace Tests\Infrastructure\Repositories;
 
+use Money\Money;
 use Tests\Infrastructure\TestCase;
 use Thinktomorrow\Trader\Application\Country\Country;
+use Thinktomorrow\Trader\Domain\Common\Price\TaxMode;
 use Thinktomorrow\Trader\Domain\Model\ShippingProfile\Exceptions\CouldNotFindShippingProfile;
 use Thinktomorrow\Trader\Domain\Model\ShippingProfile\ShippingProfileId;
+use Thinktomorrow\Trader\Domain\Model\ShippingProfile\Tariff;
 use Thinktomorrow\Trader\Testing\Order\OrderContext;
 
 class ShippingProfileRepositoryTest extends TestCase
@@ -22,6 +25,28 @@ class ShippingProfileRepositoryTest extends TestCase
             $repository->save($shippingProfile);
 
             $this->assertEquals($shippingProfile, $repository->find($shippingProfile->shippingProfileId));
+        }
+    }
+
+    public function test_it_preserves_including_vat_tariff_authority(): void
+    {
+        foreach (OrderContext::drivers() as $orderContext) {
+            $profile = $orderContext->dontPersist()->createShippingProfile('inclusive-profile');
+            $profile->addTariff(Tariff::create(
+                $orderContext->repos()->shippingProfileRepository()->nextTariffReference(),
+                $profile->shippingProfileId,
+                Money::EUR(700),
+                Money::EUR(0),
+                null,
+                TaxMode::Inclusive,
+            ));
+            $repository = $orderContext->repos()->shippingProfileRepository();
+
+            $repository->save($profile);
+            $savedTariff = $repository->find($profile->shippingProfileId)->getTariffs()[0];
+
+            $this->assertEquals(Money::EUR(700), $savedTariff->getRate());
+            $this->assertSame(TaxMode::Inclusive, $savedTariff->getTaxMode());
         }
     }
 

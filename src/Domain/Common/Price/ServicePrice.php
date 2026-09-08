@@ -13,25 +13,25 @@ use Money\Money;
  * in isolation. Their VAT is determined at the level of the order as a whole through a pro-rata
  * allocation across all applicable VAT rates of the products inside the order.
  *
- * Service item prices represent pure net amounts which only later become taxable amounts
- * once they are processed through the order-level VAT allocation mechanism.
- *
  * Domain logic:
- * - The canonical state of a service price is ALWAYS the price excluding VAT.
+ * - A resolved excluding-VAT amount is always available for order calculations.
+ * - The configured amount and its tax mode are retained as the authoritative source.
  * - A service item never has a VAT percentage of its own. VAT must be allocated later by the
  *   order's VAT allocation process (e.g. VatAllocator), based on the distribution of VAT rates
  *   of the order’s line items.
- * - Because service items may need to be split across multiple VAT rates (when an order contains
- *   products with mixed VAT percentages), this value object intentionally exposes only the
- *   excluding-VAT price and not an including-VAT or VAT-total amount.
+ * - Because service items may be split across multiple VAT rates, definitive including-VAT and
+ *   VAT totals are exposed by the order-level VAT allocation result.
  * - As a value object, this class is immutable. All operations must return a new instance.
  *
- * In summary: service item prices represent pure net amounts which only later become taxable
- * amounts once they are processed through the order-level VAT allocation mechanism.
+ * In summary: a service price retains input authority while the VAT allocation owns tax totals.
  */
-interface ServicePrice extends Price
+interface ServicePrice extends HasAuthoritativeAmount, Price
 {
     public static function fromExcludingVat(Money $excludingVat): static;
+
+    public static function fromIncludingVat(Money $includingVat, Money $resolvedExcludingVat): static;
+
+    public static function fromVatApplicableAmount(VatApplicableAmount $amount, Money $resolvedExcludingVat): static;
 
     public function applyDiscount(DiscountPrice $discount): static;
 }

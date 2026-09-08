@@ -19,6 +19,7 @@ use Thinktomorrow\Trader\Domain\Model\Order\Discount\DiscountId;
 use Thinktomorrow\Trader\Domain\Model\Order\Exceptions\CouldNotFindOrder;
 use Thinktomorrow\Trader\Domain\Model\Order\Exceptions\OrderAlreadyInMerchantHands;
 use Thinktomorrow\Trader\Domain\Model\Order\Exceptions\VatSnapshotMismatchException;
+use Thinktomorrow\Trader\Domain\Model\Order\Exceptions\VatSnapshotNotCalculated;
 use Thinktomorrow\Trader\Domain\Model\Order\Invoice\InvoiceReference;
 use Thinktomorrow\Trader\Domain\Model\Order\Invoice\InvoiceRepository;
 use Thinktomorrow\Trader\Domain\Model\Order\Line\Line;
@@ -99,9 +100,21 @@ class MysqlOrderRepository implements InvoiceRepository, OrderRepository
 
     private function getMappedDataForSave(Order $order): array
     {
+        if (! $order->hasUpToDateVatSnapshot() && $order->inCustomerHands()) {
+            $this->container->get(AdjustOrderVatSnapshot::class)->adjust($order);
+        }
+
+        if (! $order->hasPricingSnapshot()) {
+            throw new VatSnapshotNotCalculated('Cannot save an order without a pricing snapshot.');
+        }
+
         try {
             return $order->getMappedData();
-        } catch (VatSnapshotMismatchException) {
+        } catch (VatSnapshotMismatchException|VatSnapshotNotCalculated $exception) {
+            if ($order->hasFrozenPricing()) {
+                throw $exception;
+            }
+
             $this->container->get(AdjustOrderVatSnapshot::class)->adjust($order);
 
             return $order->getMappedData();
@@ -112,14 +125,32 @@ class MysqlOrderRepository implements InvoiceRepository, OrderRepository
     {
         $lineIds = array_map(fn ($lineState) => $lineState['line_id'], $order->getChildEntities()[Line::class]);
 
-        DB::table(static::$orderLinesTable)
-            ->where('order_id', $order->orderId->get())
-            ->whereNotIn('line_id', $lineIds)
-            ->delete();
+        if (! $order->hasFrozenPricing()) {
+            DB::table(static::$orderLinesTable)
+                ->where('order_id', $order->orderId->get())
+                ->whereNotIn('line_id', $lineIds)
+                ->delete();
+        }
 
         // TODO:delete line discounts...
 
         foreach ($order->getChildEntities()[Line::class] as $lineState) {
+            $lineState = $this->preserveStoredPricing($order, static::$orderLinesTable, [
+                'order_id' => $order->orderId->get(),
+                'line_id' => $lineState['line_id'],
+            ], $lineState, [
+                'unit_price_incl',
+                'unit_price_excl',
+                'total_excl',
+                'total_incl',
+                'total_vat',
+                'discount_excl',
+                'discount_incl',
+                'tax_rate',
+                'includes_vat',
+                'quantity',
+            ]);
+
             DB::table(static::$orderLinesTable)
                 ->updateOrInsert([
                     'order_id' => $order->orderId->get(),
@@ -146,12 +177,21 @@ class MysqlOrderRepository implements InvoiceRepository, OrderRepository
             $discountStates = array_merge($discountStates, $payment->getChildEntities()[Discount::class]);
         }
 
-        DB::table(static::$orderDiscountsTable)
-            ->where('order_id', $order->orderId->get())
-            ->whereNotIn('discount_id', array_map(fn ($discountState) => $discountState['discount_id'], $discountStates))
-            ->delete();
+        if (! $order->hasFrozenPricing()) {
+            DB::table(static::$orderDiscountsTable)
+                ->where('order_id', $order->orderId->get())
+                ->whereNotIn('discount_id', array_map(fn ($discountState) => $discountState['discount_id'], $discountStates))
+                ->delete();
+        }
 
         foreach ($discountStates as $discountState) {
+            $discountState = $this->preserveStoredPricing($order, static::$orderDiscountsTable, [
+                'order_id' => $order->orderId->get(),
+                'discount_id' => $discountState['discount_id'],
+                'discountable_type' => $discountState['discountable_type'],
+                'discountable_id' => $discountState['discountable_id'],
+            ], $discountState, ['total_excl', 'total_incl', 'tax_mode', 'vat_rate']);
+
             DB::table(static::$orderDiscountsTable)
                 ->updateOrInsert([
                     'order_id' => $order->orderId->get(),
@@ -190,12 +230,19 @@ class MysqlOrderRepository implements InvoiceRepository, OrderRepository
     {
         $shippingIds = array_map(fn ($shippingState) => $shippingState['shipping_id'], $order->getChildEntities()[Shipping::class]);
 
-        DB::table(static::$orderShippingTable)
-            ->where('order_id', $order->orderId->get())
-            ->whereNotIn('shipping_id', $shippingIds)
-            ->delete();
+        if (! $order->hasFrozenPricing()) {
+            DB::table(static::$orderShippingTable)
+                ->where('order_id', $order->orderId->get())
+                ->whereNotIn('shipping_id', $shippingIds)
+                ->delete();
+        }
 
         foreach ($order->getChildEntities()[Shipping::class] as $shippingState) {
+            $shippingState = $this->preserveStoredPricing($order, static::$orderShippingTable, [
+                'order_id' => $order->orderId->get(),
+                'shipping_id' => $shippingState['shipping_id'],
+            ], $shippingState, ['cost_excl', 'cost_incl', 'cost_tax_mode', 'discount_excl', 'discount_incl', 'total_excl', 'total_incl']);
+
             DB::table(static::$orderShippingTable)
                 ->updateOrInsert([
                     'order_id' => $order->orderId->get(),
@@ -210,12 +257,19 @@ class MysqlOrderRepository implements InvoiceRepository, OrderRepository
     {
         $paymentIds = array_map(fn ($paymentState) => $paymentState['payment_id'], $order->getChildEntities()[Payment::class]);
 
-        DB::table(static::$orderPaymentTable)
-            ->where('order_id', $order->orderId->get())
-            ->whereNotIn('payment_id', $paymentIds)
-            ->delete();
+        if (! $order->hasFrozenPricing()) {
+            DB::table(static::$orderPaymentTable)
+                ->where('order_id', $order->orderId->get())
+                ->whereNotIn('payment_id', $paymentIds)
+                ->delete();
+        }
 
         foreach ($order->getChildEntities()[Payment::class] as $paymentState) {
+            $paymentState = $this->preserveStoredPricing($order, static::$orderPaymentTable, [
+                'order_id' => $order->orderId->get(),
+                'payment_id' => $paymentState['payment_id'],
+            ], $paymentState, ['cost_excl', 'cost_incl', 'cost_tax_mode', 'discount_excl', 'discount_incl', 'total_excl', 'total_incl']);
+
             DB::table(static::$orderPaymentTable)
                 ->updateOrInsert([
                     'order_id' => $order->orderId->get(),
@@ -303,6 +357,21 @@ class MysqlOrderRepository implements InvoiceRepository, OrderRepository
     private function exists(OrderId $orderId): bool
     {
         return DB::table(static::$orderTable)->where('order_id', $orderId->get())->exists();
+    }
+
+    private function preserveStoredPricing(Order $order, string $table, array $identifiers, array $state, array $pricingColumns): array
+    {
+        if (! $order->hasFrozenPricing()) {
+            return $state;
+        }
+
+        $storedState = DB::table($table)->where($identifiers)->first();
+
+        if (! $storedState) {
+            return $state;
+        }
+
+        return array_replace($state, array_intersect_key((array) $storedState, array_flip($pricingColumns)));
     }
 
     private function existsReference(OrderReference $orderReference): bool

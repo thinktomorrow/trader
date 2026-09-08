@@ -8,15 +8,16 @@ use Thinktomorrow\Trader\Domain\Common\Price\DefaultItemDiscountPrice;
 use Thinktomorrow\Trader\Domain\Common\Price\DiscountPrice;
 use Thinktomorrow\Trader\Domain\Common\Price\ItemDiscountPrice;
 use Thinktomorrow\Trader\Domain\Common\Price\ItemPrice;
+use Thinktomorrow\Trader\Domain\Common\Price\TaxMode;
 
 trait HasDiscounts
 {
     /** @var Discount[] */
     private array $discounts = [];
 
-    protected function calculateDiscountPrice(Money $base): DiscountPrice|ItemDiscountPrice
+    protected function calculateDiscountPrice(Money $base, TaxMode $taxMode = TaxMode::Exclusive, ?Money $authoritativeBase = null): DiscountPrice|ItemDiscountPrice
     {
-        $totalDiscount = DefaultDiscountPrice::zero();
+        $totalDiscount = DefaultDiscountPrice::zero($taxMode);
 
         /** @var Discount $discount */
         foreach ($this->discounts as $discount) {
@@ -24,7 +25,9 @@ trait HasDiscounts
         }
 
         if ($totalDiscount->getExcludingVat()->greaterThanOrEqual($base)) {
-            return DefaultDiscountPrice::fromExcludingVat($base);
+            return $taxMode === TaxMode::Inclusive
+                ? DefaultDiscountPrice::fromIncludingVat($authoritativeBase ?? $totalDiscount->getAuthoritativeAmount(), $base)
+                : DefaultDiscountPrice::fromExcludingVat($base);
         }
 
         return $totalDiscount;
@@ -40,6 +43,10 @@ trait HasDiscounts
         }
 
         if ($totalDiscount->getExcludingVat()->greaterThanOrEqual($base->getExcludingVat())) {
+            if ($base->isIncludingVatAuthoritative()) {
+                return DefaultItemDiscountPrice::fromIncludingVat($base->getIncludingVat(), $base->getVatPercentage());
+            }
+
             return DefaultItemDiscountPrice::fromExcludingVat($base->getExcludingVat(), $base->getVatPercentage());
         }
 

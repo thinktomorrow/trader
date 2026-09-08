@@ -46,4 +46,26 @@ final class VatAllocatedLineTest extends TestCase
 
         $this->assertEquals(Money::EUR(1000), $line->getTotalIncludingVat());
     }
+
+    public function test_it_can_add_and_subtract_lines_with_the_same_rate(): void
+    {
+        $line = new VatAllocatedLine(Money::EUR(100), Money::EUR(21), VatPercentage::fromString('21'));
+        $other = new VatAllocatedLine(Money::EUR(50), Money::EUR(11), VatPercentage::fromString('21'));
+
+        $sum = $line->add($other);
+        $difference = $line->subtract($other);
+
+        $this->assertEquals(Money::EUR(150), $sum->getTaxableBase());
+        $this->assertEquals(Money::EUR(32), $sum->getVatAmount());
+        $this->assertEquals(Money::EUR(50), $difference->getTaxableBase());
+        $this->assertEquals(Money::EUR(10), $difference->getVatAmount());
+    }
+
+    public function test_it_rejects_arithmetic_with_different_rates(): void
+    {
+        $this->expectException(\InvalidArgumentException::class);
+
+        (new VatAllocatedLine(Money::EUR(100), Money::EUR(21), VatPercentage::fromString('21')))
+            ->add(new VatAllocatedLine(Money::EUR(100), Money::EUR(6), VatPercentage::fromString('6')));
+    }
 }

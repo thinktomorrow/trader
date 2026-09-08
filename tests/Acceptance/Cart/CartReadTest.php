@@ -66,11 +66,11 @@ class CartReadTest extends CartContext
         $cart = $this->orderContext->repos()->cartRepository()->findCart($order->orderId);
 
         $this->assertEquals(Money::EUR(35), $cart->getShippingCostExcl());
-        $this->assertEquals(Money::EUR(42), $cart->getShippingCostIncl());
+        $this->assertEquals(Money::EUR(43), $cart->getShippingCostIncl());
         $this->assertEquals(Money::EUR(35), $cart->getPaymentCostExcl());
-        $this->assertEquals(Money::EUR(42), $cart->getPaymentCostIncl());
+        $this->assertEquals(Money::EUR(43), $cart->getPaymentCostIncl());
         $this->assertEquals(Money::EUR(236), $cart->getTotalExcl());
-        $this->assertEquals(Money::EUR(285), $cart->getTotalIncl());
+        $this->assertEquals(Money::EUR(286), $cart->getTotalIncl());
         $this->assertCount(0, $cart->getDiscounts());
         $this->assertCount(2, $cart->getAllDiscounts());
     }

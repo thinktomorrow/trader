@@ -7,11 +7,13 @@ namespace Thinktomorrow\Trader\Domain\Common\Price;
 use Money\Money;
 use Thinktomorrow\Trader\Domain\Common\Vat\VatPercentage;
 
-interface ItemDiscountPrice extends Price
+interface ItemDiscountPrice extends HasAuthoritativeAmount, PriceWithVat
 {
     public static function fromExcludingVat(Money $amount, VatPercentage $vatPercentage): static;
 
     public static function fromIncludingVat(Money $includingVat, VatPercentage $vatPercentage): static;
+
+    public static function fromResolvedAmounts(Money $excludingVat, Money $includingVat, VatPercentage $vatPercentage, TaxMode $taxMode): static;
 
     public static function zero(VatPercentage $vatPercentage, bool $includingVatAuthoritative = false): static;
 

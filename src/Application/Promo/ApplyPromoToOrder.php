@@ -17,7 +17,7 @@ class ApplyPromoToOrder
     /**
      * @param  OrderDiscount[]  $discounts
      */
-    public function apply(Order $order, array $discounts, ?string $coupon_code = null): void
+    public function apply(Order $order, array $discounts, ?string $coupon_code = null, PromoApplicationScope $scope = PromoApplicationScope::All): void
     {
         static::validateDiscounts($discounts);
 
@@ -31,11 +31,11 @@ class ApplyPromoToOrder
         // Loop over different discountables: lines, shipping, payment, order
         foreach ($discounts as $discount) {
 
-            if ($discount instanceof LineDiscount) {
+            if ($discount instanceof LineDiscount && $scope !== PromoApplicationScope::ServicesAndOrder) {
                 foreach ($order->getLines() as $line) {
                     if ($discount->isApplicable($order, $line)) {
 
-                        $discount->setCalculateExcludingVat($this->config->areItemDiscountsCalculatedExcludingVat());
+                        $discount->setCalculationTaxMode($this->config->getItemDiscountTaxMode());
 
                         $discount->apply($order, $line, $this->orderRepository->nextDiscountReference());
                         $hasBeenApplied = true;
@@ -43,10 +43,17 @@ class ApplyPromoToOrder
                 }
             }
 
-            if ($discount instanceof OrderDiscount) {
+            if ($discount instanceof OrderDiscount && $scope !== PromoApplicationScope::Lines) {
                 foreach ($order->getShippings() as $shipping) {
                     if ($discount->isApplicable($order, $shipping)) {
                         $discount->apply($order, $shipping, $this->orderRepository->nextDiscountReference());
+                        $hasBeenApplied = true;
+                    }
+                }
+
+                foreach ($order->getPayments() as $payment) {
+                    if ($discount->isApplicable($order, $payment)) {
+                        $discount->apply($order, $payment, $this->orderRepository->nextDiscountReference());
                         $hasBeenApplied = true;
                     }
                 }

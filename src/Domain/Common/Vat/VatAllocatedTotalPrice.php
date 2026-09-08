@@ -3,6 +3,7 @@
 namespace Thinktomorrow\Trader\Domain\Common\Vat;
 
 use Money\Money;
+use Thinktomorrow\Trader\Domain\Common\Vat\Exceptions\InvalidVatAllocatedTotal;
 
 /**
  * Result object of the VAT allocation process.
@@ -38,6 +39,7 @@ final class VatAllocatedTotalPrice
     public function __construct(array $vatLines, Money $totalExcluding, Money $totalVat, Money $totalIncluding)
     {
         $this->validateLines($vatLines);
+        $this->validateTotals($vatLines, $totalExcluding, $totalVat, $totalIncluding);
 
         $this->vatLines = $vatLines;
         $this->totalExcluding = $totalExcluding;
@@ -97,6 +99,30 @@ final class VatAllocatedTotalPrice
             if (! $line instanceof VatAllocatedLine) {
                 throw new \InvalidArgumentException('vatLines must be an array of VatAllocatedLine instances.');
             }
+        }
+    }
+
+    /** @param VatAllocatedLine[] $vatLines */
+    private function validateTotals(array $vatLines, Money $totalExcluding, Money $totalVat, Money $totalIncluding): void
+    {
+        if (! $totalExcluding->add($totalVat)->equals($totalIncluding)) {
+            throw new InvalidVatAllocatedTotal('VAT allocated total must satisfy excluding VAT + VAT = including VAT.');
+        }
+
+        $lineExcluding = new Money('0', $totalExcluding->getCurrency());
+        $lineVat = new Money('0', $totalVat->getCurrency());
+
+        foreach ($vatLines as $line) {
+            $lineExcluding = $lineExcluding->add($line->getTaxableBase());
+            $lineVat = $lineVat->add($line->getVatAmount());
+        }
+
+        if (! $lineExcluding->equals($totalExcluding)) {
+            throw new InvalidVatAllocatedTotal('VAT line taxable bases must equal the allocated total excluding VAT.');
+        }
+
+        if (! $lineVat->equals($totalVat)) {
+            throw new InvalidVatAllocatedTotal('VAT line amounts must equal the allocated total VAT.');
         }
     }
 }

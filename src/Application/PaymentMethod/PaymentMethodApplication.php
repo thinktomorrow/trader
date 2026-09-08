@@ -26,7 +26,7 @@ class PaymentMethodApplication
     {
         $paymentMethodId = $this->paymentMethodRepository->nextReference();
 
-        $paymentMethod = PaymentMethod::create($paymentMethodId, $command->getProviderId(), $command->getRate());
+        $paymentMethod = PaymentMethod::create($paymentMethodId, $command->getProviderId(), $command->getRate(), $command->getTaxMode());
         $paymentMethod->updateCountries($command->getCountryIds());
         $paymentMethod->addData($command->getData());
 
@@ -42,7 +42,7 @@ class PaymentMethodApplication
         $paymentMethod = $this->paymentMethodRepository->find($command->getPaymentMethodId());
 
         $paymentMethod->updateProvider($command->getProviderId());
-        $paymentMethod->updateRate($command->getRate());
+        $paymentMethod->updateRate($command->getRate(), $command->getTaxMode() ?? $paymentMethod->getTaxMode());
         $paymentMethod->updateCountries($command->getCountryIds());
         $paymentMethod->addData($command->getData());
 

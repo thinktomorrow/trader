@@ -58,6 +58,11 @@ class OrderTest extends TestCase
             'shipping_cost_incl' => '0',
             'payment_cost_excl' => '0',
             'payment_cost_incl' => '0',
+            'pricing_fingerprint' => 'pricing-v4:'.hash('sha256', json_encode([
+                'currency' => 'EUR',
+                'vat_exempt' => false,
+                'components' => [],
+            ], JSON_THROW_ON_ERROR)),
             'data' => '[]',
         ], $order->getMappedData());
 

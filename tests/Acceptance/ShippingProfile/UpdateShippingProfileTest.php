@@ -10,6 +10,7 @@ use Thinktomorrow\Trader\Application\ShippingProfile\CreateShippingProfile;
 use Thinktomorrow\Trader\Application\ShippingProfile\CreateTariff;
 use Thinktomorrow\Trader\Application\ShippingProfile\UpdateShippingProfile;
 use Thinktomorrow\Trader\Application\ShippingProfile\UpdateTariff;
+use Thinktomorrow\Trader\Domain\Common\Price\TaxMode;
 use Thinktomorrow\Trader\Domain\Model\Country\CountryId;
 use Thinktomorrow\Trader\Domain\Model\ShippingProfile\ShippingProviderId;
 
@@ -53,12 +54,14 @@ class UpdateShippingProfileTest extends TestCase
 
         $tariffId = $this->orderContext->apps()->shippingProfileApplication()->createTariff(new CreateTariff($shippingProfileId->get(), '50', '10', '30'));
 
-        $this->orderContext->apps()->shippingProfileApplication()->updateTariff(new UpdateTariff($tariffId->get(), $shippingProfileId->get(), '60', '20', null));
+        $this->orderContext->apps()->shippingProfileApplication()->updateTariff(new UpdateTariff($tariffId->get(), $shippingProfileId->get(), '60', '20', null, 'inclusive'));
+        $this->orderContext->apps()->shippingProfileApplication()->updateTariff(new UpdateTariff($tariffId->get(), $shippingProfileId->get(), '70', '20', null));
 
         $tariff = $this->orderContext->repos()->shippingProfileRepository()->find($shippingProfileId)->findTariff($tariffId);
 
-        $this->assertEquals(Money::EUR('60'), $tariff->getRate());
+        $this->assertEquals(Money::EUR('70'), $tariff->getRate());
         $this->assertEquals('20', $tariff->getMappedData()['from']);
         $this->assertNull($tariff->getMappedData()['to']);
+        $this->assertSame(TaxMode::Inclusive, $tariff->getTaxMode());
     }
 }

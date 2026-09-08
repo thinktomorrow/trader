@@ -18,7 +18,7 @@ This package provides domain-first ecommerce business logic for Laravel projects
 - Use Trader Application services as entry points; avoid direct persistence writes for business mutations.
 - Respect package boundaries: keep framework concerns in `Infrastructure`, orchestration in `Application`, and business invariants in `Domain`.
 - Preserve state-machine semantics by using Trader order/payment/shipping transition APIs instead of manual state updates.
-- Keep VAT/price logic consistent with config keys like `does_price_input_includes_vat`, `include_vat_in_prices`, `calculate_item_discounts_excluding_vat`, `vat_rounding_strategy`, and `allow_vat_exemption`.
+- Keep VAT/price logic consistent with config keys like `does_price_input_includes_vat`, `include_vat_in_prices`, `calculate_item_discounts_excluding_vat`, and `allow_vat_exemption`.
 - Keep app-specific behavior in the host app, not inside package/vendor code.
 - Avoid breaking public behavior; prefer additive, backwards-compatible defaults.
 - Do not create new top-level folders or add dependencies without explicit approval.

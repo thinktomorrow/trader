@@ -4,6 +4,19 @@ Important changes will be notified in this file
 
 ## Unreleased
 
+### Breaking changes
+
+- Added explicit `TaxMode` authority for shipping tariffs, payment rates and fixed order discounts.
+- Added authority methods to item, service and discount price contracts and preserved gross authority when VAT rates change.
+- Changed VAT allocation to preserve authoritative gross service and discount amounts while allocating taxable bases net-first.
+- Changed VAT and order total result objects to reject inconsistent taxable-base, VAT and gross totals.
+- Changed cart refresh ordering so VAT rates and line discounts are resolved before shipping tariffs and service discounts.
+- Added `OrderServicePriceResolver` to resolve order-dependent shipping and payment prices without coupling cart services to `VatAllocator`.
+- Added persisted service gross amounts, tax modes and a VAT calculation fingerprint; legacy service data remains exclusive-VAT authoritative.
+- Changed pro-rata allocation to integer-safe largest-remainder allocation with deterministic VAT-rate ordering.
+- Fixed item authority loss during VAT aggregation and fixed combined promo discount accumulation.
+- Removed the configurable VAT rounding strategy; item totals now always round VAT on the full line amount.
+
 ## 2026-09-03 - 0.9.8
 
 - Fixed: Laravel Pint is now a flexible development dependency and no longer constrains consuming applications.

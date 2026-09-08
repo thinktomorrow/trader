@@ -161,7 +161,7 @@ final class ItemDiscountPriceTest extends TestCase
         $this->assertTrue($result->isIncludingVatAuthoritative());
     }
 
-    public function test_multiple_additions_accumulate_correctly(): void
+    public function test_multiple_additions_preserve_the_sum_of_resolved_components(): void
     {
         $discount = DefaultItemDiscountPrice::zero(VatPercentage::fromString('21'));
 
@@ -176,7 +176,7 @@ final class ItemDiscountPriceTest extends TestCase
         );
 
         $this->assertEquals(Money::EUR(60), $discount->getExcludingVat());
-        $this->assertEquals(Money::EUR(73), $discount->getIncludingVat());
+        $this->assertEquals(Money::EUR(72), $discount->getIncludingVat());
     }
 
     public function test_large_discount_values_are_supported(): void

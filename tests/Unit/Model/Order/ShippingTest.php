@@ -37,8 +37,12 @@ class ShippingTest extends TestCase
             'shipping_profile_id' => $shippingProfileId->get(),
             'shipping_state' => $state->value,
             'cost_excl' => $cost->getExcludingVat()->getAmount(),
-            'discount_excl' => 0,
+            'discount_excl' => '0',
             'total_excl' => $cost->getExcludingVat()->getAmount(),
+            'cost_incl' => null,
+            'discount_incl' => null,
+            'total_incl' => null,
+            'cost_tax_mode' => 'exclusive',
             'data' => json_encode(['shipping_profile_id' => $shippingProfileId->get()]),
         ], $shipping->getMappedData());
     }
@@ -56,6 +60,10 @@ class ShippingTest extends TestCase
             'cost_excl' => '50',
             'discount_excl' => '0',
             'total_excl' => '50',
+            'cost_incl' => null,
+            'discount_incl' => null,
+            'total_incl' => null,
+            'cost_tax_mode' => 'exclusive',
             'data' => json_encode([
                 'title' => ['nl' => 'shipping-aaa title nl', 'fr' => 'shipping-aaa title fr'],
                 'shipping_profile_id' => 'shipping-profile-aaa',

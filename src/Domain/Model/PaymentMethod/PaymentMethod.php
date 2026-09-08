@@ -9,6 +9,8 @@ use Thinktomorrow\Trader\Domain\Common\Cash\Cash;
 use Thinktomorrow\Trader\Domain\Common\Entity\Aggregate;
 use Thinktomorrow\Trader\Domain\Common\Entity\HasData;
 use Thinktomorrow\Trader\Domain\Common\Event\RecordsEvents;
+use Thinktomorrow\Trader\Domain\Common\Price\TaxMode;
+use Thinktomorrow\Trader\Domain\Common\Price\VatApplicableAmount;
 use Thinktomorrow\Trader\Domain\Model\Country\CountryId;
 use Thinktomorrow\Trader\Domain\Model\Country\HasCountryIds;
 
@@ -26,9 +28,11 @@ class PaymentMethod implements Aggregate
 
     private Money $rate;
 
+    private TaxMode $taxMode;
+
     private function __construct() {}
 
-    public static function create(PaymentMethodId $paymentMethodId, PaymentMethodProviderId $paymentMethodProviderId, Money $rate): static
+    public static function create(PaymentMethodId $paymentMethodId, PaymentMethodProviderId $paymentMethodProviderId, Money $rate, TaxMode $taxMode = TaxMode::Exclusive): static
     {
         $method = new static;
 
@@ -36,6 +40,7 @@ class PaymentMethod implements Aggregate
         $method->paymentMethodProviderId = $paymentMethodProviderId;
         $method->state = PaymentMethodState::online;
         $method->rate = $rate;
+        $method->taxMode = $taxMode;
 
         return $method;
     }
@@ -60,14 +65,25 @@ class PaymentMethod implements Aggregate
         return $this->paymentMethodProviderId;
     }
 
-    public function updateRate(Money $rate): void
+    public function updateRate(Money $rate, TaxMode $taxMode = TaxMode::Exclusive): void
     {
         $this->rate = $rate;
+        $this->taxMode = $taxMode;
     }
 
     public function getRate(): Money
     {
         return $this->rate;
+    }
+
+    public function getVatApplicableRate(): VatApplicableAmount
+    {
+        return VatApplicableAmount::fromMoney($this->rate, $this->taxMode);
+    }
+
+    public function getTaxMode(): TaxMode
+    {
+        return $this->taxMode;
     }
 
     public function getMappedData(): array
@@ -77,6 +93,7 @@ class PaymentMethod implements Aggregate
             'provider_id' => $this->paymentMethodProviderId->get(),
             'state' => $this->state->value,
             'rate' => $this->rate->getAmount(),
+            'tax_mode' => $this->taxMode->value,
             'data' => json_encode($this->data),
         ];
     }
@@ -89,6 +106,7 @@ class PaymentMethod implements Aggregate
         $method->paymentMethodProviderId = PaymentMethodProviderId::fromString($state['provider_id']);
         $method->state = PaymentMethodState::from($state['state']);
         $method->rate = Cash::make($state['rate']);
+        $method->taxMode = isset($state['tax_mode']) ? TaxMode::from($state['tax_mode']) : TaxMode::Exclusive;
         $method->data = json_decode($state['data'], true);
         $method->countryIds = array_map(fn ($countryState) => CountryId::fromString($countryState['country_id']), $childEntities[CountryId::class]);
 

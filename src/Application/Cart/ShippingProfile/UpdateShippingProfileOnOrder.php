@@ -8,11 +8,10 @@ use Psr\Container\ContainerInterface;
 use Thinktomorrow\Trader\Application\Cart\ShippingProfile\Eligibility\ProfileMustBeOnline;
 use Thinktomorrow\Trader\Application\Cart\ShippingProfile\Eligibility\ProfileMustSupportShippingCountry;
 use Thinktomorrow\Trader\Application\Cart\ShippingProfile\Eligibility\ShippingProfileEligibility;
-use Thinktomorrow\Trader\Domain\Common\Cash\Cash;
+use Thinktomorrow\Trader\Application\VatRate\OrderServicePriceResolver;
 use Thinktomorrow\Trader\Domain\Model\Order\Order;
 use Thinktomorrow\Trader\Domain\Model\Order\OrderRepository;
 use Thinktomorrow\Trader\Domain\Model\Order\Shipping\Shipping;
-use Thinktomorrow\Trader\Domain\Model\Order\Shipping\ShippingCost;
 use Thinktomorrow\Trader\Domain\Model\Order\Shipping\ShippingState;
 use Thinktomorrow\Trader\Domain\Model\ShippingProfile\Exceptions\CouldNotFindShippingProfile;
 use Thinktomorrow\Trader\Domain\Model\ShippingProfile\ShippingProfile;
@@ -24,7 +23,8 @@ class UpdateShippingProfileOnOrder
     public function __construct(
         private ContainerInterface $container,
         private OrderRepository $orderRepository,
-        private ShippingProfileRepository $shippingProfileRepository
+        private ShippingProfileRepository $shippingProfileRepository,
+        private OrderServicePriceResolver $servicePriceResolver,
     ) {}
 
     public function handle(Order $order, ShippingProfileId $shippingProfileId): void
@@ -56,12 +56,7 @@ class UpdateShippingProfileOnOrder
 
     private function applyShippingProfile(Order $order, ShippingProfile $shippingProfile): void
     {
-        // Apply matching tariff - if no tariff is found, no rate will be applied
-        $tariff = $shippingProfile->findTariffByPrice($order->getSubtotalExcl());
-
-        $shippingCost = ShippingCost::fromExcludingVat(
-            $tariff ? $tariff->getRate() : Cash::zero(),
-        );
+        $shippingCost = $this->servicePriceResolver->resolveShippingCost($order, $shippingProfile);
 
         if (count($order->getShippings()) > 0) {
             /** @var Shipping $existingShipping */

@@ -5,11 +5,13 @@ declare(strict_types=1);
 namespace Thinktomorrow\Trader\Application\Cart\PaymentMethod;
 
 use Psr\Container\ContainerInterface;
+use Thinktomorrow\Trader\Application\VatRate\OrderServicePriceResolver;
 use Thinktomorrow\Trader\Domain\Model\Order\Order;
 use Thinktomorrow\Trader\Domain\Model\Order\OrderRepository;
 use Thinktomorrow\Trader\Domain\Model\Order\Payment\Payment;
-use Thinktomorrow\Trader\Domain\Model\Order\Payment\PaymentCost;
 use Thinktomorrow\Trader\Domain\Model\Order\Payment\PaymentState;
+use Thinktomorrow\Trader\Domain\Model\PaymentMethod\Exceptions\CouldNotFindPaymentMethod;
+use Thinktomorrow\Trader\Domain\Model\PaymentMethod\PaymentMethod;
 use Thinktomorrow\Trader\Domain\Model\PaymentMethod\PaymentMethodId;
 use Thinktomorrow\Trader\Domain\Model\PaymentMethod\PaymentMethodRepository;
 
@@ -23,8 +25,13 @@ class UpdatePaymentMethodOnOrder
 
     private VerifyPaymentMethodForCart $verifyPaymentMethodForCart;
 
-    public function __construct(ContainerInterface $container, OrderRepository $orderRepository, VerifyPaymentMethodForCart $verifyPaymentMethodForCart, PaymentMethodRepository $paymentMethodRepository)
-    {
+    public function __construct(
+        ContainerInterface $container,
+        OrderRepository $orderRepository,
+        VerifyPaymentMethodForCart $verifyPaymentMethodForCart,
+        PaymentMethodRepository $paymentMethodRepository,
+        private OrderServicePriceResolver $servicePriceResolver,
+    ) {
         $this->container = $container;
         $this->orderRepository = $orderRepository;
         $this->paymentMethodRepository = $paymentMethodRepository;
@@ -35,15 +42,31 @@ class UpdatePaymentMethodOnOrder
     {
         $paymentMethod = $this->paymentMethodRepository->find($paymentMethodId);
 
+        $this->applyPaymentMethod($order, $paymentMethod);
+    }
+
+    public function refresh(Order $order, PaymentMethodId $paymentMethodId): void
+    {
+        try {
+            $paymentMethod = $this->paymentMethodRepository->find($paymentMethodId);
+        } catch (CouldNotFindPaymentMethod) {
+            $this->removePaymentMethodFromOrder($order);
+
+            return;
+        }
+
+        $this->applyPaymentMethod($order, $paymentMethod);
+    }
+
+    private function applyPaymentMethod(Order $order, PaymentMethod $paymentMethod): void
+    {
         if (! $this->verifyPaymentMethodForCart->verify($order, $paymentMethod)) {
             $this->removePaymentMethodFromOrder($order);
 
             return;
         }
 
-        $paymentCost = PaymentCost::fromExcludingVat(
-            $paymentMethod->getRate(),
-        );
+        $paymentCost = $this->servicePriceResolver->resolvePaymentCost($order, $paymentMethod);
 
         if (count($order->getPayments()) > 0) {
             $existingPayment = $order->getPayments()[0];
@@ -67,7 +90,7 @@ class UpdatePaymentMethodOnOrder
         }
     }
 
-    private function removePaymentMethodFromOrder(Order $order)
+    private function removePaymentMethodFromOrder(Order $order): void
     {
         foreach ($order->getPayments() as $payment) {
             $order->deletePayment($payment->paymentId);

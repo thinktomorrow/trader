@@ -10,6 +10,7 @@ use Thinktomorrow\Trader\Domain\Common\Entity\HasData;
 use Thinktomorrow\Trader\Domain\Common\Price\DefaultServicePrice;
 use Thinktomorrow\Trader\Domain\Common\Price\DiscountPrice;
 use Thinktomorrow\Trader\Domain\Common\Price\ServicePrice;
+use Thinktomorrow\Trader\Domain\Common\Price\TaxMode;
 use Thinktomorrow\Trader\Domain\Model\Order\Discount\Discount;
 use Thinktomorrow\Trader\Domain\Model\Order\Discount\DiscountableId;
 use Thinktomorrow\Trader\Domain\Model\Order\Discount\DiscountableItem;
@@ -92,10 +93,13 @@ final class Shipping implements ChildAggregate, DiscountableItem
             'shipping_id' => $this->shippingId->get(),
             'shipping_profile_id' => $this->shippingProfileId?->get(),
             'shipping_state' => $this->shippingState->getValueAsString(),
-            // Always store excluding vat cost, vat is calculated based on the products in the order.
             'cost_excl' => $this->shippingCost->getExcludingVat()->getAmount(),
             'discount_excl' => $this->getDiscountPrice()->getExcludingVat()->getAmount(),
             'total_excl' => $this->getShippingCostTotal()->getExcludingVat()->getAmount(),
+            'cost_incl' => $this->shippingCost->getTaxMode() === TaxMode::Inclusive ? $this->shippingCost->getAuthoritativeAmount()->getAmount() : null,
+            'discount_incl' => $this->getDiscountPrice()->getTaxMode() === TaxMode::Inclusive ? $this->getDiscountPrice()->getAuthoritativeAmount()->getAmount() : null,
+            'total_incl' => $this->getShippingCostTotal()->getTaxMode() === TaxMode::Inclusive ? $this->getShippingCostTotal()->getAuthoritativeAmount()->getAmount() : null,
+            'cost_tax_mode' => $this->shippingCost->getTaxMode()->value,
             'data' => json_encode($data),
         ];
     }
@@ -119,7 +123,9 @@ final class Shipping implements ChildAggregate, DiscountableItem
         $shipping->shippingId = ShippingId::fromString($state['shipping_id']);
         $shipping->shippingProfileId = $state['shipping_profile_id'] ? ShippingProfileId::fromString($state['shipping_profile_id']) : null;
         $shipping->shippingState = $state['shipping_state'];
-        $shipping->shippingCost = DefaultServicePrice::fromExcludingVat(Money::EUR($state['cost_excl']));
+        $shipping->shippingCost = ($state['cost_tax_mode'] ?? TaxMode::Exclusive->value) === TaxMode::Inclusive->value
+            ? DefaultServicePrice::fromIncludingVat(Money::EUR($state['cost_incl']), Money::EUR($state['cost_excl']))
+            : DefaultServicePrice::fromExcludingVat(Money::EUR($state['cost_excl']));
         $shipping->discounts = array_map(fn ($discountState) => Discount::fromMappedData($discountState, $state), $childEntities[Discount::class]);
         $shipping->data = json_decode($state['data'], true);
 
@@ -128,7 +134,11 @@ final class Shipping implements ChildAggregate, DiscountableItem
 
     public function getDiscountPrice(): DiscountPrice
     {
-        return $this->calculateDiscountPrice($this->shippingCost->getExcludingVat());
+        return $this->calculateDiscountPrice(
+            $this->shippingCost->getExcludingVat(),
+            $this->shippingCost->getTaxMode(),
+            $this->shippingCost->getAuthoritativeAmount(),
+        );
     }
 
     public function getDiscountableId(): DiscountableId

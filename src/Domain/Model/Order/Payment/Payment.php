@@ -10,6 +10,7 @@ use Thinktomorrow\Trader\Domain\Common\Entity\HasData;
 use Thinktomorrow\Trader\Domain\Common\Price\DefaultServicePrice;
 use Thinktomorrow\Trader\Domain\Common\Price\DiscountPrice;
 use Thinktomorrow\Trader\Domain\Common\Price\ServicePrice;
+use Thinktomorrow\Trader\Domain\Common\Price\TaxMode;
 use Thinktomorrow\Trader\Domain\Model\Order\Discount\Discount;
 use Thinktomorrow\Trader\Domain\Model\Order\Discount\DiscountableId;
 use Thinktomorrow\Trader\Domain\Model\Order\Discount\DiscountableItem;
@@ -85,7 +86,11 @@ class Payment implements ChildAggregate, DiscountableItem
 
     public function getDiscountPrice(): DiscountPrice
     {
-        return $this->calculateDiscountPrice($this->paymentCost->getExcludingVat());
+        return $this->calculateDiscountPrice(
+            $this->paymentCost->getExcludingVat(),
+            $this->paymentCost->getTaxMode(),
+            $this->paymentCost->getAuthoritativeAmount(),
+        );
     }
 
     public function getMappedData(): array
@@ -100,6 +105,10 @@ class Payment implements ChildAggregate, DiscountableItem
             'cost_excl' => $this->paymentCost->getExcludingVat()->getAmount(),
             'discount_excl' => $this->getDiscountPrice()->getExcludingVat()->getAmount(),
             'total_excl' => $this->getPaymentCostTotal()->getExcludingVat()->getAmount(),
+            'cost_incl' => $this->paymentCost->getTaxMode() === TaxMode::Inclusive ? $this->paymentCost->getAuthoritativeAmount()->getAmount() : null,
+            'discount_incl' => $this->getDiscountPrice()->getTaxMode() === TaxMode::Inclusive ? $this->getDiscountPrice()->getAuthoritativeAmount()->getAmount() : null,
+            'total_incl' => $this->getPaymentCostTotal()->getTaxMode() === TaxMode::Inclusive ? $this->getPaymentCostTotal()->getAuthoritativeAmount()->getAmount() : null,
+            'cost_tax_mode' => $this->paymentCost->getTaxMode()->value,
             'data' => json_encode($data),
         ];
     }
@@ -123,7 +132,9 @@ class Payment implements ChildAggregate, DiscountableItem
         $payment->paymentId = PaymentId::fromString($state['payment_id']);
         $payment->paymentMethodId = $state['payment_method_id'] ? PaymentMethodId::fromString($state['payment_method_id']) : null;
         $payment->paymentState = $state['payment_state'];
-        $payment->paymentCost = DefaultServicePrice::fromExcludingVat(Money::EUR($state['cost_excl']));
+        $payment->paymentCost = ($state['cost_tax_mode'] ?? TaxMode::Exclusive->value) === TaxMode::Inclusive->value
+            ? DefaultServicePrice::fromIncludingVat(Money::EUR($state['cost_incl']), Money::EUR($state['cost_excl']))
+            : DefaultServicePrice::fromExcludingVat(Money::EUR($state['cost_excl']));
         $payment->discounts = array_map(fn ($discountState) => Discount::fromMappedData($discountState, $state), $childEntities[Discount::class]);
         $payment->data = json_decode($state['data'], true);
 

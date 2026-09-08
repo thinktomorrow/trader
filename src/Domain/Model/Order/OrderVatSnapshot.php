@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Thinktomorrow\Trader\Domain\Model\Order;
 
 use Money\Money;
@@ -8,107 +10,101 @@ use Thinktomorrow\Trader\Domain\Model\Order\Exceptions\VatSnapshotMismatchExcept
 
 final class OrderVatSnapshot
 {
-    /** @var VatAllocatedLine[] */
-    private array $vatLines;
-
-    private Money $shippingIncl;
-
-    private Money $paymentIncl;
-
-    private Money $discountIncl;
-
-    private Money $totalVat;
-
-    private Money $totalIncl;
-
+    /**
+     * @param  VatAllocatedLine[]  $vatLines
+     */
     private function __construct(
-        array $vatLines,
-        Money $shippingIncl,
-        Money $paymentIncl,
-        Money $discountIncl,
-        Money $totalVat,
-        Money $totalIncl,
-    ) {
-        $this->vatLines = $vatLines;
-        $this->shippingIncl = $shippingIncl;
-        $this->paymentIncl = $paymentIncl;
-        $this->discountIncl = $discountIncl;
-        $this->totalVat = $totalVat;
-        $this->totalIncl = $totalIncl;
-    }
+        private array $vatLines,
+        private Money $subtotalExcl,
+        private Money $subtotalIncl,
+        private Money $shippingExcl,
+        private Money $shippingIncl,
+        private Money $paymentExcl,
+        private Money $paymentIncl,
+        private Money $discountExcl,
+        private Money $discountIncl,
+        private Money $totalExcl,
+        private Money $totalVat,
+        private Money $totalIncl,
+        private ?string $pricingFingerprint,
+    ) {}
 
     public static function empty(): self
     {
-        return new self(
-            [],
-            Money::EUR(0),
-            Money::EUR(0),
-            Money::EUR(0),
-            Money::EUR(0),
-            Money::EUR(0),
-        );
+        $zero = Money::EUR(0);
+
+        return new self([], $zero, $zero, $zero, $zero, $zero, $zero, $zero, $zero, $zero, $zero, $zero, null);
     }
 
     /**
-     * Factory used by application layer (VatAllocator)
-     *
      * @param  VatAllocatedLine[]  $vatLines
      */
     public static function fromVatAllocation(
         array $vatLines,
+        Money $subtotalExcl,
+        Money $subtotalIncl,
+        Money $shippingExcl,
         Money $shippingIncl,
+        Money $paymentExcl,
         Money $paymentIncl,
+        Money $discountExcl,
         Money $discountIncl,
+        Money $totalExcl,
         Money $totalVat,
         Money $totalIncl,
-        Money $totalExcl
+        ?string $pricingFingerprint = null,
     ): self {
-
-        // Invariant 1: total_excl + total_vat === total_incl
-        if (! $totalExcl->add($totalVat)->equals($totalIncl)) {
-            throw new \LogicException(
-                'OrderVatSnapshot invariant violated: total_excl + total_vat must equal total_incl: ['.
-                $totalExcl->getAmount().'] + ['.$totalVat->getAmount().'] != ['.$totalIncl->getAmount().']'
-            );
-        }
-
-        // Invariant 2: sum(vatLines.vat_amount) === totalVat
-        $vatSum = Money::EUR(0);
-
-        foreach ($vatLines as $vatLine) {
-            if (! $vatLine instanceof VatAllocatedLine) {
-                throw new \InvalidArgumentException('vatLines must be instances of VatAllocatedLine.');
-            }
-
-            $vatSum = $vatSum->add($vatLine->getVatAmount());
-        }
-
-        if (! $vatSum->equals($totalVat)) {
-            throw new \LogicException(
-                'OrderVatSnapshot invariant violated: sum of vat lines ['.
-                $vatSum->getAmount().'] does not equal total vat ['.$totalVat->getAmount().'].'
-            );
-        }
+        self::assertTotals($vatLines, $subtotalExcl, $subtotalIncl, $shippingExcl, $shippingIncl, $paymentExcl, $paymentIncl, $discountExcl, $discountIncl, $totalExcl, $totalVat, $totalIncl);
 
         return new self(
             $vatLines,
+            $subtotalExcl,
+            $subtotalIncl,
+            $shippingExcl,
             $shippingIncl,
+            $paymentExcl,
             $paymentIncl,
+            $discountExcl,
             $discountIncl,
+            $totalExcl,
             $totalVat,
             $totalIncl,
+            $pricingFingerprint,
         );
     }
 
-    public static function fromState(array $vatLines, Money $shippingIncl, Money $paymentIncl, Money $discountIncl, Money $totalVat, Money $totalIncl): self
-    {
-        return new self(
+    /**
+     * @param  VatAllocatedLine[]  $vatLines
+     */
+    public static function fromState(
+        array $vatLines,
+        Money $subtotalExcl,
+        Money $subtotalIncl,
+        Money $shippingExcl,
+        Money $shippingIncl,
+        Money $paymentExcl,
+        Money $paymentIncl,
+        Money $discountExcl,
+        Money $discountIncl,
+        Money $totalExcl,
+        Money $totalVat,
+        Money $totalIncl,
+        ?string $pricingFingerprint = null,
+    ): self {
+        return self::fromVatAllocation(
             $vatLines,
+            $subtotalExcl,
+            $subtotalIncl,
+            $shippingExcl,
             $shippingIncl,
+            $paymentExcl,
             $paymentIncl,
+            $discountExcl,
             $discountIncl,
+            $totalExcl,
             $totalVat,
-            $totalIncl
+            $totalIncl,
+            $pricingFingerprint,
         );
     }
 
@@ -118,9 +114,29 @@ final class OrderVatSnapshot
         return $this->vatLines;
     }
 
+    public function getSubtotalExcl(): Money
+    {
+        return $this->subtotalExcl;
+    }
+
+    public function getSubtotalIncl(): Money
+    {
+        return $this->subtotalIncl;
+    }
+
+    public function getShippingExcl(): Money
+    {
+        return $this->shippingExcl;
+    }
+
     public function getShippingIncl(): Money
     {
         return $this->shippingIncl;
+    }
+
+    public function getPaymentExcl(): Money
+    {
+        return $this->paymentExcl;
     }
 
     public function getPaymentIncl(): Money
@@ -128,9 +144,19 @@ final class OrderVatSnapshot
         return $this->paymentIncl;
     }
 
+    public function getDiscountExcl(): Money
+    {
+        return $this->discountExcl;
+    }
+
     public function getDiscountIncl(): Money
     {
         return $this->discountIncl;
+    }
+
+    public function getTotalExcl(): Money
+    {
+        return $this->totalExcl;
     }
 
     public function getTotalVat(): Money
@@ -145,13 +171,76 @@ final class OrderVatSnapshot
 
     public function assertMatchesTotalExcl(Money $totalExcl): void
     {
-        if (! $totalExcl->add($this->totalVat)->equals($this->totalIncl)) {
+        if (! $this->totalExcl->equals($totalExcl)) {
             throw new VatSnapshotMismatchException(
-                'Stored VAT snapshot total incl ['.$this->totalIncl->getAmount().
-                '] does not match current order totals excl ['.
-                $totalExcl->getAmount().'] + vat ['.
-                $this->totalVat->getAmount().'].'
+                sprintf(
+                    'Stored pricing snapshot total excl [%s] does not match current order total excl [%s].',
+                    $this->totalExcl->getAmount(),
+                    $totalExcl->getAmount(),
+                )
             );
+        }
+    }
+
+    public function assertMatchesPricingFingerprint(string $pricingFingerprint): void
+    {
+        if ($this->pricingFingerprint !== null && $this->pricingFingerprint !== $pricingFingerprint) {
+            throw new VatSnapshotMismatchException('Stored pricing snapshot no longer matches the current order calculation inputs.');
+        }
+    }
+
+    public function getPricingFingerprint(): ?string
+    {
+        return $this->pricingFingerprint;
+    }
+
+    /**
+     * @param  VatAllocatedLine[]  $vatLines
+     */
+    private static function assertTotals(
+        array $vatLines,
+        Money $subtotalExcl,
+        Money $subtotalIncl,
+        Money $shippingExcl,
+        Money $shippingIncl,
+        Money $paymentExcl,
+        Money $paymentIncl,
+        Money $discountExcl,
+        Money $discountIncl,
+        Money $totalExcl,
+        Money $totalVat,
+        Money $totalIncl,
+    ): void {
+        if (! $totalExcl->add($totalVat)->equals($totalIncl)) {
+            throw new \LogicException('Pricing snapshot invariant violated: total_excl + total_vat must equal total_incl.');
+        }
+
+        if (! $subtotalExcl->add($shippingExcl)->add($paymentExcl)->subtract($discountExcl)->equals($totalExcl)) {
+            throw new \LogicException('Pricing snapshot invariant violated: excluding-VAT components do not equal total_excl.');
+        }
+
+        if (! $subtotalIncl->add($shippingIncl)->add($paymentIncl)->subtract($discountIncl)->equals($totalIncl)) {
+            throw new \LogicException('Pricing snapshot invariant violated: including-VAT components do not equal total_incl.');
+        }
+
+        $vatSum = Money::EUR(0);
+        $taxableBaseSum = Money::EUR(0);
+
+        foreach ($vatLines as $vatLine) {
+            if (! $vatLine instanceof VatAllocatedLine) {
+                throw new \InvalidArgumentException('vatLines must be instances of VatAllocatedLine.');
+            }
+
+            $vatSum = $vatSum->add($vatLine->getVatAmount());
+            $taxableBaseSum = $taxableBaseSum->add($vatLine->getTaxableBase());
+        }
+
+        if (! $vatSum->equals($totalVat)) {
+            throw new \LogicException('Pricing snapshot invariant violated: VAT lines do not equal total_vat.');
+        }
+
+        if (! $taxableBaseSum->equals($totalExcl)) {
+            throw new \LogicException('Pricing snapshot invariant violated: VAT taxable bases do not equal total_excl.');
         }
     }
 }

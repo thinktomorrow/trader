@@ -8,6 +8,7 @@ use Money\Money;
 use Thinktomorrow\Trader\Domain\Common\Entity\Aggregate;
 use Thinktomorrow\Trader\Domain\Common\Entity\HasData;
 use Thinktomorrow\Trader\Domain\Common\Event\RecordsEvents;
+use Thinktomorrow\Trader\Domain\Common\Price\TaxMode;
 use Thinktomorrow\Trader\Domain\Model\Country\CountryId;
 use Thinktomorrow\Trader\Domain\Model\Country\HasCountryIds;
 use Thinktomorrow\Trader\Domain\Model\ShippingProfile\Events\TariffDeleted;
@@ -79,6 +80,21 @@ final class ShippingProfile implements Aggregate
     {
         foreach ($this->tariffs as $tariff) {
             if ($tariff->withinRange($tariffBaseExcl)) {
+                return $tariff;
+            }
+        }
+
+        return null;
+    }
+
+    public function findTariffByPrices(Money $tariffBaseExcl, Money $tariffBaseIncl): ?Tariff
+    {
+        foreach ($this->tariffs as $tariff) {
+            $tariffBase = $tariff->getTaxMode() === TaxMode::Inclusive
+                ? $tariffBaseIncl
+                : $tariffBaseExcl;
+
+            if ($tariff->withinRange($tariffBase)) {
                 return $tariff;
             }
         }

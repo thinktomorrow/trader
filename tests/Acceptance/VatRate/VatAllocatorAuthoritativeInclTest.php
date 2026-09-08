@@ -7,6 +7,7 @@ use PHPUnit\Framework\Attributes\DataProvider;
 use Tests\Acceptance\TestCase;
 use Thinktomorrow\Trader\Application\VatRate\Allocator\ProRateAllocator;
 use Thinktomorrow\Trader\Application\VatRate\Allocator\VatAllocator;
+use Thinktomorrow\Trader\Application\VatRate\Allocator\VatApplicableAmountAllocator;
 use Thinktomorrow\Trader\Domain\Common\Cash\Cash;
 use Thinktomorrow\Trader\Domain\Common\Price\DefaultItemPrice;
 use Thinktomorrow\Trader\Domain\Common\Vat\VatPercentage;
@@ -39,7 +40,7 @@ final class VatAllocatorAuthoritativeInclTest extends TestCase
         $order = $this->orderContext->createEmptyOrder();
         $this->orderContext->addLineToOrder($order, $line);
 
-        $allocator = new VatAllocator(new ProRateAllocator);
+        $allocator = new VatAllocator(new VatApplicableAmountAllocator(new ProRateAllocator));
 
         $result = $allocator->allocate(
             $order,

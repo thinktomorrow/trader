@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Tests\Infrastructure\Repositories;
 
 use Tests\Infrastructure\TestCase;
+use Thinktomorrow\Trader\Domain\Common\Price\TaxMode;
 use Thinktomorrow\Trader\Domain\Model\PaymentMethod\Exceptions\CouldNotFindPaymentMethod;
 use Thinktomorrow\Trader\Domain\Model\PaymentMethod\PaymentMethodId;
 use Thinktomorrow\Trader\Testing\Order\OrderContext;
@@ -21,6 +22,23 @@ class PaymentMethodRepositoryTest extends TestCase
             $repository->save($paymentMethod);
 
             $this->assertEquals($paymentMethod, $repository->find($paymentMethod->paymentMethodId));
+        }
+    }
+
+    public function test_it_preserves_including_vat_authority(): void
+    {
+        foreach (OrderContext::drivers() as $orderContext) {
+            $paymentMethod = $orderContext->dontPersist()->createPaymentMethod('inclusive-payment', [
+                'rate' => '700',
+                'tax_mode' => TaxMode::Inclusive->value,
+            ]);
+            $repository = $orderContext->repos()->paymentMethodRepository();
+
+            $repository->save($paymentMethod);
+            $savedPaymentMethod = $repository->find($paymentMethod->paymentMethodId);
+
+            $this->assertEquals('700', $savedPaymentMethod->getRate()->getAmount());
+            $this->assertSame(TaxMode::Inclusive, $savedPaymentMethod->getTaxMode());
         }
     }
 

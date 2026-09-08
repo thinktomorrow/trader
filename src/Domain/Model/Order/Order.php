@@ -93,6 +93,11 @@ final class Order implements Aggregate, DiscountableItem
         return $this->getOrderState()->inCustomerHands();
     }
 
+    public function hasFrozenPricing(): bool
+    {
+        return ! $this->inCustomerHands();
+    }
+
     public function getShippingAddress(): ?ShippingAddress
     {
         return $this->shippingAddress;
@@ -379,14 +384,25 @@ final class Order implements Aggregate, DiscountableItem
             VatPercentage::fromString($vatLineData['vat_percentage']),
         ), json_decode($state['vat_lines'], true));
 
-        $order->vatSnapshot = OrderVatSnapshot::fromState(
-            vatLines: $vatLines,
-            shippingIncl: Money::EUR($state['shipping_cost_incl']),
-            paymentIncl: Money::EUR($state['payment_cost_incl']),
-            discountIncl: Money::EUR($state['discount_incl']),
-            totalVat: Money::EUR($state['total_vat']),
-            totalIncl: Money::EUR($state['total_incl']),
-        );
+        try {
+            $order->vatSnapshot = OrderVatSnapshot::fromState(
+                vatLines: $vatLines,
+                subtotalExcl: Money::EUR($state['subtotal_excl']),
+                subtotalIncl: Money::EUR($state['subtotal_incl']),
+                shippingExcl: Money::EUR($state['shipping_cost_excl']),
+                shippingIncl: Money::EUR($state['shipping_cost_incl']),
+                paymentExcl: Money::EUR($state['payment_cost_excl']),
+                paymentIncl: Money::EUR($state['payment_cost_incl']),
+                discountExcl: Money::EUR($state['discount_excl']),
+                discountIncl: Money::EUR($state['discount_incl']),
+                totalExcl: Money::EUR($state['total_excl']),
+                totalVat: Money::EUR($state['total_vat']),
+                totalIncl: Money::EUR($state['total_incl']),
+                pricingFingerprint: $state['pricing_fingerprint'] ?? $state['vat_calculation_fingerprint'] ?? null,
+            );
+        } catch (\LogicException) {
+            $order->vatSnapshot = null;
+        }
 
         return $order;
     }

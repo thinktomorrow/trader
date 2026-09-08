@@ -5,8 +5,13 @@ declare(strict_types=1);
 namespace Tests\Infrastructure\Repositories;
 
 use Illuminate\Support\Facades\DB;
+use Money\Money;
 use Tests\Infrastructure\TestCase;
 use Thinktomorrow\Trader\Application\Order\State\Order\AbandonOrder;
+use Thinktomorrow\Trader\Domain\Common\Price\DefaultItemPrice;
+use Thinktomorrow\Trader\Domain\Common\Price\DefaultServicePrice;
+use Thinktomorrow\Trader\Domain\Common\Price\TaxMode;
+use Thinktomorrow\Trader\Domain\Common\Vat\VatPercentage;
 use Thinktomorrow\Trader\Domain\Model\Order\Exceptions\CouldNotFindOrder;
 use Thinktomorrow\Trader\Domain\Model\Order\OrderId;
 use Thinktomorrow\Trader\Domain\Model\Order\OrderReference;
@@ -145,6 +150,70 @@ final class OrderRepositoryTest extends TestCase
             $this->assertCount(1, $savedOrder->getShippings()[0]->getDiscounts());
             $this->assertCount(1, $savedOrder->getPayments()[0]->getDiscounts());
             $this->assertTrue($savedOrder->hasUpToDateVatSnapshot());
+        }
+    }
+
+    public function test_it_preserves_including_vat_authority_for_services_and_discounts(): void
+    {
+        foreach (OrderContext::drivers() as $orderContext) {
+            $orderId = 'gross-'.$orderContext->driverName;
+            $order = $orderContext->createDefaultOrder($orderId);
+            $order->getShippings()[0]->updateCost(DefaultServicePrice::fromIncludingVat(Money::EUR(700), Money::EUR(579)));
+            $order->getPayments()[0]->updateCost(DefaultServicePrice::fromIncludingVat(Money::EUR(121), Money::EUR(100)));
+            $orderContext->addDiscountToOrder($order, $orderContext->createOrderDiscount($orderId, 'gross-discount', [
+                'total_excl' => '10',
+                'total_incl' => '12',
+                'tax_mode' => TaxMode::Inclusive->value,
+                'promo_id' => null,
+                'promo_discount_id' => null,
+            ]));
+
+            $orderContext->saveOrder($order);
+            $savedOrder = $orderContext->findOrder($order->orderId);
+
+            $this->assertSame(TaxMode::Inclusive, $savedOrder->getShippings()[0]->getShippingCost()->getTaxMode());
+            $this->assertSame(TaxMode::Inclusive, $savedOrder->getPayments()[0]->getPaymentCost()->getTaxMode());
+            $this->assertSame(TaxMode::Inclusive, $savedOrder->getDiscounts()[0]->getDiscountPrice()->getTaxMode());
+            $this->assertEquals(Money::EUR(700), $savedOrder->getShippingCostIncl(), $orderContext->driverName);
+            $this->assertEquals(Money::EUR(121), $savedOrder->getPaymentCostIncl(), $orderContext->driverName);
+            $this->assertEquals(Money::EUR(12), $savedOrder->getDiscountTotalIncl(), $orderContext->driverName);
+            $this->assertTrue($savedOrder->hasUpToDateVatSnapshot());
+        }
+    }
+
+    public function test_it_preserves_historical_pricing_when_a_confirmed_order_is_saved(): void
+    {
+        foreach ([OrderContext::mysql(), OrderContext::laravel()] as $orderContext) {
+            $orderId = 'frozen-'.$orderContext->driverName;
+            $order = $orderContext->createDefaultOrder($orderId);
+            $order->updateState(DefaultOrderState::confirmed);
+            $orderContext->saveOrder($order);
+
+            $storedLinePricing = (array) DB::table('trader_order_lines')
+                ->where('order_id', $orderId)
+                ->where('line_id', $orderId.':line-aaa')
+                ->first(['unit_price_excl', 'unit_price_incl', 'total_excl', 'total_incl', 'total_vat', 'quantity']);
+            $storedShippingPricing = (array) DB::table('trader_order_shipping')
+                ->where('order_id', $orderId)
+                ->first(['cost_excl', 'cost_incl', 'cost_tax_mode', 'discount_excl', 'discount_incl', 'total_excl', 'total_incl']);
+
+            $order->getLines()[0]->updatePrice(DefaultItemPrice::fromExcludingVat(Money::EUR(999), VatPercentage::fromString('21')));
+            $order->getShippings()[0]->updateCost(DefaultServicePrice::fromExcludingVat(Money::EUR(999)));
+            $orderContext->saveOrder($order);
+
+            $this->assertSame($storedLinePricing, (array) DB::table('trader_order_lines')
+                ->where('order_id', $orderId)
+                ->where('line_id', $orderId.':line-aaa')
+                ->first(array_keys($storedLinePricing)), $orderContext->driverName);
+            $this->assertSame($storedShippingPricing, (array) DB::table('trader_order_shipping')
+                ->where('order_id', $orderId)
+                ->first(array_keys($storedShippingPricing)), $orderContext->driverName);
+
+            $savedOrder = $orderContext->findOrder($order->orderId);
+
+            $this->assertEquals(Money::EUR(166), $savedOrder->getSubtotalExcl(), $orderContext->driverName);
+            $this->assertEquals(Money::EUR(50), $savedOrder->getShippingCostExcl(), $orderContext->driverName);
+            $this->assertTrue($savedOrder->hasUpToDateVatSnapshot(), $orderContext->driverName);
         }
     }
 }

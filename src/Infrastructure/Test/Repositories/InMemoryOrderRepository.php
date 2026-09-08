@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Thinktomorrow\Trader\Infrastructure\Test\Repositories;
 
+use Thinktomorrow\Trader\Application\Cart\RefreshCart\Adjusters\AdjustOrderVatSnapshot;
 use Thinktomorrow\Trader\Domain\Model\Order\Discount\DiscountId;
 use Thinktomorrow\Trader\Domain\Model\Order\Exceptions\CouldNotFindOrder;
 use Thinktomorrow\Trader\Domain\Model\Order\Exceptions\OrderAlreadyInMerchantHands;
@@ -19,6 +20,7 @@ use Thinktomorrow\Trader\Domain\Model\Order\OrderRepository;
 use Thinktomorrow\Trader\Domain\Model\Order\Payment\PaymentId;
 use Thinktomorrow\Trader\Domain\Model\Order\Shipping\ShippingId;
 use Thinktomorrow\Trader\Domain\Model\Order\ShopperId;
+use Thinktomorrow\Trader\Infrastructure\Test\TestContainer;
 
 final class InMemoryOrderRepository implements InMemoryRepository, InvoiceRepository, OrderRepository
 {
@@ -39,6 +41,14 @@ final class InMemoryOrderRepository implements InMemoryRepository, InvoiceReposi
 
     public function save(Order $order): void
     {
+        if (! $order->hasUpToDateVatSnapshot() && $order->inCustomerHands()) {
+            (new TestContainer)->get(AdjustOrderVatSnapshot::class)->adjust($order);
+        }
+
+        if (! $order->hasPricingSnapshot()) {
+            throw new \LogicException('Cannot save an order without a pricing snapshot.');
+        }
+
         self::$orders[$order->orderId->get()] = $order;
     }
 

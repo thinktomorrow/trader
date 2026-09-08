@@ -6,6 +6,7 @@ namespace Thinktomorrow\Trader\Application\ShippingProfile;
 
 use Money\Money;
 use Thinktomorrow\Trader\Domain\Common\Cash\Cash;
+use Thinktomorrow\Trader\Domain\Common\Price\TaxMode;
 use Thinktomorrow\Trader\Domain\Model\ShippingProfile\ShippingProfileId;
 use Thinktomorrow\Trader\Domain\Model\ShippingProfile\TariffId;
 
@@ -21,13 +22,18 @@ class UpdateTariff
 
     private ?string $to;
 
-    public function __construct(string $tariffId, string $shippingProfileId, string $rate, string $from, ?string $to)
+    public function __construct(string $tariffId, string $shippingProfileId, string $rate, string $from, ?string $to, private ?string $taxMode = null)
     {
         $this->tariffId = $tariffId;
         $this->shippingProfileId = $shippingProfileId;
         $this->rate = $rate;
         $this->from = $from;
         $this->to = $to;
+    }
+
+    public function getTaxMode(): ?TaxMode
+    {
+        return $this->taxMode ? TaxMode::from($this->taxMode) : null;
     }
 
     public function getTariffId(): TariffId

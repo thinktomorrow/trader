@@ -12,9 +12,9 @@ use Thinktomorrow\Trader\Domain\Common\Price\DefaultItemPrice;
 use Thinktomorrow\Trader\Domain\Common\Price\DiscountPrice;
 use Thinktomorrow\Trader\Domain\Common\Price\ItemDiscountPrice;
 use Thinktomorrow\Trader\Domain\Common\Price\ItemPrice;
+use Thinktomorrow\Trader\Domain\Common\Price\TaxMode;
 use Thinktomorrow\Trader\Domain\Common\Price\WithAuthoritativeIncl;
 use Thinktomorrow\Trader\Domain\Common\Vat\VatPercentage;
-use Thinktomorrow\Trader\Domain\Common\Vat\VatRoundingStrategy;
 use Thinktomorrow\Trader\Domain\Model\Order\Discount\Discount;
 use Thinktomorrow\Trader\Domain\Model\Order\Discount\DiscountableId;
 use Thinktomorrow\Trader\Domain\Model\Order\Discount\DiscountableItem;
@@ -52,6 +52,7 @@ final class Line implements ChildAggregate, DiscountableItem
         $line->lineId = $lineId;
         $line->purchasableReference = $purchasableReference;
         $line->unitPrice = $unitPrice;
+        $line->setAuthoritativeIncl($unitPrice->isIncludingVatAuthoritative());
         $line->quantity = $quantity;
         $line->data = $data;
 
@@ -77,17 +78,28 @@ final class Line implements ChildAggregate, DiscountableItem
 
     public function getTotal(): ItemPrice
     {
-        return $this->multiplyByVatRoundingStrategy($this->getDiscountedUnitPrice());
+        return $this->getSubtotal()->applyDiscount($this->getDiscountPrice());
     }
 
     public function getSubtotal(): ItemPrice
     {
-        return $this->multiplyByVatRoundingStrategy($this->unitPrice);
+        $quantity = $this->quantity->asInt();
+
+        if (! $this->unitPrice->isIncludingVatAuthoritative()) {
+            return $this->unitPrice->multiply($quantity);
+        }
+
+        return DefaultItemPrice::fromMoney(
+            $this->unitPrice->getIncludingVat()->multiply($quantity),
+            $this->unitPrice->getVatPercentage(),
+            true,
+        );
     }
 
     public function getDiscountPrice(): DiscountPrice|ItemDiscountPrice
     {
-        return $this->calculateItemDiscountPrice($this->getSubtotal());
+        return $this->calculateItemDiscountPrice($this->getUnitPrice())
+            ->multiply($this->quantity->asInt());
     }
 
     public function getDiscountPriceExcl(): Money
@@ -179,9 +191,12 @@ final class Line implements ChildAggregate, DiscountableItem
         $line->personalisations = array_map(fn ($personalisationState) => LinePersonalisation::fromMappedData($personalisationState, $state), $childEntities[LinePersonalisation::class]);
         $line->data = json_decode($state['data'], true);
 
-        $line->unitPrice = $line->authoritativeIncl()
-            ? DefaultItemPrice::fromMoney(Cash::make($state['unit_price_incl']), VatPercentage::fromString($state['tax_rate']), true)
-            : DefaultItemPrice::fromMoney(Cash::make($state['unit_price_excl']), VatPercentage::fromString($state['tax_rate']), false);
+        $line->unitPrice = DefaultItemPrice::fromResolvedAmounts(
+            Cash::make($state['unit_price_excl']),
+            Cash::make($state['unit_price_incl']),
+            VatPercentage::fromString($state['tax_rate']),
+            $line->authoritativeIncl() ? TaxMode::Inclusive : TaxMode::Exclusive,
+        );
 
         return $line;
     }
@@ -194,24 +209,5 @@ final class Line implements ChildAggregate, DiscountableItem
     public function getDiscountableType(): DiscountableType
     {
         return DiscountableType::line;
-    }
-
-    private function multiplyByVatRoundingStrategy(ItemPrice $itemPrice): ItemPrice
-    {
-        $quantity = $this->quantity->asInt();
-
-        if (! VatRoundingStrategy::fromStringOrDefault($this->getData('vat_rounding_strategy'))->isLineBased()) {
-            return $itemPrice->multiply($quantity);
-        }
-
-        if (! $itemPrice->isIncludingVatAuthoritative()) {
-            return $itemPrice->multiply($quantity);
-        }
-
-        return DefaultItemPrice::fromMoney(
-            $itemPrice->getIncludingVat()->multiply($quantity),
-            $itemPrice->getVatPercentage(),
-            true,
-        );
     }
 }

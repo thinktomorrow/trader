@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Thinktomorrow\Trader\Application\Promo\OrderPromo;
 
+use Thinktomorrow\Trader\Application\VatRate\Allocator\VatAllocator;
 use Thinktomorrow\Trader\Domain\Common\Map\Mappable;
 use Thinktomorrow\Trader\Domain\Common\Price\DiscountPrice;
 use Thinktomorrow\Trader\Domain\Model\Order\Discount\DiscountableItem;
@@ -12,7 +13,7 @@ use Thinktomorrow\Trader\Domain\Model\Order\Order;
 
 interface OrderDiscount extends Mappable
 {
-    public static function fromMappedData(array $state, array $aggregateState, array $conditions): static;
+    public static function fromMappedData(array $state, array $aggregateState, array $conditions, VatAllocator $vatAllocator): static;
 
     public function isApplicable(Order $order, DiscountableItem $discountable): bool;
 

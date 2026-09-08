@@ -9,17 +9,13 @@ use Thinktomorrow\Trader\Domain\Common\Price\ItemPrice;
 class ProRateAllocator
 {
     /**
-     * Pro-rata allocation across VAT groups.
+     * Allocate a monetary amount proportionally across VAT groups using minor-unit integer math.
      *
-     * Stable ordering:
-     * - remainder-centen worden verdeeld in de volgorde van de input array.
+     * Truncated shares are reconciled using the largest-remainder method. Equal remainders are
+     * resolved by highest VAT rate, making the result independent of the input array order.
+     * The returned allocations always add up exactly to the requested amount.
      *
-     * Guaranteert:
-     * - som(allocaties) === $totalToAllocate
-     * - geen verloren centen / remainders
-     *
-     * @param  array<string, ItemPrice>  $itemTotalsPerRate  bv. ['21' => ItemPrice(1210), '9' => ItemPrice(1090)]
-     * @param  Money  $totalToAllocate  bv. Money(1000)
+     * @param  array<string, ItemPrice>  $itemTotalsPerRate
      * @return array<string, Money>
      */
     public function allocate(array $itemTotalsPerRate, Money $totalToAllocate): array
@@ -27,85 +23,103 @@ class ProRateAllocator
         $this->assertItemTotalsAreInstanceOfItemPrice($itemTotalsPerRate);
         $this->assertItemTotalsAreKeyedWithRates($itemTotalsPerRate);
 
-        /**
-         * Edge cases:
-         *
-         * - nothing to allocate (no shipping, payment costs and no discounts).
-         */
+        // Preserve all known VAT groups even when there is no amount to allocate.
         if ($totalToAllocate->isZero()) {
             return $this->mapToZero($totalToAllocate, $itemTotalsPerRate);
         }
 
+        if ($itemTotalsPerRate === []) {
+            throw new \InvalidArgumentException('Cannot allocate a non-zero amount without VAT groups.');
+        }
+
         $sum = $this->sumItemsExcl($itemTotalsPerRate);
 
-        /**
-         * Edge cases:
-         *
-         * - No / Free items, only shipping
-         * - All item totals zero
-         * - Massive order discount making subtotal zero
-         * - Multi-VAT but all zero
-         *
-         * In these cases, we allocate the full amount to the first VAT rate.
-         */
+        // Without a proportional basis, assign the full amount to the highest VAT rate as a stable fallback.
         if ($sum->isZero()) {
             $result = $this->mapToZero($totalToAllocate, $itemTotalsPerRate);
 
-            $firstKey = array_key_first($itemTotalsPerRate);
+            if ($result === []) {
+                return [];
+            }
+
+            $rates = array_keys($itemTotalsPerRate);
+            usort($rates, fn (string|int $left, string|int $right): int => $this->compareVatRatesDescending((string) $left, (string) $right));
+
+            $firstKey = $rates[0];
             $result[$firstKey] = $totalToAllocate;
 
             return $result;
         }
 
         $currency = $totalToAllocate->getCurrency();
-        $totalMinor = (int) $totalToAllocate->getAmount(); // centen
+        $totalMinor = $totalToAllocate->getAmount();
+        $sumMinor = $sum->getAmount();
         $alloc = [];
-        $allocatedSum = new Money('0', $currency);
+        $allocatedSum = '0';
+        $fractionalRemainders = [];
 
-        // 1) voorlopige allocaties (floor per ratio)
+        // Keep each exact share as an integer quotient plus its residual numerator. The common
+        // denominator means residuals can be compared directly without floats or precision loss.
         foreach ($itemTotalsPerRate as $rate => $itemPricePerRate) {
-            $ratio = bcdiv(
-                (string) $itemPricePerRate->getExcludingVat()->getAmount(),
-                (string) $sum->getAmount(),
-                12 // genoeg precisie voor ratio
-            );
+            $product = bcmul($totalMinor, $itemPricePerRate->getExcludingVat()->getAmount(), 0);
+            $minor = bcdiv($product, $sumMinor, 0);
+            $fractionalRemainder = bcsub($product, bcmul($minor, $sumMinor, 0), 0);
 
-            $minor = $this->truncateTowardZero($totalMinor * (float) $ratio);
+            // Normalize residuals to a positive-denominator orientation so their sort order remains valid.
+            if (bccomp($sumMinor, '0', 0) < 0) {
+                $fractionalRemainder = bcsub('0', $fractionalRemainder, 0);
+            }
 
-            $alloc[$rate] = new Money((string) $minor, $currency);
-            $allocatedSum = $allocatedSum->add($alloc[$rate]);
+            $alloc[$rate] = new Money($minor, $currency);
+            $allocatedSum = bcadd($allocatedSum, $minor, 0);
+            $fractionalRemainders[] = [
+                'rate' => $rate,
+                'vat_rate' => $itemPricePerRate->getVatPercentage()->get(),
+                'remainder' => $fractionalRemainder,
+            ];
         }
 
-        // 2) remainder in minor units (mag niet blijven liggen)
-        $remainder = $totalMinor - (int) $allocatedSum->getAmount();
+        $remainder = bcsub($totalMinor, $allocatedSum, 0);
 
-        if ($remainder === 0) {
-            return $alloc; // perfect gesplitst
+        if (bccomp($remainder, '0', 0) === 0) {
+            return $alloc;
         }
 
-        // 3) remainder stabiel verdelen over de keys in volgorde
-        foreach ($alloc as $rate => $money) {
-            if ($remainder === 0) {
+        $adjustment = bccomp($remainder, '0', 0) > 0 ? '1' : '-1';
+
+        // Positive totals receive cents at the largest residuals; negative totals remove cents
+        // at the mirrored residuals. VAT rate is the deterministic tie-breaker in both directions.
+        usort($fractionalRemainders, function (array $left, array $right) use ($adjustment): int {
+            $remainderComparison = bccomp($right['remainder'], $left['remainder'], 0);
+
+            if ($adjustment === '-1') {
+                $remainderComparison *= -1;
+            }
+
+            return $remainderComparison !== 0
+                ? $remainderComparison
+                : $this->compareVatRatesDescending($left['vat_rate'], $right['vat_rate']);
+        });
+
+        foreach ($fractionalRemainders as $fractionalRemainder) {
+            if (bccomp($remainder, '0', 0) === 0) {
                 break;
             }
 
-            $adjustment = $remainder > 0 ? 1 : -1;
-
-            $alloc[$rate] = $money->add(new Money((string) $adjustment, $currency));
-
-            $remainder -= $adjustment;
+            $rate = $fractionalRemainder['rate'];
+            $alloc[$rate] = $alloc[$rate]->add(new Money($adjustment, $currency));
+            $remainder = bcsub($remainder, $adjustment, 0);
         }
 
-        if ($remainder !== 0) {
+        // Truncating one share per group can leave at most one minor unit per group to reconcile.
+        if (bccomp($remainder, '0', 0) !== 0) {
             throw new \LogicException('ProRateAllocator remainder leak detected: '.$remainder);
         }
 
         return $alloc;
     }
 
-    /**
-     * @return Money[]
-     */
+    /** @return array<string, Money> */
     private function mapToZero(Money $totalToAllocate, array $itemTotals): array
     {
         $currency = $totalToAllocate->getCurrency();
@@ -128,12 +142,12 @@ class ProRateAllocator
         return $sum;
     }
 
-    /**
-     * Allows for negative values to be truncated toward zero.
-     */
-    private function truncateTowardZero(float $value): int
+    private function compareVatRatesDescending(string $left, string $right): int
     {
-        return $value >= 0 ? (int) floor($value) : (int) ceil($value);
+        $leftDecimals = str_contains($left, '.') ? strlen(substr(strrchr($left, '.'), 1)) : 0;
+        $rightDecimals = str_contains($right, '.') ? strlen(substr(strrchr($right, '.'), 1)) : 0;
+
+        return bccomp($right, $left, max($leftDecimals, $rightDecimals));
     }
 
     private function assertItemTotalsAreKeyedWithRates(array $itemTotalsPerRate): void
@@ -153,7 +167,7 @@ class ProRateAllocator
     {
         foreach ($itemTotalsPerRate as $itemTotal) {
             if (! $itemTotal instanceof ItemPrice) {
-                throw new \InvalidArgumentException('itemTotalsPerRate must be an array of ItemPrice instances. Got '.$itemTotal::class);
+                throw new \InvalidArgumentException('itemTotalsPerRate must be an array of ItemPrice instances. Got '.get_debug_type($itemTotal));
             }
         }
     }

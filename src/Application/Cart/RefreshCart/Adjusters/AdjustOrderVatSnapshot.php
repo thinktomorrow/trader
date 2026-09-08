@@ -13,21 +13,22 @@ class AdjustOrderVatSnapshot implements Adjuster
 
     public function adjust(Order $order): void
     {
-        $vatAllocatedTotalPrices = $this->vatAllocator->allocate(
-            $order,
-            $order->getShippingCostExcl(),
-            $order->getPaymentCostExcl(),
-            $order->getDiscountTotalExcl(),
-        );
+        $vatAllocatedTotalPrices = $this->vatAllocator->allocateOrder($order);
 
         $snapShot = OrderVatSnapshot::fromVatAllocation(
             vatLines: $vatAllocatedTotalPrices->total()->getVatLines(),
+            subtotalExcl: $vatAllocatedTotalPrices->items()->getTotalExcludingVat(),
+            subtotalIncl: $vatAllocatedTotalPrices->items()->getTotalIncludingVat(),
+            shippingExcl: $vatAllocatedTotalPrices->shipping()->getTotalExcludingVat(),
             shippingIncl: $vatAllocatedTotalPrices->shipping()->getTotalIncludingVat(),
+            paymentExcl: $vatAllocatedTotalPrices->payment()->getTotalExcludingVat(),
             paymentIncl: $vatAllocatedTotalPrices->payment()->getTotalIncludingVat(),
+            discountExcl: $vatAllocatedTotalPrices->discounts()->getTotalExcludingVat(),
             discountIncl: $vatAllocatedTotalPrices->discounts()->getTotalIncludingVat(),
+            totalExcl: $vatAllocatedTotalPrices->total()->getTotalExcludingVat(),
             totalVat: $vatAllocatedTotalPrices->total()->getTotalVat(),
             totalIncl: $vatAllocatedTotalPrices->total()->getTotalIncludingVat(),
-            totalExcl: $order->getTotalExcl(),
+            pricingFingerprint: $order->getPricingFingerprint(),
         );
 
         $order->applyVatSnapshot($snapShot);

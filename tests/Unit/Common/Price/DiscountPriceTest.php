@@ -6,9 +6,19 @@ use Money\Money;
 use PHPUnit\Framework\TestCase;
 use Thinktomorrow\Trader\Domain\Common\Price\DefaultDiscountPrice;
 use Thinktomorrow\Trader\Domain\Common\Price\Exceptions\PriceCannotBeNegative;
+use Thinktomorrow\Trader\Domain\Common\Price\TaxMode;
 
 final class DiscountPriceTest extends TestCase
 {
+    public function test_it_preserves_an_authoritative_including_vat_amount_after_resolution(): void
+    {
+        $price = DefaultDiscountPrice::fromIncludingVat(Money::EUR(700), Money::EUR(579));
+
+        $this->assertEquals(Money::EUR(579), $price->getExcludingVat());
+        $this->assertEquals(Money::EUR(700), $price->getAuthoritativeAmount());
+        $this->assertSame(TaxMode::Inclusive, $price->getTaxMode());
+    }
+
     public function test_it_can_create_discount_from_excluding_vat(): void
     {
         $discount = DefaultDiscountPrice::fromExcludingVat(Money::EUR(100));
@@ -88,5 +98,33 @@ final class DiscountPriceTest extends TestCase
         $discount = DefaultDiscountPrice::fromExcludingVat(Money::EUR(1_000_000));
 
         $this->assertEquals(Money::EUR(1_000_000), $discount->getExcludingVat());
+    }
+
+    public function test_including_vat_addition_preserves_summed_gross_authority(): void
+    {
+        $result = DefaultDiscountPrice::fromIncludingVat(Money::EUR(121), Money::EUR(100))
+            ->add(DefaultDiscountPrice::fromIncludingVat(Money::EUR(242), Money::EUR(200)));
+
+        $this->assertEquals(Money::EUR(300), $result->getExcludingVat());
+        $this->assertEquals(Money::EUR(363), $result->getAuthoritativeAmount());
+        $this->assertSame(TaxMode::Inclusive, $result->getTaxMode());
+    }
+
+    public function test_mixed_authority_addition_falls_back_to_net_authority(): void
+    {
+        $result = DefaultDiscountPrice::fromIncludingVat(Money::EUR(121), Money::EUR(100))
+            ->add(DefaultDiscountPrice::fromExcludingVat(Money::EUR(200)));
+
+        $this->assertEquals(Money::EUR(300), $result->getAuthoritativeAmount());
+        $this->assertSame(TaxMode::Exclusive, $result->getTaxMode());
+    }
+
+    public function test_multiplication_preserves_including_vat_authority(): void
+    {
+        $result = DefaultDiscountPrice::fromIncludingVat(Money::EUR(121), Money::EUR(100))->multiply(3);
+
+        $this->assertEquals(Money::EUR(300), $result->getExcludingVat());
+        $this->assertEquals(Money::EUR(363), $result->getAuthoritativeAmount());
+        $this->assertSame(TaxMode::Inclusive, $result->getTaxMode());
     }
 }

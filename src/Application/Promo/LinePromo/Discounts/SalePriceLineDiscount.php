@@ -7,8 +7,10 @@ namespace Thinktomorrow\Trader\Application\Promo\LinePromo\Discounts;
 use Money\Money;
 use Thinktomorrow\Trader\Application\Promo\LinePromo\LineDiscount;
 use Thinktomorrow\Trader\Application\Promo\OrderPromo\Discounts\BaseOrderDiscount;
+use Thinktomorrow\Trader\Application\VatRate\Allocator\VatAllocator;
 use Thinktomorrow\Trader\Domain\Common\Price\DefaultItemDiscountPrice;
 use Thinktomorrow\Trader\Domain\Common\Price\ItemDiscountPrice;
+use Thinktomorrow\Trader\Domain\Common\Price\TaxMode;
 use Thinktomorrow\Trader\Domain\Model\Order\Discount\DiscountableItem;
 use Thinktomorrow\Trader\Domain\Model\Order\Line\Line;
 use Thinktomorrow\Trader\Domain\Model\Order\Order;
@@ -16,12 +18,7 @@ use Thinktomorrow\Trader\Domain\Model\Promo\Discounts\SalePriceSystemDiscount;
 
 class SalePriceLineDiscount extends BaseOrderDiscount implements LineDiscount
 {
-    /**
-     * Whether to calculate the discount based on prices excluding VAT.
-     * For B2B scenarios where prices are calculated excluding VAT.
-     * In B2C scenarios, prices are typically calculated including VAT.
-     */
-    private bool $calculateExcludingVat = false;
+    private TaxMode $calculationTaxMode = TaxMode::Inclusive;
 
     public static function getMapKey(): string
     {
@@ -57,8 +54,7 @@ class SalePriceLineDiscount extends BaseOrderDiscount implements LineDiscount
 
         $unitPrice = $discountable->getUnitPrice();
 
-        if (! $this->calculateExcludingVat && $unitPrice->isIncludingVatAuthoritative()) {
-
+        if ($this->calculationTaxMode === TaxMode::Inclusive && $unitPrice->isIncludingVatAuthoritative()) {
             $salePriceIncl = Money::EUR($discountable->getData('sale_price_incl'));
 
             $discountMoney = $unitPrice->getIncludingVat()->subtract($salePriceIncl);
@@ -72,13 +68,13 @@ class SalePriceLineDiscount extends BaseOrderDiscount implements LineDiscount
         return DefaultItemDiscountPrice::fromExcludingVat($discountMoney, $unitPrice->getVatPercentage());
     }
 
-    public function setCalculateExcludingVat(bool $calculateExcludingVat): void
+    public function setCalculationTaxMode(TaxMode $taxMode): void
     {
-        $this->calculateExcludingVat = $calculateExcludingVat;
+        $this->calculationTaxMode = $taxMode;
     }
 
-    public static function fromMappedData(array $state, array $aggregateState, array $conditions): static
+    public static function fromMappedData(array $state, array $aggregateState, array $conditions, VatAllocator $vatAllocator): static
     {
-        return parent::fromMappedData($state, $aggregateState, $conditions);
+        return parent::fromMappedData($state, $aggregateState, $conditions, $vatAllocator);
     }
 }
