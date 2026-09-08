@@ -8,8 +8,16 @@ use Thinktomorrow\Trader\Domain\Common\Price\ItemDiscountPrice;
 use Thinktomorrow\Trader\Domain\Model\Order\Order;
 use Thinktomorrow\Trader\Domain\Model\Order\Shipping\Shipping;
 
+/**
+ * Creates a deterministic, versioned hash of all order inputs that affect VAT allocation.
+ *
+ * The fingerprint detects pricing changes that may leave the net total unchanged, such as
+ * changing the authoritative tax mode or swapping prices between order components.
+ */
 final class OrderPricingFingerprint
 {
+    private const PREFIX = 'pricing-v4';
+
     public static function calculate(Order $order): string
     {
         $inputs = [];
@@ -82,7 +90,7 @@ final class OrderPricingFingerprint
 
         usort($inputs, fn (array $left, array $right): int => [$left['type'], $left['id']] <=> [$right['type'], $right['id']]);
 
-        return 'pricing-v4:'.hash('sha256', json_encode([
+        return self::PREFIX.':'.hash('sha256', json_encode([
             'currency' => 'EUR',
             'vat_exempt' => $order->isVatExempt(),
             'components' => $inputs,

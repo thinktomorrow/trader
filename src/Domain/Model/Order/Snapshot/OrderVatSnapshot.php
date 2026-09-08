@@ -8,6 +8,12 @@ use Money\Money;
 use Thinktomorrow\Trader\Domain\Common\Vat\VatAllocatedLine;
 use Thinktomorrow\Trader\Domain\Model\Order\Exceptions\VatSnapshotMismatchException;
 
+/**
+ * Captures the validated result of VAT allocation as one consistent set of totals and VAT lines.
+ *
+ * Its pricing fingerprint ties the calculated values to their source inputs, allowing mutable
+ * orders to reject a snapshot once those inputs no longer match.
+ */
 final class OrderVatSnapshot
 {
     /**
