@@ -17,6 +17,7 @@ use Thinktomorrow\Trader\Domain\Model\Order\Line\LineId;
 use Thinktomorrow\Trader\Domain\Model\Order\Line\PurchasableReference;
 use Thinktomorrow\Trader\Domain\Model\Order\Line\Quantity;
 use Thinktomorrow\Trader\Domain\Model\Order\OrderId;
+use Thinktomorrow\Trader\Domain\Model\Product\Variant\VariantUnitPrice;
 use Thinktomorrow\Trader\Domain\Model\Promo\DiscountId as PromoDiscountId;
 use Thinktomorrow\Trader\Domain\Model\Promo\PromoId;
 
@@ -28,11 +29,12 @@ final class LineRoundingTest extends TestCase
             OrderId::fromString('order-aaa'),
             LineId::fromString('line-aaa'),
             PurchasableReference::fromString('variant@variant-aaa'),
-            DefaultItemPrice::fromMoney(Money::EUR(199), VatPercentage::fromString('21'), true),
+            VariantUnitPrice::fromMoney(Money::EUR(199), VatPercentage::fromString('21'), true),
             Quantity::fromInt(3),
             [],
         );
 
+        $this->assertInstanceOf(VariantUnitPrice::class, $line->getSubtotal());
         $this->assertEquals(Money::EUR(597), $line->getTotal()->getIncludingVat());
         $this->assertEquals(Money::EUR(493), $line->getTotal()->getExcludingVat());
         $this->assertEquals(Money::EUR(104), $line->getTotal()->getVatTotal());

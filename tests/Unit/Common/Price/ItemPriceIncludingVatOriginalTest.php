@@ -58,11 +58,10 @@ final class ItemPriceIncludingVatOriginalTest extends TestCase
         // Including VAT is preserved exactly when originally provided
         $this->assertEquals(Money::EUR(2000), $total->getIncludingVat());
 
-        // Excluding VAT remains the canonical calculation base
-        $this->assertEquals(Money::EUR(1652), $total->getExcludingVat());
+        // Excluding VAT is derived from the authoritative line total
+        $this->assertEquals(Money::EUR(1653), $total->getExcludingVat());
 
-        // VAT absorbs any rounding differences 347 -> 348
-        $this->assertEquals(Money::EUR(348), $total->getVatTotal());
+        $this->assertEquals(Money::EUR(347), $total->getVatTotal());
     }
 
     public function test_multiply_preserves_original_including_vat_exactly_with_large_diffs(): void
@@ -79,11 +78,10 @@ final class ItemPriceIncludingVatOriginalTest extends TestCase
         // Including VAT is preserved exactly when originally provided
         $this->assertEquals(Money::EUR(20000), $total->getIncludingVat());
 
-        // Excluding VAT remains the canonical calculation base
-        $this->assertEquals(Money::EUR(16520), $total->getExcludingVat());
+        // Excluding VAT is derived from the authoritative line total
+        $this->assertEquals(Money::EUR(16529), $total->getExcludingVat());
 
-        // VAT absorbs any rounding differences 3470 -> 3480
-        $this->assertEquals(Money::EUR(3480), $total->getVatTotal());
+        $this->assertEquals(Money::EUR(3471), $total->getVatTotal());
     }
 
     public function test_apply_discount_preserves_original_including_vat(): void
@@ -124,8 +122,8 @@ final class ItemPriceIncludingVatOriginalTest extends TestCase
 
         // discount incl = round(0.50 × 1.21) = 0.61
         $this->assertEquals(Money::EUR(1939), $result->getIncludingVat());
-        $this->assertEquals(Money::EUR(1602), $result->getExcludingVat());
-        $this->assertEquals(Money::EUR(337), $result->getVatTotal());
+        $this->assertEquals(Money::EUR(1603), $result->getExcludingVat());
+        $this->assertEquals(Money::EUR(336), $result->getVatTotal());
     }
 
     public function test_original_including_vat_is_tracked(): void

@@ -83,17 +83,7 @@ final class Line implements ChildAggregate, DiscountableItem
 
     public function getSubtotal(): ItemPrice
     {
-        $quantity = $this->quantity->asInt();
-
-        if (! $this->unitPrice->isIncludingVatAuthoritative()) {
-            return $this->unitPrice->multiply($quantity);
-        }
-
-        return DefaultItemPrice::fromMoney(
-            $this->unitPrice->getIncludingVat()->multiply($quantity),
-            $this->unitPrice->getVatPercentage(),
-            true,
-        );
+        return $this->unitPrice->multiply($this->quantity->asInt());
     }
 
     public function getDiscountPrice(): DiscountPrice|ItemDiscountPrice

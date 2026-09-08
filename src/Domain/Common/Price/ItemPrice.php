@@ -8,16 +8,11 @@ use Money\Money;
 use Thinktomorrow\Trader\Domain\Common\Vat\VatPercentage;
 
 /**
- * Value object representing a calculated price where the canonical state is:
- *   - excluding VAT amount
- *   - VAT percentage
+ * Value object representing a price with resolved excluding and including VAT amounts.
  *
  * Domain logic:
- * - The canonical state is always excluding VAT.
- * - Including VAT and VAT total are always derived from the canonical state
- * - In case the price is constructed from an including VAT amount, that original
- *   amount is stored to avoid rounding drift when retrieving including VAT again.
- * - Multiplication should be done on the excluding VAT amount to avoid rounding drift.
+ * - The tax mode determines which amount is authoritative.
+ * - Multiplication uses the authoritative amount and derives its counterpart afterwards.
  * - Discount should be applied to the entire line total, not per unit.
  * - ItemPrice should handle VAT correctness.
  */

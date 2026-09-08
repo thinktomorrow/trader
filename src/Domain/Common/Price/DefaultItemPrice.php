@@ -111,11 +111,10 @@ class DefaultItemPrice implements ItemPrice
             );
         }
 
-        return static::fromResolvedAmounts(
-            $this->excludingVat->multiply($quantity),
+        return static::fromMoney(
             $this->includingVat->multiply($quantity),
             $this->vatPercentage,
-            $this->taxMode,
+            true,
         );
     }
 
