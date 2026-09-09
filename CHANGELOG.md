@@ -16,6 +16,8 @@ Important changes will be notified in this file
 - Changed pro-rata allocation to integer-safe largest-remainder allocation with deterministic VAT-rate ordering.
 - Fixed item authority loss during VAT aggregation and fixed combined promo discount accumulation.
 - Removed the configurable VAT rounding strategy; item totals now always round VAT on the full line amount.
+- Added domain state-reader contracts for merchant order, payment and shipping state checks.
+- Moved taxonomy filter queries from `TaxonomyRepository` to the application-level `TaxonomyItemRepository`.
 
 ## 2026-09-03 - 0.9.8
 

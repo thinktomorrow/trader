@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Thinktomorrow\Trader\Infrastructure\Test\Repositories;
 
 use Thinktomorrow\Trader\Application\Taxonomy\TaxonomyItem;
+use Thinktomorrow\Trader\Application\Taxonomy\TaxonomyItemRepository;
 use Thinktomorrow\Trader\Domain\Model\Taxonomy\Exceptions\CouldNotFindTaxonomy;
 use Thinktomorrow\Trader\Domain\Model\Taxonomy\Taxonomy;
 use Thinktomorrow\Trader\Domain\Model\Taxonomy\TaxonomyId;
@@ -12,7 +13,7 @@ use Thinktomorrow\Trader\Domain\Model\Taxonomy\TaxonomyRepository;
 use Thinktomorrow\Trader\Domain\Model\Taxonomy\TaxonomyState;
 use Thinktomorrow\Trader\Infrastructure\Laravel\Models\DefaultTaxonomyItem;
 
-final class InMemoryTaxonomyRepository implements InMemoryRepository, TaxonomyRepository
+final class InMemoryTaxonomyRepository implements InMemoryRepository, TaxonomyItemRepository, TaxonomyRepository
 {
     /** @var Taxonomy[] */
     public static array $taxonomies = [];

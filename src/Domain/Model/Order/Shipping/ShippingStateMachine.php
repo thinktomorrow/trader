@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Thinktomorrow\Trader\Domain\Model\Order\Shipping;
 
 use Assert\Assertion;
-use Thinktomorrow\Trader\Application\Order\MerchantOrder\MerchantOrderShipping;
 use Thinktomorrow\Trader\Domain\Common\State\AbstractStateMachine;
 use Thinktomorrow\Trader\Domain\Common\State\State;
 use Thinktomorrow\Trader\Domain\Model\Order\Order;
@@ -16,7 +15,7 @@ final class ShippingStateMachine extends AbstractStateMachine
 
     protected function getState($model): State
     {
-        if ($model instanceof MerchantOrderShipping) {
+        if ($model instanceof ShippingStateReader) {
             // Get class of state so we can create the state
             $firstState = reset($this->states);
 

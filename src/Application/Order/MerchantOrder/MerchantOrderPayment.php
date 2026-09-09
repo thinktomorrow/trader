@@ -3,16 +3,15 @@
 namespace Thinktomorrow\Trader\Application\Order\MerchantOrder;
 
 use Money\Money;
+use Thinktomorrow\Trader\Domain\Model\Order\Payment\PaymentStateReader;
 
-interface MerchantOrderPayment
+interface MerchantOrderPayment extends PaymentStateReader
 {
     public static function fromMappedData(array $state, array $orderState, iterable $discounts): static;
 
     public function getPaymentId(): string;
 
     public function getPaymentMethodId(): ?string;
-
-    public function getPaymentState(): string;
 
     public function getCostPriceExcl(): Money;
 

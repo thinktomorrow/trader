@@ -5,16 +5,15 @@ declare(strict_types=1);
 namespace Thinktomorrow\Trader\Application\Order\MerchantOrder;
 
 use Money\Money;
+use Thinktomorrow\Trader\Domain\Model\Order\Shipping\ShippingStateReader;
 
-interface MerchantOrderShipping
+interface MerchantOrderShipping extends ShippingStateReader
 {
     public static function fromMappedData(array $state, array $cartState, iterable $discounts): static;
 
     public function getShippingId(): string;
 
     public function getShippingProfileId(): ?string;
-
-    public function getShippingState(): string;
 
     public function getCostPriceExcl(): Money;
 

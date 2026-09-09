@@ -8,13 +8,14 @@ use Illuminate\Support\Facades\DB;
 use Psr\Container\ContainerInterface;
 use Ramsey\Uuid\Uuid;
 use Thinktomorrow\Trader\Application\Taxonomy\TaxonomyItem;
+use Thinktomorrow\Trader\Application\Taxonomy\TaxonomyItemRepository;
 use Thinktomorrow\Trader\Domain\Model\Taxonomy\Exceptions\CouldNotFindTaxonomy;
 use Thinktomorrow\Trader\Domain\Model\Taxonomy\Taxonomy;
 use Thinktomorrow\Trader\Domain\Model\Taxonomy\TaxonomyId;
 use Thinktomorrow\Trader\Domain\Model\Taxonomy\TaxonomyRepository;
 use Thinktomorrow\Trader\Domain\Model\Taxonomy\TaxonomyState;
 
-class MysqlTaxonomyRepository implements TaxonomyRepository
+class MysqlTaxonomyRepository implements TaxonomyItemRepository, TaxonomyRepository
 {
     protected static $taxonomyTable = 'trader_taxonomies';
 

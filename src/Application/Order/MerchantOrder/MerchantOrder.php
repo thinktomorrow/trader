@@ -3,8 +3,9 @@
 namespace Thinktomorrow\Trader\Application\Order\MerchantOrder;
 
 use Money\Money;
+use Thinktomorrow\Trader\Domain\Model\Order\State\OrderStateReader;
 
-interface MerchantOrder
+interface MerchantOrder extends OrderStateReader
 {
     public static function fromMappedData(array $state, array $childObjects, array $discounts): static;
 
@@ -13,8 +14,6 @@ interface MerchantOrder
     public function getOrderReference(): string;
 
     public function getInvoiceReference(): ?string;
-
-    public function getState(): string;
 
     public function getConfirmedAt(): ?\DateTime;
 

@@ -74,6 +74,7 @@ use Thinktomorrow\Trader\Application\Taxon\Redirect\TaxonRedirectRepository;
 use Thinktomorrow\Trader\Application\Taxon\Tree\TaxonNode;
 use Thinktomorrow\Trader\Application\Taxon\Tree\TaxonTreeRepository;
 use Thinktomorrow\Trader\Application\Taxonomy\TaxonomyItem;
+use Thinktomorrow\Trader\Application\Taxonomy\TaxonomyItemRepository;
 use Thinktomorrow\Trader\Application\VatNumber\VatNumberValidator;
 use Thinktomorrow\Trader\Application\VatRate\Allocator\VatAllocator;
 use Thinktomorrow\Trader\Application\VatRate\Allocator\VatApplicableAmountAllocator;
@@ -189,6 +190,7 @@ class TraderServiceProvider extends ServiceProvider
         $this->app->bind(VariantPropertyRepository::class, MysqlVariantPropertyRepository::class);
         $this->app->bind(TaxonRepository::class, MysqlTaxonRepository::class);
         $this->app->bind(TaxonomyRepository::class, MysqlTaxonomyRepository::class);
+        $this->app->bind(TaxonomyItemRepository::class, MysqlTaxonomyRepository::class);
         $this->app->bind(TaxonTreeRepository::class, MysqlTaxonTreeRepository::class);
         $this->app->bind(CategoryRepository::class, MysqlTaxonTreeRepository::class);
         $this->app->bind(TaxaSelectOptions::class, VineTaxaSelectOptions::class);

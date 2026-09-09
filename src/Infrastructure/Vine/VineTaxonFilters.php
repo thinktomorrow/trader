@@ -10,9 +10,9 @@ use Thinktomorrow\Trader\Application\Taxon\Tree\TaxonNode;
 use Thinktomorrow\Trader\Application\Taxon\Tree\TaxonTree;
 use Thinktomorrow\Trader\Application\Taxon\Tree\TaxonTreeRepository;
 use Thinktomorrow\Trader\Application\Taxonomy\TaxonomyItem;
+use Thinktomorrow\Trader\Application\Taxonomy\TaxonomyItemRepository;
 use Thinktomorrow\Trader\Domain\Common\Locale;
 use Thinktomorrow\Trader\Domain\Model\Taxonomy\TaxonomyId;
-use Thinktomorrow\Trader\Domain\Model\Taxonomy\TaxonomyRepository;
 use Thinktomorrow\Trader\Domain\Model\Taxonomy\TaxonomyType;
 use Thinktomorrow\Trader\TraderConfig;
 
@@ -20,13 +20,13 @@ class VineTaxonFilters implements TaxonFilters
 {
     private TaxonTreeRepository $taxonTreeRepository;
 
-    private TaxonomyRepository $taxonomyRepository;
+    private TaxonomyItemRepository $taxonomyRepository;
 
     private Locale $locale;
 
     private TaxonHierarchy $taxonHierarchy;
 
-    public function __construct(TraderConfig $traderConfig, TaxonTreeRepository $taxonTreeRepository, TaxonomyRepository $taxonomyRepository, ?TaxonHierarchy $taxonHierarchy = null)
+    public function __construct(TraderConfig $traderConfig, TaxonTreeRepository $taxonTreeRepository, TaxonomyItemRepository $taxonomyRepository, ?TaxonHierarchy $taxonHierarchy = null)
     {
         $this->taxonTreeRepository = $taxonTreeRepository;
         $this->taxonomyRepository = $taxonomyRepository;
