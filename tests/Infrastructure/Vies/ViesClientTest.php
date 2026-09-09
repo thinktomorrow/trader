@@ -17,6 +17,7 @@ class ViesClientTest extends TestCase
         'TIMEOUT',
         'MS_MAX_CONCURRENT_REQ',
         'GLOBAL_MAX_CONCURRENT_REQ',
+        'MS_UNAVAILABLE',
         'SERVER_BUSY',
         'SERVICE_UNAVAILABLE',
     ];
