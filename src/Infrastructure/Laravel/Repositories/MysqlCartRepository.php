@@ -16,7 +16,7 @@ use Thinktomorrow\Trader\Application\Cart\Read\CartRepository;
 use Thinktomorrow\Trader\Application\Cart\Read\CartShipping;
 use Thinktomorrow\Trader\Application\Cart\Read\CartShippingAddress;
 use Thinktomorrow\Trader\Application\Cart\Read\CartShopper;
-use Thinktomorrow\Trader\Application\Cart\RefreshCart\Adjusters\AdjustOrderVatSnapshot;
+use Thinktomorrow\Trader\Application\Cart\RefreshCart\Adjusters\AdjustOrderPricingSnapshot;
 use Thinktomorrow\Trader\Domain\Model\Order\Discount\Discount;
 use Thinktomorrow\Trader\Domain\Model\Order\Exceptions\OrderAlreadyInMerchantHands;
 use Thinktomorrow\Trader\Domain\Model\Order\Line\Personalisations\LinePersonalisation;
@@ -48,8 +48,8 @@ final class MysqlCartRepository implements CartRepository
             throw new OrderAlreadyInMerchantHands('Cannot fetch cart. Order is no longer in customer hands and has already the following state: '.$order->getOrderState()->getValueAsString());
         }
 
-        // Since we rely on the vat order snapshot for prices, we need to provide a vat snapshot state to the cart read models.
-        $this->container->get(AdjustOrderVatSnapshot::class)->adjust($order);
+        // Cart read models rely on the pricing snapshot for their totals.
+        $this->container->get(AdjustOrderPricingSnapshot::class)->adjust($order);
 
         $orderState = $order->getMappedData();
 

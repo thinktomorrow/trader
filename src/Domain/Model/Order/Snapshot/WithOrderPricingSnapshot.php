@@ -7,32 +7,37 @@ namespace Thinktomorrow\Trader\Domain\Model\Order\Snapshot;
 use Money\Money;
 use Thinktomorrow\Trader\Domain\Common\Vat\VatAllocatedLine;
 use Thinktomorrow\Trader\Domain\Common\Vat\VatPercentage;
-use Thinktomorrow\Trader\Domain\Model\Order\Exceptions\VatSnapshotNotCalculated;
+use Thinktomorrow\Trader\Domain\Model\Order\Exceptions\PricingSnapshotNotCalculated;
 
-trait WithOrderVatSnapshot
+trait WithOrderPricingSnapshot
 {
-    protected ?OrderVatSnapshot $vatSnapshot = null;
+    protected ?OrderPricingSnapshot $pricingSnapshot = null;
 
-    public function applyVatSnapshot(OrderVatSnapshot $snapshot): void
+    public function applyPricingSnapshot(OrderPricingSnapshot $snapshot): void
     {
         $snapshot->assertMatchesTotalExcl($this->getTotalExcl());
         $snapshot->assertMatchesPricingFingerprint($this->getPricingFingerprint());
-        $this->vatSnapshot = $snapshot;
+        $this->pricingSnapshot = $snapshot;
     }
 
-    public function invalidateVatSnapshot(): void
+    public function invalidatePricingSnapshot(): void
     {
-        $this->vatSnapshot = null;
+        $this->pricingSnapshot = null;
     }
 
     public function hasPricingSnapshot(): bool
     {
-        return $this->vatSnapshot !== null;
+        return $this->pricingSnapshot !== null;
     }
 
-    public function hasUpToDateVatSnapshot(): bool
+    public function findPricingSnapshot(): ?OrderPricingSnapshot
     {
-        if (! $this->vatSnapshot) {
+        return $this->pricingSnapshot;
+    }
+
+    public function hasUpToDatePricingSnapshot(): bool
+    {
+        if (! $this->pricingSnapshot) {
             return false;
         }
 
@@ -40,12 +45,12 @@ trait WithOrderVatSnapshot
             return true;
         }
 
-        if ($this->vatSnapshot->getPricingFingerprint() === null) {
+        if ($this->pricingSnapshot->getPricingFingerprint() === null) {
             return false;
         }
 
         try {
-            $this->assertVatSnapshotMatchesCurrentPricing($this->vatSnapshot);
+            $this->assertPricingSnapshotMatchesCurrentPricing($this->pricingSnapshot);
 
             return true;
         } catch (\LogicException) {
@@ -53,7 +58,7 @@ trait WithOrderVatSnapshot
         }
     }
 
-    protected function initializeVatSnapshotFromState(array $state): void
+    protected function initializePricingSnapshotFromState(array $state): void
     {
         try {
             $vatLinesData = json_decode($state['vat_lines'], true);
@@ -68,7 +73,7 @@ trait WithOrderVatSnapshot
                 VatPercentage::fromString($vatLineData['vat_percentage']),
             ), $vatLinesData);
 
-            $this->vatSnapshot = OrderVatSnapshot::fromState(
+            $this->pricingSnapshot = OrderPricingSnapshot::fromState(
                 vatLines: $vatLines,
                 subtotalExcl: Money::EUR($state['subtotal_excl']),
                 subtotalIncl: Money::EUR($state['subtotal_incl']),
@@ -84,13 +89,13 @@ trait WithOrderVatSnapshot
                 pricingFingerprint: $state['pricing_fingerprint'] ?? $state['vat_calculation_fingerprint'] ?? null,
             );
         } catch (\Throwable) {
-            $this->vatSnapshot = null;
+            $this->pricingSnapshot = null;
         }
     }
 
     protected function getOrderTotalsState(): array
     {
-        $snapshot = $this->getCurrentVatSnapshot('order totals state');
+        $snapshot = $this->getCurrentPricingSnapshot('order totals state');
 
         return [
             'subtotal_excl' => $snapshot->getSubtotalExcl()->getAmount(),
@@ -113,25 +118,25 @@ trait WithOrderVatSnapshot
         ];
     }
 
-    protected function getFrozenVatSnapshot(): ?OrderVatSnapshot
+    protected function getFrozenPricingSnapshot(): ?OrderPricingSnapshot
     {
-        return $this->hasFrozenPricing() ? $this->vatSnapshot : null;
+        return $this->hasFrozenPricing() ? $this->pricingSnapshot : null;
     }
 
-    protected function getCurrentVatSnapshot(string $value): OrderVatSnapshot
+    protected function getCurrentPricingSnapshot(string $value): OrderPricingSnapshot
     {
-        if (! $this->vatSnapshot) {
-            throw new VatSnapshotNotCalculated('Cannot get '.$value.' when VAT snapshot is not calculated.');
+        if (! $this->pricingSnapshot) {
+            throw new PricingSnapshotNotCalculated('Cannot get '.$value.' when pricing snapshot is not calculated.');
         }
 
         if (! $this->hasFrozenPricing()) {
-            $this->assertVatSnapshotMatchesCurrentPricing($this->vatSnapshot);
+            $this->assertPricingSnapshotMatchesCurrentPricing($this->pricingSnapshot);
         }
 
-        return $this->vatSnapshot;
+        return $this->pricingSnapshot;
     }
 
-    private function assertVatSnapshotMatchesCurrentPricing(OrderVatSnapshot $snapshot): void
+    private function assertPricingSnapshotMatchesCurrentPricing(OrderPricingSnapshot $snapshot): void
     {
         $snapshot->assertMatchesTotalExcl($this->getTotalExcl());
         $snapshot->assertMatchesPricingFingerprint($this->getPricingFingerprint());

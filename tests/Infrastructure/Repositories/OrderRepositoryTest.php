@@ -112,7 +112,7 @@ final class OrderRepositoryTest extends TestCase
             $savedOrder = $orderContext->findOrder($order->orderId);
 
             $this->assertEquals(DefaultOrderState::cart_abandoned, $savedOrder->getOrderState());
-            $this->assertTrue($savedOrder->hasUpToDateVatSnapshot());
+            $this->assertTrue($savedOrder->hasUpToDatePricingSnapshot());
         }
     }
 
@@ -149,7 +149,7 @@ final class OrderRepositoryTest extends TestCase
             $this->assertEquals(236, (int) $savedOrder->getTotalExcl()->getAmount());
             $this->assertCount(1, $savedOrder->getShippings()[0]->getDiscounts());
             $this->assertCount(1, $savedOrder->getPayments()[0]->getDiscounts());
-            $this->assertTrue($savedOrder->hasUpToDateVatSnapshot());
+            $this->assertTrue($savedOrder->hasUpToDatePricingSnapshot());
         }
     }
 
@@ -177,7 +177,7 @@ final class OrderRepositoryTest extends TestCase
             $this->assertEquals(Money::EUR(700), $savedOrder->getShippingCostIncl(), $orderContext->driverName);
             $this->assertEquals(Money::EUR(121), $savedOrder->getPaymentCostIncl(), $orderContext->driverName);
             $this->assertEquals(Money::EUR(12), $savedOrder->getDiscountTotalIncl(), $orderContext->driverName);
-            $this->assertTrue($savedOrder->hasUpToDateVatSnapshot());
+            $this->assertTrue($savedOrder->hasUpToDatePricingSnapshot());
         }
     }
 
@@ -213,7 +213,7 @@ final class OrderRepositoryTest extends TestCase
 
             $this->assertEquals(Money::EUR(166), $savedOrder->getSubtotalExcl(), $orderContext->driverName);
             $this->assertEquals(Money::EUR(50), $savedOrder->getShippingCostExcl(), $orderContext->driverName);
-            $this->assertTrue($savedOrder->hasUpToDateVatSnapshot(), $orderContext->driverName);
+            $this->assertTrue($savedOrder->hasUpToDatePricingSnapshot(), $orderContext->driverName);
         }
     }
 }

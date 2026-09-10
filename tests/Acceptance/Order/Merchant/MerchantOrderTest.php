@@ -6,7 +6,7 @@ namespace Tests\Acceptance\Order\Merchant;
 
 use Money\Money;
 use Tests\Acceptance\Cart\CartContext;
-use Thinktomorrow\Trader\Application\Cart\RefreshCart\Adjusters\AdjustOrderVatSnapshot;
+use Thinktomorrow\Trader\Application\Cart\RefreshCart\Adjusters\AdjustOrderPricingSnapshot;
 use Thinktomorrow\Trader\Application\Order\MerchantOrder\MerchantOrder;
 use Thinktomorrow\Trader\Application\Order\MerchantOrder\MerchantOrderPayment;
 use Thinktomorrow\Trader\Application\Order\MerchantOrder\MerchantOrderShipping;
@@ -24,7 +24,7 @@ class MerchantOrderTest extends CartContext
     {
         $order = $this->orderContext->createDefaultDiscountedOrder();
 
-        (new TestContainer)->get(AdjustOrderVatSnapshot::class)->adjust($order);
+        (new TestContainer)->get(AdjustOrderPricingSnapshot::class)->adjust($order);
         $this->orderContext->saveOrder($order);
 
         $order = $this->orderContext->findMerchantOrder($order->orderId->get());
@@ -50,7 +50,7 @@ class MerchantOrderTest extends CartContext
     {
         $order = $this->orderContext->createDefaultDiscountedOrder();
 
-        (new TestContainer)->get(AdjustOrderVatSnapshot::class)->adjust($order);
+        (new TestContainer)->get(AdjustOrderPricingSnapshot::class)->adjust($order);
         $this->orderContext->saveOrder($order);
 
         $order = $this->orderContext->findMerchantOrder($order->orderId->get());
@@ -74,7 +74,7 @@ class MerchantOrderTest extends CartContext
         $order->getShippings()[0]->addDiscount($this->orderContext->createShippingDiscount());
         $order->getPayments()[0]->addDiscount($this->orderContext->createPaymentDiscount());
 
-        (new TestContainer)->get(AdjustOrderVatSnapshot::class)->adjust($order);
+        (new TestContainer)->get(AdjustOrderPricingSnapshot::class)->adjust($order);
         $this->orderContext->saveOrder($order);
 
         $order = $this->orderContext->findMerchantOrder($order->orderId->get());
@@ -209,7 +209,7 @@ class MerchantOrderTest extends CartContext
 
         // Vat Snapshot needs to be adjusted to pick up customer info
         $order = $this->orderContext->findOrder(OrderId::fromString('xxx'));
-        (new TestContainer)->get(AdjustOrderVatSnapshot::class)->adjust($order);
+        (new TestContainer)->get(AdjustOrderPricingSnapshot::class)->adjust($order);
         $this->orderContext->saveOrder($order);
 
         $order = $this->orderContext->findMerchantOrder(OrderId::fromString('xxx'));
@@ -228,7 +228,7 @@ class MerchantOrderTest extends CartContext
 
         // Vat Snapshot needs to be adjusted to pick up customer info
         $order = $this->orderContext->findOrder(OrderId::fromString('xxx'));
-        (new TestContainer)->get(AdjustOrderVatSnapshot::class)->adjust($order);
+        (new TestContainer)->get(AdjustOrderPricingSnapshot::class)->adjust($order);
         $this->orderContext->saveOrder($order);
 
         $order = $this->orderContext->findMerchantOrder(OrderId::fromString('xxx'));

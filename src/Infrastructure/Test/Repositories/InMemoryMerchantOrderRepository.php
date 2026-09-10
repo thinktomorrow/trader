@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Thinktomorrow\Trader\Infrastructure\Test\Repositories;
 
-use Thinktomorrow\Trader\Application\Cart\RefreshCart\Adjusters\AdjustOrderVatSnapshot;
+use Thinktomorrow\Trader\Application\Cart\RefreshCart\Adjusters\AdjustOrderPricingSnapshot;
 use Thinktomorrow\Trader\Application\Order\MerchantOrder\MerchantOrder;
 use Thinktomorrow\Trader\Application\Order\MerchantOrder\MerchantOrderBillingAddress;
 use Thinktomorrow\Trader\Application\Order\MerchantOrder\MerchantOrderEvent;
@@ -43,8 +43,8 @@ class InMemoryMerchantOrderRepository implements InMemoryRepository, MerchantOrd
 
         $order = InMemoryOrderRepository::$orders[$orderId->get()];
 
-        // Since we rely on the vat order snapshot for prices, we need to provide a vat snapshot state to the order read models.
-        (new TestContainer)->get(AdjustOrderVatSnapshot::class)->adjust($order);
+        // Order read models rely on the pricing snapshot for their totals.
+        (new TestContainer)->get(AdjustOrderPricingSnapshot::class)->adjust($order);
 
         $orderState = array_merge($order->getMappedData(), [
             'order_state' => $order->getOrderState(),

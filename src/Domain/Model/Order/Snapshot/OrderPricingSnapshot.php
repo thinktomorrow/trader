@@ -6,7 +6,7 @@ namespace Thinktomorrow\Trader\Domain\Model\Order\Snapshot;
 
 use Money\Money;
 use Thinktomorrow\Trader\Domain\Common\Vat\VatAllocatedLine;
-use Thinktomorrow\Trader\Domain\Model\Order\Exceptions\VatSnapshotMismatchException;
+use Thinktomorrow\Trader\Domain\Model\Order\Exceptions\PricingSnapshotMismatchException;
 
 /**
  * Captures the validated result of VAT allocation as one consistent set of totals and VAT lines.
@@ -14,7 +14,7 @@ use Thinktomorrow\Trader\Domain\Model\Order\Exceptions\VatSnapshotMismatchExcept
  * Its pricing fingerprint ties the calculated values to their source inputs, allowing mutable
  * orders to reject a snapshot once those inputs no longer match.
  */
-final class OrderVatSnapshot
+final class OrderPricingSnapshot
 {
     /**
      * @param  VatAllocatedLine[]  $vatLines
@@ -178,7 +178,7 @@ final class OrderVatSnapshot
     public function assertMatchesTotalExcl(Money $totalExcl): void
     {
         if (! $this->totalExcl->equals($totalExcl)) {
-            throw new VatSnapshotMismatchException(
+            throw new PricingSnapshotMismatchException(
                 sprintf(
                     'Stored pricing snapshot total excl [%s] does not match current order total excl [%s].',
                     $this->totalExcl->getAmount(),
@@ -190,8 +190,12 @@ final class OrderVatSnapshot
 
     public function assertMatchesPricingFingerprint(string $pricingFingerprint): void
     {
-        if ($this->pricingFingerprint !== null && $this->pricingFingerprint !== $pricingFingerprint) {
-            throw new VatSnapshotMismatchException('Stored pricing snapshot no longer matches the current order calculation inputs.');
+        if ($this->pricingFingerprint === null) {
+            throw new PricingSnapshotMismatchException('Stored pricing snapshot has no fingerprint and cannot be used for mutable pricing.');
+        }
+
+        if ($this->pricingFingerprint !== $pricingFingerprint) {
+            throw new PricingSnapshotMismatchException('Stored pricing snapshot no longer matches the current order calculation inputs.');
         }
     }
 

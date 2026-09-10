@@ -14,7 +14,7 @@ use Thinktomorrow\Trader\Application\Cart\RefreshCart\Adjusters\AdjustDiscounts;
 use Thinktomorrow\Trader\Application\Cart\RefreshCart\Adjusters\AdjustDiscountsAndServices;
 use Thinktomorrow\Trader\Application\Cart\RefreshCart\Adjusters\AdjustLine;
 use Thinktomorrow\Trader\Application\Cart\RefreshCart\Adjusters\AdjustLines;
-use Thinktomorrow\Trader\Application\Cart\RefreshCart\Adjusters\AdjustOrderVatSnapshot;
+use Thinktomorrow\Trader\Application\Cart\RefreshCart\Adjusters\AdjustOrderPricingSnapshot;
 use Thinktomorrow\Trader\Application\Cart\RefreshCart\Adjusters\AdjustPayment;
 use Thinktomorrow\Trader\Application\Cart\RefreshCart\Adjusters\AdjustShipping;
 use Thinktomorrow\Trader\Application\Cart\RefreshCart\Adjusters\AdjustVatRates;
@@ -85,7 +85,7 @@ final class CartApplication
                 $this->container->get(AdjustShipping::class),
                 $this->container->get(AdjustPayment::class),
             ),
-            $this->container->get(AdjustOrderVatSnapshot::class),
+            $this->container->get(AdjustOrderPricingSnapshot::class),
         ]);
     }
 
@@ -97,7 +97,7 @@ final class CartApplication
             $this->container->get(OrderState::class)::getDefaultState()
         );
 
-        $this->container->get(AdjustOrderVatSnapshot::class)->adjust($order);
+        $this->container->get(AdjustOrderPricingSnapshot::class)->adjust($order);
 
         $this->orderRepository->save($order);
 

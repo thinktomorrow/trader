@@ -8,7 +8,7 @@ use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 use Psr\Container\ContainerInterface;
 use Ramsey\Uuid\Uuid;
-use Thinktomorrow\Trader\Application\Cart\RefreshCart\Adjusters\AdjustOrderVatSnapshot;
+use Thinktomorrow\Trader\Application\Cart\RefreshCart\Adjusters\AdjustOrderPricingSnapshot;
 use Thinktomorrow\Trader\Application\Order\Invoice\CreateInvoiceReferenceByYearAndMonth;
 use Thinktomorrow\Trader\Domain\Common\Address\AddressType;
 use Thinktomorrow\Trader\Domain\Model\Order\Address\BillingAddress;
@@ -18,8 +18,8 @@ use Thinktomorrow\Trader\Domain\Model\Order\Discount\DiscountableType;
 use Thinktomorrow\Trader\Domain\Model\Order\Discount\DiscountId;
 use Thinktomorrow\Trader\Domain\Model\Order\Exceptions\CouldNotFindOrder;
 use Thinktomorrow\Trader\Domain\Model\Order\Exceptions\OrderAlreadyInMerchantHands;
-use Thinktomorrow\Trader\Domain\Model\Order\Exceptions\VatSnapshotMismatchException;
-use Thinktomorrow\Trader\Domain\Model\Order\Exceptions\VatSnapshotNotCalculated;
+use Thinktomorrow\Trader\Domain\Model\Order\Exceptions\PricingSnapshotMismatchException;
+use Thinktomorrow\Trader\Domain\Model\Order\Exceptions\PricingSnapshotNotCalculated;
 use Thinktomorrow\Trader\Domain\Model\Order\Invoice\InvoiceReference;
 use Thinktomorrow\Trader\Domain\Model\Order\Invoice\InvoiceRepository;
 use Thinktomorrow\Trader\Domain\Model\Order\Line\Line;
@@ -100,22 +100,22 @@ class MysqlOrderRepository implements InvoiceRepository, OrderRepository
 
     private function getMappedDataForSave(Order $order): array
     {
-        if (! $order->hasUpToDateVatSnapshot() && $order->inCustomerHands()) {
-            $this->container->get(AdjustOrderVatSnapshot::class)->adjust($order);
+        if (! $order->hasUpToDatePricingSnapshot() && $order->inCustomerHands()) {
+            $this->container->get(AdjustOrderPricingSnapshot::class)->adjust($order);
         }
 
         if (! $order->hasPricingSnapshot()) {
-            throw new VatSnapshotNotCalculated('Cannot save an order without a pricing snapshot.');
+            throw new PricingSnapshotNotCalculated('Cannot save an order without a pricing snapshot.');
         }
 
         try {
             return $order->getMappedData();
-        } catch (VatSnapshotMismatchException|VatSnapshotNotCalculated $exception) {
+        } catch (PricingSnapshotMismatchException|PricingSnapshotNotCalculated $exception) {
             if ($order->hasFrozenPricing()) {
                 throw $exception;
             }
 
-            $this->container->get(AdjustOrderVatSnapshot::class)->adjust($order);
+            $this->container->get(AdjustOrderPricingSnapshot::class)->adjust($order);
 
             return $order->getMappedData();
         }

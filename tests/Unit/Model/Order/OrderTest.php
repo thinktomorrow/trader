@@ -6,7 +6,7 @@ namespace Tests\Unit\Model\Order;
 
 use Money\Money;
 use Tests\Unit\TestCase;
-use Thinktomorrow\Trader\Application\Cart\RefreshCart\Adjusters\AdjustOrderVatSnapshot;
+use Thinktomorrow\Trader\Application\Cart\RefreshCart\Adjusters\AdjustOrderPricingSnapshot;
 use Thinktomorrow\Trader\Domain\Common\Email;
 use Thinktomorrow\Trader\Domain\Common\Price\DefaultServicePrice;
 use Thinktomorrow\Trader\Domain\Model\Customer\CustomerId;
@@ -39,7 +39,7 @@ class OrderTest extends TestCase
             DefaultOrderState::cart_pending
         );
 
-        (new TestContainer)->get(AdjustOrderVatSnapshot::class)->adjust($order);
+        (new TestContainer)->get(AdjustOrderPricingSnapshot::class)->adjust($order);
 
         $this->assertEquals([
             'order_id' => 'xxx',
@@ -78,7 +78,7 @@ class OrderTest extends TestCase
             OrderReference::fromString('xx-ref'),
             DefaultOrderState::cart_pending,
         );
-        (new TestContainer)->get(AdjustOrderVatSnapshot::class)->adjust($order);
+        (new TestContainer)->get(AdjustOrderPricingSnapshot::class)->adjust($order);
 
         $state = array_merge($order->getMappedData(), [
             'order_state' => DefaultOrderState::cart_pending,

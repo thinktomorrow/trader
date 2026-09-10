@@ -8,7 +8,7 @@ use DateTime;
 use Money\Money;
 use Tests\Acceptance\TestCase;
 use Tests\TestHelpers;
-use Thinktomorrow\Trader\Application\Cart\RefreshCart\Adjusters\AdjustOrderVatSnapshot;
+use Thinktomorrow\Trader\Application\Cart\RefreshCart\Adjusters\AdjustOrderPricingSnapshot;
 use Thinktomorrow\Trader\Domain\Model\Order\State\DefaultOrderState;
 use Thinktomorrow\Trader\Infrastructure\Laravel\Models\DefaultOrderGridItem;
 use Thinktomorrow\Trader\Infrastructure\Test\TestContainer;
@@ -22,7 +22,7 @@ class OrderGridItemTest extends TestCase
         $order = $this->orderContext->createDefaultDiscountedOrder();
 
         // Refresh Vat snapshot
-        (new TestContainer)->get(AdjustOrderVatSnapshot::class)->adjust($order);
+        (new TestContainer)->get(AdjustOrderPricingSnapshot::class)->adjust($order);
         $this->orderContext->saveOrder($order);
         $order = $this->orderContext->findOrder($order->orderId);
 
@@ -55,7 +55,7 @@ class OrderGridItemTest extends TestCase
         $order = $this->orderContext->createDefaultDiscountedOrder();
 
         // Refresh Vat snapshot
-        (new TestContainer)->get(AdjustOrderVatSnapshot::class)->adjust($order);
+        (new TestContainer)->get(AdjustOrderPricingSnapshot::class)->adjust($order);
         $this->orderContext->saveOrder($order);
         $order = $this->orderContext->findOrder($order->orderId);
 
@@ -80,7 +80,7 @@ class OrderGridItemTest extends TestCase
         $order->getShippings()[0]->addDiscount($this->orderContext->createShippingDiscount());
         $order->getPayments()[0]->addDiscount($this->orderContext->createPaymentDiscount());
 
-        (new TestContainer)->get(AdjustOrderVatSnapshot::class)->adjust($order);
+        (new TestContainer)->get(AdjustOrderPricingSnapshot::class)->adjust($order);
         $this->orderContext->saveOrder($order);
         $order = $this->orderContext->findOrder($order->orderId);
 

@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Tests\Acceptance\Cart;
 
 use Money\Money;
-use Thinktomorrow\Trader\Application\Cart\RefreshCart\Adjusters\AdjustOrderVatSnapshot;
+use Thinktomorrow\Trader\Application\Cart\RefreshCart\Adjusters\AdjustOrderPricingSnapshot;
 use Thinktomorrow\Trader\Domain\Model\Order\OrderId;
 use Thinktomorrow\Trader\Domain\Model\Product\Personalisation\PersonalisationType;
 use Thinktomorrow\Trader\Infrastructure\Test\TestContainer;
@@ -60,7 +60,7 @@ class CartReadTest extends CartContext
         $order->getShippings()[0]->addDiscount($this->orderContext->createShippingDiscount());
         $order->getPayments()[0]->addDiscount($this->orderContext->createPaymentDiscount());
 
-        (new TestContainer)->get(AdjustOrderVatSnapshot::class)->adjust($order);
+        (new TestContainer)->get(AdjustOrderPricingSnapshot::class)->adjust($order);
         $this->orderContext->saveOrder($order);
 
         $cart = $this->orderContext->repos()->cartRepository()->findCart($order->orderId);

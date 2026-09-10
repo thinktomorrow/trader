@@ -6,7 +6,7 @@ namespace Tests\Acceptance\Promo;
 
 use Money\Money;
 use Tests\Acceptance\TestCase;
-use Thinktomorrow\Trader\Application\Cart\RefreshCart\Adjusters\AdjustOrderVatSnapshot;
+use Thinktomorrow\Trader\Application\Cart\RefreshCart\Adjusters\AdjustOrderPricingSnapshot;
 use Thinktomorrow\Trader\Application\Promo\ApplyPromoToOrder;
 use Thinktomorrow\Trader\Application\Promo\Coupon\EnterCoupon;
 use Thinktomorrow\Trader\Application\Promo\LinePromo\Discounts\SalePriceLineDiscount;
@@ -72,7 +72,7 @@ class OrderPromoTest extends TestCase
         ], [], $this->catalogContext->apps()->vatAllocator());
 
         $discount->apply($order, $order, DiscountId::fromString('applied-discount'));
-        (new TestContainer)->get(AdjustOrderVatSnapshot::class)->adjust($order);
+        (new TestContainer)->get(AdjustOrderPricingSnapshot::class)->adjust($order);
 
         $this->assertEquals(Money::EUR(5), $order->getDiscountTotalExcl());
         $this->assertEquals(Money::EUR(5), $order->getDiscountTotalIncl());
@@ -433,7 +433,7 @@ class OrderPromoTest extends TestCase
         ], [], $this->catalogContext->apps()->vatAllocator());
 
         $discount->apply($order, $order, DiscountId::fromString('applied-discount'));
-        (new TestContainer)->get(AdjustOrderVatSnapshot::class)->adjust($order);
+        (new TestContainer)->get(AdjustOrderPricingSnapshot::class)->adjust($order);
 
         $this->assertEquals(Money::EUR(227), $order->getDiscountTotalIncl());
         $this->assertEquals(Money::EUR(0), $order->getTotalExcl());

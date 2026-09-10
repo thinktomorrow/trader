@@ -6,13 +6,13 @@ namespace Tests\Unit\Model\Order;
 
 use Money\Money;
 use Tests\Unit\TestCase;
-use Thinktomorrow\Trader\Application\Cart\RefreshCart\Adjusters\AdjustOrderVatSnapshot;
+use Thinktomorrow\Trader\Application\Cart\RefreshCart\Adjusters\AdjustOrderPricingSnapshot;
 use Thinktomorrow\Trader\Domain\Common\Cash\Cash;
 use Thinktomorrow\Trader\Domain\Common\Price\DefaultServicePrice;
 use Thinktomorrow\Trader\Domain\Common\Price\TaxMode;
 use Thinktomorrow\Trader\Domain\Common\Vat\VatPercentage;
-use Thinktomorrow\Trader\Domain\Model\Order\Exceptions\VatSnapshotMismatchException;
-use Thinktomorrow\Trader\Domain\Model\Order\Exceptions\VatSnapshotNotCalculated;
+use Thinktomorrow\Trader\Domain\Model\Order\Exceptions\PricingSnapshotMismatchException;
+use Thinktomorrow\Trader\Domain\Model\Order\Exceptions\PricingSnapshotNotCalculated;
 use Thinktomorrow\Trader\Domain\Model\Order\Order;
 use Thinktomorrow\Trader\Domain\Model\Order\OrderId;
 use Thinktomorrow\Trader\Domain\Model\Order\OrderReference;
@@ -55,7 +55,7 @@ class OrderTotalsTest extends TestCase
         $order = $this->orderContext->createDefaultOrder();
         $this->orderContext->addDiscountToOrder($order, $this->orderContext->createOrderDiscount());
 
-        (new TestContainer)->get(AdjustOrderVatSnapshot::class)->adjust($order);
+        (new TestContainer)->get(AdjustOrderPricingSnapshot::class)->adjust($order);
 
         $this->assertEquals(Money::EUR('200'), $order->getSubtotalIncl());
         $this->assertEquals(Money::EUR('61'), $order->getShippingCostIncl());
@@ -83,7 +83,7 @@ class OrderTotalsTest extends TestCase
         $this->assertEquals(Money::EUR('35'), $order->getShippingCostExcl());
         $this->assertEquals(Money::EUR('251'), $order->getTotalExcl());
 
-        (new TestContainer)->get(AdjustOrderVatSnapshot::class)->adjust($order);
+        (new TestContainer)->get(AdjustOrderPricingSnapshot::class)->adjust($order);
 
         $this->assertEquals(Money::EUR('43'), $order->getShippingCostIncl());
         $this->assertEquals(Money::EUR('61'), $order->getPaymentCostIncl());
@@ -99,7 +99,7 @@ class OrderTotalsTest extends TestCase
         $this->assertEquals(Money::EUR('35'), $order->getPaymentCostExcl());
         $this->assertEquals(Money::EUR('251'), $order->getTotalExcl());
 
-        (new TestContainer)->get(AdjustOrderVatSnapshot::class)->adjust($order);
+        (new TestContainer)->get(AdjustOrderPricingSnapshot::class)->adjust($order);
 
         $this->assertEquals(Money::EUR('61'), $order->getShippingCostIncl());
         $this->assertEquals(Money::EUR('43'), $order->getPaymentCostIncl());
@@ -119,7 +119,7 @@ class OrderTotalsTest extends TestCase
         $this->assertEquals(Money::EUR('15'), $order->getDiscountTotalExcl());
         $this->assertEquals(Money::EUR('221'), $order->getTotalExcl());
 
-        (new TestContainer)->get(AdjustOrderVatSnapshot::class)->adjust($order);
+        (new TestContainer)->get(AdjustOrderPricingSnapshot::class)->adjust($order);
 
         $this->assertEquals(Money::EUR('43'), $order->getShippingCostIncl());
         $this->assertEquals(Money::EUR('43'), $order->getPaymentCostIncl());
@@ -138,7 +138,7 @@ class OrderTotalsTest extends TestCase
             'tax_mode' => TaxMode::Inclusive->value,
         ]));
 
-        (new TestContainer)->get(AdjustOrderVatSnapshot::class)->adjust($order);
+        (new TestContainer)->get(AdjustOrderPricingSnapshot::class)->adjust($order);
 
         $this->assertEquals(Money::EUR(0), $order->getShippingCostExcl());
         $this->assertEquals(Money::EUR(0), $order->getShippingCostIncl());
@@ -149,8 +149,8 @@ class OrderTotalsTest extends TestCase
         $order = $this->orderContext->createDefaultOrder();
         $order->getShippings()[0]->updateCost(DefaultServicePrice::fromIncludingVat(Money::EUR(61), Money::EUR(50)));
 
-        $this->assertFalse($order->hasUpToDateVatSnapshot());
-        $this->expectException(VatSnapshotMismatchException::class);
+        $this->assertFalse($order->hasUpToDatePricingSnapshot());
+        $this->expectException(PricingSnapshotMismatchException::class);
 
         $order->getShippingCostIncl();
     }
@@ -160,12 +160,12 @@ class OrderTotalsTest extends TestCase
         $order = $this->orderContext->createDefaultOrder();
         $order->getShippings()[0]->updateCost(DefaultServicePrice::fromIncludingVat(Money::EUR(61), Money::EUR(50)));
         $order->getPayments()[0]->updateCost(DefaultServicePrice::fromIncludingVat(Money::EUR(121), Money::EUR(100)));
-        (new TestContainer)->get(AdjustOrderVatSnapshot::class)->adjust($order);
+        (new TestContainer)->get(AdjustOrderPricingSnapshot::class)->adjust($order);
 
         $order->getShippings()[0]->updateCost(DefaultServicePrice::fromIncludingVat(Money::EUR(121), Money::EUR(100)));
         $order->getPayments()[0]->updateCost(DefaultServicePrice::fromIncludingVat(Money::EUR(61), Money::EUR(50)));
 
-        $this->assertFalse($order->hasUpToDateVatSnapshot());
+        $this->assertFalse($order->hasUpToDatePricingSnapshot());
     }
 
     public function test_legacy_snapshot_without_fingerprint_remains_readable_when_pricing_is_frozen(): void
@@ -175,15 +175,35 @@ class OrderTotalsTest extends TestCase
             OrderReference::fromString('LEGACY-ORDER'),
             DefaultOrderState::confirmed,
         );
-        (new TestContainer)->get(AdjustOrderVatSnapshot::class)->adjust($order);
+        (new TestContainer)->get(AdjustOrderPricingSnapshot::class)->adjust($order);
         $state = array_merge($order->getMappedData(), [
             'order_state' => $order->getOrderState(),
             'pricing_fingerprint' => null,
         ]);
         $hydratedOrder = Order::fromMappedData($state);
 
-        $this->assertTrue($hydratedOrder->hasUpToDateVatSnapshot());
+        $this->assertTrue($hydratedOrder->hasUpToDatePricingSnapshot());
         $this->assertEquals($order->getTotalIncl(), $hydratedOrder->getTotalIncl());
+    }
+
+    public function test_legacy_snapshot_without_fingerprint_is_not_readable_while_pricing_is_mutable(): void
+    {
+        $order = Order::create(
+            OrderId::fromString('legacy-cart'),
+            OrderReference::fromString('LEGACY-CART'),
+            DefaultOrderState::cart_pending,
+        );
+        (new TestContainer)->get(AdjustOrderPricingSnapshot::class)->adjust($order);
+        $state = array_merge($order->getMappedData(), [
+            'order_state' => $order->getOrderState(),
+            'pricing_fingerprint' => null,
+        ]);
+        $hydratedOrder = Order::fromMappedData($state);
+
+        $this->assertFalse($hydratedOrder->hasUpToDatePricingSnapshot());
+        $this->expectException(PricingSnapshotMismatchException::class);
+
+        $hydratedOrder->getTotalIncl();
     }
 
     public function test_malformed_persisted_vat_lines_invalidate_snapshot_instead_of_blocking_hydration(): void
@@ -193,7 +213,7 @@ class OrderTotalsTest extends TestCase
             OrderReference::fromString('MALFORMED-ORDER'),
             DefaultOrderState::confirmed,
         );
-        (new TestContainer)->get(AdjustOrderVatSnapshot::class)->adjust($order);
+        (new TestContainer)->get(AdjustOrderPricingSnapshot::class)->adjust($order);
         $state = array_merge($order->getMappedData(), [
             'order_state' => $order->getOrderState(),
             'vat_lines' => json_encode([[
@@ -205,8 +225,8 @@ class OrderTotalsTest extends TestCase
 
         $hydratedOrder = Order::fromMappedData($state);
 
-        $this->assertFalse($hydratedOrder->hasUpToDateVatSnapshot());
-        $this->expectException(VatSnapshotNotCalculated::class);
+        $this->assertFalse($hydratedOrder->hasUpToDatePricingSnapshot());
+        $this->expectException(PricingSnapshotNotCalculated::class);
 
         $hydratedOrder->getTotalIncl();
     }
@@ -218,7 +238,7 @@ class OrderTotalsTest extends TestCase
             OrderReference::fromString('INVALID-JSON-ORDER'),
             DefaultOrderState::confirmed,
         );
-        (new TestContainer)->get(AdjustOrderVatSnapshot::class)->adjust($order);
+        (new TestContainer)->get(AdjustOrderPricingSnapshot::class)->adjust($order);
         $state = array_merge($order->getMappedData(), [
             'order_state' => $order->getOrderState(),
             'vat_lines' => '{invalid',
@@ -226,8 +246,8 @@ class OrderTotalsTest extends TestCase
 
         $hydratedOrder = Order::fromMappedData($state);
 
-        $this->assertFalse($hydratedOrder->hasUpToDateVatSnapshot());
-        $this->expectException(VatSnapshotNotCalculated::class);
+        $this->assertFalse($hydratedOrder->hasUpToDatePricingSnapshot());
+        $this->expectException(PricingSnapshotNotCalculated::class);
 
         $hydratedOrder->getTotalIncl();
     }

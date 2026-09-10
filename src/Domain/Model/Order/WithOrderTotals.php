@@ -10,7 +10,7 @@ trait WithOrderTotals
 {
     public function getSubtotalExcl(): Money
     {
-        if ($snapshot = $this->getFrozenVatSnapshot()) {
+        if ($snapshot = $this->getFrozenPricingSnapshot()) {
             return $snapshot->getSubtotalExcl();
         }
 
@@ -25,7 +25,7 @@ trait WithOrderTotals
 
     public function getSubtotalIncl(): Money
     {
-        if ($snapshot = $this->getFrozenVatSnapshot()) {
+        if ($snapshot = $this->getFrozenPricingSnapshot()) {
             return $snapshot->getSubtotalIncl();
         }
 
@@ -40,7 +40,7 @@ trait WithOrderTotals
 
     public function getShippingCostExcl(): Money
     {
-        if ($snapshot = $this->getFrozenVatSnapshot()) {
+        if ($snapshot = $this->getFrozenPricingSnapshot()) {
             return $snapshot->getShippingExcl();
         }
 
@@ -55,7 +55,7 @@ trait WithOrderTotals
 
     public function getPaymentCostExcl(): Money
     {
-        if ($snapshot = $this->getFrozenVatSnapshot()) {
+        if ($snapshot = $this->getFrozenPricingSnapshot()) {
             return $snapshot->getPaymentExcl();
         }
 
@@ -70,7 +70,7 @@ trait WithOrderTotals
 
     public function getDiscountTotalExcl(): Money
     {
-        if ($snapshot = $this->getFrozenVatSnapshot()) {
+        if ($snapshot = $this->getFrozenPricingSnapshot()) {
             return $snapshot->getDiscountExcl();
         }
 
@@ -85,7 +85,7 @@ trait WithOrderTotals
 
     public function getTotalExcl(): Money
     {
-        if ($snapshot = $this->getFrozenVatSnapshot()) {
+        if ($snapshot = $this->getFrozenPricingSnapshot()) {
             return $snapshot->getTotalExcl();
         }
 
@@ -97,31 +97,31 @@ trait WithOrderTotals
 
     public function getShippingCostIncl(): Money
     {
-        return $this->getCurrentVatSnapshot('shipping cost incl.')->getShippingIncl();
+        return $this->getCurrentPricingSnapshot('shipping cost incl.')->getShippingIncl();
     }
 
     public function getPaymentCostIncl(): Money
     {
-        return $this->getCurrentVatSnapshot('payment cost incl.')->getPaymentIncl();
+        return $this->getCurrentPricingSnapshot('payment cost incl.')->getPaymentIncl();
     }
 
     public function getDiscountTotalIncl(): Money
     {
-        return $this->getCurrentVatSnapshot('discount total incl.')->getDiscountIncl();
+        return $this->getCurrentPricingSnapshot('discount total incl.')->getDiscountIncl();
     }
 
     public function getTotalVat(): Money
     {
-        return $this->getCurrentVatSnapshot('total VAT')->getTotalVat();
+        return $this->getCurrentPricingSnapshot('total VAT')->getTotalVat();
     }
 
     public function getTotalIncl(): Money
     {
-        return $this->getCurrentVatSnapshot('total incl.')->getTotalIncl();
+        return $this->getCurrentPricingSnapshot('total incl.')->getTotalIncl();
     }
 
     public function getVatLines(): array
     {
-        return $this->getCurrentVatSnapshot('VAT lines')->getVatLines();
+        return $this->getCurrentPricingSnapshot('VAT lines')->getVatLines();
     }
 }

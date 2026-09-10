@@ -10,6 +10,7 @@ use Thinktomorrow\Trader\Domain\Common\Price\ItemPrice;
 use Thinktomorrow\Trader\Domain\Common\Price\Price;
 use Thinktomorrow\Trader\Domain\Common\Price\TaxMode;
 use Thinktomorrow\Trader\Domain\Common\Price\VatApplicableAmount;
+use Thinktomorrow\Trader\Domain\Common\Vat\Exceptions\InvalidVatAllocatedTotal;
 use Thinktomorrow\Trader\Domain\Common\Vat\VatAllocatedLine;
 use Thinktomorrow\Trader\Domain\Common\Vat\VatAllocatedTotalPrice;
 use Thinktomorrow\Trader\Domain\Common\Vat\VatAllocatedTotalPrices;
@@ -49,17 +50,17 @@ final class VatAllocator
         // Item bases per VAT
         $itemBasesPerVatRate = $this->collectItemBasesPerVatRate($order);
 
-        $itemsTotal = $this->buildAllocatedItemTotal($order);
-        $shippingTotal = $this->vatApplicableAmountAllocator->allocate($itemBasesPerVatRate, $this->normalizeAmount($shipping));
-        $paymentTotal = $this->vatApplicableAmountAllocator->allocate($itemBasesPerVatRate, $this->normalizeAmount($payment));
-        $discountTotal = $this->vatApplicableAmountAllocator->allocate($itemBasesPerVatRate, $this->normalizeAmount($discount));
+        $itemsTotal = $this->allocateStage($order, 'items', fn () => $this->buildAllocatedItemTotal($order));
+        $shippingTotal = $this->allocateStage($order, 'shipping', fn () => $this->vatApplicableAmountAllocator->allocate($itemBasesPerVatRate, $this->normalizeAmount($shipping)));
+        $paymentTotal = $this->allocateStage($order, 'payment', fn () => $this->vatApplicableAmountAllocator->allocate($itemBasesPerVatRate, $this->normalizeAmount($payment)));
+        $discountTotal = $this->allocateStage($order, 'discounts', fn () => $this->vatApplicableAmountAllocator->allocate($itemBasesPerVatRate, $this->normalizeAmount($discount)));
 
         return new VatAllocatedTotalPrices(
             items: $itemsTotal,
             shipping: $shippingTotal,
             payment: $paymentTotal,
             discounts: $discountTotal,
-            total: $this->buildAllocatedTotal($itemsTotal, $shippingTotal, $paymentTotal, $discountTotal)
+            total: $this->allocateStage($order, 'combined_order', fn () => $this->buildAllocatedTotal($itemsTotal, $shippingTotal, $paymentTotal, $discountTotal))
         );
     }
 
@@ -71,7 +72,7 @@ final class VatAllocator
     public function allocateOrder(Order $order): VatAllocatedTotalPrices
     {
         $itemBasesPerVatRate = $this->collectItemBasesPerVatRate($order);
-        $itemsTotal = $this->buildAllocatedItemTotal($order);
+        $itemsTotal = $this->allocateStage($order, 'items', fn () => $this->buildAllocatedItemTotal($order));
         $shippingCosts = [];
         $shippingDiscounts = [];
         $paymentCosts = [];
@@ -79,29 +80,29 @@ final class VatAllocator
         $orderDiscountParts = [];
 
         foreach ($order->getShippings() as $shipping) {
-            $shippingCosts[] = $this->allocateAuthoritativePrice($itemBasesPerVatRate, $shipping->getShippingCost());
-            $shippingDiscounts[] = $this->allocateAuthoritativePrice($itemBasesPerVatRate, $shipping->getDiscountPrice());
+            $shippingCosts[] = $this->allocateStage($order, 'shipping', fn () => $this->allocateAuthoritativePrice($itemBasesPerVatRate, $shipping->getShippingCost()));
+            $shippingDiscounts[] = $this->allocateStage($order, 'shipping_discount', fn () => $this->allocateAuthoritativePrice($itemBasesPerVatRate, $shipping->getDiscountPrice()));
         }
 
         foreach ($order->getPayments() as $payment) {
-            $paymentCosts[] = $this->allocateAuthoritativePrice($itemBasesPerVatRate, $payment->getPaymentCost());
-            $paymentDiscounts[] = $this->allocateAuthoritativePrice($itemBasesPerVatRate, $payment->getDiscountPrice());
+            $paymentCosts[] = $this->allocateStage($order, 'payment', fn () => $this->allocateAuthoritativePrice($itemBasesPerVatRate, $payment->getPaymentCost()));
+            $paymentDiscounts[] = $this->allocateStage($order, 'payment_discount', fn () => $this->allocateAuthoritativePrice($itemBasesPerVatRate, $payment->getDiscountPrice()));
         }
 
         foreach ($order->getDiscounts() as $discount) {
-            $orderDiscountParts[] = $this->allocateAuthoritativePrice($itemBasesPerVatRate, $discount->getDiscountPrice());
+            $orderDiscountParts[] = $this->allocateStage($order, 'order_discount', fn () => $this->allocateAuthoritativePrice($itemBasesPerVatRate, $discount->getDiscountPrice()));
         }
 
-        $shippingTotal = $this->combineAllocatedTotals($shippingCosts, $shippingDiscounts);
-        $paymentTotal = $this->combineAllocatedTotals($paymentCosts, $paymentDiscounts);
-        $discountTotal = $this->combineAllocatedTotals($orderDiscountParts);
+        $shippingTotal = $this->allocateStage($order, 'combined_shipping', fn () => $this->combineAllocatedTotals($shippingCosts, $shippingDiscounts));
+        $paymentTotal = $this->allocateStage($order, 'combined_payment', fn () => $this->combineAllocatedTotals($paymentCosts, $paymentDiscounts));
+        $discountTotal = $this->allocateStage($order, 'combined_discounts', fn () => $this->combineAllocatedTotals($orderDiscountParts));
 
         return new VatAllocatedTotalPrices(
             items: $itemsTotal,
             shipping: $shippingTotal,
             payment: $paymentTotal,
             discounts: $discountTotal,
-            total: $this->buildAllocatedTotal($itemsTotal, $shippingTotal, $paymentTotal, $discountTotal),
+            total: $this->allocateStage($order, 'combined_order', fn () => $this->buildAllocatedTotal($itemsTotal, $shippingTotal, $paymentTotal, $discountTotal)),
         );
     }
 
@@ -323,5 +324,19 @@ final class VatAllocator
             $totalVat,
             $totalExcludingVat->add($totalVat),
         );
+    }
+
+    /** @param callable(): VatAllocatedTotalPrice $allocation */
+    private function allocateStage(Order $order, string $stage, callable $allocation): VatAllocatedTotalPrice
+    {
+        try {
+            return $allocation();
+        } catch (InvalidVatAllocatedTotal $exception) {
+            throw $exception->withContext([
+                'allocation_stage' => $stage,
+                'order_id' => $order->orderId->get(),
+                'pricing_fingerprint' => $order->getPricingFingerprint(),
+            ]);
+        }
     }
 }

@@ -20,6 +20,8 @@ use Thinktomorrow\Trader\Application\Cart\Read\CartShipping;
 use Thinktomorrow\Trader\Application\Cart\Read\CartShippingAddress;
 use Thinktomorrow\Trader\Application\Cart\Read\CartShopper;
 use Thinktomorrow\Trader\Application\Cart\RefreshCart\Adjusters\AdjustLine;
+use Thinktomorrow\Trader\Application\Cart\RefreshCart\Adjusters\AdjustOrderPricingSnapshot;
+use Thinktomorrow\Trader\Application\Cart\RefreshCart\Adjusters\AdjustOrderVatSnapshot;
 use Thinktomorrow\Trader\Application\Cart\ShippingProfile\Eligibility\ProfileMustBeOnline;
 use Thinktomorrow\Trader\Application\Cart\ShippingProfile\Eligibility\ProfileMustSupportShippingCountry;
 use Thinktomorrow\Trader\Application\Cart\ShippingProfile\Eligibility\ShippingProfileEligibility;
@@ -108,6 +110,7 @@ use Thinktomorrow\Trader\Domain\Model\Stock\StockItemRepository;
 use Thinktomorrow\Trader\Domain\Model\Taxon\TaxonRepository;
 use Thinktomorrow\Trader\Domain\Model\Taxonomy\TaxonomyRepository;
 use Thinktomorrow\Trader\Domain\Model\VatRate\VatRateRepository;
+use Thinktomorrow\Trader\Infrastructure\Laravel\Commands\RecalculateOrderPricingCommand;
 use Thinktomorrow\Trader\Infrastructure\Laravel\Models\Cart\DefaultAdjustLine;
 use Thinktomorrow\Trader\Infrastructure\Laravel\Models\Cart\DefaultCart;
 use Thinktomorrow\Trader\Infrastructure\Laravel\Models\Cart\DefaultCartBillingAddress;
@@ -260,6 +263,7 @@ class TraderServiceProvider extends ServiceProvider
         $this->app->bind(VatAllocator::class, fn ($app) => new VatAllocator(
             $app->make(VatApplicableAmountAllocator::class),
         ));
+        $this->app->bind(AdjustOrderPricingSnapshot::class, fn ($app) => $app->make(AdjustOrderVatSnapshot::class));
 
         // MerchantOrder models
         $this->app->bind(MerchantOrder::class, fn () => DefaultMerchantOrder::class);
@@ -284,6 +288,10 @@ class TraderServiceProvider extends ServiceProvider
 
     public function boot()
     {
+        if ($this->app->runningInConsole()) {
+            $this->commands([RecalculateOrderPricingCommand::class]);
+        }
+
         // Config
         $this->publishes([__DIR__.'/config/config.php' => config_path('trader.php')]);
         $this->mergeConfigFrom(__DIR__.'/config/config.php', 'trader');

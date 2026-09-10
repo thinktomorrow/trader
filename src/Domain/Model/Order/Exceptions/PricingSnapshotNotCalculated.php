@@ -4,4 +4,4 @@ declare(strict_types=1);
 
 namespace Thinktomorrow\Trader\Domain\Model\Order\Exceptions;
 
-final class VatSnapshotMismatchException extends \LogicException {}
+final class PricingSnapshotNotCalculated extends \LogicException {}

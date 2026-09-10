@@ -13,6 +13,10 @@ final class TestContainer implements ContainerInterface
     public function add(string $id, $entry)
     {
         self::$entries[$id] = $entry;
+
+        foreach (class_parents($entry) as $parentClass) {
+            self::$entries[$parentClass] ??= $entry;
+        }
     }
 
     public function get(string $id)

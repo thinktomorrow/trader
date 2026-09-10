@@ -4,6 +4,7 @@ namespace Thinktomorrow\Trader\Domain\Common\Vat;
 
 use Money\Money;
 use Thinktomorrow\Trader\Domain\Common\Vat\Exceptions\InvalidVatAllocatedTotal;
+use Thinktomorrow\Trader\Domain\Common\Vat\Exceptions\InvalidVatAllocatedTotalReason;
 
 /**
  * Result object of the VAT allocation process.
@@ -105,10 +106,6 @@ final class VatAllocatedTotalPrice
     /** @param VatAllocatedLine[] $vatLines */
     private function validateTotals(array $vatLines, Money $totalExcluding, Money $totalVat, Money $totalIncluding): void
     {
-        if (! $totalExcluding->add($totalVat)->equals($totalIncluding)) {
-            throw new InvalidVatAllocatedTotal('VAT allocated total must satisfy excluding VAT + VAT = including VAT.');
-        }
-
         $lineExcluding = new Money('0', $totalExcluding->getCurrency());
         $lineVat = new Money('0', $totalVat->getCurrency());
 
@@ -117,12 +114,54 @@ final class VatAllocatedTotalPrice
             $lineVat = $lineVat->add($line->getVatAmount());
         }
 
+        $calculatedIncluding = $totalExcluding->add($totalVat);
+        $context = [
+            'currency' => $totalIncluding->getCurrency()->getCode(),
+            'declared_totals' => [
+                'excluding' => $totalExcluding->getAmount(),
+                'vat' => $totalVat->getAmount(),
+                'including' => $totalIncluding->getAmount(),
+            ],
+            'calculated_totals' => [
+                'excluding_plus_vat' => $calculatedIncluding->getAmount(),
+                'vat_line_taxable_base_sum' => $lineExcluding->getAmount(),
+                'vat_line_amount_sum' => $lineVat->getAmount(),
+            ],
+            'deltas' => [
+                'total_equation' => $calculatedIncluding->subtract($totalIncluding)->getAmount(),
+                'taxable_base' => $lineExcluding->subtract($totalExcluding)->getAmount(),
+                'vat_amount' => $lineVat->subtract($totalVat)->getAmount(),
+            ],
+            'vat_lines' => array_map(static fn (VatAllocatedLine $line): array => [
+                'vat_percentage' => $line->getVatPercentage()->get(),
+                'taxable_base' => $line->getTaxableBase()->getAmount(),
+                'vat_amount' => $line->getVatAmount()->getAmount(),
+                'currency' => $line->getTaxableBase()->getCurrency()->getCode(),
+            ], $vatLines),
+        ];
+
+        if (! $calculatedIncluding->equals($totalIncluding)) {
+            throw new InvalidVatAllocatedTotal(
+                InvalidVatAllocatedTotalReason::TotalEquationMismatch,
+                'VAT allocated total must satisfy excluding VAT + VAT = including VAT.',
+                $context,
+            );
+        }
+
         if (! $lineExcluding->equals($totalExcluding)) {
-            throw new InvalidVatAllocatedTotal('VAT line taxable bases must equal the allocated total excluding VAT.');
+            throw new InvalidVatAllocatedTotal(
+                InvalidVatAllocatedTotalReason::TaxableBaseSumMismatch,
+                'VAT line taxable bases must equal the allocated total excluding VAT.',
+                $context,
+            );
         }
 
         if (! $lineVat->equals($totalVat)) {
-            throw new InvalidVatAllocatedTotal('VAT line amounts must equal the allocated total VAT.');
+            throw new InvalidVatAllocatedTotal(
+                InvalidVatAllocatedTotalReason::VatAmountSumMismatch,
+                'VAT line amounts must equal the allocated total VAT.',
+                $context,
+            );
         }
     }
 }

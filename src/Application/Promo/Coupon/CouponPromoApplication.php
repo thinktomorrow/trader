@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Thinktomorrow\Trader\Application\Promo\Coupon;
 
 use Psr\Container\ContainerInterface;
-use Thinktomorrow\Trader\Application\Cart\RefreshCart\Adjusters\AdjustOrderVatSnapshot;
+use Thinktomorrow\Trader\Application\Cart\RefreshCart\Adjusters\AdjustOrderPricingSnapshot;
 use Thinktomorrow\Trader\Application\Promo\ApplyPromoToOrder;
 use Thinktomorrow\Trader\Application\Promo\OrderPromo\OrderPromoRepository;
 use Thinktomorrow\Trader\Domain\Common\Event\EventDispatcher;
@@ -32,8 +32,8 @@ final class CouponPromoApplication
 
         $this->applyPromoToOrder->apply($order, $promo->getDiscounts(), $enterCoupon->getCouponCode());
 
-        // Recalculate VAT snapshot
-        $this->container->get(AdjustOrderVatSnapshot::class)->adjust($order);
+        // Recalculate the pricing snapshot after changing the applied discounts.
+        $this->container->get(AdjustOrderPricingSnapshot::class)->adjust($order);
 
         $this->orderRepository->save($order);
 

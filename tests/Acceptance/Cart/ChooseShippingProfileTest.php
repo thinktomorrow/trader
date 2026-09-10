@@ -3,7 +3,7 @@
 namespace Tests\Acceptance\Cart;
 
 use Money\Money;
-use Thinktomorrow\Trader\Application\Cart\RefreshCart\Adjusters\AdjustOrderVatSnapshot;
+use Thinktomorrow\Trader\Application\Cart\RefreshCart\Adjusters\AdjustOrderPricingSnapshot;
 use Thinktomorrow\Trader\Application\Cart\ShippingProfile\Eligibility\ProfileMustBeOnline;
 use Thinktomorrow\Trader\Application\Cart\ShippingProfile\Eligibility\ProfileMustSupportShippingCountry;
 use Thinktomorrow\Trader\Application\Cart\ShippingProfile\Eligibility\ShippingProfileEligibility;
@@ -52,7 +52,7 @@ class ChooseShippingProfileTest extends CartContext
         $this->whenIChooseShipping('gross-shipping');
 
         $savedOrder = $this->orderContext->findOrder($order->orderId);
-        (new TestContainer)->get(AdjustOrderVatSnapshot::class)->adjust($savedOrder);
+        (new TestContainer)->get(AdjustOrderPricingSnapshot::class)->adjust($savedOrder);
 
         $this->assertEquals(Money::EUR(583), $savedOrder->getShippingCostExcl());
         $this->assertEquals(Money::EUR(700), $savedOrder->getShippingCostIncl());

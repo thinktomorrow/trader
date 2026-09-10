@@ -8,9 +8,9 @@ use Money\Money;
 use PHPUnit\Framework\TestCase;
 use Thinktomorrow\Trader\Domain\Common\Vat\VatAllocatedLine;
 use Thinktomorrow\Trader\Domain\Common\Vat\VatPercentage;
-use Thinktomorrow\Trader\Domain\Model\Order\Snapshot\OrderVatSnapshot;
+use Thinktomorrow\Trader\Domain\Model\Order\Snapshot\OrderPricingSnapshot;
 
-final class OrderVatSnapshotTest extends TestCase
+final class OrderPricingSnapshotTest extends TestCase
 {
     public function test_it_rejects_an_inconsistent_total_equation(): void
     {
@@ -46,9 +46,9 @@ final class OrderVatSnapshotTest extends TestCase
         $this->snapshot(Money::EUR(0), Money::EUR(0), Money::EUR(0), ['invalid']);
     }
 
-    private function snapshot(Money $totalExcl, Money $totalVat, Money $totalIncl, array $vatLines): OrderVatSnapshot
+    private function snapshot(Money $totalExcl, Money $totalVat, Money $totalIncl, array $vatLines): OrderPricingSnapshot
     {
-        return OrderVatSnapshot::fromVatAllocation(
+        return OrderPricingSnapshot::fromVatAllocation(
             vatLines: $vatLines,
             subtotalExcl: $totalExcl,
             subtotalIncl: $totalIncl,

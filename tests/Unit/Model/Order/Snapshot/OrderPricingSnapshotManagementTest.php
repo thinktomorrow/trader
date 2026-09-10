@@ -9,12 +9,12 @@ use PHPUnit\Framework\TestCase;
 use Thinktomorrow\Trader\Domain\Model\Order\Order;
 use Thinktomorrow\Trader\Domain\Model\Order\OrderId;
 use Thinktomorrow\Trader\Domain\Model\Order\OrderReference;
-use Thinktomorrow\Trader\Domain\Model\Order\Snapshot\OrderVatSnapshot;
+use Thinktomorrow\Trader\Domain\Model\Order\Snapshot\OrderPricingSnapshot;
 use Thinktomorrow\Trader\Domain\Model\Order\State\DefaultOrderState;
 
-final class OrderVatSnapshotManagementTest extends TestCase
+final class OrderPricingSnapshotManagementTest extends TestCase
 {
-    public function test_it_applies_validates_and_invalidates_a_vat_snapshot(): void
+    public function test_it_applies_validates_and_invalidates_a_pricing_snapshot(): void
     {
         $order = Order::create(
             OrderId::fromString('order-aaa'),
@@ -22,7 +22,7 @@ final class OrderVatSnapshotManagementTest extends TestCase
             DefaultOrderState::cart_pending,
         );
         $zero = Money::EUR(0);
-        $snapshot = OrderVatSnapshot::fromVatAllocation(
+        $snapshot = OrderPricingSnapshot::fromVatAllocation(
             vatLines: [],
             subtotalExcl: $zero,
             subtotalIncl: $zero,
@@ -38,13 +38,13 @@ final class OrderVatSnapshotManagementTest extends TestCase
             pricingFingerprint: $order->getPricingFingerprint(),
         );
 
-        $order->applyVatSnapshot($snapshot);
+        $order->applyPricingSnapshot($snapshot);
 
         $this->assertTrue($order->hasPricingSnapshot());
-        $this->assertTrue($order->hasUpToDateVatSnapshot());
+        $this->assertTrue($order->hasUpToDatePricingSnapshot());
         $this->assertEquals($zero, $order->getTotalIncl());
 
-        $order->invalidateVatSnapshot();
+        $order->invalidatePricingSnapshot();
 
         $this->assertFalse($order->hasPricingSnapshot());
     }

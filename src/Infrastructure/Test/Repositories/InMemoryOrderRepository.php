@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Thinktomorrow\Trader\Infrastructure\Test\Repositories;
 
-use Thinktomorrow\Trader\Application\Cart\RefreshCart\Adjusters\AdjustOrderVatSnapshot;
+use Thinktomorrow\Trader\Application\Cart\RefreshCart\Adjusters\AdjustOrderPricingSnapshot;
 use Thinktomorrow\Trader\Domain\Model\Order\Discount\DiscountId;
 use Thinktomorrow\Trader\Domain\Model\Order\Exceptions\CouldNotFindOrder;
 use Thinktomorrow\Trader\Domain\Model\Order\Exceptions\OrderAlreadyInMerchantHands;
@@ -41,8 +41,8 @@ final class InMemoryOrderRepository implements InMemoryRepository, InvoiceReposi
 
     public function save(Order $order): void
     {
-        if (! $order->hasUpToDateVatSnapshot() && $order->inCustomerHands()) {
-            (new TestContainer)->get(AdjustOrderVatSnapshot::class)->adjust($order);
+        if (! $order->hasUpToDatePricingSnapshot() && $order->inCustomerHands()) {
+            (new TestContainer)->get(AdjustOrderPricingSnapshot::class)->adjust($order);
         }
 
         if (! $order->hasPricingSnapshot()) {

@@ -41,8 +41,8 @@ use Thinktomorrow\Trader\Domain\Model\Order\Shipping\HasShippings;
 use Thinktomorrow\Trader\Domain\Model\Order\Shipping\Shipping;
 use Thinktomorrow\Trader\Domain\Model\Order\Shipping\ShippingId;
 use Thinktomorrow\Trader\Domain\Model\Order\Shipping\ShippingState;
-use Thinktomorrow\Trader\Domain\Model\Order\Snapshot\OrderVatSnapshot;
-use Thinktomorrow\Trader\Domain\Model\Order\Snapshot\WithOrderVatSnapshot;
+use Thinktomorrow\Trader\Domain\Model\Order\Snapshot\OrderPricingSnapshot;
+use Thinktomorrow\Trader\Domain\Model\Order\Snapshot\WithOrderPricingSnapshot;
 use Thinktomorrow\Trader\Domain\Model\Order\Snapshot\WithPricingFingerprint;
 use Thinktomorrow\Trader\Domain\Model\Order\State\OrderState;
 
@@ -55,8 +55,8 @@ final class Order implements Aggregate, DiscountableItem
     use HasPayments;
     use HasShippings;
     use RecordsEvents;
+    use WithOrderPricingSnapshot;
     use WithOrderTotals;
-    use WithOrderVatSnapshot;
     use WithPricingFingerprint;
 
     public readonly OrderId $orderId;
@@ -346,16 +346,16 @@ final class Order implements Aggregate, DiscountableItem
         $order->data = json_decode($state['data'], true);
         $order->orderEvents = array_map(fn ($orderEventState) => OrderEvent::fromMappedData($orderEventState, $state), $childEntities[OrderEvent::class]);
 
-        $order->initializeVatSnapshotFromState($state);
+        $order->initializePricingSnapshotFromState($state);
 
         return $order;
     }
 
     /**
-     * Duplicate of fromMappedData but without VAT snapshot validation
-     * Allows for migration to snapshot orders
+     * Duplicate of fromMappedData but without pricing snapshot validation.
+     * Allows for migration to snapshot orders.
      */
-    public static function fromMappedDataWithoutVatValidation(array $state, array $childEntities = []): static
+    public static function fromMappedDataWithoutPricingValidation(array $state, array $childEntities = []): static
     {
         $order = new static;
 
@@ -390,7 +390,7 @@ final class Order implements Aggregate, DiscountableItem
         ), json_decode($state['vat_lines'], true));
 
         try {
-            $order->vatSnapshot = OrderVatSnapshot::fromState(
+            $order->pricingSnapshot = OrderPricingSnapshot::fromState(
                 vatLines: $vatLines,
                 subtotalExcl: Money::EUR($state['subtotal_excl']),
                 subtotalIncl: Money::EUR($state['subtotal_incl']),
@@ -406,10 +406,16 @@ final class Order implements Aggregate, DiscountableItem
                 pricingFingerprint: $state['pricing_fingerprint'] ?? $state['vat_calculation_fingerprint'] ?? null,
             );
         } catch (\LogicException) {
-            $order->vatSnapshot = null;
+            $order->pricingSnapshot = null;
         }
 
         return $order;
+    }
+
+    /** @deprecated Use fromMappedDataWithoutPricingValidation(). */
+    public static function fromMappedDataWithoutVatValidation(array $state, array $childEntities = []): static
+    {
+        return self::fromMappedDataWithoutPricingValidation($state, $childEntities);
     }
 
     private static function emptyChildEntities(): array
