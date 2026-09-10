@@ -4,20 +4,69 @@ Important changes will be notified in this file
 
 ## Unreleased
 
+## 2026-09-10 - 0.10.0
+
 ### Breaking changes
 
-- Added explicit `TaxMode` authority for shipping tariffs, payment rates and fixed order discounts.
-- Added authority methods to item, service and discount price contracts and preserved gross authority when VAT rates change.
-- Changed VAT allocation to preserve authoritative gross service and discount amounts while allocating taxable bases net-first.
+- Added explicit `TaxMode` authority (inclusive / exclusive) for shipping tariffs, payment rates and fixed order
+  discounts.
+- Added authority methods to item, service and discount price contracts and preserved gross authority when VAT rates
+  change.
+- Changed VAT allocation to preserve authoritative gross service and discount amounts while allocating taxable bases
+  net-first.
 - Changed VAT and order total result objects to reject inconsistent taxable-base, VAT and gross totals.
-- Changed cart refresh ordering so VAT rates and line discounts are resolved before shipping tariffs and service discounts.
-- Added `OrderServicePriceResolver` to resolve order-dependent shipping and payment prices without coupling cart services to `VatAllocator`.
-- Added persisted service gross amounts, tax modes and a VAT calculation fingerprint; legacy service data remains exclusive-VAT authoritative.
+- Changed cart refresh ordering so VAT rates and line discounts are resolved before shipping tariffs and service
+  discounts.
 - Changed pro-rata allocation to integer-safe largest-remainder allocation with deterministic VAT-rate ordering.
-- Fixed item authority loss during VAT aggregation and fixed combined promo discount accumulation.
 - Removed the configurable VAT rounding strategy; item totals now always round VAT on the full line amount.
-- Added domain state-reader contracts for merchant order, payment and shipping state checks.
+- Removed `VatRoundingStrategy`, `TraderConfig::getVatRoundingStrategy()` and the `vat_rounding_strategy` config key.
+- Replaced `TraderConfig::areItemDiscountsCalculatedExcludingVat()` with `getItemDiscountTaxMode()` and added
+  `doesTariffInputIncludeVat()`.
+- Renamed the order VAT snapshot API to pricing snapshot terminology: `OrderVatSnapshot`, `WithOrderVatSnapshot`,
+  `AdjustOrderVatSnapshot`, related order methods and snapshot exceptions have pricing-named replacements. This is an
+  intentional API break; migrate consumers to the new names even though the old adjuster has a temporary deprecated
+  wrapper.
 - Moved taxonomy filter queries from `TaxonomyRepository` to the application-level `TaxonomyItemRepository`.
+- Changed `LineDiscount::fromMappedData()` and `OrderDiscount::fromMappedData()` to require a `VatAllocator`, and
+  replaced `LineDiscount::setCalculateExcludingVat()` with `setCalculationTaxMode()`.
+
+See [the 0.9.x to 0.10.0 upgrade guide](upgrade-0.9-to-0.10.md) for all required consumer changes.
+
+### Added
+
+- Added `OrderServicePriceResolver` to resolve order-dependent shipping and payment prices without coupling cart
+  services to `VatAllocator`.
+- Added persisted service gross amounts, tax modes and an order `pricing_fingerprint`.
+- Added `OrderPricingApplication` and `trader:recalculate-order-pricing` to safely inspect or recalculate one order's
+  atomic pricing snapshot. Frozen orders cannot be silently repriced.
+- Added domain state-reader contracts for merchant order, payment and shipping state checks.
+
+### Changed
+
+- Orders now persist one validated `OrderPricingSnapshot` containing component totals, VAT lines and a pricing
+  fingerprint. Confirmed and paid orders retain their frozen historical pricing.
+- Tariff, payment method and fixed discount inputs support explicit `inclusive` or `exclusive` tax authority.
+- `VatPercentage::fromString()` now accepts only non-negative decimal values with at most six decimal places.
+- Cart refresh now reprices and revalidates the selected payment method, removing it when it no longer exists or is not
+  available.
+- Order discounts now also apply to payment costs.
+
+### Migration and schema notes
+
+- Added `tax_mode` to `trader_shipping_profile_tariffs`, `trader_payment_methods` and `trader_order_discounts`.
+- Added `cost_incl`, `discount_incl`, `total_incl` and `cost_tax_mode` to `trader_order_shipping` and
+  `trader_order_payment`.
+- Added nullable `pricing_fingerprint` to `trader_orders`.
+- Existing tariffs, payment methods and service records remain exclusive-VAT authoritative. Existing order discounts
+  with a populated `total_incl` are backfilled as inclusive.
+- Projects that ran an unreleased intermediate migration containing `vat_calculation_fingerprint` must inspect and
+  reconcile that column before deployment if `pricing_fingerprint` also exists.
+
+### Fixed
+
+- Fixed item authority loss during VAT aggregation and multiplication.
+- Fixed combined promo discount accumulation.
+- Fixed cent allocation by using integer-safe largest-remainder allocation with deterministic VAT-rate ordering.
 
 ## 2026-09-03 - 0.9.8
 
@@ -30,9 +79,11 @@ Important changes will be notified in this file
 - Changed: existing taxon filter, flattened taxon and main category queries now share the hierarchy implementation.
 - Added: composable shipping profile eligibility rules and order-aware available shipping profile query.
 - Note: applications replacing the shipping eligibility binding must retain the package's online and country rules.
-- Changed: explicitly selecting an unavailable shipping profile now throws `ShippingProfileIsNotAvailable` before mutating the order.
+- Changed: explicitly selecting an unavailable shipping profile now throws `ShippingProfileIsNotAvailable` before
+  mutating the order.
 - Changed: cart refresh silently removes a selected shipping profile that is no longer available.
-- Fixed: unrestricted shipping profiles remain available when a shipping country is selected, while restricted profiles require a matching country.
+- Fixed: unrestricted shipping profiles remain available when a shipping country is selected, while restricted profiles
+  require a matching country.
 
 ## 2026-07-29 - 0.9.6
 
