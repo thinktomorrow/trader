@@ -27,3 +27,6 @@ jobs:
 
             - name: Run larastan
               run: composer phpstan
+
+            - name: Run deptrac
+              run: vendor/bin/deptrac analyse --fail-on-uncovered

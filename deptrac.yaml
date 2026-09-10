@@ -1,4 +1,4 @@
-parameters:
+deptrac:
   paths:
     - ./src/
   exclude_files:
@@ -6,21 +6,73 @@ parameters:
   layers:
     - name: Infrastructure
       collectors:
-        - type: className
-          regex: .*\\Infrastructure\\.*
+        - type: classLike
+          value: .*\\Infrastructure\\.*
     - name: Application
       collectors:
-        - type: className
-          regex: .*\\Application\\.*
+        - type: classLike
+          value: .*\\Application\\.*
     - name: Domain
       collectors:
-        - type: className
-          regex: .*\\Domain\\.*
+        - type: classLike
+          value: .*\\Domain\\.*
+    - name: Configuration
+      collectors:
+        - type: classLike
+          value: ^Thinktomorrow\\Trader\\TraderConfig$
+    - name: DomainVendor
+      collectors:
+        - type: composer
+          composerPath: composer.json
+          composerLockPath: composer.lock
+          packages:
+            - moneyphp/money
+            - beberlei/assert
+            - psr/container
+    - name: Framework
+      collectors:
+        - type: composer
+          composerPath: composer.json
+          composerLockPath: composer.lock
+          packages:
+            - laravel/framework
+            - nesbot/carbon
+            - symfony/http-kernel
+    - name: Vine
+      collectors:
+        - type: composer
+          composerPath: composer.json
+          composerLockPath: composer.lock
+          packages:
+            - thinktomorrow/vine
+    - name: InfrastructureVendor
+      collectors:
+        - type: composer
+          composerPath: composer.json
+          composerLockPath: composer.lock
+          packages:
+            - ramsey/uuid
 
   ruleset:
     Infrastructure:
       - Application
       - Domain
+      - Configuration
+      - DomainVendor
+      - Framework
+      - Vine
+      - InfrastructureVendor
     Application:
       - Domain
+      - Configuration
+      - DomainVendor
+      - Framework
+      - Vine
     Domain:
+      - DomainVendor
+    Configuration:
+      - Domain
+    DomainVendor: ~
+    Framework: ~
+    Vine: ~
+    InfrastructureVendor: ~

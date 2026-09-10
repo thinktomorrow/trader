@@ -31,7 +31,7 @@
         "illuminate/database": "^11.46|^12.20",
         "orchestra/testbench": "^9.16|^10.3",
         "nesbot/carbon": "^3.8",
-        "qossmic/deptrac-shim": "^1.0.2",
+        "deptrac/deptrac": "^4.7",
         "infection/infection": "^0.30.3",
         "laravel/pint": "^1.24",
         "thinktomorrow/trader-testing": "dev-main"

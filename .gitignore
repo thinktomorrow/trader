@@ -1,4 +1,5 @@
 /vendor
 /build
 /coverage
+.deptrac.cache
 .phpunit.result.cache
