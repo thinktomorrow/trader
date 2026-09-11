@@ -12,6 +12,24 @@ class VariantLinksTest extends ProductContext
 {
     use TestHelpers;
 
+    public function test_it_can_compose_links_from_a_loaded_product_without_reloading_it(): void
+    {
+        $product = $this->catalogContext->createProduct();
+        $this->catalogContext->createVariant($product->productId->get(), 'variant-bbb');
+        $productDetail = $this->catalogContext->repos()->productDetailRepository()->findProductDetail($product->getVariants()[0]->variantId);
+        $composer = $this->catalogContext->repos()->variantLinksComposer();
+        $locale = Locale::fromString('fr');
+        $expected = $composer->get($productDetail, $locale);
+        $this->catalogContext->repos()->productRepository()->delete($product->productId);
+
+        $links = $composer->getForProduct($product, $productDetail, $locale);
+
+        $this->assertCount(2, $links);
+        $this->assertEquals($expected, $links);
+        $this->assertSame('variant-aaa option title fr', $links[0]->getLabel());
+        $this->assertSame('/variant-bbb', $links[1]->getUrl());
+    }
+
     public function test_it_can_compose_variant_links()
     {
         $product = $this->catalogContext->createProduct();

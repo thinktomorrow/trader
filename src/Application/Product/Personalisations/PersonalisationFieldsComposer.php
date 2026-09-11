@@ -6,6 +6,7 @@ namespace Thinktomorrow\Trader\Application\Product\Personalisations;
 
 use Psr\Container\ContainerInterface;
 use Thinktomorrow\Trader\Domain\Common\Locale;
+use Thinktomorrow\Trader\Domain\Model\Product\Product;
 use Thinktomorrow\Trader\Domain\Model\Product\ProductId;
 use Thinktomorrow\Trader\Domain\Model\Product\ProductRepository;
 
@@ -25,6 +26,11 @@ class PersonalisationFieldsComposer
     {
         $product = $this->productRepository->find($productId);
 
+        return $this->getForProduct($product, $locale);
+    }
+
+    public function getForProduct(Product $product, Locale $locale): array
+    {
         $results = [];
 
         foreach ($product->getPersonalisations() as $personalisation) {

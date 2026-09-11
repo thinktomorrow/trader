@@ -4,6 +4,9 @@ Important changes will be notified in this file
 
 ## Unreleased
 
+- Added: `VariantLinksComposer::getForProduct()` to avoid duplicate product find queries when rendering variant links
+  for a product.
+
 ## 2026-09-10 - 0.10.0
 
 ### Breaking changes

@@ -35,6 +35,11 @@ class VariantLinksComposer
     {
         $product = $this->productRepository->find(ProductId::fromString($productDetail->getProductId()));
 
+        return $this->getForProduct($product, $productDetail, $locale);
+    }
+
+    public function getForProduct(Product $product, ProductDetail $productDetail, Locale $locale): VariantLinks
+    {
         /**
          * When there are no variant properties set on the product, but there are
          * multiple variants, the variants themselves are used as links instead.
