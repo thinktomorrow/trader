@@ -57,7 +57,7 @@ final class MysqlOrderGridRepository implements OrderGridRepository
 
     public function filterByShopperEmail(string $shopperEmail): static
     {
-        $this->builder->where(static::$shopperTable.'.email', 'LIKE', '%'.$shopperEmail.'%');
+        $this->builder->where(self::$shopperTable.'.email', 'LIKE', '%'.$shopperEmail.'%');
 
         return $this;
     }
@@ -74,14 +74,14 @@ final class MysqlOrderGridRepository implements OrderGridRepository
 
     public function filterByCustomerId(string $customerId): static
     {
-        $this->builder->where(static::$shopperTable.'.customer_id', $customerId);
+        $this->builder->where(self::$shopperTable.'.customer_id', $customerId);
 
         return $this;
     }
 
     public function filterByStates(array $states): static
     {
-        $this->builder->whereIn(static::$orderTable.'.order_state', $states);
+        $this->builder->whereIn(self::$orderTable.'.order_state', $states);
 
         return $this;
     }
@@ -99,11 +99,11 @@ final class MysqlOrderGridRepository implements OrderGridRepository
     private function filterByDate(string $column, ?string $startAt = null, ?string $endAt = null): static
     {
         if (! is_null($startAt)) {
-            $this->builder->where(static::$orderTable.'.'.$column, '>=', Carbon::parse($startAt)->toDateTimeString());
+            $this->builder->where(self::$orderTable.'.'.$column, '>=', Carbon::parse($startAt)->toDateTimeString());
         }
 
         if (! is_null($endAt)) {
-            $this->builder->where(static::$orderTable.'.'.$column, '<=', Carbon::parse($endAt)->toDateTimeString());
+            $this->builder->where(self::$orderTable.'.'.$column, '<=', Carbon::parse($endAt)->toDateTimeString());
         }
 
         return $this;
@@ -200,11 +200,11 @@ final class MysqlOrderGridRepository implements OrderGridRepository
             $this->sortByDefault();
         }
 
-        return $this->builder->select(static::$orderTable.'.order_id')->get()->pluck('order_id')->toArray();
+        return $this->builder->select(self::$orderTable.'.order_id')->get()->pluck('order_id')->toArray();
     }
 
     private function sortByDefault(): void
     {
-        $this->builder->orderBy(static::$orderTable.'.created_at', 'DESC');
+        $this->builder->orderBy(self::$orderTable.'.created_at', 'DESC');
     }
 }

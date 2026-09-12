@@ -39,7 +39,7 @@ final class BaseRate implements ChildEntity
 
     public static function fromMappedData(array $state, array $aggregateState): static
     {
-        $object = new static;
+        $object = new self;
         $object->baseRateId = BaseRateId::fromString($state['base_rate_id']);
         $object->originVatRateId = VatRateId::fromString($state['origin_vat_rate_id']);
         $object->targetVatRateId = VatRateId::fromString($aggregateState['vat_rate_id']);

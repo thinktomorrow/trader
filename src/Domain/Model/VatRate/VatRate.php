@@ -146,7 +146,7 @@ final class VatRate implements Aggregate
 
     public static function fromMappedData(array $state, array $childEntities = []): static
     {
-        $object = new static;
+        $object = new self;
         $object->vatRateId = VatRateId::fromString($state['vat_rate_id']);
         $object->countryId = CountryId::fromString($state['country_id']);
         $object->rate = VatPercentage::fromString($state['rate']);

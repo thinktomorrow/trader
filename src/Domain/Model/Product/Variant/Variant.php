@@ -139,7 +139,7 @@ final class Variant implements ChildAggregate
 
     public static function fromMappedData(array $state, array $aggregateState, array $childEntities = []): static
     {
-        $variant = new static;
+        $variant = new self;
 
         $variant->productId = ProductId::fromString($aggregateState['product_id']);
         $variant->variantId = VariantId::fromString($state['variant_id']);

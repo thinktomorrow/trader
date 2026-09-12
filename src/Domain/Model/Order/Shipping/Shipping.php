@@ -113,7 +113,7 @@ final class Shipping implements ChildAggregate, DiscountableItem
 
     public static function fromMappedData(array $state, array $aggregateState, array $childEntities = []): static
     {
-        $shipping = new static;
+        $shipping = new self;
 
         if (! $state['shipping_state'] instanceof ShippingState) {
             throw new \InvalidArgumentException('Shipping state is expected to be instance of ShippingState. Instead '.gettype($state['shipping_state']).' is passed.');

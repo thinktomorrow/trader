@@ -158,7 +158,7 @@ final class Line implements ChildAggregate, DiscountableItem
 
     public static function fromMappedData(array $state, array $aggregateState, array $childEntities = []): static
     {
-        $line = new static;
+        $line = new self;
 
         $line->setAuthoritativeIncl($state['includes_vat']);
 

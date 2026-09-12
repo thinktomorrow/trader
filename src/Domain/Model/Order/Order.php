@@ -357,7 +357,7 @@ final class Order implements Aggregate, DiscountableItem
      */
     public static function fromMappedDataWithoutPricingValidation(array $state, array $childEntities = []): static
     {
-        $order = new static;
+        $order = new self;
 
         $childEntities += self::emptyChildEntities();
 

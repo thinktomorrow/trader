@@ -82,7 +82,7 @@ final class Tariff implements ChildEntity
 
     public static function fromMappedData(array $state, array $aggregateState): static
     {
-        $tariff = new static;
+        $tariff = new self;
 
         $tariff->tariffId = TariffId::fromString($state['tariff_id']);
         $tariff->shippingProfileId = ShippingProfileId::fromString($aggregateState['shipping_profile_id']);
