@@ -6,6 +6,9 @@ namespace Tests\Infrastructure\Repositories;
 
 use Illuminate\Support\Facades\DB;
 use Tests\Infrastructure\TestCase;
+use Thinktomorrow\Trader\Application\Cart\CartApplication;
+use Thinktomorrow\Trader\Application\Cart\Line\AddLine;
+use Thinktomorrow\Trader\Application\Cart\RefreshCart\RefreshCart;
 use Thinktomorrow\Trader\Domain\Model\Product\Variant\Variant;
 use Thinktomorrow\Trader\Domain\Model\Product\Variant\VariantId;
 use Thinktomorrow\Trader\Domain\Model\Product\VariantTaxa\VariantProperty;
@@ -100,6 +103,57 @@ final class VariantRepositoryTest extends TestCase
 
             $this->assertNotNull($repository->findAllVariantsForCart([$variant->variantId]));
         }
+    }
+
+    public function test_bulk_cart_variants_keep_personalisations_for_each_product(): void
+    {
+        $catalog = $this->catalogContext;
+        $first = $catalog->createProduct('first-product', 'first-variant');
+        $second = $catalog->createProduct('second-product', 'second-variant');
+        $catalog->addPersonalisationToProduct($first, $catalog->makePersonalisation('first-product', 'first-personalisation'));
+        $catalog->addPersonalisationToProduct($second, $catalog->makePersonalisation('second-product', 'second-personalisation'));
+        $catalog->saveProduct($first);
+        $catalog->saveProduct($second);
+
+        $variants = $catalog->repos()->variantRepository()->findAllVariantsForCart(['first-variant', 'second-variant']);
+
+        $this->assertCount(2, $variants);
+        $personalisations = [];
+        foreach ($variants as $variant) {
+            $personalisations[$variant->getProductId()->get()] = array_values(array_map(fn ($field) => $field->personalisationId->get(), $variant->getPersonalisations()));
+        }
+        $this->assertSame(['first-personalisation'], $personalisations['first-product']);
+        $this->assertSame(['second-personalisation'], $personalisations['second-product']);
+    }
+
+    public function test_empty_cart_variant_list_does_not_query_the_database(): void
+    {
+        DB::enableQueryLog();
+        DB::flushQueryLog();
+
+        $this->assertSame([], $this->catalogContext->repos()->variantRepository()->findAllVariantsForCart([]));
+        $this->assertSame([], DB::getQueryLog());
+        DB::disableQueryLog();
+    }
+
+    public function test_cart_refresh_loads_variants_once_for_prices_and_vat(): void
+    {
+        $product = $this->catalogContext->createProduct();
+        $cartApplication = app(CartApplication::class);
+        $orderId = $cartApplication->createNewOrder();
+        $cartApplication->addLine(new AddLine($orderId->get(), $product->getVariants()[0]->variantId->get(), 2, [], []));
+        DB::enableQueryLog();
+        DB::flushQueryLog();
+
+        $cartApplication->refresh(new RefreshCart($orderId->get()));
+
+        $variantQueries = array_filter(DB::getQueryLog(), fn (array $query): bool => str_contains($query['query'], 'from `trader_product_variants`'));
+        $personalisationQueries = array_filter(DB::getQueryLog(), fn (array $query): bool => str_contains($query['query'], 'from `trader_product_personalisations`'));
+        DB::disableQueryLog();
+        $this->assertCount(1, $variantQueries);
+        $this->assertCount(1, $personalisationQueries);
+        $cart = $this->orderContext->repos()->cartRepository()->findCart($orderId);
+        $this->assertSame(2, $cart->getLines()[0]->getQuantity());
     }
 
     public function test_it_keeps_variant_taxa_with_null_data_when_loading_states(): void

@@ -77,9 +77,12 @@ final class CartApplication
 
     private function recalculate(Order $order): void
     {
+        $adjustLines = $this->container->get(AdjustLines::class);
+        $variants = $adjustLines->getVariantsForOrder($order);
+
         $this->refreshCartAction->handle($order, [
-            $this->container->get(AdjustLines::class),
-            $this->container->get(AdjustVatRates::class),
+            $adjustLines->withVariants($variants),
+            $this->container->get(AdjustVatRates::class)->withVariants($variants),
             new AdjustDiscountsAndServices(
                 $this->container->get(AdjustDiscounts::class),
                 $this->container->get(AdjustShipping::class),

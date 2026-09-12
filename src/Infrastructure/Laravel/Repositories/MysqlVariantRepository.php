@@ -263,6 +263,10 @@ class MysqlVariantRepository implements StockItemRepository, VariantForCartRepos
 
     public function findAllVariantsForCart(array $variantIds): array
     {
+        if ($variantIds === []) {
+            return [];
+        }
+
         $states = DB::table(static::$variantTable)
             ->join(static::$productTable, static::$variantTable.'.product_id', '=', static::$productTable.'.product_id')
             ->whereIn(static::$productTable.'.state', ProductState::onlineStates())
@@ -274,7 +278,7 @@ class MysqlVariantRepository implements StockItemRepository, VariantForCartRepos
             ->get();
 
         $allPersonalisationStates = DB::table(static::$productPersonalisationsTable)
-            ->where(static::$productPersonalisationsTable.'.product_id', $states->pluck('product_id')->unique()->toArray())
+            ->whereIn(static::$productPersonalisationsTable.'.product_id', $states->pluck('product_id')->unique()->toArray())
             ->get()
             ->map(fn ($item) => (array) $item);
 

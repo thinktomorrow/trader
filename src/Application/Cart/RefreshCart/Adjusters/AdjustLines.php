@@ -18,6 +18,9 @@ class AdjustLines implements Adjuster
 
     private AdjustLine $adjustLine;
 
+    /** @var VariantForCart[]|null */
+    private ?array $variants = null;
+
     public function __construct(VariantForCartRepository $variantForCartRepository, AdjustLine $adjustLine)
     {
         $this->variantForCartRepository = $variantForCartRepository;
@@ -26,10 +29,7 @@ class AdjustLines implements Adjuster
 
     public function adjust(Order $order): void
     {
-        // Extract all the variants in the cart
-        $variantLines = array_filter($order->getLines(), fn (Line $line) => $line->getPurchasableReference()->isVariant());
-        $variantIds = array_map(fn (Line $line) => $line->getPurchasableReference()->getId(), $variantLines);
-        $variants = $this->variantForCartRepository->findAllVariantsForCart($variantIds);
+        $variants = $this->variants ?? $this->getVariantsForOrder($order);
 
         foreach ($order->getLines() as $line) {
             // No longer there? Maybe deleted.
@@ -65,6 +65,24 @@ class AdjustLines implements Adjuster
 
         // todo: Fetch variantForCart...
         // Update lines for: title, discounts, ...
+    }
+
+    /** @return VariantForCart[] */
+    public function getVariantsForOrder(Order $order): array
+    {
+        $variantLines = array_filter($order->getLines(), fn (Line $line) => $line->getPurchasableReference()->isVariant());
+        $variantIds = array_unique(array_map(fn (Line $line) => $line->getPurchasableReference()->getId(), $variantLines));
+
+        return $variantIds ? $this->variantForCartRepository->findAllVariantsForCart($variantIds) : [];
+    }
+
+    /** @param VariantForCart[] $variants */
+    public function withVariants(array $variants): static
+    {
+        $adjuster = clone $this;
+        $adjuster->variants = $variants;
+
+        return $adjuster;
     }
 
     private function findVariant(array $variants, VariantId $variantId): ?VariantForCart

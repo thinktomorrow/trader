@@ -5,8 +5,14 @@ declare(strict_types=1);
 namespace Tests\Infrastructure\Repositories;
 
 use Tests\Infrastructure\TestCase;
+use Thinktomorrow\Trader\Application\Cart\CartApplication;
+use Thinktomorrow\Trader\Application\Cart\Line\AddLine;
+use Thinktomorrow\Trader\Application\Cart\RefreshCart\RefreshCart;
+use Thinktomorrow\Trader\Application\Promo\Coupon\CouponPromoApplication;
+use Thinktomorrow\Trader\Application\Promo\Coupon\EnterCoupon;
 use Thinktomorrow\Trader\Application\Promo\OrderPromo\OrderPromo;
 use Thinktomorrow\Trader\Domain\Common\Price\TaxMode;
+use Thinktomorrow\Trader\Domain\Model\Order\OrderRepository;
 use Thinktomorrow\Trader\Domain\Model\Promo\Discounts\FixedAmountDiscount;
 use Thinktomorrow\Trader\Domain\Model\Promo\Exceptions\CouldNotFindPromo;
 use Thinktomorrow\Trader\Domain\Model\Promo\PromoId;
@@ -120,5 +126,55 @@ final class PromoRepositoryTest extends TestCase
 
             $this->assertInstanceOf(OrderPromo::class, $repository->findOrderPromoByCouponCode('foobar'));
         }
+    }
+
+    public function test_system_marketing_and_coupon_promos_are_loaded_separately(): void
+    {
+        foreach (OrderContext::drivers() as $orderContext) {
+            $repository = $orderContext->repos()->promoRepository();
+            $orderContext->createPromo('system-promo', ['is_system_promo' => true]);
+            $orderContext->createPromo('marketing-promo');
+            $orderContext->createPromo('coupon-promo', ['coupon_code' => 'SAVE']);
+
+            $marketing = $repository->getAvailableOrderPromos();
+            $system = $repository->getAvailableSystemPromos();
+
+            $this->assertCount(1, $marketing);
+            $this->assertSame('marketing-promo', $marketing[0]->promoId->get());
+            $this->assertCount(1, $system);
+            $this->assertSame('system-promo', $system[0]->promoId->get());
+            $this->assertSame('coupon-promo', $repository->findOrderPromoByCouponCode('SAVE')->promoId->get());
+        }
+    }
+
+    public function test_mysql_cart_refresh_combines_system_marketing_and_coupon_discounts(): void
+    {
+        foreach (['system', 'marketing', 'coupon'] as $type) {
+            $this->orderContext->createPromo($type, [
+                'is_system_promo' => $type === 'system',
+                'is_combinable' => true,
+                'coupon_code' => $type === 'coupon' ? 'SAVE' : null,
+            ], [
+                $this->orderContext->createPromoDiscount($type, $type.'-discount', 'fixed_amount', [
+                    'data' => json_encode(['amount' => '100', 'tax_mode' => 'exclusive']),
+                ]),
+            ]);
+        }
+        $product = $this->catalogContext->createProduct(variantId: null);
+        $variant = $this->catalogContext->createVariant($product, values: ['unit_price' => 10000, 'sale_price' => 10000]);
+        $application = app(CartApplication::class);
+        $orderId = $application->createNewOrder();
+        $application->addLine(new AddLine($orderId->get(), $variant->variantId->get(), 1, [], []));
+        app(CouponPromoApplication::class)->enterCoupon(new EnterCoupon($orderId->get(), 'SAVE'));
+
+        $application->refresh(new RefreshCart($orderId->get()));
+
+        $order = app(OrderRepository::class)->find($orderId);
+        $promoIds = array_map(fn ($discount) => $discount->promoId->get(), $order->getDiscounts());
+        sort($promoIds);
+        $this->assertSame(['coupon', 'marketing', 'system'], $promoIds);
+        $this->assertSame('300', $order->getDiscountTotalExcl()->getAmount());
+        $this->assertSame('11640', $order->getTotalIncl()->getAmount());
+        $this->assertSame('SAVE', $order->getEnteredCouponCode());
     }
 }

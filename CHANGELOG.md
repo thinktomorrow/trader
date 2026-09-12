@@ -4,8 +4,15 @@ Important changes will be notified in this file
 
 ## Unreleased
 
+## 2026-09-12 - 0.10.1
+
 - Added: `VariantLinksComposer::getForProduct()` to avoid duplicate product find queries when rendering variant links
   for a product.
+- Changed: cart refresh loads variants once and reuses them for line and VAT adjustments, avoiding duplicate queries.
+- Changed: empty cart variant lookups no longer query the database.
+- Fixed: bulk cart variant loading now includes personalisations for all requested products.
+- Fixed: system promotions are excluded from regular marketing promotions, allowing system, marketing and coupon
+  discounts to combine correctly.
 
 ## 2026-09-10 - 0.10.0
 

@@ -54,6 +54,7 @@ final class MysqlPromoRepository implements OrderPromoRepository, PromoRepositor
     {
         $results = $this->baseActiveQuery()
             ->whereNull('coupon_code')
+            ->where('is_system_promo', false)
             ->get();
 
         return $this->composeOrderPromosFromResults($results);
