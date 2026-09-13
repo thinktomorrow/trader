@@ -68,7 +68,7 @@ final class VatAllocatedLine
                 'Given: '.$other->vatPercentage->get().'%, expected: '.$this->vatPercentage->get().'%.');
         }
 
-        return new static(
+        return new self(
             $this->taxableBase->subtract($other->taxableBase),
             $this->vatAmount->subtract($other->vatAmount),
             $this->vatPercentage

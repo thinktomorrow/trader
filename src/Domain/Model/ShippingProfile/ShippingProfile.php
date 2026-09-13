@@ -149,7 +149,7 @@ final class ShippingProfile implements Aggregate
 
     public static function fromMappedData(array $state, array $childEntities = []): static
     {
-        $shippingProfile = new static;
+        $shippingProfile = new self;
         $shippingProfile->shippingProfileId = ShippingProfileId::fromString($state['shipping_profile_id']);
         $shippingProfile->shippingProviderId = ShippingProviderId::fromString($state['provider_id']);
         $shippingProfile->state = ShippingProfileState::from($state['state']);

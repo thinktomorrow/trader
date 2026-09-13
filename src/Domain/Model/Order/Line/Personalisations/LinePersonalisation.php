@@ -53,7 +53,7 @@ final class LinePersonalisation implements ChildEntity
 
     public static function fromMappedData(array $state, array $aggregateState): static
     {
-        $personalisation = new static;
+        $personalisation = new self;
 
         $personalisation->lineId = LineId::fromString($aggregateState['line_id']);
         $personalisation->linePersonalisationId = LinePersonalisationId::fromString($state['line_personalisation_id']);

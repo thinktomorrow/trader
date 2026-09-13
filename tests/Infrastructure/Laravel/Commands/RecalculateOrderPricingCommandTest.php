@@ -7,6 +7,7 @@ namespace Tests\Infrastructure\Laravel\Commands;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
+use Orchestra\Testbench\TestCase;
 use Thinktomorrow\Trader\Domain\Model\Order\Order;
 use Thinktomorrow\Trader\Domain\Model\Order\OrderId;
 use Thinktomorrow\Trader\Domain\Model\Order\OrderReference;
@@ -14,7 +15,7 @@ use Thinktomorrow\Trader\Domain\Model\Order\OrderRepository;
 use Thinktomorrow\Trader\Domain\Model\Order\State\DefaultOrderState;
 use Thinktomorrow\Trader\Infrastructure\Laravel\TraderServiceProvider;
 
-final class RecalculateOrderPricingCommandTest extends \Orchestra\Testbench\TestCase
+final class RecalculateOrderPricingCommandTest extends TestCase
 {
     protected function getEnvironmentSetUp($app): void
     {

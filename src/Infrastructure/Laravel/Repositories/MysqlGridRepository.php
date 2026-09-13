@@ -312,7 +312,7 @@ class MysqlGridRepository implements GridRepository
 
         if (isset($this->limit) && $this->limit < $this->perPage) {
             $rows = $this->builder->get();
-            $results = (new \Illuminate\Pagination\LengthAwarePaginator($rows, count($rows), $this->perPage))
+            $results = (new LaravelLengthAwarePaginator($rows, count($rows), $this->perPage))
                 ->withQueryString();
         } else {
             $results = $this->builder->paginate($this->perPage, ['*'], 'page', null, $total)->withQueryString();

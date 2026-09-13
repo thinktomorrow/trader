@@ -94,7 +94,7 @@ final class Discount implements ChildEntity
 
     public static function fromMappedData(array $state, array $aggregateState): static
     {
-        $discount = new static;
+        $discount = new self;
 
         $discount->orderId = OrderId::fromString($aggregateState['order_id']);
         $discount->discountId = DiscountId::fromString($state['discount_id']);
