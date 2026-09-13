@@ -16,6 +16,11 @@ use Thinktomorrow\Trader\Infrastructure\Laravel\TraderServiceProvider;
 
 final class RecalculateOrderPricingCommandTest extends \Orchestra\Testbench\TestCase
 {
+    protected function getEnvironmentSetUp($app): void
+    {
+        $app['config']->set('database.default', 'testing');
+    }
+
     public function test_it_recalculates_an_order_without_persisting_during_a_dry_run(): void
     {
         $order = Order::create(
