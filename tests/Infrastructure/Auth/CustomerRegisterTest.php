@@ -85,12 +85,12 @@ class CustomerRegisterTest extends TestCase
         $this->assertCount(0, CustomerModel::all());
     }
 
-    public function test_it_avoids_displaying_email_error()
+    public function test_it_rejects_an_existing_customer_email()
     {
         $customer = $this->orderContext->createCustomer();
         $this->orderContext->createCustomerLogin($customer);
 
-        $response = $this->post(route('customer.register.store'), [
+        $response = $this->from(route('customer.register'))->post(route('customer.register.store'), [
             'firstname' => 'Ben',
             'lastname' => 'Doe',
             'email' => 'ben@thinktomorrow.be',
@@ -98,11 +98,14 @@ class CustomerRegisterTest extends TestCase
             'password_confirmation' => 'secret123',
         ]);
 
-        $response->assertRedirect(route('customer.login'));
-        $response->assertSessionHas('status');
-        $response->assertSessionHasNoErrors();
+        $response->assertRedirect(route('customer.register'));
+        $response->assertSessionHasErrors([
+            'email' => 'trader-auth.register.validation.email_taken',
+        ]);
+        $response->assertSessionMissing('status');
 
         $this->assertDatabaseCount('trader_customers', 1);
+        Notification::assertNothingSent();
     }
 
     public function test_it_handles_customer_created_by_concurrent_registration()
@@ -127,7 +130,7 @@ class CustomerRegisterTest extends TestCase
             };
         });
 
-        $response = $this->post(route('customer.register.store'), [
+        $response = $this->from(route('customer.register'))->post(route('customer.register.store'), [
             'firstname' => 'Ben',
             'lastname' => 'Doe',
             'email' => 'ben@thinktomorrow.be',
@@ -135,11 +138,31 @@ class CustomerRegisterTest extends TestCase
             'password_confirmation' => 'secret123',
         ]);
 
-        $response->assertRedirect(route('customer.login'));
-        $response->assertSessionHas('status', 'trader-auth.register.status.verification_notice');
-        $response->assertSessionHasNoErrors();
+        $response->assertRedirect(route('customer.register'));
+        $response->assertSessionHasErrors([
+            'email' => 'trader-auth.register.validation.email_taken',
+        ]);
+        $response->assertSessionMissing('status');
 
         $this->assertDatabaseCount('trader_customers', 1);
+        Notification::assertNothingSent();
+    }
+
+    public function test_it_throttles_registration_attempts(): void
+    {
+        $payload = [
+            'firstname' => 'Ben',
+            'lastname' => 'Doe',
+            'email' => 'invalid',
+            'password' => 'secret123',
+            'password_confirmation' => 'secret123',
+        ];
+
+        for ($attempt = 1; $attempt <= 10; $attempt++) {
+            $this->post(route('customer.register.store'), $payload)->assertRedirect();
+        }
+
+        $this->post(route('customer.register.store'), $payload)->assertTooManyRequests();
     }
 
     public function test_it_validates_register_request()

@@ -7,6 +7,8 @@ namespace Thinktomorrow\Trader\Infrastructure\Shop\CustomerAuth\Controllers;
 use Illuminate\Foundation\Validation\ValidatesRequests;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
+use Illuminate\Validation\Rule;
+use Illuminate\Validation\ValidationException;
 use Thinktomorrow\Trader\Application\Customer\CustomerApplication;
 use Thinktomorrow\Trader\Application\Customer\RegisterCustomer;
 use Thinktomorrow\Trader\Domain\Common\Email;
@@ -39,48 +41,41 @@ class CustomerRegisterController extends Controller
             'is_business' => ['sometimes', 'boolean'],
             'firstname' => ['required', 'string', 'max:200'],
             'lastname' => ['required', 'string', 'max:200'],
-            'email' => ['required', 'string', 'email', 'max:200'],
+            'email' => ['required', 'string', 'email', 'max:200', Rule::unique(CustomerModel::class, 'email')],
             'password' => ['required', 'string', 'min:8', 'confirmed'],
             'company' => ['required_if:is_business,true', 'nullable', 'max:200'],
         ], [
             'company.required_if' => __('trader-auth.register.validation.company_required'),
+            'email.unique' => __('trader-auth.register.validation.email_taken'),
         ]);
 
-        $existingCustomer = CustomerModel::where('email', $request->input('email'))->first();
+        try {
+            $customerId = $this->customerApplication->registerCustomer(new RegisterCustomer(
+                $request->input('email'),
+                $request->boolean('is_business'),
+                app()->getLocale(),
+                [
+                    'firstname' => $request->input('firstname'),
+                    'lastname' => $request->input('lastname'),
+                    'company' => $request->input('company'),
+                    'vat_number' => $request->input('vat_number'),
+                    'phone' => $request->input('phone'),
+                ]
+            ));
 
-        if ($existingCustomer) {
-            $this->sendVerificationNotificationWhenNeeded($existingCustomer);
-        }
+            $this->customerLoginRepository->save(CustomerLogin::create(
+                $customerId,
+                Email::fromString($request->input('email')),
+                bcrypt($request->input('password'))
+            ));
 
-        if (! $existingCustomer) {
-            try {
-                $customerId = $this->customerApplication->registerCustomer(new RegisterCustomer(
-                    $request->input('email'),
-                    $request->boolean('is_business'),
-                    app()->getLocale(),
-                    [
-                        'firstname' => $request->input('firstname'),
-                        'lastname' => $request->input('lastname'),
-                        'company' => $request->input('company'),
-                        'vat_number' => $request->input('vat_number'),
-                        'phone' => $request->input('phone'),
-                    ]
-                ));
+            $customer = CustomerModel::findOrFail($customerId->get());
 
-                $this->customerLoginRepository->save(CustomerLogin::create(
-                    $customerId,
-                    Email::fromString($request->input('email')),
-                    bcrypt($request->input('password'))
-                ));
-
-                $customer = CustomerModel::findOrFail($customerId->get());
-
-                $customer->sendEmailVerificationNotification();
-            } catch (CustomerAlreadyExists) {
-                $this->sendVerificationNotificationWhenNeeded(
-                    CustomerModel::where('email', $request->input('email'))->firstOrFail()
-                );
-            }
+            $customer->sendEmailVerificationNotification();
+        } catch (CustomerAlreadyExists) {
+            throw ValidationException::withMessages([
+                'email' => __('trader-auth.register.validation.email_taken'),
+            ]);
         }
 
         if (! $redirect) {
@@ -90,12 +85,5 @@ class CustomerRegisterController extends Controller
         return redirect()
             ->to($redirect)
             ->with('status', __('trader-auth.register.status.verification_notice'));
-    }
-
-    private function sendVerificationNotificationWhenNeeded(CustomerModel $customer): void
-    {
-        if (! $customer->hasVerifiedEmail()) {
-            $customer->sendEmailVerificationNotification();
-        }
     }
 }

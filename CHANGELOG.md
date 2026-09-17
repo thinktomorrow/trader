@@ -4,6 +4,12 @@ Important changes will be notified in this file
 
 ## Unreleased
 
+## 2026-09-17 - 0.9.9
+
+- Changed: customer registration now reports an existing email address as a field validation error instead of
+  redirecting to login and optionally resending a verification email.
+- Added: configurable customer registration middleware, rate limited to ten attempts per minute by default.
+
 ## 2026-09-03 - 0.9.8
 
 - Fixed: Laravel Pint is now a flexible development dependency and no longer constrains consuming applications.
