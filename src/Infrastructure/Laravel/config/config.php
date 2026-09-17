@@ -90,6 +90,12 @@ return [
     'show_variants_in_grid_by_default' => false,
 
     /**
+     * Middleware applied to the customer registration request. Projects can
+     * append their own spam protection middleware to this list.
+     */
+    'customer_registration_middleware' => ['throttle:10,1'],
+
+    /**
      * The mail address that will be used to send
      * the customer password reset mail
      */

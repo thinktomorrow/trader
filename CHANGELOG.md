@@ -4,6 +4,10 @@ Important changes will be notified in this file
 
 ## Unreleased
 
+- Changed: customer registration now reports an existing email address as a field validation error instead of
+  redirecting to login and optionally resending a verification email.
+- Added: configurable customer registration middleware, rate limited to ten attempts per minute by default.
+
 ## 2026-09-12 - 0.10.1
 
 - Added: `VariantLinksComposer::getForProduct()` to avoid duplicate product find queries when rendering variant links

@@ -23,7 +23,9 @@ Route::group(['prefix' => 'you', 'middleware' => ['web']], function () {
 
     // Customer registration routes
     Route::get('register', [CustomerRegisterController::class, 'showRegisterForm'])->name('customer.register');
-    Route::post('register', [CustomerRegisterController::class, 'register'])->name('customer.register.store');
+    Route::post('register', [CustomerRegisterController::class, 'register'])
+        ->middleware(config('trader.customer_registration_middleware', ['throttle:10,1']))
+        ->name('customer.register.store');
 
     // Email Verification Routes - for signed out customers
     Route::get('email/verify/{id}/{hash}', [VerificationController::class, 'verify'])->name('customer.verification.verify');
