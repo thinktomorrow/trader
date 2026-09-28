@@ -175,3 +175,17 @@ Checked repository for agent-editor instruction files:
 - `.github/copilot-instructions.md`: not found.
 
 If any of these files are added later, treat them as higher-priority supplements to this guide.
+
+## Agent skills
+
+### Issue tracker
+
+Issues and specs live as local markdown files under `.scratch/`. See `docs/agents/issue-tracker.md`.
+
+### Triage labels
+
+Use the five default triage roles as local issue status strings. See `docs/agents/triage-labels.md`.
+
+### Domain docs
+
+Use a single-context layout rooted at `CONTEXT.md` and `docs/adr/`. See `docs/agents/domain.md`.
