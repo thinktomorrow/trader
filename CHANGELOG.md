@@ -4,10 +4,12 @@ Important changes will be notified in this file
 
 ## Unreleased
 
+## 2026-10-22 - 0.10.3
+
 - Changed: customer registration now reports an existing email address as a field validation error instead of
   redirecting to login and optionally resending a verification email.
 - Added: configurable customer registration middleware, rate limited to ten attempts per minute by default.
-- Added: ShippingProfile::nextFreeShippingThreshold () to indicate an amount from which this profile is considered free.
+- Added: `ShippingProfile::nextFreeShippingThreshold()` to find the next free shipping tariff for an order subtotal.
 
 ## 2026-09-12 - 0.10.1
 
