@@ -169,6 +169,38 @@ class ShippingProfileTest extends TestCase
         );
     }
 
+    public function test_it_finds_the_next_free_shipping_threshold_for_inclusive_tariffs(): void
+    {
+        $profile = ShippingProfile::create(ShippingProfileId::fromString('shipping'), ShippingProviderId::fromString('postnl'), true);
+        $profile->addTariff(Tariff::create(TariffId::fromString('later'), $profile->shippingProfileId, Money::EUR(0), Money::EUR(1000000), null, TaxMode::Inclusive));
+        $profile->addTariff(Tariff::create(TariffId::fromString('current'), $profile->shippingProfileId, Money::EUR(10000), Money::EUR(0), Money::EUR(849999), TaxMode::Inclusive));
+        $profile->addTariff(Tariff::create(TariffId::fromString('free'), $profile->shippingProfileId, Money::EUR(0), Money::EUR(850000), Money::EUR(999999), TaxMode::Inclusive));
+
+        $this->assertSame('850000', $profile->nextFreeShippingThreshold(Money::EUR(702479), Money::EUR(849999))->getAmount());
+        $this->assertNull($profile->nextFreeShippingThreshold(Money::EUR(702480), Money::EUR(850000)));
+    }
+
+    public function test_it_uses_the_excluding_vat_subtotal_for_an_exclusive_free_tariff(): void
+    {
+        $profile = ShippingProfile::create(ShippingProfileId::fromString('shipping'), ShippingProviderId::fromString('postnl'), true);
+        $profile->addTariff(Tariff::create(TariffId::fromString('current'), $profile->shippingProfileId, Money::EUR(1000), Money::EUR(0), Money::EUR(99999), TaxMode::Exclusive));
+        $profile->addTariff(Tariff::create(TariffId::fromString('free'), $profile->shippingProfileId, Money::EUR(0), Money::EUR(100000), null, TaxMode::Exclusive));
+
+        $this->assertSame('100000', $profile->nextFreeShippingThreshold(Money::EUR(99999), Money::EUR(120998))->getAmount());
+        $this->assertNull($profile->nextFreeShippingThreshold(Money::EUR(100000), Money::EUR(121000)));
+    }
+
+    public function test_it_has_no_free_shipping_threshold_without_a_paid_current_tariff_and_a_free_future_tariff(): void
+    {
+        $profile = ShippingProfile::create(ShippingProfileId::fromString('shipping'), ShippingProviderId::fromString('postnl'), true);
+
+        $this->assertNull($profile->nextFreeShippingThreshold(Money::EUR(0), Money::EUR(0)));
+
+        $profile->addTariff(Tariff::create(TariffId::fromString('current'), $profile->shippingProfileId, Money::EUR(1000), Money::EUR(0), null));
+
+        $this->assertNull($profile->nextFreeShippingThreshold(Money::EUR(500), Money::EUR(605)));
+    }
+
     private function createdShippingProfile(): ShippingProfile
     {
         return ShippingProfile::fromMappedData([

@@ -102,6 +102,32 @@ final class ShippingProfile implements Aggregate
         return null;
     }
 
+    public function nextFreeShippingThreshold(Money $subtotalExcl, Money $subtotalIncl): ?Money
+    {
+        $currentTariff = $this->findTariffByPrices($subtotalExcl, $subtotalIncl);
+
+        if (! $currentTariff || $currentTariff->getRate()->isZero()) {
+            return null;
+        }
+
+        $threshold = null;
+
+        foreach ($this->tariffs as $tariff) {
+            if (! $tariff->getRate()->isZero()) {
+                continue;
+            }
+
+            $subtotal = $tariff->getTaxMode() === TaxMode::Inclusive ? $subtotalIncl : $subtotalExcl;
+            $from = $tariff->getFrom();
+
+            if ($from->greaterThan($subtotal) && (! $threshold || $from->lessThan($threshold))) {
+                $threshold = $from;
+            }
+        }
+
+        return $threshold;
+    }
+
     public function findTariff(TariffId $tariffId): Tariff
     {
         foreach ($this->tariffs as $tariff) {

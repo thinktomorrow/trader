@@ -50,6 +50,11 @@ final class Tariff implements ChildEntity
         return $this->rate;
     }
 
+    public function getFrom(): Money
+    {
+        return $this->from;
+    }
+
     public function getVatApplicableRate(): VatApplicableAmount
     {
         return VatApplicableAmount::fromMoney($this->rate, $this->taxMode);
