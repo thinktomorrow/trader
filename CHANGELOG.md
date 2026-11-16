@@ -2,31 +2,43 @@
 
 Important changes will be notified in this file
 
-## Unreleased
+## 0.11.0 (Unreleased)
 
+- Changed: discount selection now evaluates compatible promo combinations by final VAT-inclusive order total,
+  repricing shipping and payment after product discounts. Existing promo priorities and stacking behavior need
+  verification; see the [discount upgrade guide](upgrade-0.10-to-0.11.md).
+- Added: `combines_with` (target types `line`, `order`, `shipping`, `payment`) and
+  `multiple_product_discounts_per_line` replace the `is_combinable` boolean. Both promos must allow the other's
+  types; stacking product discounts on one line requires both stacking flags. The migrations backfill the legacy
+  boolean, then drop it.
+- Added: `discountable_type` on `trader_promo_discounts`. The migration backfills only built-in `sale_price`,
+  `fixed_amount` and `percentage_off` discounts; projects must backfill custom discount keys before loading promos.
+  See the [data migration steps](upgrade-0.10-to-0.11.md#2-plan-the-schema-and-data-migration).
 - Added: `CreatePromoDiscount`, `UpdatePromoDiscount` and `DeletePromoDiscount` commands on `PromoApplication` for
-  managing one discount at a time, including its conditions.
+  managing one discount at a time, including its conditions and an explicit target type for custom discounts.
+- Changed: `CreatePromo`, `CreateSystemPromo` and `UpdatePromo` now take a combines-with list and a
+  product-discount-stacking flag instead of `isCombinable`. Update positional constructor calls.
 - Changed: `UpdatePromo` no longer accepts or replaces discounts; `Promo` exposes targeted discount operations instead
-  of `updateDiscounts()`. Migrate direct consumers using the
-  [promo discount upgrade instructions](upgrade-0.9-to-0.10.md#6-update-customized-contracts-and-factories).
+  of `updateDiscounts()`. Update admin and import flows to retain existing discount IDs; see the
+  [promo command upgrade instructions](upgrade-0.10-to-0.11.md#3-update-promo-commands-and-admin-workflows).
 - Changed: promo discount condition input is now `ConditionDTO` instead of `UpdateCondition`, shared by create and
   update.
 - Removed: unused `UpdateDiscount` command. Use `UpdatePromoDiscount` via `PromoApplication::updatePromoDiscount()`
   to change an existing promo discount. See the
-  [promo discount upgrade instructions](upgrade-0.9-to-0.10.md#6-update-customized-contracts-and-factories).
+  [promo command upgrade instructions](upgrade-0.10-to-0.11.md#3-update-promo-commands-and-admin-workflows).
 - Fixed: changing promo properties no longer removes existing discounts; the sale-price system discount is created via
   the dedicated discount command.
 - Removed: `CreateCouponPromo`; create coupon promos with `CreatePromo` and a non-null coupon code instead. See the
-  [promo creation upgrade instructions](upgrade-0.9-to-0.10.md#6-update-customized-contracts-and-factories).
+  [promo command upgrade instructions](upgrade-0.10-to-0.11.md#3-update-promo-commands-and-admin-workflows).
 - Removed: `ApplyPromoToOrder` and `PromoApplicationScope`; cart discount selection now uses
   `SelectBestPromoCombination`. Update direct consumers before upgrading. See the
-  [promo application upgrade instructions](upgrade-0.9-to-0.10.md#6-update-customized-contracts-and-factories).
+  [custom integration upgrade instructions](upgrade-0.10-to-0.11.md#4-migrate-custom-discount-integrations).
 - Removed: deprecated `AdjustOrderVatSnapshot` alias. Inject and call `AdjustOrderPricingSnapshot` instead; update
   project-specific commands and cart actions before upgrading. See the
-  [pricing snapshot upgrade instructions](upgrade-0.9-to-0.10.md#5-rename-the-pricing-snapshot-api).
-- Renamed namespaces: `Thinktomorrow\Trader\Application\Promo\Conditions` to
-  `Thinktomorrow\Trader\Application\Promo\ApplicableConditions` and `Thinktomorrow\Trader\Application\Promo\Discounts`
-  to `Thinktomorrow\Trader\Application\Promo\ApplicableDiscounts`.
+  [custom integration upgrade instructions](upgrade-0.10-to-0.11.md#4-migrate-custom-discount-integrations).
+- Removed: legacy `OrderPromoRepository`, order/line discount application classes and order discount model namespace.
+  Custom factories and implementations must migrate to `ApplicableDiscounts` / `ApplicableConditions` and
+  `Domain\Model\Order\AppliedDiscount`; see the [custom integration guide](upgrade-0.10-to-0.11.md#4-migrate-custom-discount-integrations).
 
 ## 2026-10-22 - 0.10.3
 

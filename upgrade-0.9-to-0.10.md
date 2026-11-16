@@ -1,4 +1,4 @@
-# Upgrade Guide: 0.9.x -> 0.10.0
+# Upgrade Guide: 0.9.x -> 0.10.0 (vat refactor)
 
 This guide lists the required changes to safely migrate a project from Trader `0.9.x` to `0.10.0`.
 
@@ -12,15 +12,8 @@ rg --glob '*.php' --glob '!vendor/**' "OrderVatSnapshot|WithOrderVatSnapshot|Adj
 
 Every match must be reviewed. Do not complete the upgrade while old snapshot API references remain.
 
-### Known project usages
-
-The deprecated `AdjustOrderVatSnapshot` alias has been removed after Trader `0.10.3`. Update constructor injection,
-imports and calls before upgrading to a version without the alias. In the current project code:
-
-- Mauquoy still injects it in `app/Plugins/Trader/Setup/Commands/MigrateToVatAllocatedOrderTotals.php`.
-- Twerk still injects it in the same migration command and in
-  `app/Plugins/Trader/Project/Shop/Cart/ApplyQuotationShippingCost.php`; the latter runs in the quotation flow.
-- Hanolux already injects `AdjustOrderPricingSnapshot` in its migration command.
+The deprecated `AdjustOrderVatSnapshot` wrapper remains available in `0.10.3`, but consumers should move to
+`AdjustOrderPricingSnapshot`. It is removed in [Trader 0.11.0](upgrade-0.10-to-0.11.md).
 
 ## 2. Update the package
 
@@ -78,16 +71,16 @@ amount.
 
 This is an intentional API break. Apply all relevant replacements:
 
-| Before | After |
-| --- | --- |
-| `OrderVatSnapshot` | `OrderPricingSnapshot` |
-| `WithOrderVatSnapshot` | `WithOrderPricingSnapshot` |
-| `AdjustOrderVatSnapshot` | `AdjustOrderPricingSnapshot` |
-| `VatSnapshotNotCalculated` | `PricingSnapshotNotCalculated` |
+| Before                         | After                              |
+|--------------------------------|------------------------------------|
+| `OrderVatSnapshot`             | `OrderPricingSnapshot`             |
+| `WithOrderVatSnapshot`         | `WithOrderPricingSnapshot`         |
+| `AdjustOrderVatSnapshot`       | `AdjustOrderPricingSnapshot`       |
+| `VatSnapshotNotCalculated`     | `PricingSnapshotNotCalculated`     |
 | `VatSnapshotMismatchException` | `PricingSnapshotMismatchException` |
-| `applyVatSnapshot()` | `applyPricingSnapshot()` |
-| `invalidateVatSnapshot()` | `invalidatePricingSnapshot()` |
-| `hasUpToDateVatSnapshot()` | `hasUpToDatePricingSnapshot()` |
+| `applyVatSnapshot()`           | `applyPricingSnapshot()`           |
+| `invalidateVatSnapshot()`      | `invalidatePricingSnapshot()`      |
+| `hasUpToDateVatSnapshot()`     | `hasUpToDatePricingSnapshot()`     |
 
 `OrderPricingSnapshot` lives in
 `Thinktomorrow\Trader\Domain\Model\Order\Snapshot\OrderPricingSnapshot`. Also update constructor injection, container
@@ -119,46 +112,8 @@ Only apply these steps where the project customizes or constructs the affected t
   repositories must bind both contracts where needed.
 - Update custom merchant order, payment, and shipping read models or mocks for the new state-reader contracts.
 
-`CreateCouponPromo` has been removed after Trader `0.10.3`. Replace its imports and constructor calls with
-`Thinktomorrow\Trader\Application\Promo\CUD\CreatePromo`. Pass the coupon code as the first argument;
-pass `null` there for an automatic promo. The remaining arguments follow `CreatePromo`'s constructor signature.
-
-`ApplyPromoToOrder` and its `PromoApplicationScope` have been removed after Trader `0.10.3`. Remove imports,
-container bindings and direct calls. For cart recalculation, use the `AdjustDiscounts` adjuster, which gathers
-available promos and delegates selection and application to `SelectBestPromoCombination`. If you invoke the selector
-directly, pass available `Promo` objects rather than the discount instances accepted by `ApplyPromoToOrder`.
-The old `Lines` / `ServicesAndOrder` scope split is no longer needed: the selector applies product discounts
-before repricing shipping and payment and then applies order, shipping and payment discounts.
-
-Promo discounts now have their own commands in `Thinktomorrow\Trader\Application\Promo\CUD`, handled by
-`PromoApplication::createPromoDiscount()`, `updatePromoDiscount()` and `deletePromoDiscount()`. Remove the discounts
-argument from `new UpdatePromo(...)`; its remaining arguments are promo ID, coupon code, start and end dates,
-`combinesWith`, `multipleProductDiscountsPerLine`, and promo data. `updatePromo()` now preserves all discounts.
-Review every existing `new UpdatePromo(...)` call for the removed discounts argument.
-The unused `UpdateDiscount` command has been removed. Replace direct references with `UpdatePromoDiscount` and call
-`PromoApplication::updatePromoDiscount()` with the promo ID and an existing discount ID.
-Create or change each discount separately, for example:
-
-```php
-$discountId = $promoApplication->createPromoDiscount(new CreatePromoDiscount(
-    $promoId->get(), 'fixed_amount', [], ['amount' => '50'],
-));
-
-$promoApplication->updatePromoDiscount(new UpdatePromoDiscount(
-    $promoId->get(), $discountId->get(), 'fixed_amount', [], ['amount' => '75'],
-));
-
-$promoApplication->deletePromoDiscount(new DeletePromoDiscount($promoId->get(), $discountId->get()));
-```
-
-Import these command classes from the same `CUD` namespace. The conditions argument accepts entries with `key` and
-`data`; the discount class can optionally be passed after `data`. Create allocates a discount ID unless an explicit ID
-is supplied as the final argument (for a fixed system discount). Direct aggregate consumers should replace
-`Promo::updateDiscounts()` with `addPromoDiscount()`, `findPromoDiscount()`, `updatePromoDiscount()` and
-`deletePromoDiscount()`. Delete and update require an existing discount ID. Custom implementations of the domain
-`Discount` interface must also provide `getPromoId(): PromoId` and `getDiscountId(): PromoDiscountId` (the built-in
-`BaseDiscount` already does). Replace direct `UpdateCondition` references with `ConditionDTO` in the same `CUD`
-namespace; both create and update commands now use it for condition input.
+For the breaking promo command, discount and combination-policy changes in `0.11.0`, follow the separate
+[0.10.x to 0.11.0 upgrade guide](upgrade-0.10-to-0.11.md) once this upgrade is complete.
 
 ## 7. Set tax authority explicitly for new prices
 
