@@ -4,38 +4,21 @@ declare(strict_types=1);
 
 namespace Thinktomorrow\Trader\Infrastructure\Test\Repositories;
 
-use Thinktomorrow\Trader\Application\Promo\OrderPromo\OrderDiscount;
-use Thinktomorrow\Trader\Application\Promo\OrderPromo\OrderDiscountFactory;
-use Thinktomorrow\Trader\Application\Promo\OrderPromo\OrderPromo;
-use Thinktomorrow\Trader\Application\Promo\OrderPromo\OrderPromoRepository;
-use Thinktomorrow\Trader\Domain\Model\Promo\Condition;
-use Thinktomorrow\Trader\Domain\Model\Promo\Discount;
-use Thinktomorrow\Trader\Domain\Model\Promo\DiscountFactory;
-use Thinktomorrow\Trader\Domain\Model\Promo\DiscountId;
+use Thinktomorrow\Trader\Domain\Model\Promo\Discounts\PromoDiscountId;
 use Thinktomorrow\Trader\Domain\Model\Promo\Exceptions\CouldNotFindPromo;
 use Thinktomorrow\Trader\Domain\Model\Promo\Promo;
 use Thinktomorrow\Trader\Domain\Model\Promo\PromoId;
 use Thinktomorrow\Trader\Domain\Model\Promo\PromoRepository;
 use Thinktomorrow\Trader\Domain\Model\Promo\PromoState;
 
-final class InMemoryPromoRepository implements InMemoryRepository, OrderPromoRepository, PromoRepository
+final class InMemoryPromoRepository implements InMemoryRepository, PromoRepository
 {
     /** @var Promo[] */
     public static array $promos = [];
 
     private string $nextReference = 'ppp-123';
 
-    private string $nextDiscountReference = 'ddd-123';
-
-    private DiscountFactory $discountFactory;
-
-    private OrderDiscountFactory $orderDiscountFactory;
-
-    public function __construct(DiscountFactory $discountFactory, OrderDiscountFactory $orderDiscountFactory)
-    {
-        $this->discountFactory = $discountFactory;
-        $this->orderDiscountFactory = $orderDiscountFactory;
-    }
+    private int $nextDiscountReference = 123;
 
     public function save(Promo $promo): void
     {
@@ -65,9 +48,9 @@ final class InMemoryPromoRepository implements InMemoryRepository, OrderPromoRep
         return PromoId::fromString($this->nextReference);
     }
 
-    public function nextDiscountReference(): DiscountId
+    public function nextPromoDiscountReference(): PromoDiscountId
     {
-        return DiscountId::fromString($this->nextDiscountReference);
+        return PromoDiscountId::fromString('ddd-'.$this->nextDiscountReference++);
     }
 
     // For testing purposes only
@@ -81,39 +64,25 @@ final class InMemoryPromoRepository implements InMemoryRepository, OrderPromoRep
         self::$promos = [];
     }
 
-    public function getAvailableSystemPromos(): array
+    public function getAvailableAutomaticPromos(): array
     {
         $result = [];
 
         foreach ($this->filterActivePromos() as $promo) {
-            if (! $promo->isSystemPromo()) {
+            if ($promo->getCouponCode() !== null) {
                 continue;
             }
-            $result[] = $this->createApplicablePromoFromPromo($promo);
+            $result[] = $promo;
         }
 
         return $result;
     }
 
-    public function getAvailableOrderPromos(): array
-    {
-        $result = [];
-
-        foreach ($this->filterActivePromos() as $promo) {
-            if ($promo->hasCouponCode() || $promo->isSystemPromo()) {
-                continue;
-            }
-            $result[] = $this->createApplicablePromoFromPromo($promo);
-        }
-
-        return $result;
-    }
-
-    public function findOrderPromoByCouponCode(string $couponCode): ?OrderPromo
+    public function findAvailableByCouponCode(string $couponCode): ?Promo
     {
         foreach ($this->filterActivePromos() as $promo) {
-            if ($promo->hasCouponCode() && $promo->getCouponCode() == $couponCode) {
-                return $this->createApplicablePromoFromPromo($promo);
+            if ($promo->getCouponCode() !== null && $promo->getCouponCode() === $couponCode) {
+                return $promo;
             }
         }
 
@@ -144,26 +113,5 @@ final class InMemoryPromoRepository implements InMemoryRepository, OrderPromoRep
         }
 
         return $result;
-    }
-
-    private function createApplicablePromoFromPromo(Promo $promo): OrderPromo
-    {
-        return OrderPromo::fromMappedData(
-            $promo->getMappedData(),
-            [
-                OrderDiscount::class => array_map(function (Discount $discount) use ($promo) {
-                    if (! is_callable([$discount, 'getConditions'])) {
-                        throw new \LogicException('An order promo discount must expose its conditions.');
-                    }
-
-                    return $this->orderDiscountFactory->make(
-                        $discount::getMapKey(),
-                        $discount->getMappedData(),
-                        $promo->getMappedData(),
-                        array_map(fn (Condition $condition) => $condition->getMappedData(), $discount->getConditions())
-                    );
-                }, $promo->getDiscounts()),
-            ]
-        );
     }
 }

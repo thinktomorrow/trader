@@ -11,12 +11,12 @@ use Thinktomorrow\Trader\Domain\Common\Price\DefaultServicePrice;
 use Thinktomorrow\Trader\Domain\Common\Price\DiscountPrice;
 use Thinktomorrow\Trader\Domain\Common\Price\ServicePrice;
 use Thinktomorrow\Trader\Domain\Common\Price\TaxMode;
-use Thinktomorrow\Trader\Domain\Model\Order\Discount\Discount;
-use Thinktomorrow\Trader\Domain\Model\Order\Discount\DiscountableId;
-use Thinktomorrow\Trader\Domain\Model\Order\Discount\DiscountableItem;
-use Thinktomorrow\Trader\Domain\Model\Order\Discount\DiscountableType;
-use Thinktomorrow\Trader\Domain\Model\Order\Discount\HasDiscounts;
+use Thinktomorrow\Trader\Domain\Model\Order\AppliedDiscount\Discount;
+use Thinktomorrow\Trader\Domain\Model\Order\AppliedDiscount\DiscountableId;
+use Thinktomorrow\Trader\Domain\Model\Order\AppliedDiscount\DiscountableItem;
+use Thinktomorrow\Trader\Domain\Model\Order\AppliedDiscount\HasDiscounts;
 use Thinktomorrow\Trader\Domain\Model\Order\OrderId;
+use Thinktomorrow\Trader\Domain\Model\Promo\Discounts\DiscountableType;
 use Thinktomorrow\Trader\Domain\Model\ShippingProfile\ShippingProfileId;
 
 final class Shipping implements ChildAggregate, DiscountableItem

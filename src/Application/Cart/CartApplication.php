@@ -15,8 +15,6 @@ use Thinktomorrow\Trader\Application\Cart\RefreshCart\Adjusters\AdjustDiscountsA
 use Thinktomorrow\Trader\Application\Cart\RefreshCart\Adjusters\AdjustLine;
 use Thinktomorrow\Trader\Application\Cart\RefreshCart\Adjusters\AdjustLines;
 use Thinktomorrow\Trader\Application\Cart\RefreshCart\Adjusters\AdjustOrderPricingSnapshot;
-use Thinktomorrow\Trader\Application\Cart\RefreshCart\Adjusters\AdjustPayment;
-use Thinktomorrow\Trader\Application\Cart\RefreshCart\Adjusters\AdjustShipping;
 use Thinktomorrow\Trader\Application\Cart\RefreshCart\Adjusters\AdjustVatRates;
 use Thinktomorrow\Trader\Application\Cart\RefreshCart\RefreshCart;
 use Thinktomorrow\Trader\Application\Cart\RefreshCart\RefreshCartAction;
@@ -85,8 +83,6 @@ final class CartApplication
             $this->container->get(AdjustVatRates::class)->withVariants($variants),
             new AdjustDiscountsAndServices(
                 $this->container->get(AdjustDiscounts::class),
-                $this->container->get(AdjustShipping::class),
-                $this->container->get(AdjustPayment::class),
             ),
             $this->container->get(AdjustOrderPricingSnapshot::class),
         ]);

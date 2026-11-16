@@ -13,9 +13,8 @@ use Thinktomorrow\Trader\Application\Order\Invoice\CreateInvoiceReferenceByYearA
 use Thinktomorrow\Trader\Domain\Common\Address\AddressType;
 use Thinktomorrow\Trader\Domain\Model\Order\Address\BillingAddress;
 use Thinktomorrow\Trader\Domain\Model\Order\Address\ShippingAddress;
-use Thinktomorrow\Trader\Domain\Model\Order\Discount\Discount;
-use Thinktomorrow\Trader\Domain\Model\Order\Discount\DiscountableType;
-use Thinktomorrow\Trader\Domain\Model\Order\Discount\DiscountId;
+use Thinktomorrow\Trader\Domain\Model\Order\AppliedDiscount\AppliedDiscountId;
+use Thinktomorrow\Trader\Domain\Model\Order\AppliedDiscount\Discount;
 use Thinktomorrow\Trader\Domain\Model\Order\Exceptions\CouldNotFindOrder;
 use Thinktomorrow\Trader\Domain\Model\Order\Exceptions\OrderAlreadyInMerchantHands;
 use Thinktomorrow\Trader\Domain\Model\Order\Exceptions\PricingSnapshotMismatchException;
@@ -41,6 +40,7 @@ use Thinktomorrow\Trader\Domain\Model\Order\Shipping\ShippingState;
 use Thinktomorrow\Trader\Domain\Model\Order\Shopper;
 use Thinktomorrow\Trader\Domain\Model\Order\ShopperId;
 use Thinktomorrow\Trader\Domain\Model\Order\State\OrderState;
+use Thinktomorrow\Trader\Domain\Model\Promo\Discounts\DiscountableType;
 use Thinktomorrow\Trader\TraderConfig;
 
 class MysqlOrderRepository implements InvoiceRepository, OrderRepository
@@ -573,9 +573,9 @@ class MysqlOrderRepository implements InvoiceRepository, OrderRepository
         return ShopperId::fromString((string) Uuid::uuid4());
     }
 
-    public function nextDiscountReference(): DiscountId
+    public function nextAppliedDiscountReference(): AppliedDiscountId
     {
-        return DiscountId::fromString((string) Uuid::uuid4());
+        return AppliedDiscountId::fromString((string) Uuid::uuid4());
     }
 
     public function nextLineReference(): LineId

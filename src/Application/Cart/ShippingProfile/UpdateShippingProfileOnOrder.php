@@ -37,15 +37,23 @@ class UpdateShippingProfileOnOrder
 
     public function refresh(Order $order, ShippingProfileId $shippingProfileId): void
     {
+        $this->refreshWithProfile($order, $this->findForRefresh($shippingProfileId));
+    }
+
+    /** Return null when the selected profile no longer exists, so refresh can remove shipping. */
+    public function findForRefresh(ShippingProfileId $shippingProfileId): ?ShippingProfile
+    {
         try {
-            $shippingProfile = $this->shippingProfileRepository->find($shippingProfileId);
+            return $this->shippingProfileRepository->find($shippingProfileId);
         } catch (CouldNotFindShippingProfile) {
-            $this->removeAllShippingsFromOrder($order);
-
-            return;
+            return null;
         }
+    }
 
-        if (! $this->shippingProfileEligibility()->isEligible($order, $shippingProfile)) {
+    /** Recheck eligibility and recalculate shipping costs for this order without loading the profile again. */
+    public function refreshWithProfile(Order $order, ?ShippingProfile $shippingProfile): void
+    {
+        if ($shippingProfile === null || ! $this->shippingProfileEligibility()->isEligible($order, $shippingProfile)) {
             $this->removeAllShippingsFromOrder($order);
 
             return;

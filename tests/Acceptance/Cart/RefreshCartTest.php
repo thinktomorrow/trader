@@ -147,6 +147,30 @@ class RefreshCartTest extends CartContext
         $this->assertEquals(Money::EUR(200), $order->getShippingCostExcl());
     }
 
+    public function test_refresh_removes_missing_service_profiles_with_a_product_promo(): void
+    {
+        $this->catalogContext->createProduct('aaa', null);
+        $this->catalogContext->createVariant('aaa', 'aaa-variant-aaa', [
+            'unit_price' => 10000,
+            'sale_price' => 8000,
+        ]);
+        $this->whenIAddTheVariantToTheCart('aaa-variant-aaa');
+        $this->givenShippingCostsForAPurchaseOfEur(5, 0, 200, [], 'shipping');
+        $this->givenPaymentMethod(10);
+        $this->whenIChooseShipping('shipping');
+        $this->whenIChoosePayment('visa');
+
+        $this->orderContext->repos()->shippingProfileRepository()->delete(ShippingProfileId::fromString('shipping'));
+        $this->orderContext->repos()->paymentMethodRepository()->delete(PaymentMethodId::fromString('visa'));
+
+        $this->refreshCart();
+
+        $order = $this->getOrder();
+        $this->assertEquals(Money::EUR(2000), $order->getLines()[0]->getDiscountPriceExcl());
+        $this->assertSame([], $order->getShippings());
+        $this->assertSame([], $order->getPayments());
+    }
+
     public function test_it_refreshes_the_selected_payment_method_cost(): void
     {
         $this->givenPaymentMethod(10);

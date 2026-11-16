@@ -7,13 +7,17 @@ namespace Thinktomorrow\Trader\Domain\Model\Promo\Discounts;
 use Money\Money;
 use Thinktomorrow\Trader\Domain\Common\Cash\Cash;
 use Thinktomorrow\Trader\Domain\Common\Price\TaxMode;
-use Thinktomorrow\Trader\Domain\Model\Promo\Discount;
 
 final class FixedAmountDiscount extends BaseDiscount implements Discount
 {
     private Money $amount;
 
     private TaxMode $taxMode;
+
+    public static function fixedDiscountableType(): ?DiscountableType
+    {
+        return DiscountableType::order;
+    }
 
     public static function getMapKey(): string
     {

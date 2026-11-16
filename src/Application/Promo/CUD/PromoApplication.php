@@ -5,7 +5,11 @@ declare(strict_types=1);
 namespace Thinktomorrow\Trader\Application\Promo\CUD;
 
 use Thinktomorrow\Trader\Domain\Common\Event\EventDispatcher;
-use Thinktomorrow\Trader\Domain\Model\Promo\DiscountFactory;
+use Thinktomorrow\Trader\Domain\Model\Promo\CombinationPolicy;
+use Thinktomorrow\Trader\Domain\Model\Promo\Discounts\Discount;
+use Thinktomorrow\Trader\Domain\Model\Promo\Discounts\DiscountableType;
+use Thinktomorrow\Trader\Domain\Model\Promo\Discounts\DiscountFactory;
+use Thinktomorrow\Trader\Domain\Model\Promo\Discounts\PromoDiscountId;
 use Thinktomorrow\Trader\Domain\Model\Promo\Discounts\SalePriceSystemDiscount;
 use Thinktomorrow\Trader\Domain\Model\Promo\Events\PromoDeleted;
 use Thinktomorrow\Trader\Domain\Model\Promo\Promo;
@@ -35,7 +39,7 @@ class PromoApplication
     {
         $promoId = $this->promoRepository->nextReference();
 
-        $promo = Promo::create($promoId, $command->getCouponCode(), $command->getStartAt(), $command->getEndAt(), $command->isCombinable());
+        $promo = Promo::create($promoId, $command->getCouponCode(), $command->getStartAt(), $command->getEndAt(), new CombinationPolicy($command->getCombinesWith(), $command->allowsMultipleProductDiscountsPerLine()));
         $promo->addData($command->getData());
 
         $this->promoRepository->save($promo);
@@ -49,7 +53,7 @@ class PromoApplication
     {
         $promoId = $command->getSystemPromoId();
 
-        $promo = Promo::create($promoId, null, null, null, $command->isCombinable());
+        $promo = Promo::create($promoId, $command->getCouponCode(), null, null, new CombinationPolicy($command->getCombinesWith(), $command->allowsMultipleProductDiscountsPerLine()));
         $promo->addData($command->getData());
 
         $promo->setAsSystemPromo();
@@ -68,24 +72,74 @@ class PromoApplication
      */
     public function createSalePriceSystemPromo(): void
     {
-        $promoId = $this->createSystemPromo(new CreateSystemPromo('system_sale_price', true, []));
+        $promoId = $this->createSystemPromo(new CreateSystemPromo('system_sale_price', DiscountableType::values(), null, false, []));
 
-        $this->updatePromo(new UpdatePromo(
+        $this->createPromoDiscount(new CreatePromoDiscount(
             $promoId->get(),
+            SalePriceSystemDiscount::getMapKey(),
+            [],
+            [],
             null,
-            null,
-            null,
-            true,
-            [
-                [
-                    'discountId' => SalePriceSystemDiscount::getMapKey(),
-                    'key' => SalePriceSystemDiscount::getMapKey(),
-                    'conditions' => [],
-                    'data' => [],
-                ],
-            ],
-            []
+            SalePriceSystemDiscount::getMapKey(),
         ));
+    }
+
+    public function createPromoDiscount(CreatePromoDiscount $command): PromoDiscountId
+    {
+        $promo = $this->promoRepository->find($command->getPromoId());
+        $discountId = $command->getDiscountId() ?? $this->promoRepository->nextPromoDiscountReference();
+
+        $promo->addPromoDiscount($this->makeDiscount($promo, $discountId, $command));
+
+        $this->promoRepository->save($promo);
+        $this->eventDispatcher->dispatchAll($promo->releaseEvents());
+
+        return $discountId;
+    }
+
+    public function updatePromoDiscount(UpdatePromoDiscount $command): void
+    {
+        $promo = $this->promoRepository->find($command->getPromoId());
+        $currentDiscount = $promo->findPromoDiscount($command->getDiscountId());
+        $discountableType = $command->getDiscountableType() ?? ($currentDiscount::getMapKey() === $command->getMapKey() ? $currentDiscount->getDiscountableType() : null);
+
+        $promo->updatePromoDiscount($this->makeDiscount($promo, $command->getDiscountId(), $command, $discountableType));
+
+        $this->promoRepository->save($promo);
+        $this->eventDispatcher->dispatchAll($promo->releaseEvents());
+    }
+
+    public function deletePromoDiscount(DeletePromoDiscount $command): void
+    {
+        $promo = $this->promoRepository->find($command->getPromoId());
+        $promo->deletePromoDiscount($command->getDiscountId());
+
+        $this->promoRepository->save($promo);
+        $this->eventDispatcher->dispatchAll($promo->releaseEvents());
+    }
+
+    private function makeDiscount(Promo $promo, PromoDiscountId $discountId, CreatePromoDiscount|UpdatePromoDiscount $command, ?DiscountableType $discountableType = null): Discount
+    {
+        $conditionStates = [];
+
+        foreach ($command->getConditions() as $condition) {
+            $conditionStates[] = [
+                'key' => $condition->getMapKey(),
+                'data' => json_encode($condition->getData()),
+            ];
+        }
+
+        return $this->discountFactory->make(
+            $command->getMapKey(),
+            [
+                'promo_id' => $promo->promoId->get(),
+                'discount_id' => $discountId->get(),
+                'discountable_type' => ($command->getDiscountableType() ?? $discountableType)?->value,
+                'data' => json_encode($command->getData()),
+            ],
+            $promo->getMappedData(),
+            $conditionStates,
+        );
     }
 
     public function updatePromo(UpdatePromo $command): void
@@ -95,35 +149,8 @@ class PromoApplication
         $promo->updateCouponCode($command->getCouponCode());
         $promo->updateStartAt($command->getStartAt());
         $promo->updateEndAt($command->getEndAt());
-        $promo->updateIsCombinable($command->isCombinable());
+        $promo->updateCombinationPolicy(new CombinationPolicy($command->getCombinesWith(), $command->allowsMultipleProductDiscountsPerLine()));
         $promo->addData($command->getData());
-
-        $discounts = [];
-        foreach ($command->getDiscounts() as $commandDiscount) {
-            $discountId = $commandDiscount->getDiscountId() ?: $this->promoRepository->nextDiscountReference();
-
-            // Conditions ...
-            $conditionStates = [];
-            foreach ($commandDiscount->getConditions() as $conditionPayload) {
-                $conditionStates[] = [
-                    'key' => $conditionPayload->getMapKey(),
-                    'data' => json_encode($conditionPayload->getData()),
-                ];
-            }
-
-            $discounts[] = $this->discountFactory->make(
-                $commandDiscount->getMapKey(),
-                [
-                    'promo_id' => $promo->promoId->get(),
-                    'discount_id' => $discountId->get(),
-                    'data' => json_encode($commandDiscount->getData()),
-                ],
-                $promo->getMappedData(),
-                $conditionStates
-            );
-        }
-
-        $promo->updateDiscounts($discounts);
 
         $this->promoRepository->save($promo);
 

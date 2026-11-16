@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Thinktomorrow\Trader\Infrastructure\Test\Repositories;
 
 use Thinktomorrow\Trader\Application\Cart\RefreshCart\Adjusters\AdjustOrderPricingSnapshot;
-use Thinktomorrow\Trader\Domain\Model\Order\Discount\DiscountId;
+use Thinktomorrow\Trader\Domain\Model\Order\AppliedDiscount\AppliedDiscountId;
 use Thinktomorrow\Trader\Domain\Model\Order\Exceptions\CouldNotFindOrder;
 use Thinktomorrow\Trader\Domain\Model\Order\Exceptions\OrderAlreadyInMerchantHands;
 use Thinktomorrow\Trader\Domain\Model\Order\Invoice\InvoiceReference;
@@ -36,6 +36,8 @@ final class InMemoryOrderRepository implements InMemoryRepository, InvoiceReposi
     private string $nextShopperReference = 'shopper-123';
 
     private string $nextDiscountReference = 'discount-123';
+
+    private int $nextDiscountSequence = 0;
 
     private string $nextLineReference = 'line';
 
@@ -133,9 +135,9 @@ final class InMemoryOrderRepository implements InMemoryRepository, InvoiceReposi
         return ShopperId::fromString($this->nextShopperReference);
     }
 
-    public function nextDiscountReference(): DiscountId
+    public function nextAppliedDiscountReference(): AppliedDiscountId
     {
-        return DiscountId::fromString($this->nextDiscountReference.'-'.mt_rand(1, 999));
+        return AppliedDiscountId::fromString($this->nextDiscountReference.'-'.++$this->nextDiscountSequence);
     }
 
     public function nextLineReference(): LineId

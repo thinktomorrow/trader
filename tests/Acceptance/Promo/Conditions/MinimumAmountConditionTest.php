@@ -6,21 +6,21 @@ namespace Tests\Acceptance\Promo\Conditions;
 
 use Tests\Acceptance\TestCase;
 use Tests\TestHelpers;
-use Thinktomorrow\Trader\Application\Promo\OrderPromo\Conditions\MinimumAmountOrderCondition;
-use Thinktomorrow\Trader\Application\Promo\OrderPromo\OrderConditionFactory;
+use Thinktomorrow\Trader\Application\Promo\ApplicableConditions\ApplicableConditionFactory;
+use Thinktomorrow\Trader\Application\Promo\ApplicableConditions\MinimumAmountCondition;
 
 class MinimumAmountConditionTest extends TestCase
 {
     use TestHelpers;
 
-    private OrderConditionFactory $factory;
+    private ApplicableConditionFactory $factory;
 
     protected function setUp(): void
     {
         parent::setUp();
 
-        $this->factory = new OrderConditionFactory([
-            MinimumAmountOrderCondition::class,
+        $this->factory = new ApplicableConditionFactory([
+            MinimumAmountCondition::class,
         ]);
     }
 
@@ -30,7 +30,7 @@ class MinimumAmountConditionTest extends TestCase
             'data' => json_encode(['amount' => '50']),
         ], []);
 
-        $this->assertInstanceOf(MinimumAmountOrderCondition::class, $condition);
+        $this->assertInstanceOf(MinimumAmountCondition::class, $condition);
     }
 
     public function test_it_can_check_condition()

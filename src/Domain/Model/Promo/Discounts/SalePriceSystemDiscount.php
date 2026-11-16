@@ -4,10 +4,13 @@ declare(strict_types=1);
 
 namespace Thinktomorrow\Trader\Domain\Model\Promo\Discounts;
 
-use Thinktomorrow\Trader\Domain\Model\Promo\Discount;
-
 final class SalePriceSystemDiscount extends BaseDiscount implements Discount
 {
+    public static function fixedDiscountableType(): ?DiscountableType
+    {
+        return DiscountableType::line;
+    }
+
     public static function getMapKey(): string
     {
         return 'sale_price';

@@ -8,7 +8,11 @@ use Assert\Assertion;
 use Thinktomorrow\Trader\Domain\Common\Entity\Aggregate;
 use Thinktomorrow\Trader\Domain\Common\Entity\HasData;
 use Thinktomorrow\Trader\Domain\Common\Event\RecordsEvents;
+use Thinktomorrow\Trader\Domain\Model\Promo\Discounts\Discount;
+use Thinktomorrow\Trader\Domain\Model\Promo\Discounts\DiscountableType;
+use Thinktomorrow\Trader\Domain\Model\Promo\Discounts\PromoDiscountId;
 use Thinktomorrow\Trader\Domain\Model\Promo\Events\PromoCreated;
+use Thinktomorrow\Trader\Domain\Model\Promo\Exceptions\CouldNotFindPromoDiscount;
 
 class Promo implements Aggregate
 {
@@ -21,7 +25,7 @@ class Promo implements Aggregate
 
     private ?string $coupon_code;
 
-    private bool $isCombinable;
+    private CombinationPolicy $combinationPolicy;
 
     /**
      * System promo is a fixed promo that cannot be managed
@@ -36,12 +40,12 @@ class Promo implements Aggregate
     /** @var Discount[] */
     private array $discounts;
 
-    public static function create(PromoId $promoId, ?string $coupon_code, ?\DateTime $startAt, ?\DateTime $endAt, bool $isCombinable): static
+    public static function create(PromoId $promoId, ?string $coupon_code, ?\DateTime $startAt, ?\DateTime $endAt, CombinationPolicy $combinationPolicy): static
     {
         $promo = new static;
         $promo->promoId = $promoId;
         $promo->state = PromoState::online;
-        $promo->isCombinable = $isCombinable;
+        $promo->combinationPolicy = $combinationPolicy;
         $promo->coupon_code = $coupon_code;
         $promo->startAt = $startAt;
         $promo->endAt = $endAt;
@@ -90,16 +94,95 @@ class Promo implements Aggregate
         return $this->state;
     }
 
-    public function updateDiscounts(array $discounts): void
+    public function addPromoDiscount(Discount $discount): void
     {
-        Assertion::allIsInstanceOf($discounts, Discount::class);
+        if (! $discount->getPromoId()->equals($this->promoId)) {
+            throw new \InvalidArgumentException('Discount does not belong to promo ['.$this->promoId->get().'].');
+        }
 
-        $this->discounts = $discounts;
+        foreach ($this->discounts as $existingDiscount) {
+            if ($existingDiscount->getDiscountId()->equals($discount->getDiscountId())) {
+                throw new \InvalidArgumentException('Discount ['.$discount->getDiscountId()->get().'] already exists on promo ['.$this->promoId->get().'].');
+            }
+        }
+
+        $this->discounts[] = $discount;
+    }
+
+    public function findPromoDiscount(PromoDiscountId $discountId): Discount
+    {
+        foreach ($this->discounts as $discount) {
+            if ($discount->getDiscountId()->equals($discountId)) {
+                return $discount;
+            }
+        }
+
+        throw new CouldNotFindPromoDiscount('No discount found by id ['.$discountId->get().'] on promo ['.$this->promoId->get().'].');
+    }
+
+    public function updatePromoDiscount(Discount $discount): void
+    {
+        $this->findPromoDiscount($discount->getDiscountId());
+
+        if (! $discount->getPromoId()->equals($this->promoId)) {
+            throw new \InvalidArgumentException('Discount does not belong to promo ['.$this->promoId->get().'].');
+        }
+
+        foreach ($this->discounts as $index => $existingDiscount) {
+            if ($existingDiscount->getDiscountId()->equals($discount->getDiscountId())) {
+                $this->discounts[$index] = $discount;
+
+                return;
+            }
+        }
+    }
+
+    public function deletePromoDiscount(PromoDiscountId $discountId): void
+    {
+        $this->findPromoDiscount($discountId);
+
+        foreach ($this->discounts as $index => $discount) {
+            if ($discount->getDiscountId()->equals($discountId)) {
+                array_splice($this->discounts, $index, 1);
+
+                return;
+            }
+        }
     }
 
     public function getDiscounts(): array
     {
         return $this->discounts;
+    }
+
+    /** @return list<DiscountableType> */
+    public function getDiscountableTypes(): array
+    {
+        $types = [];
+
+        foreach ($this->discounts as $discount) {
+            $type = $discount->getDiscountableType();
+            $types[$type->value] = $type;
+        }
+
+        return array_values($types);
+    }
+
+    public function canCombineWith(self $other): bool
+    {
+        foreach ($this->getDiscountableTypes() as $type) {
+            if (! $other->combinationPolicy->allows($type)) {
+                return false;
+            }
+        }
+
+        foreach ($other->getDiscountableTypes() as $type) {
+            if (! $this->combinationPolicy->allows($type)) {
+                return false;
+            }
+        }
+
+        return true;
     }
 
     public function updateCouponCode(?string $coupon_code): void
@@ -117,9 +200,14 @@ class Promo implements Aggregate
         $this->endAt = $endAt;
     }
 
-    public function updateIsCombinable(bool $isCombinable): void
+    public function updateCombinationPolicy(CombinationPolicy $combinationPolicy): void
     {
-        $this->isCombinable = $isCombinable;
+        $this->combinationPolicy = $combinationPolicy;
+    }
+
+    public function getCombinationPolicy(): CombinationPolicy
+    {
+        return $this->combinationPolicy;
     }
 
     public function getMappedData(): array
@@ -127,7 +215,8 @@ class Promo implements Aggregate
         return [
             'promo_id' => $this->promoId->get(),
             'state' => $this->state->value,
-            'is_combinable' => $this->isCombinable,
+            'combines_with' => json_encode($this->combinationPolicy->toArray()),
+            'multiple_product_discounts_per_line' => $this->combinationPolicy->allowsMultipleProductDiscountsPerLine(),
             'is_system_promo' => $this->isSystemPromo,
             'coupon_code' => $this->coupon_code,
             'start_at' => $this->startAt?->format('Y-m-d H:i:s'),
@@ -151,7 +240,7 @@ class Promo implements Aggregate
 
         $promo->promoId = PromoId::fromString($state['promo_id']);
         $promo->state = PromoState::from($state['state']);
-        $promo->isCombinable = $state['is_combinable'];
+        $promo->combinationPolicy = CombinationPolicy::fromArray(json_decode($state['combines_with'], true, flags: JSON_THROW_ON_ERROR), (bool) $state['multiple_product_discounts_per_line']);
         $promo->isSystemPromo = $state['is_system_promo'];
         $promo->coupon_code = $state['coupon_code'];
         $promo->startAt = $state['start_at'] ? \DateTime::createFromFormat('Y-m-d H:i:s', $state['start_at']) : null;

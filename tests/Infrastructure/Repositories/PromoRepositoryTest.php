@@ -10,11 +10,14 @@ use Thinktomorrow\Trader\Application\Cart\Line\AddLine;
 use Thinktomorrow\Trader\Application\Cart\RefreshCart\RefreshCart;
 use Thinktomorrow\Trader\Application\Promo\Coupon\CouponPromoApplication;
 use Thinktomorrow\Trader\Application\Promo\Coupon\EnterCoupon;
-use Thinktomorrow\Trader\Application\Promo\OrderPromo\OrderPromo;
 use Thinktomorrow\Trader\Domain\Common\Price\TaxMode;
 use Thinktomorrow\Trader\Domain\Model\Order\OrderRepository;
+use Thinktomorrow\Trader\Domain\Model\Promo\CombinationPolicy;
+use Thinktomorrow\Trader\Domain\Model\Promo\Conditions\MinimumLinesQuantity;
+use Thinktomorrow\Trader\Domain\Model\Promo\Discounts\DiscountableType;
 use Thinktomorrow\Trader\Domain\Model\Promo\Discounts\FixedAmountDiscount;
 use Thinktomorrow\Trader\Domain\Model\Promo\Exceptions\CouldNotFindPromo;
+use Thinktomorrow\Trader\Domain\Model\Promo\Promo;
 use Thinktomorrow\Trader\Domain\Model\Promo\PromoId;
 use Thinktomorrow\Trader\Domain\Model\Promo\PromoState;
 use Thinktomorrow\Trader\Testing\Order\OrderContext;
@@ -52,6 +55,67 @@ final class PromoRepositoryTest extends TestCase
 
             $this->assertInstanceOf(FixedAmountDiscount::class, $savedDiscount);
             $this->assertSame(TaxMode::Inclusive, $savedDiscount->getTaxMode());
+        }
+    }
+
+    public function test_it_persists_a_targeted_discount_update_and_delete_with_conditions(): void
+    {
+        foreach (OrderContext::drivers() as $orderContext) {
+            $repository = $orderContext->repos()->promoRepository();
+            $promo = $orderContext->dontPersist()->createPromo('targeted-promo', [], [
+                $orderContext->createPromoDiscount('targeted-promo', 'first', 'fixed_amount', [
+                    'data' => json_encode(['amount' => '50']),
+                ], [
+                    MinimumLinesQuantity::fromMappedData(['data' => json_encode(['minimum_quantity' => '2'])], []),
+                ]),
+                $orderContext->createPromoDiscount('targeted-promo', 'second', 'percentage_off', [
+                    'data' => json_encode(['percentage' => '10']),
+                ]),
+            ]);
+            $repository->save($promo);
+
+            $promo = $repository->find($promo->promoId);
+            $promo->updatePromoDiscount($orderContext->createPromoDiscount('targeted-promo', 'first', 'fixed_amount', [
+                'data' => json_encode(['amount' => '75']),
+            ], [
+                MinimumLinesQuantity::fromMappedData(['data' => json_encode(['minimum_quantity' => '3'])], []),
+            ]));
+            $repository->save($promo);
+
+            $saved = $repository->find($promo->promoId);
+            $this->assertCount(2, $saved->getDiscounts());
+            $this->assertSame('75', $saved->getDiscounts()[0]->getData('amount'));
+            $this->assertEquals(3, $saved->getDiscounts()[0]->getConditions()[0]->getData('minimum_quantity'));
+            $this->assertSame('10', $saved->getDiscounts()[1]->getData('percentage'));
+
+            $saved->deletePromoDiscount($saved->getDiscounts()[0]->getDiscountId());
+            $repository->save($saved);
+
+            $remaining = $repository->find($promo->promoId)->getDiscounts();
+            $this->assertCount(1, $remaining);
+            $this->assertSame('second', $remaining[0]->getDiscountId()->get());
+        }
+    }
+
+    public function test_it_preserves_combination_policy_and_discountable_type_across_repositories(): void
+    {
+        foreach (OrderContext::drivers() as $orderContext) {
+            $repository = $orderContext->repos()->promoRepository();
+            $promo = $orderContext->dontPersist()->createPromo('classified-promo', [], [
+                $orderContext->createPromoDiscount('classified-promo', 'classified-discount', 'fixed_amount', [
+                    'discountable_type' => DiscountableType::order->value,
+                    'data' => json_encode(['amount' => '100']),
+                ]),
+            ]);
+            $promo->updateCombinationPolicy(new CombinationPolicy([DiscountableType::order, DiscountableType::shipping]));
+
+            $repository->save($promo);
+            $saved = $repository->find($promo->promoId);
+            $applicable = $repository->getAvailableAutomaticPromos()[0];
+
+            $this->assertSame(['order', 'shipping'], $saved->getCombinationPolicy()->toArray());
+            $this->assertSame(DiscountableType::order, $saved->getDiscounts()[0]->getDiscountableType());
+            $this->assertSame([DiscountableType::order], $applicable->getDiscountableTypes());
         }
     }
 
@@ -110,8 +174,8 @@ final class PromoRepositoryTest extends TestCase
                 'end_at' => now()->addDays(2)->format('Y-m-d H:i:s'),
             ]);
 
-            $this->assertCount(1, $repository->getAvailableOrderPromos());
-            $this->assertEquals($promo->promoId, $repository->getAvailableOrderPromos()[0]->promoId);
+            $this->assertCount(1, $repository->getAvailableAutomaticPromos());
+            $this->assertEquals($promo->promoId, $repository->getAvailableAutomaticPromos()[0]->promoId);
         }
     }
 
@@ -124,26 +188,27 @@ final class PromoRepositoryTest extends TestCase
                 'coupon_code' => 'foobar',
             ]);
 
-            $this->assertInstanceOf(OrderPromo::class, $repository->findOrderPromoByCouponCode('foobar'));
+            $this->assertInstanceOf(Promo::class, $repository->findAvailableByCouponCode('foobar'));
         }
     }
 
-    public function test_system_marketing_and_coupon_promos_are_loaded_separately(): void
+    public function test_automatic_promos_include_system_and_admin_promos_but_not_coupon_promos(): void
     {
         foreach (OrderContext::drivers() as $orderContext) {
             $repository = $orderContext->repos()->promoRepository();
             $orderContext->createPromo('system-promo', ['is_system_promo' => true]);
             $orderContext->createPromo('marketing-promo');
             $orderContext->createPromo('coupon-promo', ['coupon_code' => 'SAVE']);
+            $orderContext->createPromo('system-coupon-promo', ['is_system_promo' => true, 'coupon_code' => 'SYSTEM']);
 
-            $marketing = $repository->getAvailableOrderPromos();
-            $system = $repository->getAvailableSystemPromos();
+            $automatic = $repository->getAvailableAutomaticPromos();
 
-            $this->assertCount(1, $marketing);
-            $this->assertSame('marketing-promo', $marketing[0]->promoId->get());
-            $this->assertCount(1, $system);
-            $this->assertSame('system-promo', $system[0]->promoId->get());
-            $this->assertSame('coupon-promo', $repository->findOrderPromoByCouponCode('SAVE')->promoId->get());
+            $this->assertCount(2, $automatic);
+            $ids = array_map(fn (Promo $promo) => $promo->promoId->get(), $automatic);
+            sort($ids);
+            $this->assertSame(['marketing-promo', 'system-promo'], $ids);
+            $this->assertSame('coupon-promo', $repository->findAvailableByCouponCode('SAVE')->promoId->get());
+            $this->assertSame('system-coupon-promo', $repository->findAvailableByCouponCode('SYSTEM')->promoId->get());
         }
     }
 
@@ -152,7 +217,7 @@ final class PromoRepositoryTest extends TestCase
         foreach (['system', 'marketing', 'coupon'] as $type) {
             $this->orderContext->createPromo($type, [
                 'is_system_promo' => $type === 'system',
-                'is_combinable' => true,
+                'combines_with' => json_encode(DiscountableType::values()),
                 'coupon_code' => $type === 'coupon' ? 'SAVE' : null,
             ], [
                 $this->orderContext->createPromoDiscount($type, $type.'-discount', 'fixed_amount', [

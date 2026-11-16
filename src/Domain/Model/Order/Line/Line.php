@@ -15,14 +15,14 @@ use Thinktomorrow\Trader\Domain\Common\Price\ItemPrice;
 use Thinktomorrow\Trader\Domain\Common\Price\TaxMode;
 use Thinktomorrow\Trader\Domain\Common\Price\WithAuthoritativeIncl;
 use Thinktomorrow\Trader\Domain\Common\Vat\VatPercentage;
-use Thinktomorrow\Trader\Domain\Model\Order\Discount\Discount;
-use Thinktomorrow\Trader\Domain\Model\Order\Discount\DiscountableId;
-use Thinktomorrow\Trader\Domain\Model\Order\Discount\DiscountableItem;
-use Thinktomorrow\Trader\Domain\Model\Order\Discount\DiscountableType;
-use Thinktomorrow\Trader\Domain\Model\Order\Discount\HasDiscounts;
+use Thinktomorrow\Trader\Domain\Model\Order\AppliedDiscount\Discount;
+use Thinktomorrow\Trader\Domain\Model\Order\AppliedDiscount\DiscountableId;
+use Thinktomorrow\Trader\Domain\Model\Order\AppliedDiscount\DiscountableItem;
+use Thinktomorrow\Trader\Domain\Model\Order\AppliedDiscount\HasDiscounts;
 use Thinktomorrow\Trader\Domain\Model\Order\Line\Personalisations\HasPersonalisations;
 use Thinktomorrow\Trader\Domain\Model\Order\Line\Personalisations\LinePersonalisation;
 use Thinktomorrow\Trader\Domain\Model\Order\OrderId;
+use Thinktomorrow\Trader\Domain\Model\Promo\Discounts\DiscountableType;
 
 final class Line implements ChildAggregate, DiscountableItem
 {

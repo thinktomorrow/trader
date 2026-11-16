@@ -4,8 +4,6 @@ declare(strict_types=1);
 
 namespace Thinktomorrow\Trader\Domain\Model\Promo\Conditions;
 
-use Thinktomorrow\Trader\Domain\Model\Promo\Condition;
-
 class MinimumLinesQuantity extends BaseCondition implements Condition
 {
     private int $minimum_quantity;

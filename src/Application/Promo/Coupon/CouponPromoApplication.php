@@ -5,19 +5,18 @@ declare(strict_types=1);
 namespace Thinktomorrow\Trader\Application\Promo\Coupon;
 
 use Psr\Container\ContainerInterface;
+use Thinktomorrow\Trader\Application\Cart\RefreshCart\Adjusters\AdjustDiscounts;
 use Thinktomorrow\Trader\Application\Cart\RefreshCart\Adjusters\AdjustOrderPricingSnapshot;
-use Thinktomorrow\Trader\Application\Promo\ApplyPromoToOrder;
-use Thinktomorrow\Trader\Application\Promo\OrderPromo\OrderPromoRepository;
 use Thinktomorrow\Trader\Domain\Common\Event\EventDispatcher;
 use Thinktomorrow\Trader\Domain\Model\Order\OrderRepository;
+use Thinktomorrow\Trader\Domain\Model\Promo\PromoRepository;
 
 final class CouponPromoApplication
 {
     public function __construct(
         private OrderRepository $orderRepository,
         private EventDispatcher $eventDispatcher,
-        private OrderPromoRepository $orderPromoRepository,
-        private ApplyPromoToOrder $applyPromoToOrder,
+        private PromoRepository $promoRepository,
         private ContainerInterface $container,
     ) {}
 
@@ -26,11 +25,12 @@ final class CouponPromoApplication
         $order = $this->orderRepository->find($enterCoupon->getOrderId());
 
         // Find by coupon in active promo's
-        if (! $promo = $this->orderPromoRepository->findOrderPromoByCouponCode($enterCoupon->getCouponCode())) {
+        if (! $promo = $this->promoRepository->findAvailableByCouponCode($enterCoupon->getCouponCode())) {
             return;
         }
 
-        $this->applyPromoToOrder->apply($order, $promo->getDiscounts(), $enterCoupon->getCouponCode());
+        $order->setEnteredCouponCode($enterCoupon->getCouponCode());
+        $this->container->get(AdjustDiscounts::class)->adjust($order);
 
         // Recalculate the pricing snapshot after changing the applied discounts.
         $this->container->get(AdjustOrderPricingSnapshot::class)->adjust($order);
@@ -45,6 +45,9 @@ final class CouponPromoApplication
         $order = $this->orderRepository->find($removeCoupon->getOrderId());
 
         $order->removeEnteredCouponCode();
+
+        $this->container->get(AdjustDiscounts::class)->adjust($order);
+        $this->container->get(AdjustOrderPricingSnapshot::class)->adjust($order);
 
         $this->orderRepository->save($order);
 

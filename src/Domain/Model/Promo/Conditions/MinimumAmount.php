@@ -6,7 +6,6 @@ namespace Thinktomorrow\Trader\Domain\Model\Promo\Conditions;
 
 use Money\Money;
 use Thinktomorrow\Trader\Domain\Common\Cash\Cash;
-use Thinktomorrow\Trader\Domain\Model\Promo\Condition;
 
 class MinimumAmount extends BaseCondition implements Condition
 {

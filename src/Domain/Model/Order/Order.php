@@ -13,11 +13,10 @@ use Thinktomorrow\Trader\Domain\Common\Vat\VatAllocatedLine;
 use Thinktomorrow\Trader\Domain\Common\Vat\VatPercentage;
 use Thinktomorrow\Trader\Domain\Model\Order\Address\BillingAddress;
 use Thinktomorrow\Trader\Domain\Model\Order\Address\ShippingAddress;
-use Thinktomorrow\Trader\Domain\Model\Order\Discount\Discount;
-use Thinktomorrow\Trader\Domain\Model\Order\Discount\DiscountableId;
-use Thinktomorrow\Trader\Domain\Model\Order\Discount\DiscountableItem;
-use Thinktomorrow\Trader\Domain\Model\Order\Discount\DiscountableType;
-use Thinktomorrow\Trader\Domain\Model\Order\Discount\HasDiscounts;
+use Thinktomorrow\Trader\Domain\Model\Order\AppliedDiscount\Discount;
+use Thinktomorrow\Trader\Domain\Model\Order\AppliedDiscount\DiscountableId;
+use Thinktomorrow\Trader\Domain\Model\Order\AppliedDiscount\DiscountableItem;
+use Thinktomorrow\Trader\Domain\Model\Order\AppliedDiscount\HasDiscounts;
 use Thinktomorrow\Trader\Domain\Model\Order\Events\OrderBillingAddressDeleted;
 use Thinktomorrow\Trader\Domain\Model\Order\Events\OrderBillingAddressUpdated;
 use Thinktomorrow\Trader\Domain\Model\Order\Events\OrderCreated;
@@ -45,6 +44,7 @@ use Thinktomorrow\Trader\Domain\Model\Order\Snapshot\OrderPricingSnapshot;
 use Thinktomorrow\Trader\Domain\Model\Order\Snapshot\WithOrderPricingSnapshot;
 use Thinktomorrow\Trader\Domain\Model\Order\Snapshot\WithPricingFingerprint;
 use Thinktomorrow\Trader\Domain\Model\Order\State\OrderState;
+use Thinktomorrow\Trader\Domain\Model\Promo\Discounts\DiscountableType;
 
 final class Order implements Aggregate, DiscountableItem
 {

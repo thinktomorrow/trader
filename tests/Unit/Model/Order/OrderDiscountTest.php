@@ -8,11 +8,12 @@ use Money\Money;
 use Tests\Unit\TestCase;
 use Thinktomorrow\Trader\Domain\Common\Cash\Percentage;
 use Thinktomorrow\Trader\Domain\Common\Price\DefaultDiscountPrice;
-use Thinktomorrow\Trader\Domain\Model\Order\Discount\Discount;
-use Thinktomorrow\Trader\Domain\Model\Order\Discount\DiscountableId;
-use Thinktomorrow\Trader\Domain\Model\Order\Discount\DiscountableType;
-use Thinktomorrow\Trader\Domain\Model\Order\Discount\DiscountId;
+use Thinktomorrow\Trader\Domain\Model\Order\AppliedDiscount\AppliedDiscountId;
+use Thinktomorrow\Trader\Domain\Model\Order\AppliedDiscount\Discount;
+use Thinktomorrow\Trader\Domain\Model\Order\AppliedDiscount\DiscountableId;
+use Thinktomorrow\Trader\Domain\Model\Promo\Discounts\DiscountableType;
 use Thinktomorrow\Trader\Domain\Model\Order\OrderId;
+use Thinktomorrow\Trader\Domain\Model\Promo\Discounts\PromoDiscountId;
 use Thinktomorrow\Trader\Domain\Model\Promo\PromoId;
 
 class OrderDiscountTest extends TestCase
@@ -21,11 +22,11 @@ class OrderDiscountTest extends TestCase
     {
         $discount = Discount::create(
             $orderId = OrderId::fromString('aaa'),
-            $discountId = DiscountId::fromString('bbb'),
+            $discountId = AppliedDiscountId::fromString('bbb'),
             $discountableType = DiscountableType::line,
             $discountableId = DiscountableId::fromString('ccc'),
             $promoId = PromoId::fromString('ddd'),
-            $promoDiscountId = \Thinktomorrow\Trader\Domain\Model\Promo\DiscountId::fromString('eee'),
+            $promoDiscountId = PromoDiscountId::fromString('eee'),
             $discountTotal = DefaultDiscountPrice::fromExcludingVat(Money::EUR(50)),
             ['foo' => 'bar']
         );
@@ -135,7 +136,7 @@ class OrderDiscountTest extends TestCase
         $this->assertCount(1, $order->getChildEntities()[Discount::class]);
 
         $order->deleteDiscount(
-            DiscountId::fromString('order-aaa:discount-aaa'),
+            AppliedDiscountId::fromString('order-aaa:discount-aaa'),
         );
 
         $this->assertCount(0, $order->getChildEntities()[Discount::class]);

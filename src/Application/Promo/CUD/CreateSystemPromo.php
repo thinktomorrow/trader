@@ -4,20 +4,19 @@ declare(strict_types=1);
 
 namespace Thinktomorrow\Trader\Application\Promo\CUD;
 
+use Thinktomorrow\Trader\Domain\Model\Promo\Discounts\DiscountableType;
 use Thinktomorrow\Trader\Domain\Model\Promo\PromoId;
 
 class CreateSystemPromo
 {
     private string $systemPromoId;
 
-    protected bool $isCombinable;
-
     protected array $data;
 
-    public function __construct(string $systemPromoId, bool $isCombinable, array $data)
+    /** @param list<string> $combinesWith */
+    public function __construct(string $systemPromoId, protected array $combinesWith, private ?string $couponCode, private bool $multipleProductDiscountsPerLine, array $data)
     {
         $this->systemPromoId = $systemPromoId;
-        $this->isCombinable = $isCombinable;
         $this->data = $data;
     }
 
@@ -26,13 +25,24 @@ class CreateSystemPromo
         return PromoId::fromString($this->systemPromoId);
     }
 
-    public function isCombinable(): bool
+    /** @return list<DiscountableType> */
+    public function getCombinesWith(): array
     {
-        return $this->isCombinable;
+        return array_map(fn (string $type): DiscountableType => DiscountableType::from($type), $this->combinesWith);
+    }
+
+    public function allowsMultipleProductDiscountsPerLine(): bool
+    {
+        return $this->multipleProductDiscountsPerLine;
     }
 
     public function getData(): array
     {
         return $this->data;
+    }
+
+    public function getCouponCode(): ?string
+    {
+        return $this->couponCode;
     }
 }

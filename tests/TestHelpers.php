@@ -558,7 +558,8 @@ trait TestHelpers
     //        return Promo::fromMappedData(array_merge([
     //            'promo_id' => 'abc',
     //            'state' => PromoState::online->value,
-    //            'is_combinable' => false,
+    //            'combines_with' => '[]',
+    //            'multiple_product_discounts_per_line' => false,
     //            'coupon_code' => null,
     //            'start_at' => null,
     //            'end_at' => null,

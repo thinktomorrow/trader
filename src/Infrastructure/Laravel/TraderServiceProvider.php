@@ -19,9 +19,11 @@ use Thinktomorrow\Trader\Application\Cart\Read\CartRepository;
 use Thinktomorrow\Trader\Application\Cart\Read\CartShipping;
 use Thinktomorrow\Trader\Application\Cart\Read\CartShippingAddress;
 use Thinktomorrow\Trader\Application\Cart\Read\CartShopper;
+use Thinktomorrow\Trader\Application\Cart\RefreshCart\Adjusters\AdjustDiscounts;
 use Thinktomorrow\Trader\Application\Cart\RefreshCart\Adjusters\AdjustLine;
 use Thinktomorrow\Trader\Application\Cart\RefreshCart\Adjusters\AdjustOrderPricingSnapshot;
-use Thinktomorrow\Trader\Application\Cart\RefreshCart\Adjusters\AdjustOrderVatSnapshot;
+use Thinktomorrow\Trader\Application\Cart\RefreshCart\Adjusters\AdjustPayment;
+use Thinktomorrow\Trader\Application\Cart\RefreshCart\Adjusters\AdjustShipping;
 use Thinktomorrow\Trader\Application\Cart\ShippingProfile\Eligibility\ProfileMustBeOnline;
 use Thinktomorrow\Trader\Application\Cart\ShippingProfile\Eligibility\ProfileMustSupportShippingCountry;
 use Thinktomorrow\Trader\Application\Cart\ShippingProfile\Eligibility\ShippingProfileEligibility;
@@ -60,14 +62,14 @@ use Thinktomorrow\Trader\Application\Product\Taxa\ProductTaxonItem;
 use Thinktomorrow\Trader\Application\Product\Taxa\VariantTaxonItem;
 use Thinktomorrow\Trader\Application\Product\VariantLinks\VariantLink;
 use Thinktomorrow\Trader\Application\Product\VariantProperties\VariantPropertyRepository;
-use Thinktomorrow\Trader\Application\Promo\LinePromo\Discounts\SalePriceLineDiscount;
-use Thinktomorrow\Trader\Application\Promo\OrderPromo\Conditions\MinimumAmountOrderCondition;
-use Thinktomorrow\Trader\Application\Promo\OrderPromo\Conditions\MinimumLinesQuantityOrderCondition;
-use Thinktomorrow\Trader\Application\Promo\OrderPromo\Discounts\FixedAmountOrderDiscount;
-use Thinktomorrow\Trader\Application\Promo\OrderPromo\Discounts\PercentageOffOrderDiscount;
-use Thinktomorrow\Trader\Application\Promo\OrderPromo\OrderConditionFactory;
-use Thinktomorrow\Trader\Application\Promo\OrderPromo\OrderDiscountFactory;
-use Thinktomorrow\Trader\Application\Promo\OrderPromo\OrderPromoRepository;
+use Thinktomorrow\Trader\Application\Promo\ApplicableConditions\ApplicableConditionFactory;
+use Thinktomorrow\Trader\Application\Promo\ApplicableConditions\MinimumAmountCondition;
+use Thinktomorrow\Trader\Application\Promo\ApplicableConditions\MinimumLinesQuantityCondition;
+use Thinktomorrow\Trader\Application\Promo\ApplicableDiscounts\ApplicableDiscountFactory;
+use Thinktomorrow\Trader\Application\Promo\ApplicableDiscounts\FixedAmountOrderSubtotalDiscount;
+use Thinktomorrow\Trader\Application\Promo\ApplicableDiscounts\PercentageOffOrderSubtotalDiscount;
+use Thinktomorrow\Trader\Application\Promo\ApplicableDiscounts\SalePriceProductDiscount;
+use Thinktomorrow\Trader\Application\Promo\SelectBestPromoCombination;
 use Thinktomorrow\Trader\Application\Taxon\Queries\CategoryRepository;
 use Thinktomorrow\Trader\Application\Taxon\Queries\TaxaSelectOptions;
 use Thinktomorrow\Trader\Application\Taxon\Queries\TaxonFilters;
@@ -97,10 +99,10 @@ use Thinktomorrow\Trader\Domain\Model\Order\State\OrderStateMachine;
 use Thinktomorrow\Trader\Domain\Model\PaymentMethod\PaymentMethodRepository;
 use Thinktomorrow\Trader\Domain\Model\Product\ProductRepository;
 use Thinktomorrow\Trader\Domain\Model\Product\VariantRepository;
-use Thinktomorrow\Trader\Domain\Model\Promo\ConditionFactory;
+use Thinktomorrow\Trader\Domain\Model\Promo\Conditions\ConditionFactory;
 use Thinktomorrow\Trader\Domain\Model\Promo\Conditions\MinimumAmount;
 use Thinktomorrow\Trader\Domain\Model\Promo\Conditions\MinimumLinesQuantity;
-use Thinktomorrow\Trader\Domain\Model\Promo\DiscountFactory;
+use Thinktomorrow\Trader\Domain\Model\Promo\Discounts\DiscountFactory;
 use Thinktomorrow\Trader\Domain\Model\Promo\Discounts\FixedAmountDiscount;
 use Thinktomorrow\Trader\Domain\Model\Promo\Discounts\PercentageOffDiscount;
 use Thinktomorrow\Trader\Domain\Model\Promo\Discounts\SalePriceSystemDiscount;
@@ -217,7 +219,6 @@ class TraderServiceProvider extends ServiceProvider
         );
         $this->app->bind(PaymentMethodForCartRepository::class, MysqlPaymentMethodRepository::class);
         $this->app->bind(PromoRepository::class, MysqlPromoRepository::class);
-        $this->app->bind(OrderPromoRepository::class, MysqlPromoRepository::class);
         $this->app->bind(OrderRepository::class, MysqlOrderRepository::class);
         $this->app->bind(ShippingProfileRepository::class, MysqlShippingProfileRepository::class);
         $this->app->bind(VatRateRepository::class, MysqlVatRateRepository::class);
@@ -263,7 +264,21 @@ class TraderServiceProvider extends ServiceProvider
         $this->app->bind(VatAllocator::class, fn ($app) => new VatAllocator(
             $app->make(VatApplicableAmountAllocator::class),
         ));
-        $this->app->bind(AdjustOrderPricingSnapshot::class, fn ($app) => $app->make(AdjustOrderVatSnapshot::class));
+        $this->app->bind(AdjustOrderPricingSnapshot::class, fn ($app) => new AdjustOrderPricingSnapshot(
+            $app->make(VatAllocator::class),
+        ));
+        $this->app->bind(SelectBestPromoCombination::class, fn ($app) => new SelectBestPromoCombination(
+            $app->make(OrderRepository::class),
+            $app->make(TraderConfig::class),
+            $app->make(AdjustOrderPricingSnapshot::class),
+            $app->make(AdjustShipping::class),
+            $app->make(AdjustPayment::class),
+            $app->make(ApplicableDiscountFactory::class),
+        ));
+        $this->app->bind(AdjustDiscounts::class, fn ($app) => new AdjustDiscounts(
+            $app->make(PromoRepository::class),
+            $app->make(SelectBestPromoCombination::class),
+        ));
 
         // MerchantOrder models
         $this->app->bind(MerchantOrder::class, fn () => DefaultMerchantOrder::class);
@@ -354,21 +369,21 @@ class TraderServiceProvider extends ServiceProvider
         });
 
         // Discount and condition application logic
-        $this->app->bind(OrderConditionFactory::class, function () {
-            return new OrderConditionFactory([
-                MinimumLinesQuantityOrderCondition::class,
-                MinimumAmountOrderCondition::class,
+        $this->app->bind(ApplicableConditionFactory::class, function () {
+            return new ApplicableConditionFactory([
+                MinimumLinesQuantityCondition::class,
+                MinimumAmountCondition::class,
             ]);
         });
 
-        $this->app->bind(OrderDiscountFactory::class, function ($app) {
-            return new OrderDiscountFactory(
+        $this->app->bind(ApplicableDiscountFactory::class, function ($app) {
+            return new ApplicableDiscountFactory(
                 [
-                    SalePriceLineDiscount::class,
-                    PercentageOffOrderDiscount::class,
-                    FixedAmountOrderDiscount::class,
+                    SalePriceProductDiscount::class,
+                    PercentageOffOrderSubtotalDiscount::class,
+                    FixedAmountOrderSubtotalDiscount::class,
                 ],
-                $app->get(OrderConditionFactory::class),
+                $app->get(ApplicableConditionFactory::class),
                 $app->get(VatAllocator::class),
             );
         });

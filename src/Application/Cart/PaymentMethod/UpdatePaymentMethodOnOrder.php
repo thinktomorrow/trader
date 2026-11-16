@@ -47,9 +47,23 @@ class UpdatePaymentMethodOnOrder
 
     public function refresh(Order $order, PaymentMethodId $paymentMethodId): void
     {
+        $this->refreshWithMethod($order, $this->findForRefresh($paymentMethodId));
+    }
+
+    /** Return null when the selected method no longer exists, so refresh can remove payment. */
+    public function findForRefresh(PaymentMethodId $paymentMethodId): ?PaymentMethod
+    {
         try {
-            $paymentMethod = $this->paymentMethodRepository->find($paymentMethodId);
+            return $this->paymentMethodRepository->find($paymentMethodId);
         } catch (CouldNotFindPaymentMethod) {
+            return null;
+        }
+    }
+
+    /** Recheck availability and recalculate payment costs for this order without loading the method again. */
+    public function refreshWithMethod(Order $order, ?PaymentMethod $paymentMethod): void
+    {
+        if ($paymentMethod === null) {
             $this->removePaymentMethodFromOrder($order);
 
             return;

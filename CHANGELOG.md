@@ -4,6 +4,30 @@ Important changes will be notified in this file
 
 ## Unreleased
 
+- Added: `CreatePromoDiscount`, `UpdatePromoDiscount` and `DeletePromoDiscount` commands on `PromoApplication` for
+  managing one discount at a time, including its conditions.
+- Changed: `UpdatePromo` no longer accepts or replaces discounts; `Promo` exposes targeted discount operations instead
+  of `updateDiscounts()`. Migrate direct consumers using the
+  [promo discount upgrade instructions](upgrade-0.9-to-0.10.md#6-update-customized-contracts-and-factories).
+- Changed: promo discount condition input is now `ConditionDTO` instead of `UpdateCondition`, shared by create and
+  update.
+- Removed: unused `UpdateDiscount` command. Use `UpdatePromoDiscount` via `PromoApplication::updatePromoDiscount()`
+  to change an existing promo discount. See the
+  [promo discount upgrade instructions](upgrade-0.9-to-0.10.md#6-update-customized-contracts-and-factories).
+- Fixed: changing promo properties no longer removes existing discounts; the sale-price system discount is created via
+  the dedicated discount command.
+- Removed: `CreateCouponPromo`; create coupon promos with `CreatePromo` and a non-null coupon code instead. See the
+  [promo creation upgrade instructions](upgrade-0.9-to-0.10.md#6-update-customized-contracts-and-factories).
+- Removed: `ApplyPromoToOrder` and `PromoApplicationScope`; cart discount selection now uses
+  `SelectBestPromoCombination`. Update direct consumers before upgrading. See the
+  [promo application upgrade instructions](upgrade-0.9-to-0.10.md#6-update-customized-contracts-and-factories).
+- Removed: deprecated `AdjustOrderVatSnapshot` alias. Inject and call `AdjustOrderPricingSnapshot` instead; update
+  project-specific commands and cart actions before upgrading. See the
+  [pricing snapshot upgrade instructions](upgrade-0.9-to-0.10.md#5-rename-the-pricing-snapshot-api).
+- Renamed namespaces: `Thinktomorrow\Trader\Application\Promo\Conditions` to
+  `Thinktomorrow\Trader\Application\Promo\ApplicableConditions` and `Thinktomorrow\Trader\Application\Promo\Discounts`
+  to `Thinktomorrow\Trader\Application\Promo\ApplicableDiscounts`.
+
 ## 2026-10-22 - 0.10.3
 
 - Changed: customer registration now reports an existing email address as a field validation error instead of

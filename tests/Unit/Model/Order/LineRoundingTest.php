@@ -9,16 +9,16 @@ use PHPUnit\Framework\TestCase;
 use Thinktomorrow\Trader\Domain\Common\Price\DefaultItemDiscountPrice;
 use Thinktomorrow\Trader\Domain\Common\Price\DefaultItemPrice;
 use Thinktomorrow\Trader\Domain\Common\Vat\VatPercentage;
-use Thinktomorrow\Trader\Domain\Model\Order\Discount\Discount;
-use Thinktomorrow\Trader\Domain\Model\Order\Discount\DiscountableType;
-use Thinktomorrow\Trader\Domain\Model\Order\Discount\DiscountId;
+use Thinktomorrow\Trader\Domain\Model\Order\AppliedDiscount\AppliedDiscountId;
+use Thinktomorrow\Trader\Domain\Model\Order\AppliedDiscount\Discount;
+use Thinktomorrow\Trader\Domain\Model\Promo\Discounts\DiscountableType;
 use Thinktomorrow\Trader\Domain\Model\Order\Line\Line;
 use Thinktomorrow\Trader\Domain\Model\Order\Line\LineId;
 use Thinktomorrow\Trader\Domain\Model\Order\Line\PurchasableReference;
 use Thinktomorrow\Trader\Domain\Model\Order\Line\Quantity;
 use Thinktomorrow\Trader\Domain\Model\Order\OrderId;
 use Thinktomorrow\Trader\Domain\Model\Product\Variant\VariantUnitPrice;
-use Thinktomorrow\Trader\Domain\Model\Promo\DiscountId as PromoDiscountId;
+use Thinktomorrow\Trader\Domain\Model\Promo\Discounts\PromoDiscountId;
 use Thinktomorrow\Trader\Domain\Model\Promo\PromoId;
 
 final class LineRoundingTest extends TestCase
@@ -65,7 +65,7 @@ final class LineRoundingTest extends TestCase
         );
         $line->addDiscount(Discount::create(
             OrderId::fromString('order-aaa'),
-            DiscountId::fromString('discount-aaa'),
+            AppliedDiscountId::fromString('discount-aaa'),
             DiscountableType::line,
             $line->getDiscountableId(),
             PromoId::fromString('promo-aaa'),

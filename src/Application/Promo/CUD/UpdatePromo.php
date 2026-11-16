@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Thinktomorrow\Trader\Application\Promo\CUD;
 
+use Thinktomorrow\Trader\Domain\Model\Promo\Discounts\DiscountableType;
 use Thinktomorrow\Trader\Domain\Model\Promo\PromoId;
 
 class UpdatePromo
@@ -16,20 +17,15 @@ class UpdatePromo
 
     private ?string $endAt;
 
-    private bool $isCombinable;
-
-    private array $discounts;
-
     private array $data;
 
-    public function __construct(string $promoId, ?string $couponCode, ?string $startAt, ?string $endAt, bool $isCombinable, array $discounts, array $data)
+    /** @param list<string> $combinesWith */
+    public function __construct(string $promoId, ?string $couponCode, ?string $startAt, ?string $endAt, private array $combinesWith, private bool $multipleProductDiscountsPerLine, array $data)
     {
         $this->promoId = $promoId;
         $this->couponCode = $couponCode;
         $this->startAt = $startAt;
         $this->endAt = $endAt;
-        $this->isCombinable = $isCombinable;
-        $this->discounts = $discounts;
         $this->data = $data;
     }
 
@@ -53,15 +49,15 @@ class UpdatePromo
         return $this->endAt ? new \DateTime($this->endAt) : null;
     }
 
-    public function isCombinable(): bool
+    /** @return list<DiscountableType> */
+    public function getCombinesWith(): array
     {
-        return $this->isCombinable;
+        return array_map(fn (string $type): DiscountableType => DiscountableType::from($type), $this->combinesWith);
     }
 
-    /** @return UpdateDiscount[] */
-    public function getDiscounts(): array
+    public function allowsMultipleProductDiscountsPerLine(): bool
     {
-        return array_map(fn (array $discountPayload) => new UpdateDiscount(...$discountPayload), $this->discounts);
+        return $this->multipleProductDiscountsPerLine;
     }
 
     public function getData(): array

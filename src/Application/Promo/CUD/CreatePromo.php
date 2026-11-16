@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Thinktomorrow\Trader\Application\Promo\CUD;
 
+use Thinktomorrow\Trader\Domain\Model\Promo\Discounts\DiscountableType;
+
 class CreatePromo
 {
     protected ?string $couponCode;
@@ -12,17 +14,19 @@ class CreatePromo
 
     protected ?string $endAt;
 
-    protected bool $isCombinable;
-
     protected array $data;
 
-    public function __construct(?string $couponCode, ?string $startAt, ?string $endAt, bool $isCombinable, array $data)
+    /** @var list<string> */
+    protected array $combinesWith;
+
+    /** @param list<string> $combinesWith */
+    public function __construct(?string $couponCode, ?string $startAt, ?string $endAt, array $combinesWith, protected bool $multipleProductDiscountsPerLine, array $data)
     {
         $this->couponCode = $couponCode;
         $this->startAt = $startAt;
         $this->endAt = $endAt;
-        $this->isCombinable = $isCombinable;
         $this->data = $data;
+        $this->combinesWith = $combinesWith;
     }
 
     public function getCouponCode(): ?string
@@ -40,9 +44,15 @@ class CreatePromo
         return $this->endAt ? new \DateTime($this->endAt) : null;
     }
 
-    public function isCombinable(): bool
+    /** @return list<DiscountableType> */
+    public function getCombinesWith(): array
     {
-        return $this->isCombinable;
+        return array_map(fn (string $type): DiscountableType => DiscountableType::from($type), $this->combinesWith);
+    }
+
+    public function allowsMultipleProductDiscountsPerLine(): bool
+    {
+        return $this->multipleProductDiscountsPerLine;
     }
 
     public function getData(): array
