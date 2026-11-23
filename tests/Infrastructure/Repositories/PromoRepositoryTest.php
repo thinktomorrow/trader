@@ -212,6 +212,21 @@ final class PromoRepositoryTest extends TestCase
         }
     }
 
+    public function test_available_promos_include_active_coupons_as_well_as_automatic_promos(): void
+    {
+        foreach (OrderContext::drivers() as $orderContext) {
+            $repository = $orderContext->repos()->promoRepository();
+            $orderContext->createPromo('automatic');
+            $orderContext->createPromo('coupon', ['coupon_code' => 'SAVE']);
+            $orderContext->createPromo('offline', ['state' => PromoState::offline->value]);
+
+            $ids = array_map(fn (Promo $promo): string => $promo->promoId->get(), $repository->getAvailablePromos());
+            sort($ids);
+
+            $this->assertSame(['automatic', 'coupon'], $ids);
+        }
+    }
+
     public function test_mysql_cart_refresh_combines_system_marketing_and_coupon_discounts(): void
     {
         foreach (['system', 'marketing', 'coupon'] as $type) {

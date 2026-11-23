@@ -78,6 +78,11 @@ final class InMemoryPromoRepository implements InMemoryRepository, PromoReposito
         return $result;
     }
 
+    public function getAvailablePromos(): array
+    {
+        return $this->filterActivePromos();
+    }
+
     public function findAvailableByCouponCode(string $couponCode): ?Promo
     {
         foreach ($this->filterActivePromos() as $promo) {

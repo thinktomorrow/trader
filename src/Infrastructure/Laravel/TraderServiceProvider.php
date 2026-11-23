@@ -69,6 +69,8 @@ use Thinktomorrow\Trader\Application\Promo\ApplicableDiscounts\ApplicableDiscoun
 use Thinktomorrow\Trader\Application\Promo\ApplicableDiscounts\FixedAmountOrderSubtotalDiscount;
 use Thinktomorrow\Trader\Application\Promo\ApplicableDiscounts\PercentageOffOrderSubtotalDiscount;
 use Thinktomorrow\Trader\Application\Promo\ApplicableDiscounts\SalePriceProductDiscount;
+use Thinktomorrow\Trader\Application\Promo\Preview\FindPromoSuggestionsForProduct;
+use Thinktomorrow\Trader\Application\Promo\Preview\StandardPromoPreviewEligibility;
 use Thinktomorrow\Trader\Application\Promo\SelectBestPromoCombination;
 use Thinktomorrow\Trader\Application\Taxon\Queries\CategoryRepository;
 use Thinktomorrow\Trader\Application\Taxon\Queries\TaxaSelectOptions;
@@ -149,6 +151,7 @@ use Thinktomorrow\Trader\Infrastructure\Laravel\Models\MerchantOrder\DefaultMerc
 use Thinktomorrow\Trader\Infrastructure\Laravel\Models\MerchantOrder\DefaultMerchantOrderShopper;
 use Thinktomorrow\Trader\Infrastructure\Laravel\Models\PaymentMethod\DefaultPaymentMethodForCart;
 use Thinktomorrow\Trader\Infrastructure\Laravel\Models\PaymentMethod\DefaultVerifyPaymentMethodForCart;
+use Thinktomorrow\Trader\Infrastructure\Laravel\Repositories\MemoizedMysqlPromoRepository;
 use Thinktomorrow\Trader\Infrastructure\Laravel\Repositories\MysqlCartRepository;
 use Thinktomorrow\Trader\Infrastructure\Laravel\Repositories\MysqlCountryRepository;
 use Thinktomorrow\Trader\Infrastructure\Laravel\Repositories\MysqlCustomerLoginRepository;
@@ -160,7 +163,6 @@ use Thinktomorrow\Trader\Infrastructure\Laravel\Repositories\MysqlOrderRepositor
 use Thinktomorrow\Trader\Infrastructure\Laravel\Repositories\MysqlPaymentMethodRepository;
 use Thinktomorrow\Trader\Infrastructure\Laravel\Repositories\MysqlProductDetailRepository;
 use Thinktomorrow\Trader\Infrastructure\Laravel\Repositories\MysqlProductRepository;
-use Thinktomorrow\Trader\Infrastructure\Laravel\Repositories\MysqlPromoRepository;
 use Thinktomorrow\Trader\Infrastructure\Laravel\Repositories\MysqlShippingProfileRepository;
 use Thinktomorrow\Trader\Infrastructure\Laravel\Repositories\MysqlTaxonomyRepository;
 use Thinktomorrow\Trader\Infrastructure\Laravel\Repositories\MysqlTaxonRedirectRepository;
@@ -218,7 +220,11 @@ class TraderServiceProvider extends ServiceProvider
             )
         );
         $this->app->bind(PaymentMethodForCartRepository::class, MysqlPaymentMethodRepository::class);
-        $this->app->bind(PromoRepository::class, MysqlPromoRepository::class);
+        $this->app->bind(PromoRepository::class, MemoizedMysqlPromoRepository::class);
+        $this->app->bind(FindPromoSuggestionsForProduct::class, fn ($app) => new FindPromoSuggestionsForProduct(
+            $app->make(PromoRepository::class),
+            [$app->make(StandardPromoPreviewEligibility::class)],
+        ));
         $this->app->bind(OrderRepository::class, MysqlOrderRepository::class);
         $this->app->bind(ShippingProfileRepository::class, MysqlShippingProfileRepository::class);
         $this->app->bind(VatRateRepository::class, MysqlVatRateRepository::class);

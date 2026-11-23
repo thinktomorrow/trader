@@ -43,6 +43,28 @@ final class MysqlPromoRepository implements PromoRepository
         return $this->composePromosFromResults($results);
     }
 
+    public function getAvailablePromos(): array
+    {
+        return $this->composePromosFromResults($this->baseActiveQuery()->get());
+    }
+
+    /**
+     * Next instant at which the available promo set can change without a write.
+     * This is used to set a specific promo cache lifespan so the application
+     * takes the timing of promo's in consideration in its caching cycle.
+     */
+    public function nextAvailabilityTransitionAt(): ?\DateTimeImmutable
+    {
+        $now = Carbon::now();
+        $query = DB::table(self::$promoTable)->whereIn('state', PromoState::onlineStates());
+
+        $nextStart = (clone $query)->where('start_at', '>', $now)->min('start_at');
+        $nextEnd = (clone $query)->where('end_at', '>', $now)->min('end_at');
+        $next = array_filter([$nextStart, $nextEnd]);
+
+        return $next ? new \DateTimeImmutable(min($next)) : null;
+    }
+
     public function findAvailableByCouponCode(string $couponCode): ?Promo
     {
         $result = $this->baseActiveQuery()

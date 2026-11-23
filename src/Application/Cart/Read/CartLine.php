@@ -13,6 +13,8 @@ interface CartLine
 
     public function getPurchasableReference(): PurchasableReference;
 
+    public function getData(?string $key = null, $default = null): mixed;
+
     public function getUnitPriceExcl(): Money;
 
     public function getUnitPriceIncl(): Money;

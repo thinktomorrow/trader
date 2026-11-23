@@ -133,8 +133,8 @@ repositories, migration helpers and tests as well as live checkout code; do not 
 custom repository without checking its mapping and persisted columns.
 
 `OrderPromoRepository`, `OrderPromo` and `ApplyPromoToOrder`/`PromoApplicationScope` are removed. Query available
-promos through the domain `PromoRepository`. For catalog or cart display, read the promo discount's domain data;
-where application behavior is needed, convert discounts with `ApplicableDiscountFactory`. Cart recalculation uses
+promos through the domain `PromoRepository`. For catalog suggestions use `FindPromoSuggestionsForProduct` as described
+in step 5; do not infer preview eligibility from the eventual winning discount. Cart recalculation uses
 `AdjustDiscounts` and `SelectBestPromoCombination`, which receives
 **promos**, not old discount objects; update custom cart actions accordingly. The deprecated
 `AdjustOrderVatSnapshot` alias is also removed; inject `AdjustOrderPricingSnapshot`, including in quotation actions.
@@ -151,7 +151,48 @@ All three projects also contain `Setup/Common/MysqlOrderMigrationRepository.php`
 `Domain\Model\Order\Discount` classes. Establish whether these historical migration helpers must run again before
 adapting them to the new order mapping; do not assume an unused setup command is safe to execute after the upgrade.
 
-## 5. Verify before release
+## 5. Set up promo previews and cache invalidation
+
+`PromoRepository::getAvailablePromos()` includes both automatic and coupon promos that are currently online and
+within their dates. `FindPromoSuggestionsForProduct::get($product, $locale, $quantity, $cart)` returns
+`PromoSuggestions` with `applicablePromos` and `conditionalPromos` Collections. `Applicable` means the conditions
+would be met in this preview context; it does **not** guarantee the promo wins against another discount. A coupon
+without its code entered is `Conditional`. Each suggestion exposes `promoId`, `discountId`, `discountKey`,
+`pdpDescription`, `productBadgeText`, and `cartDescription`. The map key describes a discount type and is not
+necessarily unique; use the persisted promo/discount IDs for identification.
+
+Promo data can hold localized `pdp_description`, `product_badge_text` and `cart_description` maps, plus the booleans
+`show_on_pdp_when_ready`, `show_on_pdp_when_pending`, `show_on_cart_line`, and `show_on_cart`. All visibility flags
+default to false. Set a coupon's flags explicitly before exposing it to visitors. Register project-specific
+`PromoPreviewEligibility` implementations in the `FindPromoSuggestionsForProduct` binding. Unsupported discounts
+are omitted; merely setting a visibility flag does not bypass product suitability. Trader includes a built-in
+eligibility implementation for sale-price and order-subtotal discounts with minimum amount/quantity conditions.
+The cart argument represents the cart **before** adding the product; omit it for a standalone PDP preview.
+Unknown conditions remain conditional rather than being presented as met.
+Eligibility implementations receive a `PromoPreviewProduct` containing product/variant IDs, taxon IDs, and base and
+sale prices, not a full `ProductDetail`. The PDP query creates this snapshot from `ProductDetail` and rejects
+unavailable products. Cart incentives use the stored cart-line data directly (including `sale_price_excl` and taxa),
+without loading product details again. Cart lines are assessed from their existing snapshot; do not infer a sale
+from their discounted price, which may already include another promotion.
+Custom `CartLine` implementations must expose `getData(?string $key = null, $default = null): mixed`; the default
+cart-line implementation already provides this method.
+
+`FindCartPromoIncentives::get($cart, $locale)` returns one `show_on_cart` incentive per suitable promo, including
+promos that are not yet applied. `FindAppliedPromoBadgesForCartLine::get($line, $locale)` uses only actually applied
+line discounts and `show_on_cart_line`; use it for cart lines and checkout summary lines. In an application using
+Chief or another admin, add fields for these promo-data keys to the project's promo form and preserve existing
+promo data when saving. The existing cart description is not proof of an applied discount.
+
+The default Laravel binding of `PromoRepository` is now `MemoizedMysqlPromoRepository`, backed by `PromoCache`.
+Available promo reads are shared for up to 60 minutes, with an earlier refresh at the next scheduled start or end.
+`find()` bypasses the cache for mutable promo editing. `save()` and `delete()` invalidate after a successful write
+(after commit if inside a transaction); reads inside a transaction bypass the cache. Do not mutate objects returned
+by the available-promo listing. Any project-specific Eloquent/DB updates to `trader_promos`, its discounts, or
+discount conditions bypass repository invalidation: migrate them to `PromoApplication`, or inject `PromoCache` and
+call `clear()` **after commit**. In particular, audit promo admin forms, imports, migrations and setup commands.
+No new promo table columns are required for the presentation keys.
+
+## 6. Verify before release
 
 The selector compares compatible promo sets by final **VAT-inclusive order total**. It applies product discounts,
 reprices shipping and payment, then applies order, shipping and payment discounts. Check selection and totals for

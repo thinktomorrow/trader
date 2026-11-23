@@ -13,6 +13,9 @@ interface PromoRepository
     public function find(PromoId $promoId): Promo;
 
     /** @return list<Promo> */
+    public function getAvailablePromos(): array;
+
+    /** @return list<Promo> */
     public function getAvailableAutomaticPromos(): array;
 
     public function findAvailableByCouponCode(string $couponCode): ?Promo;

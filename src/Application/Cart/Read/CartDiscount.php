@@ -26,4 +26,6 @@ interface CartDiscount
     public function isCouponCodeBased(): bool;
 
     public function getCouponCode(): ?string;
+
+    public function getData(string $key, $default = null): mixed;
 }
