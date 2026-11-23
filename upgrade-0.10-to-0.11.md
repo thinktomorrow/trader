@@ -177,8 +177,9 @@ from their discounted price, which may already include another promotion.
 Custom `CartLine` implementations must expose `getData(?string $key = null, $default = null): mixed`; the default
 cart-line implementation already provides this method.
 
-`FindCartPromoIncentives::get($cart, $locale)` returns one `show_on_cart` incentive per suitable promo, including
-promos that are not yet applied. `FindAppliedPromoBadgesForCartLine::get($line, $locale)` uses only actually applied
+`FindCartPromoIncentives::get($cart, $locale)` returns one `show_on_cart` incentive per suitable promo, excluding
+promos already applied anywhere in the cart (including line, order, shipping and payment discounts). An entered
+coupon that did not win a discount may still be suggested. `FindAppliedPromoBadgesForCartLine::get($line, $locale)` uses only actually applied
 line discounts and `show_on_cart_line`; use it for cart lines and checkout summary lines. In an application using
 Chief or another admin, add fields for these promo-data keys to the project's promo form and preserve existing
 promo data when saving. The existing cart description is not proof of an applied discount.

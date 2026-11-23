@@ -7,6 +7,7 @@ namespace Tests\Unit\Promo;
 use Money\Money;
 use PHPUnit\Framework\TestCase;
 use Thinktomorrow\Trader\Application\Cart\Read\Cart;
+use Thinktomorrow\Trader\Application\Cart\Read\CartDiscount;
 use Thinktomorrow\Trader\Application\Cart\Read\CartLine;
 use Thinktomorrow\Trader\Application\Promo\Preview\FindCartPromoIncentives;
 use Thinktomorrow\Trader\Application\Promo\Preview\FindPromoSuggestionsForProduct;
@@ -50,5 +51,37 @@ final class FindCartPromoIncentivesTest extends TestCase
 
         $this->assertSame(['cart-promo'], $query->get($cart, 'nl')->pluck('promoId')->all());
         $this->assertSame('Gebruik SAVE', $query->get($cart, 'nl')->first()->cartDescription);
+    }
+
+    public function test_it_hides_an_incentive_once_its_promo_is_applied_to_a_line(): void
+    {
+        $promo = Promo::create(PromoId::fromString('cart-promo'), 'SAVE', null, null, new CombinationPolicy([]));
+        $promo->addData(['show_on_cart' => true, 'cart_description' => ['nl' => 'Gebruik SAVE']]);
+        $promo->addPromoDiscount(PercentageOffDiscount::fromMappedData(
+            ['discount_id' => 'cart-discount', 'data' => '{"percentage":"10"}'],
+            ['promo_id' => 'cart-promo'],
+            [Condition::class => []],
+        ));
+
+        $promos = $this->createMock(PromoRepository::class);
+        $promos->method('getAvailablePromos')->willReturn([$promo]);
+        $line = $this->createMock(CartLine::class);
+        $line->method('getPurchasableReference')->willReturn(new PurchasableReference('variant', 'variant-1'));
+        $line->method('getUnitPriceExcl')->willReturn(Money::EUR(10000));
+        $line->method('getData')->willReturnCallback(fn (?string $key = null, $default = null) => [
+            'sale_price_excl' => '10000',
+        ][$key] ?? $default);
+
+        $appliedDiscount = $this->createMock(CartDiscount::class);
+        $appliedDiscount->method('getData')->with('promo_id')->willReturn('cart-promo');
+        $cart = $this->createMock(Cart::class);
+        $cart->method('getLines')->willReturn([$line]);
+        $cart->method('getSubtotalExcl')->willReturn(Money::EUR(10000));
+        $cart->method('getQuantity')->willReturn(1);
+        $cart->method('getAllDiscounts')->willReturn([$appliedDiscount]);
+
+        $query = new FindCartPromoIncentives(new FindPromoSuggestionsForProduct($promos, [new StandardPromoPreviewEligibility]));
+
+        $this->assertTrue($query->get($cart, 'nl')->isEmpty());
     }
 }
