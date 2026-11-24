@@ -174,9 +174,9 @@ toward a condition, or a newly applicable coupon still needs its code entered. `
 the conditions before adding the product; it does **not** mean the discount was applied. `Irrelevant` means the
 product makes no relevant contribution. Neither `AlreadyEligible` nor `Irrelevant` appears in the two product-page
 Collections. A coupon-only order promo does not appear on the product page, but can remain a cart incentive. Preview
-status does **not** guarantee the promo wins against another discount. Each suggestion exposes `promoId`, `discountId`, `discountKey`,
-`pdpDescription`, `productBadgeText`, and `cartDescription`. The map key describes a discount type and is not
-necessarily unique; use the persisted promo/discount IDs for identification.
+status does **not** guarantee the promo wins against another discount. Each suggestion exposes `promoId`, `discountId`,
+`discountKey`, `pdpDescription`, `productBadgeText`, and `cartDescription`. The map key describes a discount type and
+is not necessarily unique; use the persisted promo/discount IDs for identification.
 
 Promo data can hold localized `pdp_description`, `product_badge_text` and `cart_description` maps, plus the booleans
 `show_on_pdp_when_ready`, `show_on_pdp_when_pending`, `show_on_cart_line`, and `show_on_cart`. All visibility flags
