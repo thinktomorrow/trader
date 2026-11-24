@@ -31,9 +31,9 @@ final class FindPromoSuggestionsForProduct
 
         return new PromoSuggestions(
             $candidates->filter(fn (array $candidate): bool => $candidate['status'] === PromoPreviewStatus::Applicable
-                && (bool) $candidate['promo']->getData('show_on_pdp_when_ready', false))->pluck('suggestion')->values(),
+                && (bool) $candidate['promo']->getData('show_on_pdp', false))->pluck('suggestion')->values(),
             $candidates->filter(fn (array $candidate): bool => $candidate['status'] === PromoPreviewStatus::Conditional
-                && (bool) $candidate['promo']->getData('show_on_pdp_when_pending', false))->pluck('suggestion')->values(),
+                && (bool) $candidate['promo']->getData('show_on_pdp', false))->pluck('suggestion')->values(),
         );
     }
 
@@ -53,9 +53,7 @@ final class FindPromoSuggestionsForProduct
         $candidates = collect();
 
         foreach ($this->promoRepository->getAvailablePromos() as $promo) {
-            if (! $promo->getData('show_on_pdp_when_ready', false)
-                && ! $promo->getData('show_on_pdp_when_pending', false)
-                && ! $promo->getData('show_on_cart', false)) {
+            if (! $promo->getData('show_on_pdp', false) && ! $promo->getData('show_on_cart', false)) {
                 continue;
             }
 

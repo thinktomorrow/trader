@@ -178,13 +178,16 @@ status does **not** guarantee the promo wins against another discount. Each sugg
 `discountKey`, `pdpDescription`, `productBadgeText`, and `cartDescription`. The map key describes a discount type and
 is not necessarily unique; use the persisted promo/discount IDs for identification.
 
-Promo data can hold localized `pdp_description`, `product_badge_text` and `cart_description` maps, plus the booleans
-`show_on_pdp_when_ready`, `show_on_pdp_when_pending`, `show_on_cart_line`, and `show_on_cart`. All visibility flags
-default to false. Set a coupon's flags explicitly before exposing it to visitors. The query uses the registered
-`ApplicableDiscountFactory` and each discount's `promoPreviewStatus()`. Unregistered discount types are omitted;
-merely setting a visibility flag does not bypass product suitability. Built-in sale-price and order-subtotal discounts
-evaluate their preview conditions through `ApplicableCondition::evaluatePreview()`. A condition missing from the
-applicable condition factory causes a mapping exception, as it does for actual discount application. The cart
+Promo data can hold localized `pdp_description`, `product_badge_text` and `cart_description` maps. For each locale,
+validate `pdp_description` in the shop-admin as plain text without HTML, with a maximum of 80 characters. Render it
+as escaped text on the PDP; do not silently truncate it when reading promo data. Promo data can also hold the booleans
+`show_on_pdp`, `show_on_cart_line`, and `show_on_cart`. The PDP flag shows suggestions with an `Applicable` or
+`Conditional` preview status; `AlreadyEligible` is not shown. All visibility flags default to false. Set a coupon's
+flags explicitly before exposing it to visitors. The query uses the registered `ApplicableDiscountFactory` and each
+discount's `promoPreviewStatus()`. Unregistered discount types are omitted; merely setting a visibility flag does not
+bypass product suitability. Built-in sale-price and order-subtotal discounts evaluate their preview conditions through
+`ApplicableCondition::evaluatePreview()`. A condition missing from the applicable condition factory causes a mapping
+exception, as it does for actual discount application. The cart
 argument represents the cart **before** adding the product; omit it for a standalone PDP preview.
 `PromoPreviewProduct` contains product/variant IDs, taxon IDs, base and sale prices, and `quantityToAdd`, not a full
 `ProductDetail`. The PDP query creates this snapshot from `ProductDetail` and rejects unavailable products. Cart

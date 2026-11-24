@@ -35,16 +35,15 @@ final class FindPromoSuggestionsForProductTest extends TestCase
     public function test_it_separates_applicable_and_conditional_promos_and_only_publishes_opted_in_coupons(): void
     {
         $automatic = $this->promo('automatic', null, 1000, [
-            'show_on_pdp_when_ready' => true,
+            'show_on_pdp' => true,
             'pdp_description' => ['nl' => 'Nu beschikbaar'],
         ]);
         $coupon = $this->promo('coupon', 'SAVE', 1000, [
-            'show_on_pdp_when_ready' => true,
-            'show_on_pdp_when_pending' => true,
+            'show_on_pdp' => true,
             'pdp_description' => ['nl' => 'Gebruik de code'],
         ]);
         $hidden = $this->promo('hidden', 'PRIVATE', 1000, []);
-        $minimum = $this->promo('minimum', null, 20000, ['show_on_pdp_when_pending' => true]);
+        $minimum = $this->promo('minimum', null, 20000, ['show_on_pdp' => true]);
 
         $repository = $this->createMock(PromoRepository::class);
         $repository->method('getAvailablePromos')->willReturn([$automatic, $coupon, $hidden, $minimum]);
@@ -95,8 +94,7 @@ final class FindPromoSuggestionsForProductTest extends TestCase
     public function test_minimum_quantity_is_conditional_until_the_preview_reaches_the_threshold(): void
     {
         $promo = $this->promo('quantity', null, 0, [
-            'show_on_pdp_when_ready' => true,
-            'show_on_pdp_when_pending' => true,
+            'show_on_pdp' => true,
         ]);
         $promo->getDiscounts()[0]->updateConditions([
             MinimumLinesQuantity::fromMappedData(['data' => '{"minimum_quantity":2}'], []),
@@ -118,8 +116,7 @@ final class FindPromoSuggestionsForProductTest extends TestCase
     public function test_order_promo_is_only_a_pdp_incentive_when_the_product_contributes_to_the_minimum(): void
     {
         $promo = $this->promo('minimum', null, 20000, [
-            'show_on_pdp_when_ready' => true,
-            'show_on_pdp_when_pending' => true,
+            'show_on_pdp' => true,
         ]);
         $repository = $this->createMock(PromoRepository::class);
         $repository->method('getAvailablePromos')->willReturn([$promo]);
@@ -153,8 +150,7 @@ final class FindPromoSuggestionsForProductTest extends TestCase
     public function test_coupon_only_order_promo_is_not_a_pdp_incentive(): void
     {
         $promo = $this->promo('coupon', 'SAVE', 0, [
-            'show_on_pdp_when_ready' => true,
-            'show_on_pdp_when_pending' => true,
+            'show_on_pdp' => true,
             'show_on_cart' => true,
         ]);
         $promo->getDiscounts()[0]->updateConditions([]);
@@ -181,7 +177,7 @@ final class FindPromoSuggestionsForProductTest extends TestCase
 
     public function test_an_already_met_condition_does_not_hide_progress_toward_another_condition(): void
     {
-        $promo = $this->promo('combined', null, 1000, ['show_on_pdp_when_pending' => true]);
+        $promo = $this->promo('combined', null, 1000, ['show_on_pdp' => true]);
         $promo->getDiscounts()[0]->updateConditions([
             MinimumAmount::fromMappedData(['data' => '{"amount":1000}'], []),
             MinimumLinesQuantity::fromMappedData(['data' => '{"minimum_quantity":3}'], []),
@@ -203,7 +199,7 @@ final class FindPromoSuggestionsForProductTest extends TestCase
 
     public function test_free_product_does_not_advance_an_order_amount_minimum(): void
     {
-        $promo = $this->promo('minimum', null, 1000, ['show_on_pdp_when_pending' => true]);
+        $promo = $this->promo('minimum', null, 1000, ['show_on_pdp' => true]);
         $repository = $this->createMock(PromoRepository::class);
         $repository->method('getAvailablePromos')->willReturn([$promo]);
         $product = $this->createMock(ProductDetail::class);
@@ -218,7 +214,7 @@ final class FindPromoSuggestionsForProductTest extends TestCase
     public function test_sale_price_discount_is_only_relevant_for_sale_products_and_respects_its_coupon(): void
     {
         $promo = Promo::create(PromoId::fromString('sale'), 'SALE', null, null, new CombinationPolicy([]));
-        $promo->addData(['show_on_pdp_when_ready' => true, 'show_on_pdp_when_pending' => true]);
+        $promo->addData(['show_on_pdp' => true]);
         $promo->addPromoDiscount(SalePriceSystemDiscount::fromMappedData(
             ['discount_id' => 'sale-discount', 'data' => '{}'],
             ['promo_id' => 'sale'],
