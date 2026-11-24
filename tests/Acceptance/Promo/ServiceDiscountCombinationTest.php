@@ -20,16 +20,21 @@ use Thinktomorrow\Trader\Application\Promo\ApplicableDiscounts\ApplicableDiscoun
 use Thinktomorrow\Trader\Application\Promo\ApplicableDiscounts\BaseApplicableDiscount;
 use Thinktomorrow\Trader\Application\Promo\ApplicableDiscounts\OrderSubtotalDiscount;
 use Thinktomorrow\Trader\Application\Promo\ApplicableDiscounts\PaymentDiscount;
+use Thinktomorrow\Trader\Application\Promo\ApplicableDiscounts\ProductDiscount;
 use Thinktomorrow\Trader\Application\Promo\ApplicableDiscounts\ShippingDiscount;
 use Thinktomorrow\Trader\Application\Promo\Preview\FindCartPromoIncentives;
 use Thinktomorrow\Trader\Application\Promo\Preview\FindPromoSuggestionsForProduct;
 use Thinktomorrow\Trader\Application\Promo\SelectBestPromoCombination;
 use Thinktomorrow\Trader\Application\VatRate\Allocator\VatAllocator;
 use Thinktomorrow\Trader\Domain\Common\Price\DefaultDiscountPrice;
+use Thinktomorrow\Trader\Domain\Common\Price\DefaultItemDiscountPrice;
 use Thinktomorrow\Trader\Domain\Common\Price\DefaultServicePrice;
 use Thinktomorrow\Trader\Domain\Common\Price\DiscountPrice;
+use Thinktomorrow\Trader\Domain\Common\Price\ItemDiscountPrice;
+use Thinktomorrow\Trader\Domain\Common\Price\TaxMode;
 use Thinktomorrow\Trader\Domain\Model\Order\AppliedDiscount\AppliedDiscountId;
 use Thinktomorrow\Trader\Domain\Model\Order\AppliedDiscount\DiscountableItem;
+use Thinktomorrow\Trader\Domain\Model\Order\Line\Line;
 use Thinktomorrow\Trader\Domain\Model\Order\Order;
 use Thinktomorrow\Trader\Domain\Model\Order\Payment\Payment;
 use Thinktomorrow\Trader\Domain\Model\Order\Shipping\Shipping;
@@ -182,6 +187,32 @@ final class ServiceDiscountCombinationTest extends TestCase
         $this->assertEquals(Money::EUR(0), $payment->getPaymentCostTotal()->getExcludingVat());
     }
 
+    public function test_competing_product_promos_choose_the_best_discount_on_each_line(): void
+    {
+        $order = $this->orderContext->createDefaultOrder();
+
+        $this->selector()->apply($order, [
+            $this->linePromo('pickup', 10),
+            $this->linePromo('sale', 30, 'line-bbb'),
+        ]);
+
+        $this->assertSame(['pickup'], array_map(fn ($discount) => $discount->promoId->get(), $order->getLines()[0]->getDiscounts()));
+        $this->assertSame(['sale'], array_map(fn ($discount) => $discount->promoId->get(), $order->getLines()[1]->getDiscounts()));
+    }
+
+    public function test_a_mixed_promo_keeps_its_order_discount_when_its_line_discount_loses_on_one_line(): void
+    {
+        $order = $this->orderContext->createDefaultOrder();
+        $this->selector()->apply($order, [
+            $this->linePromo('mixed', 10, null, ['line', 'order'], true),
+            $this->linePromo('sale', 30, 'line-bbb', ['line', 'order']),
+        ]);
+
+        $this->assertSame(['mixed'], array_map(fn ($discount) => $discount->promoId->get(), $order->getLines()[0]->getDiscounts()));
+        $this->assertSame(['sale'], array_map(fn ($discount) => $discount->promoId->get(), $order->getLines()[1]->getDiscounts()));
+        $this->assertSame(['mixed'], array_map(fn ($discount) => $discount->promoId->get(), $order->getDiscounts()));
+    }
+
     public function test_custom_unconditional_order_discounts_can_combine(): void
     {
         $order = $this->orderContext->createDefaultOrder();
@@ -236,7 +267,32 @@ final class ServiceDiscountCombinationTest extends TestCase
             $pricing ?? new AdjustOrderPricingSnapshot($this->catalogContext->apps()->vatAllocator()),
             new AdjustShipping($shipping ?? $this->createStub(UpdateShippingProfileOnOrder::class)),
             new AdjustPayment($payment ?? $this->createStub(UpdatePaymentMethodOnOrder::class)),
-            new ApplicableDiscountFactory([ServiceTestDiscount::class, OrderTestDiscount::class], new ApplicableConditionFactory([]), $this->catalogContext->apps()->vatAllocator()),
+            new ApplicableDiscountFactory([ServiceTestDiscount::class, OrderTestDiscount::class, LineTestDiscount::class], new ApplicableConditionFactory([]), $this->catalogContext->apps()->vatAllocator()),
+        );
+    }
+
+    /** @param list<string> $combinesWith */
+    private function linePromo(string $id, int $amount, ?string $lineId = null, array $combinesWith = ['line'], bool $withOrderDiscount = false): Promo
+    {
+        $discount = LineTestPromoDiscount::fromMappedData(
+            ['discount_id' => $id.'-discount', 'discountable_type' => 'line', 'data' => json_encode(['amount' => $amount, 'line_id' => $lineId])],
+            ['promo_id' => $id, 'coupon_code' => null, 'data' => '[]'],
+            [Condition::class => []],
+        );
+
+        $discounts = [$discount];
+
+        if ($withOrderDiscount) {
+            $discounts[] = OrderTestPromoDiscount::fromMappedData(
+                ['discount_id' => $id.'-order', 'discountable_type' => 'order', 'data' => '[]'],
+                ['promo_id' => $id, 'coupon_code' => null, 'data' => '[]'],
+                [Condition::class => []],
+            );
+        }
+
+        return Promo::fromMappedData(
+            ['promo_id' => $id, 'state' => 'online', 'is_system_promo' => false, 'coupon_code' => null, 'combines_with' => json_encode($combinesWith), 'multiple_product_discounts_per_line' => false, 'data' => '[]', 'start_at' => null, 'end_at' => null],
+            [PromoDiscount::class => $discounts],
         );
     }
 
@@ -261,6 +317,49 @@ final class ServiceTestPromoDiscount extends BaseDiscount implements PromoDiscou
     public static function getMapKey(): string
     {
         return 'test-service-discount';
+    }
+}
+
+final class LineTestPromoDiscount extends BaseDiscount implements PromoDiscount
+{
+    public static function getMapKey(): string
+    {
+        return 'test-line-discount';
+    }
+}
+
+final class LineTestDiscount extends BaseApplicableDiscount implements ProductDiscount
+{
+    private int $amount;
+
+    private ?string $lineId;
+
+    public static function getMapKey(): string
+    {
+        return LineTestPromoDiscount::getMapKey();
+    }
+
+    public function isApplicable(Order $order, DiscountableItem $line): bool
+    {
+        return $line instanceof Line
+            && ($this->lineId === null || str_ends_with($line->lineId->get(), ':'.$this->lineId))
+            && parent::isApplicable($order, $line);
+    }
+
+    public function getDiscountPrice(Order $order, DiscountableItem $line): ItemDiscountPrice
+    {
+        return DefaultItemDiscountPrice::fromExcludingVat(Money::EUR($this->amount), $line->getUnitPrice()->getVatPercentage());
+    }
+
+    public function setCalculationTaxMode(TaxMode $taxMode): void {}
+
+    public static function fromMappedData(array $state, array $aggregateState, array $conditions, VatAllocator $vatAllocator): static
+    {
+        $discount = parent::fromMappedData($state, $aggregateState, $conditions, $vatAllocator);
+        $discount->amount = json_decode($state['data'], true)['amount'];
+        $discount->lineId = json_decode($state['data'], true)['line_id'];
+
+        return $discount;
     }
 }
 

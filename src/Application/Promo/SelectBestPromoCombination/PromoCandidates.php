@@ -85,8 +85,8 @@ final class PromoCandidates
     }
 
     /**
-     * Include every originally applicable product discount of the selected promos.
-     * The search filters have already ruled out conflicting inter-promo stacks.
+     * Return every originally applicable product discount of the selected promos.
+     * The caller must resolve competing discounts on each line before applying them.
      *
      * @param  list<Promo>  $selected
      * @return array<string, list<ProductDiscount>>

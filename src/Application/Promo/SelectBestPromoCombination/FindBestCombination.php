@@ -4,11 +4,16 @@ declare(strict_types=1);
 
 namespace Thinktomorrow\Trader\Application\Promo\SelectBestPromoCombination;
 
+use Money\Money;
 use Thinktomorrow\Trader\Application\Cart\RefreshCart\Adjusters\AdjustOrderPricingSnapshot;
 use Thinktomorrow\Trader\Application\Promo\ApplicableDiscounts\OrderSubtotalDiscount;
+use Thinktomorrow\Trader\Application\Promo\ApplicableDiscounts\ProductDiscount;
 use Thinktomorrow\Trader\Application\Promo\ApplicableDiscounts\SalePriceProductDiscount;
+use Thinktomorrow\Trader\Domain\Model\Order\AppliedDiscount\AppliedDiscountId;
+use Thinktomorrow\Trader\Domain\Model\Order\Line\Line;
 use Thinktomorrow\Trader\Domain\Model\Order\Order;
 use Thinktomorrow\Trader\Domain\Model\Promo\Promo;
+use Thinktomorrow\Trader\Domain\Model\Promo\Discounts\DiscountableType;
 
 /** Searches compatible subsets and compares their definitive totals, including VAT. */
 final class FindBestCombination
@@ -40,6 +45,12 @@ final class FindBestCombination
             }
 
             $candidates->indexProductDiscounts($order);
+
+            // Line-only promos can be selected together: competition is resolved on
+            // each line, without multiplying the search by every product promo.
+            if ($this->allProductPromosCanCombine($promos, $candidates)) {
+                return new PromoCombination($promos, $this->bestProductDiscountsForSelection($order, $promos, $candidates));
+            }
 
             // With one sale-price promo and mutually combinable unconditional order
             // promos, only two selections need comparison (if it combines with all or none).
@@ -85,7 +96,7 @@ final class FindBestCombination
         $promo = $promos[$index];
 
         // Skip exploring combinations with this promo if it conflicts with those already selected.
-        if (! $this->canCombineWithSelected($promo, $selected) || ! $this->canStackProductsWithSelected($promo, $selected, $candidates)) {
+        if (! $this->canCombineWithSelected($promo, $selected)) {
             return;
         }
 
@@ -106,7 +117,7 @@ final class FindBestCombination
     /** @param list<Promo> $selected */
     private function evaluateCombination(Order $order, array $selected, PromoCandidates $prepared): EvaluatedCombination
     {
-        $combination = new PromoCombination($selected, $prepared->productDiscountsForSelection($order, $selected));
+        $combination = new PromoCombination($selected, $this->bestProductDiscountsForSelection($order, $selected, $prepared));
 
         $trial = unserialize(serialize($order));
 
@@ -142,26 +153,99 @@ final class FindBestCombination
         return true;
     }
 
-    /** @param list<Promo> $selected */
-    private function canStackProductsWithSelected(Promo $candidate, array $selected, PromoCandidates $prepared): bool
+    /** @param list<Promo> $promos */
+    private function allProductPromosCanCombine(array $promos, PromoCandidates $candidates): bool
     {
-        $candidateLines = $prepared->productDiscountsFor($candidate);
-
-        foreach ($selected as $existing) {
-            $existingLines = $prepared->productDiscountsFor($existing);
-
-            foreach ($candidateLines as $lineId => $discounts) {
-                if ($discounts === [] || ($existingLines[$lineId] ?? []) === []) {
-                    continue;
+        foreach ($promos as $index => $promo) {
+            foreach ($candidates->discountsFor($promo) as $discount) {
+                if ($discount->getDiscountableType() !== DiscountableType::line) {
+                    return false;
                 }
+            }
 
-                if (! $candidate->getCombinationPolicy()->allowsProductStackingWith($existing->getCombinationPolicy())) {
+            foreach (array_slice($promos, $index + 1) as $other) {
+                if (! $this->canCombine($promo, $other)) {
                     return false;
                 }
             }
         }
 
         return true;
+    }
+
+    /**
+     * Choose the best eligible discount group on each line. A promo's discounts
+     * stay together on a target, while different promos compete unless both
+     * explicitly permit stacking on that same target.
+     *
+     * @param  list<Promo>  $selected
+     * @return array<string, list<ProductDiscount>>
+     */
+    private function bestProductDiscountsForSelection(Order $order, array $selected, PromoCandidates $candidates): array
+    {
+        $choices = [];
+
+        foreach ($order->getLines() as $line) {
+            $lineId = $line->getDiscountableId()->get();
+            $groups = [];
+
+            foreach ($selected as $promo) {
+                $discounts = $candidates->productDiscountsFor($promo)[$lineId] ?? [];
+
+                if ($discounts !== []) {
+                    $groups[] = [$promo, $discounts];
+                }
+            }
+
+            $best = [];
+            $bestTotal = $line->getTotal()->getIncludingVat();
+            $this->searchLineDiscounts($order, $line, $groups, 0, [], [], $best, $bestTotal);
+            $choices[$lineId] = $best;
+        }
+
+        return $choices;
+    }
+
+    /**
+     * @param  list<array{Promo, list<ProductDiscount>}>  $groups
+     * @param  list<Promo>  $chosenPromos
+     * @param  list<ProductDiscount>  $chosenDiscounts
+     * @param  list<ProductDiscount>  $best
+     */
+    private function searchLineDiscounts(Order $order, Line $line, array $groups, int $index, array $chosenPromos, array $chosenDiscounts, array &$best, Money &$bestTotal): void
+    {
+        if ($index === count($groups)) {
+            if ($chosenDiscounts === []) {
+                return;
+            }
+
+            $trialLine = unserialize(serialize($line));
+
+            foreach ($chosenDiscounts as $sequence => $discount) {
+                $discount->apply($order, $trialLine, AppliedDiscountId::fromString('simulated-line-discount-'.($sequence + 1)));
+            }
+
+            $total = $trialLine->getTotal()->getIncludingVat();
+
+            if ($total->lessThan($bestTotal) || ($total->equals($bestTotal) && count($trialLine->getDiscounts()) > count($best))) {
+                $best = $chosenDiscounts;
+                $bestTotal = $total;
+            }
+
+            return;
+        }
+
+        $this->searchLineDiscounts($order, $line, $groups, $index + 1, $chosenPromos, $chosenDiscounts, $best, $bestTotal);
+
+        [$promo, $discounts] = $groups[$index];
+
+        foreach ($chosenPromos as $existing) {
+            if (! $promo->getCombinationPolicy()->allowsProductStackingWith($existing->getCombinationPolicy())) {
+                return;
+            }
+        }
+
+        $this->searchLineDiscounts($order, $line, $groups, $index + 1, [...$chosenPromos, $promo], [...$chosenDiscounts, ...$discounts], $best, $bestTotal);
     }
 
     private function canCombine(Promo $a, Promo $b): bool
