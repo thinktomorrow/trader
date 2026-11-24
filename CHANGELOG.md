@@ -4,10 +4,14 @@ Important changes will be notified in this file
 
 ## 0.11.0 (Unreleased)
 
-- Added: product promo preview with `Applicable`, `Conditional` and `Irrelevant` outcomes, two Collections for the
-  product page, opt-in presentation fields, cart incentives and applied cart-line badges. Active automatic and coupon
-  promos can both participate; custom discounts provide their own preview eligibility. Cart incentives exclude promos
-  already applied anywhere in the cart.
+- Added: product promo preview with `Applicable`, `Conditional`, `AlreadyEligible` and `Irrelevant` outcomes, two
+  Collections for the product page, opt-in presentation fields, cart incentives and applied cart-line badges. Active
+  automatic and coupon promos can both participate; applicable discounts determine preview relevance and conditions
+  evaluate preview progress. Cart incentives exclude promos already applied anywhere in the cart.
+- Changed: product-page order promos appear only when adding the product meets a condition or moves the cart toward it;
+  promos already eligible without the product and coupon-only order promos are hidden there. Cart incentives also
+  consider selected shipping and payment for registered discount types. See the
+  [promo preview upgrade instructions](upgrade-0.10-to-0.11.md#5-set-up-promo-previews-and-cache-invalidation).
 - Added: `MemoizedMysqlPromoRepository` and `PromoCache` to cache available promos for at most 60 minutes, refresh at
   promo start/end transitions, and invalidate after repository writes. Direct database promo writes must explicitly
   clear `PromoCache`; see the [upgrade guide](upgrade-0.10-to-0.11.md#5-set-up-promo-previews-and-cache-invalidation).
