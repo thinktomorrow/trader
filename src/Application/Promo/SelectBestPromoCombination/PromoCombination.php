@@ -10,8 +10,8 @@ use Thinktomorrow\Trader\Domain\Model\Promo\Promo;
 final readonly class PromoCombination
 {
     /**
-     * @param list<Promo> $promos
-     * @param array<string, list<ProductDiscount>> $productDiscounts
+     * @param  list<Promo>  $promos
+     * @param  array<string, list<ProductDiscount>>  $productDiscounts
      */
     public function __construct(public array $promos, public array $productDiscounts) {}
 }

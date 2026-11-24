@@ -280,8 +280,8 @@ final class PromoTest extends TestCase
     }
 
     /**
-     * @param list<DiscountableType> $types
-     * @param list<DiscountableType> $combinesWith
+     * @param  list<DiscountableType>  $types
+     * @param  list<DiscountableType>  $combinesWith
      */
     private function promoWithDiscountTypes(string $id, array $types, array $combinesWith): Promo
     {

@@ -11,8 +11,8 @@ use Thinktomorrow\Trader\Domain\Common\Price\DefaultDiscountPrice;
 use Thinktomorrow\Trader\Domain\Model\Order\AppliedDiscount\AppliedDiscountId;
 use Thinktomorrow\Trader\Domain\Model\Order\AppliedDiscount\Discount;
 use Thinktomorrow\Trader\Domain\Model\Order\AppliedDiscount\DiscountableId;
-use Thinktomorrow\Trader\Domain\Model\Promo\Discounts\DiscountableType;
 use Thinktomorrow\Trader\Domain\Model\Order\OrderId;
+use Thinktomorrow\Trader\Domain\Model\Promo\Discounts\DiscountableType;
 use Thinktomorrow\Trader\Domain\Model\Promo\Discounts\PromoDiscountId;
 use Thinktomorrow\Trader\Domain\Model\Promo\PromoId;
 

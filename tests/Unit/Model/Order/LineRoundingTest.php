@@ -11,13 +11,13 @@ use Thinktomorrow\Trader\Domain\Common\Price\DefaultItemPrice;
 use Thinktomorrow\Trader\Domain\Common\Vat\VatPercentage;
 use Thinktomorrow\Trader\Domain\Model\Order\AppliedDiscount\AppliedDiscountId;
 use Thinktomorrow\Trader\Domain\Model\Order\AppliedDiscount\Discount;
-use Thinktomorrow\Trader\Domain\Model\Promo\Discounts\DiscountableType;
 use Thinktomorrow\Trader\Domain\Model\Order\Line\Line;
 use Thinktomorrow\Trader\Domain\Model\Order\Line\LineId;
 use Thinktomorrow\Trader\Domain\Model\Order\Line\PurchasableReference;
 use Thinktomorrow\Trader\Domain\Model\Order\Line\Quantity;
 use Thinktomorrow\Trader\Domain\Model\Order\OrderId;
 use Thinktomorrow\Trader\Domain\Model\Product\Variant\VariantUnitPrice;
+use Thinktomorrow\Trader\Domain\Model\Promo\Discounts\DiscountableType;
 use Thinktomorrow\Trader\Domain\Model\Promo\Discounts\PromoDiscountId;
 use Thinktomorrow\Trader\Domain\Model\Promo\PromoId;
 
