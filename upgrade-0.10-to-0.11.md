@@ -139,6 +139,19 @@ in step 5; do not infer preview eligibility from the eventual winning discount. 
 **promos**, not old discount objects; update custom cart actions accordingly. The deprecated
 `AdjustOrderVatSnapshot` alias is also removed; inject `AdjustOrderPricingSnapshot`, including in quotation actions.
 
+For custom promo previews, `PromoPreviewEligibility` and `StandardPromoPreviewEligibility` are removed. Inject
+`ApplicableDiscountFactory` alongside `PromoRepository` into `FindPromoSuggestionsForProduct`; the factory translates
+each domain discount with `forDiscount($promo, $discount)`. Custom `ApplicableCondition` implementations must add
+`evaluatePreview(?Cart $cart, PromoPreviewProduct|Cart|CartShipping|CartPayment $subject): PromoPreviewStatus` for
+suggestions while retaining `check(Order $order, DiscountableItem $discountable): bool` for actual discount application.
+The subject prompted the suggestion and is not necessarily the target receiving the discount. A custom class
+implementing `ApplicableDiscount` directly must also implement `promoPreviewStatus($subject, ?Cart $cart)`;
+`BaseApplicableDiscount` provides the default. Override its `isPreviewRelevant()` for custom line discounts so they
+identify the products they concern; the default does not show every line discount on every product page. For custom
+shipping and payment discounts, register the matching domain and applicable discount classes before expecting cart
+incentives for selected services. Replace direct calls to `cartIncentivesForProduct()` with `cartIncentivesFor()`, and
+pass the quantity to add when calling `PromoPreviewProduct::fromProductDetail($product, $quantity)`.
+
 ### Known consumer work (local project versions at analysis time)
 
 | Project | Trader version | Changes to verify in the project |
@@ -155,34 +168,40 @@ adapting them to the new order mapping; do not assume an unused setup command is
 
 `PromoRepository::getAvailablePromos()` includes both automatic and coupon promos that are currently online and
 within their dates. `FindPromoSuggestionsForProduct::get($product, $locale, $quantity, $cart)` returns
-`PromoSuggestions` with `applicablePromos` and `conditionalPromos` Collections. `Applicable` means the conditions
-would be met in this preview context; it does **not** guarantee the promo wins against another discount. A coupon
-without its code entered is `Conditional`. Each suggestion exposes `promoId`, `discountId`, `discountKey`,
+`PromoSuggestions` with `applicablePromos` and `conditionalPromos` Collections. On the product page, `Applicable`
+means adding this product meets a condition that the cart did not already meet; `Conditional` means it makes progress
+toward a condition, or a newly applicable coupon still needs its code entered. `AlreadyEligible` means the cart met
+the conditions before adding the product; it does **not** mean the discount was applied. `Irrelevant` means the
+product makes no relevant contribution. Neither `AlreadyEligible` nor `Irrelevant` appears in the two product-page
+Collections. A coupon-only order promo does not appear on the product page, but can remain a cart incentive. Preview
+status does **not** guarantee the promo wins against another discount. Each suggestion exposes `promoId`, `discountId`, `discountKey`,
 `pdpDescription`, `productBadgeText`, and `cartDescription`. The map key describes a discount type and is not
 necessarily unique; use the persisted promo/discount IDs for identification.
 
 Promo data can hold localized `pdp_description`, `product_badge_text` and `cart_description` maps, plus the booleans
 `show_on_pdp_when_ready`, `show_on_pdp_when_pending`, `show_on_cart_line`, and `show_on_cart`. All visibility flags
-default to false. Set a coupon's flags explicitly before exposing it to visitors. Register project-specific
-`PromoPreviewEligibility` implementations in the `FindPromoSuggestionsForProduct` binding. Unsupported discounts
-are omitted; merely setting a visibility flag does not bypass product suitability. Trader includes a built-in
-eligibility implementation for sale-price and order-subtotal discounts with minimum amount/quantity conditions.
-The cart argument represents the cart **before** adding the product; omit it for a standalone PDP preview.
-Unknown conditions remain conditional rather than being presented as met.
-Eligibility implementations receive a `PromoPreviewProduct` containing product/variant IDs, taxon IDs, and base and
-sale prices, not a full `ProductDetail`. The PDP query creates this snapshot from `ProductDetail` and rejects
-unavailable products. Cart incentives use the stored cart-line data directly (including `sale_price_excl` and taxa),
-without loading product details again. Cart lines are assessed from their existing snapshot; do not infer a sale
+default to false. Set a coupon's flags explicitly before exposing it to visitors. The query uses the registered
+`ApplicableDiscountFactory` and each discount's `promoPreviewStatus()`. Unregistered discount types are omitted;
+merely setting a visibility flag does not bypass product suitability. Built-in sale-price and order-subtotal discounts
+evaluate their preview conditions through `ApplicableCondition::evaluatePreview()`. A condition missing from the
+applicable condition factory causes a mapping exception, as it does for actual discount application. The cart
+argument represents the cart **before** adding the product; omit it for a standalone PDP preview.
+`PromoPreviewProduct` contains product/variant IDs, taxon IDs, base and sale prices, and `quantityToAdd`, not a full
+`ProductDetail`. The PDP query creates this snapshot from `ProductDetail` and rejects unavailable products. Cart
+incentives use stored cart-line data directly (including `sale_price_excl` and taxa), without loading product details
+again; their `quantityToAdd` is zero because those lines are already included in cart totals. Do not infer a sale
 from their discounted price, which may already include another promotion.
 Custom `CartLine` implementations must expose `getData(?string $key = null, $default = null): mixed`; the default
 cart-line implementation already provides this method.
 
 `FindCartPromoIncentives::get($cart, $locale)` returns one `show_on_cart` incentive per suitable promo, excluding
 promos already applied anywhere in the cart (including line, order, shipping and payment discounts). An entered
-coupon that did not win a discount may still be suggested. `FindAppliedPromoBadgesForCartLine::get($line, $locale)` uses only actually applied
-line discounts and `show_on_cart_line`; use it for cart lines and checkout summary lines. In an application using
-Chief or another admin, add fields for these promo-data keys to the project's promo form and preserve existing
-promo data when saving. The existing cart description is not proof of an applied discount.
+coupon that did not win a discount may still be suggested. Cart incentives assess existing variant lines and selected
+shipping and payment; the latter require registered custom discount types if no built-in discount targets that service.
+`FindAppliedPromoBadgesForCartLine::get($line, $locale)` uses only actually applied line discounts and
+`show_on_cart_line`; use it for cart lines and checkout summary lines. In an application using Chief or another admin,
+add fields for these promo-data keys to the project's promo form and preserve existing promo data when saving. The
+existing cart description is not proof of an applied discount.
 
 The default Laravel binding of `PromoRepository` is now `MemoizedMysqlPromoRepository`, backed by `PromoCache`.
 Available promo reads are shared for up to 60 minutes, with an earlier refresh at the next scheduled start or end.
