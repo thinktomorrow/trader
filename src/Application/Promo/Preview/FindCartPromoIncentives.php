@@ -27,11 +27,19 @@ final class FindCartPromoIncentives
                 continue;
             }
 
-            $incentives = $incentives->concat($this->suggestions->cartIncentivesForProduct(
+            $incentives = $incentives->concat($this->suggestions->cartIncentivesFor(
                 PromoPreviewProduct::fromCartLine($line),
                 $locale,
                 $cart,
             ));
+        }
+
+        if ($shipping = $cart->getShipping()) {
+            $incentives = $incentives->concat($this->suggestions->cartIncentivesFor($shipping, $locale, $cart));
+        }
+
+        if ($payment = $cart->getPayment()) {
+            $incentives = $incentives->concat($this->suggestions->cartIncentivesFor($payment, $locale, $cart));
         }
 
         return $incentives

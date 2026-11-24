@@ -35,14 +35,24 @@ class ApplicableDiscountFactory extends Factory
         return $this->findMappable($key)::fromMappedData($state, $aggregateState, $conditions, $this->vatAllocator);
     }
 
-    /** @return list<ApplicableDiscount> */
-    public function forPromo(Promo $promo): array
+    public function supports(string $key): bool
     {
-        return array_map(fn (Discount $discount): ApplicableDiscount => $this->make(
+        return isset($this->mapping[$key]);
+    }
+
+    public function forDiscount(Promo $promo, Discount $discount): ApplicableDiscount
+    {
+        return $this->make(
             $discount::getMapKey(),
             $discount->getMappedData(),
             $promo->getMappedData(),
             array_map(fn (Condition $condition): array => $condition->getMappedData(), $discount->getConditions()),
-        ), $promo->getDiscounts());
+        );
+    }
+
+    /** @return list<ApplicableDiscount> */
+    public function forPromo(Promo $promo): array
+    {
+        return array_map(fn (Discount $discount): ApplicableDiscount => $this->forDiscount($promo, $discount), $promo->getDiscounts());
     }
 }

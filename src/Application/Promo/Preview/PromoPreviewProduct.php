@@ -17,9 +17,11 @@ final readonly class PromoPreviewProduct
         public array $taxonIds,
         public Money $unitPriceExcl,
         public Money $salePriceExcl,
+        /** Amount added to the cart; zero when this product is already in it. */
+        public int $quantityToAdd,
     ) {}
 
-    public static function fromProductDetail(ProductDetail $product): self
+    public static function fromProductDetail(ProductDetail $product, int $quantityToAdd): self
     {
         return new self(
             $product->getProductId(),
@@ -27,6 +29,7 @@ final readonly class PromoPreviewProduct
             array_map(fn ($taxon): string => $taxon->getTaxonId(), $product->getTaxa()),
             $product->getUnitPrice()->getExcludingVat(),
             $product->getSalePrice()->getExcludingVat(),
+            $quantityToAdd,
         );
     }
 
@@ -41,6 +44,7 @@ final readonly class PromoPreviewProduct
             array_values(array_filter(array_column($line->getData('taxa', []), 'taxon_id'))),
             $unitPrice,
             $salePrice !== null ? Money::EUR($salePrice) : $unitPrice,
+            0,
         );
     }
 

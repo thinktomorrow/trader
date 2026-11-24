@@ -6,20 +6,16 @@ namespace Thinktomorrow\Trader\Application\Promo\Preview;
 
 use Illuminate\Support\Collection;
 use Thinktomorrow\Trader\Application\Cart\Read\Cart;
+use Thinktomorrow\Trader\Application\Cart\Read\CartPayment;
+use Thinktomorrow\Trader\Application\Cart\Read\CartShipping;
 use Thinktomorrow\Trader\Application\Product\ProductDetail\ProductDetail;
+use Thinktomorrow\Trader\Application\Promo\ApplicableDiscounts\ApplicableDiscountFactory;
 use Thinktomorrow\Trader\Domain\Model\Promo\Promo;
 use Thinktomorrow\Trader\Domain\Model\Promo\PromoRepository;
 
 final class FindPromoSuggestionsForProduct
 {
-    /** @var list<PromoPreviewEligibility> */
-    private array $eligibilities;
-
-    /** @param iterable<PromoPreviewEligibility> $eligibilities */
-    public function __construct(private PromoRepository $promoRepository, iterable $eligibilities = [])
-    {
-        $this->eligibilities = is_array($eligibilities) ? array_values($eligibilities) : iterator_to_array($eligibilities, false);
-    }
+    public function __construct(private PromoRepository $promoRepository, private ApplicableDiscountFactory $discountFactory) {}
 
     public function get(ProductDetail $product, string $locale, int $quantity = 1, ?Cart $cart = null): PromoSuggestions
     {
@@ -31,7 +27,7 @@ final class FindPromoSuggestionsForProduct
             return new PromoSuggestions(collect(), collect());
         }
 
-        $candidates = $this->candidates(PromoPreviewProduct::fromProductDetail($product), $locale, $quantity, $cart);
+        $candidates = $this->candidates(PromoPreviewProduct::fromProductDetail($product, $quantity), $locale, $cart);
 
         return new PromoSuggestions(
             $candidates->filter(fn (array $candidate): bool => $candidate['status'] === PromoPreviewStatus::Applicable
@@ -42,9 +38,9 @@ final class FindPromoSuggestionsForProduct
     }
 
     /** @return Collection<int, PromoSuggestion> */
-    public function cartIncentivesForProduct(PromoPreviewProduct $product, string $locale, Cart $cart): Collection
+    public function cartIncentivesFor(PromoPreviewProduct|Cart|CartShipping|CartPayment $subject, string $locale, Cart $cart): Collection
     {
-        return $this->candidates($product, $locale, 0, $cart)
+        return $this->candidates($subject, $locale, $cart)
             ->filter(fn (array $candidate): bool => (bool) $candidate['promo']->getData('show_on_cart', false))
             ->pluck('suggestion')
             ->unique(fn (PromoSuggestion $suggestion): string => $suggestion->promoId)
@@ -52,7 +48,7 @@ final class FindPromoSuggestionsForProduct
     }
 
     /** @return Collection<int, array{promo: Promo, status: PromoPreviewStatus, suggestion: PromoSuggestion}> */
-    private function candidates(PromoPreviewProduct $product, string $locale, int $quantity, ?Cart $cart): Collection
+    private function candidates(PromoPreviewProduct|Cart|CartShipping|CartPayment $subject, string $locale, ?Cart $cart): Collection
     {
         $candidates = collect();
 
@@ -64,14 +60,14 @@ final class FindPromoSuggestionsForProduct
             }
 
             foreach ($promo->getDiscounts() as $discount) {
-                $eligibility = $this->eligibilityFor($discount::getMapKey());
-
-                if (! $eligibility || ($status = $eligibility->assess($promo, $discount, $product, $quantity, $cart)) === PromoPreviewStatus::Irrelevant) {
+                if (! $this->discountFactory->supports($discount::getMapKey())) {
                     continue;
                 }
 
-                if ($promo->hasCouponCode() && $cart?->getEnteredCoupon() !== $promo->getCouponCode()) {
-                    $status = PromoPreviewStatus::Conditional;
+                $status = $this->discountFactory->forDiscount($promo, $discount)->promoPreviewStatus($subject, $cart);
+
+                if ($status === PromoPreviewStatus::Irrelevant) {
+                    continue;
                 }
 
                 $candidates->push([
@@ -83,16 +79,5 @@ final class FindPromoSuggestionsForProduct
         }
 
         return $candidates;
-    }
-
-    private function eligibilityFor(string $key): ?PromoPreviewEligibility
-    {
-        foreach ($this->eligibilities as $eligibility) {
-            if ($eligibility->supports($key)) {
-                return $eligibility;
-            }
-        }
-
-        return null;
     }
 }

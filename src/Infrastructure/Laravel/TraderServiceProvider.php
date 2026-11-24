@@ -70,7 +70,6 @@ use Thinktomorrow\Trader\Application\Promo\ApplicableDiscounts\FixedAmountOrderS
 use Thinktomorrow\Trader\Application\Promo\ApplicableDiscounts\PercentageOffOrderSubtotalDiscount;
 use Thinktomorrow\Trader\Application\Promo\ApplicableDiscounts\SalePriceProductDiscount;
 use Thinktomorrow\Trader\Application\Promo\Preview\FindPromoSuggestionsForProduct;
-use Thinktomorrow\Trader\Application\Promo\Preview\StandardPromoPreviewEligibility;
 use Thinktomorrow\Trader\Application\Promo\SelectBestPromoCombination;
 use Thinktomorrow\Trader\Application\Taxon\Queries\CategoryRepository;
 use Thinktomorrow\Trader\Application\Taxon\Queries\TaxaSelectOptions;
@@ -223,7 +222,7 @@ class TraderServiceProvider extends ServiceProvider
         $this->app->bind(PromoRepository::class, MemoizedMysqlPromoRepository::class);
         $this->app->bind(FindPromoSuggestionsForProduct::class, fn ($app) => new FindPromoSuggestionsForProduct(
             $app->make(PromoRepository::class),
-            [$app->make(StandardPromoPreviewEligibility::class)],
+            $app->make(ApplicableDiscountFactory::class),
         ));
         $this->app->bind(OrderRepository::class, MysqlOrderRepository::class);
         $this->app->bind(ShippingProfileRepository::class, MysqlShippingProfileRepository::class);

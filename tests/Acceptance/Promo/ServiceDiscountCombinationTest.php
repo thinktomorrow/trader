@@ -7,6 +7,10 @@ namespace Tests\Acceptance\Promo;
 use Money\Money;
 use Tests\Acceptance\TestCase;
 use Thinktomorrow\Trader\Application\Cart\PaymentMethod\UpdatePaymentMethodOnOrder;
+use Thinktomorrow\Trader\Application\Cart\Read\Cart;
+use Thinktomorrow\Trader\Application\Cart\Read\CartDiscount;
+use Thinktomorrow\Trader\Application\Cart\Read\CartPayment;
+use Thinktomorrow\Trader\Application\Cart\Read\CartShipping;
 use Thinktomorrow\Trader\Application\Cart\RefreshCart\Adjusters\AdjustOrderPricingSnapshot;
 use Thinktomorrow\Trader\Application\Cart\RefreshCart\Adjusters\AdjustPayment;
 use Thinktomorrow\Trader\Application\Cart\RefreshCart\Adjusters\AdjustShipping;
@@ -17,6 +21,8 @@ use Thinktomorrow\Trader\Application\Promo\ApplicableDiscounts\BaseApplicableDis
 use Thinktomorrow\Trader\Application\Promo\ApplicableDiscounts\OrderSubtotalDiscount;
 use Thinktomorrow\Trader\Application\Promo\ApplicableDiscounts\PaymentDiscount;
 use Thinktomorrow\Trader\Application\Promo\ApplicableDiscounts\ShippingDiscount;
+use Thinktomorrow\Trader\Application\Promo\Preview\FindCartPromoIncentives;
+use Thinktomorrow\Trader\Application\Promo\Preview\FindPromoSuggestionsForProduct;
 use Thinktomorrow\Trader\Application\Promo\SelectBestPromoCombination;
 use Thinktomorrow\Trader\Application\VatRate\Allocator\VatAllocator;
 use Thinktomorrow\Trader\Domain\Common\Price\DefaultDiscountPrice;
@@ -34,12 +40,49 @@ use Thinktomorrow\Trader\Domain\Model\Promo\Discounts\BaseDiscount;
 use Thinktomorrow\Trader\Domain\Model\Promo\Discounts\Discount as PromoDiscount;
 use Thinktomorrow\Trader\Domain\Model\Promo\Discounts\DiscountableType;
 use Thinktomorrow\Trader\Domain\Model\Promo\Promo;
+use Thinktomorrow\Trader\Domain\Model\Promo\PromoRepository;
 use Thinktomorrow\Trader\Domain\Model\ShippingProfile\ShippingProfile;
 use Thinktomorrow\Trader\Domain\Model\ShippingProfile\ShippingProviderId;
 use Thinktomorrow\Trader\Infrastructure\Test\TestTraderConfig;
 
 final class ServiceDiscountCombinationTest extends TestCase
 {
+    public function test_cart_incentives_include_promos_for_selected_shipping_and_payment(): void
+    {
+        $shippingPromo = $this->promo('shipping', DiscountableType::shipping, [], 10);
+        $shippingPromo->addData(['show_on_cart' => true]);
+        $paymentPromo = $this->promo('payment', DiscountableType::payment, [], 10);
+        $paymentPromo->addData(['show_on_cart' => true]);
+        $orderPromo = $this->promo('order', DiscountableType::order, [], 10);
+        $orderPromo->addData(['show_on_cart' => true]);
+
+        $repository = $this->createMock(PromoRepository::class);
+        $repository->method('getAvailablePromos')->willReturn([$shippingPromo, $paymentPromo, $orderPromo]);
+        $shipping = $this->createMock(CartShipping::class);
+        $payment = $this->createMock(CartPayment::class);
+        $cart = $this->createMock(Cart::class);
+        $cart->method('getLines')->willReturn([]);
+        $cart->method('getShipping')->willReturn($shipping);
+        $cart->method('getPayment')->willReturn($payment);
+
+        $query = new FindCartPromoIncentives(new FindPromoSuggestionsForProduct(
+            $repository,
+            new ApplicableDiscountFactory([ServiceTestDiscount::class], new ApplicableConditionFactory([])),
+        ));
+
+        $this->assertSame(['shipping', 'payment'], $query->get($cart, 'nl')->pluck('promoId')->all());
+
+        $appliedDiscount = $this->createMock(CartDiscount::class);
+        $appliedDiscount->method('getData')->with('promo_id')->willReturn('shipping');
+        $cartWithAppliedShipping = $this->createMock(Cart::class);
+        $cartWithAppliedShipping->method('getLines')->willReturn([]);
+        $cartWithAppliedShipping->method('getShipping')->willReturn($shipping);
+        $cartWithAppliedShipping->method('getPayment')->willReturn($payment);
+        $cartWithAppliedShipping->method('getAllDiscounts')->willReturn([$appliedDiscount]);
+
+        $this->assertSame(['payment'], $query->get($cartWithAppliedShipping, 'nl')->pluck('promoId')->all());
+    }
+
     public function test_no_candidates_skip_trial_but_still_refresh_services(): void
     {
         $order = $this->orderContext->createDefaultOrder();

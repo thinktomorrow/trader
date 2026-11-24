@@ -9,9 +9,15 @@ use PHPUnit\Framework\TestCase;
 use Thinktomorrow\Trader\Application\Cart\Read\Cart;
 use Thinktomorrow\Trader\Application\Cart\Read\CartDiscount;
 use Thinktomorrow\Trader\Application\Cart\Read\CartLine;
+use Thinktomorrow\Trader\Application\Promo\ApplicableConditions\ApplicableConditionFactory;
+use Thinktomorrow\Trader\Application\Promo\ApplicableConditions\MinimumAmountCondition;
+use Thinktomorrow\Trader\Application\Promo\ApplicableConditions\MinimumLinesQuantityCondition;
+use Thinktomorrow\Trader\Application\Promo\ApplicableDiscounts\ApplicableDiscountFactory;
+use Thinktomorrow\Trader\Application\Promo\ApplicableDiscounts\FixedAmountOrderSubtotalDiscount;
+use Thinktomorrow\Trader\Application\Promo\ApplicableDiscounts\PercentageOffOrderSubtotalDiscount;
+use Thinktomorrow\Trader\Application\Promo\ApplicableDiscounts\SalePriceProductDiscount;
 use Thinktomorrow\Trader\Application\Promo\Preview\FindCartPromoIncentives;
 use Thinktomorrow\Trader\Application\Promo\Preview\FindPromoSuggestionsForProduct;
-use Thinktomorrow\Trader\Application\Promo\Preview\StandardPromoPreviewEligibility;
 use Thinktomorrow\Trader\Domain\Model\Order\Line\PurchasableReference;
 use Thinktomorrow\Trader\Domain\Model\Promo\CombinationPolicy;
 use Thinktomorrow\Trader\Domain\Model\Promo\Conditions\Condition;
@@ -47,7 +53,7 @@ final class FindCartPromoIncentivesTest extends TestCase
         $cart->method('getSubtotalExcl')->willReturn(Money::EUR(20000));
         $cart->method('getQuantity')->willReturn(2);
 
-        $query = new FindCartPromoIncentives(new FindPromoSuggestionsForProduct($promos, [new StandardPromoPreviewEligibility]));
+        $query = new FindCartPromoIncentives(new FindPromoSuggestionsForProduct($promos, $this->discountFactory()));
 
         $this->assertSame(['cart-promo'], $query->get($cart, 'nl')->pluck('promoId')->all());
         $this->assertSame('Gebruik SAVE', $query->get($cart, 'nl')->first()->cartDescription);
@@ -80,8 +86,16 @@ final class FindCartPromoIncentivesTest extends TestCase
         $cart->method('getQuantity')->willReturn(1);
         $cart->method('getAllDiscounts')->willReturn([$appliedDiscount]);
 
-        $query = new FindCartPromoIncentives(new FindPromoSuggestionsForProduct($promos, [new StandardPromoPreviewEligibility]));
+        $query = new FindCartPromoIncentives(new FindPromoSuggestionsForProduct($promos, $this->discountFactory()));
 
         $this->assertTrue($query->get($cart, 'nl')->isEmpty());
+    }
+
+    private function discountFactory(): ApplicableDiscountFactory
+    {
+        return new ApplicableDiscountFactory(
+            [SalePriceProductDiscount::class, PercentageOffOrderSubtotalDiscount::class, FixedAmountOrderSubtotalDiscount::class],
+            new ApplicableConditionFactory([MinimumAmountCondition::class, MinimumLinesQuantityCondition::class]),
+        );
     }
 }

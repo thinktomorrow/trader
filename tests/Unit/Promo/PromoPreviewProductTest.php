@@ -27,11 +27,12 @@ final class PromoPreviewProductTest extends TestCase
         $product->method('getUnitPrice')->willReturn(VariantUnitPrice::fromScalars('10000', '21', false));
         $product->method('getSalePrice')->willReturn(VariantSalePrice::fromScalars('9000', '21', false));
 
-        $preview = PromoPreviewProduct::fromProductDetail($product);
+        $preview = PromoPreviewProduct::fromProductDetail($product, 2);
 
         $this->assertSame('variant-1', $preview->variantId);
         $this->assertSame(['taxon-1'], $preview->taxonIds);
         $this->assertTrue($preview->isOnSale());
+        $this->assertSame(2, $preview->quantityToAdd);
     }
 
     public function test_a_discounted_cart_line_is_not_mistaken_for_a_sale_product(): void
@@ -51,6 +52,7 @@ final class PromoPreviewProductTest extends TestCase
         $this->assertFalse($product->isOnSale());
         $this->assertSame('product-1', $product->productId);
         $this->assertSame(['taxon-1'], $product->taxonIds);
+        $this->assertSame(0, $product->quantityToAdd);
     }
 
     public function test_missing_sale_price_falls_back_to_unit_price(): void

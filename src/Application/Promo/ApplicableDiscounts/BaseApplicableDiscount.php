@@ -5,7 +5,12 @@ declare(strict_types=1);
 namespace Thinktomorrow\Trader\Application\Promo\ApplicableDiscounts;
 
 use Assert\Assertion;
+use Thinktomorrow\Trader\Application\Cart\Read\Cart;
+use Thinktomorrow\Trader\Application\Cart\Read\CartPayment;
+use Thinktomorrow\Trader\Application\Cart\Read\CartShipping;
 use Thinktomorrow\Trader\Application\Promo\ApplicableConditions\ApplicableCondition;
+use Thinktomorrow\Trader\Application\Promo\Preview\PromoPreviewProduct;
+use Thinktomorrow\Trader\Application\Promo\Preview\PromoPreviewStatus;
 use Thinktomorrow\Trader\Application\VatRate\Allocator\VatAllocator;
 use Thinktomorrow\Trader\Domain\Common\Price\DefaultDiscountPrice;
 use Thinktomorrow\Trader\Domain\Common\Price\DiscountPrice;
@@ -63,6 +68,63 @@ abstract class BaseApplicableDiscount
             DiscountableType::shipping => $order->getShippings() !== [],
             DiscountableType::payment => $order->getPayments() !== [],
             DiscountableType::order => true,
+        };
+    }
+
+    public function promoPreviewStatus(PromoPreviewProduct|Cart|CartShipping|CartPayment $subject, ?Cart $cart): PromoPreviewStatus
+    {
+        if (! $this->isPreviewRelevant($subject)) {
+            return PromoPreviewStatus::Irrelevant;
+        }
+
+        $isPdp = $subject instanceof PromoPreviewProduct && $subject->quantityToAdd > 0;
+        $status = PromoPreviewStatus::AlreadyEligible;
+
+        if ($this->conditions === [] && $isPdp) {
+            // An unconditional order discount is not an incentive for this product.
+            $status = $this->discountableType === DiscountableType::order
+                ? PromoPreviewStatus::Irrelevant
+                : PromoPreviewStatus::Applicable;
+        }
+
+        foreach ($this->conditions as $condition) {
+            $conditionStatus = $condition->evaluatePreview($cart, $subject);
+
+            if ($conditionStatus === PromoPreviewStatus::Irrelevant) {
+                return PromoPreviewStatus::Irrelevant;
+            }
+
+            if ($conditionStatus === PromoPreviewStatus::Conditional) {
+                $status = PromoPreviewStatus::Conditional;
+            } elseif ($conditionStatus === PromoPreviewStatus::Applicable && $status === PromoPreviewStatus::AlreadyEligible) {
+                $status = PromoPreviewStatus::Applicable;
+            }
+        }
+
+        if ($status === PromoPreviewStatus::Applicable
+            && $this->promoData['coupon_code'] !== null
+            && $cart?->getEnteredCoupon() !== $this->promoData['coupon_code']) {
+            return PromoPreviewStatus::Conditional;
+        }
+
+        return $status;
+    }
+
+    /**
+     * First filter for whether this suggestion subject can be relevant to the
+     * discount. This does not check conditions or whether the discount is applied.
+     *
+     * Line discounts must override this to decide which products they concern;
+     * SalePriceProductDiscount does so for products with a sale price.
+     */
+    protected function isPreviewRelevant(PromoPreviewProduct|Cart|CartShipping|CartPayment $subject): bool
+    {
+        return match ($this->discountableType) {
+            DiscountableType::order => $subject instanceof PromoPreviewProduct || $subject instanceof Cart,
+            // A line discount needs its own product-specific relevance check.
+            DiscountableType::line => false,
+            DiscountableType::shipping => $subject instanceof CartShipping,
+            DiscountableType::payment => $subject instanceof CartPayment,
         };
     }
 
