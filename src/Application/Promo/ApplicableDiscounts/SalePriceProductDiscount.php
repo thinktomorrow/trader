@@ -6,8 +6,8 @@ namespace Thinktomorrow\Trader\Application\Promo\ApplicableDiscounts;
 
 use Money\Money;
 use Thinktomorrow\Trader\Application\Cart\Read\Cart;
-use Thinktomorrow\Trader\Application\Cart\Read\CartPayment;
-use Thinktomorrow\Trader\Application\Cart\Read\CartShipping;
+use Thinktomorrow\Trader\Application\Cart\PaymentMethod\PaymentMethodForCart;
+use Thinktomorrow\Trader\Application\Cart\ShippingProfile\ShippingProfileForCart;
 use Thinktomorrow\Trader\Application\Promo\Preview\PromoPreviewProduct;
 use Thinktomorrow\Trader\Application\VatRate\Allocator\VatAllocator;
 use Thinktomorrow\Trader\Domain\Common\Price\DefaultItemDiscountPrice;
@@ -55,7 +55,7 @@ class SalePriceProductDiscount extends BaseApplicableDiscount implements Product
     }
 
     /** Only a product with a sale price is relevant to this line discount. */
-    protected function isPreviewRelevant(PromoPreviewProduct|Cart|CartShipping|CartPayment $subject): bool
+    protected function isPreviewRelevant(PromoPreviewProduct|Cart|ShippingProfileForCart|PaymentMethodForCart $subject): bool
     {
         return $subject instanceof PromoPreviewProduct && $subject->isOnSale();
     }

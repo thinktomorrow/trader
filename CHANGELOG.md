@@ -4,13 +4,18 @@ Important changes will be notified in this file
 
 ## 0.11.0 (Unreleased)
 
+- Changed: shipping and payment promo previews now use offered `ShippingProfileForCart` and `PaymentMethodForCart`
+  choices instead of selected `CartShipping` and `CartPayment`. `FindCartPromoIncentives::get()` accepts offered choices;
+  `forShippingProfile()` and `forPaymentMethod()` return per-choice incentives only for `Applicable` or `AlreadyEligible`
+  promos with `show_on_cart` and a localized `cart_description`, excluding promos already applied in the cart. Custom
+  preview signatures and callers must be updated; see the [promo preview upgrade instructions](upgrade-0.10-to-0.11.md#5-set-up-promo-previews-and-cache-invalidation).
 - Added: product promo preview with `Applicable`, `Conditional`, `AlreadyEligible` and `Irrelevant` outcomes, two
   Collections for the product page, opt-in presentation fields, cart incentives and applied cart-line badges. Active
   automatic and coupon promos can both participate; applicable discounts determine preview relevance and conditions
   evaluate preview progress. Cart incentives exclude promos already applied anywhere in the cart.
 - Changed: product-page order promos appear only when adding the product meets a condition or moves the cart toward it;
   promos already eligible without the product and coupon-only order promos are hidden there. Cart incentives also
-  consider selected shipping and payment for registered discount types. See the
+  consider offered shipping and payment choices for registered discount types. See the
   [promo preview upgrade instructions](upgrade-0.10-to-0.11.md#5-set-up-promo-previews-and-cache-invalidation).
 - Added: `MemoizedMysqlPromoRepository` and `PromoCache` to cache available promos for at most 60 minutes, refresh at
   promo start/end transitions, and invalidate after repository writes. Direct database promo writes must explicitly

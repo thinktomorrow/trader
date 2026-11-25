@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace Thinktomorrow\Trader\Application\Promo\ApplicableDiscounts;
 
 use Thinktomorrow\Trader\Application\Cart\Read\Cart;
-use Thinktomorrow\Trader\Application\Cart\Read\CartPayment;
-use Thinktomorrow\Trader\Application\Cart\Read\CartShipping;
+use Thinktomorrow\Trader\Application\Cart\PaymentMethod\PaymentMethodForCart;
+use Thinktomorrow\Trader\Application\Cart\ShippingProfile\ShippingProfileForCart;
 use Thinktomorrow\Trader\Application\Promo\Preview\PromoPreviewProduct;
 use Thinktomorrow\Trader\Application\Promo\Preview\PromoPreviewStatus;
 use Thinktomorrow\Trader\Domain\Common\Map\Mappable;
@@ -30,8 +30,8 @@ interface ApplicableDiscount extends Mappable
      * The subject prompted the suggestion; it need not receive the discount
      * itself (a product can prompt a suggestion for an order discount).
      *
-     * AlreadyEligible means the cart met the conditions before adding the
-     * product. It does not mean the discount was actually applied.
+     * AlreadyEligible means the cart already met the preview conditions.
+     * It does not mean the discount was actually applied.
      */
-    public function promoPreviewStatus(PromoPreviewProduct|Cart|CartShipping|CartPayment $subject, ?Cart $cart): PromoPreviewStatus;
+    public function promoPreviewStatus(PromoPreviewProduct|Cart|ShippingProfileForCart|PaymentMethodForCart $subject, ?Cart $cart): PromoPreviewStatus;
 }

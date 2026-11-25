@@ -6,8 +6,8 @@ namespace Thinktomorrow\Trader\Application\Promo\ApplicableDiscounts;
 
 use Assert\Assertion;
 use Thinktomorrow\Trader\Application\Cart\Read\Cart;
-use Thinktomorrow\Trader\Application\Cart\Read\CartPayment;
-use Thinktomorrow\Trader\Application\Cart\Read\CartShipping;
+use Thinktomorrow\Trader\Application\Cart\PaymentMethod\PaymentMethodForCart;
+use Thinktomorrow\Trader\Application\Cart\ShippingProfile\ShippingProfileForCart;
 use Thinktomorrow\Trader\Application\Promo\ApplicableConditions\ApplicableCondition;
 use Thinktomorrow\Trader\Application\Promo\Preview\PromoPreviewProduct;
 use Thinktomorrow\Trader\Application\Promo\Preview\PromoPreviewStatus;
@@ -71,7 +71,7 @@ abstract class BaseApplicableDiscount
         };
     }
 
-    public function promoPreviewStatus(PromoPreviewProduct|Cart|CartShipping|CartPayment $subject, ?Cart $cart): PromoPreviewStatus
+    public function promoPreviewStatus(PromoPreviewProduct|Cart|ShippingProfileForCart|PaymentMethodForCart $subject, ?Cart $cart): PromoPreviewStatus
     {
         if (! $this->isPreviewRelevant($subject)) {
             return PromoPreviewStatus::Irrelevant;
@@ -117,14 +117,14 @@ abstract class BaseApplicableDiscount
      * Line discounts must override this to decide which products they concern;
      * SalePriceProductDiscount does so for products with a sale price.
      */
-    protected function isPreviewRelevant(PromoPreviewProduct|Cart|CartShipping|CartPayment $subject): bool
+    protected function isPreviewRelevant(PromoPreviewProduct|Cart|ShippingProfileForCart|PaymentMethodForCart $subject): bool
     {
         return match ($this->discountableType) {
             DiscountableType::order => $subject instanceof PromoPreviewProduct || $subject instanceof Cart,
             // A line discount needs its own product-specific relevance check.
             DiscountableType::line => false,
-            DiscountableType::shipping => $subject instanceof CartShipping,
-            DiscountableType::payment => $subject instanceof CartPayment,
+            DiscountableType::shipping => $subject instanceof ShippingProfileForCart,
+            DiscountableType::payment => $subject instanceof PaymentMethodForCart,
         };
     }
 

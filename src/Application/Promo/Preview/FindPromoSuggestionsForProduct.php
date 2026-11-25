@@ -6,8 +6,8 @@ namespace Thinktomorrow\Trader\Application\Promo\Preview;
 
 use Illuminate\Support\Collection;
 use Thinktomorrow\Trader\Application\Cart\Read\Cart;
-use Thinktomorrow\Trader\Application\Cart\Read\CartPayment;
-use Thinktomorrow\Trader\Application\Cart\Read\CartShipping;
+use Thinktomorrow\Trader\Application\Cart\PaymentMethod\PaymentMethodForCart;
+use Thinktomorrow\Trader\Application\Cart\ShippingProfile\ShippingProfileForCart;
 use Thinktomorrow\Trader\Application\Product\ProductDetail\ProductDetail;
 use Thinktomorrow\Trader\Application\Promo\ApplicableDiscounts\ApplicableDiscountFactory;
 use Thinktomorrow\Trader\Domain\Model\Promo\Promo;
@@ -38,7 +38,7 @@ final class FindPromoSuggestionsForProduct
     }
 
     /** @return Collection<int, PromoSuggestion> */
-    public function cartIncentivesFor(PromoPreviewProduct|Cart|CartShipping|CartPayment $subject, string $locale, Cart $cart): Collection
+    public function cartIncentivesFor(PromoPreviewProduct|Cart|ShippingProfileForCart|PaymentMethodForCart $subject, string $locale, Cart $cart): Collection
     {
         return $this->candidates($subject, $locale, $cart)
             ->filter(fn (array $candidate): bool => (bool) $candidate['promo']->getData('show_on_cart', false))
@@ -47,8 +47,20 @@ final class FindPromoSuggestionsForProduct
             ->values();
     }
 
+    /** @return Collection<int, PromoSuggestion> */
+    public function serviceIncentivesFor(ShippingProfileForCart|PaymentMethodForCart $subject, string $locale, Cart $cart): Collection
+    {
+        return $this->candidates($subject, $locale, $cart)
+            ->filter(fn (array $candidate): bool => (bool) $candidate['promo']->getData('show_on_cart', false)
+                && in_array($candidate['status'], [PromoPreviewStatus::Applicable, PromoPreviewStatus::AlreadyEligible], true))
+            ->pluck('suggestion')
+            ->filter(fn (PromoSuggestion $suggestion): bool => $suggestion->cartDescription !== null)
+            ->unique(fn (PromoSuggestion $suggestion): string => $suggestion->promoId)
+            ->values();
+    }
+
     /** @return Collection<int, array{promo: Promo, status: PromoPreviewStatus, suggestion: PromoSuggestion}> */
-    private function candidates(PromoPreviewProduct|Cart|CartShipping|CartPayment $subject, string $locale, ?Cart $cart): Collection
+    private function candidates(PromoPreviewProduct|Cart|ShippingProfileForCart|PaymentMethodForCart $subject, string $locale, ?Cart $cart): Collection
     {
         $candidates = collect();
 

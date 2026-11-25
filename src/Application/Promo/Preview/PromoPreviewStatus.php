@@ -8,7 +8,7 @@ enum PromoPreviewStatus
 {
     case Irrelevant;
 
-    /** The conditions were met before adding the previewed product; this does not mean a discount was applied. */
+    /** The cart already meets the conditions; this does not mean a discount was applied. */
     case AlreadyEligible;
     case Applicable;
     case Conditional;

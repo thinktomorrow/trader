@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace Thinktomorrow\Trader\Application\Promo\ApplicableConditions;
 
 use Thinktomorrow\Trader\Application\Cart\Read\Cart;
-use Thinktomorrow\Trader\Application\Cart\Read\CartPayment;
-use Thinktomorrow\Trader\Application\Cart\Read\CartShipping;
+use Thinktomorrow\Trader\Application\Cart\PaymentMethod\PaymentMethodForCart;
+use Thinktomorrow\Trader\Application\Cart\ShippingProfile\ShippingProfileForCart;
 use Thinktomorrow\Trader\Application\Promo\Preview\PromoPreviewProduct;
 use Thinktomorrow\Trader\Application\Promo\Preview\PromoPreviewStatus;
 use Thinktomorrow\Trader\Domain\Model\Order\AppliedDiscount\DiscountableItem;
@@ -31,7 +31,7 @@ class MinimumLinesQuantityCondition implements ApplicableCondition
         return $this->meetsMinimum($order->getQuantity()->asInt());
     }
 
-    public function evaluatePreview(?Cart $cart, PromoPreviewProduct|Cart|CartShipping|CartPayment $subject): PromoPreviewStatus
+    public function evaluatePreview(?Cart $cart, PromoPreviewProduct|Cart|ShippingProfileForCart|PaymentMethodForCart $subject): PromoPreviewStatus
     {
         $quantity = $cart?->getQuantity() ?? 0;
 

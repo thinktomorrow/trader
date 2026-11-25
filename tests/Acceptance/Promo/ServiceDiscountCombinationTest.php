@@ -6,16 +6,18 @@ namespace Tests\Acceptance\Promo;
 
 use Money\Money;
 use Tests\Acceptance\TestCase;
+use Thinktomorrow\Trader\Application\Cart\PaymentMethod\PaymentMethodForCart;
 use Thinktomorrow\Trader\Application\Cart\PaymentMethod\UpdatePaymentMethodOnOrder;
 use Thinktomorrow\Trader\Application\Cart\Read\Cart;
 use Thinktomorrow\Trader\Application\Cart\Read\CartDiscount;
-use Thinktomorrow\Trader\Application\Cart\Read\CartPayment;
-use Thinktomorrow\Trader\Application\Cart\Read\CartShipping;
 use Thinktomorrow\Trader\Application\Cart\RefreshCart\Adjusters\AdjustOrderPricingSnapshot;
 use Thinktomorrow\Trader\Application\Cart\RefreshCart\Adjusters\AdjustPayment;
 use Thinktomorrow\Trader\Application\Cart\RefreshCart\Adjusters\AdjustShipping;
+use Thinktomorrow\Trader\Application\Cart\ShippingProfile\ShippingProfileForCart;
 use Thinktomorrow\Trader\Application\Cart\ShippingProfile\UpdateShippingProfileOnOrder;
+use Thinktomorrow\Trader\Application\Promo\ApplicableConditions\ApplicableCondition;
 use Thinktomorrow\Trader\Application\Promo\ApplicableConditions\ApplicableConditionFactory;
+use Thinktomorrow\Trader\Application\Promo\ApplicableConditions\MinimumAmountCondition;
 use Thinktomorrow\Trader\Application\Promo\ApplicableDiscounts\ApplicableDiscountFactory;
 use Thinktomorrow\Trader\Application\Promo\ApplicableDiscounts\BaseApplicableDiscount;
 use Thinktomorrow\Trader\Application\Promo\ApplicableDiscounts\OrderSubtotalDiscount;
@@ -24,6 +26,8 @@ use Thinktomorrow\Trader\Application\Promo\ApplicableDiscounts\ProductDiscount;
 use Thinktomorrow\Trader\Application\Promo\ApplicableDiscounts\ShippingDiscount;
 use Thinktomorrow\Trader\Application\Promo\Preview\FindCartPromoIncentives;
 use Thinktomorrow\Trader\Application\Promo\Preview\FindPromoSuggestionsForProduct;
+use Thinktomorrow\Trader\Application\Promo\Preview\PromoPreviewProduct;
+use Thinktomorrow\Trader\Application\Promo\Preview\PromoPreviewStatus;
 use Thinktomorrow\Trader\Application\Promo\SelectBestPromoCombination;
 use Thinktomorrow\Trader\Application\VatRate\Allocator\VatAllocator;
 use Thinktomorrow\Trader\Domain\Common\Price\DefaultDiscountPrice;
@@ -40,7 +44,9 @@ use Thinktomorrow\Trader\Domain\Model\Order\Payment\Payment;
 use Thinktomorrow\Trader\Domain\Model\Order\Shipping\Shipping;
 use Thinktomorrow\Trader\Domain\Model\PaymentMethod\PaymentMethod;
 use Thinktomorrow\Trader\Domain\Model\PaymentMethod\PaymentMethodProviderId;
+use Thinktomorrow\Trader\Domain\Model\Promo\Conditions\BaseCondition;
 use Thinktomorrow\Trader\Domain\Model\Promo\Conditions\Condition;
+use Thinktomorrow\Trader\Domain\Model\Promo\Conditions\MinimumAmount;
 use Thinktomorrow\Trader\Domain\Model\Promo\Discounts\BaseDiscount;
 use Thinktomorrow\Trader\Domain\Model\Promo\Discounts\Discount as PromoDiscount;
 use Thinktomorrow\Trader\Domain\Model\Promo\Discounts\DiscountableType;
@@ -52,40 +58,98 @@ use Thinktomorrow\Trader\Infrastructure\Test\TestTraderConfig;
 
 final class ServiceDiscountCombinationTest extends TestCase
 {
-    public function test_cart_incentives_include_promos_for_selected_shipping_and_payment(): void
+    public function test_cart_incentives_include_promos_for_offered_shipping_and_payment_before_selection(): void
     {
         $shippingPromo = $this->promo('shipping', DiscountableType::shipping, [], 10);
-        $shippingPromo->addData(['show_on_cart' => true]);
+        $shippingPromo->addData(['show_on_cart' => true, 'cart_description' => ['nl' => 'Gratis verzending']]);
         $paymentPromo = $this->promo('payment', DiscountableType::payment, [], 10);
-        $paymentPromo->addData(['show_on_cart' => true]);
+        $paymentPromo->addData(['show_on_cart' => true, 'cart_description' => ['nl' => 'Betaalvoordeel']]);
         $orderPromo = $this->promo('order', DiscountableType::order, [], 10);
         $orderPromo->addData(['show_on_cart' => true]);
 
         $repository = $this->createMock(PromoRepository::class);
         $repository->method('getAvailablePromos')->willReturn([$shippingPromo, $paymentPromo, $orderPromo]);
-        $shipping = $this->createMock(CartShipping::class);
-        $payment = $this->createMock(CartPayment::class);
+        $shipping = $this->createMock(ShippingProfileForCart::class);
+        $payment = $this->createMock(PaymentMethodForCart::class);
         $cart = $this->createMock(Cart::class);
         $cart->method('getLines')->willReturn([]);
-        $cart->method('getShipping')->willReturn($shipping);
-        $cart->method('getPayment')->willReturn($payment);
 
         $query = new FindCartPromoIncentives(new FindPromoSuggestionsForProduct(
             $repository,
             new ApplicableDiscountFactory([ServiceTestDiscount::class], new ApplicableConditionFactory([])),
         ));
 
-        $this->assertSame(['shipping', 'payment'], $query->get($cart, 'nl')->pluck('promoId')->all());
+        $this->assertSame([], $query->get($cart, 'nl')->pluck('promoId')->all());
+        $this->assertSame(['shipping', 'payment'], $query->get($cart, 'nl', [$shipping], [$payment])->pluck('promoId')->all());
+        $this->assertSame('Gratis verzending', $query->forShippingProfile($cart, $shipping, 'nl')->first()->cartDescription);
+        $this->assertSame('Betaalvoordeel', $query->forPaymentMethod($cart, $payment, 'nl')->first()->cartDescription);
 
         $appliedDiscount = $this->createMock(CartDiscount::class);
         $appliedDiscount->method('getData')->with('promo_id')->willReturn('shipping');
         $cartWithAppliedShipping = $this->createMock(Cart::class);
         $cartWithAppliedShipping->method('getLines')->willReturn([]);
-        $cartWithAppliedShipping->method('getShipping')->willReturn($shipping);
-        $cartWithAppliedShipping->method('getPayment')->willReturn($payment);
         $cartWithAppliedShipping->method('getAllDiscounts')->willReturn([$appliedDiscount]);
 
-        $this->assertSame(['payment'], $query->get($cartWithAppliedShipping, 'nl')->pluck('promoId')->all());
+        $this->assertSame(['payment'], $query->get($cartWithAppliedShipping, 'nl', [$shipping], [$payment])->pluck('promoId')->all());
+        $this->assertSame([], $query->forShippingProfile($cartWithAppliedShipping, $shipping, 'nl')->all());
+    }
+
+    public function test_service_incentives_require_visibility_and_eligible_preview_conditions(): void
+    {
+        $eligiblePromo = $this->promo('eligible', DiscountableType::shipping, [], 10);
+        $eligiblePromo->addData(['show_on_cart' => true, 'cart_description' => ['nl' => 'Verzendvoordeel']]);
+        $hiddenPromo = $this->promo('hidden', DiscountableType::shipping, [], 10);
+        $noDescriptionPromo = $this->promo('no-description', DiscountableType::shipping, [], 10);
+        $noDescriptionPromo->addData(['show_on_cart' => true]);
+        $conditionalDiscount = ServiceTestPromoDiscount::fromMappedData(
+            ['discount_id' => 'conditional-discount', 'discountable_type' => 'shipping', 'data' => '{"amount":10,"inclusive":false}'],
+            ['promo_id' => 'conditional', 'coupon_code' => null, 'data' => '[]'],
+            [Condition::class => [MinimumAmount::fromMappedData(['data' => '{"amount":"10000"}'], [])]],
+        );
+        $conditionalPromo = Promo::fromMappedData(
+            ['promo_id' => 'conditional', 'state' => 'online', 'is_system_promo' => false, 'coupon_code' => null, 'combines_with' => '[]', 'multiple_product_discounts_per_line' => false, 'data' => '{"show_on_cart":true}', 'start_at' => null, 'end_at' => null],
+            [PromoDiscount::class => [$conditionalDiscount]],
+        );
+        $repository = $this->createMock(PromoRepository::class);
+        $repository->method('getAvailablePromos')->willReturn([$eligiblePromo, $hiddenPromo, $noDescriptionPromo, $conditionalPromo]);
+        $shippingProfile = $this->createMock(ShippingProfileForCart::class);
+        $paymentMethod = $this->createMock(PaymentMethodForCart::class);
+        $cart = $this->createMock(Cart::class);
+        $cart->method('getSubtotalExcl')->willReturn(Money::EUR(1000));
+        $query = new FindCartPromoIncentives(new FindPromoSuggestionsForProduct(
+            $repository,
+            new ApplicableDiscountFactory([ServiceTestDiscount::class], new ApplicableConditionFactory([MinimumAmountCondition::class])),
+        ));
+
+        $this->assertSame(['eligible'], $query->forShippingProfile($cart, $shippingProfile, 'nl')->pluck('promoId')->all());
+        $this->assertSame([], $query->forPaymentMethod($cart, $paymentMethod, 'nl')->pluck('promoId')->all());
+    }
+
+    public function test_service_incentives_are_scoped_to_the_offered_choice(): void
+    {
+        $discount = ServiceTestPromoDiscount::fromMappedData(
+            ['discount_id' => 'choice-discount', 'discountable_type' => 'shipping', 'data' => '{"amount":10,"inclusive":false}'],
+            ['promo_id' => 'choice', 'coupon_code' => null, 'data' => '[]'],
+            [Condition::class => [ServiceChoiceRule::fromMappedData(['data' => '{}'], [])]],
+        );
+        $promo = Promo::fromMappedData(
+            ['promo_id' => 'choice', 'state' => 'online', 'is_system_promo' => false, 'coupon_code' => null, 'combines_with' => '[]', 'multiple_product_discounts_per_line' => false, 'data' => '{"show_on_cart":true,"cart_description":{"nl":"Kies levering voor voordeel"}}', 'start_at' => null, 'end_at' => null],
+            [PromoDiscount::class => [$discount]],
+        );
+        $repository = $this->createMock(PromoRepository::class);
+        $repository->method('getAvailablePromos')->willReturn([$promo]);
+        $cart = $this->createMock(Cart::class);
+        $pickup = $this->createMock(ShippingProfileForCart::class);
+        $pickup->method('getShippingProfileId')->willReturn('pickup');
+        $delivery = $this->createMock(ShippingProfileForCart::class);
+        $delivery->method('getShippingProfileId')->willReturn('delivery');
+        $query = new FindCartPromoIncentives(new FindPromoSuggestionsForProduct(
+            $repository,
+            new ApplicableDiscountFactory([ServiceTestDiscount::class], new ApplicableConditionFactory([ServiceChoicePreviewCondition::class])),
+        ));
+
+        $this->assertSame([], $query->forShippingProfile($cart, $pickup, 'nl')->pluck('promoId')->all());
+        $this->assertSame(['choice'], $query->forShippingProfile($cart, $delivery, 'nl')->pluck('promoId')->all());
     }
 
     public function test_no_candidates_skip_trial_but_still_refresh_services(): void
@@ -309,6 +373,39 @@ final class ServiceDiscountCombinationTest extends TestCase
             ['promo_id' => $id, 'state' => 'online', 'is_system_promo' => false, 'coupon_code' => null, 'combines_with' => json_encode($combinesWith), 'multiple_product_discounts_per_line' => false, 'data' => '[]', 'start_at' => null, 'end_at' => null],
             [PromoDiscount::class => [$discount]],
         );
+    }
+}
+
+final class ServiceChoiceRule extends BaseCondition implements Condition
+{
+    public static function getMapKey(): string
+    {
+        return 'service_choice_rule';
+    }
+}
+
+final class ServiceChoicePreviewCondition implements ApplicableCondition
+{
+    public static function getMapKey(): string
+    {
+        return ServiceChoiceRule::getMapKey();
+    }
+
+    public function check(Order $order, DiscountableItem $discountable): bool
+    {
+        return true;
+    }
+
+    public function evaluatePreview(?Cart $cart, PromoPreviewProduct|Cart|ShippingProfileForCart|PaymentMethodForCart $subject): PromoPreviewStatus
+    {
+        return $subject instanceof ShippingProfileForCart && $subject->getShippingProfileId() === 'delivery'
+            ? PromoPreviewStatus::Applicable
+            : PromoPreviewStatus::Irrelevant;
+    }
+
+    public static function fromMappedData(array $state, array $aggregateState): static
+    {
+        return new self;
     }
 }
 

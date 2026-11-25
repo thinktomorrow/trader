@@ -142,14 +142,14 @@ in step 5; do not infer preview eligibility from the eventual winning discount. 
 For custom promo previews, `PromoPreviewEligibility` and `StandardPromoPreviewEligibility` are removed. Inject
 `ApplicableDiscountFactory` alongside `PromoRepository` into `FindPromoSuggestionsForProduct`; the factory translates
 each domain discount with `forDiscount($promo, $discount)`. Custom `ApplicableCondition` implementations must add
-`evaluatePreview(?Cart $cart, PromoPreviewProduct|Cart|CartShipping|CartPayment $subject): PromoPreviewStatus` for
+`evaluatePreview(?Cart $cart, PromoPreviewProduct|Cart|ShippingProfileForCart|PaymentMethodForCart $subject): PromoPreviewStatus` for
 suggestions while retaining `check(Order $order, DiscountableItem $discountable): bool` for actual discount application.
 The subject prompted the suggestion and is not necessarily the target receiving the discount. A custom class
 implementing `ApplicableDiscount` directly must also implement `promoPreviewStatus($subject, ?Cart $cart)`;
 `BaseApplicableDiscount` provides the default. Override its `isPreviewRelevant()` for custom line discounts so they
 identify the products they concern; the default does not show every line discount on every product page. For custom
 shipping and payment discounts, register the matching domain and applicable discount classes before expecting cart
-incentives for selected services. Replace direct calls to `cartIncentivesForProduct()` with `cartIncentivesFor()`, and
+incentives for offered services. Replace direct calls to `cartIncentivesForProduct()` with `cartIncentivesFor()`, and
 pass the quantity to add when calling `PromoPreviewProduct::fromProductDetail($product, $quantity)`.
 
 ### Known consumer work (local project versions at analysis time)
@@ -197,14 +197,52 @@ from their discounted price, which may already include another promotion.
 Custom `CartLine` implementations must expose `getData(?string $key = null, $default = null): mixed`; the default
 cart-line implementation already provides this method.
 
-`FindCartPromoIncentives::get($cart, $locale)` returns one `show_on_cart` incentive per suitable promo, excluding
-promos already applied anywhere in the cart (including line, order, shipping and payment discounts). An entered
-coupon that did not win a discount may still be suggested. Cart incentives assess existing variant lines and selected
-shipping and payment; the latter require registered custom discount types if no built-in discount targets that service.
+`FindCartPromoIncentives::get($cart, $locale, $shippingProfiles = [], $paymentMethods = [])` returns one `show_on_cart`
+incentive per suitable promo, excluding promos already applied anywhere in the cart (including line, order, shipping
+and payment discounts). An entered coupon that did not win a discount may still be suggested. Cart incentives assess
+existing variant lines and the **offered** `ShippingProfileForCart` and `PaymentMethodForCart` options passed by the
+caller; they no longer read `$cart->getShipping()` or `$cart->getPayment()` as preview subjects. Shipping and payment
+suggestions require registered custom discount types if no built-in discount targets that service. To show a
+suggestion beneath one checkout choice, call `forShippingProfile($cart, $shippingProfile, $locale)` or
+`forPaymentMethod($cart, $paymentMethod, $locale)`. These service queries include only `Applicable` and
+`AlreadyEligible` suggestions with `show_on_cart = true` and a non-empty localized `cart_description`; they omit a
+promo once any of its discounts is applied in the cart. An `AlreadyEligible` status describes preview eligibility,
+**not** proof that a discount was actually applied. Use the cart's applied discounts for summary badges and totals.
+
+Update custom `ApplicableDiscount::promoPreviewStatus()` and `BaseApplicableDiscount::isPreviewRelevant()` overrides
+to accept `PromoPreviewProduct|Cart|ShippingProfileForCart|PaymentMethodForCart`. Update every custom
+`ApplicableCondition::evaluatePreview()` signature to the same subject union. Conditions that used the *selected*
+`$cart->getShipping()` or `$cart->getPayment()` to decide whether a choice qualifies should instead inspect the
+offered `$subject` (for example, `$subject instanceof ShippingProfileForCart && ! $subject->requiresAddress()` for a
+pickup choice). The cart argument still supplies customer, line and applied-discount context. A choice object does
+not carry a calculated shipping tariff or payment cost: when a preview depends on a positive price, supply that
+context in the application's choice preview rather than assuming an unselected choice has a `CartShipping` or
+`CartPayment` cost. Migrate project-specific preview overrides before upgrading, as old narrower PHP method
+signatures are incompatible with these new contracts. A promo with `show_on_cart = false` must be enabled in the
+project before expecting a shipping or payment incentive.
+
 `FindAppliedPromoBadgesForCartLine::get($line, $locale)` uses only actually applied line discounts and
 `show_on_cart_line`; use it for cart lines and checkout summary lines. In an application using Chief or another admin,
 add fields for these promo-data keys to the project's promo form and preserve existing promo data when saving. The
 existing cart description is not proof of an applied discount.
+
+### Hanolux checkout adoption
+
+Hanolux's `CheckoutShippingController` passes each available `ShippingProfileForCart` to
+`FindCartPromoIncentives::forShippingProfile($cart, $profile, $locale)` and renders the returned `cartDescription` beneath
+that choice. It only requests shipping incentives for profiles with a positive nominal tariff; a shipping discount
+cannot reduce an already free tariff. This is an incentive preview, not a discounted-price quote: the choice label
+continues to show the tariff before promo discounts, while the applied shipping discount is shown in the checkout
+summary after selection. The pickup line-discount message remains a product incentive on the pickup choice.
+
+Update Hanolux's `Shop/Discounts/Conditions/{CustomerHasAquaLuxPricelist,IncludedTaxa,ExcludedTaxa,PickupShipping}Condition.php`
+and `Shop/Discounts/{AquaLuxFreeShippingDiscount,PickupLineDiscount}.php` to accept the new preview subject union.
+The Aqua'Lux discount now recognizes offered shipping profiles; `PickupShippingCondition` checks the offered profile
+when it is the subject, while retaining cart-based evaluation for product previews. Aqua'Lux requires
+`show_on_cart = true`: new setup uses that default, and the project migration
+`2026_11_24_220402_enable_aqualux_shipping_incentive.php` enables it for existing rows once. Subsequent admin changes
+remain authoritative because the setup action preserves stored promo data. Keep the `show_on_cart` check in Trader's
+preview query; hiding a promo in Chief must also hide its shipping incentive.
 
 The default Laravel binding of `PromoRepository` is now `MemoizedMysqlPromoRepository`, backed by `PromoCache`.
 Available promo reads are shared for up to 60 minutes, with an earlier refresh at the next scheduled start or end.
