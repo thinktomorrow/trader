@@ -16,6 +16,7 @@ final readonly class PromoSuggestion
         public ?string $pdpDescription,
         public ?string $productBadgeText,
         public ?string $cartDescription,
+        public ?string $cartShippingLabelDescription = null,
     ) {}
 
     public static function fromPromo(Promo $promo, Discount $discount, string $locale): self
@@ -27,6 +28,7 @@ final readonly class PromoSuggestion
             self::localizedText($promo, 'pdp_description', $locale),
             self::localizedText($promo, 'product_badge_text', $locale),
             self::localizedText($promo, 'cart_description', $locale),
+            self::localizedText($promo, 'cart_shipping_label_description', $locale),
         );
     }
 

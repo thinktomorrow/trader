@@ -20,6 +20,8 @@ class MerchantOrderRepositoryTest extends TestCase
             $merchantOrder = $repository->findMerchantOrder($order->orderId);
 
             $this->assertInstanceOf(MerchantOrder::class, $merchantOrder);
+            $this->assertEquals($order->getShippingCostIncl(), $merchantOrder->getShippings()[0]->getTotalPriceIncl());
+            $this->assertEquals($order->getPaymentCostIncl(), $merchantOrder->getPayments()[0]->getTotalPriceIncl());
         }
     }
 

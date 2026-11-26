@@ -20,11 +20,23 @@ interface CartPayment
 
     public function getTotalPriceExcl(): Money;
 
+    public function getCostPriceIncl(): Money;
+
+    public function getDiscountPriceIncl(): Money;
+
+    public function getTotalPriceIncl(): Money;
+
     public function getFormattedCostPriceExcl(): string;
 
     public function getFormattedDiscountPriceExcl(): string;
 
     public function getFormattedTotalPriceExcl(): string;
+
+    public function getFormattedCostPriceIncl(): string;
+
+    public function getFormattedDiscountPriceIncl(): string;
+
+    public function getFormattedTotalPriceIncl(): string;
 
     /** @return CartDiscount[] */
     public function getDiscounts(): iterable;

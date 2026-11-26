@@ -61,7 +61,12 @@ final class ServiceDiscountCombinationTest extends TestCase
     public function test_cart_incentives_include_promos_for_offered_shipping_and_payment_before_selection(): void
     {
         $shippingPromo = $this->promo('shipping', DiscountableType::shipping, [], 10);
-        $shippingPromo->addData(['show_on_cart' => true, 'cart_description' => ['nl' => 'Gratis verzending']]);
+        $shippingPromo->addData([
+            'show_on_cart' => true,
+            'cart_description' => ['nl' => 'Gratis verzending in winkelmandje'],
+            'show_on_checkout_shipping_label' => true,
+            'cart_shipping_label_description' => ['nl' => 'Gratis verzending bij levering'],
+        ]);
         $paymentPromo = $this->promo('payment', DiscountableType::payment, [], 10);
         $paymentPromo->addData(['show_on_cart' => true, 'cart_description' => ['nl' => 'Betaalvoordeel']]);
         $orderPromo = $this->promo('order', DiscountableType::order, [], 10);
@@ -81,7 +86,8 @@ final class ServiceDiscountCombinationTest extends TestCase
 
         $this->assertSame([], $query->get($cart, 'nl')->pluck('promoId')->all());
         $this->assertSame(['shipping', 'payment'], $query->get($cart, 'nl', [$shipping], [$payment])->pluck('promoId')->all());
-        $this->assertSame('Gratis verzending', $query->forShippingProfile($cart, $shipping, 'nl')->first()->cartDescription);
+        $this->assertSame('Gratis verzending in winkelmandje', $query->get($cart, 'nl', [$shipping])->first()->cartDescription);
+        $this->assertSame('Gratis verzending bij levering', $query->forShippingProfile($cart, $shipping, 'nl')->first()->cartShippingLabelDescription);
         $this->assertSame('Betaalvoordeel', $query->forPaymentMethod($cart, $payment, 'nl')->first()->cartDescription);
 
         $appliedDiscount = $this->createMock(CartDiscount::class);
@@ -97,10 +103,10 @@ final class ServiceDiscountCombinationTest extends TestCase
     public function test_service_incentives_require_visibility_and_eligible_preview_conditions(): void
     {
         $eligiblePromo = $this->promo('eligible', DiscountableType::shipping, [], 10);
-        $eligiblePromo->addData(['show_on_cart' => true, 'cart_description' => ['nl' => 'Verzendvoordeel']]);
+        $eligiblePromo->addData(['show_on_checkout_shipping_label' => true, 'cart_shipping_label_description' => ['nl' => 'Verzendvoordeel']]);
         $hiddenPromo = $this->promo('hidden', DiscountableType::shipping, [], 10);
         $noDescriptionPromo = $this->promo('no-description', DiscountableType::shipping, [], 10);
-        $noDescriptionPromo->addData(['show_on_cart' => true]);
+        $noDescriptionPromo->addData(['show_on_checkout_shipping_label' => true]);
         $conditionalDiscount = ServiceTestPromoDiscount::fromMappedData(
             ['discount_id' => 'conditional-discount', 'discountable_type' => 'shipping', 'data' => '{"amount":10,"inclusive":false}'],
             ['promo_id' => 'conditional', 'coupon_code' => null, 'data' => '[]'],
@@ -125,6 +131,30 @@ final class ServiceDiscountCombinationTest extends TestCase
         $this->assertSame([], $query->forPaymentMethod($cart, $paymentMethod, 'nl')->pluck('promoId')->all());
     }
 
+    public function test_cart_and_checkout_shipping_label_have_independent_presentation_settings(): void
+    {
+        $cartPromo = $this->promo('cart', DiscountableType::shipping, [], 10);
+        $cartPromo->addData(['show_on_cart' => true, 'cart_description' => ['nl' => 'Voordeel in winkelmandje']]);
+        $labelPromo = $this->promo('label', DiscountableType::shipping, [], 10);
+        $labelPromo->addData([
+            'show_on_checkout_shipping_label' => true,
+            'cart_shipping_label_description' => ['nl' => 'Voordeel bij verzending'],
+        ]);
+
+        $repository = $this->createMock(PromoRepository::class);
+        $repository->method('getAvailablePromos')->willReturn([$cartPromo, $labelPromo]);
+        $shippingProfile = $this->createMock(ShippingProfileForCart::class);
+        $cart = $this->createMock(Cart::class);
+        $cart->method('getLines')->willReturn([]);
+        $query = new FindCartPromoIncentives(new FindPromoSuggestionsForProduct(
+            $repository,
+            new ApplicableDiscountFactory([ServiceTestDiscount::class], new ApplicableConditionFactory([])),
+        ));
+
+        $this->assertSame(['cart'], $query->get($cart, 'nl', [$shippingProfile])->pluck('promoId')->all());
+        $this->assertSame(['label'], $query->forShippingProfile($cart, $shippingProfile, 'nl')->pluck('promoId')->all());
+    }
+
     public function test_service_incentives_are_scoped_to_the_offered_choice(): void
     {
         $discount = ServiceTestPromoDiscount::fromMappedData(
@@ -133,7 +163,7 @@ final class ServiceDiscountCombinationTest extends TestCase
             [Condition::class => [ServiceChoiceRule::fromMappedData(['data' => '{}'], [])]],
         );
         $promo = Promo::fromMappedData(
-            ['promo_id' => 'choice', 'state' => 'online', 'is_system_promo' => false, 'coupon_code' => null, 'combines_with' => '[]', 'multiple_product_discounts_per_line' => false, 'data' => '{"show_on_cart":true,"cart_description":{"nl":"Kies levering voor voordeel"}}', 'start_at' => null, 'end_at' => null],
+            ['promo_id' => 'choice', 'state' => 'online', 'is_system_promo' => false, 'coupon_code' => null, 'combines_with' => '[]', 'multiple_product_discounts_per_line' => false, 'data' => '{"show_on_checkout_shipping_label":true,"cart_shipping_label_description":{"nl":"Kies levering voor voordeel"}}', 'start_at' => null, 'end_at' => null],
             [PromoDiscount::class => [$discount]],
         );
         $repository = $this->createMock(PromoRepository::class);

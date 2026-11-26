@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace Thinktomorrow\Trader\Application\Promo\Preview;
 
 use Illuminate\Support\Collection;
-use Thinktomorrow\Trader\Application\Cart\Read\Cart;
 use Thinktomorrow\Trader\Application\Cart\PaymentMethod\PaymentMethodForCart;
+use Thinktomorrow\Trader\Application\Cart\Read\Cart;
 use Thinktomorrow\Trader\Application\Cart\ShippingProfile\ShippingProfileForCart;
 use Thinktomorrow\Trader\Application\Product\ProductDetail\ProductDetail;
 use Thinktomorrow\Trader\Application\Promo\ApplicableDiscounts\ApplicableDiscountFactory;
@@ -59,13 +59,27 @@ final class FindPromoSuggestionsForProduct
             ->values();
     }
 
+    /** @return Collection<int, PromoSuggestion> */
+    public function shippingLabelIncentivesFor(ShippingProfileForCart $subject, string $locale, Cart $cart): Collection
+    {
+        return $this->candidates($subject, $locale, $cart)
+            ->filter(fn (array $candidate): bool => (bool) $candidate['promo']->getData('show_on_checkout_shipping_label', false)
+                && in_array($candidate['status'], [PromoPreviewStatus::Applicable, PromoPreviewStatus::AlreadyEligible], true))
+            ->pluck('suggestion')
+            ->filter(fn (PromoSuggestion $suggestion): bool => $suggestion->cartShippingLabelDescription !== null)
+            ->unique(fn (PromoSuggestion $suggestion): string => $suggestion->promoId)
+            ->values();
+    }
+
     /** @return Collection<int, array{promo: Promo, status: PromoPreviewStatus, suggestion: PromoSuggestion}> */
     private function candidates(PromoPreviewProduct|Cart|ShippingProfileForCart|PaymentMethodForCart $subject, string $locale, ?Cart $cart): Collection
     {
         $candidates = collect();
 
         foreach ($this->promoRepository->getAvailablePromos() as $promo) {
-            if (! $promo->getData('show_on_pdp', false) && ! $promo->getData('show_on_cart', false)) {
+            if (! $promo->getData('show_on_pdp', false)
+                && ! $promo->getData('show_on_cart', false)
+                && ! $promo->getData('show_on_checkout_shipping_label', false)) {
                 continue;
             }
 

@@ -14,8 +14,8 @@ final class FindCartPromoIncentives
     public function __construct(private FindPromoSuggestionsForProduct $suggestions) {}
 
     /**
-     * @param iterable<ShippingProfileForCart> $shippingProfiles
-     * @param iterable<PaymentMethodForCart> $paymentMethods
+     * @param  iterable<ShippingProfileForCart>  $shippingProfiles
+     * @param  iterable<PaymentMethodForCart>  $paymentMethods
      * @return Collection<int, PromoSuggestion>
      */
     public function get(Cart $cart, string $locale, iterable $shippingProfiles = [], iterable $paymentMethods = []): Collection
@@ -50,7 +50,7 @@ final class FindCartPromoIncentives
     /** @return Collection<int, PromoSuggestion> */
     public function forShippingProfile(Cart $cart, ShippingProfileForCart $shippingProfile, string $locale): Collection
     {
-        return $this->withoutAppliedPromos($this->suggestions->serviceIncentivesFor($shippingProfile, $locale, $cart), $cart);
+        return $this->withoutAppliedPromos($this->suggestions->shippingLabelIncentivesFor($shippingProfile, $locale, $cart), $cart);
     }
 
     /** @return Collection<int, PromoSuggestion> */
@@ -60,7 +60,7 @@ final class FindCartPromoIncentives
     }
 
     /**
-     * @param Collection<int, PromoSuggestion> $incentives
+     * @param  Collection<int, PromoSuggestion>  $incentives
      * @return Collection<int, PromoSuggestion>
      */
     private function withoutAppliedPromos(Collection $incentives, Cart $cart): Collection

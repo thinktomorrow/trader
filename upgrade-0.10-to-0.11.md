@@ -202,11 +202,12 @@ incentive per suitable promo, excluding promos already applied anywhere in the c
 and payment discounts). An entered coupon that did not win a discount may still be suggested. Cart incentives assess
 existing variant lines and the **offered** `ShippingProfileForCart` and `PaymentMethodForCart` options passed by the
 caller; they no longer read `$cart->getShipping()` or `$cart->getPayment()` as preview subjects. Shipping and payment
-suggestions require registered custom discount types if no built-in discount targets that service. To show a
-suggestion beneath one checkout choice, call `forShippingProfile($cart, $shippingProfile, $locale)` or
-`forPaymentMethod($cart, $paymentMethod, $locale)`. These service queries include only `Applicable` and
-`AlreadyEligible` suggestions with `show_on_cart = true` and a non-empty localized `cart_description`; they omit a
-promo once any of its discounts is applied in the cart. An `AlreadyEligible` status describes preview eligibility,
+suggestions require registered custom discount types if no built-in discount targets that service.
+`forShippingProfile($cart, $shippingProfile, $locale)` is for a checkout shipping label: it requires
+`show_on_checkout_shipping_label = true` and a non-empty localized `cart_shipping_label_description`.
+`forPaymentMethod($cart, $paymentMethod, $locale)` continues to return cart incentives for payment choices.
+These service queries include only `Applicable` and `AlreadyEligible` suggestions and omit a promo once any of its
+discounts is applied in the cart. An `AlreadyEligible` status describes preview eligibility,
 **not** proof that a discount was actually applied. Use the cart's applied discounts for summary badges and totals.
 
 Update custom `ApplicableDiscount::promoPreviewStatus()` and `BaseApplicableDiscount::isPreviewRelevant()` overrides
@@ -219,7 +220,7 @@ not carry a calculated shipping tariff or payment cost: when a preview depends o
 context in the application's choice preview rather than assuming an unselected choice has a `CartShipping` or
 `CartPayment` cost. Migrate project-specific preview overrides before upgrading, as old narrower PHP method
 signatures are incompatible with these new contracts. A promo with `show_on_cart = false` must be enabled in the
-project before expecting a shipping or payment incentive.
+project before expecting a cart incentive. Enable `show_on_checkout_shipping_label` separately for checkout labels.
 
 `FindAppliedPromoBadgesForCartLine::get($line, $locale)` uses only actually applied line discounts and
 `show_on_cart_line`; use it for cart lines and checkout summary lines. In an application using Chief or another admin,
@@ -229,7 +230,8 @@ existing cart description is not proof of an applied discount.
 ### Hanolux checkout adoption
 
 Hanolux's `CheckoutShippingController` passes each available `ShippingProfileForCart` to
-`FindCartPromoIncentives::forShippingProfile($cart, $profile, $locale)` and renders the returned `cartDescription` beneath
+`FindCartPromoIncentives::forShippingProfile($cart, $profile, $locale)` and renders the returned
+`cartShippingLabelDescription` beneath
 that choice. It only requests shipping incentives for profiles with a positive nominal tariff; a shipping discount
 cannot reduce an already free tariff. This is an incentive preview, not a discounted-price quote: the choice label
 continues to show the tariff before promo discounts, while the applied shipping discount is shown in the checkout
@@ -238,11 +240,14 @@ summary after selection. The pickup line-discount message remains a product ince
 Update Hanolux's `Shop/Discounts/Conditions/{CustomerHasAquaLuxPricelist,IncludedTaxa,ExcludedTaxa,PickupShipping}Condition.php`
 and `Shop/Discounts/{AquaLuxFreeShippingDiscount,PickupLineDiscount}.php` to accept the new preview subject union.
 The Aqua'Lux discount now recognizes offered shipping profiles; `PickupShippingCondition` checks the offered profile
-when it is the subject, while retaining cart-based evaluation for product previews. Aqua'Lux requires
-`show_on_cart = true`: new setup uses that default, and the project migration
-`2026_11_24_220402_enable_aqualux_shipping_incentive.php` enables it for existing rows once. Subsequent admin changes
-remain authoritative because the setup action preserves stored promo data. Keep the `show_on_cart` check in Trader's
-preview query; hiding a promo in Chief must also hide its shipping incentive.
+when it is the subject, while retaining cart-based evaluation for product previews. Aqua'Lux uses `show_on_cart`
+with `cart_description` for cart messages, and `show_on_checkout_shipping_label` with
+`cart_shipping_label_description` for checkout shipping labels. The project migration
+`2026_11_24_220402_enable_aqualux_shipping_incentive.php` enables cart visibility for existing rows once; the later
+`2026_11_26_084732_backfill_aqualux_checkout_shipping_label.php` adds checkout label fields to existing promos
+without overwriting admin-edited copy or visibility. Subsequent admin changes remain authoritative because the setup
+action preserves stored promo data. On cart pages without an address, Hanolux previews shipping choices for
+`primary_vat_country`; checkout eligibility still uses the actual shipping country.
 
 The default Laravel binding of `PromoRepository` is now `MemoizedMysqlPromoRepository`, backed by `PromoCache`.
 Available promo reads are shared for up to 60 minutes, with an earlier refresh at the next scheduled start or end.
@@ -252,6 +257,22 @@ by the available-promo listing. Any project-specific Eloquent/DB updates to `tra
 discount conditions bypass repository invalidation: migrate them to `PromoApplication`, or inject `PromoCache` and
 call `clear()` **after commit**. In particular, audit promo admin forms, imports, migrations and setup commands.
 No new promo table columns are required for the presentation keys.
+
+### Service prices including VAT
+
+`CartShipping`, `CartPayment`, `MerchantOrderShipping` and `MerchantOrderPayment` now expose
+`getCostPriceIncl()`, `getDiscountPriceIncl()`, `getTotalPriceIncl()` and their `getFormatted*Incl()` counterparts.
+Use `getCostPriceIncl()` for the original service charge, `getDiscountPriceIncl()` for its applied discount and
+`getTotalPriceIncl()` for the charge after discount. The existing `*Excl()` methods are unchanged.
+
+These inclusive amounts are computed while composing the read model, using the order's product VAT mix. An inclusive
+merchant-entered tariff keeps its entered gross amount; exclusive tariffs gain VAT according to the order's products.
+Service discounts are allocated separately before being subtracted, matching the order's pricing snapshot. Custom
+`CartShipping`, `CartPayment`, `MerchantOrderShipping` and `MerchantOrderPayment` implementations must implement the
+new getters. Custom repositories composing the default read models must supply allocated `cost_incl`, `discount_incl`
+and `total_incl` values for both shipping and payment; persisted exclusive service rows may have null values in those
+columns and cannot be used directly. Rendering a strikethrough shipping price can now use
+`$cart->getShipping()->getFormattedCostPriceIncl()` instead of reloading the order to recalculate it.
 
 ## 6. Verify before release
 

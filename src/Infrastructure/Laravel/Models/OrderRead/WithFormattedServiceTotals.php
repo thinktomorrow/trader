@@ -27,4 +27,19 @@ trait WithFormattedServiceTotals
             $this->getLocale()
         );
     }
+
+    public function getFormattedCostPriceIncl(): string
+    {
+        return $this->renderMoney($this->getCostPriceIncl(), $this->getLocale());
+    }
+
+    public function getFormattedDiscountPriceIncl(): string
+    {
+        return $this->renderMoney($this->getDiscountPriceIncl(), $this->getLocale());
+    }
+
+    public function getFormattedTotalPriceIncl(): string
+    {
+        return $this->renderMoney($this->getTotalPriceIncl(), $this->getLocale());
+    }
 }

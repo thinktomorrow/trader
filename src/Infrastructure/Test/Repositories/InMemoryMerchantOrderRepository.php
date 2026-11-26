@@ -14,6 +14,8 @@ use Thinktomorrow\Trader\Application\Order\MerchantOrder\MerchantOrderRepository
 use Thinktomorrow\Trader\Application\Order\MerchantOrder\MerchantOrderShipping;
 use Thinktomorrow\Trader\Application\Order\MerchantOrder\MerchantOrderShippingAddress;
 use Thinktomorrow\Trader\Application\Order\MerchantOrder\MerchantOrderShopper;
+use Thinktomorrow\Trader\Application\VatRate\Allocator\VatAllocator;
+use Thinktomorrow\Trader\Application\VatRate\CalculateServicePricesIncludingVat;
 use Thinktomorrow\Trader\Domain\Model\Order\AppliedDiscount\Discount;
 use Thinktomorrow\Trader\Domain\Model\Order\Exceptions\CouldNotFindOrder;
 use Thinktomorrow\Trader\Domain\Model\Order\Line\Line;
@@ -49,6 +51,7 @@ class InMemoryMerchantOrderRepository implements InMemoryRepository, MerchantOrd
         $orderState = array_merge($order->getMappedData(), [
             'order_state' => $order->getOrderState(),
         ]);
+        $servicePricesIncludingVat = new CalculateServicePricesIncludingVat((new TestContainer)->get(VatAllocator::class));
 
         $lines = array_map(fn (Line $line) => DefaultMerchantOrderLine::fromMappedData(
             array_merge($line->getMappedData(), []),
@@ -71,25 +74,39 @@ class InMemoryMerchantOrderRepository implements InMemoryRepository, MerchantOrd
             $orderState
         ) : null;
 
-        $shippings = array_map(fn ($shipping) => DefaultMerchantOrderShipping::fromMappedData(
-            array_merge($shipping->getMappedData(), [
-                'shipping_state' => $shipping->getShippingState(),
-            ]),
-            $orderState,
-            array_map(fn (Discount $discount) => DefaultMerchantOrderDiscount::fromMappedData(array_merge($discount->getMappedData(), [
-                'percentage' => $discount->getPercentage($shipping->getShippingCost()->getExcludingVat()),
-            ]), $orderState), $shipping->getDiscounts())// TODO: cart shipping discounts
-        ), $order->getShippings());
+        $shippings = array_map(function ($shipping) use ($order, $orderState, $servicePricesIncludingVat) {
+            $prices = $servicePricesIncludingVat->forOrder($order, $shipping->getShippingCost(), $shipping->getDiscountPrice());
 
-        $payments = array_map(fn ($payment) => DefaultMerchantOrderPayment::fromMappedData(
-            array_merge($payment->getMappedData(), [
-                'payment_state' => $payment->getPaymentState(),
-            ]),
-            $orderState,
-            array_map(fn (Discount $discount) => DefaultMerchantOrderDiscount::fromMappedData(array_merge($discount->getMappedData(), [
-                'percentage' => $discount->getPercentage($payment->getPaymentCost()->getExcludingVat()),
-            ]), $orderState), $payment->getDiscounts())// TODO: cart payment discounts
-        ), $order->getPayments());
+            return DefaultMerchantOrderShipping::fromMappedData(
+                array_merge($shipping->getMappedData(), [
+                    'shipping_state' => $shipping->getShippingState(),
+                    'cost_incl' => $prices['cost']->getAmount(),
+                    'discount_incl' => $prices['discount']->getAmount(),
+                    'total_incl' => $prices['total']->getAmount(),
+                ]),
+                $orderState,
+                array_map(fn (Discount $discount) => DefaultMerchantOrderDiscount::fromMappedData(array_merge($discount->getMappedData(), [
+                    'percentage' => $discount->getPercentage($shipping->getShippingCost()->getExcludingVat()),
+                ]), $orderState), $shipping->getDiscounts())// TODO: cart shipping discounts
+            );
+        }, $order->getShippings());
+
+        $payments = array_map(function ($payment) use ($order, $orderState, $servicePricesIncludingVat) {
+            $prices = $servicePricesIncludingVat->forOrder($order, $payment->getPaymentCost(), $payment->getDiscountPrice());
+
+            return DefaultMerchantOrderPayment::fromMappedData(
+                array_merge($payment->getMappedData(), [
+                    'payment_state' => $payment->getPaymentState(),
+                    'cost_incl' => $prices['cost']->getAmount(),
+                    'discount_incl' => $prices['discount']->getAmount(),
+                    'total_incl' => $prices['total']->getAmount(),
+                ]),
+                $orderState,
+                array_map(fn (Discount $discount) => DefaultMerchantOrderDiscount::fromMappedData(array_merge($discount->getMappedData(), [
+                    'percentage' => $discount->getPercentage($payment->getPaymentCost()->getExcludingVat()),
+                ]), $orderState), $payment->getDiscounts())// TODO: cart payment discounts
+            );
+        }, $order->getPayments());
 
         $shopper = $order->getShopper() ? DefaultMerchantOrderShopper::fromMappedData(
             $order->getShopper()->getMappedData(),

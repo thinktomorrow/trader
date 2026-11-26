@@ -4,6 +4,13 @@ Important changes will be notified in this file
 
 ## 0.11.0 (Unreleased)
 
+- Changed: checkout shipping labels use independent `show_on_checkout_shipping_label` and localized
+  `cart_shipping_label_description` promo fields; `cart_description` and `show_on_cart` control cart incentives.
+  Update callers of `FindCartPromoIncentives::forShippingProfile()` and existing promo data; see the
+  [promo preview upgrade instructions](upgrade-0.10-to-0.11.md#5-set-up-promo-previews-and-cache-invalidation).
+- Added: cart and merchant-order shipping/payment read models expose VAT-inclusive cost, discount and total prices,
+  including formatted variants. Inclusive service inputs remain authoritative; exclusive inputs follow the order's
+  product VAT mix. See the [service pricing upgrade instructions](upgrade-0.10-to-0.11.md#service-prices-including-vat).
 - Changed: shipping and payment promo previews now use offered `ShippingProfileForCart` and `PaymentMethodForCart`
   choices instead of selected `CartShipping` and `CartPayment`. `FindCartPromoIncentives::get()` accepts offered choices;
   `forShippingProfile()` and `forPaymentMethod()` return per-choice incentives only for `Applicable` or `AlreadyEligible`

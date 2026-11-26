@@ -123,6 +123,12 @@ final class VatAllocator
         );
     }
 
+    /** Allocate one persisted service price using its authoritative amount and resolved taxable base. */
+    public function allocateServicePrice(Order $order, HasAuthoritativeAmount&Price $price): VatAllocatedTotalPrice
+    {
+        return $this->allocateAuthoritativePrice($this->collectItemBasesPerVatRate($order), $price);
+    }
+
     /**
      * Preserve each line's own VAT and rounding, then group those definitive values by VAT rate.
      * Recalculating VAT from a grouped taxable base could produce a different rounded result.

@@ -31,6 +31,8 @@ final class CartRepositoryTest extends TestCase
                 Cash::from($order->getTotalIncl())->toLocalizedFormat(Locale::fromString('nl', 'BE')),
                 $cart->getFormattedTotalIncl()
             );
+            $this->assertEquals($order->getShippingCostIncl(), $cart->getShipping()->getTotalPriceIncl());
+            $this->assertEquals($order->getPaymentCostIncl(), $cart->getPayment()->getTotalPriceIncl());
         }
     }
 
