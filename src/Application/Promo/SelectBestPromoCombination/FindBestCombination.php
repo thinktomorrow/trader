@@ -12,8 +12,8 @@ use Thinktomorrow\Trader\Application\Promo\ApplicableDiscounts\SalePriceProductD
 use Thinktomorrow\Trader\Domain\Model\Order\AppliedDiscount\AppliedDiscountId;
 use Thinktomorrow\Trader\Domain\Model\Order\Line\Line;
 use Thinktomorrow\Trader\Domain\Model\Order\Order;
-use Thinktomorrow\Trader\Domain\Model\Promo\Promo;
 use Thinktomorrow\Trader\Domain\Model\Promo\Discounts\DiscountableType;
+use Thinktomorrow\Trader\Domain\Model\Promo\Promo;
 
 /** Searches compatible subsets and compares their definitive totals, including VAT. */
 final class FindBestCombination

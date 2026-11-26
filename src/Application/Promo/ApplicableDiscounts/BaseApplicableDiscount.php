@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace Thinktomorrow\Trader\Application\Promo\ApplicableDiscounts;
 
 use Assert\Assertion;
-use Thinktomorrow\Trader\Application\Cart\Read\Cart;
 use Thinktomorrow\Trader\Application\Cart\PaymentMethod\PaymentMethodForCart;
+use Thinktomorrow\Trader\Application\Cart\Read\Cart;
 use Thinktomorrow\Trader\Application\Cart\ShippingProfile\ShippingProfileForCart;
 use Thinktomorrow\Trader\Application\Promo\ApplicableConditions\ApplicableCondition;
 use Thinktomorrow\Trader\Application\Promo\Preview\PromoPreviewProduct;

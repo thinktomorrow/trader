@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace Thinktomorrow\Trader\Application\Promo\ApplicableConditions;
 
-use Thinktomorrow\Trader\Application\Cart\Read\Cart;
 use Thinktomorrow\Trader\Application\Cart\PaymentMethod\PaymentMethodForCart;
+use Thinktomorrow\Trader\Application\Cart\Read\Cart;
 use Thinktomorrow\Trader\Application\Cart\ShippingProfile\ShippingProfileForCart;
 use Thinktomorrow\Trader\Application\Promo\Preview\PromoPreviewProduct;
 use Thinktomorrow\Trader\Application\Promo\Preview\PromoPreviewStatus;
