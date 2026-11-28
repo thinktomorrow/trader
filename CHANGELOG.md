@@ -2,7 +2,9 @@
 
 Important changes will be notified in this file
 
-## 0.11.0 (Unreleased)
+## Unreleased
+
+## 2026-11-28 - 0.11.0
 
 - Changed: checkout shipping labels use independent `show_on_checkout_shipping_label` and localized
   `cart_shipping_label_description` promo fields; `cart_description` and `show_on_cart` control cart incentives.
@@ -12,10 +14,13 @@ Important changes will be notified in this file
   including formatted variants. Inclusive service inputs remain authoritative; exclusive inputs follow the order's
   product VAT mix. See the [service pricing upgrade instructions](upgrade-0.10-to-0.11.md#service-prices-including-vat).
 - Changed: shipping and payment promo previews now use offered `ShippingProfileForCart` and `PaymentMethodForCart`
-  choices instead of selected `CartShipping` and `CartPayment`. `FindCartPromoIncentives::get()` accepts offered choices;
-  `forShippingProfile()` and `forPaymentMethod()` return per-choice incentives only for `Applicable` or `AlreadyEligible`
+  choices instead of selected `CartShipping` and `CartPayment`. `FindCartPromoIncentives::get()` accepts offered
+  choices;
+  `forShippingProfile()` and `forPaymentMethod()` return per-choice incentives only for `Applicable` or
+  `AlreadyEligible`
   promos with `show_on_cart` and a localized `cart_description`, excluding promos already applied in the cart. Custom
-  preview signatures and callers must be updated; see the [promo preview upgrade instructions](upgrade-0.10-to-0.11.md#5-set-up-promo-previews-and-cache-invalidation).
+  preview signatures and callers must be updated; see
+  the [promo preview upgrade instructions](upgrade-0.10-to-0.11.md#5-set-up-promo-previews-and-cache-invalidation).
 - Added: product promo preview with `Applicable`, `Conditional`, `AlreadyEligible` and `Irrelevant` outcomes, two
   Collections for the product page, opt-in presentation fields, cart incentives and applied cart-line badges. Active
   automatic and coupon promos can both participate; applicable discounts determine preview relevance and conditions
@@ -61,7 +66,8 @@ Important changes will be notified in this file
   [custom integration upgrade instructions](upgrade-0.10-to-0.11.md#4-migrate-custom-discount-integrations).
 - Removed: legacy `OrderPromoRepository`, order/line discount application classes and order discount model namespace.
   Custom factories and implementations must migrate to `ApplicableDiscounts` / `ApplicableConditions` and
-  `Domain\Model\Order\AppliedDiscount`; see the [custom integration guide](upgrade-0.10-to-0.11.md#4-migrate-custom-discount-integrations).
+  `Domain\Model\Order\AppliedDiscount`; see
+  the [custom integration guide](upgrade-0.10-to-0.11.md#4-migrate-custom-discount-integrations).
 
 ## 2026-10-22 - 0.10.3
 
